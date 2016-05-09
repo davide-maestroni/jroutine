@@ -168,16 +168,24 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @StreamTransform(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            long maxDelay, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @NotNull Backoff backoff);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            @Nullable UnitDuration maxDelay);
+    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @Nullable UnitDuration delay);
 
     /**
      * {@inheritDoc}

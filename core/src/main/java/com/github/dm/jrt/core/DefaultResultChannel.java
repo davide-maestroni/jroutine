@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -96,9 +97,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final Object mMutex = new Object();
 
-    private final int mOutputLimit;
+    private final Backoff mOutputBackoff;
 
-    private final UnitDuration mOutputMaxDelay;
+    private final int mOutputLimit;
 
     private final NestedQueue<Object> mOutputQueue;
 
@@ -155,7 +156,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mExecutionTimeout = configuration.getReadTimeoutOrElse(zero());
         mTimeoutActionType = configuration.getReadTimeoutActionOrElse(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
-        mOutputMaxDelay = configuration.getOutputMaxDelayOrElse(zero());
+        mOutputBackoff = configuration.getOutputBackoffOrElse(Backoff.zeroDelay());
         mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
         mOutputQueue = new NestedQueue<Object>() {
 
@@ -859,8 +860,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void waitOutputs() {
 
         try {
-            final UnitDuration delay = mOutputMaxDelay;
-            if (!delay.waitTrue(mMutex, mHasOutputs)) {
+            final long delay = mOutputBackoff.getDelay(mOutputCount - mOutputLimit);
+            if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasOutputs)) {
                 mLogger.dbg("timeout while waiting for room in the output channel [%s]", delay);
             }
 

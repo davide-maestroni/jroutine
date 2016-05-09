@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoff.constantDelay;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
@@ -49,7 +51,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
  * order to avoid excessive memory consumption. In case the maximum number is reached when passing
  * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
- * <li>The maximum delay to be applied to the calling thread when the buffered data exceed the
+ * <li>The backoff policy to be applied to the calling thread when the buffered data exceed the
  * channel core limit.</li>
  * <li>The maximum number of input data buffered in the channel.When the number of data exceeds it,
  * a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.</li>
@@ -74,9 +76,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
     private static final ChannelConfiguration sDefaultConfiguration =
             builder().buildConfiguration();
 
-    private final int mChannelLimit;
+    private final Backoff mChannelBackoff;
 
-    private final UnitDuration mChannelMaxDelay;
+    private final int mChannelLimit;
 
     private final int mChannelMaxSize;
 
@@ -102,7 +104,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param channelOrderType the order in which data are collected from the output channel.
      * @param channelLimit     the maximum number of buffered data before applying a delay to the
      *                         feeding thread. Must not be negative.
-     * @param channelMaxDelay  the maximum delay to apply while waiting for an object to be passed
+     * @param channelBackoff   the backoff policy to apply while waiting for an object to be passed
      *                         to the channel.
      * @param channelMaxSize   the maximum number of buffered data. Must be positive.
      * @param log              the log instance.
@@ -111,17 +113,17 @@ public final class ChannelConfiguration extends DeepEqualObject {
     private ChannelConfiguration(@Nullable final Runner runner,
             @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelLimit,
-            @Nullable final UnitDuration channelMaxDelay, final int channelMaxSize,
+            @Nullable final Backoff channelBackoff, final int channelMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
         super(asArgs(runner, readTimeout, actionType, channelOrderType, channelLimit,
-                channelMaxDelay, channelMaxSize, log, logLevel));
+                channelBackoff, channelMaxSize, log, logLevel));
         mRunner = runner;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
         mChannelLimit = channelLimit;
-        mChannelMaxDelay = channelMaxDelay;
+        mChannelBackoff = channelBackoff;
         mChannelMaxSize = channelMaxSize;
         mLog = log;
         mLogLevel = logLevel;
@@ -171,7 +173,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOrElse(null))
                       .withChannelLimit(initialConfiguration.getInputLimitOrElse(
                               ChannelConfiguration.DEFAULT))
-                      .withChannelMaxDelay(initialConfiguration.getInputMaxDelayOrElse(null))
+                      .withChannelBackoff(initialConfiguration.getInputBackoffOrElse(null))
                       .withChannelMaxSize(initialConfiguration.getInputMaxSizeOrElse(
                               ChannelConfiguration.DEFAULT));
     }
@@ -215,7 +217,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOrElse(null))
                       .withChannelLimit(initialConfiguration.getOutputLimitOrElse(
                               ChannelConfiguration.DEFAULT))
-                      .withChannelMaxDelay(initialConfiguration.getOutputMaxDelayOrElse(null))
+                      .withChannelBackoff(initialConfiguration.getOutputBackoffOrElse(null))
                       .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOrElse(
                               ChannelConfiguration.DEFAULT));
     }
@@ -243,6 +245,19 @@ public final class ChannelConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Returns the backoff policy to apply while waiting for an object to be passed to the channel
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the delay.
+     */
+    public Backoff getChannelBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
+
+        final Backoff channelBackoff = mChannelBackoff;
+        return (channelBackoff != null) ? channelBackoff : valueIfNotSet;
+    }
+
+    /**
      * Returns the limit of buffered data (DEFAULT by default) before starting to apply a delay to
      * the feeding thread.
      *
@@ -253,19 +268,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         final int limit = mChannelLimit;
         return (limit != DEFAULT) ? limit : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum delay to apply while waiting for an object to be passed to the channel
-     * (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the delay.
-     */
-    public UnitDuration getChannelMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
-
-        final UnitDuration maxDelay = mChannelMaxDelay;
-        return (maxDelay != null) ? maxDelay : valueIfNotSet;
     }
 
     /**
@@ -367,7 +369,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withInputOrder(getChannelOrderTypeOrElse(null))
                                           .withInputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withInputMaxDelay(getChannelMaxDelayOrElse(null))
+                                          .withInputBackoff(getChannelBackoffOrElse(null))
                                           .withInputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .apply();
@@ -403,7 +405,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withOutputOrder(getChannelOrderTypeOrElse(null))
                                           .withOutputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withOutputMaxDelay(getChannelMaxDelayOrElse(null))
+                                          .withOutputBackoff(getChannelBackoffOrElse(null))
                                           .withOutputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .apply();
@@ -435,9 +437,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private int mChannelLimit;
+        private Backoff mChannelBackoff;
 
-        private UnitDuration mChannelMaxDelay;
+        private int mChannelLimit;
 
         private int mChannelMaxSize;
 
@@ -530,9 +532,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
                 withChannelLimit(limit);
             }
 
-            final UnitDuration channelTimeout = configuration.mChannelMaxDelay;
-            if (channelTimeout != null) {
-                withChannelMaxDelay(channelTimeout);
+            final Backoff channelBackoff = configuration.mChannelBackoff;
+            if (channelBackoff != null) {
+                withChannelBackoff(channelBackoff);
             }
 
             final int maxSize = configuration.mChannelMaxSize;
@@ -551,6 +553,58 @@ public final class ChannelConfiguration extends DeepEqualObject {
             }
 
             return this;
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the channel limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the timeout time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelBackoff(final long delay,
+                @NotNull final TimeUnit timeUnit) {
+
+            return withChannelBackoff(constantDelay(delay, timeUnit));
+        }
+
+        /**
+         * Sets the backoff policy to apply while waiting for the channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the channel limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param backoff the backoff policy.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelBackoff(@Nullable final Backoff backoff) {
+
+            mChannelBackoff = backoff;
+            return this;
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the channel limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelBackoff(@Nullable final UnitDuration delay) {
+
+            return withChannelBackoff((delay != null) ? constantDelay(delay) : null);
         }
 
         /**
@@ -575,42 +629,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
             }
 
             mChannelLimit = limit;
-            return this;
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
-         * room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the channel limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay    the delay.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelMaxDelay(final long delay,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withChannelMaxDelay(fromUnit(delay, timeUnit));
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
-         * room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the channel limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay the delay.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelMaxDelay(@Nullable final UnitDuration delay) {
-
-            mChannelMaxDelay = delay;
             return this;
         }
 
@@ -749,7 +767,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         private ChannelConfiguration buildConfiguration() {
 
             return new ChannelConfiguration(mRunner, mReadTimeout, mTimeoutActionType,
-                    mChannelOrderType, mChannelLimit, mChannelMaxDelay, mChannelMaxSize, mLog,
+                    mChannelOrderType, mChannelLimit, mChannelBackoff, mChannelMaxSize, mLog,
                     mLogLevel);
         }
 
@@ -760,7 +778,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
             mChannelLimit = configuration.mChannelLimit;
-            mChannelMaxDelay = configuration.mChannelMaxDelay;
+            mChannelBackoff = configuration.mChannelBackoff;
             mChannelMaxSize = configuration.mChannelMaxSize;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;

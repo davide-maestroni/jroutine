@@ -201,13 +201,13 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .apply();
-        assertThat(configuration).isNotEqualTo(builder().withInputMaxDelay(zero()).apply());
+        assertThat(configuration).isNotEqualTo(builder().withInputBackoff(zero()).apply());
         assertThat(configuration).isNotEqualTo(
-                builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
+                builder().withInputBackoff(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom()
-                                .withInputMaxDelay(UnitDuration.millis(1))
+                                .withInputBackoff(UnitDuration.millis(1))
                                 .apply()).isNotEqualTo(
-                builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
+                builder().withInputBackoff(1, TimeUnit.MILLISECONDS).apply());
     }
 
     @Test
@@ -216,7 +216,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withInputMaxDelay(1, null);
+            builder().withInputBackoff(1, null);
 
             fail();
 
@@ -226,7 +226,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withInputMaxDelay(-1, TimeUnit.MILLISECONDS);
+            builder().withInputBackoff(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -368,13 +368,13 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .apply();
-        assertThat(configuration).isNotEqualTo(builder().withOutputMaxDelay(zero()).apply());
+        assertThat(configuration).isNotEqualTo(builder().withOutputBackoff(zero()).apply());
         assertThat(configuration).isNotEqualTo(
-                builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
+                builder().withOutputBackoff(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom()
-                                .withOutputMaxDelay(UnitDuration.millis(1))
+                                .withOutputBackoff(UnitDuration.millis(1))
                                 .apply()).isNotEqualTo(
-                builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
+                builder().withOutputBackoff(1, TimeUnit.MILLISECONDS).apply());
     }
 
     @Test
@@ -383,7 +383,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withOutputMaxDelay(1, null);
+            builder().withOutputBackoff(1, null);
 
             fail();
 
@@ -393,7 +393,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            builder().withOutputMaxDelay(-1, TimeUnit.MILLISECONDS);
+            builder().withOutputBackoff(-1, TimeUnit.MILLISECONDS);
 
             fail();
 

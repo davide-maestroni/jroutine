@@ -31,14 +31,14 @@ import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputLimit;
-import com.github.dm.jrt.object.annotation.InputMaxDelay;
+import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.MaxInstances;
+import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputLimit;
-import com.github.dm.jrt.object.annotation.OutputMaxDelay;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.Priority;
@@ -518,15 +518,15 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withInputLimit(").append(inputLimitAnnotation.value()).append(")");
         }
 
-        final InputMaxDelay inputMaxDelayAnnotation =
-                methodElement.getAnnotation(InputMaxDelay.class);
-        if (inputMaxDelayAnnotation != null) {
-            builder.append(".withInputMaxDelay(")
-                   .append(inputMaxDelayAnnotation.value())
+        final InputBackoff inputBackoffAnnotation =
+                methodElement.getAnnotation(InputBackoff.class);
+        if (inputBackoffAnnotation != null) {
+            builder.append(".withInputBackoff(")
+                   .append(inputBackoffAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(inputMaxDelayAnnotation.unit())
+                   .append(inputBackoffAnnotation.unit())
                    .append(")");
         }
 
@@ -563,15 +563,15 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withOutputLimit(").append(outputLimitAnnotation.value()).append(")");
         }
 
-        final OutputMaxDelay outputMaxDelayAnnotation =
-                methodElement.getAnnotation(OutputMaxDelay.class);
-        if (outputMaxDelayAnnotation != null) {
-            builder.append(".withOutputMaxDelay(")
-                   .append(outputMaxDelayAnnotation.value())
+        final OutputBackoff outputBackoffAnnotation =
+                methodElement.getAnnotation(OutputBackoff.class);
+        if (outputBackoffAnnotation != null) {
+            builder.append(".withOutputBackoff(")
+                   .append(outputBackoffAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(outputMaxDelayAnnotation.unit())
+                   .append(outputBackoffAnnotation.unit())
                    .append(")");
         }
 

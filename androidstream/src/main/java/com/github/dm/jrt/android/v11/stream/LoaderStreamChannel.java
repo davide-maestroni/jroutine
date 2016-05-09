@@ -168,16 +168,24 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(CONFIG)
-    LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            long maxDelay, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @NotNull Backoff backoff);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(CONFIG)
-    LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            @Nullable UnitDuration maxDelay);
+    LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit, long delay,
+            @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @Nullable UnitDuration delay);
 
     /**
      * {@inheritDoc}

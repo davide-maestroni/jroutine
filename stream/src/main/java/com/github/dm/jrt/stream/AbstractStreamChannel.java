@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerOperation;
 import static com.github.dm.jrt.function.Functions.functionCall;
@@ -245,19 +244,32 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
-            final long maxDelay, @NotNull final TimeUnit timeUnit) {
+    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+            @NotNull final Backoff backoff) {
 
-        return backPressureOn(runner, maxInputs, fromUnit(maxDelay, timeUnit));
+        return invocationConfiguration().withRunner(runner)
+                                        .withInputLimit(limit)
+                                        .withInputBackoff(backoff)
+                                        .apply();
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
-            @Nullable final UnitDuration maxDelay) {
+    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+            final long delay, @NotNull final TimeUnit timeUnit) {
 
         return invocationConfiguration().withRunner(runner)
-                                        .withInputLimit(maxInputs)
-                                        .withInputMaxDelay(maxDelay)
+                                        .withInputLimit(limit)
+                                        .withInputBackoff(delay, timeUnit)
+                                        .apply();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+            @Nullable final UnitDuration delay) {
+
+        return invocationConfiguration().withRunner(runner)
+                                        .withInputLimit(limit)
+                                        .withInputBackoff(delay)
                                         .apply();
     }
 

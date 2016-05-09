@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -66,9 +67,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private final Condition mHasInputs;
 
-    private final int mInputLimit;
+    private final Backoff mInputBackoff;
 
-    private final UnitDuration mInputMaxDelay;
+    private final int mInputLimit;
 
     private final NestedQueue<IN> mInputQueue;
 
@@ -116,7 +117,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         mRunner = runner;
         mInputOrder = configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY);
         mInputLimit = configuration.getInputLimitOrElse(Integer.MAX_VALUE);
-        mInputMaxDelay = configuration.getInputMaxDelayOrElse(zero());
+        mInputBackoff = configuration.getInputBackoffOrElse(Backoff.zeroDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputQueue = new NestedQueue<IN>() {
 
@@ -403,15 +404,15 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private void waitInputs() {
 
-        final UnitDuration delay = mInputMaxDelay;
-        if (!delay.isZero() && mRunner.isExecutionThread()) {
+        final long delay = mInputBackoff.getDelay(mInputCount - mInputLimit);
+        if ((delay > 0) && mRunner.isExecutionThread()) {
             throw new InputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
                             + "\nTry employing a different runner than: " + mRunner);
         }
 
         try {
-            if (!delay.waitTrue(mMutex, mHasInputs)) {
+            if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasInputs)) {
                 mLogger.dbg("timeout while waiting for room in the input channel [%s]", delay);
             }
 

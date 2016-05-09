@@ -17,9 +17,12 @@
 package com.github.dm.jrt.core.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Backoff utility class.
@@ -32,9 +35,19 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 05/09/2016.
  */
-public abstract class Backoff {
+public abstract class Backoff extends DeepEqualObject {
 
     private static final ConstantBackoff sZeroBackoff = new ConstantBackoff(0);
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected Backoff(@Nullable final Object[] args) {
+
+        super(args);
+    }
 
     /**
      * Returns a constant backoff.
@@ -49,7 +62,8 @@ public abstract class Backoff {
     @NotNull
     public static Backoff constantDelay(final long value, @NotNull final TimeUnit unit) {
 
-        return new ConstantBackoff(unit.toMillis(value));
+        final long delayMillis = unit.toMillis(value);
+        return constantDelay(delayMillis);
     }
 
     /**
@@ -63,7 +77,8 @@ public abstract class Backoff {
     @NotNull
     public static Backoff constantDelay(@NotNull final UnitDuration delay) {
 
-        return new ConstantBackoff(delay.toMillis());
+        final long delayMillis = delay.toMillis();
+        return constantDelay(delayMillis);
     }
 
     /**
@@ -177,6 +192,12 @@ public abstract class Backoff {
         return sZeroBackoff;
     }
 
+    @NotNull
+    private static Backoff constantDelay(final long delayMillis) {
+
+        return (delayMillis == 0) ? zeroDelay() : new ConstantBackoff(delayMillis);
+    }
+
     /**
      * Caps this backoff policy to the specified maximum delay.
      *
@@ -241,6 +262,7 @@ public abstract class Backoff {
          */
         private ConstantBackoff(final long delayMillis) {
 
+            super(asArgs(delayMillis));
             mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
         }
 
@@ -268,6 +290,7 @@ public abstract class Backoff {
          */
         private CappedBackoff(@NotNull final Backoff wrapped, final long delayMillis) {
 
+            super(asArgs(wrapped, delayMillis));
             mBackoff = wrapped;
             mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
         }
@@ -297,6 +320,7 @@ public abstract class Backoff {
          */
         private DecorrelatedJitterBackoff(final long delayMillis) {
 
+            super(asArgs(delayMillis));
             mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
             mLast = delayMillis;
         }
@@ -325,6 +349,7 @@ public abstract class Backoff {
          */
         private ExponentialBackoff(final long delayMillis) {
 
+            super(asArgs(delayMillis));
             mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
         }
 
@@ -355,6 +380,7 @@ public abstract class Backoff {
          */
         private JitterBackoff(@NotNull final Backoff wrapped, final float percentage) {
 
+            super(asArgs(wrapped, percentage));
             if ((percentage < 0) || (percentage > 1)) {
                 throw new IllegalArgumentException(
                         "the jitter percentage must be between 0 and 1, but is: " + percentage);
@@ -387,6 +413,7 @@ public abstract class Backoff {
          */
         private LinearBackoff(final long delayMillis) {
 
+            super(asArgs(delayMillis));
             mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
         }
 

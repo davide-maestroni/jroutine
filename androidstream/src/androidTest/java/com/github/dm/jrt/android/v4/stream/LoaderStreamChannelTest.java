@@ -47,6 +47,7 @@ import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -319,7 +320,90 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
                                       .thenGet(range(1, 1000))
+                                      .backPressureOn(handlerRunner, 2,
+                                              Backoff.linearDelay(seconds(10)))
+                                      .map(Functions.<Number>identity())
+                                      .with(loaderFrom(activity))
+                                      .map(new Function<Number, Double>() {
+
+                                          public Double apply(final Number number) {
+
+                                              final double value = number.doubleValue();
+                                              return Math.sqrt(value);
+                                          }
+                                      })
+                                      .sync()
+                                      .map(new Function<Double, SumData>() {
+
+                                          public SumData apply(final Double aDouble) {
+
+                                              return new SumData(aDouble, 1);
+                                          }
+                                      })
+                                      .reduce(new BiFunction<SumData, SumData, SumData>() {
+
+                                          public SumData apply(final SumData data1,
+                                                  final SumData data2) {
+
+                                              return new SumData(data1.sum + data2.sum,
+                                                      data1.count + data2.count);
+                                          }
+                                      })
+                                      .map(new Function<SumData, Double>() {
+
+                                          public Double apply(final SumData data) {
+
+                                              return data.sum / data.count;
+                                          }
+                                      })
+                                      .runOnShared()
+                                      .afterMax(seconds(10))
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .async()
+                                      .thenGet(range(1, 1000))
                                       .backPressureOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
+                                      .map(Functions.<Number>identity())
+                                      .with(loaderFrom(activity))
+                                      .map(new Function<Number, Double>() {
+
+                                          public Double apply(final Number number) {
+
+                                              final double value = number.doubleValue();
+                                              return Math.sqrt(value);
+                                          }
+                                      })
+                                      .sync()
+                                      .map(new Function<Double, SumData>() {
+
+                                          public SumData apply(final Double aDouble) {
+
+                                              return new SumData(aDouble, 1);
+                                          }
+                                      })
+                                      .reduce(new BiFunction<SumData, SumData, SumData>() {
+
+                                          public SumData apply(final SumData data1,
+                                                  final SumData data2) {
+
+                                              return new SumData(data1.sum + data2.sum,
+                                                      data1.count + data2.count);
+                                          }
+                                      })
+                                      .map(new Function<SumData, Double>() {
+
+                                          public Double apply(final SumData data) {
+
+                                              return data.sum / data.count;
+                                          }
+                                      })
+                                      .runOnShared()
+                                      .afterMax(seconds(10))
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .async()
+                                      .thenGet(range(1, 1000))
+                                      .backPressureOn(handlerRunner, 2, seconds(10))
                                       .map(Functions.<Number>identity())
                                       .with(loaderFrom(activity))
                                       .map(new Function<Number, Double>() {

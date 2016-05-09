@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoff.constantDelay;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
@@ -59,8 +61,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
  * order to avoid excessive memory consumption. In case the maximum number is reached when passing
  * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
- * <li>The maximum delay to be applied to the calling thread when the buffered input data exceed the
- * channel core limit.</li>
+ * <li>The backoff policy to be applied to the calling thread when the buffered input data exceed
+ * the channel core limit.</li>
  * <li>The maximum number of input data buffered in the channel. When the number of data exceeds it,
  * a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.</li>
  * <li>The order in which data are dispatched through the output channel. The order of input data is
@@ -71,7 +73,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * order to avoid excessive memory consumption. In case the maximum number is reached when passing
  * an output, the call will block until enough data are consumed or the specified delay elapses.
  * </li>
- * <li>The maximum delay to be applied to the calling thread when the buffered output data exceed
+ * <li>The backoff policy to be applied to the calling thread when the buffered output data exceed
  * the channel core limit.</li>
  * <li>The maximum number of output data buffered in the channel. When the number of data exceeds
  * it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.
@@ -99,9 +101,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final int mCoreInstances;
 
-    private final int mInputLimit;
+    private final Backoff mInputBackoff;
 
-    private final UnitDuration mInputMaxDelay;
+    private final int mInputLimit;
 
     private final int mInputMaxSize;
 
@@ -113,9 +115,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final int mMaxInstances;
 
-    private final int mOutputLimit;
+    private final Backoff mOutputBackoff;
 
-    private final UnitDuration mOutputMaxDelay;
+    private final int mOutputLimit;
 
     private final int mOutputMaxSize;
 
@@ -143,14 +145,14 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param inputOrderType  the order in which input data are collected from the input channel.
      * @param inputLimit      the maximum number of buffered input data before applying a delay to
      *                        the feeding thread. Must not be negative.
-     * @param inputMaxDelay   the maximum delay to apply while waiting for an input to be passed to
+     * @param inputBackoff    the backoff policy to apply while waiting for an input to be passed to
      *                        the input channel.
      * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
      * @param outputOrderType the order in which output data are collected from the result channel.
      * @param outputLimit     the maximum number of buffered output data before applying a delay to
      *                        the feeding thread. Must not be negative.
-     * @param outputMaxDelay  the maximum delay to apply while waiting for an output to be passed to
-     *                        the result channel.
+     * @param outputBackoff   the backoff policy to apply while waiting for an output to be passed
+     *                        to the result channel.
      * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
      * @param log             the log instance.
      * @param logLevel        the log level.
@@ -159,14 +161,14 @@ public final class InvocationConfiguration extends DeepEqualObject {
             final int maxInstances, final int coreInstances,
             @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType inputOrderType, final int inputLimit,
-            @Nullable final UnitDuration inputMaxDelay, final int inputMaxSize,
+            @Nullable final Backoff inputBackoff, final int inputMaxSize,
             @Nullable final OrderType outputOrderType, final int outputLimit,
-            @Nullable final UnitDuration outputMaxDelay, final int outputMaxSize,
-            @Nullable final Log log, @Nullable final Level logLevel) {
+            @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
+            @Nullable final Level logLevel) {
 
         super(asArgs(runner, priority, maxInstances, coreInstances, readTimeout, actionType,
-                inputOrderType, inputLimit, inputMaxDelay, inputMaxSize, outputOrderType,
-                outputLimit, outputMaxDelay, outputMaxSize, log, logLevel));
+                inputOrderType, inputLimit, inputBackoff, inputMaxSize, outputOrderType,
+                outputLimit, outputBackoff, outputMaxSize, log, logLevel));
         mRunner = runner;
         mPriority = priority;
         mMaxInstances = maxInstances;
@@ -175,11 +177,11 @@ public final class InvocationConfiguration extends DeepEqualObject {
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
         mInputLimit = inputLimit;
-        mInputMaxDelay = inputMaxDelay;
+        mInputBackoff = inputBackoff;
         mInputMaxSize = inputMaxSize;
         mOutputOrderType = outputOrderType;
         mOutputLimit = outputLimit;
-        mOutputMaxDelay = outputMaxDelay;
+        mOutputBackoff = outputBackoff;
         mOutputMaxSize = outputMaxSize;
         mLog = log;
         mLogLevel = logLevel;
@@ -245,6 +247,19 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Returns the backoff policy to apply while waiting for an input to be processed (null by
+     * default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the backoff policy.
+     */
+    public Backoff getInputBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
+
+        final Backoff inputBackoff = mInputBackoff;
+        return (inputBackoff != null) ? inputBackoff : valueIfNotSet;
+    }
+
+    /**
      * Returns the limit of buffered input data (DEFAULT by default) before starting to apply a
      * delay to the feeding thread.
      *
@@ -255,19 +270,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         final int inputLimit = mInputLimit;
         return (inputLimit != DEFAULT) ? inputLimit : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum delay to apply while waiting for an input to be processed (null by
-     * default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the delay.
-     */
-    public UnitDuration getInputMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
-
-        final UnitDuration inputMaxDelay = mInputMaxDelay;
-        return (inputMaxDelay != null) ? inputMaxDelay : valueIfNotSet;
     }
 
     /**
@@ -331,6 +333,19 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Returns the backoff policy to apply while waiting for an output to be read from the output
+     * channel (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the delay.
+     */
+    public Backoff getOutputBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
+
+        final Backoff outputBackoff = mOutputBackoff;
+        return (outputBackoff != null) ? outputBackoff : valueIfNotSet;
+    }
+
+    /**
      * Returns the limit of buffered output data (DEFAULT by default) before starting to apply a
      * delay to the feeding thread.
      *
@@ -341,19 +356,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         final int outputLimit = mOutputLimit;
         return (outputLimit != DEFAULT) ? outputLimit : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum delay to apply while waiting for an output to be read from the output
-     * channel (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the delay.
-     */
-    public UnitDuration getOutputMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
-
-        final UnitDuration outputMaxDelay = mOutputMaxDelay;
-        return (outputMaxDelay != null) ? outputMaxDelay : valueIfNotSet;
     }
 
     /**
@@ -589,9 +591,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private int mCoreInstances;
 
-        private int mInputLimit;
+        private Backoff mInputBackoff;
 
-        private UnitDuration mInputMaxDelay;
+        private int mInputLimit;
 
         private int mInputMaxSize;
 
@@ -603,9 +605,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private int mMaxInstances;
 
-        private int mOutputLimit;
+        private Backoff mOutputBackoff;
 
-        private UnitDuration mOutputMaxDelay;
+        private int mOutputLimit;
 
         private int mOutputMaxSize;
 
@@ -704,6 +706,60 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
+         * Sets the backoff policy to apply while waiting for the input channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the input limit, or it might
+         * have no effect on the invocation execution.
+         *
+         * @param backoff the backoff policy.
+         * @return this builder.
+         * @see #withInputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withInputBackoff(@Nullable final Backoff backoff) {
+
+            mInputBackoff = backoff;
+            return this;
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the input channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the input limit, or it might
+         * have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the delay time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         * @see #withInputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withInputBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
+
+            return withInputBackoff(constantDelay(delay, timeUnit));
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the input channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the input limit, or it might
+         * have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         * @see #withInputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withInputBackoff(@Nullable final UnitDuration delay) {
+
+            return withInputBackoff((delay != null) ? constantDelay(delay) : null);
+        }
+
+        /**
          * Sets the limit of data that the input channel can retain before starting to slow down the
          * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
          * up to the specific implementation to choose a default one.
@@ -725,43 +781,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
             }
 
             mInputLimit = inputLimit;
-            return this;
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
-         * have room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the input limit, or it might
-         * have no effect on the invocation execution.
-         *
-         * @param delay    the delay.
-         * @param timeUnit the delay time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-         * @see #withInputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withInputMaxDelay(final long delay, @NotNull final TimeUnit timeUnit) {
-
-            return withInputMaxDelay(fromUnit(delay, timeUnit));
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
-         * have room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the input limit, or it might
-         * have no effect on the invocation execution.
-         *
-         * @param delay the delay.
-         * @return this builder.
-         * @see #withInputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withInputMaxDelay(@Nullable final UnitDuration delay) {
-
-            mInputMaxDelay = delay;
             return this;
         }
 
@@ -855,6 +874,60 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
+         * Sets the backoff policy to apply while waiting for the result channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the output limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param backoff the backoff policy.
+         * @return this builder.
+         * @see #withOutputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withOutputBackoff(@Nullable final Backoff backoff) {
+
+            mOutputBackoff = backoff;
+            return this;
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the result channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the output limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the delay time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         * @see #withOutputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withOutputBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
+
+            return withOutputBackoff(constantDelay(delay, timeUnit));
+        }
+
+        /**
+         * Sets the constant delay to apply while waiting for the result channel to have room for
+         * additional data.
+         * <p>
+         * This configuration option should be used on conjunction with the output limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         * @see #withOutputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withOutputBackoff(@Nullable final UnitDuration delay) {
+
+            return withOutputBackoff((delay != null) ? constantDelay(delay) : null);
+        }
+
+        /**
          * Sets the limit of data that the output channel can retain before starting to slow down
          * the feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it
          * is up to the specific implementation to choose a default one.
@@ -876,44 +949,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
             }
 
             mOutputLimit = outputLimit;
-            return this;
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
-         * have room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the output limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay    the delay.
-         * @param timeUnit the delay time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-         * @see #withOutputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withOutputMaxDelay(final long delay,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withOutputMaxDelay(fromUnit(delay, timeUnit));
-        }
-
-        /**
-         * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
-         * have room for additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the output limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay the delay.
-         * @return this builder.
-         * @see #withOutputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withOutputMaxDelay(@Nullable final UnitDuration delay) {
-
-            mOutputMaxDelay = delay;
             return this;
         }
 
@@ -1084,9 +1119,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withInputLimit(inputLimit);
             }
 
-            final UnitDuration inputMaxDelay = configuration.mInputMaxDelay;
-            if (inputMaxDelay != null) {
-                withInputMaxDelay(inputMaxDelay);
+            final Backoff inputBackoff = configuration.mInputBackoff;
+            if (inputBackoff != null) {
+                withInputBackoff(inputBackoff);
             }
 
             final int inputSize = configuration.mInputMaxSize;
@@ -1104,9 +1139,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withOutputLimit(outputLimit);
             }
 
-            final UnitDuration outputTimeout = configuration.mOutputMaxDelay;
-            if (outputTimeout != null) {
-                withOutputMaxDelay(outputTimeout);
+            final Backoff outputBackoff = configuration.mOutputBackoff;
+            if (outputBackoff != null) {
+                withOutputBackoff(outputBackoff);
             }
 
             final int outputSize = configuration.mOutputMaxSize;
@@ -1132,8 +1167,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
-                    mReadTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputMaxDelay,
-                    mInputMaxSize, mOutputOrderType, mOutputLimit, mOutputMaxDelay, mOutputMaxSize,
+                    mReadTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputBackoff,
+                    mInputMaxSize, mOutputOrderType, mOutputLimit, mOutputBackoff, mOutputMaxSize,
                     mLog, mLogLevel);
         }
 
@@ -1147,11 +1182,11 @@ public final class InvocationConfiguration extends DeepEqualObject {
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;
             mInputLimit = configuration.mInputLimit;
-            mInputMaxDelay = configuration.mInputMaxDelay;
+            mInputBackoff = configuration.mInputBackoff;
             mInputMaxSize = configuration.mInputMaxSize;
             mOutputOrderType = configuration.mOutputOrderType;
             mOutputLimit = configuration.mOutputLimit;
-            mOutputMaxDelay = configuration.mOutputMaxDelay;
+            mOutputBackoff = configuration.mOutputBackoff;
             mOutputMaxSize = configuration.mOutputMaxSize;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;

@@ -98,7 +98,7 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .withLogLevel(Level.SILENT)
-                                                            .withChannelMaxDelay(
+                                                            .withChannelBackoff(
                                                                     UnitDuration.seconds(1))
                                                             .withReadTimeout(
                                                                     UnitDuration.seconds(10))
@@ -146,11 +146,11 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .apply();
-        assertThat(configuration).isNotEqualTo(builder().withChannelMaxDelay(zero()).apply());
+        assertThat(configuration).isNotEqualTo(builder().withChannelBackoff(zero()).apply());
         assertThat(configuration).isNotEqualTo(
-                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).apply());
-        assertThat(configuration.builderFrom().withChannelMaxDelay(millis(1)).apply()).isNotEqualTo(
-                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).apply());
+                builder().withChannelBackoff(1, TimeUnit.MILLISECONDS).apply());
+        assertThat(configuration.builderFrom().withChannelBackoff(millis(1)).apply()).isNotEqualTo(
+                builder().withChannelBackoff(1, TimeUnit.MILLISECONDS).apply());
     }
 
     @Test
@@ -159,7 +159,7 @@ public class ChannelConfigurationTest {
 
         try {
 
-            builder().withChannelMaxDelay(1, null);
+            builder().withChannelBackoff(1, null);
 
             fail();
 
@@ -169,7 +169,7 @@ public class ChannelConfigurationTest {
 
         try {
 
-            builder().withChannelMaxDelay(-1, TimeUnit.MILLISECONDS);
+            builder().withChannelBackoff(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -234,12 +234,12 @@ public class ChannelConfigurationTest {
                        .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
                        .withInputLimit(10)
-                       .withInputMaxDelay(millis(33))
+                       .withInputBackoff(millis(33))
                        .withInputMaxSize(100)
                        .apply();
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
-                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelBackoff(millis(33))
                                                             .withChannelMaxSize(100)
                                                             .withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
@@ -265,7 +265,7 @@ public class ChannelConfigurationTest {
                        .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
                        .withInputLimit(10)
-                       .withInputMaxDelay(millis(33))
+                       .withInputBackoff(millis(33))
                        .withInputMaxSize(100)
                        .apply();
         final ChannelConfiguration configuration = builder().withRunner(Runners.syncRunner())
@@ -291,12 +291,12 @@ public class ChannelConfigurationTest {
                        .withLogLevel(Level.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)
                        .withOutputLimit(10)
-                       .withOutputMaxDelay(millis(33))
+                       .withOutputBackoff(millis(33))
                        .withOutputMaxSize(100)
                        .apply();
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
-                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelBackoff(millis(33))
                                                             .withChannelMaxSize(100)
                                                             .withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
@@ -388,7 +388,7 @@ public class ChannelConfigurationTest {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
-                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelBackoff(millis(33))
                                                             .withChannelMaxSize(100)
                                                             .withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
@@ -407,7 +407,7 @@ public class ChannelConfigurationTest {
                        .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
                        .withInputLimit(10)
-                       .withInputMaxDelay(millis(33))
+                       .withInputBackoff(millis(33))
                        .withInputMaxSize(100)
                        .apply();
         assertThat(configuration.toInputChannelConfiguration()).isEqualTo(invocationConfiguration);
@@ -418,7 +418,7 @@ public class ChannelConfigurationTest {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
-                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelBackoff(millis(33))
                                                             .withChannelMaxSize(100)
                                                             .withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
@@ -444,7 +444,7 @@ public class ChannelConfigurationTest {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
-                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelBackoff(millis(33))
                                                             .withChannelMaxSize(100)
                                                             .withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
@@ -463,7 +463,7 @@ public class ChannelConfigurationTest {
                        .withLogLevel(Level.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)
                        .withOutputLimit(10)
-                       .withOutputMaxDelay(millis(33))
+                       .withOutputBackoff(millis(33))
                        .withOutputMaxSize(100)
                        .apply();
         assertThat(configuration.toOutputChannelConfiguration()).isEqualTo(invocationConfiguration);

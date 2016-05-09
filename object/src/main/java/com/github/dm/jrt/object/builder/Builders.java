@@ -34,14 +34,14 @@ import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputLimit;
-import com.github.dm.jrt.object.annotation.InputMaxDelay;
+import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.MaxInstances;
+import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputLimit;
-import com.github.dm.jrt.object.annotation.OutputMaxDelay;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.Priority;
@@ -586,14 +586,14 @@ public class Builders {
      * @param annotations   the annotations.
      * @return the modified configuration.
      * @see com.github.dm.jrt.object.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.object.annotation.InputBackoff InputBackoff
      * @see com.github.dm.jrt.object.annotation.InputLimit InputLimit
-     * @see com.github.dm.jrt.object.annotation.InputMaxDelay InputMaxDelay
      * @see com.github.dm.jrt.object.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.object.annotation.InputOrder InputOrder
      * @see com.github.dm.jrt.object.annotation.LogLevel LogLevel
      * @see com.github.dm.jrt.object.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.object.annotation.OutputBackoff OutputBackoff
      * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
-     * @see com.github.dm.jrt.object.annotation.OutputMaxDelay OutputMaxDelay
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.object.annotation.Priority Priority
@@ -619,9 +619,9 @@ public class Builders {
             } else if (annotationType == InputLimit.class) {
                 builder.withInputLimit(((InputLimit) annotation).value());
 
-            } else if (annotationType == InputMaxDelay.class) {
-                final InputMaxDelay delayAnnotation = (InputMaxDelay) annotation;
-                builder.withInputMaxDelay(delayAnnotation.value(), delayAnnotation.unit());
+            } else if (annotationType == InputBackoff.class) {
+                final InputBackoff backoffAnnotation = (InputBackoff) annotation;
+                builder.withInputBackoff(backoffAnnotation.value(), backoffAnnotation.unit());
 
             } else if (annotationType == InputMaxSize.class) {
                 builder.withInputMaxSize(((InputMaxSize) annotation).value());
@@ -638,9 +638,9 @@ public class Builders {
             } else if (annotationType == OutputLimit.class) {
                 builder.withOutputLimit(((OutputLimit) annotation).value());
 
-            } else if (annotationType == OutputMaxDelay.class) {
-                final OutputMaxDelay delayAnnotation = (OutputMaxDelay) annotation;
-                builder.withOutputMaxDelay(delayAnnotation.value(), delayAnnotation.unit());
+            } else if (annotationType == OutputBackoff.class) {
+                final OutputBackoff backoffAnnotation = (OutputBackoff) annotation;
+                builder.withOutputBackoff(backoffAnnotation.value(), backoffAnnotation.unit());
 
             } else if (annotationType == OutputMaxSize.class) {
                 builder.withOutputMaxSize(((OutputMaxSize) annotation).value());
@@ -671,14 +671,14 @@ public class Builders {
      * @param method        the target method.
      * @return the modified configuration.
      * @see com.github.dm.jrt.object.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.object.annotation.InputBackoff InputBackoff
      * @see com.github.dm.jrt.object.annotation.InputLimit InputLimit
-     * @see com.github.dm.jrt.object.annotation.InputMaxDelay InputMaxDelay
      * @see com.github.dm.jrt.object.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.object.annotation.InputOrder InputOrder
      * @see com.github.dm.jrt.object.annotation.LogLevel LogLevel
      * @see com.github.dm.jrt.object.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.object.annotation.OutputBackoff OutputBackoff
      * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
-     * @see com.github.dm.jrt.object.annotation.OutputMaxDelay OutputMaxDelay
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.object.annotation.Priority Priority

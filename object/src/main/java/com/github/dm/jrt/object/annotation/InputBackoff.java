@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Through this annotation it is possible to indicate the delay to apply to the feeding thread,
- * while waiting for an output channel to have room for additional data.
+ * Through this annotation it is possible to indicate the constant delay to apply while waiting for
+ * an input channel to have room for additional data.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.OutputMaxDelay *;
+ *              &#64;com.github.dm.jrt.object.annotation.InputBackoff *;
  *         }
  *     </code>
  * </pre>
@@ -57,10 +57,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OutputMaxDelay {
+public @interface InputBackoff {
 
     /**
-     * The time unit of the delay to apply while waiting for an output channel to have room for
+     * The time unit of the delay to apply while waiting for an input channel to have room for
      * additional data.
      *
      * @return the time unit.
@@ -68,7 +68,7 @@ public @interface OutputMaxDelay {
     TimeUnit unit() default TimeUnit.MILLISECONDS;
 
     /**
-     * The delay to apply while waiting for an output channel to have room for additional data.
+     * The delay to apply while waiting for an input channel to have room for additional data.
      *
      * @return the delay.
      */

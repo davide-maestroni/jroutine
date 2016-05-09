@@ -170,7 +170,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay, timeUnit).apply()}.
+     * .withInputBackoff(backoff).apply()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
@@ -178,21 +178,42 @@ public interface StreamChannel<IN, OUT>
      * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
      * exceptions.
      *
-     * @param runner    the configured runner.
-     * @param maxInputs the maximum number of buffered inputs before starting to slow down the
-     *                  feeding thread.
-     * @param maxDelay  the maximum constantDelay to apply to the feeding thread.
-     * @param timeUnit  the constantDelay time unit.
+     * @param runner  the configured runner.
+     * @param limit   the maximum number of buffered inputs before starting to slow down the
+     *                feeding thread.
+     * @param backoff the backoff policy to apply to the feeding thread.
      * @return the configured stream.
      */
     @NotNull
     @StreamTransform(CONFIG)
-    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs, long maxDelay,
+    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @NotNull Backoff backoff);
+
+    /**
+     * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputBackoff(delay, timeUnit).apply()}.
+     * <br>
+     * This method is useful to easily apply a configuration which will slow down the thread
+     * feeding the next routine concatenated to the stream, when the number of buffered inputs
+     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
+     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
+     * exceptions.
+     *
+     * @param runner   the configured runner.
+     * @param limit    the maximum number of buffered inputs before starting to slow down the
+     *                 feeding thread.
+     * @param delay    the constant delay to apply to the feeding thread.
+     * @param timeUnit the delay time unit.
+     * @return the configured stream.
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit, long delay,
             @NotNull TimeUnit timeUnit);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay).apply()}.
+     * .withInputBackoff(delay).apply()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -200,16 +221,16 @@ public interface StreamChannel<IN, OUT>
      * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
      * exceptions.
      *
-     * @param runner    the configured runner.
-     * @param maxInputs the maximum number of buffered inputs before starting to slow down the
-     *                  feeding thread.
-     * @param maxDelay  the maximum constantDelay to apply to the feeding thread.
+     * @param runner the configured runner.
+     * @param limit  the maximum number of buffered inputs before starting to slow down the
+     *               feeding thread.
+     * @param delay  the constant delay to apply to the feeding thread.
      * @return the configured stream.
      */
     @NotNull
     @StreamTransform(CONFIG)
-    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            @Nullable UnitDuration maxDelay);
+    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+            @Nullable UnitDuration delay);
 
     /**
      * Concatenates a stream based on the specified accumulating consumer to this one.

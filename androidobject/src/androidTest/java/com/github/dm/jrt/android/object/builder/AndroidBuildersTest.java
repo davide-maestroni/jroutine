@@ -53,6 +53,20 @@ public class AndroidBuildersTest extends AndroidTestCase {
                          .apply());
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new AndroidBuilders();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public interface AnnotationItf {
 
         @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)

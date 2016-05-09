@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executors;
@@ -40,6 +42,7 @@ public class Runners {
      */
     protected Runners() {
 
+        ConstantConditions.avoid();
     }
 
     /**

@@ -70,6 +70,20 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineAndroid();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testIOChannel() {
 
         assertThat(JRoutineAndroid.io().of("test").next()).isEqualTo("test");

@@ -86,6 +86,7 @@ public class JRoutineLoaderObject {
      */
     protected JRoutineLoaderObject() {
 
+        ConstantConditions.avoid();
     }
 
     /**

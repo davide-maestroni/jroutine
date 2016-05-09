@@ -29,6 +29,21 @@ import static org.junit.Assert.fail;
 public class ConstantConditionsTest {
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new ConstantConditions();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testNotNegative() {
 
         assertThat(ConstantConditions.notNegative("test", 0)).isEqualTo(0);

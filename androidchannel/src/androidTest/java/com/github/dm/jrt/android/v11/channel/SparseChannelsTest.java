@@ -353,6 +353,20 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new SparseChannels();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testInputMap() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

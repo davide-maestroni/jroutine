@@ -150,6 +150,7 @@ public class JRoutineLoader {
      */
     protected JRoutineLoader() {
 
+        ConstantConditions.avoid();
     }
 
     /**

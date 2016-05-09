@@ -83,6 +83,7 @@ public class JRoutineLoaderObjectCompat {
      */
     protected JRoutineLoaderObjectCompat() {
 
+        ConstantConditions.avoid();
     }
 
     /**

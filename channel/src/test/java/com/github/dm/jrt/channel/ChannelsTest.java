@@ -605,6 +605,21 @@ public class ChannelsTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Channels();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =

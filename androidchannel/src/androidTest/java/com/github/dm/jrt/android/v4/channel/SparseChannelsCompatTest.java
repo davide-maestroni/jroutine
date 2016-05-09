@@ -337,6 +337,20 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new SparseChannelsCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testInputMap() {
 
         final ArrayList<ParcelableSelectable<Object>> outputs =

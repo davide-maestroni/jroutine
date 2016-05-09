@@ -48,6 +48,21 @@ import static org.junit.Assert.fail;
 public class RunnerTest {
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Runners();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testDynamicPoolRunner() throws InterruptedException {
 
         testRunner(Runners.sharedRunner());

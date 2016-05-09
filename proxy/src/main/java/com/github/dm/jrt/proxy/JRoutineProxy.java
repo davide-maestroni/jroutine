@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.proxy;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
@@ -43,6 +44,7 @@ public class JRoutineProxy {
      */
     protected JRoutineProxy() {
 
+        ConstantConditions.avoid();
     }
 
     /**

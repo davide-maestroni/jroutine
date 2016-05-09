@@ -461,6 +461,21 @@ public class StreamsTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Streams();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testCount() {
 
         assertThat(Streams.streamOf()

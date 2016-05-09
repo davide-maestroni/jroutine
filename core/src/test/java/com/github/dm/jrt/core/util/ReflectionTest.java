@@ -50,6 +50,21 @@ public class ReflectionTest {
     @Test
     public void testConstructor() {
 
+        boolean failed = false;
+        try {
+            new Reflection();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
+    public void testFindConstructor() {
+
         assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();
         assertThat(Reflection.findConstructor(TestClass.class, "test")).isNotNull();
         assertThat(
@@ -57,7 +72,7 @@ public class ReflectionTest {
     }
 
     @Test
-    public void testConstructorError() {
+    public void testFindConstructorError() {
 
         try {
 
@@ -71,7 +86,7 @@ public class ReflectionTest {
     }
 
     @Test
-    public void testConstructorNullParamError() {
+    public void testFindConstructorNullParamError() {
 
         try {
 
@@ -85,7 +100,7 @@ public class ReflectionTest {
     }
 
     @Test
-    public void testConstructorParamNumberError() {
+    public void testFindConstructorParamNumberError() {
 
         try {
 

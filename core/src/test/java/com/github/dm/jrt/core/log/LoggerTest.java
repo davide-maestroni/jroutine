@@ -46,6 +46,21 @@ public class LoggerTest {
     private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Logs();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testDefaultLog() {
 
         final NullLog log = Logs.nullLog();

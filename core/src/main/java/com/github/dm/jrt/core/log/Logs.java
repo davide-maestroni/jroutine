@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.log;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,6 +36,7 @@ public class Logs {
      */
     protected Logs() {
 
+        ConstantConditions.avoid();
     }
 
     /**

@@ -162,6 +162,21 @@ public class JRoutineTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutine();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =

@@ -586,6 +586,21 @@ public class RoutineTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineCore();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testDeadlockOnAll() {
 
         final Routine<Object, Object> routine2 =

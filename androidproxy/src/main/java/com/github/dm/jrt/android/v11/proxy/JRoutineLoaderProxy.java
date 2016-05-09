@@ -55,6 +55,7 @@ public class JRoutineLoaderProxy {
      */
     protected JRoutineLoaderProxy() {
 
+        ConstantConditions.avoid();
     }
 
     /**

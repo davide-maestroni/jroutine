@@ -36,7 +36,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     /**
-     * Avoid explicit instantiation.
+     * Constructor.
      */
     DefaultIOChannelBuilder() {
 

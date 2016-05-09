@@ -325,6 +325,20 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new AndroidChannels();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =

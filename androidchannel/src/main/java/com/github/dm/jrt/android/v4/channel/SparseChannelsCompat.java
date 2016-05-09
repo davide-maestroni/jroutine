@@ -47,6 +47,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     protected SparseChannelsCompat() {
 
+        ConstantConditions.avoid();
     }
 
     /**

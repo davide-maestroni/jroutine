@@ -69,6 +69,20 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         super(TestActivity.class);
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineAndroidCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testIOChannel() {
 
         assertThat(JRoutineAndroidCompat.io().of("test").next()).isEqualTo("test");

@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.routine.InvocationMode;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.StreamChannel;
@@ -60,6 +61,7 @@ public class LoaderStreams extends Streams {
      */
     protected LoaderStreams() {
 
+        ConstantConditions.avoid();
     }
 
     /**

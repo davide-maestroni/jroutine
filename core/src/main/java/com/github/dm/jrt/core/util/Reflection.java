@@ -52,6 +52,7 @@ public class Reflection {
      */
     protected Reflection() {
 
+        ConstantConditions.avoid();
     }
 
     /**

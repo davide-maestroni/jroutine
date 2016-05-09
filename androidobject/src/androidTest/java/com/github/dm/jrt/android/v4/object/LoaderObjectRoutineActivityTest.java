@@ -320,6 +320,20 @@ public class LoaderObjectRoutineActivityTest
         assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineLoaderObjectCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testContextWrapper() {
 
         final TestActivity activity = getActivity();

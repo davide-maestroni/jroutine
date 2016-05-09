@@ -23,6 +23,7 @@ import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,7 @@ public class AndroidBuilders {
      */
     protected AndroidBuilders() {
 
+        ConstantConditions.avoid();
     }
 
     /**

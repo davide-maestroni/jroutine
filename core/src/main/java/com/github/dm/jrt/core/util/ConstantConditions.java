@@ -30,6 +30,17 @@ public class ConstantConditions {
      */
     protected ConstantConditions() {
 
+        avoid();
+    }
+
+    /**
+     * Asserts that the calling method is not called.
+     *
+     * @throws java.lang.AssertionError if the method is called.
+     */
+    public static void avoid() {
+
+        throw new AssertionError("method " + buildMethodName() + " cannot be called");
     }
 
     /**
@@ -173,5 +184,23 @@ public class ConstantConditions {
         }
 
         return number;
+    }
+
+    /**
+     * Asserts that the calling method is not called.
+     *
+     * @throws java.lang.UnsupportedOperationException if the method is called.
+     */
+    public static void unsupported() {
+
+        throw new UnsupportedOperationException(
+                "method " + buildMethodName() + " is not supported");
+    }
+
+    @NotNull
+    private static String buildMethodName() {
+
+        final StackTraceElement traceElement = Thread.currentThread().getStackTrace()[3];
+        return traceElement.getClassName() + "#" + traceElement.getMethodName();
     }
 }

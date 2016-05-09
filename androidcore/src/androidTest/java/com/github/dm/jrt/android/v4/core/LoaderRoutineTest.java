@@ -867,6 +867,20 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineLoaderCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testFactoryId() {
 
         assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))

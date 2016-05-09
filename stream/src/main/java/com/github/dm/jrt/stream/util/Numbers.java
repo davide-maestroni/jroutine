@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.stream.util;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +36,7 @@ public class Numbers {
      */
     protected Numbers() {
 
+        ConstantConditions.avoid();
     }
 
     /**

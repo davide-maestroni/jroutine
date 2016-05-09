@@ -142,6 +142,21 @@ public class ProxyRoutineTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineProxy();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testGenericProxyCache() {
 
         final TestList<String> testList = new TestList<String>();

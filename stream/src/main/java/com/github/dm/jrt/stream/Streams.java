@@ -76,6 +76,7 @@ public class Streams extends Functions {
      */
     protected Streams() {
 
+        ConstantConditions.avoid();
     }
 
     /**

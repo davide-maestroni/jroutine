@@ -292,6 +292,21 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineObject();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testDuplicateAnnotationError() {
 
         try {

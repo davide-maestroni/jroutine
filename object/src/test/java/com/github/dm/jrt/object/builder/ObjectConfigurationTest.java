@@ -79,6 +79,21 @@ public class ObjectConfigurationTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Builders();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testSharedFieldsEquals() {
 
         final ObjectConfiguration configuration = builder().withSharedFields("group").apply();

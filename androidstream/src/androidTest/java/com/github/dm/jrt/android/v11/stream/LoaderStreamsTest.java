@@ -569,6 +569,20 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 "test3");
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new LoaderStreams();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testDistribute() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

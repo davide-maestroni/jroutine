@@ -177,6 +177,20 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineService();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testDecorator() {
 
         final UnitDuration timeout = seconds(10);

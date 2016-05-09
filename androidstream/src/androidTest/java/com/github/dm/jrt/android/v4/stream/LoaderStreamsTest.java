@@ -536,6 +536,20 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 "test2", "test3");
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new LoaderStreamsCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =

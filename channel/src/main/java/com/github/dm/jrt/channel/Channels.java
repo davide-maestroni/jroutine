@@ -44,6 +44,7 @@ public class Channels {
      */
     protected Channels() {
 
+        ConstantConditions.avoid();
     }
 
     /**

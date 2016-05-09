@@ -1000,7 +1000,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void remove() {
 
-            throw new UnsupportedOperationException();
+            ConstantConditions.unsupported();
         }
     }
 
@@ -1375,7 +1375,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void remove() {
 
-            throw new UnsupportedOperationException();
+            ConstantConditions.unsupported();
         }
 
         public boolean abort() {
@@ -1709,7 +1709,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void remove() {
 
-            throw new UnsupportedOperationException();
+            ConstantConditions.unsupported();
         }
     }
 

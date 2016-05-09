@@ -986,6 +986,20 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineLoader();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testFactoryId() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

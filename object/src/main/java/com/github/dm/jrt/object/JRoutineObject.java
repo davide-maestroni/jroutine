@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.object;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -72,6 +73,7 @@ public class JRoutineObject {
      */
     protected JRoutineObject() {
 
+        ConstantConditions.avoid();
     }
 
     /**

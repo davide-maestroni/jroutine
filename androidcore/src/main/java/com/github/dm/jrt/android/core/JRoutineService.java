@@ -90,6 +90,7 @@ public class JRoutineService {
      */
     protected JRoutineService() {
 
+        ConstantConditions.avoid();
     }
 
     /**

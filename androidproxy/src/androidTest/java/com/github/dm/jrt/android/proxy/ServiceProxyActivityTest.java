@@ -106,6 +106,20 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineServiceProxy();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testGenericProxyCache() {
 
         final ServiceProxyRoutineBuilder builder =

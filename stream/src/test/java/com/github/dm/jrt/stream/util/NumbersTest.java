@@ -238,6 +238,21 @@ public class NumbersTest {
     }
 
     @Test
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new Numbers();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testToBig() {
 
         assertThat(Numbers.toBig(3)).isEqualTo(new BigDecimal(3));

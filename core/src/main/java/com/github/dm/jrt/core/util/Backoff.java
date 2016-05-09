@@ -102,7 +102,8 @@ public abstract class Backoff {
      * The backoff will return a delay computed by taking in consideration the previous jitter
      * delay.
      * <p>
-     * Note that this particular implementation TODO
+     * Note that this particular implementation tries to scale the maximum jitter on the count
+     * value.
      *
      * @param value the delay value.
      * @param unit  the delay unit.
@@ -120,6 +121,9 @@ public abstract class Backoff {
      * <br>
      * The backoff will return a delay computed by taking in consideration the previous jitter
      * delay.
+     * <p>
+     * Note that this particular implementation tries to scale the maximum jitter on the count
+     * value.
      *
      * @param delay the delay.
      * @return the backoff instance.
@@ -301,7 +305,8 @@ public abstract class Backoff {
         public long getDelay(final int count) {
 
             final long delay = mDelay;
-            mLast = delay + Math.round(((mLast * 3) - delay) * mRandom.nextDouble());
+            final double last = Math.IEEEremainder(mLast, delay) + (delay * (1 << (count - 1)));
+            mLast = delay + Math.round(((last * 3) - delay) * mRandom.nextDouble());
             return mLast;
         }
     }

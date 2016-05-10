@@ -55,7 +55,7 @@ public class StreamException extends RoutineException {
             return (StreamException) cause;
         }
 
-        return new StreamException(
-                (cause instanceof RoutineException) ? (RoutineException) cause.getCause() : cause);
+        // Unwrap routine exception to get the original cause
+        return new StreamException((cause instanceof RoutineException) ? cause.getCause() : cause);
     }
 }

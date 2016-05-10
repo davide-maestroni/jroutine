@@ -17,7 +17,7 @@
 package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ import retrofit2.Call;
  *
  * @param <T> the response type.
  */
-public class ExecuteCall<T> extends OperationInvocation<Call<T>, T> {
+public class ExecuteCall<T> extends TransformInvocation<Call<T>, T> {
 
     /**
      * Constructor.

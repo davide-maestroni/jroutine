@@ -167,7 +167,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(CONFIG)
     StreamChannel<IN, OUT> async();
-
+Cosmetic
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
      * .withInputBackoff(backoff).apply()}.
@@ -186,8 +186,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(CONFIG)
-    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
-            @NotNull Backoff backoff);
+    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit, @NotNull Backoff backoff);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -208,7 +207,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(CONFIG)
-    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit, long delay,
+    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
             @NotNull TimeUnit timeUnit);
 
     /**
@@ -229,7 +228,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(CONFIG)
-    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int limit,
+    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
             @Nullable UnitDuration delay);
 
     /**

@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.FunctionWrapper;
 
@@ -34,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class MapInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
+class MapInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
 
     private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
 

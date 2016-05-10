@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
@@ -177,7 +177,7 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final OperationInvocation<IN, OUT> invocation) {
+            @NotNull final TransformInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }

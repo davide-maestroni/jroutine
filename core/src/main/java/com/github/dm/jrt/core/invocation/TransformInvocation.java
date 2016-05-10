@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class OperationInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+public abstract class TransformInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
 
     /**
@@ -40,7 +40,7 @@ public abstract class OperationInvocation<IN, OUT> extends InvocationFactory<IN,
      *
      * @param args the constructor arguments.
      */
-    protected OperationInvocation(@Nullable final Object[] args) {
+    protected TransformInvocation(@Nullable final Object[] args) {
 
         super(args);
     }

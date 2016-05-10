@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -193,7 +193,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-            @NotNull final OperationInvocation<IN, OUT> invocation) {
+            @NotNull final TransformInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }

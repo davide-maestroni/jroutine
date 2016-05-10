@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -102,7 +102,7 @@ public class FunctionsTest {
 
             public Invocation<Object, String> get() {
 
-                return new OperationInvocation<Object, String>(null) {
+                return new TransformInvocation<Object, String>(null) {
 
                     public void onInput(final Object input,
                             @NotNull final ResultChannel<String> result) {
@@ -149,7 +149,7 @@ public class FunctionsTest {
     }
 
     @NotNull
-    private static OperationInvocation<Object, String> createOperation() {
+    private static TransformInvocation<Object, String> createTransform() {
 
         return consumerOperation(new BiConsumer<Object, ResultChannel<String>>() {
 
@@ -161,7 +161,7 @@ public class FunctionsTest {
     }
 
     @NotNull
-    private static OperationInvocation<Object, String> createOperation2() {
+    private static TransformInvocation<Object, String> createTransform2() {
 
         return functionOperation(new Function<Object, String>() {
 
@@ -173,7 +173,7 @@ public class FunctionsTest {
     }
 
     @NotNull
-    private static OperationInvocation<String, String> createOperation3() {
+    private static TransformInvocation<String, String> createTransform3() {
 
         return predicateFilter(new Predicate<String>() {
 
@@ -745,7 +745,7 @@ public class FunctionsTest {
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo(supplierFactory(supplier));
-        assertThat(factory).isNotEqualTo(createOperation());
+        assertThat(factory).isNotEqualTo(createTransform());
         assertThat(factory).isNotEqualTo("");
         assertThat(supplierFactory(supplier)).isEqualTo(supplierFactory(supplier));
         assertThat(supplierFactory(supplier).hashCode()).isEqualTo(
@@ -1208,7 +1208,7 @@ public class FunctionsTest {
     @Test
     public void testOperation() {
 
-        final Routine<Object, String> routine = JRoutineCore.on(createOperation()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createTransform()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -1216,7 +1216,7 @@ public class FunctionsTest {
     @Test
     public void testOperation2() {
 
-        final Routine<Object, String> routine = JRoutineCore.on(createOperation2()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createTransform2()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -1225,9 +1225,9 @@ public class FunctionsTest {
     public void testOperation2Equals() {
 
         final FunctionWrapper<Object, ? super Object> identity = identity();
-        final InvocationFactory<Object, String> factory = createOperation2();
+        final InvocationFactory<Object, String> factory = createTransform2();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createOperation2());
+        assertThat(factory).isNotEqualTo(createTransform2());
         assertThat(factory).isNotEqualTo(functionOperation(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
@@ -1254,7 +1254,7 @@ public class FunctionsTest {
     @Test
     public void testOperation3() {
 
-        final Routine<String, String> routine = JRoutineCore.on(createOperation3()).buildRoutine();
+        final Routine<String, String> routine = JRoutineCore.on(createTransform3()).buildRoutine();
         assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
@@ -1262,9 +1262,9 @@ public class FunctionsTest {
     public void testOperation3Equals() {
 
         final PredicateWrapper<Object> negative = negative();
-        final InvocationFactory<String, String> factory = createOperation3();
+        final InvocationFactory<String, String> factory = createTransform3();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createOperation3());
+        assertThat(factory).isNotEqualTo(createTransform3());
         assertThat(factory).isNotEqualTo(predicateFilter(negative));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
@@ -1291,10 +1291,10 @@ public class FunctionsTest {
     @Test
     public void testOperationEquals() {
 
-        final InvocationFactory<Object, String> factory = createOperation();
+        final InvocationFactory<Object, String> factory = createTransform();
         final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createOperation());
+        assertThat(factory).isNotEqualTo(createTransform());
         assertThat(factory).isNotEqualTo(consumerOperation(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");

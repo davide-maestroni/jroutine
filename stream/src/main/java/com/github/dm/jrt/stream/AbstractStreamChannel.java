@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -244,7 +244,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+    public StreamChannel<IN, OUT> backoffOn(@Nullable final Runner runner, final int limit,
             @NotNull final Backoff backoff) {
 
         return invocationConfiguration().withRunner(runner)
@@ -254,7 +254,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+    public StreamChannel<IN, OUT> backoffOn(@Nullable final Runner runner, final int limit,
             final long delay, @NotNull final TimeUnit timeUnit) {
 
         return invocationConfiguration().withRunner(runner)
@@ -264,7 +264,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int limit,
+    public StreamChannel<IN, OUT> backoffOn(@Nullable final Runner runner, final int limit,
             @Nullable final UnitDuration delay) {
 
         return invocationConfiguration().withRunner(runner)
@@ -538,7 +538,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> runOn(@Nullable final Runner runner) {
 
         final InvocationMode invocationMode = mInvocationMode;
-        final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
+        final TransformInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
         final StreamChannel<IN, OUT> channel =
                 streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
         if (invocationMode == InvocationMode.ASYNC) {

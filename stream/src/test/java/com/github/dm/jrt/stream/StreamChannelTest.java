@@ -35,7 +35,7 @@ import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -503,7 +503,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(1, 1000))
-                          .backPressureOn(mSingleThreadRunner, 2, Backoff.linearDelay(seconds(10)))
+                          .backoffOn(mSingleThreadRunner, 2, Backoff.linearDelay(seconds(10)))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -542,7 +542,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(1, 1000))
-                          .backPressureOn(mSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
+                          .backoffOn(mSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -581,7 +581,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(1, 1000))
-                          .backPressureOn(mSingleThreadRunner, 2, seconds(10))
+                          .backoffOn(mSingleThreadRunner, 2, seconds(10))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -1392,7 +1392,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().map((OperationInvocation<Object, Object>) null);
+            Streams.streamOf().async().map((TransformInvocation<Object, Object>) null);
 
             fail();
 
@@ -1402,7 +1402,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().map((OperationInvocation<Object, Object>) null);
+            Streams.streamOf().parallel().map((TransformInvocation<Object, Object>) null);
 
             fail();
 
@@ -1412,7 +1412,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().map((OperationInvocation<Object, Object>) null);
+            Streams.streamOf().sync().map((TransformInvocation<Object, Object>) null);
 
             fail();
 
@@ -1422,7 +1422,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((OperationInvocation<Object, Object>) null);
+            Streams.streamOf().serial().map((TransformInvocation<Object, Object>) null);
 
             fail();
 
@@ -2739,7 +2739,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class AbortInvocation extends OperationInvocation<Object, Object> {
+    private static class AbortInvocation extends TransformInvocation<Object, Object> {
 
         private AbortInvocation() {
 
@@ -2839,7 +2839,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class UpperCase extends OperationInvocation<String, String> {
+    private static class UpperCase extends TransformInvocation<String, String> {
 
         /**
          * Constructor.

@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
@@ -752,7 +752,7 @@ public class JRoutineTest {
         }
     }
 
-    public static class ToCase extends OperationInvocation<String, String> {
+    public static class ToCase extends TransformInvocation<String, String> {
 
         private final boolean mIsUpper;
 

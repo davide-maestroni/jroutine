@@ -80,8 +80,8 @@ public class InvocationTest {
     @Test
     public void testComparableFilterInvocation() {
 
-        final TestComparableOperationInvocation factory =
-                new TestComparableOperationInvocation(asArgs(1));
+        final TestComparableTransformInvocation factory =
+                new TestComparableTransformInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
@@ -93,10 +93,10 @@ public class InvocationTest {
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
-        assertThat(factory).isNotEqualTo(new TestComparableOperationInvocation(asArgs(2)));
+        assertThat(factory).isNotEqualTo(new TestComparableTransformInvocation(asArgs(2)));
         assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableOperationInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableOperationInvocation(asArgs(1)));
+                new TestComparableTransformInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableTransformInvocation(asArgs(1)));
     }
 
     @Test
@@ -281,15 +281,15 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableOperationInvocation
-            extends OperationInvocation<Object, Object> {
+    private static class TestComparableTransformInvocation
+            extends TransformInvocation<Object, Object> {
 
         /**
          * Constructor.
          *
          * @param args the constructor arguments.
          */
-        protected TestComparableOperationInvocation(@Nullable final Object[] args) {
+        protected TestComparableTransformInvocation(@Nullable final Object[] args) {
 
             super(args);
         }
@@ -299,7 +299,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestInvocation extends OperationInvocation<Object, Object> {
+    private static class TestInvocation extends TransformInvocation<Object, Object> {
 
         /**
          * Constructor.

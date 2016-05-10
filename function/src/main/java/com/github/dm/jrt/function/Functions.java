@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -172,10 +172,10 @@ public class Functions {
      * @return the operation invocation.
      */
     @NotNull
-    public static <IN, OUT> OperationInvocation<IN, OUT> consumerOperation(
+    public static <IN, OUT> TransformInvocation<IN, OUT> consumerOperation(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerOperationInvocation<IN, OUT>(wrap(consumer));
+        return new ConsumerTransformInvocation<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -233,10 +233,10 @@ public class Functions {
      * @return the operation invocation.
      */
     @NotNull
-    public static <IN, OUT> OperationInvocation<IN, OUT> functionOperation(
+    public static <IN, OUT> TransformInvocation<IN, OUT> functionOperation(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
-        return new FunctionOperationInvocation<IN, OUT>(wrap(function));
+        return new FunctionTransformInvocation<IN, OUT>(wrap(function));
     }
 
     /**
@@ -480,10 +480,10 @@ public class Functions {
      * @return the operation invocation.
      */
     @NotNull
-    public static <IN> OperationInvocation<IN, IN> predicateFilter(
+    public static <IN> TransformInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
-        return new PredicateOperationInvocation<IN>(wrap(predicate));
+        return new PredicateTransformInvocation<IN>(wrap(predicate));
     }
 
     /**

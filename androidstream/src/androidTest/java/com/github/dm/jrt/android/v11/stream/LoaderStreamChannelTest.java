@@ -44,7 +44,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -319,7 +319,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .async()
                                 .thenGet(range(1, 1000))
-                                .backPressureOn(handlerRunner, 2, Backoff.linearDelay(seconds(10)))
+                                .backoffOn(handlerRunner, 2, Backoff.linearDelay(seconds(10)))
                                 .map(Functions.<Number>identity())
                                 .with(loaderFrom(activity))
                                 .map(new Function<Number, Double>() {
@@ -359,7 +359,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .async()
                                 .thenGet(range(1, 1000))
-                                .backPressureOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
+                                .backoffOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
                                 .map(Functions.<Number>identity())
                                 .with(loaderFrom(activity))
                                 .map(new Function<Number, Double>() {
@@ -399,7 +399,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .async()
                                 .thenGet(range(1, 1000))
-                                .backPressureOn(handlerRunner, 2, seconds(10))
+                                .backoffOn(handlerRunner, 2, seconds(10))
                                 .map(Functions.<Number>identity())
                                 .with(loaderFrom(activity))
                                 .map(new Function<Number, Double>() {
@@ -2228,7 +2228,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreams.streamOf()
                          .with(loaderFrom(getActivity()))
                          .async()
-                         .map((OperationInvocation<Object, Object>) null);
+                         .map((TransformInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2239,7 +2239,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreams.streamOf()
                          .with(loaderFrom(getActivity()))
                          .parallel()
-                         .map((OperationInvocation<Object, Object>) null);
+                         .map((TransformInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2250,7 +2250,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreams.streamOf()
                          .with(loaderFrom(getActivity()))
                          .sync()
-                         .map((OperationInvocation<Object, Object>) null);
+                         .map((TransformInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2261,7 +2261,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreams.streamOf()
                          .with(loaderFrom(getActivity()))
                          .serial()
-                         .map((OperationInvocation<Object, Object>) null);
+                         .map((TransformInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3297,7 +3297,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class AbortInvocation extends OperationInvocation<Object, Object> {
+    private static class AbortInvocation extends TransformInvocation<Object, Object> {
 
         private AbortInvocation() {
 
@@ -3404,7 +3404,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class UpperCase extends OperationInvocation<String, String> {
+    private static class UpperCase extends TransformInvocation<String, String> {
 
         /**
          * Constructor.

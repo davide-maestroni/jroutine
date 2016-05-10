@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,31 +25,31 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Operation invocation based on a function instance.
+ * Operation invocation based on a predicate instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class FunctionOperationInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
+class PredicateTransformInvocation<IN> extends TransformInvocation<IN, IN> {
 
-    private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
+    private final PredicateWrapper<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
-     * @param function the function instance.
+     * @param predicate the predicate instance.
      */
-    FunctionOperationInvocation(
-            @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
+    PredicateTransformInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
-        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
-        mFunction = function;
+        super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+        mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
 
-        result.pass(mFunction.apply(input));
+        if (mPredicate.test(input)) {
+            result.pass(input);
+        }
     }
 }

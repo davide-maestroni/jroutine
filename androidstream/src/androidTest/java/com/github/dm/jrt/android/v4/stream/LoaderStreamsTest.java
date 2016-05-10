@@ -42,7 +42,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -2116,7 +2116,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class CharAt extends OperationInvocation<List<?>, Character> {
+    private static class CharAt extends TransformInvocation<List<?>, Character> {
 
         /**
          * Constructor.
@@ -2135,7 +2135,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     private static class Sort extends
-            OperationInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+            TransformInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;
 

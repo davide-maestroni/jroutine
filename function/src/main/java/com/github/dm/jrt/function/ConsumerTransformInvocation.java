@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ConsumerOperationInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
+class ConsumerTransformInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
 
     private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
@@ -41,7 +41,7 @@ class ConsumerOperationInvocation<IN, OUT> extends OperationInvocation<IN, OUT> 
      *
      * @param consumer the consumer instance.
      */
-    ConsumerOperationInvocation(
+    ConsumerTransformInvocation(
             @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));

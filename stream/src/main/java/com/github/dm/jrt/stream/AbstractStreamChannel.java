@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -517,7 +518,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> retry(final int count) {
 
-        return retry(count, Backoff.zeroDelay());
+        return retry(count, Backoffs.zeroDelay());
     }
 
     @NotNull

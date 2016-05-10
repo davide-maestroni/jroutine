@@ -49,7 +49,7 @@ import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -323,7 +323,8 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
                                       .thenGet(range(1, 1000))
-                                      .backoffOn(handlerRunner, 2, Backoff.linearDelay(seconds(10)))
+                                      .backoffOn(handlerRunner, 2,
+                                              Backoffs.linearDelay(seconds(10)))
                                       .map(Functions.<Number>identity())
                                       .with(loaderFrom(activity))
                                       .map(new Function<Number, Double>() {

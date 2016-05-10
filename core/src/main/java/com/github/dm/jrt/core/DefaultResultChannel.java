@@ -34,6 +34,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -156,7 +157,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mExecutionTimeout = configuration.getReadTimeoutOrElse(zero());
         mTimeoutActionType = configuration.getReadTimeoutActionOrElse(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
-        mOutputBackoff = configuration.getOutputBackoffOrElse(Backoff.zeroDelay());
+        mOutputBackoff = configuration.getOutputBackoffOrElse(Backoffs.zeroDelay());
         mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
         mOutputQueue = new NestedQueue<Object>() {
 

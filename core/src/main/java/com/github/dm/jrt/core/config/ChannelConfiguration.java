@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.Backoff.constantDelay;
+import static com.github.dm.jrt.core.util.Backoffs.constantDelay;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 

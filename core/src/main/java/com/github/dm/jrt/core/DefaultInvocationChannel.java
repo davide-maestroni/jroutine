@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -117,7 +118,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         mRunner = runner;
         mInputOrder = configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY);
         mInputLimit = configuration.getInputLimitOrElse(Integer.MAX_VALUE);
-        mInputBackoff = configuration.getInputBackoffOrElse(Backoff.zeroDelay());
+        mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.zeroDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputQueue = new NestedQueue<IN>() {
 

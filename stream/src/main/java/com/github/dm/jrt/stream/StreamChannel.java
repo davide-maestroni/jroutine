@@ -167,7 +167,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(CONFIG)
     StreamChannel<IN, OUT> async();
-Cosmetic
+
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
      * .withInputBackoff(backoff).apply()}.

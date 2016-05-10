@@ -84,7 +84,8 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<Boolean> result) {
+        public void onInput(final IN input, @NotNull final ResultChannel<Boolean> result) throws
+                Exception {
 
             if (!mIsMatch && mPredicate.test(input)) {
                 mIsMatch = true;

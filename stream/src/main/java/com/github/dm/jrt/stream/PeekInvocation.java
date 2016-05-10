@@ -45,7 +45,8 @@ class PeekInvocation<DATA> extends TransformInvocation<DATA, DATA> {
         mConsumer = consumer;
     }
 
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
+            Exception {
 
         mConsumer.accept(input);
         result.pass(input);

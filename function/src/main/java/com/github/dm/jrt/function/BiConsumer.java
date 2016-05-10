@@ -31,6 +31,7 @@ public interface BiConsumer<IN1, IN2> {
      *
      * @param in1 the first input argument.
      * @param in2 the second input argument.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void accept(IN1 in1, IN2 in2);
+    void accept(IN1 in1, IN2 in2) throws Exception;
 }

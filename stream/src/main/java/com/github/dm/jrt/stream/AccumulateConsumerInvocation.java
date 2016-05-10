@@ -104,7 +104,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
         if (mIsFirst) {
             mIsFirst = false;

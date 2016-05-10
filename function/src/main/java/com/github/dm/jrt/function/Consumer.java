@@ -29,6 +29,7 @@ public interface Consumer<IN> {
      * Performs this operation on the given argument.
      *
      * @param in the input argument.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void accept(IN in);
+    void accept(IN in) throws Exception;
 }

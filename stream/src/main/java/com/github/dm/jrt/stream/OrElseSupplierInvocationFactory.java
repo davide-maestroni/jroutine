@@ -101,7 +101,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
             result.pass(input);
         }
 
-        public void onResult(@NotNull final ResultChannel<DATA> result) {
+        public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
 
             if (!mHasOutputs) {
                 final long count = mCount;

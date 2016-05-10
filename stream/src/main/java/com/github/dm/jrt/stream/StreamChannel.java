@@ -62,11 +62,14 @@ import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.
  * Each function in the stream is backed by a routine instance, which may have its own specific
  * configuration and invocation mode.
  * <p>
- * Note that, if at least one reduce function is part of the chain, the results will be propagated
- * only when the previous routine invocations complete.
- * <br>
  * To better document the effect of each method on the underlying stream, a {@link StreamTransform}
  * annotation indicates for each one the type of transformation applied.
+ * <p>
+ * Note that each {@code START} method may throw a {@link com.github.dm.jrt.stream.StreamException}
+ * if an unexpected error occurs while initiating the flow of data.
+ * <br>
+ * Note also that, if at least one reduce function is part of the chain, the results will be
+ * propagated only when the previous routine invocations complete.
  * <p>
  * Created by davide-maestroni on 12/23/2015.
  *
@@ -152,6 +155,7 @@ public interface StreamChannel<IN, OUT>
      * @param <BEFORE> the concatenation input type.
      * @param <AFTER>  the concatenation output type.
      * @return the transformed stream.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> apply(
@@ -1141,6 +1145,7 @@ public interface StreamChannel<IN, OUT>
      * @param function the bi-function modifying the binding one.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamTransform(MAP)
@@ -1158,6 +1163,7 @@ public interface StreamChannel<IN, OUT>
      * @param function the function modifying the binding one.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamTransform(MAP)

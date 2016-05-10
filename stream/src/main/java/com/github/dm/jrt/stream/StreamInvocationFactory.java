@@ -98,7 +98,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         }
 
-        public void onInitialize() {
+        public void onInitialize() throws Exception {
 
             final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             mOutputChannel = mFunction.apply(Streams.streamOf(ioChannel));

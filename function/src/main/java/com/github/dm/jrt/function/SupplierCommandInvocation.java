@@ -46,7 +46,7 @@ class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
         mSupplier = supplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         result.pass(mSupplier.get());
     }

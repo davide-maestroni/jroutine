@@ -89,7 +89,8 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<Map<KEY, IN>> result) {
+        public void onInput(final IN input,
+                @NotNull final ResultChannel<Map<KEY, IN>> result) throws Exception {
 
             mMap.put(mFunction.apply(input), input);
         }

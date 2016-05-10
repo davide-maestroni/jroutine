@@ -77,7 +77,7 @@ class SplitKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Output
         mOutputChannel.abort(error);
     }
 
-    public void onOutput(final IN output) {
+    public void onOutput(final IN output) throws Exception {
 
         final HashMap<Object, IOChannel<IN>> channels = mInputChannels;
         final Object key = mKeyFunction.apply(output);

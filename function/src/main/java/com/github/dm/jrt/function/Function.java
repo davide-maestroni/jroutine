@@ -31,6 +31,7 @@ public interface Function<IN, OUT> {
      *
      * @param in the input argument.
      * @return the function result.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    OUT apply(IN in);
+    OUT apply(IN in) throws Exception;
 }

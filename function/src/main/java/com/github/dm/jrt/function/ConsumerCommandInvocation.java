@@ -46,7 +46,7 @@ class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
         mConsumer = consumer;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         mConsumer.accept(result);
     }

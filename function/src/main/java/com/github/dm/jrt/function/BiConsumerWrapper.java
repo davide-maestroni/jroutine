@@ -150,7 +150,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     }
 
     @SuppressWarnings("unchecked")
-    public void accept(final IN1 in1, final IN2 in2) {
+    public void accept(final IN1 in1, final IN2 in2) throws Exception {
 
         for (final BiConsumer<?, ?> consumer : mConsumers) {
             ((BiConsumer<Object, Object>) consumer).accept(in1, in2);

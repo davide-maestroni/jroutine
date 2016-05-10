@@ -185,7 +185,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiConsumer() {
+    public void testBiConsumer() throws Exception {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
         final BiConsumerWrapper<Object, Object> consumer2 = wrap(consumer1);
@@ -283,7 +283,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiFunction() {
+    public void testBiFunction() throws Exception {
 
         final TestBiFunction function1 = new TestBiFunction();
         final BiFunctionWrapper<Object, Object, Object> function2 = wrap(function1);
@@ -403,7 +403,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiSink() {
+    public void testBiSink() throws Exception {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
         final BiConsumerWrapper<Object, Object> consumer2 = biSink().andThen(consumer1);
@@ -413,7 +413,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testCastPredicate() {
+    public void testCastPredicate() throws Exception {
 
         final FunctionWrapper<Object, Number> function = castTo(Number.class);
         function.apply(1);
@@ -571,7 +571,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testConstantSupplier() {
+    public void testConstantSupplier() throws Exception {
 
         final TestFunction function = new TestFunction();
         final SupplierWrapper<Object> supplier = constant("test").andThen(function);
@@ -606,7 +606,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testConsumer() {
+    public void testConsumer() throws Exception {
 
         final TestConsumer consumer1 = new TestConsumer();
         final ConsumerWrapper<Object> consumer2 = wrap(consumer1);
@@ -704,7 +704,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testEqualToPredicate() {
+    public void testEqualToPredicate() throws Exception {
 
         final PredicateWrapper<Object> predicate = isEqualTo("test");
         assertThat(predicate.test("test")).isTrue();
@@ -768,7 +768,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testFunction() {
+    public void testFunction() throws Exception {
 
         final TestFunction function1 = new TestFunction();
         final FunctionWrapper<Object, Object> function2 = wrap(function1);
@@ -995,7 +995,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testIdentity() {
+    public void testIdentity() throws Exception {
 
         final TestFunction function1 = new TestFunction();
         final FunctionWrapper<Object, Object> function2 = identity().andThen(function1);
@@ -1005,7 +1005,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testInstanceOfPredicate() {
+    public void testInstanceOfPredicate() throws Exception {
 
         final PredicateWrapper<Object> predicate = isInstanceOf(String.class);
         assertThat(predicate.test("test")).isTrue();
@@ -1040,7 +1040,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testMaxBiFunction() {
+    public void testMaxBiFunction() throws Exception {
 
         final BiFunctionWrapper<String, String, String> function = max();
         assertThat(function.apply("A TEST", "test")).isEqualTo("test");
@@ -1073,7 +1073,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testMaxByBiFunction() {
+    public void testMaxByBiFunction() throws Exception {
 
         final BiFunctionWrapper<String, String, String> function =
                 maxBy(String.CASE_INSENSITIVE_ORDER);
@@ -1123,7 +1123,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testMinBiFunction() {
+    public void testMinBiFunction() throws Exception {
 
         final BiFunctionWrapper<String, String, String> function = min();
         assertThat(function.apply("A TEST", "test")).isEqualTo("A TEST");
@@ -1156,7 +1156,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testMinByBiFunction() {
+    public void testMinByBiFunction() throws Exception {
 
         final BiFunctionWrapper<String, String, String> function =
                 minBy(String.CASE_INSENSITIVE_ORDER);
@@ -1319,7 +1319,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testPredicate() {
+    public void testPredicate() throws Exception {
 
         final TestPredicate predicate1 = new TestPredicate();
         final PredicateWrapper<Object> predicate2 = wrap(predicate1);
@@ -1528,7 +1528,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testSameAsPredicate() {
+    public void testSameAsPredicate() throws Exception {
 
         final Identity instance = new Identity();
         final PredicateWrapper<Object> predicate = isSameAs(instance);
@@ -1557,7 +1557,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testSink() {
+    public void testSink() throws Exception {
 
         final TestConsumer consumer1 = new TestConsumer();
         final ConsumerWrapper<Object> consumer2 = sink().andThen(consumer1);
@@ -1567,7 +1567,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testSupplier() {
+    public void testSupplier() throws Exception {
 
         final TestSupplier supplier1 = new TestSupplier();
         final SupplierWrapper<Object> supplier2 = wrap(supplier1);

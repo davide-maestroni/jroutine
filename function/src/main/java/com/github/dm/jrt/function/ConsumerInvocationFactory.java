@@ -83,7 +83,7 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+                @NotNull final ResultChannel<OUT> result) throws Exception {
 
             mConsumer.accept(new ArrayList<IN>(inputs), result);
         }

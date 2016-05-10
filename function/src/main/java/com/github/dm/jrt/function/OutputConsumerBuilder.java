@@ -54,17 +54,17 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
         mOnComplete = wrap(onComplete);
     }
 
-    public void onComplete() {
+    public void onComplete() throws Exception {
 
         mOnComplete.accept(null);
     }
 
-    public void onError(@NotNull final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) throws Exception {
 
         mOnError.accept(error);
     }
 
-    public void onOutput(final OUT output) {
+    public void onOutput(final OUT output) throws Exception {
 
         mOnOutput.accept(output);
     }

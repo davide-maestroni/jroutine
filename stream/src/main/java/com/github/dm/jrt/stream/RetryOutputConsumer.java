@@ -83,7 +83,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         mOutputChannel.pass(mOutputs).close();
     }
 
-    public void onError(@NotNull final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) throws Exception {
 
         Long delay = null;
         if (!(error instanceof AbortException)) {
@@ -105,6 +105,11 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
     public void run() {
 
-        mBind.apply(mInputChannel).bind(this);
+        try {
+            mBind.apply(mInputChannel).bind(this);
+
+        } catch (final Exception e) {
+            mOutputChannel.abort(e);
+        }
     }
 }

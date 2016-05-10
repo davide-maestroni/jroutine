@@ -234,7 +234,13 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
                     StreamChannel<BEFORE, AFTER>> function) {
 
-        return ConstantConditions.notNull("transformed stream", function.apply(this));
+        try {
+            return ConstantConditions.notNull("transformed stream", function.apply(this));
+
+        } catch (final Exception e) {
+            // TODO: 10/05/16 test
+            throw StreamException.wrap(e);
+        }
     }
 
     @NotNull
@@ -721,12 +727,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
-        return buildChannel(ConstantConditions.notNull("bind function",
-                ((BiFunction<StreamConfiguration, Function<OutputChannel<IN>,
-                        OutputChannel<OUT>>, Function<OutputChannel<IN>, OutputChannel<AFTER>>>)
-                        function)
-                        .apply(newConfiguration(mStreamConfiguration, mConfiguration,
-                                mInvocationMode), mBind)));
+        try {
+            return buildChannel(ConstantConditions.notNull("bind function",
+                    ((BiFunction<StreamConfiguration, Function<OutputChannel<IN>,
+                            OutputChannel<OUT>>, Function<OutputChannel<IN>,
+                            OutputChannel<AFTER>>>) function)
+                            .apply(newConfiguration(mStreamConfiguration, mConfiguration,
+                                    mInvocationMode), mBind)));
+
+        } catch (final Exception e) {
+            throw StreamException.wrap(e);
+        }
     }
 
     @NotNull
@@ -736,10 +747,15 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<AFTER>>> function) {
 
-        return buildChannel(ConstantConditions.notNull("bind function",
-                ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
-                        Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
-                        .apply(mBind)));
+        try {
+            return buildChannel(ConstantConditions.notNull("bind function",
+                    ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
+                            Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
+                            .apply(mBind)));
+
+        } catch (final Exception e) {
+            throw StreamException.wrap(e);
+        }
     }
 
     @NotNull
@@ -957,7 +973,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
 
         if (isBind) {
-            mChannel = mBind.apply(mSourceChannel);
+            try {
+                mChannel = mBind.apply(mSourceChannel);
+
+            } catch (final Exception e) {
+                throw StreamException.wrap(e);
+            }
         }
 
         return mChannel;

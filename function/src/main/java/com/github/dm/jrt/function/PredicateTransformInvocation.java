@@ -46,7 +46,7 @@ class PredicateTransformInvocation<IN> extends TransformInvocation<IN, IN> {
         mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
 
         if (mPredicate.test(input)) {
             result.pass(input);

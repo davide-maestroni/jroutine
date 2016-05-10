@@ -52,7 +52,7 @@ class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Invocation<IN, OUT> newInvocation() {
+    public Invocation<IN, OUT> newInvocation() throws Exception {
 
         return (Invocation<IN, OUT>) mSupplier.get();
     }

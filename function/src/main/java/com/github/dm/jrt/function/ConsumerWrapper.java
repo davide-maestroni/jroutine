@@ -144,7 +144,7 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
     }
 
     @SuppressWarnings("unchecked")
-    public void accept(final IN in) {
+    public void accept(final IN in) throws Exception {
 
         for (final Consumer<?> consumer : mConsumers) {
             ((Consumer<Object>) consumer).accept(in);

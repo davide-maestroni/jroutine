@@ -1763,7 +1763,7 @@ public class Streams extends Functions {
             mIncrement = increment;
         }
 
-        public void accept(final InputChannel<OUT> result) {
+        public void accept(final InputChannel<OUT> result) throws Exception {
 
             final OUT start = mStart;
             final OUT end = mEnd;
@@ -1815,7 +1815,7 @@ public class Streams extends Functions {
             mNext = next;
         }
 
-        public void accept(final InputChannel<OUT> result) {
+        public void accept(final InputChannel<OUT> result) throws Exception {
 
             final BiFunctionWrapper<OUT, Long, OUT> next = mNext;
             OUT current = mStart;

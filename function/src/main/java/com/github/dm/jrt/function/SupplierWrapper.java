@@ -118,7 +118,7 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
     }
 
     @SuppressWarnings("unchecked")
-    public OUT get() {
+    public OUT get() throws Exception {
 
         return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
     }

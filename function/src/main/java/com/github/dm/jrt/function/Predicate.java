@@ -30,6 +30,7 @@ public interface Predicate<IN> {
      *
      * @param in the input argument.
      * @return true if the input argument matches the predicate, otherwise false.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    boolean test(IN in);
+    boolean test(IN in) throws Exception;
 }

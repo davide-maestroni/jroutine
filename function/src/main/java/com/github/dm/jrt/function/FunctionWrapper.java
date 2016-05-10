@@ -244,7 +244,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     }
 
     @SuppressWarnings("unchecked")
-    public OUT apply(final IN in) {
+    public OUT apply(final IN in) throws Exception {
 
         Object result = in;
         for (final Function<?, ?> function : mFunctions) {

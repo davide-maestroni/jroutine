@@ -72,7 +72,7 @@ public class OutputConsumerBuilderTest {
     }
 
     @Test
-    public void testOnComplete() {
+    public void testOnComplete() throws Exception {
 
         final TestConsumer<Void> consumer1 = new TestConsumer<Void>();
         final TestConsumer<Void> consumer2 = new TestConsumer<Void>();
@@ -171,7 +171,7 @@ public class OutputConsumerBuilderTest {
     }
 
     @Test
-    public void testOnError() {
+    public void testOnError() throws Exception {
 
         final TestConsumer<RoutineException> consumer1 = new TestConsumer<RoutineException>();
         final TestConsumer<RoutineException> consumer2 = new TestConsumer<RoutineException>();
@@ -270,7 +270,7 @@ public class OutputConsumerBuilderTest {
     }
 
     @Test
-    public void testOnOutput() {
+    public void testOnOutput() throws Exception {
 
         final TestConsumer<Object> consumer1 = new TestConsumer<Object>();
         final TestConsumer<Object> consumer2 = new TestConsumer<Object>();

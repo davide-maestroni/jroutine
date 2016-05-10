@@ -48,7 +48,7 @@ class FunctionTransformInvocation<IN, OUT> extends TransformInvocation<IN, OUT> 
         mFunction = function;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
         result.pass(mFunction.apply(input));
     }

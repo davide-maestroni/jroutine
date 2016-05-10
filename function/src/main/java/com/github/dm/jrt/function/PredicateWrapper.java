@@ -384,7 +384,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             mOther = other;
         }
 
-        public boolean test(final IN in) {
+        public boolean test(final IN in) throws Exception {
 
             return mPredicate.test(in) && mOther.test(in);
         }
@@ -472,7 +472,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             mPredicate = predicate;
         }
 
-        public boolean test(final IN in) {
+        public boolean test(final IN in) throws Exception {
 
             return !mPredicate.test(in);
         }
@@ -502,7 +502,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             mOther = other;
         }
 
-        public boolean test(final IN in) {
+        public boolean test(final IN in) throws Exception {
 
             return mPredicate.test(in) || mOther.test(in);
         }
@@ -554,7 +554,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
         }
     }
 
-    public boolean test(final IN in) {
+    public boolean test(final IN in) throws Exception {
 
         return mPredicate.test(in);
     }

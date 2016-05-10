@@ -343,7 +343,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     }
 
     @SuppressWarnings("unchecked")
-    public OUT apply(final IN1 in1, final IN2 in2) {
+    public OUT apply(final IN1 in1, final IN2 in2) throws Exception {
 
         return ((FunctionWrapper<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
     }

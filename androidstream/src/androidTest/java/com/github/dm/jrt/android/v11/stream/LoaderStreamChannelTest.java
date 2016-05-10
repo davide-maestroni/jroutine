@@ -1245,7 +1245,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>
     transformBiFunction() {
 
-
         return new BiFunction<LoaderStreamConfiguration, Function<OutputChannel<String>,
                 OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>() {
 

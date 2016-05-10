@@ -48,7 +48,7 @@ class ConsumerTransformInvocation<IN, OUT> extends TransformInvocation<IN, OUT> 
         mConsumer = consumer;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
         mConsumer.accept(input, result);
     }

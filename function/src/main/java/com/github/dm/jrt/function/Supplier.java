@@ -29,6 +29,7 @@ public interface Supplier<OUT> {
      * Gets a result.
      *
      * @return a result.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    OUT get();
+    OUT get() throws Exception;
 }

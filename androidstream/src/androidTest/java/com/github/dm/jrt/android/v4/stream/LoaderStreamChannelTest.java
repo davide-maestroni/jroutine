@@ -44,8 +44,8 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -323,8 +323,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
                                       .thenGet(range(1, 1000))
-                                      .backoffOn(handlerRunner, 2,
-                                              Backoff.linearDelay(seconds(10)))
+                                      .backoffOn(handlerRunner, 2, Backoff.linearDelay(seconds(10)))
                                       .map(Functions.<Number>identity())
                                       .with(loaderFrom(activity))
                                       .map(new Function<Number, Double>() {
@@ -1264,7 +1263,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     @NotNull
     private static BiFunction<LoaderStreamConfigurationCompat, Function<OutputChannel<String>,
             OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>
-    transformFunction() {
+    transformBiFunction() {
 
         return new BiFunction<LoaderStreamConfigurationCompat, Function<OutputChannel<String>,
                 OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>() {
@@ -1277,6 +1276,29 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                         LoaderConfiguration.defaultConfiguration());
                 assertThat(configuration.getLoaderContext()).isInstanceOf(
                         LoaderContextCompat.class);
+                return wrap(function).andThen(
+                        new Function<OutputChannel<String>, OutputChannel<String>>() {
+
+                            public OutputChannel<String> apply(
+                                    final OutputChannel<String> channel) {
+
+                                return JRoutineCore.on(new UpperCase()).asyncCall(channel);
+                            }
+                        });
+            }
+        };
+    }
+
+    @NotNull
+    private static Function<Function<OutputChannel<String>, OutputChannel<String>>,
+            Function<OutputChannel<String>, OutputChannel<String>>> transformFunction() {
+
+        return new Function<Function<OutputChannel<String>, OutputChannel<String>>,
+                Function<OutputChannel<String>, OutputChannel<String>>>() {
+
+            public Function<OutputChannel<String>, OutputChannel<String>> apply(
+                    final Function<OutputChannel<String>, OutputChannel<String>> function) {
+
                 return wrap(function).andThen(
                         new Function<OutputChannel<String>, OutputChannel<String>>() {
 
@@ -3030,6 +3052,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
     public void testTransform() {
 
+        assertThat(LoaderStreamsCompat.streamOf("test")
+                                      .with(loaderFrom(getActivity()))
+                                      .transform(transformBiFunction())
+                                      .afterMax(seconds(10))
+                                      .next()).isEqualTo("TEST");
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(getActivity()))
                                       .transform(transformFunction())

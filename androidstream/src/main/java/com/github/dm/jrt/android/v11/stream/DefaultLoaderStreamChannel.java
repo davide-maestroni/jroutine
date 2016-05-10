@@ -767,11 +767,20 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
     public <AFTER> LoaderStreamChannel<IN, AFTER> transform(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.transform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> transform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
 
         return (LoaderStreamChannel<IN, AFTER>) super.transform(function);
     }

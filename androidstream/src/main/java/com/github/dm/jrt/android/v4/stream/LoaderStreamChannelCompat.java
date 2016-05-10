@@ -631,6 +631,16 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @StreamTransform(MAP)
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
+            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 

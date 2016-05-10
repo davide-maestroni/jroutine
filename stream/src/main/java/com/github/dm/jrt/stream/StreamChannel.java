@@ -1138,7 +1138,7 @@ public interface StreamChannel<IN, OUT>
      * The returned function will be employed when the flow of input data is initiated (see
      * {@link TransformType#START}).
      *
-     * @param function the function modifying the binding one.
+     * @param function the bi-function modifying the binding one.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
      */
@@ -1148,6 +1148,22 @@ public interface StreamChannel<IN, OUT>
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+
+    /**
+     * Transforms the stream by modifying the binding function.
+     * <br>
+     * The returned function will be employed when the flow of input data is initiated (see
+     * {@link TransformType#START}).
+     *
+     * @param function the function modifying the binding one.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    <AFTER> StreamChannel<IN, AFTER> transform(@NotNull Function<? extends Function<? super
+            OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+            OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
     /**
      * Concatenates a consumer handling the invocation exceptions.

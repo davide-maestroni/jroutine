@@ -35,8 +35,8 @@ import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -2610,7 +2610,33 @@ public class StreamChannelTest {
                                                   });
                                       }
                                   })
-                          .afterMax(seconds(30000))
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo("TEST");
+        assertThat(Streams.streamOf("test")
+                          .transform(
+                                  new Function<Function<OutputChannel<String>,
+                                          OutputChannel<String>>, Function<OutputChannel<String>,
+                                          OutputChannel<String>>>() {
+
+                                      public Function<OutputChannel<String>,
+                                              OutputChannel<String>> apply(
+                                              final Function<OutputChannel<String>,
+                                                      OutputChannel<String>> function) {
+
+                                          return wrap(function).andThen(
+                                                  new Function<OutputChannel<String>,
+                                                          OutputChannel<String>>() {
+
+                                                      public OutputChannel<String> apply(
+                                                              final OutputChannel<String> channel) {
+
+                                                          return JRoutineCore.on(new UpperCase())
+                                                                             .asyncCall(channel);
+                                                      }
+                                                  });
+                                      }
+                                  })
+                          .afterMax(seconds(3))
                           .next()).isEqualTo("TEST");
     }
 

@@ -776,13 +776,22 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.transform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
         return (LoaderStreamChannelCompat<IN, AFTER>) super.transform(function);
     }
 

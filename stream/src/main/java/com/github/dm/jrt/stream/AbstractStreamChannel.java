@@ -729,6 +729,19 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamChannel<IN, AFTER> transform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        return buildChannel(ConstantConditions.notNull("bind function",
+                ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
+                        Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
+                        .apply(mBind)));
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {

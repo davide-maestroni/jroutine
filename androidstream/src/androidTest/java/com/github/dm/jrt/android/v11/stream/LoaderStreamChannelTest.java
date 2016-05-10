@@ -42,8 +42,10 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -70,6 +72,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
@@ -1750,6 +1753,34 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testFlatMapRetry() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final Routine<Object, String> routine =
+                JRoutineCore.on(functionOperation(new Function<Object, String>() {
+
+                    public String apply(final Object o) {
+
+                        return o.toString();
+                    }
+                })).buildRoutine();
+        try {
+            LoaderStreams.streamOf((Object) null)
+                         .with(loaderFrom(getActivity()))
+                         .async()
+                         .flatMap(new RetryFunction(getActivity(), routine))
+                         .afterMax(seconds(10))
+                         .all();
+            fail();
+
+        } catch (final RoutineException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
     public void testInvocationDeadlock() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -2632,25 +2663,43 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        final Routine<Object, String> routine =
-                JRoutineCore.on(functionOperation(new Function<Object, String>() {
-
-                    public String apply(final Object o) {
-
-                        return o.toString();
-                    }
-                })).buildRoutine();
+        ThrowException.reset();
         try {
-            LoaderStreams.streamOf((Object) null)
+            LoaderStreams.streamOf("test")
                          .with(loaderFrom(getActivity()))
-                         .async()
-                         .flatMap(new RetryFunction(getActivity(), routine))
+                         .map(new UpperCase())
+                         .map(factoryOf(ThrowException.class))
+                         .retry(2)
                          .afterMax(seconds(10))
-                         .all();
+                         .throwError();
             fail();
 
-        } catch (final RoutineException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        } catch (final InvocationException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        ThrowException.reset();
+        assertThat(LoaderStreams.streamOf("test")
+                                .with(loaderFrom(getActivity()))
+                                .map(new UpperCase())
+                                .map(factoryOf(ThrowException.class, 1))
+                                .retry(2)
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("TEST");
+
+        ThrowException.reset();
+        try {
+            LoaderStreams.streamOf("test")
+                         .with(loaderFrom(getActivity()))
+                         .map(new AbortInvocation())
+                         .map(factoryOf(ThrowException.class))
+                         .retry(2)
+                         .afterMax(seconds(10))
+                         .throwError();
+            fail();
+
+        } catch (final AbortException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(UnsupportedOperationException.class);
         }
     }
 
@@ -3248,6 +3297,19 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    private static class AbortInvocation extends OperationInvocation<Object, Object> {
+
+        private AbortInvocation() {
+
+            super(null);
+        }
+
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
+
+            result.abort(new UnsupportedOperationException());
+        }
+    }
+
     private static class RetryFunction implements Function<Object, StreamChannel<Object, String>> {
 
         private final Activity mActivity;
@@ -3305,6 +3367,40 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
             this.sum = sum;
             this.count = count;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class ThrowException extends TemplateInvocation<Object, Object> {
+
+        private static int sCount;
+
+        private final int mMaxCount;
+
+        private ThrowException() {
+
+            this(Integer.MAX_VALUE);
+        }
+
+        private ThrowException(final int maxCount) {
+
+            mMaxCount = maxCount;
+        }
+
+        private static void reset() {
+
+            sCount = 0;
+        }
+
+        @Override
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
+                Exception {
+
+            if (sCount++ < mMaxCount) {
+                throw new IllegalStateException();
+            }
+
+            result.pass(input);
         }
     }
 

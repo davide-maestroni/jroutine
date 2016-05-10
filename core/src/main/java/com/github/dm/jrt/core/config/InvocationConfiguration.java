@@ -709,6 +709,10 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * Sets the backoff policy to apply while waiting for the input channel to have room for
          * additional data.
          * <p>
+         * Note that the backoff instance will be likely called from different threads, so, it's
+         * responsibility of the implementing class to ensure that consistent delays are returned
+         * based on the specified excess count.
+         * <p>
          * This configuration option should be used on conjunction with the input limit, or it might
          * have no effect on the invocation execution.
          *
@@ -876,6 +880,10 @@ public final class InvocationConfiguration extends DeepEqualObject {
         /**
          * Sets the backoff policy to apply while waiting for the result channel to have room for
          * additional data.
+         * <p>
+         * Note that the backoff instance will be likely called from different threads, so, it's
+         * responsibility of the implementing class to ensure that consistent delays are returned
+         * based on the specified excess count.
          * <p>
          * This configuration option should be used on conjunction with the output limit, or it
          * might have no effect on the invocation execution.

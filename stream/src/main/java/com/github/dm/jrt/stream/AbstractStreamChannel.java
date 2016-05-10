@@ -238,7 +238,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
             return ConstantConditions.notNull("transformed stream", function.apply(this));
 
         } catch (final Exception e) {
-            // TODO: 10/05/16 test
             throw StreamException.wrap(e);
         }
     }

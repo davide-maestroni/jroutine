@@ -127,6 +127,22 @@ public class StreamChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1", "test2");
+        try {
+            Streams.streamOf()
+                   .apply(new Function<StreamChannel<Object, Object>, StreamChannel<Object,
+                           Object>>() {
+
+                       public StreamChannel<Object, Object> apply(
+                               final StreamChannel<Object, Object> objects) {
+
+                           throw new NullPointerException();
+                       }
+                   });
+            fail();
+
+        } catch (final StreamException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
     }
 
     @Test
@@ -2638,6 +2654,76 @@ public class StreamChannelTest {
                                   })
                           .afterMax(seconds(3))
                           .next()).isEqualTo("TEST");
+        try {
+            Streams.streamOf()
+                   .transform(
+                           new BiFunction<StreamConfiguration, Function<OutputChannel<Object>,
+                                   OutputChannel<Object>>, Function<OutputChannel<Object>,
+                                   OutputChannel<Object>>>() {
+
+                               public Function<OutputChannel<Object>, OutputChannel<Object>> apply(
+                                       final StreamConfiguration configuration,
+                                       final Function<OutputChannel<Object>,
+                                               OutputChannel<Object>> function) {
+
+                                   throw new NullPointerException();
+                               }
+                           });
+            fail();
+
+        } catch (final StreamException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+
+        try {
+            Streams.streamOf()
+                   .transform(
+                           new Function<Function<OutputChannel<Object>, OutputChannel<Object>>,
+                                   Function<OutputChannel<Object>, OutputChannel<Object>>>() {
+
+                               public Function<OutputChannel<Object>, OutputChannel<Object>> apply(
+                                       final Function<OutputChannel<Object>,
+                                               OutputChannel<Object>> function) {
+
+                                   throw new NullPointerException();
+                               }
+                           });
+            fail();
+
+        } catch (final StreamException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+
+        final StreamChannel<Object, Object> stream = //
+                Streams.streamOf()
+                       .transform(
+                               new Function<Function<OutputChannel<Object>,
+                                       OutputChannel<Object>>, Function<OutputChannel<Object>,
+                                       OutputChannel<Object>>>() {
+
+                                   public Function<OutputChannel<Object>, OutputChannel<Object>>
+                                   apply(
+                                           final Function<OutputChannel<Object>,
+                                                   OutputChannel<Object>> function) {
+
+                                       return new Function<OutputChannel<Object>,
+                                               OutputChannel<Object>>() {
+
+                                           public OutputChannel<Object> apply(
+                                                   final OutputChannel<Object> objects) {
+
+                                               throw new NullPointerException();
+                                           }
+                                       };
+                                   }
+                               });
+        try {
+            stream.immediately();
+            fail();
+
+        } catch (final StreamException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
     }
 
     @Test

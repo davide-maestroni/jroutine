@@ -42,4 +42,4 @@ script: ./gradlew clean prepareComAndroidSupportSupportVLibrary && ./gradlew bui
 after_failure: find . -name TEST-\*.xml -print -exec cat {} \;
 
 # Code coverage
-after_success: ./gradlew jacocoFullReport coveralls
+after_success: ./gradlew jacocoFullReport coveralls --debug --stacktrace

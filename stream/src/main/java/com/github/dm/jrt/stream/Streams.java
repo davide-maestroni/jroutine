@@ -937,7 +937,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a factory of invocations computing the mean of the input numbers rounded to nearest
-     * instance.
+     * number.
      * <br>
      * The result will have the type matching the input with the highest precision.
      *

@@ -25,12 +25,14 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.error.DeadlockException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.Backoffs.constantDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1177,6 +1180,31 @@ public class ChannelsTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinBackoff() {
+
+        final IOChannelBuilder builder = JRoutineCore.io();
+        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.after(millis(100)).pass("test").pass("test").close();
+        try {
+            routine.asyncCall(Channels.join(channel1, channel2)
+                                      .channelConfiguration()
+                                      .withChannelLimit(0)
+                                      .withChannelBackoff(constantDelay(millis(100)))
+                                      .withChannelMaxSize(1)
+                                      .apply()
+                                      .buildChannels()).afterMax(seconds(100000)).all();
+            fail();
+
+        } catch (final DeadlockException ignored) {
 
         }
     }

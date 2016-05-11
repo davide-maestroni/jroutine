@@ -182,6 +182,95 @@ public class UnitDuration extends UnitTime {
     }
 
     /**
+     * Performs a {@link java.lang.Thread#sleep(long, int)} using the specified duration as timeout,
+     * ensuring that the sleep time is respected even if spurious wake-ups happen in the while.
+     *
+     * @param time the time value.
+     * @param unit the time unit.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     */
+    public static void sleepAtLeast(final long time, @NotNull final TimeUnit unit) throws
+            InterruptedException {
+
+        if (time == 0) {
+            return;
+        }
+
+        if ((unit.compareTo(TimeUnit.MILLISECONDS) >= 0) || ((unit.toNanos(time) % ONE_MILLI_NANOS)
+                == 0)) {
+            final long startMillis = System.currentTimeMillis();
+            while (true) {
+                if (!sleepSinceMillis(time, unit, startMillis)) {
+                    return;
+                }
+            }
+        }
+
+        final long startNanos = System.nanoTime();
+        while (true) {
+            if (!sleepSinceNanos(time, unit, startNanos)) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Performs a {@link java.lang.Thread#sleep(long, int)} as if started from the specified system
+     * time in milliseconds, by using the specified time as timeout.
+     *
+     * @param time      the time value.
+     * @param unit      the time unit.
+     * @param milliTime the starting system time in milliseconds.
+     * @return whether the sleep happened at all.
+     * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.InterruptedException  if the current thread is interrupted.
+     * @see System#currentTimeMillis()
+     */
+    public static boolean sleepSinceMillis(final long time, @NotNull final TimeUnit unit,
+            final long milliTime) throws InterruptedException {
+
+        if (time == 0) {
+            return false;
+        }
+
+        final long millisToSleep = milliTime - System.currentTimeMillis() + unit.toMillis(time);
+        if (millisToSleep <= 0) {
+            return false;
+        }
+
+        TimeUnit.MILLISECONDS.sleep(millisToSleep);
+        return true;
+    }
+
+    /**
+     * Performs a {@link java.lang.Thread#sleep(long, int)} as if started from the specified high
+     * precision system time in nanoseconds, by using the specified time as timeout.
+     *
+     * @param time     the time value.
+     * @param unit     the time unit.
+     * @param nanoTime the starting system time in nanoseconds.
+     * @return whether the sleep happened at all.
+     * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
+     * @throws java.lang.InterruptedException  if the current thread is interrupted.
+     * @see System#nanoTime()
+     */
+    public static boolean sleepSinceNanos(final long time, @NotNull final TimeUnit unit,
+            final long nanoTime) throws InterruptedException {
+
+        if (time == 0) {
+            return false;
+        }
+
+        final long nanosToSleep = nanoTime - System.nanoTime() + unit.toNanos(time);
+        if (nanosToSleep <= 0) {
+            return false;
+        }
+
+        TimeUnit.NANOSECONDS.sleep(nanosToSleep);
+        return true;
+    }
+
+    /**
      * Creates and returns an object representing the time range between now and a time in the past.
      * <br>
      * If the specified is in the future, a {@code zero()} duration will be returned.
@@ -584,25 +673,7 @@ public class UnitDuration extends UnitTime {
      */
     public void sleepAtLeast() throws InterruptedException {
 
-        if (isZero()) {
-            return;
-        }
-
-        if ((unit.compareTo(TimeUnit.MILLISECONDS) >= 0) || ((toNanos() % ONE_MILLI_NANOS) == 0)) {
-            final long startMillis = System.currentTimeMillis();
-            while (true) {
-                if (!sleepSinceMillis(startMillis)) {
-                    return;
-                }
-            }
-        }
-
-        final long startNanos = System.nanoTime();
-        while (true) {
-            if (!sleepSinceNanos(startNanos)) {
-                return;
-            }
-        }
+        sleepAtLeast(value, unit);
     }
 
     /**
@@ -617,17 +688,7 @@ public class UnitDuration extends UnitTime {
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
 
-        if (isZero()) {
-            return false;
-        }
-
-        final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
-        if (millisToSleep <= 0) {
-            return false;
-        }
-
-        TimeUnit.MILLISECONDS.sleep(millisToSleep);
-        return true;
+        return sleepSinceMillis(value, unit, milliTime);
     }
 
     /**
@@ -642,17 +703,7 @@ public class UnitDuration extends UnitTime {
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
 
-        if (isZero()) {
-            return false;
-        }
-
-        final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();
-        if (nanosToSleep <= 0) {
-            return false;
-        }
-
-        TimeUnit.NANOSECONDS.sleep(nanosToSleep);
-        return true;
+        return sleepSinceNanos(value, unit, nanoTime);
     }
 
     /**

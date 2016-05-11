@@ -168,7 +168,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .async()
-                                      .collect(new Supplier<List<String>>() {
+                                      .collectIn(new Supplier<List<String>>() {
 
                                           public List<String> get() {
 
@@ -180,7 +180,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .collect(new Supplier<List<String>>() {
+                                      .collectIn(new Supplier<List<String>>() {
 
                                           public List<String> get() {
 
@@ -322,7 +322,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 new HandlerThread(LoaderStreamChannelTest.class.getName()));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
-                                      .thenGet(range(1, 1000))
+                                      .thenGetN(range(1, 1000))
                                       .backoffOn(handlerRunner, 2,
                                               Backoffs.linearDelay(seconds(10)))
                                       .map(Functions.<Number>identity())
@@ -364,7 +364,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
-                                      .thenGet(range(1, 1000))
+                                      .thenGetN(range(1, 1000))
                                       .backoffOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
                                       .map(Functions.<Number>identity())
                                       .with(loaderFrom(activity))
@@ -405,7 +405,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
-                                      .thenGet(range(1, 1000))
+                                      .thenGetN(range(1, 1000))
                                       .backoffOn(handlerRunner, 2, seconds(10))
                                       .map(Functions.<Number>identity())
                                       .with(loaderFrom(activity))
@@ -632,7 +632,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .async()
-                                      .mapAll(new BiConsumer<List<?
+                                      .mapAllN(new BiConsumer<List<?
                                               extends String>, ResultChannel<String>>() {
 
                                           public void accept(final List<?
@@ -653,7 +653,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .mapAll(new BiConsumer<List<? extends String>,
+                                      .mapAllN(new BiConsumer<List<? extends String>,
                                               ResultChannel<String>>() {
 
                                           public void accept(final List<? extends String> strings,
@@ -713,7 +713,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
-                                      .map(new BiConsumer<String, ResultChannel<String>>() {
+                                      .mapN(new BiConsumer<String, ResultChannel<String>>() {
 
                                           public void accept(final String s,
                                                   final ResultChannel<String> result) {
@@ -727,7 +727,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(activity))
                                       .ordered(OrderType.BY_CALL)
                                       .parallel()
-                                      .map(new BiConsumer<String, ResultChannel<String>>() {
+                                      .mapN(new BiConsumer<String, ResultChannel<String>>() {
 
                                           public void accept(final String s,
                                                   final ResultChannel<String> result) {
@@ -740,7 +740,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .map(new BiConsumer<String, ResultChannel<String>>() {
+                                      .mapN(new BiConsumer<String, ResultChannel<String>>() {
 
                                           public void accept(final String s,
                                                   final ResultChannel<String> result) {
@@ -753,7 +753,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(activity))
                                       .ordered(OrderType.BY_CALL)
                                       .serial()
-                                      .map(new BiConsumer<String, ResultChannel<String>>() {
+                                      .mapN(new BiConsumer<String, ResultChannel<String>>() {
 
                                           public void accept(final String s,
                                                   final ResultChannel<String> result) {
@@ -837,7 +837,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test");
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(activity))
-                                      .orElseGet(new Consumer<ResultChannel<String>>() {
+                                      .orElseGetN(new Consumer<ResultChannel<String>>() {
 
                                           public void accept(final ResultChannel<String> result) {
 
@@ -873,7 +873,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .afterMax(seconds(10))
                                       .all()).containsExactly("est1", "est2");
         assertThat(LoaderStreamsCompat.<String>streamOf().with(loaderFrom(activity))
-                                                         .orElseGet(
+                                                         .orElseGetN(
                                                                  new Consumer<ResultChannel<String>>() {
 
                                                                      public void accept(
@@ -886,7 +886,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                          .afterMax(seconds(10))
                                                          .all()).containsExactly("est");
         assertThat(LoaderStreamsCompat.<String>streamOf().with(loaderFrom(activity))
-                                                         .orElseGet(2,
+                                                         .orElseGetN(2,
                                                                  new Consumer<ResultChannel<String>>() {
 
                                                                      public void accept(
@@ -1025,7 +1025,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .thenGet(new Consumer<ResultChannel<String>>() {
+                                      .thenGetN(new Consumer<ResultChannel<String>>() {
 
                                           public void accept(
                                                   final ResultChannel<String> resultChannel) {
@@ -1060,7 +1060,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
                                       .async()
-                                      .thenGet(new Consumer<ResultChannel<String>>() {
+                                      .thenGetN(new Consumer<ResultChannel<String>>() {
 
                                           public void accept(
                                                   final ResultChannel<String> resultChannel) {
@@ -1097,7 +1097,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
                                       .parallel()
-                                      .thenGet(3, new Consumer<ResultChannel<String>>() {
+                                      .thenGetN(3, new Consumer<ResultChannel<String>>() {
 
                                           public void accept(
                                                   final ResultChannel<String> resultChannel) {
@@ -1122,7 +1122,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
                                       .serial()
-                                      .thenGet(3, new Consumer<ResultChannel<String>>() {
+                                      .thenGetN(3, new Consumer<ResultChannel<String>>() {
 
                                           public void accept(
                                                   final ResultChannel<String> resultChannel) {
@@ -1158,7 +1158,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                               throw new NullPointerException();
                                           }
                                       })
-                                      .tryCatch(
+                                      .tryCatchN(
                                               new BiConsumer<RoutineException,
                                                       InputChannel<Object>>() {
 
@@ -1179,7 +1179,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                               return o;
                                           }
                                       })
-                                      .tryCatch(
+                                      .tryCatchN(
                                               new BiConsumer<RoutineException,
                                                       InputChannel<Object>>() {
 
@@ -1492,7 +1492,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .async()
                                .with(loaderFrom(getActivity()))
-                               .collect((Supplier<Collection<Object>>) null);
+                               .collectIn((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1503,7 +1503,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .sync()
                                .with(loaderFrom(getActivity()))
-                               .collect((Supplier<Collection<Object>>) null);
+                               .collectIn((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1518,18 +1518,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .collect((BiConsumer<Object, Object>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .sync()
-                               .collect((BiConsumer<Object, Object>) null);
+                               .collect(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1764,7 +1753,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .limit(5)
@@ -1772,7 +1761,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .limit(0)
@@ -1780,7 +1769,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .limit(15)
@@ -1789,7 +1778,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .limit(0)
@@ -1809,18 +1798,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .mapAll((BiConsumer<List<?>, ResultChannel<Object>>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .sync()
-                               .mapAll((BiConsumer<List<?>, ResultChannel<Object>>) null);
+                               .mapAllN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1840,18 +1818,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .mapAll((Function<List<?>, Object>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .sync()
-                               .mapAll((Function<List<?>, Object>) null);
+                               .mapAll(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1871,40 +1838,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .map((BiConsumer<Object, ResultChannel<Object>>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .parallel()
-                               .map((BiConsumer<Object, ResultChannel<Object>>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .sync()
-                               .map((BiConsumer<Object, ResultChannel<Object>>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .serial()
-                               .map((BiConsumer<Object, ResultChannel<Object>>) null);
+                               .mapN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2327,7 +2261,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .orElseGet((Consumer<ResultChannel<?>>) null);
+                               .orElseGetN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2337,7 +2271,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .orElseGet(1, (Consumer<ResultChannel<?>>) null);
+                               .orElseGetN(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2347,7 +2281,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .orElseGet((Supplier<?>) null);
+                               .orElseGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2357,7 +2291,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .orElseGet(1, (Supplier<?>) null);
+                               .orElseGet(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2576,7 +2510,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .skip(5)
@@ -2584,7 +2518,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).isEqualTo(Arrays.asList(6, 7, 8, 9, 10));
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .skip(15)
@@ -2592,7 +2526,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf()
                                       .sync()
-                                      .thenGet(range(1, 10))
+                                      .thenGetN(range(1, 10))
                                       .with(loaderFrom(getActivity()))
                                       .async()
                                       .skip(0)
@@ -2605,13 +2539,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
-                                      .thenGet(range(1, 3))
+                                      .thenGetN(range(1, 3))
                                       .splitBy(2, sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
-                                      .thenGet(range(1, 3))
+                                      .thenGetN(range(1, 3))
                                       .splitBy(Functions.<Integer>identity(), sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
@@ -2874,7 +2808,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
-                               .thenGet(-1, Functions.sink());
+                               .thenGetN(-1, Functions.sink());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -2907,7 +2841,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .serial()
-                               .thenGet(-1, Functions.sink());
+                               .thenGetN(-1, Functions.sink());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -2922,7 +2856,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .thenGet(3, (Consumer<ResultChannel<?>>) null);
+                               .thenGetN(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2933,7 +2867,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .thenGet((Consumer<ResultChannel<?>>) null);
+                               .thenGetN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2944,7 +2878,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .thenGet(3, (Supplier<?>) null);
+                               .thenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2955,7 +2889,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .thenGet((Supplier<?>) null);
+                               .thenGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2966,7 +2900,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .thenGet(3, (Consumer<ResultChannel<?>>) null);
+                               .thenGetN(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2977,7 +2911,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .thenGet((Consumer<ResultChannel<?>>) null);
+                               .thenGetN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2988,7 +2922,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .thenGet((Supplier<?>) null);
+                               .thenGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2999,7 +2933,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .thenGet(3, (Supplier<?>) null);
+                               .thenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3010,7 +2944,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
-                               .thenGet(3, (Supplier<?>) null);
+                               .thenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3021,7 +2955,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
-                               .thenGet(3, (Consumer<ResultChannel<?>>) null);
+                               .thenGetN(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3032,7 +2966,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .serial()
-                               .thenGet(3, (Supplier<?>) null);
+                               .thenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3043,7 +2977,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .serial()
-                               .thenGet(3, (Consumer<ResultChannel<?>>) null);
+                               .thenGetN(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3060,7 +2994,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .next()).isEqualTo("TEST");
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(getActivity()))
-                                      .transform(transformFunction())
+                                      .transformSimple(transformFunction())
                                       .afterMax(seconds(10))
                                       .next()).isEqualTo("TEST");
     }
@@ -3076,7 +3010,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .tryCatch((BiConsumer<RoutineException, InputChannel<?>>) null);
+                               .tryCatchN(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3086,7 +3020,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .tryCatch((Function<RoutineException, ?>) null);
+                               .tryCatch(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3144,7 +3078,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return LoaderStreamsCompat.streamOf(o)
                                       .with(loaderFrom(activity))
                                       .map(routine)
-                                      .tryCatch(
+                                      .tryCatchN(
                                               new BiConsumer<RoutineException,
                                                       InputChannel<String>>() {
 
@@ -3156,7 +3090,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                                              .with(loaderFrom(
                                                                                      activity))
                                                                              .map(routine)
-                                                                             .tryCatch(this)
+                                                                             .tryCatchN(this)
                                                                              .bind(channel);
 
                                                       } else {

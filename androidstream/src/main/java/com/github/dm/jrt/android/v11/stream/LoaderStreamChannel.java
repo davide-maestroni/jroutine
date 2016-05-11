@@ -199,16 +199,16 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(COLLECT)
-    <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collect(
-            @NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> LoaderStreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(COLLECT)
-    <AFTER> LoaderStreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+    <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectIn(
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
@@ -273,14 +273,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
@@ -305,15 +297,23 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(COLLECT)
-    <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
-            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
+    <AFTER> LoaderStreamChannel<IN, AFTER> mapAllN(
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> mapN(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
@@ -355,21 +355,6 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> orElseGet(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
 
     /**
@@ -378,6 +363,21 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> orElseGetN(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> orElseGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
@@ -572,22 +572,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(REDUCE)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamTransform(REDUCE)
-    <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamTransform(REDUCE)
-    <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
@@ -596,6 +580,22 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(REDUCE)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(REDUCE)
+    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetN(long count,
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(REDUCE)
+    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetN(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
@@ -622,7 +622,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> transform(
+    <AFTER> LoaderStreamChannel<IN, AFTER> transformSimple(
             @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<AFTER>>> function);
@@ -633,15 +633,15 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> tryCatch(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+            @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> tryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
+    LoaderStreamChannel<IN, OUT> tryCatchN(
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}

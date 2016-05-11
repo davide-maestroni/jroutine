@@ -150,6 +150,9 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Transforms this stream by applying the specified function.
+     * <br>
+     * This method provides a convenient way to apply a set of configurations and concatenations
+     * without breaking the fluent chain.
      *
      * @param function the transformation function.
      * @param <BEFORE> the concatenation input type.
@@ -167,6 +170,7 @@ public interface StreamChannel<IN, OUT>
      * asynchronous mode.
      *
      * @return this stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -196,8 +200,8 @@ public interface StreamChannel<IN, OUT>
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
      * .withInputBackoff(delay, timeUnit).apply()}.
      * <br>
-     * This method is useful to easily apply a configuration which will slow down the thread
-     * feeding the next routine concatenated to the stream, when the number of buffered inputs
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will slow down the thread feeding it, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
      * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
      * exceptions.
@@ -236,16 +240,17 @@ public interface StreamChannel<IN, OUT>
             @Nullable UnitDuration delay);
 
     /**
-     * Concatenates a stream based on the specified accumulating consumer to this one.
+     * Concatenates a stream accumulating data through the specified consumer.
      * <br>
-     * The output will be computed as follows, where the initial accumulated value will be the
-     * the first input:
+     * The output will be computed as follows:
      * <pre>
      *     <code>
      *
      *         consumer.accept(acc, input);
      *     </code>
      * </pre>
+     * where the initial accumulated value will be the the first input.
+     * <br>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
@@ -260,35 +265,17 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
-     * Concatenates a stream accumulating the outputs by adding them to the collections returned by
-     * the specified supplier to this one.
+     * Concatenates a stream accumulating data through the specified consumer.
      * <br>
-     * The accumulated value will be passed as result only when the outputs complete.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param supplier the supplier of collections.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(COLLECT)
-    <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collect(
-            @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * Concatenates a stream based on the specified accumulating consumer to this one.
-     * <br>
-     * The output will be computed as follows, where the initial accumulated value will be the
-     * one returned by the specified supplier:
+     * The output will be computed as follows:
      * <pre>
      *     <code>
      *
      *         consumer.accept(acc, input);
      *     </code>
      * </pre>
+     * where the initial accumulated value will be the one returned by the specified supplier.
+     * <br>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
@@ -304,6 +291,25 @@ public interface StreamChannel<IN, OUT>
     @StreamTransform(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+
+    /**
+     * Concatenates a stream accumulating the outputs by adding them to the collections returned by
+     * the specified supplier.
+     * <br>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier of collections.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collectIn(
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Returns a stream concatenating the specified output to this stream ones.
@@ -362,9 +368,7 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
-     * Concatenates a stream based on the specified predicate to this one.
-     * <br>
-     * The output will be filtered according to the result returned by the predicate.
+     * Concatenates a stream filtering data based on the values returned by the specified predicate.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -378,7 +382,8 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
-     * Concatenates a stream mapping this stream outputs by applying the specified function.
+     * Concatenates a stream mapping this stream outputs by applying the specified function to each
+     * one of them.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -424,23 +429,7 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> limit(int count);
 
     /**
-     * Concatenates a stream based on the specified mapping consumer to this one.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified mapping function to this one.
+     * Concatenates a stream mapping this stream outputs by applying the specified function.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -455,7 +444,7 @@ public interface StreamChannel<IN, OUT>
     <AFTER> StreamChannel<IN, AFTER> map(@NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
-     * Concatenates a stream based on the specified mapping invocation factory to this one.
+     * Concatenates a stream mapping this stream outputs through the specified invocation factory.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -471,9 +460,9 @@ public interface StreamChannel<IN, OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Concatenates a stream based on the specified instance to this one.
+     * Concatenates a stream mapping this stream outputs through the specified routine.
      * <br>
-     * The set configuration will be ignored.
+     * The stream configuration will be ignored.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -488,27 +477,8 @@ public interface StreamChannel<IN, OUT>
     <AFTER> StreamChannel<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.
-     * <br>
-     * All the outputs are collected and then passed to the consumer.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> mapAll(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified function to this one.
-     * <br>
-     * All the outputs are collected and then the function will be applied to them.
+     * Concatenates a stream mapping the whole collection of outputs by applying the specified
+     * function.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -524,7 +494,45 @@ public interface StreamChannel<IN, OUT>
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
-     * Concatenates a consumer handling an invocation exceptions.
+     * Concatenates a stream mapping the whole collection of outputs through the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    <AFTER> StreamChannel<IN, AFTER> mapAllN(
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream mapping this stream outputs through the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    <AFTER> StreamChannel<IN, AFTER> mapN(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a consumer handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
      * <p>
@@ -538,7 +546,7 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.
+     * Concatenates a stream consuming this stream outputs.
      * <br>
      * The stream outputs will be no further propagated.
      * <p>
@@ -602,43 +610,8 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
-     * Concatenates a stream calling the specified consumer to this one.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    StreamChannel<IN, OUT> orElseGet(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Concatenates a stream calling the specified consumer to this one.
-     * <br>
-     * The consumer will be called only when the previous routine invocations complete.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    StreamChannel<IN, OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Concatenates a stream calling the specified supplier to this one.
+     * Concatenates a stream producing the outputs returned by the specified supplier in case this
+     * one produced none.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
@@ -657,7 +630,8 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
 
     /**
-     * Concatenates a stream calling the specified supplier to this one.
+     * Concatenates a stream producing the outputs returned by the specified supplier in case this
+     * one produced none.
      * <br>
      * The supplier will be called only when the previous routine invocations complete.
      * <p>
@@ -671,6 +645,50 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     StreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * Concatenates a stream producing the outputs returned by the specified consumer in case this
+     * one produced none.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> orElseGetN(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * Concatenates a stream producing the outputs returned by the specified consumer in case this
+     * one produced none.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> orElseGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
@@ -691,6 +709,7 @@ public interface StreamChannel<IN, OUT>
      * mode.
      *
      * @return this stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -705,6 +724,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param maxInvocations the maximum number of concurrent invocations.
      * @return the configured stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -725,16 +745,17 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
-     * Concatenates a stream based on the specified accumulating function to this one.
+     * Concatenates a stream accumulating data through the specified function.
      * <br>
-     * The output will be computed as follows, where the initial accumulated value will be the
-     * the first input:
+     * The output will be computed as follows:
      * <pre>
      *     <code>
      *
      *         acc = function.apply(acc, input);
      *     </code>
      * </pre>
+     * where the initial accumulated value will be the the first input.
+     * <br>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
@@ -750,16 +771,17 @@ public interface StreamChannel<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a stream based on the specified accumulating function to this one.
+     * Concatenates a stream accumulating data through the specified function.
      * <br>
-     * The output will be computed as follows, where the initial accumulated value will be the
-     * one returned by the specified supplier:
+     * The output will be computed as follows:
      * <pre>
      *     <code>
      *
      *         acc = function.apply(acc, input);
      *     </code>
      * </pre>
+     * where the initial accumulated value will be the one returned by the specified supplier.
+     * <br>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
@@ -788,17 +810,46 @@ public interface StreamChannel<IN, OUT>
     @StreamTransform(CACHE)
     StreamChannel<IN, OUT> replay();
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Returns a new stream retrying the whole flow of data at maximum for the specified number of
+     * times.
+     *
+     * @param count the maximum number of retries.
+     * @return the retrying stream.
+     */
     @NotNull
     @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(int count);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Returns a new stream retrying the whole flow of data at maximum for the specified number of
+     * times.
+     * <br>
+     * For each retry the specified backoff policy will be applied before re-starting the flow.
+     *
+     * @param count   the maximum number of retries.
+     * @param backoff the backoff policy.
+     * @return the retrying stream.
+     */
     @NotNull
     @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Returns a new stream retrying the whole flow of data until the specified function does not
+     * return null.
+     * <br>
+     * For each retry the function is called passing the retry count (starting from 1) and the error
+     * which caused the failure. If the function returns a non-null value, that will represent the
+     * number of milliseconds to wait before a further retry. While, in case the function returns
+     * null, the flow of data will be aborted with the passed error as reason.
+     * <p>
+     * Note that no retry will be attempted in case of an explicit abortion, that is, if the error
+     * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
+     *
+     * @param function the retry function.
+     * @return the retrying stream.
+     */
     @NotNull
     @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(
@@ -835,6 +886,7 @@ public interface StreamChannel<IN, OUT>
      * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
      *
      * @return this stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -989,6 +1041,7 @@ public interface StreamChannel<IN, OUT>
      * synchronous mode.
      *
      * @return this stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -1046,46 +1099,7 @@ public interface StreamChannel<IN, OUT>
     <AFTER> StreamChannel<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamTransform(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGet(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified consumer to this one.
-     * <br>
-     * The consumer will be called only when the previous routine invocations complete.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGet(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified supplier to this one.
+     * Concatenates a stream generating the outputs returned by the specified supplier.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
@@ -1106,7 +1120,7 @@ public interface StreamChannel<IN, OUT>
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
-     * Concatenates a stream based on the specified supplier to this one.
+     * Concatenates a stream generating the outputs returned by the specified supplier.
      * <br>
      * The supplier will be called only when the previous routine invocations complete.
      * <p>
@@ -1123,6 +1137,51 @@ public interface StreamChannel<IN, OUT>
     <AFTER> StreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
+     * Concatenates a stream generating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamTransform(REDUCE)
+    <AFTER> StreamChannel<IN, AFTER> thenGetN(long count,
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream generating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(REDUCE)
+    <AFTER> StreamChannel<IN, AFTER> thenGetN(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
      * Returns a new stream making this one selectable.
      * <br>
      * Each output will be passed along unchanged.
@@ -1137,12 +1196,14 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(int index);
 
     /**
-     * Transforms the stream by modifying the binding function.
+     * Transforms the stream by modifying the flow building function.
+     * <br>
+     * The current configuration of the stream will be passed as the first parameter.
      * <br>
      * The returned function will be employed when the flow of input data is initiated (see
      * {@link TransformType#START}).
      *
-     * @param function the bi-function modifying the binding one.
+     * @param function the bi-function modifying the flow one.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
@@ -1155,39 +1216,24 @@ public interface StreamChannel<IN, OUT>
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
     /**
-     * Transforms the stream by modifying the binding function.
+     * Transforms the stream by modifying the flow building function.
      * <br>
      * The returned function will be employed when the flow of input data is initiated (see
      * {@link TransformType#START}).
      *
-     * @param function the function modifying the binding one.
+     * @param function the function modifying the flow one.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamTransform(MAP)
-    <AFTER> StreamChannel<IN, AFTER> transform(@NotNull Function<? extends Function<? super
+    <AFTER> StreamChannel<IN, AFTER> transformSimple(@NotNull Function<? extends Function<? super
             OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
             OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
     /**
-     * Concatenates a consumer handling the invocation exceptions.
-     * <br>
-     * The errors will not be automatically further propagated.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param consumer the bi-consumer instance.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamTransform(MAP)
-    StreamChannel<IN, OUT> tryCatch(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
-
-    /**
-     * Concatenates a function handling an invocation exceptions.
+     * Concatenates a function handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
      * <p>
@@ -1200,6 +1246,24 @@ public interface StreamChannel<IN, OUT>
     @StreamTransform(MAP)
     StreamChannel<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
+
+    /**
+     * Concatenates a consumer handling invocation exceptions.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The errors will not be automatically further propagated.
+     * <p>
+     * Note that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> tryCatchN(
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**
      * Concatenates a runnable always called when outputs complete, even if an error occurred.

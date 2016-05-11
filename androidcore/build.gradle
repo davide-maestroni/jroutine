@@ -59,10 +59,6 @@ android {
     lintOptions {
         disable 'MissingRegistered'
     }
-
-    jacoco {
-        version '0.7.6.201602180812'
-    }
 }
 
 dependencies {

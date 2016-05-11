@@ -40,7 +40,7 @@
 
             public static void main(final String[] args) {
 
-                final StreamChannel&lt;Double&gt; channel =
+                final StreamChannel&lt;String, Double&gt; channel =
                         Streams.streamOf(args)
                                .parallel()
                                .map(Integer::parseInt)

@@ -6,7 +6,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
@@ -31,6 +31,10 @@ gradle.projectsEvaluated {
 
     apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion '0.7.6.201602180812'
+    }
 
     def publishedProjects = subprojects.findAll {
         it.plugins.hasPlugin('jacoco')

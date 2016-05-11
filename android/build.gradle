@@ -79,6 +79,10 @@ conditionalDependencies {
     compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
+jacoco {
+    toolVersion '0.7.6.201602180812'
+}
+
 findbugs {
     toolVersion '3.0.1'
 }

@@ -21,6 +21,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,14 @@ import java.util.concurrent.Executor;
 public class AndroidRunners {
 
     private static final Runner sMainRunner = new MainRunner();
+
+    /**
+     * Avoid explicit instantiation.
+     */
+    protected AndroidRunners() {
+
+        ConstantConditions.avoid();
+    }
 
     /**
      * Returns a runner employing the specified handler.

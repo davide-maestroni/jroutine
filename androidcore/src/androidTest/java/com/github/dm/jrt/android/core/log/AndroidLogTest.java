@@ -21,6 +21,8 @@ import android.test.AndroidTestCase;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Android log unit tests.
  * <p>
@@ -39,6 +41,20 @@ public class AndroidLogTest extends AndroidTestCase {
     private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
 
     private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
+
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new AndroidLogs();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
 
     public void testLogDbg() {
 

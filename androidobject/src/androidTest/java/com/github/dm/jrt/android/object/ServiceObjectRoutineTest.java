@@ -190,6 +190,20 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new JRoutineServiceObject();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testDuplicateAnnotationError() {
 
         try {

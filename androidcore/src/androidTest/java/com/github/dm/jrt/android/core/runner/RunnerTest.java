@@ -29,8 +29,8 @@ import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
@@ -145,6 +145,20 @@ public class RunnerTest extends AndroidTestCase {
             execution.await();
             assertThat(execution.isPassed()).isTrue();
         }
+    }
+
+    public void testConstructor() {
+
+        boolean failed = false;
+        try {
+            new AndroidRunners();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+
+        }
+
+        assertThat(failed).isFalse();
     }
 
     @SuppressWarnings("ConstantConditions")

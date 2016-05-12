@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.core.log;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,6 +28,14 @@ import org.jetbrains.annotations.NotNull;
 public class AndroidLogs {
 
     private static final AndroidLog sAndroidLog = new AndroidLog();
+
+    /**
+     * Avoid explicit instantiation.
+     */
+    protected AndroidLogs() {
+
+        ConstantConditions.avoid();
+    }
 
     /**
      * Returns the Android log shared instance.

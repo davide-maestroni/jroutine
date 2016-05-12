@@ -82,7 +82,17 @@ import static org.junit.Assert.fail;
  */
 public class StreamChannelTest {
 
-    private final Runner mSingleThreadRunner = Runners.poolRunner(1);
+    private static Runner sSingleThreadRunner;
+
+    @NotNull
+    private static Runner getSingleThreadRunner() {
+
+        if (sSingleThreadRunner == null) {
+            sSingleThreadRunner = Runners.poolRunner(1);
+        }
+
+        return sSingleThreadRunner;
+    }
 
     @Test
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
@@ -510,7 +520,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetN(range(1, 1000))
-                          .backoffOn(mSingleThreadRunner, 2, Backoffs.linearDelay(seconds(10)))
+                          .backoffOn(getSingleThreadRunner(), 2, Backoffs.linearDelay(seconds(10)))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -549,7 +559,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetN(range(1, 1000))
-                          .backoffOn(mSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
+                          .backoffOn(getSingleThreadRunner(), 2, 10, TimeUnit.SECONDS)
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -588,7 +598,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetN(range(1, 1000))
-                          .backoffOn(mSingleThreadRunner, 2, seconds(10))
+                          .backoffOn(getSingleThreadRunner(), 2, seconds(10))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
 
@@ -1550,7 +1560,7 @@ public class StreamChannelTest {
             assertThat(Streams.streamOf()
                               .thenGetN(range(1, 1000))
                               .streamInvocationConfiguration()
-                              .withRunner(mSingleThreadRunner)
+                              .withRunner(getSingleThreadRunner())
                               .withInputLimit(2)
                               .withInputBackoff(seconds(3))
                               .withOutputLimit(2)
@@ -1603,7 +1613,7 @@ public class StreamChannelTest {
             assertThat(Streams.streamOf()
                               .thenGetN(range(1, 1000))
                               .streamInvocationConfiguration()
-                              .withRunner(mSingleThreadRunner)
+                              .withRunner(getSingleThreadRunner())
                               .withOutputLimit(2)
                               .withOutputBackoff(seconds(3))
                               .apply()
@@ -1652,7 +1662,7 @@ public class StreamChannelTest {
             assertThat(Streams.streamOf()
                               .thenGetN(range(1, 1000))
                               .streamInvocationConfiguration()
-                              .withRunner(mSingleThreadRunner)
+                              .withRunner(getSingleThreadRunner())
                               .withInputLimit(2)
                               .withInputBackoff(seconds(3))
                               .apply()

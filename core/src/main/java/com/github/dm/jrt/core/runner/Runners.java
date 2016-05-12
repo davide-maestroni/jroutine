@@ -77,7 +77,7 @@ public class Runners {
     @NotNull
     public static Runner poolRunner() {
 
-        return poolRunner(Runtime.getRuntime().availableProcessors() << 1);
+        return poolRunner((Runtime.getRuntime().availableProcessors() << 1) - 1);
     }
 
     /**

@@ -513,7 +513,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      *
      * @param <IN> the input data type.
      */
-    private static class SameAsPredicate<IN> implements Predicate<IN> {
+    private static class SameAsPredicate<IN> extends DeepEqualObject implements Predicate<IN> {
 
         private final Object mOther;
 
@@ -524,28 +524,8 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          */
         private SameAsPredicate(@NotNull final Object other) {
 
+            super(asArgs(other));
             mOther = other;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mOther.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof SameAsPredicate)) {
-                return false;
-            }
-
-            final SameAsPredicate<?> that = (SameAsPredicate<?>) o;
-            return (mOther == that.mOther);
         }
 
         public boolean test(final IN in) {

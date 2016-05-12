@@ -63,7 +63,7 @@ class NestedQueue<E> {
         }
 
         Object element = simpleQueue.peekFirst();
-        while (element instanceof NestedQueue) {
+        while (element instanceof InnerNestedQueue) {
             final NestedQueue<?> nested = ((NestedQueue<?>) element);
             if (!nested.mClosed || (prune(nested) != EMPTY_ELEMENT)) {
                 return nested;
@@ -118,7 +118,7 @@ class NestedQueue<E> {
     public NestedQueue<E> addNested() {
 
         checkOpen();
-        final NestedQueue<E> queue = new NestedQueue<E>();
+        final InnerNestedQueue<E> queue = new InnerNestedQueue<E>();
         mQueue.add(queue);
         return queue;
     }
@@ -157,7 +157,7 @@ class NestedQueue<E> {
         final SimpleQueue<Object> queue = mQueue;
         while (!queue.isEmpty()) {
             final Object element = queue.peekFirst();
-            if (element instanceof NestedQueue) {
+            if (element instanceof InnerNestedQueue) {
                 final NestedQueue<E> nested = (NestedQueue<E>) element;
                 nested.drainTo(collection);
                 if (!nested.mClosed || !nested.mQueue.isEmpty()) {
@@ -206,5 +206,14 @@ class NestedQueue<E> {
         if (mClosed) {
             throw new IllegalStateException("the queue is closed");
         }
+    }
+
+    /**
+     * Internal class used to discriminate between an element and a nested queue.
+     *
+     * @param <E>
+     */
+    private static class InnerNestedQueue<E> extends NestedQueue<E> {
+
     }
 }

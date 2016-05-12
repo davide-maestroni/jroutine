@@ -911,14 +911,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class AbortChannelState extends ExceptionChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         @Nullable
         @Override
         RoutineException abortConsumer(@NotNull final Throwable reason) {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
-            mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
+            mLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
             internalAbort(abortException);
             return abortException;
         }
@@ -1620,14 +1618,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class DoneChannelState extends FlushChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         @Nullable
         @Override
         RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             if (mOutputQueue.isEmpty()) {
-                mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
+                mLogger.dbg(reason, "avoiding aborting after delay since channel is closed");
                 return null;
             }
 
@@ -1720,8 +1716,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class ExceptionChannelState extends FlushChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         @Nullable
         @Override
         RoutineException abortConsumer(@NotNull final Throwable reason) {
@@ -1754,7 +1748,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         private RoutineException abortException() {
 
             final RoutineException abortException = mAbortException;
-            mSubLogger.dbg(abortException, "abort exception");
+            mLogger.dbg(abortException, "abort exception");
             return mAbortException;
         }
 
@@ -1768,7 +1762,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Override
         RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
-            mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
+            mLogger.dbg(reason, "avoiding aborting after delay since channel is closed");
             return null;
         }
 
@@ -1819,12 +1813,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class FlushChannelState extends ResultChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         @NotNull
         private IllegalStateException exception() {
 
-            mSubLogger.err("consumer invalid call on closed channel");
+            mLogger.err("consumer invalid call on closed channel");
             return new IllegalStateException("the channel is closed");
         }
 
@@ -1833,7 +1825,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         RoutineException abortInvocation(@Nullable final Throwable reason, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
-            mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
+            mLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
         }
 
@@ -1850,7 +1842,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Override
         RoutineException abortOutputChannel(@Nullable final Throwable reason) {
 
-            mSubLogger.dbg("avoiding aborting output since result channel is closed");
+            mLogger.dbg(reason, "avoiding aborting output since result channel is closed");
             return null;
         }
 
@@ -1858,15 +1850,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
-            mSubLogger.dbg("avoiding delayed output execution since channel is closed: %s", output);
+            mLogger.dbg("avoiding delayed output execution since channel is closed: %s", output);
             return false;
         }
 
         @Override
         boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
-            mSubLogger.dbg("avoiding delayed output execution since channel is closed: %s",
-                    outputs);
+            mLogger.dbg("avoiding delayed output execution since channel is closed: %s", outputs);
             return false;
         }
 
@@ -1879,7 +1870,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Override
         boolean onConsumerError(@NotNull final RoutineException error) {
 
-            mSubLogger.dbg("avoiding aborting output since result channel is closed");
+            mLogger.dbg(error,
+                    "avoiding aborting on consumer exception since result channel is closed");
             return false;
         }
 
@@ -1918,8 +1910,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class OutputChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         /**
          * Called when a consumer cause the invocation to abort by throwing an exception.
          *
@@ -1930,7 +1920,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         RoutineException abortConsumer(@NotNull final Throwable reason) {
 
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
-            mSubLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
+            mLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
             internalAbort(abortException);
             return abortException;
         }
@@ -1949,7 +1939,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
             if (delay == 0) {
-                mSubLogger.dbg(reason, "aborting channel");
+                mLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
             }
 
@@ -1966,7 +1956,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         RoutineException abortOutputChannel(@Nullable final Throwable reason) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
-            mSubLogger.dbg(reason, "aborting output");
+            mLogger.dbg(reason, "aborting output");
             internalAbort(abortException);
             return abortException;
         }
@@ -1990,7 +1980,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-            final Logger logger = mSubLogger;
+            final Logger logger = mLogger;
             try {
                 logger.dbg("closing consumer (%s)", consumer);
                 consumer.onComplete();
@@ -2012,7 +2002,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         boolean closeResultChannel() {
 
-            mSubLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
+            mLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
             if (mPendingOutputCount > 0) {
                 mState = new ResultChannelState();
 
@@ -2032,7 +2022,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Nullable
         RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
-            mSubLogger.dbg(reason, "aborting channel");
+            mLogger.dbg(reason, "aborting channel after delay");
             internalAbort(reason);
             return reason;
         }
@@ -2047,7 +2037,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
-            mSubLogger.dbg("delayed output execution: %s", output);
+            mLogger.dbg("delayed output execution: %s", output);
             --mPendingOutputCount;
             queue.add(output);
             queue.close();
@@ -2063,7 +2053,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
-            mSubLogger.dbg("delayed output execution: %s", outputs);
+            mLogger.dbg("delayed output execution: %s", outputs);
             --mPendingOutputCount;
             queue.addAll(outputs);
             queue.close();
@@ -2122,7 +2112,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         boolean onConsumerError(@NotNull final RoutineException error) {
 
-            mSubLogger.dbg(error, "aborting output");
+            mLogger.dbg(error, "aborting output on consumer exception");
             internalAbort(error);
             return true;
         }
@@ -2142,7 +2132,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 final long delay, @NotNull final TimeUnit timeUnit,
                 @NotNull final OrderType orderType) {
 
-            mSubLogger.dbg("consumer output [#%d+1]: %s [%d %s]", mOutputCount, output, delay,
+            mLogger.dbg("consumer output [#%d+1]: %s [%d %s]", mOutputCount, output, delay,
                     timeUnit);
             ++mOutputCount;
             if (delay == 0) {
@@ -2175,13 +2165,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         OutputConsumer<OUT> pass(@Nullable final OutputChannel<? extends OUT> channel) {
 
             if (channel == null) {
-                mSubLogger.wrn("passing null channel");
+                mLogger.wrn("passing null channel");
                 return null;
             }
 
             mBoundChannels.add(channel);
             ++mPendingOutputCount;
-            mSubLogger.dbg("passing channel: %s", channel);
+            mLogger.dbg("passing channel: %s", channel);
             return new DefaultOutputConsumer();
         }
 
@@ -2195,7 +2185,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         Execution pass(@Nullable final Iterable<? extends OUT> outputs) {
 
             if (outputs == null) {
-                mSubLogger.wrn("passing null iterable");
+                mLogger.wrn("passing null iterable");
                 return null;
             }
 
@@ -2206,8 +2196,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final int size = list.size();
             final long delay = mResultDelay;
-            mSubLogger.dbg("passing iterable [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs,
-                    delay, mResultDelayUnit);
+            mLogger.dbg("passing iterable [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs, delay,
+                    mResultDelayUnit);
             mOutputCount += size;
             checkMaxSize();
             if (delay == 0) {
@@ -2231,7 +2221,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         Execution pass(@Nullable final OUT output) {
 
             final long delay = mResultDelay;
-            mSubLogger.dbg("passing output [#%d+1]: %s [%d %s]", mOutputCount, output, delay,
+            mLogger.dbg("passing output [#%d+1]: %s [%d %s]", mOutputCount, output, delay,
                     mResultDelayUnit);
             ++mOutputCount;
             checkMaxSize();
@@ -2256,13 +2246,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         Execution pass(@Nullable final OUT... outputs) {
 
             if (outputs == null) {
-                mSubLogger.wrn("passing null output array");
+                mLogger.wrn("passing null output array");
                 return null;
             }
 
             final int size = outputs.length;
             final long delay = mResultDelay;
-            mSubLogger.dbg("passing array [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs, delay,
+            mLogger.dbg("passing array [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs, delay,
                     mResultDelayUnit);
             mOutputCount += size;
             checkMaxSize();
@@ -2296,12 +2286,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class ResultChannelState extends OutputChannelState {
 
-        private final Logger mSubLogger = mLogger.subContextLogger(this);
-
         @NotNull
         private IllegalStateException exception() {
 
-            mSubLogger.err("invalid call on closed channel");
+            mLogger.err("invalid call on closed channel");
             return new IllegalStateException("the channel is closed");
         }
 
@@ -2314,7 +2302,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Override
         boolean closeResultChannel() {
 
-            mSubLogger.dbg("avoiding closing result channel since already closed");
+            mLogger.dbg("avoiding closing result channel since already closed");
             return false;
         }
 
@@ -2322,7 +2310,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean delayedOutput(@NotNull final NestedQueue<Object> queue,
                 @Nullable final OUT output) {
 
-            mSubLogger.dbg("delayed output execution: %s", output);
+            mLogger.dbg("delayed output execution: %s", output);
             if (--mPendingOutputCount == 0) {
                 mState = new FlushChannelState();
             }
@@ -2335,7 +2323,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @Override
         boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
-            mSubLogger.dbg("delayed output execution: %s", outputs);
+            mLogger.dbg("delayed output execution: %s", outputs);
             if (--mPendingOutputCount == 0) {
                 mState = new FlushChannelState();
             }

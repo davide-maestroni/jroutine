@@ -131,7 +131,7 @@ public class Runners {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
                 sSharedRunner = dynamicPoolRunner((processors <= 2) ? processors : processors - 1,
-                        (processors << 3) - 1, 3L, TimeUnit.SECONDS);
+                        (processors << 2) - 1, 3, TimeUnit.SECONDS);
             }
 
             return sSharedRunner;

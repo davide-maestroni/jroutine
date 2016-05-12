@@ -245,6 +245,37 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @StreamTransform(MAP)
+    LoaderStreamChannelCompat<IN, OUT> concatGet(long count,
+            @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannelCompat<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannelCompat<IN, OUT> concatGetN(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannelCompat<IN, OUT> concatGetN(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
     LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**

@@ -243,6 +243,35 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> concatGet(long count, @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> concatGetN(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    LoaderStreamChannel<IN, OUT> concatGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**

@@ -368,6 +368,83 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
+     * Concatenates a stream concatenating the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> concatGet(long count, @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * Concatenates a stream concatenating the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * Concatenates a stream concatenating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> concatGetN(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * Concatenates a stream concatenating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamTransform(MAP)
+    StreamChannel<IN, OUT> concatGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
      * Concatenates a stream filtering data based on the values returned by the specified predicate.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
@@ -1051,6 +1128,8 @@ public interface StreamChannel<IN, OUT>
      * Concatenates a stream generating the specified output.
      * <br>
      * The outputs will be generated only when the previous routine invocations complete.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1068,6 +1147,8 @@ public interface StreamChannel<IN, OUT>
      * Concatenates a stream generating the specified outputs.
      * <br>
      * The outputs will be generated only when the previous routine invocations complete.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1085,6 +1166,8 @@ public interface StreamChannel<IN, OUT>
      * Concatenates a stream generating the output returned by the specified iterable.
      * <br>
      * The outputs will be generated only when the previous routine invocations complete.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1103,6 +1186,8 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1123,6 +1208,8 @@ public interface StreamChannel<IN, OUT>
      * Concatenates a stream generating the outputs returned by the specified supplier.
      * <br>
      * The supplier will be called only when the previous routine invocations complete.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1144,6 +1231,8 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * The consumer will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>
@@ -1167,6 +1256,8 @@ public interface StreamChannel<IN, OUT>
      * or no results may be generated.
      * <br>
      * The consumer will be called only when the previous routine invocations complete.
+     * <br>
+     * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
      * <br>

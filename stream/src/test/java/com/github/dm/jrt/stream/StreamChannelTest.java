@@ -476,6 +476,112 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testConcat2() {
+
+        assertThat(Streams.streamOf("test1").sync().concatGet(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).all()).containsExactly("test1", "TEST2");
+        assertThat(
+                Streams.streamOf("test1").sync().concatGetN(new Consumer<ResultChannel<String>>() {
+
+                    public void accept(final ResultChannel<String> resultChannel) {
+
+                        resultChannel.pass("TEST2");
+                    }
+                }).all()).containsExactly("test1", "TEST2");
+        assertThat(Streams.streamOf("test1").sync().concatGet(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .sync()
+                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1").async().concatGet(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(
+                Streams.streamOf("test1").async().concatGetN(new Consumer<ResultChannel<String>>() {
+
+                    public void accept(final ResultChannel<String> resultChannel) {
+
+                        resultChannel.pass("TEST2");
+                    }
+                }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(Streams.streamOf("test1").async().concatGet(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1").parallel().concatGet(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .concatGetN(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "TEST2");
+        assertThat(Streams.streamOf("test1").parallel().concatGet(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
     public void testConfiguration() {
 
         assertThat(

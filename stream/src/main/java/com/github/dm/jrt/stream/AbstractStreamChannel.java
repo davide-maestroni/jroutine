@@ -328,6 +328,33 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> concatGet(final long count,
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return map(new ConcatLoopSupplierInvocationFactory<OUT>(count, wrap(supplier)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> concatGet(@NotNull final Supplier<? extends OUT> supplier) {
+
+        return concatGet(1, supplier);
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> concatGetN(final long count,
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return map(new ConcatLoopConsumerInvocationFactory<OUT>(count, wrap(consumer)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> concatGetN(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return concatGetN(1, consumer);
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return map(predicateFilter(predicate));

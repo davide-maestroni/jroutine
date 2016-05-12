@@ -357,6 +357,42 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> concatGet(final long count,
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGet(count, supplier);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> concatGet(
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGet(supplier);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> concatGetN(final long count,
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetN(count, consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> concatGetN(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetN(consumer);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> filter(
             @NotNull final Predicate<? super OUT> predicate) {
 

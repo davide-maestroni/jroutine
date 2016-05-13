@@ -18,23 +18,43 @@ package com.github.dm.jrt.android;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.SupplierWrapper;
+import com.github.dm.jrt.function.Wrapper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.function.Functions.consumerCall;
+import static com.github.dm.jrt.function.Functions.consumerCommand;
+import static com.github.dm.jrt.function.Functions.consumerConversion;
+import static com.github.dm.jrt.function.Functions.functionCall;
+import static com.github.dm.jrt.function.Functions.functionConversion;
+import static com.github.dm.jrt.function.Functions.predicateFilter;
+import static com.github.dm.jrt.function.Functions.supplierCommand;
+import static com.github.dm.jrt.function.Functions.supplierFactory;
+import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Context based builder of loader routine builders.
@@ -53,6 +73,16 @@ public class LoaderBuilderCompat {
     LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
 
         mContext = ConstantConditions.notNull("loader context", context);
+    }
+
+    private static void checkStatic(@NotNull final Wrapper wrapper,
+            @NotNull final Object function) {
+
+        if (!wrapper.hasStaticScope()) {
+            throw new IllegalArgumentException(
+                    "the function instance does not have a static scope: " + function.getClass()
+                                                                                     .getName());
+        }
     }
 
     /**
@@ -182,9 +212,9 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a routine builder based on the specified operation invocation.
+     * Returns a routine builder based on the specified conversion invocation.
      *
-     * @param invocation the operation invocation instance.
+     * @param invocation the conversion invocation instance.
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the routine builder instance.
@@ -193,7 +223,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-            @NotNull final TransformInvocation<IN, OUT> invocation) {
+            @NotNull final ConversionInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }
@@ -327,6 +357,44 @@ public class LoaderBuilderCompat {
     }
 
     /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return on(consumerCall(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onCall(
+            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+
+        checkStatic(wrap(function), function);
+        return on(functionCall(function));
+    }
+
+    /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
      * class.
      * <br>
@@ -345,6 +413,132 @@ public class LoaderBuilderCompat {
     public LoaderAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
 
         return on(ContextInvocationTarget.classOfType(targetClass));
+    }
+
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <OUT> LoaderRoutineBuilder<Void, OUT> onCommand(
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return on(supplierCommand(supplier));
+    }
+
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <OUT> LoaderRoutineBuilder<Void, OUT> onCommandMore(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return on(consumerCommand(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on an invocation factory backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onContextFactory(
+            @NotNull final Supplier<? extends ContextInvocation<? super IN, ? extends OUT>>
+                    supplier) {
+
+        final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends OUT>> wrapper =
+                wrap(supplier);
+        checkStatic(wrapper, supplier);
+        return on(new SupplierContextInvocationFactory<IN, OUT>(wrapper));
+    }
+
+    /**
+     * Returns a routine builder based on a conversion invocation backed by the specified function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onConversion(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
+
+        checkStatic(wrap(function), function);
+        return on(functionConversion(function));
+    }
+
+    /**
+     * Returns a routine builder based on a conversion invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onConversionMore(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return on(consumerConversion(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on an invocation factory backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onFactory(
+            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return on(supplierFactory(supplier));
+    }
+
+    /**
+     * Returns a routine builder based on a operation invocation backed by the specified predicate.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified predicate has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN> LoaderRoutineBuilder<IN, IN> onFilter(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        checkStatic(wrap(predicate), predicate);
+        return on(predicateFilter(predicate));
     }
 
     /**

@@ -38,13 +38,10 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      * Constructor.
      *
      * @param channel the wrapped output channel.
-     * @param invoke  the invoke function.
      */
-    DefaultStreamChannel(@NotNull final OutputChannel<IN> channel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
+    DefaultStreamChannel(@NotNull final OutputChannel<IN> channel) {
 
-        super(InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC, channel,
-                invoke);
+        super(InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC, channel, null);
     }
 
     /**
@@ -53,14 +50,14 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the invocation mode.
      * @param sourceChannel  the source output channel.
-     * @param invoke         the invoke function.
+     * @param bind           the bind function.
      */
     private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bind) {
 
-        super(configuration, invocationMode, sourceChannel, invoke);
+        super(configuration, invocationMode, sourceChannel, bind);
     }
 
     @NotNull

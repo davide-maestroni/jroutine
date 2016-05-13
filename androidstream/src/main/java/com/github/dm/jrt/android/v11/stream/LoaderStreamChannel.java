@@ -265,7 +265,8 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> concatGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    LoaderStreamChannel<IN, OUT> concatGetMore(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
@@ -406,7 +407,8 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> orElseGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    LoaderStreamChannel<IN, OUT> orElseGetMore(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
@@ -484,6 +486,9 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
      */
     @NotNull
     @StreamTransform(MAP)
@@ -491,10 +496,23 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
      */
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> runOnShared();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    LoaderStreamChannel<IN, OUT> runSequentially();
 
     /**
      * {@inheritDoc}

@@ -67,7 +67,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     private boolean mIsComplete;
 
-    private IOChannel<OUT> mOutputChannel;
+    private volatile IOChannel<OUT> mOutputChannel;
 
     /**
      * Constructor.
@@ -113,28 +113,20 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public int size() {
 
-        synchronized (mMutex) {
-            return mOutputChannel.size();
-        }
+        return mOutputChannel.size();
     }
 
     @NotNull
     public OutputChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
-        synchronized (mMutex) {
-            mOutputChannel.afterMax(timeout);
-        }
-
+        mOutputChannel.afterMax(timeout);
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-        synchronized (mMutex) {
-            mOutputChannel.afterMax(timeout, timeUnit);
-        }
-
+        mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
@@ -171,8 +163,9 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     public OutputChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         final boolean isComplete;
-        final IOChannel<OUT> channel;
         final RoutineException abortException;
+        final IOChannel<OUT> outputChannel;
+        final IOChannel<OUT> channel;
         synchronized (mMutex) {
             final IdentityHashMap<OutputConsumer<? super OUT>, IOChannel<OUT>> consumers =
                     mConsumers;
@@ -182,9 +175,11 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
             isComplete = mIsComplete;
             abortException = mAbortException;
-            final IOChannel<OUT> outputChannel = mOutputChannel;
-            consumers.put(consumer, outputChannel);
-            outputChannel.bind(consumer);
+            outputChannel = mOutputChannel;
+            if ((abortException == null) && !isComplete) {
+                consumers.put(consumer, outputChannel);
+            }
+
             channel = createOutputChannel().pass(mCached);
             if (abortException != null) {
                 channel.abort(abortException);
@@ -196,76 +191,53 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
             mOutputChannel = channel;
         }
 
+        outputChannel.bind(consumer);
         return this;
     }
 
     @NotNull
     public Iterator<OUT> eventualIterator() {
 
-        synchronized (mMutex) {
-            return mOutputChannel.eventualIterator();
-        }
+        return mOutputChannel.eventualIterator();
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyAbort() {
 
-        synchronized (mMutex) {
-            mOutputChannel.eventuallyAbort();
-        }
-
+        mOutputChannel.eventuallyAbort();
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        synchronized (mMutex) {
-            mOutputChannel.eventuallyAbort(reason);
-        }
-
+        mOutputChannel.eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyExit() {
 
-        synchronized (mMutex) {
-            mOutputChannel.eventuallyExit();
-        }
-
+        mOutputChannel.eventuallyExit();
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyThrow() {
 
-        synchronized (mMutex) {
-            mOutputChannel.eventuallyThrow();
-        }
-
+        mOutputChannel.eventuallyThrow();
         return this;
     }
 
     @Nullable
     public RoutineException getError() {
 
-        final IOChannel<OUT> outputChannel;
-        synchronized (mMutex) {
-            outputChannel = mOutputChannel;
-        }
-
-        return outputChannel.getError();
+        return mOutputChannel.getError();
     }
 
     public boolean hasCompleted() {
 
-        final IOChannel<OUT> outputChannel;
-        synchronized (mMutex) {
-            outputChannel = mOutputChannel;
-        }
-
-        return outputChannel.hasCompleted();
+        return mOutputChannel.hasCompleted();
     }
 
     public boolean hasNext() {
@@ -310,12 +282,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public void throwError() {
 
-        final IOChannel<OUT> outputChannel;
-        synchronized (mMutex) {
-            outputChannel = mOutputChannel;
-        }
-
-        outputChannel.throwError();
+        mOutputChannel.throwError();
     }
 
     public Iterator<OUT> iterator() {
@@ -328,10 +295,10 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mIsComplete = true;
-            mOutputChannel.close();
             channels = new ArrayList<IOChannel<OUT>>(mConsumers.values());
         }
 
+        mOutputChannel.close();
         for (final IOChannel<OUT> channel : channels) {
             channel.close();
         }
@@ -342,10 +309,10 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mAbortException = error;
-            mOutputChannel.abort(error);
             channels = new ArrayList<IOChannel<OUT>>(mConsumers.values());
         }
 
+        mOutputChannel.abort(error);
         for (final IOChannel<OUT> channel : channels) {
             channel.abort(error);
         }
@@ -356,10 +323,10 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mCached.add(output);
-            mOutputChannel.pass(output);
             channels = new ArrayList<IOChannel<OUT>>(mConsumers.values());
         }
 
+        mOutputChannel.pass(output);
         for (final IOChannel<OUT> channel : channels) {
             channel.pass(output);
         }
@@ -367,9 +334,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public void remove() {
 
-        synchronized (mMutex) {
-            mOutputChannel.remove();
-        }
+        mOutputChannel.remove();
     }
 
     @NotNull

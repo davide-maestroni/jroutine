@@ -128,17 +128,13 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     /**
      * Constructor.
      *
-     * @param builder       the context builder.
      * @param sourceChannel the source output channel.
-     * @param invoke        the invoke function.
      */
-    DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
-            @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
+    DefaultLoaderStreamChannelCompat(@NotNull final OutputChannel<IN> sourceChannel) {
 
-        this(builder, InvocationConfiguration.defaultConfiguration(),
+        this(null, InvocationConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC, sourceChannel,
-                invoke);
+                null);
     }
 
     /**
@@ -149,16 +145,17 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
      * @param loaderConfiguration     the initial loader configuration.
      * @param invocationMode          the invocation mode.
      * @param sourceChannel           the source output channel.
-     * @param invoke                  the invoke function.
+     * @param bindFunction            if null the stream will act as a wrapper of the source output
+     *                                channel.
      */
     private DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
+            @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction) {
 
-        super(invocationConfiguration, invocationMode, sourceChannel, invoke);
+        super(invocationConfiguration, invocationMode, sourceChannel, bindFunction);
         mContextBuilder = builder;
         mStreamConfiguration =
                 ConstantConditions.notNull("loader configuration", loaderConfiguration);
@@ -649,6 +646,13 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public LoaderStreamChannelCompat<IN, OUT> runOnShared() {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.runOnShared();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> runSequentially() {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.runSequentially();
     }
 
     @NotNull

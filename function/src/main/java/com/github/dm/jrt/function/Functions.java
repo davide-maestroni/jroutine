@@ -19,9 +19,9 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -156,7 +156,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new operation invocation based on the specified bi-consumer instance.
+     * Builds and returns a new conversion invocation based on the specified bi-consumer instance.
      * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
@@ -169,13 +169,13 @@ public class Functions {
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the operation invocation.
+     * @return the conversion invocation.
      */
     @NotNull
-    public static <IN, OUT> TransformInvocation<IN, OUT> consumerOperation(
+    public static <IN, OUT> ConversionInvocation<IN, OUT> consumerConversion(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerTransformInvocation<IN, OUT>(wrap(consumer));
+        return new ConsumerConversionInvocation<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -217,7 +217,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new operation invocation based on the specified function instance.
+     * Builds and returns a new conversion invocation based on the specified function instance.
      * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
@@ -230,13 +230,13 @@ public class Functions {
      * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the operation invocation.
+     * @return the conversion invocation.
      */
     @NotNull
-    public static <IN, OUT> TransformInvocation<IN, OUT> functionOperation(
+    public static <IN, OUT> ConversionInvocation<IN, OUT> functionConversion(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
-        return new FunctionTransformInvocation<IN, OUT>(wrap(function));
+        return new FunctionConversionInvocation<IN, OUT>(wrap(function));
     }
 
     /**
@@ -462,7 +462,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new operation invocation based on the specified predicate instance.
+     * Builds and returns a new conversion invocation based on the specified predicate instance.
      * <br>
      * Only the inputs which satisfies the predicate will be passed on, while the others will be
      * filtered out.
@@ -477,13 +477,13 @@ public class Functions {
      *
      * @param predicate the predicate instance.
      * @param <IN>      the input data type.
-     * @return the operation invocation.
+     * @return the conversion invocation.
      */
     @NotNull
-    public static <IN> TransformInvocation<IN, IN> predicateFilter(
+    public static <IN> ConversionInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
-        return new PredicateTransformInvocation<IN>(wrap(predicate));
+        return new PredicateConversionInvocation<IN>(wrap(predicate));
     }
 
     /**

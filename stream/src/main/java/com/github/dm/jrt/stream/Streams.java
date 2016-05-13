@@ -1275,7 +1275,7 @@ public class Streams extends Functions {
             return (StreamChannel<OUT, OUT>) output;
         }
 
-        return new DefaultStreamChannel<OUT, OUT>(output, Functions.<OutputChannel<OUT>>identity());
+        return new DefaultStreamChannel<OUT, OUT>(output);
     }
 
     /**

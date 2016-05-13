@@ -30,8 +30,8 @@ import com.github.dm.jrt.object.annotation.AsyncMethod;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
-import com.github.dm.jrt.object.annotation.InputLimit;
 import com.github.dm.jrt.object.annotation.InputBackoff;
+import com.github.dm.jrt.object.annotation.InputLimit;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
@@ -518,8 +518,7 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withInputLimit(").append(inputLimitAnnotation.value()).append(")");
         }
 
-        final InputBackoff inputBackoffAnnotation =
-                methodElement.getAnnotation(InputBackoff.class);
+        final InputBackoff inputBackoffAnnotation = methodElement.getAnnotation(InputBackoff.class);
         if (inputBackoffAnnotation != null) {
             builder.append(".withInputBackoff(")
                    .append(inputBackoffAnnotation.value())

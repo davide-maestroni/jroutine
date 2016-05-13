@@ -689,8 +689,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        abort(timeoutException);
-        throw AbortException.wrapIfNeeded(timeoutException);
+        final RoutineException abortException = AbortException.wrapIfNeeded(timeoutException);
+        abortImmediately(abortException);
+        throw abortException;
     }
 
     private void nextExecution() {
@@ -797,8 +798,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        abort(timeoutException);
-        throw AbortException.wrapIfNeeded(timeoutException);
+        final RoutineException abortException = AbortException.wrapIfNeeded(timeoutException);
+        abortImmediately(abortException);
+        throw abortException;
     }
 
     private void runExecution(@NotNull final Execution execution, final long delay,
@@ -1338,8 +1340,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                                         + "]");
 
                     } else if (timeoutAction == TimeoutActionType.ABORT) {
-                        abort(timeoutException);
-                        throw AbortException.wrapIfNeeded(timeoutException);
+                        final RoutineException abortException =
+                                AbortException.wrapIfNeeded(timeoutException);
+                        abortImmediately(abortException);
+                        throw abortException;
                     }
                 }
             }

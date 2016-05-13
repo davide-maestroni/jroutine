@@ -42,10 +42,10 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -76,7 +76,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionOperation;
+import static com.github.dm.jrt.function.Functions.functionConversion;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -111,6 +111,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                         return value * value;
                     }
                 });
+            }
+        };
+    }
+
+    private static Function<Number, Double> sqrt() {
+
+        return new Function<Number, Double>() {
+
+            public Double apply(final Number number) {
+
+                return Math.sqrt(number.doubleValue());
             }
         };
     }
@@ -1593,9 +1604,9 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         }
 
-        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
-        channel =
-                LoaderStreamsCompat.streamOf(ioChannel.after(1000, TimeUnit.SECONDS).pass("test"));
+        channel = LoaderStreamsCompat.streamOf(
+                JRoutineCore.io().<String>buildChannel().after(1000, TimeUnit.SECONDS)
+                                                        .pass("test"));
         try {
             channel.eventuallyThrow().next();
             fail();
@@ -1620,6 +1631,16 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         }
 
+        try {
+            channel.eventuallyAbort(new IllegalArgumentException()).next();
+            fail();
+
+        } catch (final AbortException e) {
+            assertThat(e.getCause()).isNull();
+        }
+
+        channel = LoaderStreamsCompat.streamOf(
+                JRoutineCore.io().<String>buildChannel().after(seconds(1000)).pass("test"));
         try {
             channel.eventuallyAbort(new IllegalArgumentException()).next();
             fail();
@@ -1879,7 +1900,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testFlatMapRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionOperation(new Function<Object, String>() {
+                JRoutineCore.on(functionConversion(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -2223,7 +2244,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .map((TransformInvocation<Object, Object>) null);
+                               .map((ConversionInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2234,7 +2255,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
-                               .map((TransformInvocation<Object, Object>) null);
+                               .map((ConversionInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2245,7 +2266,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .map((TransformInvocation<Object, Object>) null);
+                               .map((ConversionInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2256,7 +2277,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .serial()
-                               .map((TransformInvocation<Object, Object>) null);
+                               .map((ConversionInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2630,6 +2651,21 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testSequential() {
+
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .runSequentially()
+                                      .thenGetMore(range(1, 1000))
+                                      .streamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .apply()
+                                      .map(sqrt())
+                                      .map(LoaderStreamsCompat.<Double>mean())
+                                      .map(LoaderStreamsCompat.castTo(Double.class))
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
     public void testSize() {
 
         final InvocationChannel<Object, Object> channel =
@@ -2992,7 +3028,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testThenNullPointerError() {
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sync().thenGetMore(3, null);
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .sync()
+                               .thenGetMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3035,7 +3074,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).async().thenGetMore(null);
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .async()
+                               .thenGetMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3159,7 +3201,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class AbortInvocation extends TransformInvocation<Object, Object> {
+    private static class AbortInvocation extends ConversionInvocation<Object, Object> {
 
         private AbortInvocation() {
 
@@ -3269,7 +3311,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class UpperCase extends TransformInvocation<String, String> {
+    private static class UpperCase extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.

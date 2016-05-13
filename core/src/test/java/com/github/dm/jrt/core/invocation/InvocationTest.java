@@ -80,8 +80,8 @@ public class InvocationTest {
     @Test
     public void testComparableFilterInvocation() {
 
-        final TestComparableTransformInvocation factory =
-                new TestComparableTransformInvocation(asArgs(1));
+        final TestComparableConversionInvocation factory =
+                new TestComparableConversionInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
@@ -93,10 +93,10 @@ public class InvocationTest {
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
-        assertThat(factory).isNotEqualTo(new TestComparableTransformInvocation(asArgs(2)));
+        assertThat(factory).isNotEqualTo(new TestComparableConversionInvocation(asArgs(2)));
         assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableTransformInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableTransformInvocation(asArgs(1)));
+                new TestComparableConversionInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableConversionInvocation(asArgs(1)));
     }
 
     @Test
@@ -261,6 +261,24 @@ public class InvocationTest {
         }
     }
 
+    private static class TestComparableConversionInvocation
+            extends ConversionInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        protected TestComparableConversionInvocation(@Nullable final Object[] args) {
+
+            super(args);
+        }
+
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
+
+        }
+    }
+
     private static class TestComparableInvocationFactory extends InvocationFactory<Object, Object> {
 
         /**
@@ -281,25 +299,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableTransformInvocation
-            extends TransformInvocation<Object, Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        protected TestComparableTransformInvocation(@Nullable final Object[] args) {
-
-            super(args);
-        }
-
-        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
-
-        }
-    }
-
-    private static class TestInvocation extends TransformInvocation<Object, Object> {
+    private static class TestInvocation extends ConversionInvocation<Object, Object> {
 
         /**
          * Constructor.

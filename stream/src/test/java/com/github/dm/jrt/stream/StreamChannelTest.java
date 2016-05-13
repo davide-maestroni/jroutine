@@ -32,11 +32,11 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -69,7 +69,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.days;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionOperation;
+import static com.github.dm.jrt.function.Functions.functionConversion;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -202,9 +202,7 @@ public class StreamChannelTest {
         channel = Streams.streamOf("test1", "test2", "test3");
 
         try {
-
             channel.remove();
-
             fail();
 
         } catch (final UnsupportedOperationException ignored) {
@@ -220,22 +218,18 @@ public class StreamChannelTest {
         assertThat(iterator.next()).isEqualTo("test1");
 
         try {
-
             iterator.remove();
-
             fail();
 
         } catch (final UnsupportedOperationException ignored) {
 
         }
 
-        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
-        channel = Streams.streamOf(ioChannel.after(days(1)).pass("test"));
+        channel = Streams.streamOf(
+                JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"));
 
         try {
-
             channel.eventuallyThrow().next();
-
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -243,9 +237,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             channel.eventuallyExit().next();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
@@ -253,9 +245,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             channel.eventuallyAbort().next();
-
             fail();
 
         } catch (final AbortException ignored) {
@@ -263,13 +253,21 @@ public class StreamChannelTest {
         }
 
         try {
-
             channel.eventuallyAbort(new IllegalArgumentException()).next();
-
             fail();
 
         } catch (final AbortException e) {
+            assertThat(e.getCause()).isNull();
+        }
 
+        channel = Streams.streamOf(
+                JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"));
+
+        try {
+            channel.eventuallyAbort(new IllegalArgumentException()).next();
+            fail();
+
+        } catch (final AbortException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -485,14 +483,16 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).all()).containsExactly("test1", "TEST2");
-        assertThat(
-                Streams.streamOf("test1").sync().concatGetMore(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1")
+                          .sync()
+                          .concatGetMore(new Consumer<ResultChannel<String>>() {
 
-                    public void accept(final ResultChannel<String> resultChannel) {
+                              public void accept(final ResultChannel<String> resultChannel) {
 
-                        resultChannel.pass("TEST2");
-                    }
-                }).all()).containsExactly("test1", "TEST2");
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .all()).containsExactly("test1", "TEST2");
         assertThat(Streams.streamOf("test1").sync().concatGet(3, new Supplier<String>() {
 
             public String get() {
@@ -517,14 +517,17 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
-        assertThat(
-                Streams.streamOf("test1").async().concatGetMore(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .concatGetMore(new Consumer<ResultChannel<String>>() {
 
-                    public void accept(final ResultChannel<String> resultChannel) {
+                              public void accept(final ResultChannel<String> resultChannel) {
 
-                        resultChannel.pass("TEST2");
-                    }
-                }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "TEST2");
         assertThat(Streams.streamOf("test1").async().concatGet(3, new Supplier<String>() {
 
             public String get() {
@@ -1071,7 +1074,7 @@ public class StreamChannelTest {
     public void testFlatMapRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionOperation(new Function<Object, String>() {
+                JRoutineCore.on(functionConversion(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -1200,40 +1203,42 @@ public class StreamChannelTest {
     @Test
     public void testMapAllConsumer() {
 
-        assertThat(Streams.streamOf("test1", "test2", "test3").async().mapAllMore(new BiConsumer<List<?
-                extends String>, ResultChannel<String>>() {
+        assertThat(
+                Streams.streamOf("test1", "test2", "test3").async().mapAllMore(new BiConsumer<List<?
+                        extends String>, ResultChannel<String>>() {
 
-            public void accept(final List<?
-                    extends
-                    String> strings, final ResultChannel<String> result) {
+                    public void accept(final List<?
+                            extends
+                            String> strings, final ResultChannel<String> result) {
 
-                final StringBuilder builder = new StringBuilder();
+                        final StringBuilder builder = new StringBuilder();
 
-                for (final String string : strings) {
+                        for (final String string : strings) {
 
-                    builder.append(string);
-                }
+                            builder.append(string);
+                        }
 
-                result.pass(builder.toString());
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("test1test2test3");
+                        result.pass(builder.toString());
+                    }
+                }).afterMax(seconds(3)).all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .mapAllMore(new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+                          .mapAllMore(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
-                              public void accept(final List<? extends String> strings,
-                                      final ResultChannel<String> result) {
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
 
-                                  final StringBuilder builder = new StringBuilder();
+                                          final StringBuilder builder = new StringBuilder();
 
-                                  for (final String string : strings) {
+                                          for (final String string : strings) {
 
-                                      builder.append(string);
-                                  }
+                                              builder.append(string);
+                                          }
 
-                                  result.pass(builder.toString());
-                              }
-                          })
+                                          result.pass(builder.toString());
+                                      }
+                                  })
                           .all()).containsExactly("test1test2test3");
     }
 
@@ -1467,7 +1472,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().map((TransformInvocation<Object, Object>) null);
+            Streams.streamOf().async().map((ConversionInvocation<Object, Object>) null);
 
             fail();
 
@@ -1477,7 +1482,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().map((TransformInvocation<Object, Object>) null);
+            Streams.streamOf().parallel().map((ConversionInvocation<Object, Object>) null);
 
             fail();
 
@@ -1487,7 +1492,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().map((TransformInvocation<Object, Object>) null);
+            Streams.streamOf().sync().map((ConversionInvocation<Object, Object>) null);
 
             fail();
 
@@ -1497,7 +1502,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((TransformInvocation<Object, Object>) null);
+            Streams.streamOf().serial().map((ConversionInvocation<Object, Object>) null);
 
             fail();
 
@@ -1859,13 +1864,14 @@ public class StreamChannelTest {
                 result.pass("est");
             }
         }).afterMax(seconds(3)).all()).containsExactly("est");
-        assertThat(Streams.<String>streamOf().orElseGetMore(2, new Consumer<ResultChannel<String>>() {
+        assertThat(
+                Streams.<String>streamOf().orElseGetMore(2, new Consumer<ResultChannel<String>>() {
 
-            public void accept(final ResultChannel<String> result) {
+                    public void accept(final ResultChannel<String> result) {
 
-                result.pass("est");
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("est", "est");
+                        result.pass("est");
+                    }
+                }).afterMax(seconds(3)).all()).containsExactly("est", "est");
         assertThat(Streams.<String>streamOf().orElseGet(new Supplier<String>() {
 
             public String get() {
@@ -2181,6 +2187,28 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testSequential() {
+
+        assertThat(Streams.streamOf()
+                          .runSequentially()
+                          .thenGetMore(range(1, 1000))
+                          .streamInvocationConfiguration()
+                          .withInputMaxSize(1)
+                          .withOutputMaxSize(1)
+                          .apply()
+                          .map(new Function<Number, Double>() {
+
+                              public Double apply(final Number number) {
+
+                                  return Math.sqrt(number.doubleValue());
+                              }
+                          })
+                          .map(Streams.mean())
+                          .map(Streams.castTo(Double.class))
+                          .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    @Test
     public void testSize() {
 
         final InvocationChannel<Object, Object> channel =
@@ -2239,9 +2267,11 @@ public class StreamChannelTest {
                         });
                     }
                 };
-        assertThat(
-                Streams.streamOf().thenGetMore(range(1, 3)).splitBy(2, sqr).afterMax(seconds(3)).all())
-                .containsOnly(1L, 4L, 9L);
+        assertThat(Streams.streamOf()
+                          .thenGetMore(range(1, 3))
+                          .splitBy(2, sqr)
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1L, 4L, 9L);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
                           .splitBy(Functions.<Integer>identity(), sqr)
@@ -2259,13 +2289,14 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").sync().thenGetMore(new Consumer<ResultChannel<String>>() {
+        assertThat(
+                Streams.streamOf("test1").sync().thenGetMore(new Consumer<ResultChannel<String>>() {
 
-            public void accept(final ResultChannel<String> resultChannel) {
+                    public void accept(final ResultChannel<String> resultChannel) {
 
-                resultChannel.pass("TEST2");
-            }
-        }).all()).containsOnly("TEST2");
+                        resultChannel.pass("TEST2");
+                    }
+                }).all()).containsOnly("TEST2");
         assertThat(Streams.streamOf("test1").sync().thenGet(3, new Supplier<String>() {
 
             public String get() {
@@ -2273,14 +2304,16 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(
-                Streams.streamOf("test1").sync().thenGetMore(3, new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1")
+                          .sync()
+                          .thenGetMore(3, new Consumer<ResultChannel<String>>() {
 
-                    public void accept(final ResultChannel<String> resultChannel) {
+                              public void accept(final ResultChannel<String> resultChannel) {
 
-                        resultChannel.pass("TEST2");
-                    }
-                }).all()).containsOnly("TEST2", "TEST2", "TEST2");
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1").async().thenGet(new Supplier<String>() {
 
             public String get() {
@@ -2288,14 +2321,17 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(
-                Streams.streamOf("test1").async().thenGetMore(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .thenGetMore(new Consumer<ResultChannel<String>>() {
 
-                    public void accept(final ResultChannel<String> resultChannel) {
+                              public void accept(final ResultChannel<String> resultChannel) {
 
-                        resultChannel.pass("TEST2");
-                    }
-                }).afterMax(seconds(3)).all()).containsOnly("TEST2");
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
         assertThat(Streams.streamOf("test1").async().thenGet(3, new Supplier<String>() {
 
             public String get() {
@@ -2915,7 +2951,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class AbortInvocation extends TransformInvocation<Object, Object> {
+    private static class AbortInvocation extends ConversionInvocation<Object, Object> {
 
         private AbortInvocation() {
 
@@ -3015,7 +3051,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class UpperCase extends TransformInvocation<String, String> {
+    private static class UpperCase extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.

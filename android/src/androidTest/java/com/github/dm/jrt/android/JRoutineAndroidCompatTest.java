@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build.VERSION_CODES;
+import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.AutoProxyRoutineBuilder.BuilderType;
@@ -37,7 +38,13 @@ import com.github.dm.jrt.android.v4.TestActivity;
 import com.github.dm.jrt.android.v4.TestFragment;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.ReadTimeout;
@@ -69,6 +76,151 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         super(TestActivity.class);
     }
 
+    private static void testCallFunction(final FragmentActivity activity) {
+
+        final Routine<String, String> routine =
+                JRoutineAndroidCompat.with(activity).onCall(new Function<List<String>, String>() {
+
+                    public String apply(final List<String> strings) {
+
+                        final StringBuilder builder = new StringBuilder();
+                        for (final String string : strings) {
+                            builder.append(string);
+                        }
+
+                        return builder.toString();
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
+                "test1");
+    }
+
+    private static void testConsumerCommand(final FragmentActivity activity) {
+
+        final Routine<Void, String> routine = //
+                JRoutineAndroidCompat.with(activity)
+                                     .onCommandMore(new Consumer<ResultChannel<String>>() {
+
+                                         public void accept(final ResultChannel<String> result) {
+
+                                             result.pass("test", "1");
+                                         }
+                                     })
+                                     .buildRoutine();
+        assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
+    }
+
+    private static void testConsumerConversion(final FragmentActivity activity) {
+
+        final Routine<Object, String> routine = //
+                JRoutineAndroidCompat.with(activity)
+                                     .onConversionMore(
+                                             new BiConsumer<Object, ResultChannel<String>>() {
+
+                                                 public void accept(final Object o,
+                                                         final ResultChannel<String> result) {
+
+                                                     result.pass(o.toString());
+                                                 }
+                                             })
+                                     .buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
+                "1");
+    }
+
+    private static void testConsumerFunction(final FragmentActivity activity) {
+
+        final Routine<String, String> routine = //
+                JRoutineAndroidCompat.with(activity)
+                                     .onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
+
+                                         public void accept(final List<String> strings,
+                                                 final ResultChannel<String> result) {
+
+                                             final StringBuilder builder = new StringBuilder();
+                                             for (final String string : strings) {
+                                                 builder.append(string);
+                                             }
+
+                                             result.pass(builder.toString());
+                                         }
+                                     })
+                                     .buildRoutine();
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
+                "test1");
+    }
+
+    private static void testFunctionConversion(final FragmentActivity activity) {
+
+        final Routine<Object, String> routine =
+                JRoutineAndroidCompat.with(activity).onConversion(new Function<Object, String>() {
+
+                    public String apply(final Object o) {
+
+                        return o.toString();
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
+    }
+
+    private static void testPredicateFilter(final FragmentActivity activity) {
+
+        final Routine<String, String> routine =
+                JRoutineAndroidCompat.with(activity).onFilter(new Predicate<String>() {
+
+                    public boolean test(final String s) {
+
+                        return s.length() > 1;
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test");
+    }
+
+    private static void testSupplierCommand(final FragmentActivity activity) {
+
+        final Routine<Void, String> routine =
+                JRoutineAndroidCompat.with(activity).onCommand(new Supplier<String>() {
+
+                    public String get() {
+
+                        return "test";
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test");
+    }
+
+    private static void testSupplierContextFactory(final FragmentActivity activity) {
+
+        final Routine<String, String> routine =
+                JRoutineAndroidCompat.with(activity).onContextFactory(new Supplier<PassString>() {
+
+                    public PassString get() {
+
+                        return new PassString();
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+    }
+
+    private static void testSupplierFactory(final FragmentActivity activity) {
+
+        final Routine<String, String> routine =
+                JRoutineAndroidCompat.with(activity).onFactory(new Supplier<PassString>() {
+
+                    public PassString get() {
+
+                        return new PassString();
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+    }
+
+    public void testCallFunction() {
+
+        testCallFunction(getActivity());
+    }
+
     public void testConstructor() {
 
         boolean failed = false;
@@ -81,6 +233,26 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         }
 
         assertThat(failed).isFalse();
+    }
+
+    public void testConsumerCommand() {
+
+        testConsumerCommand(getActivity());
+    }
+
+    public void testConsumerConversion() {
+
+        testConsumerConversion(getActivity());
+    }
+
+    public void testConsumerFunction() {
+
+        testConsumerFunction(getActivity());
+    }
+
+    public void testFunctionConversion() {
+
+        testFunctionConversion(getActivity());
     }
 
     public void testIOChannel() {
@@ -291,6 +463,11 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         }
     }
 
+    public void testPredicateFilter() {
+
+        testPredicateFilter(getActivity());
+    }
+
     public void testService() {
 
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
@@ -465,6 +642,21 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testSupplierCommand() {
+
+        testSupplierCommand(getActivity());
+    }
+
+    public void testSupplierContextFactory() {
+
+        testSupplierContextFactory(getActivity());
+    }
+
+    public void testSupplierFactory() {
+
+        testSupplierFactory(getActivity());
     }
 
     @ServiceProxy(TestClass.class)

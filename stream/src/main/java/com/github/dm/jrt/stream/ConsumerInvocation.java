@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
 
@@ -32,7 +32,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <IN> the input data type.
  */
-class ConsumerInvocation<IN> extends TransformInvocation<IN, Void> {
+class ConsumerInvocation<IN> extends ConversionInvocation<IN, Void> {
 
     private final ConsumerWrapper<? super IN> mConsumer;
 

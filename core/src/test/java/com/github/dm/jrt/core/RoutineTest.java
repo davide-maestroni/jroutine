@@ -38,13 +38,13 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -3411,7 +3411,7 @@ public class RoutineTest {
         }
     }
 
-    private static class AbortInvocation extends TransformInvocation<String, String> {
+    private static class AbortInvocation extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3481,7 +3481,7 @@ public class RoutineTest {
         }
     }
 
-    private static class AbortInvocation2 extends TransformInvocation<String, String> {
+    private static class AbortInvocation2 extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3498,7 +3498,7 @@ public class RoutineTest {
         }
     }
 
-    private static class AllInvocation extends TransformInvocation<Object, Object> {
+    private static class AllInvocation extends ConversionInvocation<Object, Object> {
 
         /**
          * Constructor.
@@ -3517,7 +3517,7 @@ public class RoutineTest {
         }
     }
 
-    private static class CheckCompleteInvocation extends TransformInvocation<Object, Object> {
+    private static class CheckCompleteInvocation extends ConversionInvocation<Object, Object> {
 
         /**
          * Constructor.
@@ -3536,7 +3536,7 @@ public class RoutineTest {
         }
     }
 
-    private static class CloseInvocation extends TransformInvocation<String, String> {
+    private static class CloseInvocation extends ConversionInvocation<String, String> {
 
         private final AtomicBoolean mIsFailed;
 
@@ -3736,7 +3736,7 @@ public class RoutineTest {
         }
     }
 
-    private static class HasNextInvocation extends TransformInvocation<Object, Object> {
+    private static class HasNextInvocation extends ConversionInvocation<Object, Object> {
 
         /**
          * Constructor.
@@ -3756,7 +3756,7 @@ public class RoutineTest {
         }
     }
 
-    private static class InputArrayRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class InputArrayRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3783,7 +3783,7 @@ public class RoutineTest {
         }
     }
 
-    private static class InputConsumerRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class InputConsumerRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3809,7 +3809,7 @@ public class RoutineTest {
         }
     }
 
-    private static class InputListRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class InputListRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3836,7 +3836,7 @@ public class RoutineTest {
         }
     }
 
-    private static class InputRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class InputRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3863,7 +3863,7 @@ public class RoutineTest {
         }
     }
 
-    private static class NextInvocation extends TransformInvocation<Object, Object> {
+    private static class NextInvocation extends ConversionInvocation<Object, Object> {
 
         /**
          * Constructor.
@@ -3899,7 +3899,7 @@ public class RoutineTest {
         }
     }
 
-    private static class ResultArrayRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class ResultArrayRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3915,7 +3915,7 @@ public class RoutineTest {
         }
     }
 
-    private static class ResultListRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class ResultListRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3931,7 +3931,7 @@ public class RoutineTest {
         }
     }
 
-    private static class ResultRunnerDeadlock extends TransformInvocation<String, String> {
+    private static class ResultRunnerDeadlock extends ConversionInvocation<String, String> {
 
         /**
          * Constructor.
@@ -3963,7 +3963,7 @@ public class RoutineTest {
         }
     }
 
-    private static class SleepInvocation extends TransformInvocation<Object, Object> {
+    private static class SleepInvocation extends ConversionInvocation<Object, Object> {
 
         private final UnitDuration mSleepDuration;
 
@@ -3988,7 +3988,7 @@ public class RoutineTest {
         }
     }
 
-    private static class SquareInvocation extends TransformInvocation<Integer, Integer> {
+    private static class SquareInvocation extends ConversionInvocation<Integer, Integer> {
 
         /**
          * Constructor.

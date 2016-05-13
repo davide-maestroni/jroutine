@@ -491,6 +491,9 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
      */
     @NotNull
     @StreamTransform(MAP)
@@ -498,10 +501,23 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
      */
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannelCompat<IN, OUT> runOnShared();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    LoaderStreamChannelCompat<IN, OUT> runSequentially();
 
     /**
      * {@inheritDoc}

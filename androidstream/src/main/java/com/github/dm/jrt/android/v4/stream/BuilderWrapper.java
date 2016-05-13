@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -63,9 +62,8 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
     @SuppressWarnings("unchecked")
     public LoaderStreamChannelCompat<OUT, OUT> buildChannels() {
 
-        return new DefaultLoaderStreamChannelCompat<OUT, OUT>(null,
-                (OutputChannel<OUT>) mBuilder.buildChannels(),
-                Functions.<OutputChannel<OUT>>identity());
+        return new DefaultLoaderStreamChannelCompat<OUT, OUT>(
+                (OutputChannel<OUT>) mBuilder.buildChannels());
     }
 
     @NotNull

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,31 +25,31 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Operation invocation based on a function instance.
+ * Conversion invocation based on a bi-consumer instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class FunctionTransformInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
+class ConsumerConversionInvocation<IN, OUT> extends ConversionInvocation<IN, OUT> {
 
-    private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
+    private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
     /**
      * Constructor.
      *
-     * @param function the function instance.
+     * @param consumer the consumer instance.
      */
-    FunctionTransformInvocation(
-            @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
+    ConsumerConversionInvocation(
+            @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
-        mFunction = function;
+        super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
+        mConsumer = consumer;
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
-        result.pass(mFunction.apply(input));
+        mConsumer.accept(input, result);
     }
 }

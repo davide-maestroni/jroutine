@@ -960,6 +960,20 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> runOnShared();
 
     /**
+     * Sets the stream runner so that each input is sequentially passed through the whole chain.
+     * <p>
+     * Note that the runner is employed with asynchronous and parallel invocation modes, while the
+     * synchronous and serial modes will behave as before.
+     *
+     * @return this stream.
+     * @see #async()
+     * @see #parallel()
+     */
+    @NotNull
+    @StreamTransform(CONFIG)
+    StreamChannel<IN, OUT> runSequentially();
+
+    /**
      * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
      *
      * @return this stream.

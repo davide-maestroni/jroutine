@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,31 +25,31 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Operation invocation based on a bi-consumer instance.
+ * Conversion invocation based on a predicate instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class ConsumerTransformInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
+class PredicateConversionInvocation<IN> extends ConversionInvocation<IN, IN> {
 
-    private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
+    private final PredicateWrapper<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param predicate the predicate instance.
      */
-    ConsumerTransformInvocation(
-            @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
+    PredicateConversionInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
-        super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
-        mConsumer = consumer;
+        super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+        mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
 
-        mConsumer.accept(input, result);
+        if (mPredicate.test(input)) {
+            result.pass(input);
+        }
     }
 }

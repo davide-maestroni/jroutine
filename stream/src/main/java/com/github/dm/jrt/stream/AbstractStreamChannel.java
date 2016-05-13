@@ -18,6 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -26,9 +27,9 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TransformInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -56,9 +57,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.function.Functions.consumerCall;
-import static com.github.dm.jrt.function.Functions.consumerOperation;
+import static com.github.dm.jrt.function.Functions.consumerConversion;
 import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionOperation;
+import static com.github.dm.jrt.function.Functions.functionConversion;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
 
@@ -84,6 +85,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     outs.add(out);
                 }
             };
+
+    private static final SequentialRunner sSequentialRunner = new SequentialRunner();
+
+    private static FunctionWrapper<? extends OutputChannel<?>, ? extends OutputChannel<?>>
+            sIdentity = wrap(new Function<OutputChannel<?>, OutputChannel<?>>() {
+
+        public OutputChannel<?> apply(final OutputChannel<?> channel) throws Exception {
+
+            return channel;
+        }
+    });
 
     private final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> mBind;
 
@@ -120,18 +132,20 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the delegation type.
      * @param sourceChannel  the source output channel.
-     * @param bind           the bind function.
+     * @param bindFunction   if null the stream will act as a wrapper of the source output channel.
      */
+    @SuppressWarnings("unchecked")
     protected AbstractStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bind) {
+            @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction) {
 
         mStreamConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         mSourceChannel = ConstantConditions.notNull("source channel", sourceChannel);
-        mBind = wrap(bind);
+        mBind = (bindFunction != null) ? wrap(bindFunction)
+                : (FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>>) sIdentity;
     }
 
     public boolean abort() {
@@ -384,7 +398,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
-        return map(functionOperation(function));
+        return map(functionConversion(function));
     }
 
     @NotNull
@@ -421,7 +435,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return map(consumerOperation(consumer));
+        return map(consumerConversion(consumer));
     }
 
     @NotNull
@@ -571,7 +585,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> runOn(@Nullable final Runner runner) {
 
         final InvocationMode invocationMode = mInvocationMode;
-        final TransformInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
+        final ConversionInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
         final StreamChannel<IN, OUT> channel =
                 streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
         if (invocationMode == InvocationMode.ASYNC) {
@@ -593,6 +607,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> runOnShared() {
 
         return runOn(null);
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> runSequentially() {
+
+        return streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
     }
 
     @NotNull
@@ -987,6 +1007,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     @NotNull
+    @SuppressWarnings("unchecked")
     private OutputChannel<OUT> bind() {
 
         final boolean isBind;
@@ -999,11 +1020,20 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
 
         if (isBind) {
-            try {
-                mChannel = mBind.apply(mSourceChannel);
+            if (mBind == sIdentity) {
+                mChannel = (OutputChannel<OUT>) mSourceChannel;
 
-            } catch (final Exception e) {
-                throw StreamException.wrap(e);
+            } else {
+                final IOChannel<IN> inputChannel = JRoutineCore.io().buildChannel();
+                try {
+                    mChannel = mBind.apply(inputChannel);
+
+                } catch (final Exception e) {
+                    inputChannel.abort(e);
+                    throw StreamException.wrap(e);
+                }
+
+                inputChannel.pass(mSourceChannel).close();
             }
         }
 

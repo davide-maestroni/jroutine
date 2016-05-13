@@ -109,6 +109,14 @@ public class Runners {
 
     /**
      * Returns a runner employing the specified executor service.
+     * <p>
+     * Be aware that the created runner will not fully comply with the interface contract. Java
+     * executor services do not in fact publish the used threads, so that knowing in advance whether
+     * a thread belongs to the managed pool is not feasible. This issue actually exposes routines
+     * employing the runner to possible deadlocks, in case the specified service is not exclusively
+     * accessed by the runner itself.
+     * <br>
+     * Be then careful when employing runners returned by this method.
      *
      * @param service the executor service.
      * @return the runner instance.

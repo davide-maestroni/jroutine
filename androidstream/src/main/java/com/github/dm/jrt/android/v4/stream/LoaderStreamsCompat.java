@@ -37,7 +37,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
 
@@ -1070,8 +1069,7 @@ public class LoaderStreamsCompat extends Streams {
             return (LoaderStreamChannelCompat<OUT, OUT>) output;
         }
 
-        return new DefaultLoaderStreamChannelCompat<OUT, OUT>(null, output,
-                Functions.<OutputChannel<OUT>>identity());
+        return new DefaultLoaderStreamChannelCompat<OUT, OUT>(output);
     }
 
     /**

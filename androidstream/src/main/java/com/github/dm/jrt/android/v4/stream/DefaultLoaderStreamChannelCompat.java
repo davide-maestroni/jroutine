@@ -375,20 +375,20 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> concatGetN(final long count,
+    public LoaderStreamChannelCompat<IN, OUT> concatGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetN(count, consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetMore(count, consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> concatGetN(
+    public LoaderStreamChannelCompat<IN, OUT> concatGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetN(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concatGetMore(consumer);
     }
 
     @NotNull
@@ -465,20 +465,20 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAllN(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAllMore(
             @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAllN(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAllMore(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapN(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapN(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapMore(consumer);
     }
 
     @NotNull
@@ -541,20 +541,20 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> orElseGetN(final long count,
+    public LoaderStreamChannelCompat<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetN(count, consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetMore(count, consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> orElseGetN(
+    public LoaderStreamChannelCompat<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetN(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetMore(consumer);
     }
 
     @NotNull
@@ -786,20 +786,20 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetN(final long count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetN(count, consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetMore(count, consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetN(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetN(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetMore(consumer);
     }
 
     @NotNull
@@ -842,12 +842,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> tryCatchN(
+    public LoaderStreamChannelCompat<IN, OUT> tryCatchMore(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.tryCatchN(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.tryCatchMore(consumer);
     }
 
     @NotNull

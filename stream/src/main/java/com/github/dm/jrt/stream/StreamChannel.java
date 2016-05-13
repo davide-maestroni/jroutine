@@ -422,7 +422,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    StreamChannel<IN, OUT> concatGetN(long count,
+    StreamChannel<IN, OUT> concatGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
@@ -442,7 +442,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    StreamChannel<IN, OUT> concatGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    StreamChannel<IN, OUT> concatGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Concatenates a stream filtering data based on the values returned by the specified predicate.
@@ -586,7 +586,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> mapAllN(
+    <AFTER> StreamChannel<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -605,7 +605,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    <AFTER> StreamChannel<IN, AFTER> mapN(
+    <AFTER> StreamChannel<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -744,7 +744,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    StreamChannel<IN, OUT> orElseGetN(long count,
+    StreamChannel<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
@@ -765,7 +765,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    StreamChannel<IN, OUT> orElseGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    StreamChannel<IN, OUT> orElseGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
@@ -1246,7 +1246,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGetN(long count,
+    <AFTER> StreamChannel<IN, AFTER> thenGetMore(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -1269,7 +1269,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGetN(
+    <AFTER> StreamChannel<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -1353,7 +1353,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    StreamChannel<IN, OUT> tryCatchN(
+    StreamChannel<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**

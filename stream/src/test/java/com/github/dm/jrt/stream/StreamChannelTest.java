@@ -486,7 +486,7 @@ public class StreamChannelTest {
             }
         }).all()).containsExactly("test1", "TEST2");
         assertThat(
-                Streams.streamOf("test1").sync().concatGetN(new Consumer<ResultChannel<String>>() {
+                Streams.streamOf("test1").sync().concatGetMore(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> resultChannel) {
 
@@ -502,7 +502,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .sync()
-                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+                          .concatGetMore(3, new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -518,7 +518,7 @@ public class StreamChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
         assertThat(
-                Streams.streamOf("test1").async().concatGetN(new Consumer<ResultChannel<String>>() {
+                Streams.streamOf("test1").async().concatGetMore(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> resultChannel) {
 
@@ -534,7 +534,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .async()
-                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+                          .concatGetMore(3, new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -552,7 +552,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .parallel()
-                          .concatGetN(new Consumer<ResultChannel<String>>() {
+                          .concatGetMore(new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -570,7 +570,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .parallel()
-                          .concatGetN(3, new Consumer<ResultChannel<String>>() {
+                          .concatGetMore(3, new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -625,7 +625,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("test1", "test2");
         assertThat(Streams.streamOf()
                           .async()
-                          .thenGetN(range(1, 1000))
+                          .thenGetMore(range(1, 1000))
                           .backoffOn(getSingleThreadRunner(), 2, Backoffs.linearDelay(seconds(10)))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
@@ -664,7 +664,7 @@ public class StreamChannelTest {
                           .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(Streams.streamOf()
                           .async()
-                          .thenGetN(range(1, 1000))
+                          .thenGetMore(range(1, 1000))
                           .backoffOn(getSingleThreadRunner(), 2, 10, TimeUnit.SECONDS)
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
@@ -703,7 +703,7 @@ public class StreamChannelTest {
                           .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(Streams.streamOf()
                           .async()
-                          .thenGetN(range(1, 1000))
+                          .thenGetMore(range(1, 1000))
                           .backoffOn(getSingleThreadRunner(), 2, seconds(10))
                           .map(Functions.<Number>identity())
                           .map(new Function<Number, Double>() {
@@ -1086,7 +1086,7 @@ public class StreamChannelTest {
                         final int[] count = {0};
                         return Streams.streamOf(o)
                                       .map(routine)
-                                      .tryCatchN(
+                                      .tryCatchMore(
                                               new BiConsumer<RoutineException,
                                                       InputChannel<String>>() {
 
@@ -1097,7 +1097,7 @@ public class StreamChannelTest {
 
                                                           Streams.streamOf(o)
                                                                  .map(routine)
-                                                                 .tryCatchN(this)
+                                                                 .tryCatchMore(this)
                                                                  .bind(channel);
 
                                                       } else {
@@ -1169,28 +1169,28 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .limit(5)
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .limit(0)
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .limit(15)
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .limit(0)
                           .afterMax(seconds(3))
@@ -1200,7 +1200,7 @@ public class StreamChannelTest {
     @Test
     public void testMapAllConsumer() {
 
-        assertThat(Streams.streamOf("test1", "test2", "test3").async().mapAllN(new BiConsumer<List<?
+        assertThat(Streams.streamOf("test1", "test2", "test3").async().mapAllMore(new BiConsumer<List<?
                 extends String>, ResultChannel<String>>() {
 
             public void accept(final List<?
@@ -1219,7 +1219,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .mapAllN(new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+                          .mapAllMore(new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
                               public void accept(final List<? extends String> strings,
                                       final ResultChannel<String> result) {
@@ -1242,7 +1242,7 @@ public class StreamChannelTest {
     public void testMapAllConsumerNullPointerError() {
 
         try {
-            Streams.streamOf().async().mapAllN(null);
+            Streams.streamOf().async().mapAllMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1309,7 +1309,7 @@ public class StreamChannelTest {
     public void testMapConsumer() {
 
         assertThat(Streams.streamOf("test1", "test2")
-                          .mapN(new BiConsumer<String, ResultChannel<String>>() {
+                          .mapMore(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
                                       final ResultChannel<String> result) {
@@ -1322,7 +1322,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf("test1", "test2")
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .mapN(new BiConsumer<String, ResultChannel<String>>() {
+                          .mapMore(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
                                       final ResultChannel<String> result) {
@@ -1334,7 +1334,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .sync()
-                          .mapN(new BiConsumer<String, ResultChannel<String>>() {
+                          .mapMore(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
                                       final ResultChannel<String> result) {
@@ -1345,7 +1345,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .serial()
-                          .mapN(new BiConsumer<String, ResultChannel<String>>() {
+                          .mapMore(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
                                       final ResultChannel<String> result) {
@@ -1362,7 +1362,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().mapN(null);
+            Streams.streamOf().async().mapMore(null);
 
             fail();
 
@@ -1664,7 +1664,7 @@ public class StreamChannelTest {
         try {
 
             assertThat(Streams.streamOf()
-                              .thenGetN(range(1, 1000))
+                              .thenGetMore(range(1, 1000))
                               .streamInvocationConfiguration()
                               .withRunner(getSingleThreadRunner())
                               .withInputLimit(2)
@@ -1717,7 +1717,7 @@ public class StreamChannelTest {
         try {
 
             assertThat(Streams.streamOf()
-                              .thenGetN(range(1, 1000))
+                              .thenGetMore(range(1, 1000))
                               .streamInvocationConfiguration()
                               .withRunner(getSingleThreadRunner())
                               .withOutputLimit(2)
@@ -1766,7 +1766,7 @@ public class StreamChannelTest {
         try {
 
             assertThat(Streams.streamOf()
-                              .thenGetN(range(1, 1000))
+                              .thenGetMore(range(1, 1000))
                               .streamInvocationConfiguration()
                               .withRunner(getSingleThreadRunner())
                               .withInputLimit(2)
@@ -1829,7 +1829,7 @@ public class StreamChannelTest {
                           .orElse(Arrays.asList("est1", "est2"))
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamOf("test").orElseGetN(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test").orElseGetMore(new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> result) {
 
@@ -1852,14 +1852,14 @@ public class StreamChannelTest {
         assertThat(
                 Streams.streamOf().orElse(Arrays.asList("est1", "est2")).afterMax(seconds(3)).all())
                 .containsExactly("est1", "est2");
-        assertThat(Streams.<String>streamOf().orElseGetN(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.<String>streamOf().orElseGetMore(new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> result) {
 
                 result.pass("est");
             }
         }).afterMax(seconds(3)).all()).containsExactly("est");
-        assertThat(Streams.<String>streamOf().orElseGetN(2, new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.<String>streamOf().orElseGetMore(2, new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> result) {
 
@@ -1887,7 +1887,7 @@ public class StreamChannelTest {
     public void testOrElseNullPointerError() {
 
         try {
-            Streams.streamOf().orElseGetN(null);
+            Streams.streamOf().orElseGetMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1895,7 +1895,7 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().orElseGetN(1, null);
+            Streams.streamOf().orElseGetMore(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2199,21 +2199,21 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .skip(5)
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(6, 7, 8, 9, 10));
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .skip(15)
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
                           .sync()
-                          .thenGetN(range(1, 10))
+                          .thenGetMore(range(1, 10))
                           .async()
                           .skip(0)
                           .afterMax(seconds(3))
@@ -2240,10 +2240,10 @@ public class StreamChannelTest {
                     }
                 };
         assertThat(
-                Streams.streamOf().thenGetN(range(1, 3)).splitBy(2, sqr).afterMax(seconds(3)).all())
+                Streams.streamOf().thenGetMore(range(1, 3)).splitBy(2, sqr).afterMax(seconds(3)).all())
                 .containsOnly(1L, 4L, 9L);
         assertThat(Streams.streamOf()
-                          .thenGetN(range(1, 3))
+                          .thenGetMore(range(1, 3))
                           .splitBy(Functions.<Integer>identity(), sqr)
                           .afterMax(seconds(3))
                           .all()).containsOnly(1L, 4L, 9L);
@@ -2259,7 +2259,7 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").sync().thenGetN(new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1").sync().thenGetMore(new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2274,7 +2274,7 @@ public class StreamChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(
-                Streams.streamOf("test1").sync().thenGetN(3, new Consumer<ResultChannel<String>>() {
+                Streams.streamOf("test1").sync().thenGetMore(3, new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2289,7 +2289,7 @@ public class StreamChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsOnly("TEST2");
         assertThat(
-                Streams.streamOf("test1").async().thenGetN(new Consumer<ResultChannel<String>>() {
+                Streams.streamOf("test1").async().thenGetMore(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2305,7 +2305,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .async()
-                          .thenGetN(3, new Consumer<ResultChannel<String>>() {
+                          .thenGetMore(3, new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2323,7 +2323,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("TEST2");
         assertThat(Streams.streamOf("test1")
                           .parallel()
-                          .thenGetN(new Consumer<ResultChannel<String>>() {
+                          .thenGetMore(new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2341,7 +2341,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
                           .parallel()
-                          .thenGetN(3, new Consumer<ResultChannel<String>>() {
+                          .thenGetMore(3, new Consumer<ResultChannel<String>>() {
 
                               public void accept(final ResultChannel<String> resultChannel) {
 
@@ -2518,7 +2518,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().thenGetN(-1, Functions.sink());
+            Streams.streamOf().parallel().thenGetMore(-1, Functions.sink());
 
             fail();
 
@@ -2533,7 +2533,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().thenGetN(null);
+            Streams.streamOf().sync().thenGetMore(null);
 
             fail();
 
@@ -2543,7 +2543,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().thenGetN(3, null);
+            Streams.streamOf().sync().thenGetMore(3, null);
 
             fail();
 
@@ -2573,7 +2573,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().thenGetN(null);
+            Streams.streamOf().async().thenGetMore(null);
 
             fail();
 
@@ -2583,7 +2583,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().thenGetN(3, null);
+            Streams.streamOf().async().thenGetMore(3, null);
 
             fail();
 
@@ -2613,7 +2613,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().thenGetN(null);
+            Streams.streamOf().parallel().thenGetMore(null);
 
             fail();
 
@@ -2623,7 +2623,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().thenGetN(3, null);
+            Streams.streamOf().parallel().thenGetMore(3, null);
 
             fail();
 
@@ -2799,7 +2799,7 @@ public class StreamChannelTest {
 
                 throw new NullPointerException();
             }
-        }).tryCatchN(new BiConsumer<RoutineException, InputChannel<Object>>() {
+        }).tryCatchMore(new BiConsumer<RoutineException, InputChannel<Object>>() {
 
             public void accept(final RoutineException e, final InputChannel<Object> channel) {
 
@@ -2813,7 +2813,7 @@ public class StreamChannelTest {
 
                 return o;
             }
-        }).tryCatchN(new BiConsumer<RoutineException, InputChannel<Object>>() {
+        }).tryCatchMore(new BiConsumer<RoutineException, InputChannel<Object>>() {
 
             public void accept(final RoutineException e, final InputChannel<Object> channel) {
 
@@ -2842,7 +2842,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().tryCatchN(null);
+            Streams.streamOf().tryCatchMore(null);
 
             fail();
 

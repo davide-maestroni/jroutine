@@ -540,7 +540,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
                 return true;
             }
 
-            if ((o == null) || (o.getClass() != SameAsPredicate.class)) {
+            if ((o == null) || (getClass() != o.getClass())) {
                 return false;
             }
 

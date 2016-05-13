@@ -257,7 +257,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> concatGetN(long count,
+    LoaderStreamChannel<IN, OUT> concatGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
@@ -265,7 +265,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> concatGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    LoaderStreamChannel<IN, OUT> concatGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
@@ -333,7 +333,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(COLLECT)
-    <AFTER> LoaderStreamChannel<IN, AFTER> mapAllN(
+    <AFTER> LoaderStreamChannel<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -341,7 +341,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> mapN(
+    <AFTER> LoaderStreamChannel<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -398,7 +398,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> orElseGetN(long count,
+    LoaderStreamChannel<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
@@ -406,7 +406,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> orElseGetN(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    LoaderStreamChannel<IN, OUT> orElseGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
@@ -615,7 +615,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(REDUCE)
-    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetN(long count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetMore(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -623,7 +623,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(REDUCE)
-    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetN(
+    <AFTER> LoaderStreamChannel<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -669,7 +669,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> tryCatchN(
+    LoaderStreamChannel<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**

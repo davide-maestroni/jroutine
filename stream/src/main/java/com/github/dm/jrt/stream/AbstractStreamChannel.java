@@ -341,17 +341,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGetN(final long count,
+    public StreamChannel<IN, OUT> concatGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return map(new ConcatLoopConsumerInvocationFactory<OUT>(count, wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGetN(
+    public StreamChannel<IN, OUT> concatGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return concatGetN(1, consumer);
+        return concatGetMore(1, consumer);
     }
 
     @NotNull
@@ -411,14 +411,14 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> mapAllN(
+    public <AFTER> StreamChannel<IN, AFTER> mapAllMore(
             @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         return map(consumerCall(consumer));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> mapN(
+    public <AFTER> StreamChannel<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
         return map(consumerOperation(consumer));
@@ -428,7 +428,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> onError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
-        return tryCatchN(new TryCatchBiConsumerConsumer<OUT>(consumer));
+        return tryCatchMore(new TryCatchBiConsumerConsumer<OUT>(consumer));
     }
 
     @NotNull
@@ -489,17 +489,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> orElseGetN(final long count,
+    public StreamChannel<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return map(new OrElseConsumerInvocationFactory<OUT>(count, wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> orElseGetN(
+    public StreamChannel<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return orElseGetN(1, consumer);
+        return orElseGetMore(1, consumer);
     }
 
     @NotNull
@@ -726,17 +726,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> thenGetN(final long count,
+    public <AFTER> StreamChannel<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         return map(new LoopConsumerInvocation<AFTER>(count, wrap(consumer)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> thenGetN(
+    public <AFTER> StreamChannel<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
-        return thenGetN(1, consumer);
+        return thenGetMore(1, consumer);
     }
 
     @NotNull
@@ -788,11 +788,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
-        return tryCatchN(new TryCatchBiConsumerFunction<OUT>(function));
+        return tryCatchMore(new TryCatchBiConsumerFunction<OUT>(function));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> tryCatchN(
+    public StreamChannel<IN, OUT> tryCatchMore(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 

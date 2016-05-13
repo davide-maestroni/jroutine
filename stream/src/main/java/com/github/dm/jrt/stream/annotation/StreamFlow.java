@@ -36,19 +36,19 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
-public @interface StreamTransform {
+public @interface StreamFlow {
 
     /**
-     * The stream method transform type.
+     * The stream method modification type.
      *
-     * @return the transform type.
+     * @return the modification type.
      */
-    TransformType value();
+    ModificationType value();
 
     /**
-     * Transform type enumeration.
+     * Modification type enumeration.
      */
-    enum TransformType {
+    enum ModificationType {
 
         /**
          * A new instance is created and chained to the current one.

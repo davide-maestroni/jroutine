@@ -49,7 +49,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
-import com.github.dm.jrt.stream.annotation.StreamTransform.TransformType;
+import com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -116,9 +116,9 @@ public class StreamChannelTest {
     public void testAnnotation() {
 
         // Just for coverage...
-        assertThat(TransformType.values()).containsOnly(TransformType.START, TransformType.MAP,
-                TransformType.REDUCE, TransformType.CACHE, TransformType.COLLECT,
-                TransformType.CONFIG);
+        assertThat(ModificationType.values()).containsOnly(ModificationType.START,
+                ModificationType.MAP, ModificationType.REDUCE, ModificationType.CACHE,
+                ModificationType.COLLECT, ModificationType.CONFIG);
     }
 
     @Test

@@ -145,7 +145,7 @@ public abstract class InvocationTarget<TYPE> {
                 return true;
             }
 
-            if ((o == null) || (o.getClass() != ClassInvocationTarget.class)) {
+            if ((o == null) || (getClass() != o.getClass())) {
                 return false;
             }
 
@@ -203,7 +203,7 @@ public abstract class InvocationTarget<TYPE> {
                 return true;
             }
 
-            if ((o == null) || (o.getClass() != InstanceInvocationTarget.class)) {
+            if ((o == null) || (getClass() != o.getClass())) {
                 return false;
             }
 

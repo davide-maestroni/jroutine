@@ -100,8 +100,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
         synchronized (mMutex) {
             mIsWaitingInvocation = false;
-            final InputIterator<IN> inputIterator = mInputIterator;
-            final InvocationManager<IN, OUT> manager = mInvocationManager;
             final DefaultResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
             final int count = mExecutionCount;
@@ -109,45 +107,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             try {
                 resultChannel.enterInvocation();
                 for (int i = 0; i < count; ++i) {
-                    try {
-                        inputIterator.onConsumeStart();
-                        mLogger.dbg("running execution");
-                        final boolean isComplete;
-                        try {
-                            if (mInvocation == null) {
-                                mInvocation = invocation;
-                                mLogger.dbg("initializing invocation: %s", invocation);
-                                invocation.onInitialize();
-                                mIsInitialized = true;
-                            }
-
-                            while (inputIterator.hasInput()) {
-                                invocation.onInput(inputIterator.nextInput(), resultChannel);
-                            }
-
-                        } finally {
-                            isComplete = inputIterator.onConsumeComplete();
-                        }
-
-                        if (isComplete) {
-                            invocation.onResult(resultChannel);
-                            try {
-                                mIsTerminated = true;
-                                invocation.onTerminate();
-                                manager.recycle(invocation);
-
-                            } catch (final Throwable ignored) {
-                                manager.discard(invocation);
-
-                            } finally {
-                                resultChannel.close();
-                                inputIterator.onInvocationComplete();
-                            }
-                        }
-
-                    } catch (final Throwable t) {
-                        resultChannel.abortImmediately(t);
-                    }
+                    execute(invocation);
                 }
 
             } finally {
@@ -186,6 +146,52 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     mResultChannel.startWaitingInvocation();
                 }
             }
+        }
+    }
+
+    private void execute(@NotNull final Invocation<IN, OUT> invocation) {
+
+        final InputIterator<IN> inputIterator = mInputIterator;
+        final InvocationManager<IN, OUT> manager = mInvocationManager;
+        final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+        try {
+            inputIterator.onConsumeStart();
+            mLogger.dbg("running execution");
+            final boolean isComplete;
+            try {
+                if (mInvocation == null) {
+                    mInvocation = invocation;
+                    mLogger.dbg("initializing invocation: %s", invocation);
+                    invocation.onInitialize();
+                    mIsInitialized = true;
+                }
+
+                while (inputIterator.hasInput()) {
+                    invocation.onInput(inputIterator.nextInput(), resultChannel);
+                }
+
+            } finally {
+                isComplete = inputIterator.onConsumeComplete();
+            }
+
+            if (isComplete) {
+                invocation.onResult(resultChannel);
+                try {
+                    mIsTerminated = true;
+                    invocation.onTerminate();
+                    manager.recycle(invocation);
+
+                } catch (final Throwable ignored) {
+                    manager.discard(invocation);
+
+                } finally {
+                    resultChannel.close();
+                    inputIterator.onInvocationComplete();
+                }
+            }
+
+        } catch (final Throwable t) {
+            resultChannel.abortImmediately(t);
         }
     }
 

@@ -132,7 +132,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations computing the mean of the input numbers by employing a
+     * Returns a factory of invocations computing the mean value of the input numbers by employing a
      * {@code BigDecimal}.
      *
      * @return the factory instance.
@@ -473,7 +473,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations computing the mean of the input numbers in floating
+     * Returns a factory of invocations computing the mean value of the input numbers in floating
      * precision.
      * <br>
      * The result will have the type matching the input with the highest precision.
@@ -674,7 +674,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations computing the mean of the input numbers.
+     * Returns a factory of invocations computing the mean value of the input numbers.
      * <br>
      * The result will have the type matching the input with the highest precision.
      *

@@ -176,6 +176,7 @@ public interface StreamChannel<IN, OUT>
      *                feeding thread.
      * @param backoff the backoff policy to apply to the feeding thread.
      * @return the configured stream.
+     * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
     @StreamFlow(type = CONFIG)
@@ -197,6 +198,8 @@ public interface StreamChannel<IN, OUT>
      * @param delay    the constant delay to apply to the feeding thread.
      * @param timeUnit the delay time unit.
      * @return the configured stream.
+     * @throws java.lang.IllegalArgumentException if the specified limit or the specified delay are
+     *                                            negative.
      */
     @NotNull
     @StreamFlow(type = CONFIG)
@@ -218,6 +221,7 @@ public interface StreamChannel<IN, OUT>
      *               feeding thread.
      * @param delay  the constant delay to apply to the feeding thread.
      * @return the configured stream.
+     * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
     @StreamFlow(type = CONFIG)
@@ -803,6 +807,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param maxInvocations the maximum number of concurrent invocations.
      * @return the configured stream.
+     * @throws java.lang.IllegalArgumentException if the specified number is 0 or negative.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
@@ -895,6 +900,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count the maximum number of retries.
      * @return the retrying stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(type = COLLECT, bind = CONSUMER)
@@ -909,6 +915,7 @@ public interface StreamChannel<IN, OUT>
      * @param count   the maximum number of retries.
      * @param backoff the backoff policy.
      * @return the retrying stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(type = COLLECT, bind = CONSUMER)
@@ -1087,6 +1094,7 @@ public interface StreamChannel<IN, OUT>
      * @param function the function creating the processing stream channels.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(type = MAP, bind = CONSUMER)
@@ -1108,6 +1116,7 @@ public interface StreamChannel<IN, OUT>
      * @param factory the processing invocation factory.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(type = MAP, bind = CONSUMER)
@@ -1125,6 +1134,7 @@ public interface StreamChannel<IN, OUT>
      * @param routine the processing routine instance.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(type = MAP, bind = CONSUMER)

@@ -62,7 +62,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
      * @param inputChannel  the input channel.
      * @param outputChannel the output channel.
      * @param runner        the runner instance.
-     * @param bindFunction  the bind function.
+     * @param bindFunction  the binding function.
      * @param function      the backoff function.
      */
     RetryOutputConsumer(@NotNull final OutputChannel<IN> inputChannel,
@@ -74,7 +74,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
         mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
         mRunner = ConstantConditions.notNull("runner instance", runner);
-        mBind = ConstantConditions.notNull("bind function", bindFunction);
+        mBind = ConstantConditions.notNull("binding function", bindFunction);
         mFunction = ConstantConditions.notNull("backoff function", function);
     }
 

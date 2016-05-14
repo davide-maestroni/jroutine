@@ -27,13 +27,13 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer bind function.
+ * Output consumer binding function.
  * <p>
  * Created by davide-maestroni on 05/14/2016.
  *
  * @param <OUT> the output data type.
  */
-public class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChannel<Void>> {
+class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChannel<Void>> {
 
     private final ChannelConfiguration mConfiguration;
 

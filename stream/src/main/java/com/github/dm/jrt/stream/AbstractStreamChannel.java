@@ -631,7 +631,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     OutputChannel<AFTER>>> function) {
 
         try {
-            return buildChannel(ConstantConditions.notNull("bind function",
+            return buildChannel(ConstantConditions.notNull("binding function",
                     ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
                             Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
                             .apply(mBind)));
@@ -793,7 +793,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         try {
-            return buildChannel(ConstantConditions.notNull("bind function",
+            return buildChannel(ConstantConditions.notNull("binding function",
                     ((BiFunction<StreamConfiguration, Function<OutputChannel<IN>,
                             OutputChannel<OUT>>, Function<OutputChannel<IN>,
                             OutputChannel<AFTER>>>) function)
@@ -964,7 +964,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * @param streamConfiguration the stream configuration.
      * @param invocationMode      the invocation mode.
      * @param sourceChannel       the source output channel.
-     * @param bind                the bind function.
+     * @param bind                the binding function.
      * @return the newly created channel instance.
      */
     @NotNull

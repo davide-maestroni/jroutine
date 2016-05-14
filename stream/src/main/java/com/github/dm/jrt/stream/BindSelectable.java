@@ -26,7 +26,7 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Selectable bind function.
+ * Selectable binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *

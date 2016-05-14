@@ -81,14 +81,14 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations verifying if all the inputs satisfy a specific conditions.
+     * Returns a factory of invocations verifying that all the inputs satisfy a specific conditions.
      *
      * @param predicate the predicate defining the condition.
      * @param <IN>      the input data type.
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     public static <IN> InvocationFactory<IN, Boolean> allMatch(
             @NotNull final Predicate<? super IN> predicate) {
 
@@ -96,7 +96,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations verifying if any of the inputs satisfy a specific
+     * Returns a factory of invocations verifying that any of the inputs satisfy a specific
      * conditions.
      *
      * @param predicate the predicate defining the condition.
@@ -104,7 +104,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <IN> InvocationFactory<IN, Boolean> anyMatch(
             @NotNull final Predicate<? super IN> predicate) {
 
@@ -138,7 +138,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     public static InvocationFactory<Number, BigDecimal> bigMean() {
 
         return BigMeanInvocation.factoryOf();
@@ -151,7 +151,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     public static InvocationFactory<Number, BigDecimal> bigSum() {
 
         return BigSumInvocation.factoryOf();
@@ -360,17 +360,17 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns an factory of invocations counting the number of outputs.
+     * Returns an factory of invocations counting the number of input data.
      *
-     * @param <IN> the input data type.
+     * @param <DATA> the data type.
      * @return the invocation factory.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     @SuppressWarnings("unchecked")
-    public static <IN> InvocationFactory<IN, Long> count() {
+    public static <DATA> InvocationFactory<DATA, Long> count() {
 
-        return (InvocationFactory<IN, Long>) CountInvocation.factoryOf();
+        return (InvocationFactory<DATA, Long>) CountInvocation.factoryOf();
     }
 
     /**
@@ -482,7 +482,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     @SuppressWarnings("unchecked")
     public static <N extends Number> InvocationFactory<N, Number> floatingMean() {
 
@@ -508,7 +508,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
 
         return new GroupByInvocationFactory<DATA>(size);
@@ -538,7 +538,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size,
             @Nullable final DATA placeholder) {
 
@@ -667,7 +667,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
 
         return new LimitInvocationFactory<DATA>(count);
@@ -682,7 +682,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     @SuppressWarnings("unchecked")
     public static <N extends Number> InvocationFactory<N, Number> mean() {
 
@@ -801,7 +801,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations verifying if none of the inputs satisfy a specific
+     * Returns a factory of invocations verifying that none of the inputs satisfy a specific
      * conditions.
      *
      * @param predicate the predicate defining the condition.
@@ -809,7 +809,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     public static <IN> InvocationFactory<IN, Boolean> noneMatch(
             @NotNull final Predicate<? super IN> predicate) {
 
@@ -817,7 +817,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations verifying if not all the inputs satisfy a specific
+     * Returns a factory of invocations verifying that not all the inputs satisfy a specific
      * conditions.
      *
      * @param predicate the predicate defining the condition.
@@ -825,7 +825,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <IN> InvocationFactory<IN, Boolean> notAllMatch(
             @NotNull final Predicate<? super IN> predicate) {
 
@@ -865,7 +865,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <AFTER extends Comparable<? super AFTER>> Consumer<InputChannel<AFTER>> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> increment) {
@@ -889,7 +889,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     @SuppressWarnings("unchecked")
     public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
             @NotNull final N end) {
@@ -910,7 +910,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     @SuppressWarnings("unchecked")
     public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
             @NotNull final N end, @NotNull final N increment) {
@@ -947,7 +947,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     @SuppressWarnings("unchecked")
     public static <N extends Number> InvocationFactory<N, Number> roundedMean() {
 
@@ -1136,7 +1136,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <AFTER> Consumer<InputChannel<AFTER>> sequence(@NotNull final AFTER start,
             final long count, @NotNull final BiFunction<AFTER, Long, AFTER> next) {
 
@@ -1162,7 +1162,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
 
         return new SkipInvocationFactory<DATA>(count);
@@ -1175,25 +1175,25 @@ public class Streams extends Functions {
      * @return the invocation factory instance.
      */
     @NotNull
-    @StreamFlow(type = COLLECT, bind = ROUTINE)
+    @StreamFlow(value = COLLECT, binding = ROUTINE)
     public static <IN extends Comparable<? super IN>> InvocationFactory<IN, IN> sort() {
 
         return SortInvocation.factoryOf();
     }
 
     /**
-     * Returns an factory of invocations sorting inputs by the specified comparator.
+     * Returns an factory of invocations sorting input data by the specified comparator.
      *
      * @param comparator the comparator instance.
-     * @param <IN>       the input data type.
+     * @param <DATA>     the data type.
      * @return the invocation factory instance.
      */
     @NotNull
-    @StreamFlow(type = COLLECT, bind = ROUTINE)
-    public static <IN> InvocationFactory<IN, IN> sortBy(
-            @NotNull final Comparator<? super IN> comparator) {
+    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    public static <DATA> InvocationFactory<DATA, DATA> sortBy(
+            @NotNull final Comparator<? super DATA> comparator) {
 
-        return new SortByInvocationFactory<IN>(comparator);
+        return new SortByInvocationFactory<DATA>(comparator);
     }
 
     /**
@@ -1290,11 +1290,11 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = REDUCE, bind = ROUTINE)
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
     @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, N> sum() {
+    public static <N extends Number> InvocationFactory<N, Number> sum() {
 
-        return (InvocationFactory<N, N>) SumInvocation.factoryOf();
+        return (InvocationFactory<N, Number>) SumInvocation.factoryOf();
     }
 
     /**
@@ -1304,7 +1304,7 @@ public class Streams extends Functions {
      * @return the invocation factory instance.
      */
     @NotNull
-    @StreamFlow(type = COLLECT, bind = ROUTINE)
+    @StreamFlow(value = COLLECT, binding = ROUTINE)
     public static <IN> InvocationFactory<? super IN, List<IN>> toList() {
 
         return ToListInvocation.factoryOf();
@@ -1319,7 +1319,7 @@ public class Streams extends Functions {
      * @return the invocation factory instance.
      */
     @NotNull
-    @StreamFlow(type = COLLECT, bind = ROUTINE)
+    @StreamFlow(value = COLLECT, binding = ROUTINE)
     public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
             @NotNull final Function<? super IN, KEY> keyFunction) {
 
@@ -1377,7 +1377,7 @@ public class Streams extends Functions {
      * @return the invocation factory instance.
      */
     @NotNull
-    @StreamFlow(type = COLLECT, bind = ROUTINE)
+    @StreamFlow(value = COLLECT, binding = ROUTINE)
     public static <IN> InvocationFactory<? super IN, Set<IN>> toSet() {
 
         return ToSetInvocation.factoryOf();
@@ -1386,15 +1386,15 @@ public class Streams extends Functions {
     /**
      * Returns a bi-consumer unfolding iterable inputs into the returned elements.
      *
-     * @param <DATA> the data type.
+     * @param <IN> the input data type.
      * @return the bi-consumer instance.
      */
     @NotNull
-    @StreamFlow(type = MAP, bind = ROUTINE)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     @SuppressWarnings("unchecked")
-    public static <DATA> BiConsumer<Iterable<DATA>, InputChannel<DATA>> unfold() {
+    public static <IN> BiConsumer<Iterable<IN>, InputChannel<IN>> unfold() {
 
-        return (BiConsumer<Iterable<DATA>, InputChannel<DATA>>) sUnfoldConsumer;
+        return (BiConsumer<Iterable<IN>, InputChannel<IN>>) sUnfoldConsumer;
     }
 
     /**
@@ -1404,7 +1404,7 @@ public class Streams extends Functions {
      * @return the factory instance.
      */
     @NotNull
-    @StreamFlow(type = CACHE, bind = ROUTINE)
+    @StreamFlow(value = CACHE, binding = ROUTINE)
     public static <DATA> InvocationFactory<DATA, DATA> unique() {
 
         return UniqueInvocation.factoryOf();

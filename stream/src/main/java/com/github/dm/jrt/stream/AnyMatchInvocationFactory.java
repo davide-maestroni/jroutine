@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Factory of invocations verifying if any of the inputs satisfies a specific conditions.
+ * Factory of invocations verifying that any of the inputs satisfies a specific conditions.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
  *
@@ -57,7 +57,7 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
     }
 
     /**
-     * Invocation verifying if any of the inputs satisfies a specific conditions.
+     * Invocation verifying that any of the inputs satisfies a specific conditions.
      *
      * @param <IN> the input data type.
      */

@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Selectable bind function.
+ * Selectable binding function.
  * <p>
  * Created by davide-maestroni on 05/08/2016.
  *

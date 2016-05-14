@@ -2566,7 +2566,7 @@ public class StreamsTest {
     public void testSum() {
 
         assertThat(Streams.streamOf(1, 2, 3, 4)
-                          .map(Streams.<Integer>sum())
+                          .map(Streams.sum())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(10);
     }

@@ -43,14 +43,14 @@ public @interface StreamFlow {
      *
      * @return the binding type.
      */
-    BindingType bind() default BindingType.NONE;
+    BindingType binding() default BindingType.NONE;
 
     /**
      * The stream method modification type.
      *
      * @return the modification type.
      */
-    ModificationType type();
+    ModificationType value();
 
     /**
      * Binding type enumeration.

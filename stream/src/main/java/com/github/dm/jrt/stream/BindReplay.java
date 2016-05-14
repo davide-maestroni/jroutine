@@ -25,7 +25,7 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Replay bind function.
+ * Replay binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *

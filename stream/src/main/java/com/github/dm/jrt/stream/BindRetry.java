@@ -30,7 +30,7 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Retry bind function.
+ * Retry binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
@@ -49,7 +49,7 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param bindFunction  the bind function.
+     * @param bindFunction  the binding function.
      * @param function      the backoff function.
      */
     BindRetry(@NotNull final ChannelConfiguration configuration,
@@ -58,7 +58,7 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
                     function) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBind = ConstantConditions.notNull("bind function", bindFunction);
+        mBind = ConstantConditions.notNull("binding function", bindFunction);
         mFunction = ConstantConditions.notNull("backoff function", function);
     }
 

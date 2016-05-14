@@ -68,7 +68,7 @@ class SumInvocation extends TemplateInvocation<Number, Number> {
     @Override
     public void onInitialize() {
 
-        mSum = (byte) 0;
+        mSum = 0;
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Split by count bind function.
+ * Split by count binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *

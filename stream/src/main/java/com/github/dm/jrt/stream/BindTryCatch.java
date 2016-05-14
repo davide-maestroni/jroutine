@@ -29,7 +29,7 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/catch bind function.
+ * Try/catch binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *

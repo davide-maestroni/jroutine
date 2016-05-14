@@ -50,7 +50,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the invocation mode.
      * @param sourceChannel  the source output channel.
-     * @param bind           the bind function.
+     * @param bind           the binding function.
      */
     private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode,

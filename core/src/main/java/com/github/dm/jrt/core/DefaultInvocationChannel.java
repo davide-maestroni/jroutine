@@ -414,7 +414,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         try {
             if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasInputs)) {
-                mLogger.dbg("timeout while waiting for room in the input channel [%s]", delay);
+                mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
+                        TimeUnit.MILLISECONDS);
             }
 
         } catch (final InterruptedException e) {

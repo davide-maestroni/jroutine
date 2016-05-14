@@ -160,7 +160,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                         return o.toString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
                 "1");
     }
 
@@ -174,7 +174,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                         return s.length() > 1;
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly("test");
     }
 
     private static void testSupplierCommand(final FragmentActivity activity) {

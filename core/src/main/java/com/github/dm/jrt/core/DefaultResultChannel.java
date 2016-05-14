@@ -636,7 +636,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 if (timeoutAction == TimeoutActionType.THROW) {
                     throw new ExecutionTimeoutException(
                             "timeout while waiting to know if more outputs are coming [" + timeout
-                                    + "]");
+                                    + " " + timeUnit + "]");
 
                 } else {
                     isAbort = (timeoutAction == TimeoutActionType.ABORT);
@@ -674,7 +674,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     if (timeoutAction == TimeoutActionType.THROW) {
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
-                                        + timeout + "]");
+                                        + timeout + " " + timeUnit + "]");
 
                     } else {
                         isAbort = (timeoutAction == TimeoutActionType.ABORT);
@@ -750,7 +750,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
                         throw new ExecutionTimeoutException(
-                                "timeout while waiting for outputs [" + timeout + "]");
+                                "timeout while waiting for outputs [" + timeout + " " + timeUnit
+                                        + "]");
                     }
 
                     isAbort = (timeoutAction == TimeoutActionType.ABORT);
@@ -786,7 +787,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
                         throw new ExecutionTimeoutException(
-                                "timeout while waiting for outputs [" + timeout + "]");
+                                "timeout while waiting for outputs [" + timeout + " " + timeUnit
+                                        + "]");
                     }
 
                     isAbort = (timeoutAction == TimeoutActionType.ABORT);
@@ -865,7 +867,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         try {
             final long delay = mOutputBackoff.getDelay(mOutputCount - mOutputLimit);
             if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasOutputs)) {
-                mLogger.dbg("timeout while waiting for room in the output channel [%s]", delay);
+                mLogger.dbg("timeout while waiting for room in the output channel [%s %s]", delay,
+                        TimeUnit.MILLISECONDS);
             }
 
         } catch (final InterruptedException e) {

@@ -106,7 +106,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                         result.pass("test", "1");
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
     }
 
     private static void testConsumerConversion(final Activity activity) {
@@ -122,7 +122,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                    }
                                })
                                .buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
                 "1");
     }
 
@@ -144,7 +144,8 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                    }
                                })
                                .buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
+                "test1");
     }
 
     private static void testFunctionConversion(final Activity activity) {
@@ -157,7 +158,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                         return o.toString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
                 "1");
     }
 
@@ -171,7 +172,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                         return s.length() > 1;
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly("test");
     }
 
     private static void testSupplierCommand(final Activity activity) {

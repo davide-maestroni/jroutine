@@ -61,6 +61,11 @@ public class Runners {
      *                        terminating.
      * @param keepAliveUnit   the time unit for the keep alive time.
      * @return the runner instance.
+     * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
+     *                                            <li>{@code corePoolSize < 0}</li>
+     *                                            <li>{@code maximumPoolSize <= 0}</li>
+     *                                            <li>{@code queueLimit <= 0}</li>
+     *                                            <li>{@code keepAliveTime < 0}</li></ul>
      */
     @NotNull
     public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,

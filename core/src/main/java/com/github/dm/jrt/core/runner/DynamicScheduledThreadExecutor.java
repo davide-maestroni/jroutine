@@ -52,11 +52,11 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      *                        maximum time that excess idle threads will wait for new tasks before
      *                        terminating.
      * @param keepAliveUnit   the time unit for the keep alive time.
-     * @throws java.lang.IllegalArgumentException if one of the following holds:<br>
-     *                                            {@code corePoolSize < 0}<br>
-     *                                            {@code maximumPoolSize <= 0}<br>
-     *                                            {@code keepAliveTime < 0}<br>
-     *                                            {@code queueLimit <= 0}
+     * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
+     *                                            <li>{@code corePoolSize < 0}</li>
+     *                                            <li>{@code maximumPoolSize <= 0}</li>
+     *                                            <li>{@code queueLimit <= 0}</li>
+     *                                            <li>{@code keepAliveTime < 0}</li></ul>
      */
     DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
             final int queueLimit, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {

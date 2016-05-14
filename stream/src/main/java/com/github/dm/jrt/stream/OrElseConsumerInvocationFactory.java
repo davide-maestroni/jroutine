@@ -49,8 +49,8 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
     OrElseConsumerInvocationFactory(final long count,
             @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> consumer) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer),
-                ConstantConditions.positive("count number", count)));
+        super(asArgs(ConstantConditions.positive("count number", count),
+                ConstantConditions.notNull("consumer instance", consumer)));
         mCount = count;
         mConsumer = consumer;
     }

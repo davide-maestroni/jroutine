@@ -49,6 +49,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
+import com.github.dm.jrt.stream.annotation.StreamFlow.BindingType;
 import com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType;
 
 import org.assertj.core.data.Offset;
@@ -119,39 +120,8 @@ public class StreamChannelTest {
         assertThat(ModificationType.values()).containsOnly(ModificationType.START,
                 ModificationType.MAP, ModificationType.REDUCE, ModificationType.CACHE,
                 ModificationType.COLLECT, ModificationType.CONFIG);
-    }
-
-    @Test
-    public void testApply() {
-
-        assertThat(Streams.streamOf("test1")
-                          .apply(new Function<StreamChannel<String, String>,
-                                  StreamChannel<String, String>>() {
-
-                              public StreamChannel<String, String> apply(
-                                      final StreamChannel<String, String> stream) {
-
-                                  return stream.concat("test2");
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2");
-        try {
-            Streams.streamOf()
-                   .apply(new Function<StreamChannel<Object, Object>, StreamChannel<Object,
-                           Object>>() {
-
-                       public StreamChannel<Object, Object> apply(
-                               final StreamChannel<Object, Object> objects) {
-
-                           throw new NullPointerException();
-                       }
-                   });
-            fail();
-
-        } catch (final StreamException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-        }
+        assertThat(BindingType.values()).containsOnly(BindingType.ROUTINE, BindingType.CONSUMER,
+                BindingType.NONE);
     }
 
     @Test
@@ -792,7 +762,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, channel, null).apply((InvocationConfiguration) null);
+                    InvocationMode.ASYNC, channel, null).apply(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1125,6 +1095,41 @@ public class StreamChannelTest {
 
         } catch (final RoutineException e) {
 
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
+    public void testFlatTransform() {
+
+        assertThat(Streams.streamOf("test1")
+                          .flatTransform(
+                                  new Function<StreamChannel<String, String>,
+                                          StreamChannel<String, String>>() {
+
+                                      public StreamChannel<String, String> apply(
+                                              final StreamChannel<String, String> stream) {
+
+                                          return stream.concat("test2");
+                                      }
+                                  })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        try {
+            Streams.streamOf()
+                   .flatTransform(
+                           new Function<StreamChannel<Object, Object>, StreamChannel<Object,
+                                   Object>>() {
+
+                               public StreamChannel<Object, Object> apply(
+                                       final StreamChannel<Object, Object> objects) {
+
+                                   throw new NullPointerException();
+                               }
+                           });
+            fail();
+
+        } catch (final StreamException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
     }
@@ -2729,7 +2734,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .next()).isEqualTo("TEST");
         assertThat(Streams.streamOf("test")
-                          .transformSimple(
+                          .simpleTransform(
                                   new Function<Function<OutputChannel<String>,
                                           OutputChannel<String>>, Function<OutputChannel<String>,
                                           OutputChannel<String>>>() {
@@ -2777,7 +2782,7 @@ public class StreamChannelTest {
 
         try {
             Streams.streamOf()
-                   .transformSimple(
+                   .simpleTransform(
                            new Function<Function<OutputChannel<Object>, OutputChannel<Object>>,
                                    Function<OutputChannel<Object>, OutputChannel<Object>>>() {
 
@@ -2796,7 +2801,7 @@ public class StreamChannelTest {
 
         final StreamChannel<Object, Object> stream = //
                 Streams.streamOf()
-                       .transformSimple(
+                       .simpleTransform(
                                new Function<Function<OutputChannel<Object>,
                                        OutputChannel<Object>>, Function<OutputChannel<Object>,
                                        OutputChannel<Object>>>() {

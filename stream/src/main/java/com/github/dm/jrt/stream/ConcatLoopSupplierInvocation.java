@@ -18,46 +18,51 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
+import com.github.dm.jrt.function.SupplierWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Generate invocation used to call a consumer a specific number of times.
+ * Invocation concatenating the outputs produced by a supplier.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 05/12/2016.
  *
- * @param <OUT> the output data type.
+ * @param <DATA> the data type.
  */
-class LoopConsumerInvocation<OUT> extends GenerateInvocation<Object, OUT> {
-
-    private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
+class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
     private final long mCount;
+
+    private final SupplierWrapper<? extends DATA> mSupplier;
 
     /**
      * Constructor.
      *
      * @param count    the loop count.
-     * @param consumer the consumer instance.
+     * @param supplier the supplier instance.
      */
-    LoopConsumerInvocation(final long count,
-            @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
+    ConcatLoopSupplierInvocation(final long count,
+            @NotNull final SupplierWrapper<? extends DATA> supplier) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", consumer)));
+                ConstantConditions.notNull("supplier instance", supplier)));
         mCount = count;
-        mConsumer = consumer;
+        mSupplier = supplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+
+        result.pass(input);
+    }
+
+    public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
 
         final long count = mCount;
-        final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mConsumer;
+        final SupplierWrapper<? extends DATA> supplier = mSupplier;
         for (long i = 0; i < count; ++i) {
-            consumer.accept(result);
+            result.pass(supplier.get());
         }
     }
 }

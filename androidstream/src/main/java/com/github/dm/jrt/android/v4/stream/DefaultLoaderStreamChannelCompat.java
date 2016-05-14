@@ -255,15 +255,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> apply(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> function) {
-
-        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.apply(function);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<IN, OUT> async() {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.async();
@@ -405,6 +396,15 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.flatMap(function);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> flatTransform(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.flatTransform(function);
     }
 
     @NotNull
@@ -664,6 +664,16 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> simpleTransform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.simpleTransform(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> skip(final int count) {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.skip(count);
@@ -823,16 +833,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.transform(function);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> transformSimple(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
-
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.transformSimple(function);
     }
 
     @NotNull

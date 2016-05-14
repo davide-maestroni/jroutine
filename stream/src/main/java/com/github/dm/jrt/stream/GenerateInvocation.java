@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <OUT> the output data type.
  */
-abstract class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
-        implements Invocation<Object, OUT> {
+abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+        implements Invocation<IN, OUT> {
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ abstract class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
 
     @NotNull
     @Override
-    public final Invocation<Object, OUT> newInvocation() {
+    public final Invocation<IN, OUT> newInvocation() {
 
         return this;
     }
@@ -63,7 +63,7 @@ abstract class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
 
     }
 
-    public final void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
     }
 

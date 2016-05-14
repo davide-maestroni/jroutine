@@ -49,8 +49,8 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
     OrElseSupplierInvocationFactory(final long count,
             @NotNull final SupplierWrapper<? extends DATA> supplier) {
 
-        super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier),
-                ConstantConditions.positive("count number", count)));
+        super(asArgs(ConstantConditions.positive("count number", count),
+                ConstantConditions.notNull("supplier instance", supplier)));
         mCount = count;
         mSupplier = supplier;
     }

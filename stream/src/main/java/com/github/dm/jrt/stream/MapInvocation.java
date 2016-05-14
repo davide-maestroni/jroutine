@@ -46,7 +46,7 @@ class MapInvocation<IN, OUT> extends ConversionInvocation<IN, OUT> {
     MapInvocation(@NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
             OUT>> function) {
 
-        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
+        super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }
 

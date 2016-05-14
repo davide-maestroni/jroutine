@@ -43,7 +43,7 @@ class ConsumerInvocation<IN> extends ConversionInvocation<IN, Void> {
      */
     ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
+        super(asArgs(ConstantConditions.notNull("consumer instance", consumer)));
         mConsumer = consumer;
     }
 

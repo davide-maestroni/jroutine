@@ -252,15 +252,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> apply(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> function) {
-
-        return (LoaderStreamChannel<BEFORE, AFTER>) super.apply(function);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<IN, OUT> async() {
 
         return (LoaderStreamChannel<IN, OUT>) super.async();
@@ -399,6 +390,15 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannel<IN, AFTER>) super.flatMap(function);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatTransform(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        return (LoaderStreamChannel<BEFORE, AFTER>) super.flatTransform(function);
     }
 
     @NotNull
@@ -654,6 +654,16 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> simpleTransform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.simpleTransform(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> skip(final int count) {
 
         return (LoaderStreamChannel<IN, OUT>) super.skip(count);
@@ -812,16 +822,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         return (LoaderStreamChannel<IN, AFTER>) super.transform(function);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> transformSimple(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
-
-        return (LoaderStreamChannel<IN, AFTER>) super.transformSimple(function);
     }
 
     @NotNull

@@ -41,7 +41,7 @@ class PeekInvocation<DATA> extends ConversionInvocation<DATA, DATA> {
      */
     PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> consumer) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
+        super(asArgs(ConstantConditions.notNull("consumer instance", consumer)));
         mConsumer = consumer;
     }
 

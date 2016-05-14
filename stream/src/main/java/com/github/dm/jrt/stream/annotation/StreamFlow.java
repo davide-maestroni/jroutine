@@ -39,11 +39,43 @@ import java.lang.annotation.Target;
 public @interface StreamFlow {
 
     /**
+     * The stream binding type.
+     *
+     * @return the binding type.
+     */
+    BindingType bind() default BindingType.NONE;
+
+    /**
      * The stream method modification type.
      *
      * @return the modification type.
      */
-    ModificationType value();
+    ModificationType type();
+
+    /**
+     * Binding type enumeration.
+     */
+    enum BindingType {
+
+        /**
+         * Routine binding.
+         * <br>
+         * The stream is bound to a new routine invocation.
+         */
+        ROUTINE,
+        /**
+         * Consumer binding.
+         * <br>
+         * The stream is bound to an output consumer.
+         */
+        CONSUMER,
+        /**
+         * No binding.
+         * <br>
+         * The stream is not bound.
+         */
+        NONE
+    }
 
     /**
      * Modification type enumeration.

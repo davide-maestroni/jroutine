@@ -37,9 +37,9 @@
 
             private static final String IMAGE_URI = "http://...";
 
-            private static final Function&lt;URI, Bitmap&gt; sLoaderFunction = (uri) -> {
+            private static Function&lt;URI, Bitmap&gt; loadUri() {
 
-                try {
+                return uri -> {
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -53,11 +53,24 @@
                     } finally {
                         inputStream.close();
                     }
-
-                } catch (final IOException e) {
-                    throw new InvocationException(e);
-                }
-            };
+                };
+            }
+            
+            private static Consumer&lt;Bitmap&gt; showImage(final ImageView view) {
+            
+                return bitmap -> {
+                    view.setImageBitmap(bitmap);
+                };
+            }
+            
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+            
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                            "Cannot load image", Toast.LENGTH_LONG).show();
+                };
+            }
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
@@ -65,29 +78,12 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                LoaderStreams.streamOf(uri)
+                LoaderStreams.streamOf(IMAGE_URI)
                              .with(loaderFrom(this))
-                             .loaderConfiguration()
-                             .withFactoryId(11)
-                             .apply()
-                             .map(sLoaderFunction)
-                             .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
-
-                                 &commat;Override
-                                 public void onError(&commat;NotNull final RoutineException error) {
-
-                                     final Throwable cause = error.getCause();
-                                     Toast.makeText(MainTestActivity.this, (cause != null) ?
-                                             cause.getMessage() : "Cannot load image",
-                                             Toast.LENGTH_LONG).show();
-                                 }
-
-                                 &commat;Override
-                                 public void onOutput(final Bitmap bitmap) {
-
-                                     imageView.setImageBitmap(bitmap);
-                                 }
-                             });
+                             .factoryId(11)
+                             .map(loadUri())
+                             .onError(showToast(this))
+                             .onOutput(showImage(imageView));
             }
         }
     </code>

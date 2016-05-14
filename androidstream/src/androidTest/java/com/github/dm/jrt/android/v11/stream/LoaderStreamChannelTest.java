@@ -1473,42 +1473,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 IllegalArgumentException.class);
     }
 
-    public void testApply() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(getActivity()))
-                                .apply(new Function<StreamChannel<String, String>,
-                                        StreamChannel<String, String>>() {
-
-                                    public StreamChannel<String, String> apply(
-                                            final StreamChannel<String, String> stream) {
-
-                                        return stream.concat("test2");
-                                    }
-                                })
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(getActivity()))
-                                .apply(new Function<StreamChannel<String, String>,
-                                        LoaderStreamChannel<String, String>>() {
-
-                                    public LoaderStreamChannel<String, String> apply(
-                                            final StreamChannel<String, String> stream) {
-
-                                        return ((LoaderStreamChannel<String, String>) stream)
-                                                .concat(
-                                                "test2");
-                                    }
-                                })
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2");
-    }
-
     public void testBuilder() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1966,6 +1930,44 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final RoutineException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
+    }
+
+    public void testFlatTransform() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(getActivity()))
+                                .flatTransform(
+                                        new Function<StreamChannel<String, String>,
+                                                StreamChannel<String, String>>() {
+
+                                            public StreamChannel<String, String> apply(
+                                                    final StreamChannel<String, String> stream) {
+
+                                                return stream.concat("test2");
+                                            }
+                                        })
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(getActivity()))
+                                .flatTransform(
+                                        new Function<StreamChannel<String, String>,
+                                                LoaderStreamChannel<String, String>>() {
+
+                                            public LoaderStreamChannel<String, String> apply(
+                                                    final StreamChannel<String, String> stream) {
+
+                                                return ((LoaderStreamChannel<String, String>)
+                                                        stream)
+                                                        .concat("test2");
+                                            }
+                                        })
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2");
     }
 
     public void testInvocationDeadlock() {
@@ -3338,7 +3340,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .next()).isEqualTo("TEST");
         assertThat(LoaderStreams.streamOf("test")
                                 .with(loaderFrom(getActivity()))
-                                .transformSimple(transformFunction())
+                                .simpleTransform(transformFunction())
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("TEST");
     }

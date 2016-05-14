@@ -31,7 +31,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-class GenerateOutputInvocation<OUT> extends GenerateInvocation<OUT> {
+class GenerateOutputInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
     private final List<OUT> mOutputs;
 

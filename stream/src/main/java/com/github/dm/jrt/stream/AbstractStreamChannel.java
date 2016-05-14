@@ -244,19 +244,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> apply(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> function) {
-
-        try {
-            return ConstantConditions.notNull("transformed stream", function.apply(this));
-
-        } catch (final Exception e) {
-            throw StreamException.wrap(e);
-        }
-    }
-
-    @NotNull
     public StreamChannel<IN, OUT> async() {
 
         mInvocationMode = InvocationMode.ASYNC;
@@ -345,7 +332,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> concatGet(final long count,
             @NotNull final Supplier<? extends OUT> supplier) {
 
-        return map(new ConcatLoopSupplierInvocationFactory<OUT>(count, wrap(supplier)));
+        return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(supplier)));
     }
 
     @NotNull
@@ -358,7 +345,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> concatGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return map(new ConcatLoopConsumerInvocationFactory<OUT>(count, wrap(consumer)));
+        return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(consumer)));
     }
 
     @NotNull
@@ -380,6 +367,19 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     function) {
 
         return map(new MapInvocation<OUT, AFTER>(wrap(function)));
+    }
+
+    @NotNull
+    public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> flatTransform(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        try {
+            return ConstantConditions.notNull("transformed stream", function.apply(this));
+
+        } catch (final Exception e) {
+            throw StreamException.wrap(e);
+        }
     }
 
     @NotNull
@@ -448,7 +448,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
 
-        return map(new ConsumerInvocation<OUT>(wrap(consumer)));
+        return buildChannel(mBind.andThen(
+                new BindOutputConsumer<OUT>(buildChannelConfiguration(), wrap(consumer))));
     }
 
     @NotNull
@@ -623,6 +624,24 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamChannel<IN, AFTER> simpleTransform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        try {
+            return buildChannel(ConstantConditions.notNull("bind function",
+                    ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
+                            Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
+                            .apply(mBind)));
+
+        } catch (final Exception e) {
+            throw StreamException.wrap(e);
+        }
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> skip(final int count) {
 
         return map(new SkipInvocationFactory<OUT>(count));
@@ -780,24 +799,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
                             OutputChannel<AFTER>>>) function)
                             .apply(newConfiguration(mStreamConfiguration, mConfiguration,
                                     mInvocationMode), mBind)));
-
-        } catch (final Exception e) {
-            throw StreamException.wrap(e);
-        }
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <AFTER> StreamChannel<IN, AFTER> transformSimple(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
-
-        try {
-            return buildChannel(ConstantConditions.notNull("bind function",
-                    ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
-                            Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
-                            .apply(mBind)));
 
         } catch (final Exception e) {
             throw StreamException.wrap(e);

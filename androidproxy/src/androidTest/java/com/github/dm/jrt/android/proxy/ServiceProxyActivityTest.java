@@ -331,6 +331,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass2.class))
+                                    .serviceConfiguration()
+                                    .withRunnerClass(SharedFieldRunner.class)
+                                    .apply()
                                     .invocationConfiguration()
                                     .withReadTimeout(seconds(10))
                                     .apply();
@@ -1110,6 +1113,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         public void set(int i) {
 
             assertThat(i).isEqualTo(-17);
+        }
+    }
+
+    public static class SharedFieldRunner extends RunnerDecorator {
+
+        public SharedFieldRunner() {
+
+            super(Runners.poolRunner(2));
         }
     }
 

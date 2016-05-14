@@ -54,6 +54,8 @@ public class Runners {
      *
      * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
      * @param maximumPoolSize the maximum number of threads to allow in the pool.
+     * @param queueLimit      the number of scheduled tasks that must be in the queue, before a new
+     *                        thread is allocated.
      * @param keepAliveTime   when the number of threads is greater than the core one, this is the
      *                        maximum time that excess idle threads will wait for new tasks before
      *                        terminating.
@@ -62,11 +64,11 @@ public class Runners {
      */
     @NotNull
     public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
-            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
+            final int queueLimit, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
         return scheduledRunner(
-                new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
-                        keepAliveUnit));
+                new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, queueLimit,
+                        keepAliveTime, keepAliveUnit));
     }
 
     /**
@@ -139,7 +141,7 @@ public class Runners {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
                 sSharedRunner = dynamicPoolRunner((processors <= 2) ? processors : processors - 1,
-                        (processors << 2) - 1, 3, TimeUnit.SECONDS);
+                        (processors << 2) - 1, 10, 3, TimeUnit.SECONDS);
             }
 
             return sSharedRunner;

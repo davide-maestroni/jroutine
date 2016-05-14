@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -826,6 +827,9 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final ServiceObjectRoutineBuilder builder =
                 JRoutineServiceObject.with(serviceFrom(getActivity(), RemoteTestService.class))
                                      .on(instanceOf(TestClass2.class))
+                                     .serviceConfiguration()
+                                     .withRunnerClass(SharedFieldRunner.class)
+                                     .apply()
                                      .invocationConfiguration()
                                      .withReadTimeout(seconds(10))
                                      .apply();
@@ -1507,6 +1511,14 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         }
     }
 
+    public static class SharedFieldRunner extends RunnerDecorator {
+
+        public SharedFieldRunner() {
+
+            super(Runners.poolRunner(2));
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class Count {
 
@@ -1689,14 +1701,14 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
         public int getOne() throws InterruptedException {
 
-            UnitDuration.millis(2000).sleepAtLeast();
+            UnitDuration.seconds(2).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            UnitDuration.millis(2000).sleepAtLeast();
+            UnitDuration.seconds(2).sleepAtLeast();
 
             return 2;
         }

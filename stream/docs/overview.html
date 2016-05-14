@@ -40,17 +40,18 @@
 
             public static void main(final String[] args) {
 
-                final StreamChannel&lt;String, Double&gt; channel =
-                        Streams.streamOf(args)
-                               .parallel()
-                               .map(Integer::parseInt)
-                               .map(integer -&gt; integer * integer)
-                               .async()
-                               .map(floatingMean())
-                               .sync()
-                               .map(Double.class::cast)
-                               .map(Math::sqrt);
-                final Double rms = channel.afterMax(seconds(1)).next();
+                final Double rms = Streams.streamOf(args)
+                                          .parallel()
+                                          .map(Integer::parseInt)
+                                          .map(integer -&gt; integer * integer)
+                                          .async()
+                                          .map(floatingMean())
+                                          .runSequentially()
+                                          .map(Float.class::cast)
+                                          .map(Math::sqrt)
+                                          .runOnShared()
+                                          .afterMax(seconds(1))
+                                          .next();
                 System.out.println(rms);
                 System.exit(0);
             }

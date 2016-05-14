@@ -971,8 +971,15 @@ public interface StreamChannel<IN, OUT>
     /**
      * Sets the stream runner so that each input is sequentially passed through the whole chain.
      * <p>
-     * Note that the runner is employed with asynchronous and parallel invocation modes, while the
-     * synchronous and serial modes will behave as before.
+     * On the contrary of the default synchronous runner, the set one will make so that each routine
+     * in the chain will be passed any input as soon as it is produced by the previous one. Such
+     * behavior will decrease memory demands at the expenses of a deeper stack of calls. In fact,
+     * the default synchronous runner breaks up routine calls so to perform them in a sequential
+     * loop. The main drawback of this approach is that all input data are accumulated before
+     * actually being processed by the routine invocation.
+     * <p>
+     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
+     * the synchronous and serial modes will behave as before.
      *
      * @return this stream.
      * @see #async()

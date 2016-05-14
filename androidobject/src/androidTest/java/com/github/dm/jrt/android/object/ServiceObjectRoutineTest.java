@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -820,6 +821,9 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final ServiceObjectRoutineBuilder builder =
                 JRoutineServiceObject.with(serviceFrom(getActivity(), TestService.class))
                                      .on(instanceOf(TestClass2.class))
+                                     .serviceConfiguration()
+                                     .withRunnerClass(SharedFieldRunner.class)
+                                     .apply()
                                      .invocationConfiguration()
                                      .withReadTimeout(seconds(10))
                                      .apply();
@@ -839,7 +843,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(4000);
 
         startTime = System.currentTimeMillis();
 
@@ -848,7 +852,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(4000);
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
@@ -1497,6 +1501,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
+    public static class SharedFieldRunner extends RunnerDecorator {
+
+        public SharedFieldRunner() {
+
+            super(Runners.poolRunner(2));
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class Count {
 
@@ -1679,14 +1691,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         public int getOne() throws InterruptedException {
 
-            UnitDuration.millis(1000).sleepAtLeast();
+            UnitDuration.seconds(2).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            UnitDuration.millis(1000).sleepAtLeast();
+            UnitDuration.seconds(2).sleepAtLeast();
 
             return 2;
         }

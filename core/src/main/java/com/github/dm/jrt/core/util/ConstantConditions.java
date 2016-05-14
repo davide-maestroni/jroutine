@@ -189,9 +189,11 @@ public class ConstantConditions {
     /**
      * Asserts that the calling method is not called.
      *
+     * @param <R> the desired return type.
+     * @return nothing.
      * @throws java.lang.UnsupportedOperationException if the method is called.
      */
-    public static void unsupported() {
+    public static <R> R unsupported() {
 
         throw new UnsupportedOperationException(
                 "method " + buildMethodName() + " is not supported");

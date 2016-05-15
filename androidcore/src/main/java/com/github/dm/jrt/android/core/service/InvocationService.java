@@ -90,11 +90,15 @@ public class InvocationService extends Service {
 
     private static final String KEY_INVOCATION_ID = "invocation_id";
 
+    private static final String KEY_LOG_ARGS = "log_args";
+
     private static final String KEY_LOG_CLASS = "log_class";
 
     private static final String KEY_LOG_LEVEL = "log_level";
 
     private static final String KEY_OUTPUT_ORDER = "output_order";
+
+    private static final String KEY_RUNNER_ARGS = "runner_args";
 
     private static final String KEY_RUNNER_CLASS = "runner_class";
 
@@ -192,7 +196,9 @@ public class InvocationService extends Service {
      * @param factoryArgs             the invocation factory arguments.
      * @param invocationConfiguration the invocation configuration.
      * @param runnerClass             the invocation runner class.
+     * @param runnerArgs              the runner constructor args.
      * @param logClass                the invocation log class.
+     * @param logArgs                 the log constructor args.
      */
     public static void putInvocation(@NotNull final Bundle bundle,
             @NotNull final String invocationId,
@@ -200,7 +206,8 @@ public class InvocationService extends Service {
             @Nullable final Object[] factoryArgs,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
+            @Nullable final Object[] runnerArgs, @Nullable final Class<? extends Log> logClass,
+            @Nullable final Object[] logArgs) {
 
         bundle.putString(KEY_INVOCATION_ID,
                 ConstantConditions.notNull("invocation ID", invocationId));
@@ -212,7 +219,10 @@ public class InvocationService extends Service {
                 invocationConfiguration.getOutputOrderTypeOrElse(null));
         bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOrElse(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
+        bundle.putParcelable(KEY_RUNNER_ARGS,
+                (runnerArgs != null) ? new ParcelableValue(runnerArgs) : null);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
+        bundle.putParcelable(KEY_LOG_ARGS, (logArgs != null) ? new ParcelableValue(logArgs) : null);
     }
 
     /**
@@ -376,8 +386,12 @@ public class InvocationService extends Service {
                 final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                         InvocationConfiguration.builder();
                 if (runnerClass != null) {
+                    final ParcelableValue runnerValue = data.getParcelable(KEY_RUNNER_ARGS);
+                    final Object[] runnerArgs =
+                            ((runnerValue != null) && (runnerValue.getValue() != null))
+                                    ? (Object[]) runnerValue.getValue() : Reflection.NO_ARGS;
                     try {
-                        builder.withRunner(findConstructor(runnerClass).newInstance());
+                        builder.withRunner(findConstructor(runnerClass, runnerArgs).newInstance());
 
                     } catch (final Exception e) {
                         mLogger.err(e, "error creating the runner instance");
@@ -386,8 +400,11 @@ public class InvocationService extends Service {
                 }
 
                 if (logClass != null) {
+                    final ParcelableValue logValue = data.getParcelable(KEY_LOG_ARGS);
+                    final Object[] logArgs = ((logValue != null) && (logValue.getValue() != null))
+                            ? (Object[]) logValue.getValue() : Reflection.NO_ARGS;
                     try {
-                        builder.withLog(findConstructor(logClass).newInstance());
+                        builder.withLog(findConstructor(logClass, logArgs).newInstance());
 
                     } catch (final Exception e) {
                         mLogger.err(e, "error creating the log instance");

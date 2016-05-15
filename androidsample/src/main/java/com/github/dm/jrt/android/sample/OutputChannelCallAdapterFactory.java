@@ -41,10 +41,13 @@ import retrofit2.Retrofit;
  * Output channel adapter implementation.
  * <p>
  * Created by davide-maestroni on 03/25/2016.
+ *
+ * @param <OUT> the output data type.
  */
-public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<OutputChannel> {
+public class OutputChannelCallAdapterFactory<OUT>
+        extends AbstractCallAdapterFactory<OUT, OutputChannel> {
 
-    private static final ExecuteCall<OutputChannel> sFactory = new ExecuteCall<>();
+    private static final ExecuteCall<?> sFactory = new ExecuteCall<>();
 
     private final LoaderContextCompat mContext;
 
@@ -74,19 +77,19 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected <C extends Call<OutputChannel>> OutputChannel adapt(
-            @NotNull final Routine<C, OutputChannel> routine, @NotNull final Call<?> call) {
+    protected <C extends Call<OUT>> OutputChannel adapt(@NotNull final Routine<C, OUT> routine,
+            @NotNull final Call<?> call) {
 
         // Makes the call comparable so to ensure the correct computation of the loader ID
-        final ComparableCall<OutputChannel> comparableCall = ComparableCall.of(call);
+        final ComparableCall<OUT> comparableCall = ComparableCall.of(call);
         return routine.asyncCall((C) comparableCall);
     }
 
     @NotNull
     @Override
-    protected Routine<? extends Call<OutputChannel>, OutputChannel> getRoutine(
-            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
-            @NotNull final Retrofit retrofit) {
+    @SuppressWarnings("unchecked")
+    protected Routine<? extends Call<OUT>, OUT> getRoutine(@NotNull final Type responseType,
+            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
 
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
@@ -94,7 +97,7 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(null, annotations);
         return JRoutineAndroidCompat.with(mContext)
-                                    .on(sFactory)
+                                    .on((ExecuteCall<OUT>) sFactory)
                                     .invocationConfiguration()
                                     .with(invocationConfiguration)
                                     .apply()

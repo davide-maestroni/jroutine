@@ -46,8 +46,10 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,6 +63,8 @@ import static com.github.dm.jrt.android.core.service.InvocationService.putError;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
 import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
+import static com.github.dm.jrt.core.util.Reflection.NO_ARGS;
+import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -90,7 +94,10 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
      * @param target                  the invocation factory target.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the service configuration.
-     * @throws java.lang.IllegalStateException if the specified context is no more valid.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+     *                                            parameters was found for the configured log or the
+     *                                            configured runner.
+     * @throws java.lang.IllegalStateException    if the specified context is no more valid.
      */
     ServiceRoutine(@NotNull final ServiceContext context,
             @NotNull final TargetInvocationFactory<IN, OUT> target,
@@ -101,6 +108,16 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         final Context serviceContext = context.getServiceContext();
         if (serviceContext == null) {
             throw new IllegalStateException("the service context has been destroyed");
+        }
+
+        final Class<? extends Runner> runnerClass = serviceConfiguration.getRunnerClassOrElse(null);
+        if (runnerClass != null) {
+            findConstructor(runnerClass, serviceConfiguration.getRunnerArgsOrElse(NO_ARGS));
+        }
+
+        final Class<? extends Log> logClass = serviceConfiguration.getLogClassOrElse(null);
+        if (logClass != null) {
+            findConstructor(logClass, serviceConfiguration.getLogArgsOrElse(NO_ARGS));
         }
 
         mContext = context;
@@ -349,7 +366,9 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             putInvocation(message.getData(), invocationId, targetFactory.getInvocationClass(),
                     targetFactory.getFactoryArgs(), mInvocationConfiguration,
                     serviceConfiguration.getRunnerClassOrElse(null),
-                    serviceConfiguration.getLogClassOrElse(null));
+                    serviceConfiguration.getRunnerArgsOrElse((Object[]) null),
+                    serviceConfiguration.getLogClassOrElse(null),
+                    serviceConfiguration.getLogArgsOrElse((Object[]) null));
             final Messenger inMessenger = new Messenger(mIncomingHandler);
             message.replyTo = inMessenger;
             try {

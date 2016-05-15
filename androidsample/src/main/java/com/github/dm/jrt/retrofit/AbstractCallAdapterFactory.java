@@ -35,13 +35,14 @@ import retrofit2.Retrofit;
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  *
- * @param <T> the return type.
+ * @param <OUT> the output data type.
+ * @param <T>   the return type.
  */
-public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory {
+public abstract class AbstractCallAdapterFactory<OUT, T> extends CallAdapter.Factory {
 
     private final int mParameterIndex;
 
-    private final Class<?> mReturnType;
+    private final Class<T> mReturnType;
 
     /**
      * Constructor.
@@ -57,7 +58,7 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
     }
 
     @Override
-    public CallAdapter<T> get(final Type returnType, final Annotation[] annotations,
+    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
 
         final Type responseType;
@@ -86,7 +87,7 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
             return null;
         }
 
-        final Routine<? extends Call<T>, T> routine =
+        final Routine<? extends Call<OUT>, OUT> routine =
                 getRoutine(responseType, annotations, retrofit);
         return new CallAdapterInternal(ConstantConditions.notNull("builder", routine),
                 responseType);
@@ -101,7 +102,7 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
      * @return the adapted instance.
      */
     @NotNull
-    protected abstract <C extends Call<T>> T adapt(@NotNull Routine<C, T> routine,
+    protected abstract <C extends Call<OUT>> T adapt(@NotNull Routine<C, OUT> routine,
             @NotNull Call<?> call);
 
     /**
@@ -114,7 +115,7 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
      * @return the routine instance.
      */
     @NotNull
-    protected abstract Routine<? extends Call<T>, T> getRoutine(@NotNull Type responseType,
+    protected abstract Routine<? extends Call<OUT>, OUT> getRoutine(@NotNull Type responseType,
             @NotNull Annotation[] annotations, @NotNull Retrofit retrofit);
 
     /**
@@ -124,13 +125,13 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
 
         private final Type mResponseType;
 
-        private final Routine<? extends Call<T>, T> mRoutine;
+        private final Routine<? extends Call<OUT>, OUT> mRoutine;
 
         /**
          * @param routine      the routine instance.
          * @param responseType the response type.
          */
-        private CallAdapterInternal(@NotNull final Routine<? extends Call<T>, T> routine,
+        private CallAdapterInternal(@NotNull final Routine<? extends Call<OUT>, OUT> routine,
                 @NotNull final Type responseType) {
 
             mResponseType = responseType;

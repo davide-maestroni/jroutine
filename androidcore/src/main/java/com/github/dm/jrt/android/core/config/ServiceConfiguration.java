@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,9 +53,13 @@ public final class ServiceConfiguration extends DeepEqualObject {
     private static final ServiceConfiguration sDefaultConfiguration =
             builder().buildConfiguration();
 
+    private final Object[] mLogArgs;
+
     private final Class<? extends Log> mLogClass;
 
     private final Looper mLooper;
+
+    private final Object[] mRunnerArgs;
 
     private final Class<? extends Runner> mRunnerClass;
 
@@ -65,16 +68,21 @@ public final class ServiceConfiguration extends DeepEqualObject {
      *
      * @param looper      the looper instance.
      * @param runnerClass the runner class.
+     * @param runnerArgs  the runner constructor args.
      * @param logClass    the log class.
+     * @param logArgs     the log constructor args.
      */
     private ServiceConfiguration(@Nullable final Looper looper,
             @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
+            @Nullable final Object[] runnerArgs, @Nullable final Class<? extends Log> logClass,
+            @Nullable final Object[] logArgs) {
 
-        super(asArgs(looper, runnerClass, logClass));
+        super(asArgs(looper, runnerClass, runnerArgs, logClass, logArgs));
         mLooper = looper;
         mRunnerClass = runnerClass;
+        mRunnerArgs = runnerArgs;
         mLogClass = logClass;
+        mLogArgs = logArgs;
     }
 
     /**
@@ -113,6 +121,11 @@ public final class ServiceConfiguration extends DeepEqualObject {
         return sDefaultConfiguration;
     }
 
+    private static Object[] cloneOrNull(@Nullable final Object[] args) {
+
+        return (args != null) ? args.clone() : null;
+    }
+
     /**
      * Returns a service configuration builder initialized with this configuration.
      *
@@ -122,6 +135,18 @@ public final class ServiceConfiguration extends DeepEqualObject {
     public Builder<ServiceConfiguration> builderFrom() {
 
         return builderFrom(this);
+    }
+
+    /**
+     * Returns the arguments to be passed to the log constructor.
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the constructor arguments.
+     */
+    public Object[] getLogArgsOrElse(@Nullable final Object... valueIfNotSet) {
+
+        final Object[] logArgs = mLogArgs;
+        return (logArgs != null) ? cloneOrNull(logArgs) : valueIfNotSet;
     }
 
     /**
@@ -147,6 +172,18 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
+    }
+
+    /**
+     * Returns the arguments to be passed to the runner constructor.
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the constructor arguments.
+     */
+    public Object[] getRunnerArgsOrElse(@Nullable final Object... valueIfNotSet) {
+
+        final Object[] runnerArgs = mRunnerArgs;
+        return (runnerArgs != null) ? cloneOrNull(runnerArgs) : valueIfNotSet;
     }
 
     /**
@@ -188,9 +225,13 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
+        private Object[] mLogArgs;
+
         private Class<? extends Log> mLogClass;
 
         private Looper mLooper;
+
+        private Object[] mRunnerArgs;
 
         private Class<? extends Runner> mRunnerClass;
 
@@ -254,11 +295,34 @@ public final class ServiceConfiguration extends DeepEqualObject {
                 withRunnerClass(runnerClass);
             }
 
+            final Object[] runnerArgs = configuration.mRunnerArgs;
+            if (runnerArgs != null) {
+                withRunnerArgs(runnerArgs);
+            }
+
             final Class<? extends Log> logClass = configuration.mLogClass;
             if (logClass != null) {
                 withLogClass(logClass);
             }
 
+            final Object[] logArgs = configuration.mLogArgs;
+            if (logArgs != null) {
+                withLogArgs(logArgs);
+            }
+
+            return this;
+        }
+
+        /**
+         * Sets the arguments to be passed to the log constructor.
+         *
+         * @param args the argument objects.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withLogArgs(@Nullable final Object... args) {
+
+            mLogArgs = cloneOrNull(args);
             return this;
         }
 
@@ -268,15 +332,9 @@ public final class ServiceConfiguration extends DeepEqualObject {
          *
          * @param logClass the log class.
          * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified class has no default
-         *                                            constructor.
          */
         @NotNull
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
-
-            if (logClass != null) {
-                Reflection.findConstructor(logClass);
-            }
 
             mLogClass = logClass;
             return this;
@@ -297,20 +355,27 @@ public final class ServiceConfiguration extends DeepEqualObject {
         }
 
         /**
+         * Sets the arguments to be passed to the runner constructor.
+         *
+         * @param args the argument objects.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withRunnerArgs(@Nullable final Object... args) {
+
+            mRunnerArgs = cloneOrNull(args);
+            return this;
+        }
+
+        /**
          * Sets the runner class. A null value means that it is up to the specific implementation to
          * choose a default runner.
          *
          * @param runnerClass the runner class.
          * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified class has no default
-         *                                            constructor.
          */
         @NotNull
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
-
-            if (runnerClass != null) {
-                Reflection.findConstructor(runnerClass);
-            }
 
             mRunnerClass = runnerClass;
             return this;
@@ -319,14 +384,17 @@ public final class ServiceConfiguration extends DeepEqualObject {
         @NotNull
         private ServiceConfiguration buildConfiguration() {
 
-            return new ServiceConfiguration(mLooper, mRunnerClass, mLogClass);
+            return new ServiceConfiguration(mLooper, mRunnerClass, mRunnerArgs, mLogClass,
+                    mLogArgs);
         }
 
         private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
 
             mLooper = configuration.mLooper;
             mRunnerClass = configuration.mRunnerClass;
+            mRunnerArgs = configuration.mRunnerArgs;
             mLogClass = configuration.mLogClass;
+            mLogArgs = configuration.mLogArgs;
         }
     }
 

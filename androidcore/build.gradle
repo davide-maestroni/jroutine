@@ -71,11 +71,11 @@ conditionalDependencies {
 }
 
 jacoco {
-    toolVersion '0.7.6.201602180812'
+    toolVersion project.getProperty('jacocoVersion')
 }
 
 findbugs {
-    toolVersion '3.0.1'
+    toolVersion project.getProperty('findbugsVersion')
 }
 
 tasks.withType(FindBugs) {

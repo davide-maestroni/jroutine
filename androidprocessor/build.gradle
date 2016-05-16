@@ -29,7 +29,7 @@ conditionalDependencies {
 }
 
 findbugs {
-    toolVersion '3.0.1'
+    toolVersion project.getProperty('findbugsVersion')
 }
 
 javadoc {

@@ -27,12 +27,17 @@ javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
     compile 'com.intellij:annotations:12.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0'
+    testCompile 'com.squareup.retrofit2:converter-gson:2.0.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.mock-server:mockserver-netty:3.10.4'
 }
 
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacocoTestReport {
@@ -52,6 +57,7 @@ findbugs {
 
 javadoc {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/")
+    // TODO: documentation
+    //options.overview("${project.projectDir}/docs/overview.html")
+    options.links("${prefix}/core/", "${prefix}/object/", "${prefix}/stream/")
 }

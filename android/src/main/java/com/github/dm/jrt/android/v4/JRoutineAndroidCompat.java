@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright (c) 2016. Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android;
+package com.github.dm.jrt.android.v4;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.github.dm.jrt.JRoutine;
+import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -174,6 +175,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static ServiceBuilder with(@NotNull final ServiceContext context) {
 
-        return new ServiceBuilder(context);
+        return new ServiceBuilder(context) {};
     }
 }

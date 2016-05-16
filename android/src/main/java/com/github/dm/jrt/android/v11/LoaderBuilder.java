@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android;
+package com.github.dm.jrt.android.v11;
 
+import com.github.dm.jrt.android.LoaderAutoProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
+import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.ConversionInvocation;
@@ -61,16 +62,16 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public class LoaderBuilderCompat {
+public class LoaderBuilder {
 
-    private final LoaderContextCompat mContext;
+    private final LoaderContext mContext;
 
     /**
      * Constructor.
      *
      * @param context the loader context.
      */
-    LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
+    LoaderBuilder(@NotNull final LoaderContext context) {
 
         mContext = ConstantConditions.notNull("loader context", context);
     }
@@ -304,7 +305,7 @@ public class LoaderBuilderCompat {
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
-        return JRoutineLoaderCompat.with(mContext).on(factory);
+        return JRoutineLoader.with(mContext).on(factory);
     }
 
     /**
@@ -325,7 +326,7 @@ public class LoaderBuilderCompat {
     @NotNull
     public LoaderAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
-        return new DefaultLoaderAutoProxyRoutineBuilderCompat(mContext, target);
+        return new DefaultLoaderAutoProxyRoutineBuilder(mContext, target);
     }
 
     /**
@@ -353,7 +354,7 @@ public class LoaderBuilderCompat {
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final InvocationFactory<IN, OUT> factory) {
 
-        return JRoutineLoaderCompat.with(mContext).on(factoryFrom(factory));
+        return JRoutineLoader.with(mContext).on(factoryFrom(factory));
     }
 
     /**
@@ -559,7 +560,7 @@ public class LoaderBuilderCompat {
     @NotNull
     public LoaderChannelBuilder onId(final int loaderId) {
 
-        return JRoutineLoaderCompat.with(mContext).onId(loaderId);
+        return JRoutineLoader.with(mContext).onId(loaderId);
     }
 
     /**

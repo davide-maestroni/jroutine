@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.retrofit;
+package com.github.dm.jrt.android.retrofit;
 
+import com.github.dm.jrt.android.core.JRoutineService;
+import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.retrofit.ExecuteCall;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -37,29 +43,47 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
+
 /**
  * Implementation of a call adapter factory supporting {@code OutputChannel} and
  * {@code StreamChannel} return types.
+ * <br>
+ * If properly configured, the routine invocations will run on a dedicated Android service.
  * <p>
- * Created by davide-maestroni on 03/26/2016.
+ * Created by davide-maestroni on 05/16/2016.
  */
-public class RoutineAdapterFactory extends CallAdapter.Factory {
+public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
 
     private static final ExecuteCall<?> sCallInvocation = new ExecuteCall<Object>();
 
-    private static final RoutineAdapterFactory sDefault =
-            new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration());
+    private static final TargetInvocationFactory<Call<Object>, Object> sCallTarget =
+            factoryOf(new ClassToken<ExecuteCall<Object>>() {});
 
-    private final InvocationConfiguration mConfiguration;
+    private static final ServiceRoutineAdapterFactory sDefault =
+            new ServiceRoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
+                    ServiceConfiguration.defaultConfiguration());
+
+    private final InvocationConfiguration mInvocationConfiguration;
+
+    private final ServiceConfiguration mServiceConfiguration;
+
+    private final ServiceContext mServiceContext;
 
     /**
      * Constructor.
      *
-     * @param configuration the invocation configuration.
+     * @param context                 the service context.
+     * @param invocationConfiguration the invocation configuration.
+     * @param serviceConfiguration    the service configuration.
      */
-    private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration) {
+    private ServiceRoutineAdapterFactory(@Nullable final ServiceContext context,
+            @NotNull final InvocationConfiguration invocationConfiguration,
+            @NotNull final ServiceConfiguration serviceConfiguration) {
 
-        mConfiguration = configuration;
+        mServiceContext = context;
+        mInvocationConfiguration = invocationConfiguration;
+        mServiceConfiguration = serviceConfiguration;
     }
 
     /**
@@ -79,9 +103,24 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
      * @return the factory instance.
      */
     @NotNull
-    public static RoutineAdapterFactory defaultFactory() {
+    public static ServiceRoutineAdapterFactory defaultFactory() {
 
         return sDefault;
+    }
+
+    /**
+     * Returns the a factory instance with default configuration.
+     *
+     * @param context the service context.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static ServiceRoutineAdapterFactory defaultFactory(
+            @Nullable final ServiceContext context) {
+
+        return (context == null) ? defaultFactory() : new ServiceRoutineAdapterFactory(context,
+                InvocationConfiguration.defaultConfiguration(),
+                ServiceConfiguration.defaultConfiguration());
     }
 
     @Override
@@ -113,30 +152,51 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     private Routine<? extends Call<?>, ?> buildRoutine(@NotNull final Annotation[] annotations) {
 
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
-                Builders.withAnnotations(mConfiguration, annotations);
-        return JRoutineCore.on(sCallInvocation)
-                           .invocationConfiguration()
-                           .with(invocationConfiguration)
-                           .apply()
-                           .buildRoutine();
+                Builders.withAnnotations(mInvocationConfiguration, annotations);
+        final ServiceContext serviceContext = mServiceContext;
+        if (serviceContext == null) {
+            return JRoutineCore.on(sCallInvocation)
+                               .invocationConfiguration()
+                               .with(invocationConfiguration)
+                               .apply()
+                               .buildRoutine();
+        }
+
+        return JRoutineService.with(serviceContext)
+                              .on(sCallTarget)
+                              .invocationConfiguration()
+                              .with(invocationConfiguration)
+                              .apply()
+                              .serviceConfiguration()
+                              .with(mServiceConfiguration)
+                              .apply()
+                              .buildRoutine();
     }
 
     /**
-     * Builder of routine adapter factory instances.
+     * Builder of service routine adapter factory instances.
      * <p>
      * The options set through the builder configuration will be applied to all the routine handling
      * the Retrofit calls, unless they are overwritten by specific annotations.
      *
      * @see com.github.dm.jrt.object.annotation Annotations
      */
-    public static class Builder implements ConfigurableBuilder<Builder>, Configurable<Builder> {
+    public static class Builder implements ServiceConfigurableBuilder<Builder>,
+            InvocationConfiguration.Configurable<Builder>,
+            ServiceConfiguration.Configurable<Builder> {
 
-        private InvocationConfiguration mConfiguration =
+        private InvocationConfiguration mInvocationConfiguration =
                 InvocationConfiguration.defaultConfiguration();
+
+        private ServiceConfiguration mServiceConfiguration =
+                ServiceConfiguration.defaultConfiguration();
+
+        private ServiceContext mServiceContext;
 
         /**
          * Constructor.
@@ -148,7 +208,16 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
         @NotNull
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
 
-            mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+            mInvocationConfiguration =
+                    ConstantConditions.notNull("invocation configuration", configuration);
+            return this;
+        }
+
+        @NotNull
+        public Builder apply(@NotNull final ServiceConfiguration configuration) {
+
+            mServiceConfiguration =
+                    ConstantConditions.notNull("service configuration", configuration);
             return this;
         }
 
@@ -158,15 +227,35 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
          * @return the factory instance.
          */
         @NotNull
-        public RoutineAdapterFactory buildFactory() {
+        public ServiceRoutineAdapterFactory buildFactory() {
 
-            return new RoutineAdapterFactory(mConfiguration);
+            return new ServiceRoutineAdapterFactory(mServiceContext, mInvocationConfiguration,
+                    mServiceConfiguration);
         }
 
         @NotNull
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
 
-            return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
+            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+        }
+
+        @NotNull
+        public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
+
+            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
+        }
+
+        /**
+         * Sets the factory service context.
+         *
+         * @param context the service context.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder with(@Nullable final ServiceContext context) {
+
+            mServiceContext = context;
+            return this;
         }
     }
 

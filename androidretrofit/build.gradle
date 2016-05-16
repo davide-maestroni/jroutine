@@ -1,0 +1,110 @@
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+apply plugin: 'findbugs'
+apply plugin: 'com.github.ben-manes.versions'
+apply from: '../extra.gradle'
+
+group = project.getProperty('groupName')
+version = project.getProperty('releaseVersion')
+archivesBaseName = "${project.parent.name}-${project.name}"
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
+
+    defaultConfig {
+        minSdkVersion 4
+        targetSdkVersion 23
+        versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
+        versionName version
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            testCoverageEnabled true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_5
+        targetCompatibility JavaVersion.VERSION_1_5
+    }
+
+    dexOptions {
+        preDexLibraries false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+    lintOptions {
+        disable 'MissingRegistered'
+    }
+}
+
+dependencies {
+    androidTestCompile 'org.assertj:assertj-core:1.7.1'
+    androidTestCompile 'org.mock-server:mockserver-netty:3.10.4'
+    androidTestCompile 'com.squareup.retrofit2:converter-gson:2.0.0'
+    compile 'com.android.support:support-v4:23.2.1'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0'
+}
+
+conditionalDependencies {
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'retrofit', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+}
+
+jacoco {
+    toolVersion project.getProperty('jacocoVersion')
+}
+
+findbugs {
+    toolVersion project.getProperty('findbugsVersion')
+}
+
+tasks.withType(FindBugs) {
+    excludeFilter = file('findbugs.xml')
+}
+
+tasks.withType(Javadoc) {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+    // TODO: documentation
+    //options.overview("${project.projectDir}/docs/overview.html")
+    options.links("${prefix}/lib/",
+            "${prefix}/core/",
+            "${prefix}/object/",
+            "${prefix}/stream/",
+            "${prefix}/retrofit/",
+            "${prefix}/androidcore/",
+            "${prefix}/androidobject/",
+            "${prefix}/androidstream/")
+}

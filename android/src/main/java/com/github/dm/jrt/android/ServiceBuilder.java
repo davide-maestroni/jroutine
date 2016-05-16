@@ -46,7 +46,7 @@ public class ServiceBuilder {
      *
      * @param context the service context.
      */
-    ServiceBuilder(@NotNull final ServiceContext context) {
+    protected ServiceBuilder(@NotNull final ServiceContext context) {
 
         mContext = ConstantConditions.notNull("service context", context);
     }

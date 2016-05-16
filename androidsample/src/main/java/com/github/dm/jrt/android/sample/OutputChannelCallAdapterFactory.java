@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android.sample;
 
-import com.github.dm.jrt.android.JRoutineAndroidCompat;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.builder.AndroidBuilders;
+import com.github.dm.jrt.android.v4.JRoutineAndroidCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;

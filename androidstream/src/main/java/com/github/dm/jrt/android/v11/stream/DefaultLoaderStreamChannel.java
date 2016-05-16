@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.v11.stream;
 import android.support.annotation.NonNull;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
@@ -27,6 +28,7 @@ import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader.LoaderBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -447,6 +449,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> map(
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.map(builder);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
@@ -705,6 +715,16 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        checkStatic(wrap(keyFunction), keyFunction);
+        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, builder);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function) {
@@ -729,6 +749,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
         checkStatic("routine", routine);
         return (LoaderStreamChannel<IN, AFTER>) super.splitBy(count, routine);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(count, builder);
     }
 
     @NotNull
@@ -930,6 +958,21 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <AFTER> LoaderStreamChannel<IN, AFTER> map(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return map(builder.invocationConfiguration()
+                          .with(null)
+                          .with(buildConfiguration())
+                          .apply()
+                          .loaderConfiguration()
+                          .with(null)
+                          .with(buildLoaderConfiguration())
+                          .apply()
+                          .buildRoutine());
+    }
+
+    @NotNull
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
@@ -952,6 +995,23 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        checkStatic(wrap(keyFunction), keyFunction);
+        return splitBy(keyFunction, builder.invocationConfiguration()
+                                           .with(null)
+                                           .with(buildConfiguration())
+                                           .apply()
+                                           .loaderConfiguration()
+                                           .with(null)
+                                           .with(buildLoaderConfiguration())
+                                           .apply()
+                                           .buildRoutine());
+    }
+
+    @NotNull
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -969,6 +1029,21 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
                                             .with(buildLoaderConfiguration())
                                             .apply()
                                             .buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return splitBy(count, builder.invocationConfiguration()
+                                     .with(null)
+                                     .with(buildConfiguration())
+                                     .apply()
+                                     .loaderConfiguration()
+                                     .with(null)
+                                     .with(buildLoaderConfiguration())
+                                     .apply()
+                                     .buildRoutine());
     }
 
     @NotNull

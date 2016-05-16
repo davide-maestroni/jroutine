@@ -18,6 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -1624,13 +1625,68 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testMapRoutineBuilder() {
+
+        final RoutineBuilder<String, String> builder = JRoutineCore.on(new UpperCase());
+        assertThat(Streams.streamOf("test1", "test2")
+                          .async()
+                          .map(builder)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2")
+                          .parallel()
+                          .map(builder)
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2").sync().map(builder).all()).containsExactly(
+                "TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2").serial().map(builder).all()).containsExactly(
+                "TEST1", "TEST2");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMapRoutineBuilderNullPointerError() {
+
+        try {
+            Streams.streamOf().async().map((RoutineBuilder<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().parallel().map((RoutineBuilder<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().map((RoutineBuilder<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().serial().map((RoutineBuilder<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testMapRoutineNullPointerError() {
 
         try {
-
             Streams.streamOf().async().map((Routine<Object, Object>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1638,9 +1694,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             Streams.streamOf().parallel().map((Routine<Object, Object>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1648,9 +1702,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             Streams.streamOf().sync().map((Routine<Object, Object>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1658,9 +1710,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             Streams.streamOf().serial().map((Routine<Object, Object>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2282,6 +2332,17 @@ public class StreamChannelTest {
                           .splitBy(Functions.<Integer>identity(), sqr)
                           .afterMax(seconds(3))
                           .all()).containsOnly(1L, 4L, 9L);
+        assertThat(Streams.streamOf()
+                          .thenGetMore(range(1, 3))
+                          .splitBy(2, JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1, 2, 3);
+        assertThat(Streams.streamOf()
+                          .thenGetMore(range(1, 3))
+                          .splitBy(Functions.<Integer>identity(),
+                                  JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1, 2, 3);
     }
 
     @Test

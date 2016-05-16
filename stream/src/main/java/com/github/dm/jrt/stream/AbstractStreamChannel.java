@@ -18,6 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -418,6 +419,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> map(
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return map(builder.invocationConfiguration()
+                          .with(null)
+                          .with(buildConfiguration())
+                          .apply()
+                          .buildRoutine());
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
@@ -675,6 +687,18 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return splitBy(keyFunction, builder.invocationConfiguration()
+                                           .with(null)
+                                           .with(buildConfiguration())
+                                           .apply()
+                                           .buildRoutine());
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function) {
@@ -696,6 +720,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return buildChannel(mBind.andThen(
                 new BindSplitCount<OUT, AFTER>(buildChannelConfiguration(), count, routine,
                         mInvocationMode)));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return splitBy(count, builder.invocationConfiguration()
+                                     .with(null)
+                                     .with(buildConfiguration())
+                                     .apply()
+                                     .buildRoutine());
     }
 
     @NotNull

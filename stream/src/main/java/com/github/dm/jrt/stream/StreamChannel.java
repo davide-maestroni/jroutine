@@ -18,6 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -544,10 +545,8 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Concatenates a stream mapping this stream outputs through the specified routine.
-     * <br>
-     * The stream configuration will be ignored.
      * <p>
-     * Note that the created routine will be initialized with the current configuration.
+     * Note that the stream configuration will be ignored.
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
@@ -558,6 +557,22 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> StreamChannel<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * Concatenates a stream mapping this stream outputs through the specified routine builder.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param builder the routine builder instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = ROUTINE)
+    <AFTER> StreamChannel<IN, AFTER> map(
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Concatenates a stream mapping the whole collection of outputs by applying the specified
@@ -1077,6 +1092,8 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Each output will be assigned to a specific group based on the key returned by the specified
      * function.
+     * <p>
+     * The stream configuration will be ignored.
      *
      * @param keyFunction the function assigning a key to each output.
      * @param routine     the processing routine instance.
@@ -1087,6 +1104,26 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(value = MAP, binding = CONSUMER)
     <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param builder     the builder of processing routine instances.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -1136,6 +1173,8 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
+     * <p>
+     * The stream configuration will be ignored.
      *
      * @param count   the number of groups.
      * @param routine the processing routine instance.
@@ -1147,6 +1186,27 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(value = MAP, binding = CONSUMER)
     <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param builder the builder of processing routine instances.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

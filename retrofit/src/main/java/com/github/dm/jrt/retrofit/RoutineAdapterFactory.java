@@ -43,16 +43,19 @@ import retrofit2.Retrofit;
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
-public class RoutineCallAdapterFactory extends CallAdapter.Factory {
+public class RoutineAdapterFactory extends CallAdapter.Factory {
 
     private static final ExecuteCall<?> sCallInvocation = new ExecuteCall<Object>();
+
+    private static final RoutineAdapterFactory sDefault =
+            new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration());
 
     private final InvocationConfiguration mConfiguration;
 
     /**
      * Constructor.
      */
-    private RoutineCallAdapterFactory(@NotNull final InvocationConfiguration configuration) {
+    private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = configuration;
     }
@@ -66,6 +69,17 @@ public class RoutineCallAdapterFactory extends CallAdapter.Factory {
     public static Builder builder() {
 
         return new Builder();
+    }
+
+    /**
+     * Returns the default factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public static RoutineAdapterFactory defaultFactory() {
+
+        return sDefault;
     }
 
     @Override
@@ -109,6 +123,14 @@ public class RoutineCallAdapterFactory extends CallAdapter.Factory {
                            .buildRoutine();
     }
 
+    /**
+     * Builder of routine adapter factory instances.
+     * <p>
+     * The options set through the builder configuration will be applied to all the routine handling
+     * the Retrofit calls, unless they are overwritten by specific annotations.
+     *
+     * @see com.github.dm.jrt.object.annotation Annotations
+     */
     public static class Builder implements ConfigurableBuilder<Builder>, Configurable<Builder> {
 
         private InvocationConfiguration mConfiguration =
@@ -134,9 +156,9 @@ public class RoutineCallAdapterFactory extends CallAdapter.Factory {
          * @return the factory instance.
          */
         @NotNull
-        public RoutineCallAdapterFactory buildFactory() {
+        public RoutineAdapterFactory buildFactory() {
 
-            return new RoutineCallAdapterFactory(mConfiguration);
+            return new RoutineAdapterFactory(mConfiguration);
         }
 
         @NotNull

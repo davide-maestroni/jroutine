@@ -18,10 +18,12 @@ package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -327,6 +329,14 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamFlow(value = MAP, binding = ROUTINE)
+    <AFTER> LoaderStreamChannel<IN, AFTER> map(
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @StreamFlow(value = COLLECT, binding = ROUTINE)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
@@ -569,6 +579,14 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> function);
@@ -588,6 +606,14 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(value = MAP, binding = CONSUMER)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * {@inheritDoc}
@@ -766,6 +792,22 @@ public interface LoaderStreamChannel<IN, OUT>
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
+     * Concatenates a stream mapping this stream outputs through the specified routine builder.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param builder the routine builder instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = ROUTINE)
+    <AFTER> LoaderStreamChannel<IN, AFTER> map(
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
      * different routine invocation.
      * <br>
@@ -789,6 +831,26 @@ public interface LoaderStreamChannel<IN, OUT>
      * Splits the outputs produced by this stream, so that each group will be processed by a
      * different routine invocation.
      * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param builder     the builder of processing routine instances.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      * <p>
@@ -804,6 +866,27 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(value = MAP, binding = CONSUMER)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param builder the builder of processing routine instances.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(value = MAP, binding = CONSUMER)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).apply()}.

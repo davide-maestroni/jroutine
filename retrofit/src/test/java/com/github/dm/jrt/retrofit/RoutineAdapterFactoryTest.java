@@ -41,7 +41,7 @@ import static org.mockserver.model.HttpResponse.response;
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */
-public class RoutineCallAdapterFactoryTest {
+public class RoutineAdapterFactoryTest {
 
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
@@ -64,14 +64,17 @@ public class RoutineCallAdapterFactoryTest {
     public void testOutputChannelAdapter() {
 
         sServer.when(request("/users/octocat/repos")).respond(response(BODY));
+        final RoutineAdapterFactory factory = RoutineAdapterFactory.builder()
+                                                                   .invocationConfiguration()
+                                                                   .withReadTimeout(seconds(3))
+                                                                   .apply()
+                                                                   .buildFactory();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + sServer.getPort())
-                                               .addCallAdapterFactory(
-                                                       RoutineCallAdapterFactory.builder()
-                                                                                .buildFactory())
+                                               .addCallAdapterFactory(factory)
                                                .addConverterFactory(GsonConverterFactory.create())
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").afterMax(seconds(3)).next();
+        final List<Repo> repos = service.listRepos("octocat").next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -90,8 +93,7 @@ public class RoutineCallAdapterFactoryTest {
         sServer.when(request("/users/octocat/repos")).respond(response(BODY));
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + sServer.getPort())
                                                .addCallAdapterFactory(
-                                                       RoutineCallAdapterFactory.builder()
-                                                                                .buildFactory())
+                                                       RoutineAdapterFactory.defaultFactory())
                                                .addConverterFactory(GsonConverterFactory.create())
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);

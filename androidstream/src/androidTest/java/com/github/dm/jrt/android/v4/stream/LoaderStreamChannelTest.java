@@ -23,6 +23,7 @@ import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
@@ -32,6 +33,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelCompat
         .LoaderStreamConfigurationCompat;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -2375,6 +2377,56 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
+    public void testMapRoutineBuilder() {
+
+        final RoutineBuilder<String, String> builder = JRoutineCore.on(new UpperCase());
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .map(builder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .parallel()
+                                      .map(builder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .sync()
+                                      .map(builder)
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .map(builder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST1", "TEST2");
+        final RoutineBuilder<String, String> loaderBuilder =
+                JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                                    .on(ContextInvocationFactory.factoryOf(UpperCase.class));
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .async()
+                                      .map(loaderBuilder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .parallel()
+                                      .map(loaderBuilder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .sync()
+                                      .map(loaderBuilder)
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .serial()
+                                      .map(loaderBuilder)
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST1", "TEST2");
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testMapRoutineNullPointerError() {
 
@@ -2741,6 +2793,31 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(getActivity()))
                                       .then("test1", "test2", "test3")
                                       .splitBy(Functions.<String>identity(), factory)
+                                      .afterMax(seconds(3))
+                                      .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        final RoutineBuilder<String, String> builder = JRoutineCore.on(new UpperCase());
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .with(loaderFrom(getActivity()))
+                                      .then("test1", "test2", "test3")
+                                      .splitBy(2, builder)
+                                      .afterMax(seconds(3))
+                                      .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .with(loaderFrom(getActivity()))
+                                      .then("test1", "test2", "test3")
+                                      .splitBy(Functions.<String>identity(), builder)
+                                      .afterMax(seconds(3))
+                                      .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        final LoaderRoutineBuilder<String, String> loaderBuilder =
+                JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory);
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .then("test1", "test2", "test3")
+                                      .splitBy(2, loaderBuilder)
+                                      .afterMax(seconds(3))
+                                      .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .then("test1", "test2", "test3")
+                                      .splitBy(Functions.<String>identity(), loaderBuilder)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
     }

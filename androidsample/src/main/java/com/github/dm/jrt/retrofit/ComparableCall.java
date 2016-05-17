@@ -150,9 +150,13 @@ public class ComparableCall<T> implements Call<T> {
         final Headers headers = request.headers();
         if (headers.size() > 0) {
             final Locale locale = Locale.getDefault();
-            final TreeSet<String> names = new TreeSet<>(headers.names());
+            final TreeSet<String> names = new TreeSet<>();
+            for (final String name : headers.names()) {
+                names.add((name != null) ? name.toLowerCase(locale) : null);
+            }
+
             for (final String name : names) {
-                result += result * 31 + ((name != null) ? name.toLowerCase(locale).hashCode() : 0);
+                result += result * 31 + ((name != null) ? name.hashCode() : 0);
                 final List<String> values = headers.values(name);
                 result += result * 31 + ((values != null) ? values.hashCode() : 0);
             }

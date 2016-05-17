@@ -35,7 +35,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -59,7 +58,6 @@ import java.util.Map;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.stream.Streams.sequence;
 import static com.github.dm.jrt.stream.Streams.sortBy;
@@ -2629,22 +2627,9 @@ public class StreamsTest {
                           .async()
                           .map(Streams.<Number>groupBy(3))
                           .parallel()
-                          .mapMore(Streams.<Number>unfold())
+                          .map(Streams.<Number>unfold())
                           .afterMax(seconds(3))
                           .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    }
-
-    @Test
-    public void testUnfoldEquals() {
-
-        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer =
-                wrap(Streams.unfold());
-        assertThat(consumer).isEqualTo(consumer);
-        assertThat(consumer).isNotEqualTo(null);
-        assertThat(consumer).isNotEqualTo("test");
-        assertThat(consumer).isNotEqualTo(Streams.groupBy(3));
-        assertThat(consumer).isEqualTo(wrap(Streams.unfold()));
-        assertThat(consumer.hashCode()).isEqualTo(wrap(Streams.unfold()).hashCode());
     }
 
     @Test

@@ -25,10 +25,11 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.function.Consumer;
@@ -62,15 +63,16 @@ import static com.github.dm.jrt.stream.util.Numbers.toBigSafe;
  */
 public class Streams extends Functions {
 
-    private static final BiConsumer<? extends Iterable<?>, ? extends InputChannel<?>>
-            sUnfoldConsumer = new BiConsumer<Iterable<?>, InputChannel<?>>() {
+    private static final ConversionInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
+            new ConversionInvocation<Iterable<?>, Object>(null) {
 
-        @SuppressWarnings("unchecked")
-        public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
+                @SuppressWarnings("unchecked")
+                public void onInput(final Iterable<?> input,
+                        @NotNull final ResultChannel<Object> result) throws Exception {
 
-            inputChannel.pass((Iterable) objects);
-        }
-    };
+                    result.pass((Iterable) input);
+                }
+            };
 
     /**
      * Avoid explicit instantiation.
@@ -1274,10 +1276,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
 
-        if (output instanceof StreamChannel) {
-            return (StreamChannel<OUT, OUT>) output;
-        }
-
         return new DefaultStreamChannel<OUT, OUT>(output);
     }
 
@@ -1392,9 +1390,9 @@ public class Streams extends Functions {
     @NotNull
     @StreamFlow(value = MAP, binding = ROUTINE)
     @SuppressWarnings("unchecked")
-    public static <IN> BiConsumer<Iterable<IN>, InputChannel<IN>> unfold() {
+    public static <IN> InvocationFactory<Iterable<IN>, IN> unfold() {
 
-        return (BiConsumer<Iterable<IN>, InputChannel<IN>>) sUnfoldConsumer;
+        return (InvocationFactory<Iterable<IN>, IN>) sUnfoldInvocation;
     }
 
     /**

@@ -1059,10 +1059,6 @@ public class LoaderStreams extends Streams {
     public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        if (output instanceof LoaderStreamChannel) {
-            return (LoaderStreamChannel<OUT, OUT>) output;
-        }
-
         return new DefaultLoaderStreamChannel<OUT, OUT>(output);
     }
 

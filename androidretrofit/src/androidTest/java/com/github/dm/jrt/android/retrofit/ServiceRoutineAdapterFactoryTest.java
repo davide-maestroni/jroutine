@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.retrofit;
+package com.github.dm.jrt.android.retrofit;
+
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
+import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.stream.Streams;
-
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,32 +32,40 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Routine adapter factory unit tests.
+ * Service routine adapter factory unit tests.
  * <p>
- * Created by davide-maestroni on 05/16/2016.
+ * Created by davide-maestroni on 05/17/2016.
  */
-public class RoutineAdapterFactoryTest {
+@TargetApi(VERSION_CODES.FROYO)
+public class ServiceRoutineAdapterFactoryTest
+        extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
-    @Test
+    public ServiceRoutineAdapterFactoryTest() {
+
+        super(TestActivity.class);
+    }
+
     public void testOutputChannelAdapter() throws IOException {
 
         final MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(BODY));
         server.start();
         try {
-            final RoutineAdapterFactory adapterFactory = //
-                    RoutineAdapterFactory.builder()
-                                         .invocationConfiguration()
-                                         .withReadTimeout(seconds(3))
-                                         .apply()
-                                         .buildFactory();
+            final ServiceRoutineAdapterFactory adapterFactory =
+                    ServiceRoutineAdapterFactory.builder()
+                                                .with(serviceFrom(getActivity()))
+                                                .invocationConfiguration()
+                                                .withReadTimeout(seconds(10))
+                                                .apply()
+                                                .buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
             final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                    .addCallAdapterFactory(adapterFactory)
@@ -79,14 +89,14 @@ public class RoutineAdapterFactoryTest {
         }
     }
 
-    @Test
     public void testStreamChannelAdapter() throws IOException {
 
         final MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(BODY));
         server.start();
         try {
-            final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.defaultFactory();
+            final ServiceRoutineAdapterFactory adapterFactory =
+                    ServiceRoutineAdapterFactory.defaultFactory(serviceFrom(getActivity()));
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
             final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                    .addCallAdapterFactory(adapterFactory)
@@ -105,7 +115,7 @@ public class RoutineAdapterFactoryTest {
                                       assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                   }
                               })
-                              .afterMax(seconds(3))
+                              .afterMax(seconds(10))
                               .getError()).isNull();
 
         } finally {

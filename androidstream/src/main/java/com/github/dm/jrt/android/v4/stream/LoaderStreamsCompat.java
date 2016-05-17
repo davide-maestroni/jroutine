@@ -1065,10 +1065,6 @@ public class LoaderStreamsCompat extends Streams {
     public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        if (output instanceof LoaderStreamChannelCompat) {
-            return (LoaderStreamChannelCompat<OUT, OUT>) output;
-        }
-
         return new DefaultLoaderStreamChannelCompat<OUT, OUT>(output);
     }
 

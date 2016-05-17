@@ -496,6 +496,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
             final int loaderId, @NotNull final List<? extends IN> inputs) {
 

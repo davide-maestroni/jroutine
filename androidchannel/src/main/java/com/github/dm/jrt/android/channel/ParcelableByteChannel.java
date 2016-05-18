@@ -244,7 +244,8 @@ public class ParcelableByteChannel {
      *                                         of the specified buffers.
      */
     @NotNull
-    public static BufferInputStream inputStream(@NotNull final List<ParcelableByteBuffer> buffers) {
+    public static BufferInputStream inputStream(
+            @NotNull final List<? extends ParcelableByteBuffer> buffers) {
 
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.size());
         for (final ParcelableByteBuffer buffer : buffers) {

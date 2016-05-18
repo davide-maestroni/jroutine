@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Davide Maestroni
+ * Copyright 2016 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,12 @@ import retrofit2.Call;
  *
  * @param <T> the response type.
  */
-public class ExecuteCall<T> extends ConversionInvocation<Call<T>, T> {
+public class ExecuteCallInvocation<T> extends ConversionInvocation<Call<T>, T> {
 
     /**
      * Constructor.
      */
-    public ExecuteCall() {
+    public ExecuteCallInvocation() {
 
         super(null);
     }

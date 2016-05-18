@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Davide Maestroni
+ * Copyright 2016 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,19 @@ import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -45,21 +49,28 @@ import retrofit2.Retrofit;
  */
 public class RoutineAdapterFactory extends CallAdapter.Factory {
 
-    private static final ExecuteCall<?> sCallInvocation = new ExecuteCall<Object>();
+    private static final ExecuteCallInvocation<?> sCallInvocation =
+            new ExecuteCallInvocation<Object>();
 
     private static final RoutineAdapterFactory sDefault =
-            new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration());
+            new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration(),
+                    InvocationMode.ASYNC);
 
     private final InvocationConfiguration mConfiguration;
+
+    private final InvocationMode mInvocationMode;
 
     /**
      * Constructor.
      *
-     * @param configuration the invocation configuration.
+     * @param configuration  the invocation configuration.
+     * @param invocationMode the invocation mode.
      */
-    private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration) {
+    private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode) {
 
         mConfiguration = configuration;
+        mInvocationMode = invocationMode;
     }
 
     /**
@@ -88,24 +99,35 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
 
+        InvocationMode invocationMode = mInvocationMode;
+        if (annotations != null) {
+            for (final Annotation annotation : annotations) {
+                if (annotation.annotationType() == Invoke.class) {
+                    invocationMode = ((Invoke) annotation).value();
+                }
+            }
+        }
+
         if (returnType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) returnType;
             final Type rawType = parameterizedType.getRawType();
             if (StreamChannel.class == rawType) {
-                return new StreamChannelAdapter(buildRoutine(annotations),
+                return new StreamChannelAdapter(invocationMode, buildRoutine(annotations),
                         parameterizedType.getActualTypeArguments()[1]);
 
             } else if (OutputChannel.class == rawType) {
-                return new OutputChannelAdapter(buildRoutine(annotations),
+                return new OutputChannelAdapter(invocationMode, buildRoutine(annotations),
                         parameterizedType.getActualTypeArguments()[0]);
             }
 
         } else if (returnType instanceof Class) {
             if (StreamChannel.class == returnType) {
-                return new StreamChannelAdapter(buildRoutine(annotations), Object.class);
+                return new StreamChannelAdapter(invocationMode, buildRoutine(annotations),
+                        Object.class);
 
             } else if (OutputChannel.class == returnType) {
-                return new OutputChannelAdapter(buildRoutine(annotations), Object.class);
+                return new OutputChannelAdapter(invocationMode, buildRoutine(annotations),
+                        Object.class);
             }
         }
 
@@ -113,7 +135,7 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
     }
 
     @NotNull
-    private Routine<? extends Call<?>, ?> buildRoutine(@NotNull final Annotation[] annotations) {
+    private Routine<? extends Call<?>, ?> buildRoutine(@Nullable final Annotation[] annotations) {
 
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
@@ -131,12 +153,15 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
      * The options set through the builder configuration will be applied to all the routine handling
      * the Retrofit calls, unless they are overwritten by specific annotations.
      *
-     * @see com.github.dm.jrt.object.annotation Annotations
+     * @see Builders#getInvocationMode(Method)
+     * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      */
     public static class Builder implements ConfigurableBuilder<Builder>, Configurable<Builder> {
 
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();
+
+        private InvocationMode mInvocationMode = InvocationMode.ASYNC;
 
         /**
          * Constructor.
@@ -160,13 +185,26 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
         @NotNull
         public RoutineAdapterFactory buildFactory() {
 
-            return new RoutineAdapterFactory(mConfiguration);
+            return new RoutineAdapterFactory(mConfiguration, mInvocationMode);
         }
 
         @NotNull
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
 
             return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
+        }
+
+        /**
+         * Sets the invocation mode to be used with the adapting routines (asynchronous by default).
+         *
+         * @param invocationMode the invocation mode.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
+
+            mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
+            return this;
         }
     }
 
@@ -215,21 +253,38 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
      */
     private static class OutputChannelAdapter extends BaseAdapter<OutputChannel> {
 
+        private final InvocationMode mInvocationMode;
+
         /**
          * Constructor.
          *
-         * @param routine      the routine instance.
-         * @param responseType the response type.
+         * @param invocationMode the invocation mode.
+         * @param routine        the routine instance.
+         * @param responseType   the response type.
          */
-        private OutputChannelAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
+        private OutputChannelAdapter(@NotNull final InvocationMode invocationMode,
+                @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
 
             super(routine, responseType);
+            mInvocationMode = invocationMode;
         }
 
-        public <R> OutputChannel adapt(final Call<R> call) {
+        public <OUT> OutputChannel adapt(final Call<OUT> call) {
 
-            return getRoutine().asyncCall(call);
+            final InvocationMode invocationMode = mInvocationMode;
+            final Routine<Call<?>, ?> routine = getRoutine();
+            if (invocationMode == InvocationMode.ASYNC) {
+                return routine.asyncCall(call);
+
+            } else if (invocationMode == InvocationMode.SYNC) {
+                return routine.syncCall(call);
+
+            } else if (invocationMode == InvocationMode.PARALLEL) {
+                return routine.parallelCall(call);
+            }
+
+            return routine.serialCall(call);
         }
     }
 
@@ -238,21 +293,41 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
      */
     private static class StreamChannelAdapter extends BaseAdapter<StreamChannel> {
 
+        private final InvocationMode mInvocationMode;
+
         /**
          * Constructor.
          *
-         * @param routine      the routine instance.
-         * @param responseType the response type.
+         * @param invocationMode the invocation mode.
+         * @param routine        the routine instance.
+         * @param responseType   the response type.
          */
-        private StreamChannelAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
+        private StreamChannelAdapter(@NotNull final InvocationMode invocationMode,
+                @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
 
             super(routine, responseType);
+            mInvocationMode = invocationMode;
         }
 
-        public <R> StreamChannel adapt(final Call<R> call) {
+        public <OUT> StreamChannel adapt(final Call<OUT> call) {
 
-            return Streams.streamOf(call).map(getRoutine());
+            final InvocationMode invocationMode = mInvocationMode;
+            final StreamChannel<Call<OUT>, Call<OUT>> stream = Streams.streamOf(call);
+            if (invocationMode == InvocationMode.ASYNC) {
+                stream.async();
+
+            } else if (invocationMode == InvocationMode.SYNC) {
+                stream.sync();
+
+            } else if (invocationMode == InvocationMode.PARALLEL) {
+                stream.parallel();
+
+            } else {
+                stream.serial();
+            }
+
+            return stream.map(getRoutine());
         }
     }
 }

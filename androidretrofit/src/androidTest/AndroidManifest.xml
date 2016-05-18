@@ -38,7 +38,10 @@
         </activity>
 
         <service
-            android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
+            android:name="com.github.dm.jrt.android.retrofit.service.TestService"/>
+        <service
+            android:name="com.github.dm.jrt.android.retrofit.service.RemoteTestService"
+            android:process=":remote"/>
     </application>
 
 </manifest>

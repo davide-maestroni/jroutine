@@ -14,9 +14,25 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.android.retrofit.service;
+
+import org.jetbrains.annotations.NotNull;
+
+import okhttp3.OkHttpClient;
+
 /**
- * Stream annotation definitions.
+ * Test service.
  * <p>
- * Created by davide-maestroni on 05/07/2016.
+ * Created by davide-maestroni on 05/18/2016.
  */
-package com.github.dm.jrt.stream.annotation;
+public class TestService extends RetrofitInvocationService {
+
+    private final OkHttpClient mClient = new OkHttpClient();
+
+    @NotNull
+    @Override
+    protected OkHttpClient getHttpClient() {
+
+        return mClient;
+    }
+}

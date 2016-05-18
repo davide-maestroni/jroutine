@@ -192,7 +192,7 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @NotNull
-    public static BufferInputStream inputStream(@NotNull final List<ByteBuffer> buffers) {
+    public static BufferInputStream inputStream(@NotNull final List<? extends ByteBuffer> buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -517,7 +517,7 @@ public class ByteChannel {
          *
          * @param buffers the list of input streams whose data have to be concatenated.
          */
-        private MultiBufferInputStream(@NotNull final List<ByteBuffer> buffers) {
+        private MultiBufferInputStream(@NotNull final List<? extends ByteBuffer> buffers) {
 
             final ArrayList<BufferInputStream> streams =
                     (mStreams = new ArrayList<BufferInputStream>(buffers.size()));

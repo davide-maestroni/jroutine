@@ -49,13 +49,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 05/17/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ServiceRoutineAdapterFactoryTest
+public class ServiceAdapterFactoryTest
         extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
-    public ServiceRoutineAdapterFactoryTest() {
+    public ServiceAdapterFactoryTest() {
 
         super(TestActivity.class);
     }
@@ -72,13 +72,13 @@ public class ServiceRoutineAdapterFactoryTest
         server.start();
         try {
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationConfiguration()
-                                                    .withReadTimeout(seconds(10))
-                                                    .apply()
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationConfiguration()
+                                             .withReadTimeout(seconds(10))
+                                             .apply()
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -100,14 +100,14 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.PARALLEL)
-                                                    .invocationConfiguration()
-                                                    .withReadTimeout(seconds(10))
-                                                    .apply()
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.PARALLEL)
+                                             .invocationConfiguration()
+                                             .withReadTimeout(seconds(10))
+                                             .apply()
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -129,14 +129,14 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.SYNC)
-                                                    .invocationConfiguration()
-                                                    .withReadTimeout(seconds(10))
-                                                    .apply()
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.SYNC)
+                                             .invocationConfiguration()
+                                             .withReadTimeout(seconds(10))
+                                             .apply()
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -158,14 +158,14 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.SERIAL)
-                                                    .invocationConfiguration()
-                                                    .withReadTimeout(seconds(10))
-                                                    .apply()
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationConfiguration()
+                                             .withReadTimeout(seconds(10))
+                                             .apply()
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -203,8 +203,8 @@ public class ServiceRoutineAdapterFactoryTest
         server.start();
         try {
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.defaultFactory(
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.defaultFactory(
                                 serviceFrom(activity, serviceClass));
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -230,11 +230,11 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.PARALLEL)
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.PARALLEL)
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -259,11 +259,11 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.SYNC)
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.SYNC)
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -288,11 +288,11 @@ public class ServiceRoutineAdapterFactoryTest
             }
 
             {
-                final ServiceRoutineAdapterFactory adapterFactory =
-                        ServiceRoutineAdapterFactory.builder()
-                                                    .with(serviceFrom(activity, serviceClass))
-                                                    .invocationMode(InvocationMode.SERIAL)
-                                                    .buildFactory();
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.builder()
+                                             .with(serviceFrom(activity, serviceClass))
+                                             .invocationMode(InvocationMode.SERIAL)
+                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())

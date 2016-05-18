@@ -26,18 +26,18 @@ import java.io.IOException;
 import retrofit2.Call;
 
 /**
- * Implementation of an invocation handling the execution of call instances.
+ * Implementation of an invocation handling the execution of {@link Call}s.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  *
  * @param <T> the response type.
  */
-public class ExecuteCallInvocation<T> extends ConversionInvocation<Call<T>, T> {
+public class RetrofitCallInvocation<T> extends ConversionInvocation<Call<T>, T> {
 
     /**
      * Constructor.
      */
-    public ExecuteCallInvocation() {
+    public RetrofitCallInvocation() {
 
         super(null);
     }

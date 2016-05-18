@@ -66,10 +66,10 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */
-public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
+public class ServiceAdapterFactory extends CallAdapter.Factory {
 
-    private static final ServiceRoutineAdapterFactory sDefault =
-            new ServiceRoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
+    private static final ServiceAdapterFactory sFactory =
+            new ServiceAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
                     ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
 
     private final InvocationConfiguration mInvocationConfiguration;
@@ -88,7 +88,7 @@ public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
      * @param serviceConfiguration    the service configuration.
      * @param invocationMode          the invocation mode.
      */
-    private ServiceRoutineAdapterFactory(@Nullable final ServiceContext context,
+    private ServiceAdapterFactory(@Nullable final ServiceContext context,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration,
             @NotNull final InvocationMode invocationMode) {
@@ -116,9 +116,9 @@ public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
      * @return the factory instance.
      */
     @NotNull
-    public static ServiceRoutineAdapterFactory defaultFactory() {
+    public static ServiceAdapterFactory defaultFactory() {
 
-        return sDefault;
+        return sFactory;
     }
 
     /**
@@ -131,11 +131,10 @@ public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
      *                                            {@link RetrofitInvocationService}.
      */
     @NotNull
-    public static ServiceRoutineAdapterFactory defaultFactory(
-            @Nullable final ServiceContext context) {
+    public static ServiceAdapterFactory defaultFactory(@Nullable final ServiceContext context) {
 
         return (context == null) ? defaultFactory()
-                : new ServiceRoutineAdapterFactory(verifyContext(context),
+                : new ServiceAdapterFactory(verifyContext(context),
                         InvocationConfiguration.defaultConfiguration(),
                         ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
     }
@@ -286,9 +285,9 @@ public class ServiceRoutineAdapterFactory extends CallAdapter.Factory {
          * @return the factory instance.
          */
         @NotNull
-        public ServiceRoutineAdapterFactory buildFactory() {
+        public ServiceAdapterFactory buildFactory() {
 
-            return new ServiceRoutineAdapterFactory(mServiceContext, mInvocationConfiguration,
+            return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
                     mServiceConfiguration, mInvocationMode);
         }
 

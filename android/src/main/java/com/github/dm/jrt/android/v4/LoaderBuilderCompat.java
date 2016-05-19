@@ -26,9 +26,9 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
@@ -49,9 +49,9 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerConversion;
+import static com.github.dm.jrt.function.Functions.consumerMapping;
 import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionConversion;
+import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
@@ -213,9 +213,9 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a routine builder based on the specified conversion invocation.
+     * Returns a routine builder based on the specified mapping invocation.
      *
-     * @param invocation the conversion invocation instance.
+     * @param invocation the mapping invocation instance.
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the routine builder instance.
@@ -224,7 +224,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-            @NotNull final ConversionInvocation<IN, OUT> invocation) {
+            @NotNull final MappingInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }
@@ -472,42 +472,6 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a routine builder based on a conversion invocation backed by the specified function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-     *                                            static scope.
-     */
-    @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onConversion(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-
-        checkStatic(wrap(function), function);
-        return on(functionConversion(function));
-    }
-
-    /**
-     * Returns a routine builder based on a conversion invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
-     *                                            static scope.
-     */
-    @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onConversionMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return on(consumerConversion(consumer));
-    }
-
-    /**
      * Returns a routine builder based on an invocation factory backed by the specified supplier.
      *
      * @param supplier the supplier instance.
@@ -605,5 +569,41 @@ public class LoaderBuilderCompat {
             @Nullable final Object... factoryArgs) {
 
         return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
+    }
+
+    /**
+     * Returns a routine builder based on a mapping invocation backed by the specified function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onMapping(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
+
+        checkStatic(wrap(function), function);
+        return on(functionMapping(function));
+    }
+
+    /**
+     * Returns a routine builder based on a mapping invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onMappingMore(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return on(consumerMapping(consumer));
     }
 }

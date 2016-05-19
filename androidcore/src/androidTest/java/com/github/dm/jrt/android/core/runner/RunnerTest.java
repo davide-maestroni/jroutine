@@ -26,10 +26,10 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -242,7 +242,7 @@ public class RunnerTest extends AndroidTestCase {
         testRunner(AndroidRunners.handlerRunner(new HandlerThread("test")));
     }
 
-    private static class HandlerInvocationFactory extends ConversionInvocation<Handler, Object> {
+    private static class HandlerInvocationFactory extends MappingInvocation<Handler, Object> {
 
         /**
          * Constructor.

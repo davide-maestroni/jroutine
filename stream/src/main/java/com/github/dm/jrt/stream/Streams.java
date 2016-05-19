@@ -26,8 +26,8 @@ import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiFunction;
@@ -63,8 +63,8 @@ import static com.github.dm.jrt.stream.util.Numbers.toBigSafe;
  */
 public class Streams extends Functions {
 
-    private static final ConversionInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
-            new ConversionInvocation<Iterable<?>, Object>(null) {
+    private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
+            new MappingInvocation<Iterable<?>, Object>(null) {
 
                 @SuppressWarnings("unchecked")
                 public void onInput(final Iterable<?> input,

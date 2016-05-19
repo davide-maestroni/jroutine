@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ import java.net.URLConnection;
  * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
-public class ReadConnection extends ConversionInvocation<URI, ByteBuffer> {
+public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 

@@ -109,11 +109,11 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerConversion(final FragmentActivity activity) {
+    private static void testConsumerMapping(final FragmentActivity activity) {
 
         final Routine<Object, String> routine = //
                 JRoutineAndroidCompat.with(activity)
-                                     .onConversionMore(
+                                     .onMappingMore(
                                              new BiConsumer<Object, ResultChannel<String>>() {
 
                                                  public void accept(final Object o,
@@ -149,10 +149,10 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                 "test1");
     }
 
-    private static void testFunctionConversion(final FragmentActivity activity) {
+    private static void testFunctionMapping(final FragmentActivity activity) {
 
         final Routine<Object, String> routine =
-                JRoutineAndroidCompat.with(activity).onConversion(new Function<Object, String>() {
+                JRoutineAndroidCompat.with(activity).onMapping(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -239,9 +239,9 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         testConsumerCommand(getActivity());
     }
 
-    public void testConsumerConversion() {
+    public void testConsumerMapping() {
 
-        testConsumerConversion(getActivity());
+        testConsumerMapping(getActivity());
     }
 
     public void testConsumerFunction() {
@@ -249,9 +249,9 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         testConsumerFunction(getActivity());
     }
 
-    public void testFunctionConversion() {
+    public void testFunctionMapping() {
 
-        testFunctionConversion(getActivity());
+        testFunctionMapping(getActivity());
     }
 
     public void testIOChannel() {

@@ -21,9 +21,9 @@ import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
@@ -168,16 +168,16 @@ public class JRoutine extends Streams {
     }
 
     /**
-     * Returns a routine builder based on the specified conversion invocation.
+     * Returns a routine builder based on the specified mapping invocation.
      *
-     * @param invocation the conversion invocation instance.
+     * @param invocation the mapping invocation instance.
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the routine builder instance.
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final ConversionInvocation<IN, OUT> invocation) {
+            @NotNull final MappingInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }
@@ -368,36 +368,6 @@ public class JRoutine extends Streams {
     }
 
     /**
-     * Returns a routine builder based on a conversion invocation backed by the specified function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onConversion(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionConversion(function));
-    }
-
-    /**
-     * Returns a routine builder based on a conversion invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onConversionMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerConversion(consumer));
-    }
-
-    /**
      * Returns a routine builder based on an invocation factory backed by the specified supplier.
      *
      * @param supplier the supplier instance.
@@ -443,5 +413,35 @@ public class JRoutine extends Streams {
     public static AutoProxyRoutineBuilder onInstance(@NotNull final Object object) {
 
         return new DefaultAutoProxyRoutineBuilder(InvocationTarget.instance(object));
+    }
+
+    /**
+     * Returns a routine builder based on a mapping invocation backed by the specified function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onMapping(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionMapping(function));
+    }
+
+    /**
+     * Returns a routine builder based on a mapping invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onMappingMore(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerMapping(consumer));
     }
 }

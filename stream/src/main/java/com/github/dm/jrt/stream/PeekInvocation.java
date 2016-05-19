@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
 
@@ -30,7 +30,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <DATA> the data type.
  */
-class PeekInvocation<DATA> extends ConversionInvocation<DATA, DATA> {
+class PeekInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
     private final ConsumerWrapper<? super DATA> mConsumer;
 

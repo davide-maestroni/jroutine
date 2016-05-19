@@ -19,10 +19,10 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -41,9 +41,9 @@ import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerConversion;
+import static com.github.dm.jrt.function.Functions.consumerMapping;
 import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionConversion;
+import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.identity;
 import static com.github.dm.jrt.function.Functions.isEqualTo;
 import static com.github.dm.jrt.function.Functions.isInstanceOf;
@@ -96,49 +96,13 @@ public class FunctionsTest {
     }
 
     @NotNull
-    private static ConversionInvocation<Object, String> createConversion() {
-
-        return consumerConversion(new BiConsumer<Object, ResultChannel<String>>() {
-
-            public void accept(final Object o, final ResultChannel<String> result) {
-
-                result.pass(o.toString());
-            }
-        });
-    }
-
-    @NotNull
-    private static ConversionInvocation<Object, String> createConversion2() {
-
-        return functionConversion(new Function<Object, String>() {
-
-            public String apply(final Object o) {
-
-                return o.toString();
-            }
-        });
-    }
-
-    @NotNull
-    private static ConversionInvocation<String, String> createConversion3() {
-
-        return predicateFilter(new Predicate<String>() {
-
-            public boolean test(final String s) {
-
-                return s.length() > 0;
-            }
-        });
-    }
-
-    @NotNull
     private static InvocationFactory<Object, String> createFactory() {
 
         return supplierFactory(new Supplier<Invocation<Object, String>>() {
 
             public Invocation<Object, String> get() {
 
-                return new ConversionInvocation<Object, String>(null) {
+                return new MappingInvocation<Object, String>(null) {
 
                     public void onInput(final Object input,
                             @NotNull final ResultChannel<String> result) {
@@ -180,6 +144,42 @@ public class FunctionsTest {
                 }
 
                 return builder.toString();
+            }
+        });
+    }
+
+    @NotNull
+    private static MappingInvocation<Object, String> createMapping() {
+
+        return consumerMapping(new BiConsumer<Object, ResultChannel<String>>() {
+
+            public void accept(final Object o, final ResultChannel<String> result) {
+
+                result.pass(o.toString());
+            }
+        });
+    }
+
+    @NotNull
+    private static MappingInvocation<Object, String> createMapping2() {
+
+        return functionMapping(new Function<Object, String>() {
+
+            public String apply(final Object o) {
+
+                return o.toString();
+            }
+        });
+    }
+
+    @NotNull
+    private static MappingInvocation<String, String> createMapping3() {
+
+        return predicateFilter(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return s.length() > 0;
             }
         });
     }
@@ -704,119 +704,6 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testConversion() {
-
-        final Routine<Object, String> routine = JRoutineCore.on(createConversion()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
-    public void testConversion2() {
-
-        final Routine<Object, String> routine = JRoutineCore.on(createConversion2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
-    public void testConversion2Equals() {
-
-        final FunctionWrapper<Object, ? super Object> identity = identity();
-        final InvocationFactory<Object, String> factory = createConversion2();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createConversion2());
-        assertThat(factory).isNotEqualTo(functionConversion(identity));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(functionConversion(identity)).isEqualTo(functionConversion(identity));
-        assertThat(functionConversion(identity).hashCode()).isEqualTo(
-                functionConversion(identity).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testConversion2Error() {
-
-        try {
-
-            functionConversion((Function<Object, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testConversion3() {
-
-        final Routine<String, String> routine = JRoutineCore.on(createConversion3()).buildRoutine();
-        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
-    }
-
-    @Test
-    public void testConversion3Equals() {
-
-        final PredicateWrapper<Object> negative = negative();
-        final InvocationFactory<String, String> factory = createConversion3();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createConversion3());
-        assertThat(factory).isNotEqualTo(predicateFilter(negative));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
-        assertThat(predicateFilter(negative).hashCode()).isEqualTo(
-                predicateFilter(negative).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testConversion3Error() {
-
-        try {
-
-            predicateFilter(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testConversionEquals() {
-
-        final InvocationFactory<Object, String> factory = createConversion();
-        final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createConversion());
-        assertThat(factory).isNotEqualTo(consumerConversion(sink));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(consumerConversion(sink)).isEqualTo(consumerConversion(sink));
-        assertThat(consumerConversion(sink).hashCode()).isEqualTo(
-                consumerConversion(sink).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testConversionError() {
-
-        try {
-
-            consumerConversion(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testEqualToPredicate() throws Exception {
 
         final PredicateWrapper<Object> predicate = isEqualTo("test");
@@ -858,7 +745,7 @@ public class FunctionsTest {
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo(supplierFactory(supplier));
-        assertThat(factory).isNotEqualTo(createConversion());
+        assertThat(factory).isNotEqualTo(createMapping());
         assertThat(factory).isNotEqualTo("");
         assertThat(supplierFactory(supplier)).isEqualTo(supplierFactory(supplier));
         assertThat(supplierFactory(supplier).hashCode()).isEqualTo(
@@ -1144,6 +1031,118 @@ public class FunctionsTest {
         try {
 
             isInstanceOf(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMapping() {
+
+        final Routine<Object, String> routine = JRoutineCore.on(createMapping()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
+    }
+
+    @Test
+    public void testMapping2() {
+
+        final Routine<Object, String> routine = JRoutineCore.on(createMapping2()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
+    }
+
+    @Test
+    public void testMapping2Equals() {
+
+        final FunctionWrapper<Object, ? super Object> identity = identity();
+        final InvocationFactory<Object, String> factory = createMapping2();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createMapping2());
+        assertThat(factory).isNotEqualTo(functionMapping(identity));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(functionMapping(identity)).isEqualTo(functionMapping(identity));
+        assertThat(functionMapping(identity).hashCode()).isEqualTo(
+                functionMapping(identity).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMapping2Error() {
+
+        try {
+
+            functionMapping((Function<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMapping3() {
+
+        final Routine<String, String> routine = JRoutineCore.on(createMapping3()).buildRoutine();
+        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
+    }
+
+    @Test
+    public void testMapping3Equals() {
+
+        final PredicateWrapper<Object> negative = negative();
+        final InvocationFactory<String, String> factory = createMapping3();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createMapping3());
+        assertThat(factory).isNotEqualTo(predicateFilter(negative));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
+        assertThat(predicateFilter(negative).hashCode()).isEqualTo(
+                predicateFilter(negative).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMapping3Error() {
+
+        try {
+
+            predicateFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMappingEquals() {
+
+        final InvocationFactory<Object, String> factory = createMapping();
+        final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createMapping());
+        assertThat(factory).isNotEqualTo(consumerMapping(sink));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(consumerMapping(sink)).isEqualTo(consumerMapping(sink));
+        assertThat(consumerMapping(sink).hashCode()).isEqualTo(consumerMapping(sink).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMappingError() {
+
+        try {
+
+            consumerMapping(null);
 
             fail();
 

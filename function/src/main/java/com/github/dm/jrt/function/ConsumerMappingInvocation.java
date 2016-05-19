@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,14 +25,14 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Conversion invocation based on a bi-consumer instance.
+ * Mapping invocation based on a bi-consumer instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ConsumerConversionInvocation<IN, OUT> extends ConversionInvocation<IN, OUT> {
+class ConsumerMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
     private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
@@ -41,7 +41,7 @@ class ConsumerConversionInvocation<IN, OUT> extends ConversionInvocation<IN, OUT
      *
      * @param consumer the consumer instance.
      */
-    ConsumerConversionInvocation(
+    ConsumerMappingInvocation(
             @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));

@@ -33,10 +33,10 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -71,7 +71,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.days;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionConversion;
+import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1045,7 +1045,7 @@ public class StreamChannelTest {
     public void testFlatMapRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionConversion(new Function<Object, String>() {
+                JRoutineCore.on(functionMapping(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -1478,7 +1478,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().map((ConversionInvocation<Object, Object>) null);
+            Streams.streamOf().async().map((MappingInvocation<Object, Object>) null);
 
             fail();
 
@@ -1488,7 +1488,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().map((ConversionInvocation<Object, Object>) null);
+            Streams.streamOf().parallel().map((MappingInvocation<Object, Object>) null);
 
             fail();
 
@@ -1498,7 +1498,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().map((ConversionInvocation<Object, Object>) null);
+            Streams.streamOf().sync().map((MappingInvocation<Object, Object>) null);
 
             fail();
 
@@ -1508,7 +1508,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((ConversionInvocation<Object, Object>) null);
+            Streams.streamOf().serial().map((MappingInvocation<Object, Object>) null);
 
             fail();
 
@@ -3017,7 +3017,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class AbortInvocation extends ConversionInvocation<Object, Object> {
+    private static class AbortInvocation extends MappingInvocation<Object, Object> {
 
         private AbortInvocation() {
 
@@ -3117,7 +3117,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class UpperCase extends ConversionInvocation<String, String> {
+    private static class UpperCase extends MappingInvocation<String, String> {
 
         /**
          * Constructor.

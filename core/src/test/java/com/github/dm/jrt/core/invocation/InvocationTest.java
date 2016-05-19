@@ -80,8 +80,8 @@ public class InvocationTest {
     @Test
     public void testComparableFilterInvocation() {
 
-        final TestComparableConversionInvocation factory =
-                new TestComparableConversionInvocation(asArgs(1));
+        final TestComparableMappingInvocation factory =
+                new TestComparableMappingInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
@@ -93,10 +93,10 @@ public class InvocationTest {
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
-        assertThat(factory).isNotEqualTo(new TestComparableConversionInvocation(asArgs(2)));
+        assertThat(factory).isNotEqualTo(new TestComparableMappingInvocation(asArgs(2)));
         assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableConversionInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableConversionInvocation(asArgs(1)));
+                new TestComparableMappingInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableMappingInvocation(asArgs(1)));
     }
 
     @Test
@@ -261,15 +261,15 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableConversionInvocation
-            extends ConversionInvocation<Object, Object> {
+    private static class TestComparableMappingInvocation
+            extends MappingInvocation<Object, Object> {
 
         /**
          * Constructor.
          *
          * @param args the constructor arguments.
          */
-        protected TestComparableConversionInvocation(@Nullable final Object[] args) {
+        protected TestComparableMappingInvocation(@Nullable final Object[] args) {
 
             super(args);
         }
@@ -299,7 +299,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestInvocation extends ConversionInvocation<Object, Object> {
+    private static class TestInvocation extends MappingInvocation<Object, Object> {
 
         /**
          * Constructor.

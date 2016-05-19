@@ -108,11 +108,11 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerConversion(final Activity activity) {
+    private static void testConsumerMapping(final Activity activity) {
 
         final Routine<Object, String> routine = //
                 JRoutineAndroid.with(activity)
-                               .onConversionMore(new BiConsumer<Object, ResultChannel<String>>() {
+                               .onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
 
                                    public void accept(final Object o,
                                            final ResultChannel<String> result) {
@@ -147,10 +147,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                 "test1");
     }
 
-    private static void testFunctionConversion(final Activity activity) {
+    private static void testFunctionMapping(final Activity activity) {
 
         final Routine<Object, String> routine =
-                JRoutineAndroid.with(activity).onConversion(new Function<Object, String>() {
+                JRoutineAndroid.with(activity).onMapping(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -245,13 +245,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         testConsumerCommand(getActivity());
     }
 
-    public void testConsumerConversion() {
+    public void testConsumerMapping() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
         }
 
-        testConsumerConversion(getActivity());
+        testConsumerMapping(getActivity());
     }
 
     public void testConsumerFunction() {
@@ -263,13 +263,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         testConsumerFunction(getActivity());
     }
 
-    public void testFunctionConversion() {
+    public void testFunctionMapping() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
         }
 
-        testFunctionConversion(getActivity());
+        testFunctionMapping(getActivity());
     }
 
     public void testIOChannel() {

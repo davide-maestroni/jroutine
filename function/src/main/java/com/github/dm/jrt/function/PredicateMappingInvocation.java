@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,31 +25,31 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Conversion invocation based on a function instance.
+ * Mapping invocation based on a predicate instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class FunctionConversionInvocation<IN, OUT> extends ConversionInvocation<IN, OUT> {
+class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
 
-    private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
+    private final PredicateWrapper<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
-     * @param function the function instance.
+     * @param predicate the predicate instance.
      */
-    FunctionConversionInvocation(
-            @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
+    PredicateMappingInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
-        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
-        mFunction = function;
+        super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+        mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
 
-        result.pass(mFunction.apply(input));
+        if (mPredicate.test(input)) {
+            result.pass(input);
+        }
     }
 }

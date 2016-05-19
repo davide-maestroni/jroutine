@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <DATA> the data type.
  */
-public class IdentityInvocation<DATA> extends ConversionInvocation<DATA, DATA> {
+public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
     private static final IdentityInvocation<Object> sInvocation = new IdentityInvocation<Object>();
 
@@ -47,9 +47,9 @@ public class IdentityInvocation<DATA> extends ConversionInvocation<DATA, DATA> {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> ConversionInvocation<DATA, DATA> factoryOf() {
+    public static <DATA> MappingInvocation<DATA, DATA> factoryOf() {
 
-        return (ConversionInvocation<DATA, DATA>) sInvocation;
+        return (MappingInvocation<DATA, DATA>) sInvocation;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {

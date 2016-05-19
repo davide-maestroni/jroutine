@@ -26,9 +26,9 @@ import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.DeadlockException;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -2144,7 +2144,7 @@ public class ChannelsTest {
         }
     }
 
-    private static class CharAt extends ConversionInvocation<List<?>, Character> {
+    private static class CharAt extends MappingInvocation<List<?>, Character> {
 
         /**
          * Constructor.
@@ -2162,7 +2162,7 @@ public class ChannelsTest {
         }
     }
 
-    private static class Sort extends ConversionInvocation<Selectable<Object>, Selectable<Object>> {
+    private static class Sort extends MappingInvocation<Selectable<Object>, Selectable<Object>> {
 
         private static final int INTEGER = 1;
 

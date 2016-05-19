@@ -25,11 +25,11 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ConversionInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
@@ -56,7 +56,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionConversion;
+import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
@@ -130,7 +130,7 @@ public class JRoutineTest {
         final Routine<Integer, Integer> sumRoutine =
                 JRoutine.on(factoryOf(execSum, this)).buildRoutine();
         final Routine<Integer, Integer> squareRoutine =
-                JRoutine.on(functionConversion(new Function<Integer, Integer>() {
+                JRoutine.on(functionMapping(new Function<Integer, Integer>() {
 
                     public Integer apply(final Integer integer) {
 
@@ -210,21 +210,6 @@ public class JRoutineTest {
     }
 
     @Test
-    public void testConsumerConversion() {
-
-        final Routine<Object, String> routine =
-                JRoutine.onConversionMore(new BiConsumer<Object, ResultChannel<String>>() {
-
-                    public void accept(final Object o, final ResultChannel<String> result) {
-
-                        result.pass(o.toString());
-                    }
-                }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
@@ -245,23 +230,30 @@ public class JRoutineTest {
     }
 
     @Test
-    public void testConversionInvocation() {
+    public void testConsumerMapping() {
 
-        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        final Routine<Object, String> routine =
+                JRoutine.onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
+
+                    public void accept(final Object o, final ResultChannel<String> result) {
+
+                        result.pass(o.toString());
+                    }
+                }).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
     }
 
     @Test
-    public void testFunctionConversion() {
+    public void testFunctionMapping() {
 
-        final Routine<Object, String> routine =
-                JRoutine.onConversion(new Function<Object, String>() {
+        final Routine<Object, String> routine = JRoutine.onMapping(new Function<Object, String>() {
 
-                    public String apply(final Object o) {
+            public String apply(final Object o) {
 
-                        return o.toString();
-                    }
-                }).buildRoutine();
+                return o.toString();
+            }
+        }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -316,6 +308,13 @@ public class JRoutineTest {
         final Routine<String, String> routine =
                 JRoutine.on(tokenOf(ToCase.class), true).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsOnly("TEST");
+    }
+
+    @Test
+    public void testMappingInvocation() {
+
+        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
+        assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -752,7 +751,7 @@ public class JRoutineTest {
         }
     }
 
-    public static class ToCase extends ConversionInvocation<String, String> {
+    public static class ToCase extends MappingInvocation<String, String> {
 
         private final boolean mIsUpper;
 

@@ -109,24 +109,6 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerMapping(final FragmentActivity activity) {
-
-        final Routine<Object, String> routine = //
-                JRoutineAndroidCompat.with(activity)
-                                     .onMappingMore(
-                                             new BiConsumer<Object, ResultChannel<String>>() {
-
-                                                 public void accept(final Object o,
-                                                         final ResultChannel<String> result) {
-
-                                                     result.pass(o.toString());
-                                                 }
-                                             })
-                                     .buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
-                "1");
-    }
-
     private static void testConsumerFunction(final FragmentActivity activity) {
 
         final Routine<String, String> routine = //
@@ -147,6 +129,24 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                      .buildRoutine();
         assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
                 "test1");
+    }
+
+    private static void testConsumerMapping(final FragmentActivity activity) {
+
+        final Routine<Object, String> routine = //
+                JRoutineAndroidCompat.with(activity)
+                                     .onMappingMore(
+                                             new BiConsumer<Object, ResultChannel<String>>() {
+
+                                                 public void accept(final Object o,
+                                                         final ResultChannel<String> result) {
+
+                                                     result.pass(o.toString());
+                                                 }
+                                             })
+                                     .buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
+                "1");
     }
 
     private static void testFunctionMapping(final FragmentActivity activity) {
@@ -239,14 +239,14 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         testConsumerCommand(getActivity());
     }
 
-    public void testConsumerMapping() {
-
-        testConsumerMapping(getActivity());
-    }
-
     public void testConsumerFunction() {
 
         testConsumerFunction(getActivity());
+    }
+
+    public void testConsumerMapping() {
+
+        testConsumerMapping(getActivity());
     }
 
     public void testFunctionMapping() {

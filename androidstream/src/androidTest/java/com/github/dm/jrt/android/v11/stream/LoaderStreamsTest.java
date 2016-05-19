@@ -2280,8 +2280,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class Sort extends
-            MappingInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+    private static class Sort
+            extends MappingInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;
 

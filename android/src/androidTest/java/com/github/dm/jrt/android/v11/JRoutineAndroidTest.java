@@ -108,23 +108,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerMapping(final Activity activity) {
-
-        final Routine<Object, String> routine = //
-                JRoutineAndroid.with(activity)
-                               .onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
-
-                                   public void accept(final Object o,
-                                           final ResultChannel<String> result) {
-
-                                       result.pass(o.toString());
-                                   }
-                               })
-                               .buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
-                "1");
-    }
-
     private static void testConsumerFunction(final Activity activity) {
 
         final Routine<String, String> routine = //
@@ -145,6 +128,23 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                .buildRoutine();
         assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
                 "test1");
+    }
+
+    private static void testConsumerMapping(final Activity activity) {
+
+        final Routine<Object, String> routine = //
+                JRoutineAndroid.with(activity)
+                               .onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
+
+                                   public void accept(final Object o,
+                                           final ResultChannel<String> result) {
+
+                                       result.pass(o.toString());
+                                   }
+                               })
+                               .buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
+                "1");
     }
 
     private static void testFunctionMapping(final Activity activity) {
@@ -245,15 +245,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         testConsumerCommand(getActivity());
     }
 
-    public void testConsumerMapping() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testConsumerMapping(getActivity());
-    }
-
     public void testConsumerFunction() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -261,6 +252,15 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         testConsumerFunction(getActivity());
+    }
+
+    public void testConsumerMapping() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testConsumerMapping(getActivity());
     }
 
     public void testFunctionMapping() {

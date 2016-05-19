@@ -49,8 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 05/17/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ServiceAdapterFactoryTest
-        extends ActivityInstrumentationTestCase2<TestActivity> {
+public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
@@ -72,7 +71,7 @@ public class ServiceAdapterFactoryTest
         server.start();
         try {
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationConfiguration()
@@ -100,7 +99,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.PARALLEL)
@@ -129,7 +128,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.SYNC)
@@ -158,7 +157,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.SERIAL)
@@ -204,8 +203,7 @@ public class ServiceAdapterFactoryTest
         try {
             {
                 final ServiceAdapterFactory adapterFactory =
-                        ServiceAdapterFactory.defaultFactory(
-                                serviceFrom(activity, serviceClass));
+                        ServiceAdapterFactory.defaultFactory(serviceFrom(activity, serviceClass));
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -230,7 +228,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.PARALLEL)
@@ -259,7 +257,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.SYNC)
@@ -288,7 +286,7 @@ public class ServiceAdapterFactoryTest
             }
 
             {
-                final ServiceAdapterFactory adapterFactory =
+                final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(serviceFrom(activity, serviceClass))
                                              .invocationMode(InvocationMode.SERIAL)

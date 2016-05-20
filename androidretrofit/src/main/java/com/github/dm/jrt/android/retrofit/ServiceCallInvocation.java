@@ -16,12 +16,11 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import android.util.SparseArray;
-
+import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
+import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -29,11 +28,13 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 /**
@@ -41,14 +42,33 @@ import okhttp3.ResponseBody;
  * <p>
  * Created by davide-maestroni on 05/17/2016.
  */
-public class ServiceCallInvocation
-        extends TemplateContextInvocation<ParcelableRequest, ParcelableSelectable<Object>> {
+public class ServiceCallInvocation extends
+        TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
+    /**
+     * The index of the selectable channel dedicated to the transfer of request and response body
+     * bytes.
+     */
     public static final int BYTES_INDEX = 1;
 
+    /**
+     * The index of the selectable channel dedicated to the transfer of request and response body
+     * media type.
+     */
     public static final int MEDIA_TYPE_INDEX = 0;
 
+    /**
+     * The index of the selectable channel dedicated to the transfer of the request data.
+     */
+    public static final int REQUEST_DATA_INDEX = -1;
+
     private final OkHttpClient mClient;
+
+    private MediaType mMediaType;
+
+    private ByteArrayOutputStream mOutputStream;
+
+    private RequestData mRequest;
 
     /**
      * Constructor.
@@ -71,29 +91,63 @@ public class ServiceCallInvocation
         mClient = ConstantConditions.notNull("http client instance", client);
     }
 
-    public void onInput(final ParcelableRequest input,
+    public void onInput(final ParcelableSelectable<Object> input,
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
 
-        final ResponseBody responseBody = mClient.newCall(input.rawRequest()).execute().body();
-        final SparseArray<IOChannel<Object>> channels =
-                SparseChannels.selectParcelable(result, MEDIA_TYPE_INDEX, BYTES_INDEX)
-                              .buildChannels();
+        switch (input.index) {
+            case REQUEST_DATA_INDEX:
+                mRequest = input.data();
+                break;
+
+            case MEDIA_TYPE_INDEX:
+                final String mediaType = input.data();
+                mMediaType = MediaType.parse(mediaType);
+                break;
+
+            case BYTES_INDEX:
+                if (mOutputStream == null) {
+                    mOutputStream = new ByteArrayOutputStream();
+                }
+
+                final ParcelableByteBuffer buffer = input.data();
+                ParcelableByteChannel.inputStream(buffer).transferTo(mOutputStream);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("unknown selectable index: " + input.index);
+        }
+    }
+
+    @Override
+    public void onResult(@NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws
+            IOException {
+
+        final ByteArrayOutputStream byteStream = mOutputStream;
+        final Request request = mRequest.requestWithBody(
+                (byteStream != null) ? RequestBody.create(mMediaType, byteStream.toByteArray())
+                        : null);
+        final ResponseBody responseBody = mClient.newCall(request).execute().body();
         final MediaType mediaType = responseBody.contentType();
-        final IOChannel<Object> mediaTypeChannel = channels.get(MEDIA_TYPE_INDEX);
         if (mediaType != null) {
-            mediaTypeChannel.pass(mediaType.toString());
+            result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
         }
 
-        mediaTypeChannel.close();
-        final BufferOutputStream outputStream =
-                ParcelableByteChannel.byteChannel().bind(channels.get(BYTES_INDEX));
-        final InputStream inputStream = responseBody.byteStream();
+        final IOChannel<Object> channel =
+                AndroidChannels.selectParcelable(result, BYTES_INDEX).buildChannels();
+        final BufferOutputStream outputStream = ParcelableByteChannel.byteChannel().bind(channel);
         try {
-            outputStream.writeAll(inputStream);
+            outputStream.transferFrom(responseBody.byteStream());
 
         } finally {
-            inputStream.close();
             outputStream.close();
         }
+    }
+
+    @Override
+    public void onTerminate() {
+
+        mOutputStream = null;
+        mMediaType = null;
+        mRequest = null;
     }
 }

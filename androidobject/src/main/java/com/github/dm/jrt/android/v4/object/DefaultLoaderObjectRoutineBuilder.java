@@ -251,7 +251,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mAliasName = name;
         }
 
-        public void onAbort(@NotNull final RoutineException reason) throws Exception {
+        public void onAbort(@NotNull final RoutineException reason) {
 
             mChannel.abort(reason);
         }
@@ -272,29 +272,28 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                      .method(mAliasName);
         }
 
-        public void onDestroy() throws Exception {
+        public void onDestroy() {
 
             mRoutine = null;
             mInstance = null;
         }
 
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mChannel = mRoutine.syncInvoke();
         }
 
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
-                Exception {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             mChannel.pass(input);
         }
 
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             result.pass(mChannel.result());
         }
 
-        public void onTerminate() throws Exception {
+        public void onTerminate() {
 
             mChannel = null;
         }
@@ -375,34 +374,33 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mMethod = method;
         }
 
-        public void onAbort(@NotNull final RoutineException reason) throws Exception {
+        public void onAbort(@NotNull final RoutineException reason) {
 
             mChannel.abort(reason);
         }
 
-        public void onDestroy() throws Exception {
+        public void onDestroy() {
 
             mRoutine = null;
             mInstance = null;
         }
 
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mChannel = mRoutine.syncInvoke();
         }
 
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
-                Exception {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             mChannel.pass(input);
         }
 
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             result.pass(mChannel.result());
         }
 
-        public void onTerminate() throws Exception {
+        public void onTerminate() {
 
             mChannel = null;
         }
@@ -522,7 +520,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDestroy() throws Exception {
+        public void onDestroy() {
 
             mInstance = null;
         }

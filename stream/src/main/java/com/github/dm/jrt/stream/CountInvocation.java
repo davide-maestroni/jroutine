@@ -35,7 +35,7 @@ class CountInvocation extends TemplateInvocation<Object, Long> {
 
                 @NotNull
                 @Override
-                public Invocation<Object, Long> newInvocation() throws Exception {
+                public Invocation<Object, Long> newInvocation() {
 
                     return new CountInvocation();
                 }

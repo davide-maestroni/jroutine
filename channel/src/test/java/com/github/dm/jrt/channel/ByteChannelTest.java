@@ -816,6 +816,40 @@ public class ByteChannelTest {
     }
 
     @Test
+    public void testTransferFrom() throws IOException {
+
+        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
+        stream.transferFrom(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
+        stream.flush();
+        final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+        assertThat(inputStream.read()).isEqualTo(77);
+        assertThat(inputStream.read()).isEqualTo(33);
+        assertThat(inputStream.read()).isEqualTo((byte) 155);
+        assertThat(inputStream.read()).isEqualTo(13);
+        assertThat(inputStream.read()).isEqualTo(-1);
+    }
+
+    @Test
+    public void testTransferTo() throws IOException {
+
+        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
+        stream.write(new byte[]{31, 17, (byte) 155, 13});
+        stream.flush();
+        final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        assertThat(inputStream.transferTo(outputStream)).isEqualTo(4);
+        assertThat(outputStream.size()).isEqualTo(4);
+        assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+                (byte) 13);
+        assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+        assertThat(outputStream.size()).isEqualTo(4);
+        assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+                (byte) 13);
+    }
+
+    @Test
     public void testWriteAll() throws IOException {
 
         final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();

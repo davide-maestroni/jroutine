@@ -20,7 +20,6 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.service.InvocationService;
-import com.github.dm.jrt.android.retrofit.ParcelableRequest;
 import com.github.dm.jrt.android.retrofit.ServiceCallInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -83,8 +82,8 @@ public abstract class RetrofitInvocationService extends InvocationService {
     /**
      * Factory of invocations handling OkHttp requests.
      */
-    private static class ServiceCallInvocationFactory
-            extends ContextInvocationFactory<ParcelableRequest, ParcelableSelectable<Object>> {
+    private static class ServiceCallInvocationFactory extends
+            ContextInvocationFactory<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private final OkHttpClient mClient;
 
@@ -101,7 +100,8 @@ public abstract class RetrofitInvocationService extends InvocationService {
 
         @NotNull
         @Override
-        public ContextInvocation<ParcelableRequest, ParcelableSelectable<Object>> newInvocation() {
+        public ContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>>
+        newInvocation() {
 
             return new ServiceCallInvocation(mClient);
         }

@@ -393,7 +393,7 @@ public class ParcelableByteChannel {
                 final ParcelOutputStream outputStream =
                         new ParcelOutputStream(inputStream.available());
                 try {
-                    inputStream.readAll(outputStream);
+                    inputStream.transferTo(outputStream);
                     outputStream.writeToParcel(dest);
 
                 } catch (final IOException ignored) {
@@ -509,12 +509,6 @@ public class ParcelableByteChannel {
         @Override
         public void reset() {
 
-        }
-
-        @Override
-        public long readAll(@NotNull final OutputStream out) throws IOException {
-
-            return 0;
         }
     }
 

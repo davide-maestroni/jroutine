@@ -22,6 +22,7 @@ import com.github.dm.jrt.stream.StreamChannel;
 import java.util.List;
 
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 
 /**
@@ -32,8 +33,10 @@ import retrofit2.http.Path;
 public interface GitHubService {
 
     @GET("users/{user}/repos")
+    @Headers("Accept: application/json")
     OutputChannel<List<Repo>> listRepos(@Path("user") String user);
 
     @GET("users/{user}/repos")
+    @Headers("Accept: application/json")
     StreamChannel<Object, List<Repo>> streamRepos(@Path("user") String user);
 }

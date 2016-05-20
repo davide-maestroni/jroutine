@@ -16,30 +16,18 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.InvocationMode;
-import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
-import retrofit2.Call;
-import retrofit2.CallAdapter;
-import retrofit2.Retrofit;
 
 /**
  * Implementation of a call adapter factory supporting {@code OutputChannel} and
@@ -47,18 +35,11 @@ import retrofit2.Retrofit;
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
-public class RoutineAdapterFactory extends CallAdapter.Factory {
-
-    private static final RetrofitCallInvocation<Object> sCallInvocation =
-            new RetrofitCallInvocation<Object>();
+public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
     private static final RoutineAdapterFactory sFactory =
             new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration(),
                     InvocationMode.ASYNC);
-
-    private final InvocationConfiguration mConfiguration;
-
-    private final InvocationMode mInvocationMode;
 
     /**
      * Constructor.
@@ -69,8 +50,7 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
     private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
 
-        mConfiguration = configuration;
-        mInvocationMode = invocationMode;
+        super(configuration, invocationMode);
     }
 
     /**
@@ -93,58 +73,6 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
     public static RoutineAdapterFactory defaultFactory() {
 
         return sFactory;
-    }
-
-    @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-            final Retrofit retrofit) {
-
-        InvocationMode invocationMode = mInvocationMode;
-        if (annotations != null) {
-            for (final Annotation annotation : annotations) {
-                if (annotation.annotationType() == Invoke.class) {
-                    invocationMode = ((Invoke) annotation).value();
-                }
-            }
-        }
-
-        if (returnType instanceof ParameterizedType) {
-            final ParameterizedType parameterizedType = (ParameterizedType) returnType;
-            final Type rawType = parameterizedType.getRawType();
-            if (StreamChannel.class == rawType) {
-                return new StreamChannelAdapter(invocationMode, buildRoutine(annotations),
-                        parameterizedType.getActualTypeArguments()[1]);
-
-            } else if (OutputChannel.class == rawType) {
-                return new OutputChannelAdapter(invocationMode, buildRoutine(annotations),
-                        parameterizedType.getActualTypeArguments()[0]);
-            }
-
-        } else if (returnType instanceof Class) {
-            if (StreamChannel.class == returnType) {
-                return new StreamChannelAdapter(invocationMode, buildRoutine(annotations),
-                        Object.class);
-
-            } else if (OutputChannel.class == returnType) {
-                return new OutputChannelAdapter(invocationMode, buildRoutine(annotations),
-                        Object.class);
-            }
-        }
-
-        return null;
-    }
-
-    @NotNull
-    private Routine<? extends Call<?>, ?> buildRoutine(@Nullable final Annotation[] annotations) {
-
-        // Use annotations to configure the routine
-        final InvocationConfiguration invocationConfiguration =
-                Builders.withAnnotations(mConfiguration, annotations);
-        return JRoutineCore.on(sCallInvocation)
-                           .invocationConfiguration()
-                           .with(invocationConfiguration)
-                           .apply()
-                           .buildRoutine();
     }
 
     /**
@@ -205,129 +133,6 @@ public class RoutineAdapterFactory extends CallAdapter.Factory {
 
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
-        }
-    }
-
-    /**
-     * Base adapter implementation.
-     */
-    private static abstract class BaseAdapter<T> implements CallAdapter<T> {
-
-        private final Type mResponseType;
-
-        private final Routine<Call<?>, ?> mRoutine;
-
-        /**
-         * Constructor.
-         *
-         * @param routine      the routine instance.
-         * @param responseType the response type.
-         */
-        @SuppressWarnings("unchecked")
-        private BaseAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
-                @NotNull final Type responseType) {
-
-            mResponseType = responseType;
-            mRoutine = (Routine<Call<?>, ?>) routine;
-        }
-
-        public Type responseType() {
-
-            return mResponseType;
-        }
-
-        /**
-         * Gets the adapter routine.
-         *
-         * @return the routine instance.
-         */
-        @NotNull
-        protected Routine<Call<?>, ?> getRoutine() {
-
-            return mRoutine;
-        }
-    }
-
-    /**
-     * Output channel adapter implementation.
-     */
-    private static class OutputChannelAdapter extends BaseAdapter<OutputChannel> {
-
-        private final InvocationMode mInvocationMode;
-
-        /**
-         * Constructor.
-         *
-         * @param invocationMode the invocation mode.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
-         */
-        private OutputChannelAdapter(@NotNull final InvocationMode invocationMode,
-                @NotNull final Routine<? extends Call<?>, ?> routine,
-                @NotNull final Type responseType) {
-
-            super(routine, responseType);
-            mInvocationMode = invocationMode;
-        }
-
-        public <OUT> OutputChannel adapt(final Call<OUT> call) {
-
-            final InvocationMode invocationMode = mInvocationMode;
-            final Routine<Call<?>, ?> routine = getRoutine();
-            if (invocationMode == InvocationMode.ASYNC) {
-                return routine.asyncCall(call);
-
-            } else if (invocationMode == InvocationMode.SYNC) {
-                return routine.syncCall(call);
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                return routine.parallelCall(call);
-            }
-
-            return routine.serialCall(call);
-        }
-    }
-
-    /**
-     * Stream channel adapter implementation.
-     */
-    private static class StreamChannelAdapter extends BaseAdapter<StreamChannel> {
-
-        private final InvocationMode mInvocationMode;
-
-        /**
-         * Constructor.
-         *
-         * @param invocationMode the invocation mode.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
-         */
-        private StreamChannelAdapter(@NotNull final InvocationMode invocationMode,
-                @NotNull final Routine<? extends Call<?>, ?> routine,
-                @NotNull final Type responseType) {
-
-            super(routine, responseType);
-            mInvocationMode = invocationMode;
-        }
-
-        public <OUT> StreamChannel adapt(final Call<OUT> call) {
-
-            final InvocationMode invocationMode = mInvocationMode;
-            final StreamChannel<Call<OUT>, Call<OUT>> stream = Streams.streamOf(call);
-            if (invocationMode == InvocationMode.ASYNC) {
-                stream.async();
-
-            } else if (invocationMode == InvocationMode.SYNC) {
-                stream.sync();
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                stream.parallel();
-
-            } else {
-                stream.serial();
-            }
-
-            return stream.map(getRoutine());
         }
     }
 }

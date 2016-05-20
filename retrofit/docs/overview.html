@@ -1,0 +1,75 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-retrofit</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<p>
+    Retrofit integration of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">JRoutine</a> library.
+</p>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to configure Retrofit, so to employ routines to execute the calls to the networks.
+</p>
+<b>Example 1:</b> via adapter factory.
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.defaultFactory();
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("https://api.github.com")
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService service = retrofit.create(GitHubService.class);
+                service.streamRepos(args[0])
+                       .map(Streams.&lt;Repo&gt;unfold())
+                       .onOutput(System.out::println)
+                       .afterMax(seconds(3))
+                       .hasCompleted();
+                System.exit(0);
+            }
+
+            public interface GitHubService {
+
+                &commat;GET("users/{user}/repos")
+                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+            }
+
+            public static class Repo {
+
+                public String id;
+
+                public String name;
+
+                &commat;Override
+                public String toString() {
+
+                    return name;
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

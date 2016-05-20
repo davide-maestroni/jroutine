@@ -40,7 +40,7 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
 
                 @NotNull
                 @Override
-                public Invocation<Object, List<Object>> newInvocation() throws Exception {
+                public Invocation<Object, List<Object>> newInvocation() {
 
                     return new ToListInvocation<Object>();
                 }

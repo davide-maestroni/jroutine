@@ -29,8 +29,10 @@ import java.util.TreeSet;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okio.Buffer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -71,9 +73,34 @@ public class ComparableCall<T> implements Call<T> {
         return new ComparableCall<T>(wrapped);
     }
 
-    private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
+    private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
 
-        return (o1 == o2) || !((o1 == null) || (o2 == null)) && o1.equals(o2);
+        if (b1 == b2) {
+            return true;
+        }
+
+        if ((b1 == null) || (b2 == null)) {
+            return false;
+        }
+
+        if (!equals(b1.contentType(), b2.contentType())) {
+            return false;
+        }
+
+        try {
+            if (b1.contentLength() != b2.contentLength()) {
+                return false;
+            }
+
+            final Buffer buffer1 = new Buffer();
+            b1.writeTo(buffer1);
+            final Buffer buffer2 = new Buffer();
+            b2.writeTo(buffer2);
+            return buffer1.equals(buffer2);
+
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private static boolean equals(@Nullable final Headers h1, @Nullable final Headers h2) {
@@ -102,6 +129,11 @@ public class ComparableCall<T> implements Call<T> {
         }
 
         return map1.equals(map2);
+    }
+
+    private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
+
+        return (o1 == o2) || !((o1 == null) || (o2 == null)) && o1.equals(o2);
     }
 
     @Override
@@ -141,7 +173,22 @@ public class ComparableCall<T> implements Call<T> {
         final String method = request.method();
         result += result * 31 + ((method != null) ? method.hashCode() : 0);
         final RequestBody body = request.body();
-        result += result * 31 + ((body != null) ? body.hashCode() : 0);
+        if (body == null) {
+            result += result * 31;
+
+        } else {
+            final MediaType mediaType = body.contentType();
+            result += result * 31 + ((mediaType != null) ? mediaType.hashCode() : 0);
+            final Buffer buffer = new Buffer();
+            try {
+                body.writeTo(buffer);
+            } catch (final IOException e) {
+                throw new IllegalStateException(e);
+            }
+
+            result = 31 * result + buffer.hashCode();
+        }
+
         final Object tag = request.tag();
         if (tag != request) {
             result += result * 31 + ((tag != null) ? tag.hashCode() : 0);

@@ -52,7 +52,7 @@ class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChan
         mConsumer = ConstantConditions.notNull("consumer instance", consumer);
     }
 
-    public OutputChannel<Void> apply(final OutputChannel<OUT> channel) throws Exception {
+    public OutputChannel<Void> apply(final OutputChannel<OUT> channel) {
 
         final IOChannel<Void> ioChannel = JRoutineCore.io()
                                                       .channelConfiguration()

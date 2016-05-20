@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.retrofit;
+package com.github.dm.jrt.android.v4.retrofit;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.ServiceContext;
-import com.github.dm.jrt.android.retrofit.service.RemoteTestService;
-import com.github.dm.jrt.android.retrofit.service.TestService;
+import com.github.dm.jrt.android.retrofit.GitHubService;
+import com.github.dm.jrt.android.retrofit.R;
+import com.github.dm.jrt.android.retrofit.Repo;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.stream.Streams;
@@ -38,27 +39,27 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Service routine adapter factory unit tests.
+ * Loader routine adapter factory unit tests.
  * <p>
- * Created by davide-maestroni on 05/17/2016.
+ * Created by davide-maestroni on 05/19/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
-    public ServiceAdapterFactoryTest() {
+    public LoaderAdapterFactoryTest() {
 
         super(TestActivity.class);
     }
 
-    private static void testOutputChannelAdapter(@NotNull final ServiceContext context) throws
+    private static void testOutputChannelAdapter(@NotNull final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -69,13 +70,13 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         server.start();
         try {
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationConfiguration()
-                                             .withReadTimeout(seconds(10))
-                                             .apply()
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationConfiguration()
+                                                  .withReadTimeout(seconds(10))
+                                                  .apply()
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -97,14 +98,14 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.PARALLEL)
-                                             .invocationConfiguration()
-                                             .withReadTimeout(seconds(10))
-                                             .apply()
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.PARALLEL)
+                                                  .invocationConfiguration()
+                                                  .withReadTimeout(seconds(10))
+                                                  .apply()
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -126,14 +127,14 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.SYNC)
-                                             .invocationConfiguration()
-                                             .withReadTimeout(seconds(10))
-                                             .apply()
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SYNC)
+                                                  .invocationConfiguration()
+                                                  .withReadTimeout(seconds(10))
+                                                  .apply()
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -155,14 +156,14 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.SERIAL)
-                                             .invocationConfiguration()
-                                             .withReadTimeout(seconds(10))
-                                             .apply()
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .invocationConfiguration()
+                                                  .withReadTimeout(seconds(10))
+                                                  .apply()
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -188,7 +189,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static void testStreamChannelAdapter(@NotNull final ServiceContext context) throws
+    private static void testStreamChannelAdapter(@NotNull final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -199,8 +200,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         server.start();
         try {
             {
-                final ServiceAdapterFactory adapterFactory =
-                        ServiceAdapterFactory.defaultFactory(context);
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.defaultFactory(context);
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -225,11 +226,11 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.PARALLEL)
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.PARALLEL)
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -254,11 +255,11 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.SYNC)
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SYNC)
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -283,11 +284,11 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             }
 
             {
-                final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .with(context)
-                                             .invocationMode(InvocationMode.SERIAL)
-                                             .buildFactory();
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -313,45 +314,32 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
         } finally {
             server.shutdown();
-        }
-    }
-
-    public void testInvalidContext() {
-
-        try {
-            ServiceAdapterFactory.defaultFactory(serviceFrom(getActivity()));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-            ServiceAdapterFactory.builder().with(serviceFrom(getActivity()));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
         }
     }
 
     public void testOutputChannelAdapter() throws IOException {
 
-        testOutputChannelAdapter(serviceFrom(getActivity(), TestService.class));
+        testOutputChannelAdapter(loaderFrom(getActivity()));
     }
 
-    public void testOutputChannelAdapterRemote() throws IOException {
+    public void testOutputChannelAdapterFragment() throws IOException {
 
-        testOutputChannelAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        testOutputChannelAdapter(loaderFrom(fragment));
     }
 
     public void testStreamChannelAdapter() throws IOException {
 
-        testStreamChannelAdapter(serviceFrom(getActivity(), TestService.class));
+        testStreamChannelAdapter(loaderFrom(getActivity()));
     }
 
-    public void testStreamChannelAdapterRemote() throws IOException {
+    public void testStreamChannelAdapterFragment() throws IOException {
 
-        testStreamChannelAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        testStreamChannelAdapter(loaderFrom(fragment));
     }
 }

@@ -92,7 +92,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     private static FunctionWrapper<? extends OutputChannel<?>, ? extends OutputChannel<?>>
             sIdentity = wrap(new Function<OutputChannel<?>, OutputChannel<?>>() {
 
-        public OutputChannel<?> apply(final OutputChannel<?> channel) throws Exception {
+        public OutputChannel<?> apply(final OutputChannel<?> channel) {
 
             return channel;
         }

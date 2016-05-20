@@ -40,7 +40,7 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
 
                 @NotNull
                 @Override
-                public Invocation<Object, Set<Object>> newInvocation() throws Exception {
+                public Invocation<Object, Set<Object>> newInvocation() {
 
                     return new ToSetInvocation<Object>();
                 }

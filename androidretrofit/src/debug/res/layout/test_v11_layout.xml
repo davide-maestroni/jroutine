@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/test_fragment"
-        class="com.github.dm.jrt.android.v11.channel.TestFragment"
+        class="com.github.dm.jrt.android.v11.retrofit.TestFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

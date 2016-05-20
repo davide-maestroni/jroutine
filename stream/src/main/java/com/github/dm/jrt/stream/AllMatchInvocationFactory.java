@@ -78,7 +78,7 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         }
 
         @Override
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mIsMatch = true;
         }

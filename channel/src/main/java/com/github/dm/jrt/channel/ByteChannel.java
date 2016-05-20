@@ -357,6 +357,38 @@ public class ByteChannel {
 
             return count;
         }
+
+        /**
+         * Transfers all the bytes to the specified output stream and close this one.
+         * <br>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         try {
+         *             readAll(out);
+         *
+         *         } finally {
+         *             close();
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param out the output stream.
+         * @return the total number of bytes read.
+         * @throws java.io.IOException if an I/O error occurs. In particular, an
+         *                             <code>IOException</code> may be thrown if the output stream
+         *                             has been closed.
+         */
+        public long transferTo(@NotNull final OutputStream out) throws IOException {
+
+            try {
+                return readAll(out);
+
+            } finally {
+                close();
+            }
+        }
     }
 
     /**
@@ -369,6 +401,38 @@ public class ByteChannel {
          */
         protected BufferOutputStream() {
 
+        }
+
+        /**
+         * Transfers all the bytes from the specified input stream and close it.
+         * <br>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         try {
+         *             writeAll(in);
+         *
+         *         } finally {
+         *             in.close();
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param in the input stream.
+         * @return the total number of bytes written.
+         * @throws java.io.IOException If the first byte cannot be read for any reason other than
+         *                             end of file, or if the input stream has been closed, or if
+         *                             some other I/O error occurs.
+         */
+        public long transferFrom(@NotNull final InputStream in) throws IOException {
+
+            try {
+                return writeAll(in);
+
+            } finally {
+                in.close();
+            }
         }
 
         /**

@@ -91,7 +91,7 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<DATA> result) {
 
             if (!mHasOutputs) {
                 result.pass(mOutputs);

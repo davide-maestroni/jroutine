@@ -68,7 +68,7 @@ public class Streams extends Functions {
 
                 @SuppressWarnings("unchecked")
                 public void onInput(final Iterable<?> input,
-                        @NotNull final ResultChannel<Object> result) throws Exception {
+                        @NotNull final ResultChannel<Object> result) {
 
                     result.pass((Iterable) input);
                 }

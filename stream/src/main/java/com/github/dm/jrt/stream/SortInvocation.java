@@ -40,7 +40,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
 
         @NotNull
         @Override
-        public Invocation<Comparable<Object>, Comparable<Object>> newInvocation() throws Exception {
+        public Invocation<Comparable<Object>, Comparable<Object>> newInvocation() {
 
             return new SortInvocation<Comparable<Object>>();
         }

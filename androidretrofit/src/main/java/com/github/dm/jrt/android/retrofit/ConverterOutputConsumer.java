@@ -19,7 +19,6 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -93,14 +92,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
 
             case BYTES_INDEX:
                 final ParcelableByteBuffer buffer = output.data();
-                final BufferInputStream inputStream = ParcelableByteChannel.inputStream(buffer);
-                try {
-                    inputStream.readAll(mOutputStream);
-
-                } finally {
-                    inputStream.close();
-                }
-
+                ParcelableByteChannel.inputStream(buffer).transferTo(mOutputStream);
                 break;
 
             default:

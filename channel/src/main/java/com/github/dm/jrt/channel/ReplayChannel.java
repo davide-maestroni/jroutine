@@ -290,7 +290,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         return mOutputChannel.iterator();
     }
 
-    public void onComplete() throws Exception {
+    public void onComplete() {
 
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
@@ -304,7 +304,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         }
     }
 
-    public void onError(@NotNull final RoutineException error) throws Exception {
+    public void onError(@NotNull final RoutineException error) {
 
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
@@ -318,7 +318,7 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         }
     }
 
-    public void onOutput(final OUT output) throws Exception {
+    public void onOutput(final OUT output) {
 
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {

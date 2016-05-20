@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLConnection;
@@ -50,33 +49,24 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
             IOException {
 
-        InputStream inputStream = null;
+        final URLConnection connection = uri.toURL().openConnection();
+        connection.setConnectTimeout(3000);
+        if (connection instanceof HttpURLConnection) {
+            final int code = ((HttpURLConnection) connection).getResponseCode();
+            if ((code < 200) || (code >= 300)) {
+                throw new IOException();
+            }
+        }
+
+        // We employ the utility class dedicated to the optimized transfer of bytes through a
+        // routine channel
+        final BufferOutputStream outputStream =
+                ByteChannel.byteChannel(MAX_CHUNK_SIZE).bind(result);
         try {
-            final URLConnection connection = uri.toURL().openConnection();
-            connection.setConnectTimeout(3000);
-            if (connection instanceof HttpURLConnection) {
-                final int code = ((HttpURLConnection) connection).getResponseCode();
-                if ((code < 200) || (code >= 300)) {
-                    throw new IOException();
-                }
-            }
-
-            inputStream = connection.getInputStream();
-            // We employ the utility class dedicated to the optimized transfer of bytes through a
-            // routine channel
-            final BufferOutputStream outputStream =
-                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).bind(result);
-            try {
-                outputStream.writeAll(inputStream);
-
-            } finally {
-                outputStream.close();
-            }
+            outputStream.transferFrom(connection.getInputStream());
 
         } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
+            outputStream.close();
         }
     }
 }

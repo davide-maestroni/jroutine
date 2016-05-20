@@ -316,7 +316,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mChannel = mRoutine.syncInvoke();
         }
@@ -329,13 +329,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<Object> result) {
 
             result.pass(mChannel.result());
         }
 
         @Override
-        public void onTerminate() throws Exception {
+        public void onTerminate() {
 
             mChannel = null;
         }
@@ -395,7 +395,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mChannel = mRoutine.syncInvoke();
         }
@@ -408,13 +408,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<Object> result) {
 
             result.pass(mChannel.result());
         }
 
         @Override
-        public void onTerminate() throws Exception {
+        public void onTerminate() {
 
             mChannel = null;
         }

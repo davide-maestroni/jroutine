@@ -486,7 +486,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         }
 
         @Override
-        public void onTerminate() throws Exception {
+        public void onTerminate() {
 
             mInputChannel.close();
             mInputChannel = null;

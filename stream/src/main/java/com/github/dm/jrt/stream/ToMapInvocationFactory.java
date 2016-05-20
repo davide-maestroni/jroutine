@@ -83,7 +83,7 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
         }
 
         @Override
-        public void onInitialize() throws Exception {
+        public void onInitialize() {
 
             mMap = new HashMap<KEY, IN>();
         }

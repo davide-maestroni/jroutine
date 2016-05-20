@@ -21,6 +21,8 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 import retrofit2.Call;
 
 /**
@@ -42,7 +44,7 @@ public class ExecuteCall<T> extends MappingInvocation<Call<T>, T> {
 
     @Override
     public void onInput(final Call<T> call, @NotNull final ResultChannel<T> result) throws
-            Exception {
+            IOException {
 
         result.pass(call.execute().body());
     }

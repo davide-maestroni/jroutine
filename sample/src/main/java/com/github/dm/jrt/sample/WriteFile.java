@@ -17,7 +17,6 @@
 package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ByteChannel;
-import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -70,14 +69,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     public void onInput(final ByteBuffer buffer,
             @NotNull final ResultChannel<Boolean> result) throws IOException {
 
-        final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
-        final BufferedOutputStream outputStream = mOutputStream;
-        try {
-            inputStream.readAll(outputStream);
-
-        } finally {
-            inputStream.close();
-        }
+        ByteChannel.inputStream(buffer).transferTo(mOutputStream);
     }
 
     @Override

@@ -20,11 +20,11 @@
 
     private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
-        private final java.util.List<String> mSharedFields;
+        private final java.util.Set<String> mSharedFields;
 
         private final com.github.dm.jrt.android.object.ContextInvocationTarget<?> mTarget;
 
-        private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
+        private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             super(new Object[]{sharedFields, target});

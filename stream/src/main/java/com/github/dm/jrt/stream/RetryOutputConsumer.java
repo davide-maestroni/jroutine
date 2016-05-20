@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -109,7 +110,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             mBind.apply(mInputChannel).bind(this);
 
         } catch (final Exception e) {
-            mOutputChannel.abort(e);
+            mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
         }
     }
 }

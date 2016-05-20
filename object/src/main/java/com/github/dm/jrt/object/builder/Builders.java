@@ -58,6 +58,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -355,7 +356,7 @@ public class Builders {
      */
     @NotNull
     public static Mutex getSharedMutex(@Nullable final Object target,
-            @Nullable final List<String> sharedFields) {
+            @Nullable final Collection<String> sharedFields) {
 
         if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
             return Mutex.NO_MUTEX;

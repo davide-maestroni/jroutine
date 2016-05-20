@@ -204,12 +204,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         if (StreamChannel.class == rawType) {
-            return new StreamChannelAdapter(invocationConfiguration, invocationMode,
+            return new StreamChannelAdapter(invocationConfiguration,
                     retrofit.responseBodyConverter(responseType, annotations),
                     buildRoutine(invocationConfiguration), responseType);
 
         } else if (OutputChannel.class == rawType) {
-            return new OutputChannelAdapter(invocationConfiguration, invocationMode,
+            return new OutputChannelAdapter(invocationConfiguration,
                     retrofit.responseBodyConverter(responseType, annotations),
                     buildRoutine(invocationConfiguration), responseType);
         }
@@ -384,26 +384,21 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         private final Converter<ResponseBody, ?> mConverter;
 
-        private final InvocationMode mInvocationMode;
-
         private final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> mRoutine;
 
         /**
          * Constructor.
          *
-         * @param configuration  the channel configuration.
-         * @param invocationMode the invocation mode.
-         * @param converter      the body converter.
-         * @param routine        the routine instance.
+         * @param configuration the channel configuration.
+         * @param converter     the body converter.
+         * @param routine       the routine instance.
          */
         private BindService(@NotNull final ChannelConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
                 @NotNull final Converter<ResponseBody, ?> converter,
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine) {
 
             mConfiguration = configuration;
-            mInvocationMode = invocationMode;
             mConverter = converter;
             mRoutine = routine;
         }
@@ -411,23 +406,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         public OutputChannel<Object> apply(
                 final OutputChannel<ParcelableSelectable<Object>> channel) {
 
-            final InvocationMode invocationMode = mInvocationMode;
-            final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                    mRoutine;
-            final OutputChannel<ParcelableSelectable<Object>> outputChannel;
-            if (invocationMode == InvocationMode.PARALLEL) {
-                outputChannel = routine.parallelCall(channel);
-
-            } else {
-                outputChannel = routine.asyncCall(channel);
-            }
-
             final IOChannel<Object> ioChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
                                                             .apply()
                                                             .buildChannel();
-            outputChannel.bind(new ConverterOutputConsumer(mConverter, ioChannel));
+            mRoutine.asyncCall(channel).bind(new ConverterOutputConsumer(mConverter, ioChannel));
             return ioChannel;
         }
     }
@@ -443,19 +427,15 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final InvocationMode mInvocationMode;
-
         /**
          * Constructor.
          *
-         * @param configuration  the invocation configuration.
-         * @param invocationMode the invocation mode.
-         * @param converter      the body converter.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
+         * @param configuration the invocation configuration.
+         * @param converter     the body converter.
+         * @param routine       the routine instance.
+         * @param responseType  the response type.
          */
         private OutputChannelAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
                 @NotNull final Converter<ResponseBody, ?> converter,
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
@@ -464,7 +444,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mChannelConfiguration = builderFromOutputChannel(configuration).apply();
-            mInvocationMode = invocationMode;
             mConverter = converter;
         }
 
@@ -480,23 +459,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         public <OUT> OutputChannel adapt(final Call<OUT> call) {
 
-            final InvocationMode invocationMode = mInvocationMode;
-            final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                    getRoutine();
-            final OutputChannel<ParcelableSelectable<Object>> outputChannel;
-            if (invocationMode == InvocationMode.PARALLEL) {
-                outputChannel = routine.parallelCall(invokeCall(call));
-
-            } else {
-                outputChannel = routine.asyncCall(invokeCall(call));
-            }
-
             final IOChannel<Object> ioChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mChannelConfiguration)
                                                             .apply()
                                                             .buildChannel();
-            outputChannel.bind(new ConverterOutputConsumer(mConverter, ioChannel));
+            getRoutine().asyncCall(invokeCall(call))
+                        .bind(new ConverterOutputConsumer(mConverter, ioChannel));
             return ioChannel;
         }
     }
@@ -512,19 +481,15 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final InvocationMode mInvocationMode;
-
         /**
          * Constructor.
          *
-         * @param configuration  the invocation configuration.
-         * @param invocationMode the invocation mode.
-         * @param converter      the body converter.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
+         * @param configuration the invocation configuration.
+         * @param converter     the body converter.
+         * @param routine       the routine instance.
+         * @param responseType  the response type.
          */
         private StreamChannelAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
                 @NotNull final Converter<ResponseBody, ?> converter,
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
@@ -533,7 +498,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mChannelConfiguration = builderFromOutputChannel(configuration).apply();
-            mInvocationMode = invocationMode;
             mConverter = converter;
         }
 
@@ -552,8 +516,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                         OutputChannel<ParcelableSelectable<Object>>> function) {
 
                             return wrap(function).andThen(
-                                    new BindService(mChannelConfiguration, mInvocationMode,
-                                            mConverter, getRoutine()));
+                                    new BindService(mChannelConfiguration, mConverter,
+                                            getRoutine()));
                         }
                     };
             return Streams.streamOf(call)

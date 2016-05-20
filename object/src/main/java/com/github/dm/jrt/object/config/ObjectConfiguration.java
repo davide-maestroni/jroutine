@@ -22,10 +22,10 @@ import com.github.dm.jrt.core.util.DeepEqualObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -50,17 +50,17 @@ public final class ObjectConfiguration extends DeepEqualObject {
 
     private static final ObjectConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
-    private final List<String> mFieldNames;
+    private final Set<String> mFieldNames;
 
     /**
      * Constructor.
      *
      * @param fieldNames the shared field names.
      */
-    private ObjectConfiguration(@Nullable final List<String> fieldNames) {
+    private ObjectConfiguration(@Nullable final Set<String> fieldNames) {
 
         super(asArgs(fieldNames));
-        mFieldNames = fieldNames;
+        mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
     }
 
     /**
@@ -116,9 +116,9 @@ public final class ObjectConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the field names.
      */
-    public List<String> getSharedFieldsOrElse(@Nullable final List<String> valueIfNotSet) {
+    public Set<String> getSharedFieldsOrElse(@Nullable final Set<String> valueIfNotSet) {
 
-        final List<String> fieldNames = mFieldNames;
+        final Set<String> fieldNames = mFieldNames;
         return (fieldNames != null) ? fieldNames : valueIfNotSet;
     }
 
@@ -148,7 +148,7 @@ public final class ObjectConfiguration extends DeepEqualObject {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private List<String> mFieldNames;
+        private Set<String> mFieldNames;
 
         /**
          * Constructor.
@@ -171,6 +171,14 @@ public final class ObjectConfiguration extends DeepEqualObject {
 
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
+        }
+
+        @NotNull
+        private static Set<String> toSet(@NotNull final String[] values) {
+
+            final HashSet<String> set = new HashSet<String>();
+            Collections.addAll(set, values);
+            return set;
         }
 
         /**
@@ -200,7 +208,7 @@ public final class ObjectConfiguration extends DeepEqualObject {
                 return this;
             }
 
-            final List<String> fieldNames = configuration.mFieldNames;
+            final Set<String> fieldNames = configuration.mFieldNames;
             if (fieldNames != null) {
                 withSharedFields(fieldNames);
             }
@@ -216,7 +224,7 @@ public final class ObjectConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withSharedFields() {
 
-            mFieldNames = Collections.emptyList();
+            mFieldNames = Collections.emptySet();
             return this;
         }
 
@@ -229,7 +237,7 @@ public final class ObjectConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
 
-            mFieldNames = (fieldNames != null) ? Arrays.asList(fieldNames.clone()) : null;
+            mFieldNames = (fieldNames != null) ? toSet(fieldNames) : null;
             return this;
         }
 
@@ -240,10 +248,9 @@ public final class ObjectConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withSharedFields(@Nullable final List<String> fieldNames) {
+        public Builder<TYPE> withSharedFields(@Nullable final Collection<String> fieldNames) {
 
-            mFieldNames = (fieldNames != null) ? Collections.unmodifiableList(
-                    new ArrayList<String>(fieldNames)) : null;
+            mFieldNames = (fieldNames != null) ? new HashSet<String>(fieldNames) : null;
             return this;
         }
 

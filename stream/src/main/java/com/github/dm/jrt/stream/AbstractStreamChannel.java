@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -1065,7 +1066,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     mChannel = mBind.apply(inputChannel);
 
                 } catch (final Exception e) {
-                    inputChannel.abort(e);
+                    inputChannel.abort(InvocationException.wrapIfNeeded(e));
                     throw StreamException.wrap(e);
                 }
 

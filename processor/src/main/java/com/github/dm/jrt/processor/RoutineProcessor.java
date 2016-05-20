@@ -1903,7 +1903,8 @@ public class RoutineProcessor extends AbstractProcessor {
         final SharedFields sharedFieldsAnnotation = methodElement.getAnnotation(SharedFields.class);
         if (sharedFieldsAnnotation != null) {
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
+            final StringBuilder builder =
+                    new StringBuilder("new java.util.HashSet<String>(java.util.Arrays.asList(");
             final int length = names.length;
             for (int i = 0; i < length; ++i) {
                 if (i != 0) {
@@ -1913,7 +1914,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append("\"").append(names[i]).append("\"");
             }
 
-            builder.append(")");
+            builder.append("))");
             methodHeader = methodHeader.replace("${sharedFields}", builder.toString());
 
         } else {
@@ -1958,7 +1959,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 buildGenericTypes(annotationElement, element, targetElement));
         if (sharedFieldsAnnotation != null) {
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
+            final StringBuilder builder =
+                    new StringBuilder("new java.util.HashSet<String>(java.util.Arrays.asList(");
             final int length = names.length;
             for (int i = 0; i < length; ++i) {
                 if (i != 0) {
@@ -1968,7 +1970,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 builder.append("\"").append(names[i]).append("\"");
             }
 
-            builder.append(")");
+            builder.append("))");
             methodInvocationHeader =
                     methodInvocationHeader.replace("${sharedFields}", builder.toString());
 

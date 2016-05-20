@@ -48,6 +48,7 @@ public class ComparableCallTest extends AndroidTestCase {
         final ComparableCall<List<Repo>> call =
                 ComparableCall.of(service.listRepos("octocat", "test"));
         assertThat(call).isEqualTo(call);
+        assertThat(call).isEqualTo(call.clone());
         assertThat(call).isNotEqualTo(null);
         assertThat(call).isNotEqualTo("test");
         assertThat(call).isNotEqualTo(ComparableCall.of(service.listRepos("octocat")));

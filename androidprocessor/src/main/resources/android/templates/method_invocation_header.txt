@@ -20,7 +20,7 @@
 
         private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
 
-        private final java.util.List<String> mSharedFields;
+        private final java.util.Set<String> mSharedFields;
 
         @SuppressWarnings("unused")
         private Object mInstance;
@@ -30,7 +30,7 @@
         @SuppressWarnings("unused")
         private com.github.dm.jrt.object.InvocationTarget mTarget;
 
-        private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
+        private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             mSharedFields = sharedFields;

@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.stream.Streams;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,7 +59,138 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         super(TestActivity.class);
     }
 
-    private static void testOutputChannelAdapter(@NotNull final LoaderContextCompat context) throws
+    private static void testLoaderStreamChannelAdapter(
+            @Nullable final LoaderContextCompat context) throws IOException {
+
+        final MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse().setBody(BODY));
+        server.enqueue(new MockResponse().setBody(BODY));
+        server.enqueue(new MockResponse().setBody(BODY));
+        server.enqueue(new MockResponse().setBody(BODY));
+        server.start();
+        try {
+            {
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.defaultFactory(context);
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("http://localhost:" + server.getPort())
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService2 service = retrofit.create(GitHubService2.class);
+                assertThat(service.streamLoaderRepos("octocat")
+                                  .map(Streams.<Repo>unfold())
+                                  .onOutput(new Consumer<Repo>() {
+
+                                      public void accept(final Repo repo) throws Exception {
+
+                                          final int id = Integer.parseInt(repo.getId());
+                                          assertThat(id).isBetween(1, 3);
+                                          assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                          assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                      }
+                                  })
+                                  .afterMax(seconds(10))
+                                  .getError()).isNull();
+            }
+
+            {
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.PARALLEL)
+                                                  .loaderConfiguration()
+                                                  .withResultStaleTime(seconds(3))
+                                                  .apply()
+                                                  .buildFactory();
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("http://localhost:" + server.getPort())
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService2 service = retrofit.create(GitHubService2.class);
+                assertThat(service.streamLoaderRepos("octocat")
+                                  .map(Streams.<Repo>unfold())
+                                  .onOutput(new Consumer<Repo>() {
+
+                                      public void accept(final Repo repo) throws Exception {
+
+                                          final int id = Integer.parseInt(repo.getId());
+                                          assertThat(id).isBetween(1, 3);
+                                          assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                          assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                      }
+                                  })
+                                  .afterMax(seconds(10))
+                                  .getError()).isNull();
+            }
+
+            {
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SYNC)
+                                                  .buildFactory();
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("http://localhost:" + server.getPort())
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService2 service = retrofit.create(GitHubService2.class);
+                assertThat(service.streamLoaderRepos("octocat")
+                                  .map(Streams.<Repo>unfold())
+                                  .onOutput(new Consumer<Repo>() {
+
+                                      public void accept(final Repo repo) throws Exception {
+
+                                          final int id = Integer.parseInt(repo.getId());
+                                          assertThat(id).isBetween(1, 3);
+                                          assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                          assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                      }
+                                  })
+                                  .afterMax(seconds(10))
+                                  .getError()).isNull();
+            }
+
+            {
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.builder()
+                                                  .with(context)
+                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .buildFactory();
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("http://localhost:" + server.getPort())
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService2 service = retrofit.create(GitHubService2.class);
+                assertThat(service.streamLoaderRepos("octocat")
+                                  .map(Streams.<Repo>unfold())
+                                  .onOutput(new Consumer<Repo>() {
+
+                                      public void accept(final Repo repo) throws Exception {
+
+                                          final int id = Integer.parseInt(repo.getId());
+                                          assertThat(id).isBetween(1, 3);
+                                          assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                          assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                      }
+                                  })
+                                  .afterMax(seconds(10))
+                                  .getError()).isNull();
+            }
+
+        } finally {
+            server.shutdown();
+        }
+    }
+
+    private static void testOutputChannelAdapter(@Nullable final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -189,7 +320,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testStreamChannelAdapter(@NotNull final LoaderContextCompat context) throws
+    private static void testStreamChannelAdapter(@Nullable final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -317,6 +448,24 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
+    public void testLoaderStreamChannelAdapter() throws IOException {
+
+        testLoaderStreamChannelAdapter(loaderFrom(getActivity()));
+    }
+
+    public void testLoaderStreamChannelAdapterFragment() throws IOException {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        testLoaderStreamChannelAdapter(loaderFrom(fragment));
+    }
+
+    public void testLoaderStreamChannelAdapterNullContext() throws IOException {
+
+        testLoaderStreamChannelAdapter(null);
+    }
+
     public void testOutputChannelAdapter() throws IOException {
 
         testOutputChannelAdapter(loaderFrom(getActivity()));
@@ -330,6 +479,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         testOutputChannelAdapter(loaderFrom(fragment));
     }
 
+    public void testOutputChannelAdapterNullContext() throws IOException {
+
+        testOutputChannelAdapter(null);
+    }
+
     public void testStreamChannelAdapter() throws IOException {
 
         testStreamChannelAdapter(loaderFrom(getActivity()));
@@ -341,5 +495,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         testStreamChannelAdapter(loaderFrom(fragment));
+    }
+
+    public void testStreamChannelAdapterNullContext() throws IOException {
+
+        testStreamChannelAdapter(null);
     }
 }

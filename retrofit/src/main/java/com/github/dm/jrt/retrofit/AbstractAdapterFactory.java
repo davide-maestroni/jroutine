@@ -240,17 +240,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
             final InvocationMode invocationMode = mInvocationMode;
             final Routine<Call<?>, ?> routine = getRoutine();
-            if (invocationMode == InvocationMode.ASYNC) {
+            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
+                    == InvocationMode.PARALLEL)) {
                 return routine.asyncCall(call);
-
-            } else if (invocationMode == InvocationMode.SYNC) {
-                return routine.syncCall(call);
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                return routine.parallelCall(call);
             }
 
-            return routine.serialCall(call);
+            return routine.syncCall(call);
         }
     }
 
@@ -280,17 +275,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
             final InvocationMode invocationMode = mInvocationMode;
             final StreamChannel<Call<OUT>, Call<OUT>> stream = Streams.streamOf(call);
-            if (invocationMode == InvocationMode.ASYNC) {
+            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
+                    == InvocationMode.PARALLEL)) {
                 stream.async();
 
-            } else if (invocationMode == InvocationMode.SYNC) {
-                stream.sync();
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                stream.parallel();
-
             } else {
-                stream.serial();
+                stream.sync();
             }
 
             return stream.map(getRoutine());

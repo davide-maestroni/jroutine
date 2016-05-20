@@ -1390,9 +1390,9 @@ public class Streams extends Functions {
     @NotNull
     @StreamFlow(value = MAP, binding = ROUTINE)
     @SuppressWarnings("unchecked")
-    public static <IN> InvocationFactory<Iterable<IN>, IN> unfold() {
+    public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
 
-        return (InvocationFactory<Iterable<IN>, IN>) sUnfoldInvocation;
+        return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
     }
 
     /**

@@ -68,7 +68,7 @@ public class ServiceCallInvocation extends
 
     private ByteArrayOutputStream mOutputStream;
 
-    private RequestData mRequest;
+    private RequestData mRequestData;
 
     /**
      * Constructor.
@@ -96,7 +96,7 @@ public class ServiceCallInvocation extends
 
         switch (input.index) {
             case REQUEST_DATA_INDEX:
-                mRequest = input.data();
+                mRequestData = input.data();
                 break;
 
             case MEDIA_TYPE_INDEX:
@@ -114,7 +114,7 @@ public class ServiceCallInvocation extends
                 break;
 
             default:
-                throw new UnsupportedOperationException("unknown selectable index: " + input.index);
+                throw new IllegalArgumentException("unknown selectable index: " + input.index);
         }
     }
 
@@ -123,7 +123,7 @@ public class ServiceCallInvocation extends
             IOException {
 
         final ByteArrayOutputStream byteStream = mOutputStream;
-        final Request request = mRequest.requestWithBody(
+        final Request request = mRequestData.requestWithBody(
                 (byteStream != null) ? RequestBody.create(mMediaType, byteStream.toByteArray())
                         : null);
         final ResponseBody responseBody = mClient.newCall(request).execute().body();
@@ -146,8 +146,8 @@ public class ServiceCallInvocation extends
     @Override
     public void onTerminate() {
 
+        mRequestData = null;
         mOutputStream = null;
         mMediaType = null;
-        mRequest = null;
     }
 }

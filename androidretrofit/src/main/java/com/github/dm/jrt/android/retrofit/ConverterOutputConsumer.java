@@ -22,6 +22,7 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
             mOutputChannel.pass(mConverter.convert(responseBody)).close();
 
         } catch (final IOException e) {
-            mOutputChannel.abort(e);
+            mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
         }
     }
 
@@ -96,8 +97,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
                 break;
 
             default:
-                throw new UnsupportedOperationException(
-                        "unknown selectable index: " + output.index);
+                throw new IllegalArgumentException("unknown selectable index: " + output.index);
         }
     }
 }

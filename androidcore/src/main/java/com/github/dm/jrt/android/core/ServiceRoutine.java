@@ -379,7 +379,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             } catch (final RemoteException e) {
                 logger.err(e, "error while sending service invocation message");
                 mIncomingHandler.unbindService();
-                mOutputChannel.abort(e);
+                mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
             }
         }
 

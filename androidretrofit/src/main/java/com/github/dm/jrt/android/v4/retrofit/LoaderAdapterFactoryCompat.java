@@ -363,17 +363,12 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             final Call<OUT> comparableCall = ComparableCall.of(call);
             final LoaderStreamChannelCompat<Call<OUT>, Call<OUT>> stream =
                     LoaderStreamsCompat.streamOf(comparableCall).with(mContext);
-            if (invocationMode == InvocationMode.ASYNC) {
+            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
+                    == InvocationMode.PARALLEL)) {
                 stream.async();
 
-            } else if (invocationMode == InvocationMode.SYNC) {
-                stream.sync();
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                stream.parallel();
-
             } else {
-                stream.serial();
+                stream.sync();
             }
 
             return stream.map(getRoutine());

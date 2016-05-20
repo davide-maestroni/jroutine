@@ -49,9 +49,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -102,12 +104,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @Nullable
-    private static List<String> fieldsWithShareAnnotation(
+    private static Set<String> fieldsWithShareAnnotation(
             @NotNull final ObjectConfiguration configuration, @NotNull final Method method) {
 
         final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
         if (sharedFieldsAnnotation != null) {
-            return Arrays.asList(sharedFieldsAnnotation.value());
+            final HashSet<String> set = new HashSet<String>();
+            Collections.addAll(set, sharedFieldsAnnotation.value());
+            return set;
         }
 
         return configuration.getSharedFieldsOrElse(null);
@@ -198,7 +202,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             return method(name, Reflection.NO_PARAMS);
         }
 
-        final List<String> sharedFields =
+        final Set<String> sharedFields =
                 fieldsWithShareAnnotation(mObjectConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name);
         final TargetInvocationFactory<Object, Object> factory =
@@ -222,7 +226,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
-        final List<String> sharedFields =
+        final Set<String> sharedFields =
                 fieldsWithShareAnnotation(mObjectConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
         final TargetInvocationFactory<Object, Object> factory =
@@ -276,7 +280,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final String mAliasName;
 
-        private final List<String> mSharedFields;
+        private final Set<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -290,11 +294,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedFields the list of shared field names.
+         * @param sharedFields the set of shared field names.
          * @param target       the invocation target.
          * @param name         the alias name.
          */
-        private MethodAliasInvocation(@Nullable final List<String> sharedFields,
+        private MethodAliasInvocation(@Nullable final Set<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
             mSharedFields = sharedFields;
@@ -351,7 +355,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final Class<?>[] mParameterTypes;
 
-        private final List<String> mSharedFields;
+        private final Set<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -365,13 +369,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedFields   the list of shared field names.
+         * @param sharedFields   the set of shared field names.
          * @param target         the invocation target.
          * @param name           the method name.
          * @param parameterTypes the method parameter type names.
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          */
-        private MethodSignatureInvocation(@Nullable final List<String> sharedFields,
+        private MethodSignatureInvocation(@Nullable final Set<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
                 @NotNull final String[] parameterTypes) throws ClassNotFoundException {
 
@@ -429,7 +433,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final OutputMode mOutputMode;
 
-        private final List<String> mSharedFields;
+        private final Set<String> mSharedFields;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -442,7 +446,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param sharedFields         the list of shared field names.
+         * @param sharedFields         the set of shared field names.
          * @param target               the invocation target.
          * @param targetMethodName     the target method name.
          * @param targetParameterTypes the target method parameter type names.
@@ -451,7 +455,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @throws java.lang.ClassNotFoundException if one of the specified classes is not found.
          * @throws java.lang.NoSuchMethodException  if the target method is not found.
          */
-        private ProxyInvocation(@Nullable final List<String> sharedFields,
+        private ProxyInvocation(@Nullable final Set<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target,
                 @NotNull final String targetMethodName,
                 @NotNull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
@@ -482,12 +486,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
 
-            final Object targetInstance = mInstance;
-            if (targetInstance == null) {
-                throw new IllegalStateException("such error should never happen");
-            }
-
-            callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
+            callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }
     }
@@ -530,7 +529,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-            final List<String> sharedFields =
+            final Set<String> sharedFields =
                     fieldsWithShareAnnotation(mObjectConfiguration, method);
             final Object[] factoryArgs = asArgs(sharedFields, target, targetMethod.getName(),
                     toNames(targetParameterTypes), inputMode, outputMode);

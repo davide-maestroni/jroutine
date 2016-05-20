@@ -1,0 +1,252 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-androidretrofit</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<p>
+    Android customization of Retrofit integration of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">JRoutine</a> library.
+</p>
+<p>
+    The code below shows how it is possible to configure Retrofit, so to employ loaders or services to execute calls to the network.
+</p>
+<b>Example 1:</b> via loader stream.
+<p>
+    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+            
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+            
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+            
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                            "Cannot load image", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final LoaderAdapterFactory adapterFactory = 
+                        LoaderAdapterFactory.defaultFactory(loaderFrom(this));
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("https://api.github.com")
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService service = retrofit.create(GitHubService.class);
+                service.streamRepos(args[0])
+                       .map(Streams.&lt;Repo&gt;unfold())
+                       .onOutput(addRepoTo(adapter))
+                       .onError(showToast(this))
+                       .immediately();
+            }
+
+            public interface GitHubService {
+
+                &commat;GET("users/{user}/repos")
+                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+            }
+
+            public static class Repo {
+
+                public String id;
+
+                public String name;
+
+                &commat;Override
+                public String toString() {
+
+                    return name;
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via loader stream (with Support Library).
+<p>
+    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends FragmentActivity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+            
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+            
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+            
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                            "Cannot load image", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final LoaderAdapterFactoryCompat adapterFactory = 
+                        LoaderAdapterFactoryCompat.defaultFactory(loaderFrom(this));
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("https://api.github.com")
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService service = retrofit.create(GitHubService.class);
+                service.streamRepos(args[0])
+                       .map(Streams.&lt;Repo&gt;unfold())
+                       .onOutput(addRepoTo(adapter))
+                       .onError(showToast(this))
+                       .immediately();
+            }
+
+            public interface GitHubService {
+
+                &commat;GET("users/{user}/repos")
+                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+            }
+
+            public static class Repo {
+
+                public String id;
+
+                public String name;
+
+                &commat;Override
+                public String toString() {
+
+                    return name;
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via service.
+<p>
+    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+            
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+            
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+            
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                            "Cannot load image", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final ServiceAdapterFactory adapterFactory = 
+                        ServiceAdapterFactory.defaultFactory(serviceFrom(this, MyRetrofitService.class));
+                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+                final Retrofit retrofit =
+                        new Builder().baseUrl("https://api.github.com")
+                                     .addCallAdapterFactory(adapterFactory)
+                                     .addConverterFactory(converterFactory)
+                                     .build();
+                final GitHubService service = retrofit.create(GitHubService.class);
+                service.streamRepos(args[0])
+                       .map(Streams.&lt;Repo&gt;unfold())
+                       .onOutput(addRepoTo(adapter))
+                       .onError(showToast(this))
+                       .immediately();
+            }
+
+            public interface GitHubService {
+
+                &commat;GET("users/{user}/repos")
+                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+            }
+
+            public static class Repo {
+
+                public String id;
+
+                public String name;
+
+                &commat;Override
+                public String toString() {
+
+                    return name;
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

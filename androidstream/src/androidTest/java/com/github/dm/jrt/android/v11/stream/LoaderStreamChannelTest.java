@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
@@ -2838,12 +2839,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        ThrowException.reset();
+        final AtomicInteger count1 = new AtomicInteger();
         try {
             LoaderStreams.streamOf("test")
                          .with(loaderFrom(getActivity()))
                          .map(new UpperCase())
-                         .map(factoryOf(ThrowException.class))
+                         .map(factoryOf(ThrowException.class, count1))
                          .retry(2)
                          .afterMax(seconds(10))
                          .throwError();
@@ -2853,21 +2854,21 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
 
-        ThrowException.reset();
+        final AtomicInteger count2 = new AtomicInteger();
         assertThat(LoaderStreams.streamOf("test")
                                 .with(loaderFrom(getActivity()))
                                 .map(new UpperCase())
-                                .map(factoryOf(ThrowException.class, 1))
+                                .map(factoryOf(ThrowException.class, count2, 1))
                                 .retry(2)
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("TEST");
 
-        ThrowException.reset();
+        final AtomicInteger count3 = new AtomicInteger();
         try {
             LoaderStreams.streamOf("test")
                          .with(loaderFrom(getActivity()))
                          .map(new AbortInvocation())
-                         .map(factoryOf(ThrowException.class))
+                         .map(factoryOf(ThrowException.class, count3))
                          .retry(2)
                          .afterMax(seconds(10))
                          .throwError();
@@ -3561,30 +3562,26 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("unused")
     private static class ThrowException extends TemplateInvocation<Object, Object> {
 
-        private static int sCount;
+        private final AtomicInteger mCount;
 
         private final int mMaxCount;
 
-        private ThrowException() {
+        private ThrowException(@NotNull final AtomicInteger count) {
 
-            this(Integer.MAX_VALUE);
+            this(count, Integer.MAX_VALUE);
         }
 
-        private ThrowException(final int maxCount) {
+        private ThrowException(@NotNull final AtomicInteger count, final int maxCount) {
 
+            mCount = count;
             mMaxCount = maxCount;
-        }
-
-        private static void reset() {
-
-            sCount = 0;
         }
 
         @Override
         public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
                 Exception {
 
-            if (sCount++ < mMaxCount) {
+            if (mCount.getAndIncrement() < mMaxCount) {
                 throw new IllegalStateException();
             }
 

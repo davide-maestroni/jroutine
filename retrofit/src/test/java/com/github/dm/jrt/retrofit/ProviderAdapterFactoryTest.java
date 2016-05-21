@@ -109,8 +109,7 @@ public class ProviderAdapterFactoryTest {
         {
             final ProviderAdapterFactory adapterFactory = //
                     ProviderAdapterFactory.builder()
-                                          .whenMissingAnnotation(defaultFactory)
-                                          .whenMissingName(defaultFactory)
+                                          .whenMissing(defaultFactory)
                                           .add("list", factory1)
                                           .buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();

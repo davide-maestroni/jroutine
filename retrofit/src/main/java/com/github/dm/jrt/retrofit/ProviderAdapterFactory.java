@@ -167,6 +167,20 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
         }
 
         /**
+         * Sets the factory to be used when the annotation or a matching name is missing.
+         *
+         * @param factory the factory instance.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder whenMissing(@Nullable final CallAdapter.Factory factory) {
+
+            mMissingAnnotationFactory = factory;
+            mMissingNameFactory = factory;
+            return this;
+        }
+
+        /**
          * Sets the factory to be used when the annotation is missing.
          *
          * @param factory the factory instance.

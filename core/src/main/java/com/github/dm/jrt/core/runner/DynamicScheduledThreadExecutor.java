@@ -128,6 +128,9 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      */
     private static class NonRejectingQueue extends SynchronousQueue<Runnable> {
 
+        // Just don't care...
+        private static final long serialVersionUID = -1;
+
         @Override
         public boolean offer(final Runnable runnable) {
 

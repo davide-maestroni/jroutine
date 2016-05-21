@@ -118,26 +118,15 @@ public class LoaderAdapterFactory extends AbstractAdapterFactory {
     }
 
     /**
-     * Returns the default factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public static LoaderAdapterFactory defaultFactory() {
-
-        return sFactory;
-    }
-
-    /**
      * Returns the a factory instance with default configuration.
      *
      * @param context the loader context.
      * @return the factory instance.
      */
     @NotNull
-    public static LoaderAdapterFactory defaultFactory(@Nullable final LoaderContext context) {
+    public static LoaderAdapterFactory with(@Nullable final LoaderContext context) {
 
-        return (context == null) ? defaultFactory()
+        return (context == null) ? sFactory
                 : new LoaderAdapterFactory(context, InvocationConfiguration.defaultConfiguration(),
                         LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
     }

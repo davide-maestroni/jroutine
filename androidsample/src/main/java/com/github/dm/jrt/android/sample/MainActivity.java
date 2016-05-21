@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.github.dm.jrt.android.v4.retrofit.LoaderAdapterFactoryCompat;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -64,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        final OutputChannelCallAdapterFactory adapterFactory =
-                OutputChannelCallAdapterFactory.with(loaderFrom(this));
+        final LoaderAdapterFactoryCompat adapterFactory =
+                LoaderAdapterFactoryCompat.with(loaderFrom(this));
         final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(GsonConverterFactory.create())

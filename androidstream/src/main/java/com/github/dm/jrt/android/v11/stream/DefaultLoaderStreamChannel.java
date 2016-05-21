@@ -487,7 +487,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, OUT> onError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
-        checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannel<IN, OUT>) super.onError(consumer);
     }
 
@@ -495,7 +494,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public LoaderStreamChannel<IN, Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
 
-        checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannel<IN, Void>) super.onOutput(consumer);
     }
 
@@ -879,7 +877,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
-        checkStatic(wrap(function), function);
         return (LoaderStreamChannel<IN, OUT>) super.tryCatch(function);
     }
 
@@ -889,7 +886,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
-        checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannel<IN, OUT>) super.tryCatchMore(consumer);
     }
 
@@ -897,7 +893,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public LoaderStreamChannel<IN, OUT> tryFinally(@NotNull final Runnable runnable) {
 
-        checkStatic("runnable", runnable);
         return (LoaderStreamChannel<IN, OUT>) super.tryFinally(runnable);
     }
 

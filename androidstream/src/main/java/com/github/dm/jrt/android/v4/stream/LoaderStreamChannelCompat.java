@@ -558,7 +558,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
@@ -568,7 +568,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
@@ -577,7 +577,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
@@ -586,7 +586,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
@@ -595,7 +595,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> function);
@@ -604,7 +604,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -612,7 +612,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -620,7 +620,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 

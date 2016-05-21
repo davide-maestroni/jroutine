@@ -45,8 +45,8 @@ import java.lang.annotation.Target;
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p>
- * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * Remember also that, in order for the annotation to properly work at run time, the following rules
+ * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

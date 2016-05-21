@@ -54,8 +54,6 @@ public class Runners {
      *
      * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
      * @param maximumPoolSize the maximum number of threads to allow in the pool.
-     * @param queueLimit      the number of scheduled tasks that must be in the queue, before a new
-     *                        thread is allocated.
      * @param keepAliveTime   when the number of threads is greater than the core one, this is the
      *                        maximum time that excess idle threads will wait for new tasks before
      *                        terminating.
@@ -64,16 +62,15 @@ public class Runners {
      * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
      *                                            <li>{@code corePoolSize < 0}</li>
      *                                            <li>{@code maximumPoolSize <= 0}</li>
-     *                                            <li>{@code queueLimit <= 0}</li>
      *                                            <li>{@code keepAliveTime < 0}</li></ul>
      */
     @NotNull
     public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
-            final int queueLimit, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
+            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
         return scheduledRunner(
-                new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, queueLimit,
-                        keepAliveTime, keepAliveUnit));
+                new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                        keepAliveUnit));
     }
 
     /**
@@ -145,8 +142,8 @@ public class Runners {
         synchronized (sMutex) {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
-                sSharedRunner = dynamicPoolRunner((processors <= 2) ? processors : processors - 1,
-                        (processors << 2) - 1, 10, 3, TimeUnit.SECONDS);
+                sSharedRunner = dynamicPoolRunner(Math.max(2, processors >> 1),
+                        Math.max(2, (processors << 2) - 1), 30L, TimeUnit.SECONDS);
             }
 
             return sSharedRunner;

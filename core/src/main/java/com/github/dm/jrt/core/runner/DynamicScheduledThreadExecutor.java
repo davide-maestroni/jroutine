@@ -20,12 +20,10 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +44,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      *
      * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
      * @param maximumPoolSize the maximum number of threads to allow in the pool.
-     * @param queueLimit      the number of scheduled tasks that must be in the queue, before a new
-     *                        thread is allocated.
      * @param keepAliveTime   when the number of threads is greater than the core, this is the
      *                        maximum time that excess idle threads will wait for new tasks before
      *                        terminating.
@@ -55,19 +51,15 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
      *                                            <li>{@code corePoolSize < 0}</li>
      *                                            <li>{@code maximumPoolSize <= 0}</li>
-     *                                            <li>{@code queueLimit <= 0}</li>
      *                                            <li>{@code keepAliveTime < 0}</li></ul>
      */
     DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
-            final int queueLimit, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
+            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
         super(1);
-        final RejectingBlockingQueue internalQueue = new RejectingBlockingQueue(queueLimit);
-        final QueueRejectedExecutionHandler rejectedExecutionHandler =
-                new QueueRejectedExecutionHandler(internalQueue);
         mExecutor =
                 new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                        internalQueue, rejectedExecutionHandler);
+                        new NonRejectingQueue());
     }
 
     @NotNull
@@ -131,94 +123,22 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Handler of rejected execution queueing the rejected command.
+     * Implementation of a synchronous queue, which avoids rejection of tasks by forcedly waiting
+     * for available threads.
      */
-    private static class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
-
-        private final RejectingBlockingQueue mQueue;
-
-        /**
-         * Constructor.
-         *
-         * @param queue the command queue.
-         */
-        private QueueRejectedExecutionHandler(@NotNull final RejectingBlockingQueue queue) {
-
-            mQueue = queue;
-        }
-
-        public void rejectedExecution(final Runnable runnable,
-                final ThreadPoolExecutor threadPoolExecutor) {
-
-            mQueue.push(runnable);
-        }
-    }
-
-    /**
-     * Implementation of a blocking queue rejecting the addition of any new element.
-     */
-    private static class RejectingBlockingQueue extends LinkedBlockingQueue<Runnable> {
-
-        // Just don't care...
-        private static final long serialVersionUID = -1;
-
-        private final int mLimit;
-
-        /**
-         * Constructor.
-         *
-         * @param queueLimit the number of scheduled tasks that must be in the queue, before a new
-         *                   thread is allocated.
-         */
-        private RejectingBlockingQueue(final int queueLimit) {
-
-            mLimit = ConstantConditions.notNegative("queue limit", queueLimit);
-        }
+    private static class NonRejectingQueue extends SynchronousQueue<Runnable> {
 
         @Override
-        public boolean add(final Runnable runnable) {
+        public boolean offer(final Runnable runnable) {
 
-            return (size() < mLimit) && super.add(runnable);
-        }
+            try {
+                put(runnable);
 
-        @Override
-        public boolean addAll(final Collection<? extends Runnable> collection) {
-
-            return (size() + collection.size() <= mLimit) && super.addAll(collection);
-        }
-
-        @Override
-        public int remainingCapacity() {
-
-            return Math.max(0, mLimit - size());
-        }
-
-        @Override
-        public void put(final Runnable runnable) throws InterruptedException {
-
-            if (size() >= mLimit) {
-                throw new InterruptedException();
+            } catch (final InterruptedException ignored) {
+                return false;
             }
 
-            super.put(runnable);
-        }
-
-        @Override
-        public boolean offer(final Runnable runnable, final long timeout,
-                final TimeUnit timeUnit) throws InterruptedException {
-
-            return (size() < mLimit) && super.offer(runnable, timeout, timeUnit);
-        }
-
-        @Override
-        public boolean offer(@NotNull final Runnable runnable) {
-
-            return (size() < mLimit) && super.offer(runnable);
-        }
-
-        private boolean push(@NotNull final Runnable runnable) {
-
-            return super.offer(runnable);
+            return true;
         }
     }
 }

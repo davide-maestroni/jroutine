@@ -62,8 +62,8 @@ import java.lang.annotation.Target;
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link AsyncOut.OutputMode#VALUE VALUE} by default).
  * <p>
- * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * Remember also that, in order for the annotation to properly work at run time, the following rules
+ * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

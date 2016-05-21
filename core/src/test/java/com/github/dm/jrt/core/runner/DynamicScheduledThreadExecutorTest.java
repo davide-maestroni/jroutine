@@ -34,7 +34,7 @@ public class DynamicScheduledThreadExecutorTest {
     public void testUnsupportedMethods() {
 
         final DynamicScheduledThreadExecutor executor =
-                new DynamicScheduledThreadExecutor(1, 1, 0, 1, TimeUnit.SECONDS);
+                new DynamicScheduledThreadExecutor(1, 1, 1, TimeUnit.SECONDS);
         try {
             executor.schedule(new Callable<Object>() {
 

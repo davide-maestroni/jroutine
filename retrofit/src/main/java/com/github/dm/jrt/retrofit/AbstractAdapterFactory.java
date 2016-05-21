@@ -18,7 +18,9 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -30,6 +32,7 @@ import com.github.dm.jrt.stream.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -46,8 +49,15 @@ import retrofit2.Retrofit;
  */
 public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
-    private static final RetrofitCallInvocation<Object> sCallInvocation =
-            new RetrofitCallInvocation<Object>();
+    private static final MappingInvocation<Call<Object>, Object> sCallInvocation =
+            new MappingInvocation<Call<Object>, Object>(null) {
+
+                public void onInput(final Call<Object> input,
+                        @NotNull final ResultChannel<Object> result) throws IOException {
+
+                    result.pass(input.execute().body());
+                }
+            };
 
     private final InvocationConfiguration mConfiguration;
 

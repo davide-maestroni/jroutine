@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
@@ -28,17 +28,18 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamsCompat;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
-import com.github.dm.jrt.retrofit.RetrofitCallInvocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -58,27 +59,30 @@ import retrofit2.Retrofit;
  */
 public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
 
-    private static final RetrofitCallInvocation<Object> sCallInvocation =
-            new RetrofitCallInvocation<Object>();
+    private static final TemplateContextInvocation<Call<Object>, Object> sCallInvocation =
+            new TemplateContextInvocation<Call<Object>, Object>() {
 
-    private static final LoaderAdapterFactoryCompat sFactory =
-            new LoaderAdapterFactoryCompat(null, InvocationConfiguration.defaultConfiguration(),
-                    LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+                public void onInput(final Call<Object> input,
+                        @NotNull final ResultChannel<Object> result) throws IOException {
 
-    private static final ContextInvocationWrapper<Call<Object>, Object> sInvocationWrapper =
-            new ContextInvocationWrapper<Call<Object>, Object>(sCallInvocation);
+                    result.pass(input.execute().body());
+                }
+            };
 
     private static final ContextInvocationFactory<Call<Object>, Object> sCallInvocationFactory =
             new ContextInvocationFactory<Call<Object>, Object>(null) {
 
                 @NotNull
                 @Override
-                @SuppressWarnings("unchecked")
                 public ContextInvocation<Call<Object>, Object> newInvocation() {
 
-                    return sInvocationWrapper;
+                    return sCallInvocation;
                 }
             };
+
+    private static final LoaderAdapterFactoryCompat sFactory =
+            new LoaderAdapterFactoryCompat(null, InvocationConfiguration.defaultConfiguration(),
+                    LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
 
     private final LoaderConfiguration mLoaderConfiguration;
 

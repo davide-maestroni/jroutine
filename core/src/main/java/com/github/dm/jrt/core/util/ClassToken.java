@@ -31,8 +31,8 @@ import java.lang.reflect.Type;
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p>
- * Remember that, in order for the work around to properly work at run time, you will need to add
- * the following rule to your Proguard file (if employing it for shrinking or obfuscation):
+ * Remember also that, in order for the annotation to properly work at run time, the following rules
+ * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

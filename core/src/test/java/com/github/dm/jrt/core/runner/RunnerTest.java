@@ -66,9 +66,9 @@ public class RunnerTest {
     public void testDynamicPoolRunner() throws InterruptedException {
 
         testRunner(Runners.sharedRunner());
-        testRunner(Runners.dynamicPoolRunner(3, 4, 20, 5L, TimeUnit.SECONDS));
+        testRunner(Runners.dynamicPoolRunner(3, 4, 5L, TimeUnit.SECONDS));
         testRunner(new RunnerDecorator(Runners.sharedRunner()));
-        testRunner(new RunnerDecorator(Runners.dynamicPoolRunner(1, 4, 10, 0L, TimeUnit.SECONDS)));
+        testRunner(new RunnerDecorator(Runners.dynamicPoolRunner(1, 4, 0L, TimeUnit.SECONDS)));
     }
 
     @Test

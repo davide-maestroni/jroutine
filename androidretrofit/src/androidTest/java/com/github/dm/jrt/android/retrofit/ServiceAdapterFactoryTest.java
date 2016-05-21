@@ -234,7 +234,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .with(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
-                                             .withReadTimeout(seconds(100000))
+                                             .withReadTimeout(seconds(10))
                                              .apply()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

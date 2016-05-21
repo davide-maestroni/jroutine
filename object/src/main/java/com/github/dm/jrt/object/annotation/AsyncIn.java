@@ -56,8 +56,8 @@ import java.lang.annotation.Target;
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
- * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * Remember also that, in order for the annotation to properly work at run time, the following rules
+ * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>
  *     <code>
  *

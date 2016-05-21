@@ -118,7 +118,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             mChannel = channel;
         }
 
-        public void onComplete() throws Exception {
+        public void onComplete() {
 
             try {
                 mChannel.close();
@@ -128,7 +128,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             }
         }
 
-        public void onError(@NotNull final RoutineException error) throws Exception {
+        public void onError(@NotNull final RoutineException error) {
 
             try {
                 mChannel.abort(error);
@@ -138,7 +138,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             }
         }
 
-        public void onOutput(final IN output) throws Exception {
+        public void onOutput(final IN output) {
 
             try {
                 mChannel.pass(output);

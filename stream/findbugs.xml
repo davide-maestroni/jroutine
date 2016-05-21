@@ -20,4 +20,13 @@
         <!-- Too many false positives... -->
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
     </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.stream.RetryOutputConsumer$SafeOutputConsumer"/>
+        <Or>
+            <Method name="onComplete"/>
+            <Method name="onError"/>
+            <Method name="onOutput"/>
+        </Or>
+        <Bug pattern="DE_MIGHT_IGNORE"/>
+    </Match>
 </FindBugsFilter>

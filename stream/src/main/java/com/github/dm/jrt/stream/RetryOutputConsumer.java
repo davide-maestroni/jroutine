@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -84,6 +85,70 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         mOutputChannel.pass(mOutputs).close();
     }
 
+    public void run() {
+
+        final IOChannel<IN> channel = JRoutineCore.io().buildChannel();
+        mInputChannel.bind(new SafeOutputConsumer<IN>(channel));
+        try {
+            mBind.apply(channel).bind(this);
+
+        } catch (final Exception e) {
+            final RoutineException error = InvocationException.wrapIfNeeded(e);
+            mOutputChannel.abort(error);
+            mInputChannel.abort(error);
+        }
+    }
+
+    /**
+     * Output consumer implementation avoiding the upstream propagation of errors.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class SafeOutputConsumer<IN> implements OutputConsumer<IN> {
+
+        private final IOChannel<IN> mChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the I/O channel.
+         */
+        private SafeOutputConsumer(@NotNull final IOChannel<IN> channel) {
+
+            mChannel = channel;
+        }
+
+        public void onComplete() throws Exception {
+
+            try {
+                mChannel.close();
+
+            } catch (final Exception ignored) {
+
+            }
+        }
+
+        public void onError(@NotNull final RoutineException error) throws Exception {
+
+            try {
+                mChannel.abort(error);
+
+            } catch (final Exception ignored) {
+
+            }
+        }
+
+        public void onOutput(final IN output) throws Exception {
+
+            try {
+                mChannel.pass(output);
+
+            } catch (final Exception ignored) {
+
+            }
+        }
+    }
+
     public void onError(@NotNull final RoutineException error) throws Exception {
 
         Long delay = null;
@@ -92,25 +157,17 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         }
 
         if (delay != null) {
+            mOutputs.clear();
             mRunner.run(this, delay, TimeUnit.MILLISECONDS);
 
         } else {
             mOutputChannel.abort(error);
+            mInputChannel.abort(error);
         }
     }
 
     public void onOutput(final OUT output) {
 
         mOutputs.add(output);
-    }
-
-    public void run() {
-
-        try {
-            mBind.apply(mInputChannel).bind(this);
-
-        } catch (final Exception e) {
-            mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
-        }
     }
 }

@@ -63,6 +63,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -2223,7 +2224,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf("test")
                           .map(new UpperCase())
                           .map(factoryOf(ThrowException.class, count2, 1))
-                          .retry(2)
+                          .retry(1)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST");
 
@@ -2344,6 +2345,36 @@ public class StreamChannelTest {
                                   JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
                           .afterMax(seconds(3))
                           .all()).containsOnly(1, 2, 3);
+    }
+
+    @Test
+    public void testStart() throws InterruptedException {
+
+        final Semaphore semaphore = new Semaphore(0);
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).start();
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).startAfter(10, TimeUnit.MILLISECONDS);
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).startAfter(millis(10));
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
     }
 
     @Test
@@ -2885,7 +2916,7 @@ public class StreamChannelTest {
                                    }
                                });
         try {
-            stream.immediately();
+            stream.start();
             fail();
 
         } catch (final StreamException e) {

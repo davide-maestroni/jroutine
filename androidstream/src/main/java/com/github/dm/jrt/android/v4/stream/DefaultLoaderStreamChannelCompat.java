@@ -771,6 +771,28 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> start() {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.start();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> startAfter(@NotNull final UnitDuration delay) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.startAfter(delay);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> startAfter(final long delay,
+            @NotNull final TimeUnit timeUnit) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.startAfter(delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamInvocationConfiguration() {
 

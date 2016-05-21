@@ -619,6 +619,27 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> start();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> startAfter(@NotNull UnitDuration delay);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> startAfter(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannel<IN, OUT>>
     streamInvocationConfiguration();
 

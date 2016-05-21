@@ -31,10 +31,13 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -735,6 +738,27 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> start() {
+
+        bind();
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> startAfter(@NotNull final UnitDuration delay) {
+
+        return startAfter(delay.value, delay.unit);
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> startAfter(final long delay, @NotNull final TimeUnit timeUnit) {
+
+        final Runner runner = buildConfiguration().getRunnerOrElse(Runners.sharedRunner());
+        runner.run(new BindExecution(this), delay, timeUnit);
+        return this;
+    }
+
+    @NotNull
     public Builder<? extends StreamChannel<IN, OUT>> streamInvocationConfiguration() {
 
         return new Builder<StreamChannel<IN, OUT>>(mStreamConfigurable, mStreamConfiguration);
@@ -1093,6 +1117,26 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(buildConfiguration(), factory);
+    }
+
+    private static class BindExecution implements Execution {
+
+        private final AbstractStreamChannel<?, ?> mChannel;
+
+        private BindExecution(@NotNull final AbstractStreamChannel<?, ?> channel) {
+
+            mChannel = channel;
+        }
+
+        public void run() {
+
+            try {
+                mChannel.bind();
+
+            } catch (final Throwable t) {
+                InvocationInterruptedException.throwIfInterrupt(t);
+            }
+        }
     }
 
     /**

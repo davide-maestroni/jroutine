@@ -70,6 +70,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1166,6 +1167,35 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                     }
                                 })
                                 .all()).containsExactly("test1test2test3");
+    }
+
+    private static void testStart(@NotNull final Activity activity) throws InterruptedException {
+
+        final Semaphore semaphore = new Semaphore(0);
+        LoaderStreams.streamOf("test").with(loaderFrom(activity)).onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).start();
+        assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
+        LoaderStreams.streamOf("test").with(loaderFrom(activity)).onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).startAfter(10, TimeUnit.MILLISECONDS);
+        assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
+        LoaderStreams.streamOf("test").with(loaderFrom(activity)).onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).startAfter(millis(10));
+        assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
     }
 
     private static void testThen(@NotNull final Activity activity) {
@@ -3006,6 +3036,15 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .splitBy(Functions.<String>identity(), loaderBuilder)
                                 .afterMax(seconds(3))
                                 .all()).containsOnly("TEST1", "TEST2", "TEST3");
+    }
+
+    public void testStart() throws InterruptedException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testStart(getActivity());
     }
 
     public void testThen() {

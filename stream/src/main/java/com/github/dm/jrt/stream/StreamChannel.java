@@ -1209,6 +1209,36 @@ public interface StreamChannel<IN, OUT>
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
+     * Initiates the flow of this stream.
+     *
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> start();
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param delay the delay.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> startAfter(@NotNull UnitDuration delay);
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> startAfter(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
      * Gets the invocation configuration builder related to the whole stream.
      * <br>
      * The configuration options will be applied to all the next concatenated routine unless

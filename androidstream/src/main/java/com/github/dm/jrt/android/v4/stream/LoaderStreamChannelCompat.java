@@ -628,6 +628,27 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> start();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> startAfter(@NotNull UnitDuration delay);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> startAfter(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamInvocationConfiguration();
 

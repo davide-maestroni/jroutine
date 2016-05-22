@@ -23,7 +23,7 @@ import android.os.Build.VERSION_CODES;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  * @param <OUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
+class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     private static final Runner sMainRunner = AndroidRunners.mainRunner();
 
@@ -86,7 +86,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         mLogger = logger.subContextLogger(this);
     }
 
-    @Override
     public void onComplete() {
 
         final boolean deliverResult;
@@ -107,7 +106,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         }
     }
 
-    @Override
     public void onError(@NotNull final RoutineException error) {
 
         final boolean deliverResult;
@@ -123,7 +121,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         }
     }
 
-    @Override
     public void onOutput(final OUT output) {
 
         final boolean deliverResult;

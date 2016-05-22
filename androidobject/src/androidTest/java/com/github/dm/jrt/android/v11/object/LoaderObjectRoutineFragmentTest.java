@@ -1148,7 +1148,8 @@ public class LoaderObjectRoutineFragmentTest
                                                                        .on(instanceOf(
                                                                                TestClass2.class))
                                                                        .invocationConfiguration()
-                                                                       .withOutputTimeout(seconds(10))
+                                                                       .withOutputTimeout(
+                                                                               seconds(10))
                                                                        .apply();
 
         long startTime = System.currentTimeMillis();

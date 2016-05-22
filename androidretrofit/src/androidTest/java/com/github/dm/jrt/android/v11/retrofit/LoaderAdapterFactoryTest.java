@@ -71,8 +71,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory =
-                        LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -332,8 +331,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory =
-                        LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())

@@ -593,7 +593,8 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
         }
 
-        final OutputTimeout outputTimeoutAnnotation = methodElement.getAnnotation(OutputTimeout.class);
+        final OutputTimeout outputTimeoutAnnotation =
+                methodElement.getAnnotation(OutputTimeout.class);
         if (outputTimeoutAnnotation != null) {
             builder.append(".withOutputTimeout(")
                    .append(outputTimeoutAnnotation.value())

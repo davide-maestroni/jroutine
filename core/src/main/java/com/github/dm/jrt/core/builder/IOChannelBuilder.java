@@ -40,6 +40,17 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
     <DATA> IOChannel<DATA> buildChannel();
 
     /**
+     * Builds and returns an I/O channel returning no data.
+     * <p>
+     * Note that the returned channel will be already closed.
+     *
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> IOChannel<DATA> of();
+
+    /**
      * Builds and returns an I/O channel returning the specified input.
      * <p>
      * Note that the returned channel will be already closed.

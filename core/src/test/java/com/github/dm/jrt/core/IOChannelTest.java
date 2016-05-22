@@ -576,6 +576,7 @@ public class IOChannelTest {
         final IOChannel<Integer> channel = JRoutineCore.io().of(2);
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.afterMax(seconds(1)).all()).containsExactly(2);
+        assertThat(JRoutineCore.io().of().afterMax(seconds(1)).all()).isEmpty();
         assertThat(JRoutineCore.io().of(-11, 73).afterMax(seconds(1)).all()).containsExactly(-11,
                 73);
         assertThat(JRoutineCore.io()

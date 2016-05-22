@@ -1210,7 +1210,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf() {
 
-        return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
+        return streamOf(JRoutineCore.io().<OUT>of());
     }
 
     /**

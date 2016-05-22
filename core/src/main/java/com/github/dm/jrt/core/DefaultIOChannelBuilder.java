@@ -56,6 +56,12 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
+    public <DATA> IOChannel<DATA> of() {
+
+        return this.<DATA>buildChannel().close();
+    }
+
+    @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
 
         return this.<DATA>buildChannel().pass(input).close();

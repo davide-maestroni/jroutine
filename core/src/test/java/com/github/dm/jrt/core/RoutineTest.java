@@ -2594,7 +2594,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withReadTimeoutAction(TimeoutActionType.ABORT)
+                            .withOutputTimeoutAction(TimeoutActionType.ABORT)
                             .apply()
                             .buildRoutine();
 
@@ -2654,8 +2654,8 @@ public class RoutineTest {
         final Routine<String, String> routine2 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withReadTimeoutAction(TimeoutActionType.ABORT)
-                            .withReadTimeout(millis(10))
+                            .withOutputTimeoutAction(TimeoutActionType.ABORT)
+                            .withOutputTimeout(millis(10))
                             .apply()
                             .buildRoutine();
 
@@ -2715,7 +2715,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withReadTimeoutAction(TimeoutActionType.THROW)
+                            .withOutputTimeoutAction(TimeoutActionType.THROW)
                             .apply()
                             .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
@@ -2831,7 +2831,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withReadTimeoutAction(TimeoutActionType.EXIT)
+                            .withOutputTimeoutAction(TimeoutActionType.EXIT)
                             .apply()
                             .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");

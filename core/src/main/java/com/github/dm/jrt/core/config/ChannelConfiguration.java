@@ -88,7 +88,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private final Level mLogLevel;
 
-    private final UnitDuration mReadTimeout;
+    private final UnitDuration mOutputTimeout;
 
     private final Runner mRunner;
 
@@ -98,7 +98,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * Constructor.
      *
      * @param runner           the runner used for asynchronous inputs.
-     * @param readTimeout      the timeout for the channel to produce an output.
+     * @param outputTimeout    the timeout for the channel to produce an output.
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         output is available.
      * @param channelOrderType the order in which data are collected from the output channel.
@@ -111,15 +111,16 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param logLevel         the log level.
      */
     private ChannelConfiguration(@Nullable final Runner runner,
-            @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final UnitDuration outputTimeout,
+            @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelLimit,
             @Nullable final Backoff channelBackoff, final int channelMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
-        super(asArgs(runner, readTimeout, actionType, channelOrderType, channelLimit,
+        super(asArgs(runner, outputTimeout, actionType, channelOrderType, channelLimit,
                 channelBackoff, channelMaxSize, log, logLevel));
         mRunner = runner;
-        mReadTimeout = readTimeout;
+        mOutputTimeout = outputTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
         mChannelLimit = channelLimit;
@@ -189,13 +190,16 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public static Builder<ChannelConfiguration> builderFromInvocation(
             @Nullable final InvocationConfiguration initialConfiguration) {
 
-        return (initialConfiguration == null) ? builder()
-                : builder().withRunner(initialConfiguration.getRunnerOrElse(null))
-                           .withReadTimeout(initialConfiguration.getReadTimeoutOrElse(null))
-                           .withReadTimeoutAction(
-                                   initialConfiguration.getReadTimeoutActionOrElse(null))
-                           .withLog(initialConfiguration.getLogOrElse(null))
-                           .withLogLevel(initialConfiguration.getLogLevelOrElse(null));
+        if (initialConfiguration == null) {
+            return builder();
+        }
+
+        return builder().withRunner(initialConfiguration.getRunnerOrElse(null))
+                        .withOutputTimeout(initialConfiguration.getOutputTimeoutOrElse(null))
+                        .withOutputTimeoutAction(
+                                initialConfiguration.getOutputTimeoutActionOrElse(null))
+                        .withLog(initialConfiguration.getLogOrElse(null))
+                        .withLogLevel(initialConfiguration.getLogLevelOrElse(null));
     }
 
     /**
@@ -325,7 +329,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getReadTimeoutActionOrElse(
+    public TimeoutActionType getOutputTimeoutActionOrElse(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -338,10 +342,10 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public UnitDuration getReadTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
+    public UnitDuration getOutputTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final UnitDuration readTimeout = mReadTimeout;
-        return (readTimeout != null) ? readTimeout : valueIfNotSet;
+        final UnitDuration outputTimeout = mOutputTimeout;
+        return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
     }
 
     /**
@@ -360,55 +364,50 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * Converts this configuration into an invocation one by applying the matching options to the
      * invocation input channel.
      *
-     * @return the invocation configuration.
+     * @return the invocation configuration builder.
      */
     @NotNull
-    public InvocationConfiguration toInputChannelConfiguration() {
+    public InvocationConfiguration.Builder<InvocationConfiguration> toInputChannelConfiguration() {
 
-        return toInvocationConfiguration().builderFrom()
-                                          .withInputOrder(getChannelOrderTypeOrElse(null))
+        return toInvocationConfiguration().withInputOrder(getChannelOrderTypeOrElse(null))
                                           .withInputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .withInputBackoff(getChannelBackoffOrElse(null))
                                           .withInputMaxSize(getChannelMaxSizeOrElse(
-                                                  InvocationConfiguration.DEFAULT))
-                                          .apply();
+                                                  InvocationConfiguration.DEFAULT));
     }
 
     /**
      * Converts this configuration into an invocation one by mapping the matching options.
      *
-     * @return the invocation configuration.
+     * @return the invocation configuration builder.
      */
     @NotNull
-    public InvocationConfiguration toInvocationConfiguration() {
+    public InvocationConfiguration.Builder<InvocationConfiguration> toInvocationConfiguration() {
 
         return InvocationConfiguration.builder()
                                       .withRunner(getRunnerOrElse(null))
-                                      .withReadTimeout(getReadTimeoutOrElse(null))
-                                      .withReadTimeoutAction(getReadTimeoutActionOrElse(null))
+                                      .withOutputTimeout(getOutputTimeoutOrElse(null))
+                                      .withOutputTimeoutAction(getOutputTimeoutActionOrElse(null))
                                       .withLog(getLogOrElse(null))
-                                      .withLogLevel(getLogLevelOrElse(null))
-                                      .apply();
+                                      .withLogLevel(getLogLevelOrElse(null));
     }
 
     /**
      * Converts this configuration into an invocation one by applying the matching options to the
      * invocation output channel.
      *
-     * @return the invocation configuration.
+     * @return the invocation configuration builder.
      */
     @NotNull
-    public InvocationConfiguration toOutputChannelConfiguration() {
+    public InvocationConfiguration.Builder<InvocationConfiguration> toOutputChannelConfiguration() {
 
-        return toInvocationConfiguration().builderFrom()
-                                          .withOutputOrder(getChannelOrderTypeOrElse(null))
+        return toInvocationConfiguration().withOutputOrder(getChannelOrderTypeOrElse(null))
                                           .withOutputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .withOutputBackoff(getChannelBackoffOrElse(null))
                                           .withOutputMaxSize(getChannelMaxSizeOrElse(
-                                                  InvocationConfiguration.DEFAULT))
-                                          .apply();
+                                                  InvocationConfiguration.DEFAULT));
     }
 
     /**
@@ -449,7 +448,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         private Level mLogLevel;
 
-        private UnitDuration mReadTimeout;
+        private UnitDuration mOutputTimeout;
 
         private Runner mRunner;
 
@@ -512,14 +511,14 @@ public final class ChannelConfiguration extends DeepEqualObject {
                 withRunner(runner);
             }
 
-            final UnitDuration readTimeout = configuration.mReadTimeout;
-            if (readTimeout != null) {
-                withReadTimeout(readTimeout);
+            final UnitDuration outputTimeout = configuration.mOutputTimeout;
+            if (outputTimeout != null) {
+                withOutputTimeout(outputTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
             if (timeoutActionType != null) {
-                withReadTimeoutAction(timeoutActionType);
+                withOutputTimeoutAction(timeoutActionType);
             }
 
             final OrderType orderType = configuration.mChannelOrderType;
@@ -713,9 +712,10 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
+        public Builder<TYPE> withOutputTimeout(final long timeout,
+                @NotNull final TimeUnit timeUnit) {
 
-            return withReadTimeout(fromUnit(timeout, timeUnit));
+            return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -729,9 +729,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(@Nullable final UnitDuration timeout) {
+        public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
 
-            mReadTimeout = timeout;
+            mOutputTimeout = timeout;
             return this;
         }
 
@@ -747,7 +747,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
             return this;
@@ -770,7 +770,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         @NotNull
         private ChannelConfiguration buildConfiguration() {
 
-            return new ChannelConfiguration(mRunner, mReadTimeout, mTimeoutActionType,
+            return new ChannelConfiguration(mRunner, mOutputTimeout, mTimeoutActionType,
                     mChannelOrderType, mChannelLimit, mChannelBackoff, mChannelMaxSize, mLog,
                     mLogLevel);
         }
@@ -778,7 +778,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
             mRunner = configuration.mRunner;
-            mReadTimeout = configuration.mReadTimeout;
+            mOutputTimeout = configuration.mOutputTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
             mChannelLimit = configuration.mChannelLimit;

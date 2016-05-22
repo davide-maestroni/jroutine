@@ -16,15 +16,16 @@
 
 package com.github.dm.jrt.object.annotation;
 
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Through this annotation it is possible to indicate the timeout for a readable result to become
- * available.
+ * Through this annotation it is possible to indicate the action to be taken when the timeout for a
+ * readable result to become available elapses.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -46,30 +47,23 @@ import java.util.concurrent.TimeUnit;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.ReadTimeout *;
+ *              &#64;com.github.dm.jrt.object.annotation.OutputTimeoutAction *;
  *         }
  *     </code>
  * </pre>
  * <p>
- * Created by davide-maestroni on 09/21/2014.
+ * Created by davide-maestroni on 04/08/2015.
  *
  * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ReadTimeout {
+public @interface OutputTimeoutAction {
 
     /**
-     * The time unit of the timeout for an invocation instance to produce a result.
+     * The type of action to be taken on output channel timeout.
      *
-     * @return the time unit.
+     * @return the action type.
      */
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for an invocation instance to produce a result.
-     *
-     * @return the timeout.
-     */
-    long value();
+    TimeoutActionType value();
 }

@@ -293,7 +293,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                 stream.sync();
             }
 
-            return stream.map(getRoutine());
+            return stream.map(getRoutine()).invocationMode(invocationMode);
         }
     }
 }

@@ -43,9 +43,9 @@ import com.github.dm.jrt.object.annotation.AsyncMethod;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.Invoke;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
-import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
+import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -351,7 +351,7 @@ public class ProxyRoutineTest {
         final TestClass2 test = new TestClass2();
         final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
                                                          .invocationConfiguration()
-                                                         .withReadTimeout(seconds(2))
+                                                         .withOutputTimeout(seconds(2))
                                                          .apply();
 
         long startTime = System.currentTimeMillis();
@@ -388,7 +388,7 @@ public class ProxyRoutineTest {
         final Impl impl = new Impl();
         final Itf itf = JRoutineProxy.on(instance(impl))
                                      .invocationConfiguration()
-                                     .withReadTimeout(seconds(10))
+                                     .withOutputTimeout(seconds(10))
                                      .apply()
                                      .buildProxy(Itf.class);
 
@@ -600,7 +600,7 @@ public class ProxyRoutineTest {
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineProxy.on(instance(testTimeout))
                                 .invocationConfiguration()
-                                .withReadTimeout(seconds(1))
+                                .withOutputTimeout(seconds(1))
                                 .apply()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt()).isEqualTo(31);
@@ -609,7 +609,7 @@ public class ProxyRoutineTest {
 
             JRoutineProxy.on(instance(testTimeout))
                          .invocationConfiguration()
-                         .withReadTimeoutAction(TimeoutActionType.THROW)
+                         .withOutputTimeoutAction(TimeoutActionType.THROW)
                          .apply()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
@@ -1020,7 +1020,7 @@ public class ProxyRoutineTest {
     @Proxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getOne();
     }
@@ -1041,25 +1041,25 @@ public class ProxyRoutineTest {
             classPackage = "com.github.dm.jrt.proxy")
     public interface TestProxy {
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
         @AsyncOut
         Iterable<Iterable> getList(@AsyncIn(List.class) OutputChannel<List<String>> i);
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         String getString(@AsyncIn(int.class) OutputChannel<Integer> i);
 
         @Alias("getString")
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
         String getStringParallel1(@AsyncIn(int.class) OutputChannel<Integer> i);
 
         @Alias("getString")
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
         @AsyncOut
         OutputChannel<String> getStringParallel2(@AsyncIn(int.class) OutputChannel<Integer> i);
@@ -1068,11 +1068,11 @@ public class ProxyRoutineTest {
     @Proxy(TestClass.class)
     public interface TestStatic {
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getTwo();
     }
@@ -1080,7 +1080,7 @@ public class ProxyRoutineTest {
     @Proxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
-        @ReadTimeoutAction(TimeoutActionType.ABORT)
+        @OutputTimeoutAction(TimeoutActionType.ABORT)
         int getInt();
     }
 

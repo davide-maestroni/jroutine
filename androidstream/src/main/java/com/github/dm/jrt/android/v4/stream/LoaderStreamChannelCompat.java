@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
@@ -296,6 +297,13 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     invocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    LoaderStreamChannelCompat<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * {@inheritDoc}

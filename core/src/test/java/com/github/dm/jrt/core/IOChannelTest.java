@@ -647,8 +647,8 @@ public class IOChannelTest {
 
         final IOChannel<Object> channel1 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withReadTimeout(millis(10))
-                                                       .withReadTimeoutAction(
+                                                       .withOutputTimeout(millis(10))
+                                                       .withOutputTimeoutAction(
                                                                TimeoutActionType.EXIT)
                                                        .apply()
                                                        .buildChannel();
@@ -661,8 +661,8 @@ public class IOChannelTest {
 
         final IOChannel<Object> channel2 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withReadTimeout(millis(10))
-                                                       .withReadTimeoutAction(
+                                                       .withOutputTimeout(millis(10))
+                                                       .withOutputTimeoutAction(
                                                                TimeoutActionType.ABORT)
                                                        .apply()
                                                        .buildChannel();
@@ -683,8 +683,8 @@ public class IOChannelTest {
 
         final IOChannel<Object> channel3 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withReadTimeout(millis(10))
-                                                       .withReadTimeoutAction(
+                                                       .withOutputTimeout(millis(10))
+                                                       .withOutputTimeoutAction(
                                                                TimeoutActionType.THROW)
                                                        .apply()
                                                        .buildChannel();

@@ -562,7 +562,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(LoaderStreams.blend(channel2, channel1)
                                 .channelConfiguration()
                                 .withChannelOrder(OrderType.BY_CALL)
-                                .withReadTimeout(seconds(10))
+                                .withOutputTimeout(seconds(10))
                                 .apply()
                                 .buildChannels()
                                 .all()).containsExactly("test4", "test5", "test6", "test1", "test2",

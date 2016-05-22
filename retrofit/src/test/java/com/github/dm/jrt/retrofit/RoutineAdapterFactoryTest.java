@@ -58,7 +58,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .invocationConfiguration()
-                                             .withReadTimeout(seconds(3))
+                                             .withOutputTimeout(seconds(3))
                                              .apply()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -86,7 +86,7 @@ public class RoutineAdapterFactoryTest {
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
-                                             .withReadTimeout(seconds(3))
+                                             .withOutputTimeout(seconds(3))
                                              .apply()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -114,7 +114,7 @@ public class RoutineAdapterFactoryTest {
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
-                                             .withReadTimeout(seconds(3))
+                                             .withOutputTimeout(seconds(3))
                                              .apply()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -142,7 +142,7 @@ public class RoutineAdapterFactoryTest {
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.SERIAL)
                                              .invocationConfiguration()
-                                             .withReadTimeout(seconds(3))
+                                             .withOutputTimeout(seconds(3))
                                              .apply()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

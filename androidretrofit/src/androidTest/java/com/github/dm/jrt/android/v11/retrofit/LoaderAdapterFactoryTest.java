@@ -206,7 +206,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                         LoaderAdapterFactory.builder()
                                             .with(context)
                                             .invocationConfiguration()
-                                            .withReadTimeout(seconds(10))
+                                            .withOutputTimeout(seconds(10))
                                             .apply()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -235,7 +235,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                             .with(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .invocationConfiguration()
-                                            .withReadTimeout(seconds(10))
+                                            .withOutputTimeout(seconds(10))
                                             .apply()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -264,7 +264,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                             .with(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .invocationConfiguration()
-                                            .withReadTimeout(seconds(10))
+                                            .withOutputTimeout(seconds(10))
                                             .apply()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -293,7 +293,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                             .with(context)
                                             .invocationMode(InvocationMode.SERIAL)
                                             .invocationConfiguration()
-                                            .withReadTimeout(seconds(10))
+                                            .withOutputTimeout(seconds(10))
                                             .apply()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

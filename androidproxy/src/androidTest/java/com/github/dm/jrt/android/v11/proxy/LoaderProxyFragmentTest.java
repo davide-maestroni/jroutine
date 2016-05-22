@@ -49,8 +49,8 @@ import com.github.dm.jrt.object.annotation.AsyncMethod;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
-import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
+import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -125,7 +125,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.with(loaderFrom(fragment))
                                                                      .on(instanceOf(TestList.class))
                                                                      .invocationConfiguration()
-                                                                     .withReadTimeout(seconds(10))
+                                                                     .withOutputTimeout(seconds(10))
                                                                      .apply();
 
         final TestListItf<String> testListItf1 =
@@ -385,7 +385,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                      .on(instanceOf(
                                                                              TestClass2.class))
                                                                      .invocationConfiguration()
-                                                                     .withReadTimeout(seconds(10))
+                                                                     .withOutputTimeout(seconds(10))
                                                                      .apply();
 
         long startTime = System.currentTimeMillis();
@@ -430,7 +430,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final Itf itf = JRoutineLoaderProxy.with(loaderFrom(fragment))
                                            .on(instanceOf(Impl.class))
                                            .invocationConfiguration()
-                                           .withReadTimeout(seconds(10))
+                                           .withOutputTimeout(seconds(10))
                                            .apply()
                                            .buildProxy(Itf.class);
 
@@ -649,7 +649,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderProxy.with(loaderFrom(fragment))
                                       .on(instanceOf(TestTimeout.class))
                                       .invocationConfiguration()
-                                      .withReadTimeout(seconds(10))
+                                      .withOutputTimeout(seconds(10))
                                       .apply()
                                       .buildProxy(TestTimeoutItf.class)
                                       .getInt()).isEqualTo(31);
@@ -659,7 +659,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
             JRoutineLoaderProxy.with(loaderFrom(fragment))
                                .on(instanceOf(TestTimeout.class))
                                .invocationConfiguration()
-                               .withReadTimeoutAction(TimeoutActionType.THROW)
+                               .withOutputTimeoutAction(TimeoutActionType.THROW)
                                .apply()
                                .buildProxy(TestTimeoutItf.class)
                                .getInt();
@@ -1046,7 +1046,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     @LoaderProxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @AsyncOut
         OutputChannel<Integer> getOne();
     }
@@ -1067,25 +1067,25 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
             classPackage = "com.github.dm.jrt.android.proxy")
     public interface TestProxy {
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @AsyncOut
         Iterable<Iterable> getList(@AsyncIn(List.class) OutputChannel<List<String>> i);
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @AsyncOut
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         String getString(@AsyncIn(int.class) OutputChannel<Integer> i);
 
         @Alias("getString")
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         String getStringParallel1(@AsyncIn(int.class) OutputChannel<Integer> i);
 
         @Alias("getString")
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @AsyncOut
         OutputChannel<String> getStringParallel2(@AsyncIn(int.class) OutputChannel<Integer> i);
@@ -1094,11 +1094,11 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     @LoaderProxy(TestClass.class)
     public interface TestStatic {
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @AsyncOut
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(10000)
+        @OutputTimeout(10000)
         @AsyncOut
         OutputChannel<Integer> getTwo();
     }
@@ -1106,7 +1106,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     @LoaderProxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
-        @ReadTimeoutAction(TimeoutActionType.ABORT)
+        @OutputTimeoutAction(TimeoutActionType.ABORT)
         int getInt();
     }
 

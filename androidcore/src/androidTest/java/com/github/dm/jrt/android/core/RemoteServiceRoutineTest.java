@@ -206,8 +206,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
                                .invocationConfiguration()
-                               .withReadTimeout(millis(10))
-                               .withReadTimeoutAction(TimeoutActionType.EXIT)
+                               .withOutputTimeout(millis(10))
+                               .withOutputTimeoutAction(TimeoutActionType.EXIT)
                                .apply()
                                .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
@@ -220,8 +220,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
                                .invocationConfiguration()
-                               .withReadTimeout(millis(10))
-                               .withReadTimeoutAction(TimeoutActionType.ABORT)
+                               .withOutputTimeout(millis(10))
+                               .withOutputTimeoutAction(TimeoutActionType.ABORT)
                                .apply()
                                .asyncCall("test2");
 
@@ -244,8 +244,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
                                .invocationConfiguration()
-                               .withReadTimeout(millis(10))
-                               .withReadTimeoutAction(TimeoutActionType.THROW)
+                               .withOutputTimeout(millis(10))
+                               .withOutputTimeoutAction(TimeoutActionType.THROW)
                                .apply()
                                .asyncCall("test3");
 

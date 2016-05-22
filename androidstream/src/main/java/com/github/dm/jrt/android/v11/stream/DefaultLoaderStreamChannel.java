@@ -415,6 +415,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<IN, OUT> invocationMode(
+            @NotNull final InvocationMode invocationMode) {
+
+        return (LoaderStreamChannel<IN, OUT>) super.invocationMode(invocationMode);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> limit(final int count) {
 
         return (LoaderStreamChannel<IN, OUT>) super.limit(count);

@@ -451,7 +451,7 @@ public class StreamsTest {
         assertThat(Streams.blend(channel2, channel1)
                           .channelConfiguration()
                           .withChannelOrder(OrderType.BY_CALL)
-                          .withReadTimeout(seconds(1))
+                          .withOutputTimeout(seconds(1))
                           .apply()
                           .buildChannels()
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",

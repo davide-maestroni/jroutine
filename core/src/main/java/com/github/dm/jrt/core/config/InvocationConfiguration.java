@@ -123,9 +123,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final OrderType mOutputOrderType;
 
-    private final int mPriority;
+    private final UnitDuration mOutputTimeout;
 
-    private final UnitDuration mReadTimeout;
+    private final int mPriority;
 
     private final Runner mRunner;
 
@@ -139,7 +139,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param maxInstances    the maximum number of parallel running invocations. Must be positive.
      * @param coreInstances   the maximum number of retained invocation instances. Must not be
      *                        negative.
-     * @param readTimeout     the timeout for an invocation instance to produce a result.
+     * @param outputTimeout   the timeout for an invocation instance to produce a result.
      * @param actionType      the action to be taken if the timeout elapses before a readable
      *                        result is available.
      * @param inputOrderType  the order in which input data are collected from the input channel.
@@ -159,21 +159,21 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     private InvocationConfiguration(@Nullable final Runner runner, final int priority,
             final int maxInstances, final int coreInstances,
-            @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
-            @Nullable final OrderType inputOrderType, final int inputLimit,
-            @Nullable final Backoff inputBackoff, final int inputMaxSize,
+            @Nullable final UnitDuration outputTimeout,
+            @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
+            final int inputLimit, @Nullable final Backoff inputBackoff, final int inputMaxSize,
             @Nullable final OrderType outputOrderType, final int outputLimit,
             @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
             @Nullable final Level logLevel) {
 
-        super(asArgs(runner, priority, maxInstances, coreInstances, readTimeout, actionType,
+        super(asArgs(runner, priority, maxInstances, coreInstances, outputTimeout, actionType,
                 inputOrderType, inputLimit, inputBackoff, inputMaxSize, outputOrderType,
                 outputLimit, outputBackoff, outputMaxSize, log, logLevel));
         mRunner = runner;
         mPriority = priority;
         mMaxInstances = maxInstances;
         mCoreInstances = coreInstances;
-        mReadTimeout = readTimeout;
+        mOutputTimeout = outputTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
         mInputLimit = inputLimit;
@@ -383,25 +383,13 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the invocation priority (DEFAULT by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the priority.
-     */
-    public int getPriorityOrElse(final int valueIfNotSet) {
-
-        final int priority = mPriority;
-        return (priority != DEFAULT) ? priority : valueIfNotSet;
-    }
-
-    /**
      * Returns the action to be taken if the timeout elapses before a readable result is available
      * (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getReadTimeoutActionOrElse(
+    public TimeoutActionType getOutputTimeoutActionOrElse(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -415,10 +403,22 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public UnitDuration getReadTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
+    public UnitDuration getOutputTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final UnitDuration readTimeout = mReadTimeout;
-        return (readTimeout != null) ? readTimeout : valueIfNotSet;
+        final UnitDuration outputTimeout = mOutputTimeout;
+        return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
+    }
+
+    /**
+     * Returns the invocation priority (DEFAULT by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the priority.
+     */
+    public int getPriorityOrElse(final int valueIfNotSet) {
+
+        final int priority = mPriority;
+        return (priority != DEFAULT) ? priority : valueIfNotSet;
     }
 
     /**
@@ -613,9 +613,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private OrderType mOutputOrderType;
 
-        private int mPriority;
+        private UnitDuration mOutputTimeout;
 
-        private UnitDuration mReadTimeout;
+        private int mPriority;
 
         private Runner mRunner;
 
@@ -1001,21 +1001,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the invocation priority. A {@link InvocationConfiguration#DEFAULT DEFAULT} value
-         * means that the invocations will be executed with no specific priority.
-         *
-         * @param priority the priority.
-         * @return this builder.
-         * @see com.github.dm.jrt.core.runner.PriorityRunner PriorityRunner
-         */
-        @NotNull
-        public Builder<TYPE> withPriority(final int priority) {
-
-            mPriority = priority;
-            return this;
-        }
-
-        /**
          * Sets the timeout for an invocation instance to produce a readable result.
          * <p>
          * Note that this is just the initial configuration of the invocation, since the output
@@ -1027,9 +1012,10 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
+        public Builder<TYPE> withOutputTimeout(final long timeout,
+                @NotNull final TimeUnit timeUnit) {
 
-            return withReadTimeout(fromUnit(timeout, timeUnit));
+            return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
 
         /**
@@ -1043,9 +1029,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(@Nullable final UnitDuration timeout) {
+        public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
 
-            mReadTimeout = timeout;
+            mOutputTimeout = timeout;
             return this;
         }
 
@@ -1061,9 +1047,24 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
 
             mTimeoutActionType = actionType;
+            return this;
+        }
+
+        /**
+         * Sets the invocation priority. A {@link InvocationConfiguration#DEFAULT DEFAULT} value
+         * means that the invocations will be executed with no specific priority.
+         *
+         * @param priority the priority.
+         * @return this builder.
+         * @see com.github.dm.jrt.core.runner.PriorityRunner PriorityRunner
+         */
+        @NotNull
+        public Builder<TYPE> withPriority(final int priority) {
+
+            mPriority = priority;
             return this;
         }
 
@@ -1103,14 +1104,14 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withCoreInstances(coreInvocations);
             }
 
-            final UnitDuration readTimeout = configuration.mReadTimeout;
-            if (readTimeout != null) {
-                withReadTimeout(readTimeout);
+            final UnitDuration outputTimeout = configuration.mOutputTimeout;
+            if (outputTimeout != null) {
+                withOutputTimeout(outputTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
             if (timeoutActionType != null) {
-                withReadTimeoutAction(timeoutActionType);
+                withOutputTimeoutAction(timeoutActionType);
             }
         }
 
@@ -1175,7 +1176,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
-                    mReadTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputBackoff,
+                    mOutputTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputBackoff,
                     mInputMaxSize, mOutputOrderType, mOutputLimit, mOutputBackoff, mOutputMaxSize,
                     mLog, mLogLevel);
         }
@@ -1186,7 +1187,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
             mPriority = configuration.mPriority;
             mMaxInstances = configuration.mMaxInstances;
             mCoreInstances = configuration.mCoreInstances;
-            mReadTimeout = configuration.mReadTimeout;
+            mOutputTimeout = configuration.mOutputTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;
             mInputLimit = configuration.mInputLimit;

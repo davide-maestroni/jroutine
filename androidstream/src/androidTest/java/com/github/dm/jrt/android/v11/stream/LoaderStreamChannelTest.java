@@ -48,6 +48,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -2010,6 +2011,54 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         testInvocationDeadlock(getActivity());
+    }
+
+    public void testInvocationMode() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(getActivity()))
+                                .invocationMode(InvocationMode.ASYNC)
+                                .runOnShared()
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(getActivity()))
+                                .invocationMode(InvocationMode.PARALLEL)
+                                .runOnShared()
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(getActivity()))
+                                .invocationMode(InvocationMode.SYNC)
+                                .runOnShared()
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(getActivity()))
+                                .invocationMode(InvocationMode.SERIAL)
+                                .runOnShared()
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testInvocationModeNullPointerError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        try {
+            LoaderStreams.streamOf().invocationMode(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testLimit() {

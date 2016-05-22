@@ -394,6 +394,13 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
+
+        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+        return this;
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> limit(final int count) {
 
         return map(new LimitInvocationFactory<OUT>(count));

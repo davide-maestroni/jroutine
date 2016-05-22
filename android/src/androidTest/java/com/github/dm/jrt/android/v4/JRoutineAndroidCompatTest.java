@@ -46,7 +46,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -667,7 +667,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     public interface TestProxy {
 
         @AsyncOut
-        @ReadTimeout(value = 10, unit = TimeUnit.SECONDS)
+        @OutputTimeout(value = 10, unit = TimeUnit.SECONDS)
         OutputChannel<String> getStringLow();
     }
 

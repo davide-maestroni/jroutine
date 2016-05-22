@@ -1176,6 +1176,44 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testInvocationMode() {
+
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .invocationMode(InvocationMode.ASYNC)
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .invocationMode(InvocationMode.PARALLEL)
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .invocationMode(InvocationMode.SYNC)
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .invocationMode(InvocationMode.SERIAL)
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInvocationModeNullPointerError() {
+
+        try {
+            Streams.streamOf().invocationMode(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testLimit() {
 
         assertThat(Streams.streamOf()

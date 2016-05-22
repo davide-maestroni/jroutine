@@ -44,9 +44,9 @@ import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputLimit;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
+import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
-import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -597,9 +597,9 @@ public class Builders {
      * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.object.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.object.annotation.OutputTimeoutAction OutputTimeoutAction
      * @see com.github.dm.jrt.object.annotation.Priority Priority
-     * @see com.github.dm.jrt.object.annotation.ReadTimeout ReadTimeout
-     * @see com.github.dm.jrt.object.annotation.ReadTimeoutAction ReadTimeoutAction
      */
     @NotNull
     public static InvocationConfiguration withAnnotations(
@@ -652,12 +652,12 @@ public class Builders {
             } else if (annotationType == Priority.class) {
                 builder.withPriority(((Priority) annotation).value());
 
-            } else if (annotationType == ReadTimeout.class) {
-                final ReadTimeout timeoutAnnotation = (ReadTimeout) annotation;
-                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+            } else if (annotationType == OutputTimeout.class) {
+                final OutputTimeout timeoutAnnotation = (OutputTimeout) annotation;
+                builder.withOutputTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
 
-            } else if (annotationType == ReadTimeoutAction.class) {
-                builder.withReadTimeoutAction(((ReadTimeoutAction) annotation).value());
+            } else if (annotationType == OutputTimeoutAction.class) {
+                builder.withOutputTimeoutAction(((OutputTimeoutAction) annotation).value());
             }
         }
 
@@ -682,9 +682,9 @@ public class Builders {
      * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.object.annotation.OutputTimeout OutputTimeout
+     * @see com.github.dm.jrt.object.annotation.OutputTimeoutAction OutputTimeoutAction
      * @see com.github.dm.jrt.object.annotation.Priority Priority
-     * @see com.github.dm.jrt.object.annotation.ReadTimeout ReadTimeout
-     * @see com.github.dm.jrt.object.annotation.ReadTimeoutAction ReadTimeoutAction
      */
     @NotNull
     public static InvocationConfiguration withAnnotations(

@@ -60,7 +60,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     DefaultIOChannel(@NotNull final ChannelConfiguration configuration) {
 
         final InvocationConfiguration invocationConfiguration =
-                configuration.toOutputChannelConfiguration();
+                configuration.toOutputChannelConfiguration().apply();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final IORunner runner = new IORunner(configuration.getRunnerOrElse(Runners.sharedRunner()));

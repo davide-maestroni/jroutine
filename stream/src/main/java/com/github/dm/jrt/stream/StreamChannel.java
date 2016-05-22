@@ -498,6 +498,16 @@ public interface StreamChannel<IN, OUT>
     Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration();
 
     /**
+     * Makes the stream invoke concatenated routines with the specified mode.
+     *
+     * @return this stream.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    StreamChannel<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+
+    /**
      * Concatenates a stream limiting the maximum number of outputs to the specified count.
      * <p>
      * Note that the created routine will be initialized with the current configuration.

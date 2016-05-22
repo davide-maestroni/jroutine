@@ -43,7 +43,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +80,7 @@ public class JRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
-                                                        .withReadTimeoutAction(
+                                                        .withOutputTimeoutAction(
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
@@ -688,7 +688,7 @@ public class JRoutineTest {
 
     public interface TestItf {
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getOne();
     }
@@ -696,11 +696,11 @@ public class JRoutineTest {
     @Proxy(TestClass.class)
     public interface TestStatic {
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(300)
+        @OutputTimeout(300)
         @AsyncOut
         OutputChannel<Integer> getTwo();
     }

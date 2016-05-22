@@ -306,7 +306,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
          *
          * @param wrapped the wrapped adapter instance.
          */
-        private CallAdapterDecorator(@NotNull CallAdapter<T> wrapped) {
+        private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
 
             mAdapter = wrapped;
         }
@@ -363,7 +363,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
                 stream.sync();
             }
 
-            return stream.map(getRoutine());
+            return stream.map(getRoutine()).invocationMode(invocationMode);
         }
     }
 }

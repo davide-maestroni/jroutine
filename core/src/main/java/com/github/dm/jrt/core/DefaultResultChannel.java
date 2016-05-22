@@ -154,8 +154,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mHandler = ConstantConditions.notNull("abort handler", handler);
         mRunner = ConstantConditions.notNull("runner instance", runner);
         mResultOrder = configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY);
-        mExecutionTimeout = configuration.getReadTimeoutOrElse(zero());
-        mTimeoutActionType = configuration.getReadTimeoutActionOrElse(TimeoutActionType.THROW);
+        mExecutionTimeout = configuration.getOutputTimeoutOrElse(zero());
+        mTimeoutActionType = configuration.getOutputTimeoutActionOrElse(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
         mOutputBackoff = configuration.getOutputBackoffOrElse(Backoffs.zeroDelay());
         mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);

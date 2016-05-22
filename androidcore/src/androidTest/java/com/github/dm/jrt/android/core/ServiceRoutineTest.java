@@ -215,8 +215,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
                                                              .invocationConfiguration()
-                                                             .withReadTimeout(millis(10))
-                                                             .withReadTimeoutAction(
+                                                             .withOutputTimeout(millis(10))
+                                                             .withOutputTimeoutAction(
                                                                      TimeoutActionType.EXIT)
                                                              .apply()
                                                              .asyncCall("test1");
@@ -229,8 +229,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
                                                              .invocationConfiguration()
-                                                             .withReadTimeout(millis(10))
-                                                             .withReadTimeoutAction(
+                                                             .withOutputTimeout(millis(10))
+                                                             .withOutputTimeoutAction(
                                                                      TimeoutActionType.ABORT)
                                                              .apply()
                                                              .asyncCall("test2");
@@ -253,8 +253,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
                                                              .invocationConfiguration()
-                                                             .withReadTimeout(millis(10))
-                                                             .withReadTimeoutAction(
+                                                             .withOutputTimeout(millis(10))
+                                                             .withOutputTimeoutAction(
                                                                      TimeoutActionType.THROW)
                                                              .apply()
                                                              .asyncCall("test3");

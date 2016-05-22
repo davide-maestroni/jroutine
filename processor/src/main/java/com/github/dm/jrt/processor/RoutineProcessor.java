@@ -41,9 +41,9 @@ import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputLimit;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
+import com.github.dm.jrt.object.annotation.OutputTimeout;
+import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.ReadTimeout;
-import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
 
 import org.jetbrains.annotations.NotNull;
@@ -593,21 +593,21 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
         }
 
-        final ReadTimeout readTimeoutAnnotation = methodElement.getAnnotation(ReadTimeout.class);
-        if (readTimeoutAnnotation != null) {
-            builder.append(".withReadTimeout(")
-                   .append(readTimeoutAnnotation.value())
+        final OutputTimeout outputTimeoutAnnotation = methodElement.getAnnotation(OutputTimeout.class);
+        if (outputTimeoutAnnotation != null) {
+            builder.append(".withOutputTimeout(")
+                   .append(outputTimeoutAnnotation.value())
                    .append(", ")
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
-                   .append(readTimeoutAnnotation.unit())
+                   .append(outputTimeoutAnnotation.unit())
                    .append(")");
         }
 
-        final ReadTimeoutAction actionAnnotation =
-                methodElement.getAnnotation(ReadTimeoutAction.class);
+        final OutputTimeoutAction actionAnnotation =
+                methodElement.getAnnotation(OutputTimeoutAction.class);
         if (actionAnnotation != null) {
-            builder.append(".withReadTimeoutAction(")
+            builder.append(".withOutputTimeoutAction(")
                    .append(TimeoutActionType.class.getCanonicalName())
                    .append(".")
                    .append(actionAnnotation.value())

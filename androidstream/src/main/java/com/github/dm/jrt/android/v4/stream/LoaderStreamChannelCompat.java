@@ -152,6 +152,38 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannelCompat} is expected as result.
+     */
+    @NotNull
+    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
+            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfigurationCompat} instance will be passed as input
+     * parameter to the specified function.
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -203,7 +235,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @StreamFlow(value = COLLECT, binding = ROUTINE)
-    <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectIn(
+    <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
@@ -279,17 +311,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that this instance will be passed as input parameter to the specified function, and
-     * a {@code LoaderStreamChannelCompat} is expected as result.
-     */
-    @NotNull
-    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> flatTransform(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> function);
 
     /**
      * {@inheritDoc}
@@ -550,15 +571,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> simpleTransform(
-            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @StreamFlow(value = MAP, binding = ROUTINE)
     LoaderStreamChannelCompat<IN, OUT> skip(int count);
 
@@ -726,18 +738,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @StreamFlow(value = MAP, binding = CONSUMER)
     LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that a {@link LoaderStreamConfigurationCompat} instance will be passed as input
-     * parameter to the specified function.
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
     /**
      * {@inheritDoc}

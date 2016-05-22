@@ -295,7 +295,7 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .async()
-                          .collectIn(new Supplier<List<String>>() {
+                          .collectInto(new Supplier<List<String>>() {
 
                               public List<String> get() {
 
@@ -306,7 +306,7 @@ public class StreamChannelTest {
                           .next()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .collectIn(new Supplier<List<String>>() {
+                          .collectInto(new Supplier<List<String>>() {
 
                               public List<String> get() {
 
@@ -322,7 +322,7 @@ public class StreamChannelTest {
     public void testCollectCollectionNullPointerError() {
 
         try {
-            Streams.streamOf().async().collectIn(null);
+            Streams.streamOf().async().collectInto(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1106,7 +1106,7 @@ public class StreamChannelTest {
     public void testFlatTransform() {
 
         assertThat(Streams.streamOf("test1")
-                          .flatTransform(
+                          .applyFlatTransform(
                                   new Function<StreamChannel<String, String>,
                                           StreamChannel<String, String>>() {
 
@@ -1120,7 +1120,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("test1", "test2");
         try {
             Streams.streamOf()
-                   .flatTransform(
+                   .applyFlatTransform(
                            new Function<StreamChannel<Object, Object>, StreamChannel<Object,
                                    Object>>() {
 
@@ -2828,7 +2828,7 @@ public class StreamChannelTest {
     public void testTransform() {
 
         assertThat(Streams.streamOf("test")
-                          .transform(
+                          .applyTransformWith(
                                   new BiFunction<StreamConfiguration,
                                           Function<OutputChannel<String>, OutputChannel<String>>,
                                           Function<OutputChannel<String>, OutputChannel<String>>>
@@ -2865,7 +2865,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .next()).isEqualTo("TEST");
         assertThat(Streams.streamOf("test")
-                          .simpleTransform(
+                          .applyTransform(
                                   new Function<Function<OutputChannel<String>,
                                           OutputChannel<String>>, Function<OutputChannel<String>,
                                           OutputChannel<String>>>() {
@@ -2892,7 +2892,7 @@ public class StreamChannelTest {
                           .next()).isEqualTo("TEST");
         try {
             Streams.streamOf()
-                   .transform(
+                   .applyTransformWith(
                            new BiFunction<StreamConfiguration, Function<OutputChannel<Object>,
                                    OutputChannel<Object>>, Function<OutputChannel<Object>,
                                    OutputChannel<Object>>>() {
@@ -2913,7 +2913,7 @@ public class StreamChannelTest {
 
         try {
             Streams.streamOf()
-                   .simpleTransform(
+                   .applyTransform(
                            new Function<Function<OutputChannel<Object>, OutputChannel<Object>>,
                                    Function<OutputChannel<Object>, OutputChannel<Object>>>() {
 
@@ -2932,7 +2932,7 @@ public class StreamChannelTest {
 
         final StreamChannel<Object, Object> stream = //
                 Streams.streamOf()
-                       .simpleTransform(
+                       .applyTransform(
                                new Function<Function<OutputChannel<Object>,
                                        OutputChannel<Object>>, Function<OutputChannel<Object>,
                                        OutputChannel<Object>>>() {

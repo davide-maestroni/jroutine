@@ -184,7 +184,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .async()
-                                      .collectIn(new Supplier<List<String>>() {
+                                      .collectInto(new Supplier<List<String>>() {
 
                                           public List<String> get() {
 
@@ -196,7 +196,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .collectIn(new Supplier<List<String>>() {
+                                      .collectInto(new Supplier<List<String>>() {
 
                                           public List<String> get() {
 
@@ -1679,7 +1679,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .async()
                                .with(loaderFrom(getActivity()))
-                               .collectIn((Supplier<Collection<Object>>) null);
+                               .collectInto((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1690,7 +1690,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .sync()
                                .with(loaderFrom(getActivity()))
-                               .collectIn((Supplier<Collection<Object>>) null);
+                               .collectInto((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1937,7 +1937,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .flatTransform(
+                                      .applyFlatTransform(
                                               new Function<StreamChannel<String, String>,
                                                       StreamChannel<String, String>>() {
 
@@ -1952,7 +1952,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test1", "test2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .flatTransform(
+                                      .applyFlatTransform(
                                               new Function<StreamChannel<String, String>,
                                                       LoaderStreamChannelCompat<String, String>>() {
 
@@ -3318,12 +3318,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(getActivity()))
-                                      .transform(transformBiFunction())
+                                      .applyTransformWith(transformBiFunction())
                                       .afterMax(seconds(10))
                                       .next()).isEqualTo("TEST");
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(getActivity()))
-                                      .simpleTransform(transformFunction())
+                                      .applyTransform(transformFunction())
                                       .afterMax(seconds(10))
                                       .next()).isEqualTo("TEST");
     }

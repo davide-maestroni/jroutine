@@ -152,6 +152,38 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannel} is expected as result.
+     */
+    @NotNull
+    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> applyFlatTransform(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<IN, AFTER> applyTransform(
+            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfiguration} instance will be passed as input parameter to
+     * the specified function.
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<IN, AFTER> applyTransformWith(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -201,7 +233,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(value = COLLECT, binding = ROUTINE)
-    <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectIn(
+    <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
@@ -276,17 +308,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(value = MAP, binding = ROUTINE)
     <AFTER> LoaderStreamChannel<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that this instance will be passed as input parameter to the specified function, and
-     * a {@code LoaderStreamChannel} is expected as result.
-     */
-    @NotNull
-    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatTransform(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> function);
 
     /**
      * {@inheritDoc}
@@ -545,15 +566,6 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<IN, AFTER> simpleTransform(
-            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @StreamFlow(value = MAP, binding = ROUTINE)
     LoaderStreamChannel<IN, OUT> skip(int count);
 
@@ -716,18 +728,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(value = MAP, binding = CONSUMER)
     LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that a {@link LoaderStreamConfiguration} instance will be passed as input parameter to
-     * the specified function.
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<IN, AFTER> transform(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
     /**
      * {@inheritDoc}

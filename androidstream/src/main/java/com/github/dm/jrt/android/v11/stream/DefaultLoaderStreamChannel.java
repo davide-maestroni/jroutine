@@ -254,6 +254,35 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> applyFlatTransform(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        return (LoaderStreamChannel<BEFORE, AFTER>) super.applyFlatTransform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> applyTransform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.applyTransform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> applyTransformWith(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannel<IN, AFTER>) super.applyTransformWith(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> async() {
 
         return (LoaderStreamChannel<IN, OUT>) super.async();
@@ -305,11 +334,11 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectIn(
+    public <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectInto(
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<IN, AFTER>) super.collectIn(supplier);
+        return (LoaderStreamChannel<IN, AFTER>) super.collectInto(supplier);
     }
 
     @NotNull
@@ -392,15 +421,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannel<IN, AFTER>) super.flatMap(function);
-    }
-
-    @NotNull
-    @Override
-    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatTransform(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> function) {
-
-        return (LoaderStreamChannel<BEFORE, AFTER>) super.flatTransform(function);
     }
 
     @NotNull
@@ -670,16 +690,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> simpleTransform(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
-
-        return (LoaderStreamChannel<IN, AFTER>) super.simpleTransform(function);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<IN, OUT> skip(final int count) {
 
         return (LoaderStreamChannel<IN, OUT>) super.skip(count);
@@ -867,17 +877,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
-        return transform(new SelectableTransform<IN, OUT>(index));
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> transform(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
-
-        return (LoaderStreamChannel<IN, AFTER>) super.transform(function);
+        return applyTransformWith(new SelectableTransform<IN, OUT>(index));
     }
 
     @NotNull

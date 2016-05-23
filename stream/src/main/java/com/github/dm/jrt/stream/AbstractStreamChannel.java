@@ -1157,9 +1157,9 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
         private final InvocationConfiguration mStreamConfiguration;
 
-        private ChannelConfiguration mChannelConfiguration;
+        private volatile ChannelConfiguration mChannelConfiguration;
 
-        private InvocationConfiguration mInvocationConfiguration;
+        private volatile InvocationConfiguration mInvocationConfiguration;
 
         /**
          * Constructor.

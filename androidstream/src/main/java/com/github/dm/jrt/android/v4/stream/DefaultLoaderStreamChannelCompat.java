@@ -1174,7 +1174,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         private final StreamConfiguration mWrappedConfiguration;
 
-        private LoaderConfiguration mLoaderConfiguration;
+        private volatile LoaderConfiguration mLoaderConfiguration;
 
         /**
          * Constructor.

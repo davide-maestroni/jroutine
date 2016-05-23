@@ -535,6 +535,7 @@ public interface StreamChannel<IN, OUT>
     /**
      * Makes the stream invoke concatenated routines with the specified mode.
      *
+     * @param invocationMode the invocation mode.
      * @return this stream.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */

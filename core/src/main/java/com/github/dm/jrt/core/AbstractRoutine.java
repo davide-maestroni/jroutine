@@ -65,8 +65,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private final int mCoreInvocations;
 
-    private final Object mElementMutex = new Object();
-
     private final Logger mLogger;
 
     private final int mMaxInvocations;
@@ -83,7 +81,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private volatile DefaultInvocationManager mAsyncManager;
 
-    private AbstractRoutine<IN, OUT> mElementRoutine;
+    private volatile AbstractRoutine<IN, OUT> mElementRoutine;
 
     private int mRunningCount;
 
@@ -246,33 +244,31 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @NotNull
     private Routine<IN, OUT> getElementRoutine() {
 
-        synchronized (mElementMutex) {
-            if (mElementRoutine == null) {
-                mElementRoutine =
-                        new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                mLogger) {
+        if (mElementRoutine == null) {
+            mElementRoutine =
+                    new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
+                            mLogger) {
 
-                            @NotNull
-                            @Override
-                            protected Invocation<IN, OUT> convertInvocation(
-                                    @NotNull final Invocation<IN, OUT> invocation,
-                                    @NotNull final InvocationType type) throws Exception {
+                        @NotNull
+                        @Override
+                        protected Invocation<IN, OUT> convertInvocation(
+                                @NotNull final Invocation<IN, OUT> invocation,
+                                @NotNull final InvocationType type) throws Exception {
 
-                                // No need to destroy the old one
-                                return newInvocation(type);
-                            }
+                            // No need to destroy the old one
+                            return newInvocation(type);
+                        }
 
-                            @NotNull
-                            @Override
-                            protected Invocation<IN, OUT> newInvocation(
-                                    @NotNull final InvocationType type) {
+                        @NotNull
+                        @Override
+                        protected Invocation<IN, OUT> newInvocation(
+                                @NotNull final InvocationType type) {
 
-                                return (type == InvocationType.ASYNC)
-                                        ? new ParallelInvocation<IN, OUT>(AbstractRoutine.this)
-                                        : new SerialInvocation<IN, OUT>(AbstractRoutine.this);
-                            }
-                        };
-            }
+                            return (type == InvocationType.ASYNC) ? new ParallelInvocation<IN, OUT>(
+                                    AbstractRoutine.this)
+                                    : new SerialInvocation<IN, OUT>(AbstractRoutine.this);
+                        }
+                    };
         }
 
         return mElementRoutine;

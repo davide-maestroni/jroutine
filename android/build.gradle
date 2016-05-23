@@ -95,6 +95,7 @@ tasks.withType(Javadoc) {
             "${prefix}/object/",
             "${prefix}/proxy/",
             "${prefix}/channel/",
+            "${prefix}/function/",
             "${prefix}/stream/",
             "${prefix}/androidcore/",
             "${prefix}/androidobject/",

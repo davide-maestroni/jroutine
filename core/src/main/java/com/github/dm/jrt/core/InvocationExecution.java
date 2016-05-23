@@ -35,8 +35,6 @@ import org.jetbrains.annotations.Nullable;
  */
 class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
 
-    private final Object mAbortMutex = new Object();
-
     private final InputIterator<IN> mInputIterator;
 
     private final InvocationManager<IN, OUT> mInvocationManager;
@@ -47,7 +45,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     private final DefaultResultChannel<OUT> mResultChannel;
 
-    private AbortExecution mAbortExecution;
+    private volatile AbortExecution mAbortExecution;
 
     private int mExecutionCount = 1;
 
@@ -87,13 +85,11 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     @NotNull
     public Execution abort() {
 
-        synchronized (mAbortMutex) {
-            if (mAbortExecution == null) {
-                mAbortExecution = new AbortExecution();
-            }
-
-            return mAbortExecution;
+        if (mAbortExecution == null) {
+            mAbortExecution = new AbortExecution();
         }
+
+        return mAbortExecution;
     }
 
     public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {

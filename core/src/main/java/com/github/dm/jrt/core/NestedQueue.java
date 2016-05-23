@@ -180,8 +180,8 @@ class NestedQueue<E> {
     public boolean isEmpty() {
 
         final Object element = prune(this);
-        return (element == EMPTY_ELEMENT) || ((element instanceof NestedQueue)
-                && ((NestedQueue<?>) element).isEmpty());
+        return (element == EMPTY_ELEMENT) || ((element instanceof InnerNestedQueue)
+                && ((InnerNestedQueue<?>) element).isEmpty());
     }
 
     /**
@@ -194,8 +194,8 @@ class NestedQueue<E> {
     public E removeFirst() {
 
         final Object element = prune(this);
-        if (element instanceof NestedQueue) {
-            return ((NestedQueue<E>) element).removeFirst();
+        if (element instanceof InnerNestedQueue) {
+            return ((InnerNestedQueue<E>) element).removeFirst();
         }
 
         return (E) mQueue.removeFirst();

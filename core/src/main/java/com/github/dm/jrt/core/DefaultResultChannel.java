@@ -112,9 +112,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private Object mConsumerMutex;
 
-    private FlushExecution mFlushExecution;
+    private volatile FlushExecution mFlushExecution;
 
-    private FlushExecution mForcedFlushExecution;
+    private volatile FlushExecution mForcedFlushExecution;
 
     private boolean mIsWaitingExecution;
 

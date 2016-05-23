@@ -99,7 +99,9 @@ tasks.withType(FindBugs) {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/lib/",
+    options.links('https://square.github.io/okhttp/3.x/okhttp/',
+            'https://square.github.io/retrofit/2.x/retrofit/',
+            "${prefix}/lib/",
             "${prefix}/core/",
             "${prefix}/object/",
             "${prefix}/stream/",

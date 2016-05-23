@@ -25,14 +25,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 
-import static com.github.dm.jrt.stream.util.Numbers.toBigOptimistic;
+import static com.github.dm.jrt.stream.util.Numbers.toBigDecimalOptimistic;
 
 /**
  * Invocation computing the sum of the input numbers by employing a {@code BigDecimal}.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
  */
-class BigSumInvocation extends TemplateInvocation<Number, BigDecimal> {
+class SumBigInvocation extends TemplateInvocation<Number, BigDecimal> {
 
     private static final InvocationFactory<Number, BigDecimal> sFactory =
             new InvocationFactory<Number, BigDecimal>(null) {
@@ -41,7 +41,7 @@ class BigSumInvocation extends TemplateInvocation<Number, BigDecimal> {
                 @Override
                 public Invocation<Number, BigDecimal> newInvocation() {
 
-                    return new BigSumInvocation();
+                    return new SumBigInvocation();
                 }
             };
 
@@ -50,7 +50,7 @@ class BigSumInvocation extends TemplateInvocation<Number, BigDecimal> {
     /**
      * Constructor.
      */
-    private BigSumInvocation() {
+    private SumBigInvocation() {
 
     }
 
@@ -75,7 +75,7 @@ class BigSumInvocation extends TemplateInvocation<Number, BigDecimal> {
     @Override
     public void onInput(final Number input, @NotNull final ResultChannel<BigDecimal> result) {
 
-        mSum = mSum.add(toBigOptimistic(input));
+        mSum = mSum.add(toBigDecimalOptimistic(input));
     }
 
     @Override

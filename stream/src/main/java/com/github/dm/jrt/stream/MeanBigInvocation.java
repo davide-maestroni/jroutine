@@ -26,14 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import static com.github.dm.jrt.stream.util.Numbers.toBigOptimistic;
+import static com.github.dm.jrt.stream.util.Numbers.toBigDecimalOptimistic;
 
 /**
  * Invocation computing the mean of the input numbers by employing a {@code BigDecimal}.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
  */
-class BigMeanInvocation extends TemplateInvocation<Number, BigDecimal> {
+class MeanBigInvocation extends TemplateInvocation<Number, BigDecimal> {
 
     private static final InvocationFactory<Number, BigDecimal> sFactory =
             new InvocationFactory<Number, BigDecimal>(null) {
@@ -42,7 +42,7 @@ class BigMeanInvocation extends TemplateInvocation<Number, BigDecimal> {
                 @Override
                 public Invocation<Number, BigDecimal> newInvocation() {
 
-                    return new BigMeanInvocation();
+                    return new MeanBigInvocation();
                 }
             };
 
@@ -53,7 +53,7 @@ class BigMeanInvocation extends TemplateInvocation<Number, BigDecimal> {
     /**
      * Constructor.
      */
-    private BigMeanInvocation() {
+    private MeanBigInvocation() {
 
     }
 
@@ -79,7 +79,7 @@ class BigMeanInvocation extends TemplateInvocation<Number, BigDecimal> {
     @Override
     public void onInput(final Number input, @NotNull final ResultChannel<BigDecimal> result) {
 
-        mSum = mSum.add(toBigOptimistic(input));
+        mSum = mSum.add(toBigDecimalOptimistic(input));
         ++mCount;
     }
 

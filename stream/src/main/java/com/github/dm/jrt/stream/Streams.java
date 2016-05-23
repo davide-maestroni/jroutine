@@ -54,7 +54,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.CA
 import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.COLLECT;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.MAP;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.REDUCE;
-import static com.github.dm.jrt.stream.util.Numbers.toBigSafe;
+import static com.github.dm.jrt.stream.util.Numbers.toBigDecimalSafe;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -131,32 +131,6 @@ public class Streams extends Functions {
                     super IN, ? extends OUT>> function) {
 
         return new StreamInvocationFactory<IN, OUT>(wrap(function));
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean value of the input numbers by employing a
-     * {@code BigDecimal}.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
-    public static InvocationFactory<Number, BigDecimal> bigMean() {
-
-        return BigMeanInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers by employing a
-     * {@code BigDecimal}.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
-    public static InvocationFactory<Number, BigDecimal> bigSum() {
-
-        return BigSumInvocation.factoryOf();
     }
 
     /**
@@ -475,23 +449,6 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a factory of invocations computing the mean value of the input numbers in floating
-     * precision.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> floatingMean() {
-
-        return (InvocationFactory<N, Number>) FloatingMeanInvocation.factoryOf();
-    }
-
-    /**
      * Returns a factory of invocations grouping the input data in collections of the specified
      * size.
      * <p>
@@ -689,6 +646,53 @@ public class Streams extends Functions {
     public static <N extends Number> InvocationFactory<N, Number> mean() {
 
         return (InvocationFactory<N, Number>) MeanInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations computing the mean value of the input numbers by employing a
+     * {@code BigDecimal}.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    public static InvocationFactory<Number, BigDecimal> meanBig() {
+
+        return MeanBigInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations computing the mean value of the input numbers in floating
+     * precision.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
+     *
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, Number> meanFloating() {
+
+        return (InvocationFactory<N, Number>) MeanFloatingInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations computing the mean of the input numbers rounded to nearest
+     * number.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
+     *
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, Number> meanRounded() {
+
+        return (InvocationFactory<N, Number>) MeanRoundedInvocation.factoryOf();
     }
 
     /**
@@ -937,23 +941,6 @@ public class Streams extends Functions {
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(Channels.replay(channel));
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean of the input numbers rounded to nearest
-     * number.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> roundedMean() {
-
-        return (InvocationFactory<N, Number>) RoundedMeanInvocation.factoryOf();
     }
 
     /**
@@ -1296,6 +1283,19 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a factory of invocations computing the sum of the input numbers by employing a
+     * {@code BigDecimal}.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    public static InvocationFactory<Number, BigDecimal> sumBig() {
+
+        return SumBigInvocation.factoryOf();
+    }
+
+    /**
      * Returns an factory of invocations collecting inputs into a list.
      *
      * @param <IN> the input data type.
@@ -1414,14 +1414,14 @@ public class Streams extends Functions {
             @NotNull final N start, @NotNull final N end) {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)) {
-            final BigDecimal startValue = toBigSafe(start);
-            final BigDecimal endValue = toBigSafe(end);
+            final BigDecimal startValue = toBigDecimalSafe(start);
+            final BigDecimal endValue = toBigDecimalSafe(end);
             return numberRange(startValue, endValue,
                     (startValue.compareTo(endValue) <= 0) ? 1 : -1);
 
         } else if ((start instanceof BigInteger) || (end instanceof BigInteger)) {
-            final BigDecimal startDecimal = toBigSafe(start);
-            final BigDecimal endDecimal = toBigSafe(end);
+            final BigDecimal startDecimal = toBigDecimalSafe(start);
+            final BigDecimal endDecimal = toBigDecimalSafe(end);
             if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0)) {
                 return numberRange(startDecimal, endDecimal,
                         (startDecimal.compareTo(endDecimal) <= 0) ? 1 : -1);
@@ -1475,16 +1475,16 @@ public class Streams extends Functions {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)
                 || (increment instanceof BigDecimal)) {
-            final BigDecimal startValue = toBigSafe(start);
-            final BigDecimal endValue = toBigSafe(end);
-            final BigDecimal incValue = toBigSafe(increment);
+            final BigDecimal startValue = toBigDecimalSafe(start);
+            final BigDecimal endValue = toBigDecimalSafe(end);
+            final BigDecimal incValue = toBigDecimalSafe(increment);
             return new RangeConsumer<BigDecimal>(startValue, endValue, new BigDecimalInc(incValue));
 
         } else if ((start instanceof BigInteger) || (end instanceof BigInteger)
                 || (increment instanceof BigInteger)) {
-            final BigDecimal startDecimal = toBigSafe(start);
-            final BigDecimal endDecimal = toBigSafe(end);
-            final BigDecimal incDecimal = toBigSafe(increment);
+            final BigDecimal startDecimal = toBigDecimalSafe(start);
+            final BigDecimal endDecimal = toBigDecimalSafe(end);
+            final BigDecimal incDecimal = toBigDecimalSafe(increment);
             if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0) || (incDecimal.scale()
                     > 0)) {
                 return new RangeConsumer<BigDecimal>(startDecimal, endDecimal,

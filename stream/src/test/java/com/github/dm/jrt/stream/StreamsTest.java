@@ -130,11 +130,11 @@ public class StreamsTest {
     public void testBigMean() {
 
         assertThat(Streams.streamOf(1, 2, 3, 4)
-                          .map(Streams.<Integer>bigMean())
+                          .map(Streams.<Integer>meanBig())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(new BigDecimal(2.5));
         assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
-                          .map(Streams.<Float>bigMean())
+                          .map(Streams.<Float>meanBig())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(new BigDecimal(2.5));
     }
@@ -143,7 +143,7 @@ public class StreamsTest {
     public void testBigSum() {
 
         assertThat(Streams.streamOf(1, 2, 3, 4)
-                          .map(Streams.<Integer>bigSum())
+                          .map(Streams.<Integer>sumBig())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(new BigDecimal(10));
     }
@@ -674,42 +674,42 @@ public class StreamsTest {
     @Test
     public void testFloatingMean() {
 
-        assertThat(Streams.<Long>streamOf().map(Streams.<Long>floatingMean())
+        assertThat(Streams.<Long>streamOf().map(Streams.<Long>meanFloating())
                                            .afterMax(seconds(3))
                                            .next()).isEqualTo(0f);
         assertThat(Streams.streamOf(1L, 2L, 3L, 4L)
-                          .map(Streams.<Long>floatingMean())
+                          .map(Streams.<Long>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5);
         assertThat(Streams.streamOf(1, 2, 3, 4)
-                          .map(Streams.<Integer>floatingMean())
+                          .map(Streams.<Integer>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5f);
         assertThat(Streams.streamOf((short) 1, (short) 2, (short) 3, (short) 4)
-                          .map(Streams.<Short>floatingMean())
+                          .map(Streams.<Short>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5f);
         assertThat(Streams.streamOf((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                          .map(Streams.<Byte>floatingMean())
+                          .map(Streams.<Byte>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5f);
         assertThat(Streams.streamOf(1.0, 2.0, 3.0, 4.0)
-                          .map(Streams.<Double>floatingMean())
+                          .map(Streams.<Double>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5);
         assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
-                          .map(Streams.<Float>floatingMean())
+                          .map(Streams.<Float>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(2.5f);
         assertThat(Streams.streamOf(BigInteger.valueOf(1), BigInteger.valueOf(2),
                 BigInteger.valueOf(3), BigInteger.valueOf(4))
-                          .map(Streams.<BigInteger>floatingMean())
+                          .map(Streams.<BigInteger>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(
                 new BigDecimal(2.5).setScale(15, RoundingMode.HALF_UP));
         assertThat(Streams.streamOf(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                 new BigDecimal(4))
-                          .map(Streams.<BigDecimal>floatingMean())
+                          .map(Streams.<BigDecimal>meanFloating())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(
                 new BigDecimal(2.5).setScale(15, RoundingMode.HALF_UP));
@@ -2164,41 +2164,41 @@ public class StreamsTest {
     @Test
     public void testRoundedMean() {
 
-        assertThat(Streams.<Long>streamOf().map(Streams.<Long>roundedMean())
+        assertThat(Streams.<Long>streamOf().map(Streams.<Long>meanRounded())
                                            .afterMax(seconds(3))
                                            .next()).isEqualTo(0);
         assertThat(Streams.streamOf(1L, 2L, 3L, 4L)
-                          .map(Streams.<Long>roundedMean())
+                          .map(Streams.<Long>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(3L);
         assertThat(Streams.streamOf(1, 2, 3, 4)
-                          .map(Streams.<Integer>roundedMean())
+                          .map(Streams.<Integer>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(3);
         assertThat(Streams.streamOf((short) 1, (short) 2, (short) 3, (short) 4)
-                          .map(Streams.<Short>roundedMean())
+                          .map(Streams.<Short>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo((short) 3);
         assertThat(Streams.streamOf((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                          .map(Streams.<Byte>roundedMean())
+                          .map(Streams.<Byte>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo((byte) 3);
         assertThat(Streams.streamOf(1.0, 2.0, 3.0, 4.0)
-                          .map(Streams.<Double>roundedMean())
+                          .map(Streams.<Double>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(3.0);
         assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
-                          .map(Streams.<Float>roundedMean())
+                          .map(Streams.<Float>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(3.0f);
         assertThat(Streams.streamOf(BigInteger.valueOf(1), BigInteger.valueOf(2),
                 BigInteger.valueOf(3), BigInteger.valueOf(4))
-                          .map(Streams.<BigInteger>roundedMean())
+                          .map(Streams.<BigInteger>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(BigInteger.valueOf(3));
         assertThat(Streams.streamOf(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                 new BigDecimal(4))
-                          .map(Streams.<BigDecimal>roundedMean())
+                          .map(Streams.<BigDecimal>meanRounded())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(new BigDecimal(3));
     }

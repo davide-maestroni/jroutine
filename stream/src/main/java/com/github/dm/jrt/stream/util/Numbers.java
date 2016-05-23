@@ -54,8 +54,8 @@ public class Numbers {
     public static Number add(@NotNull final Number n1, @NotNull final Number n2) {
 
         if ((n1 instanceof BigDecimal) || (n2 instanceof BigDecimal)) {
-            final BigDecimal big1 = toBig(n1);
-            final BigDecimal big2 = toBig(n2);
+            final BigDecimal big1 = toBigDecimal(n1);
+            final BigDecimal big2 = toBigDecimal(n2);
             if ((big1 == null) || (big2 == null)) {
                 return null;
             }
@@ -63,8 +63,8 @@ public class Numbers {
             return big1.add(big2);
 
         } else if ((n1 instanceof BigInteger) || (n2 instanceof BigInteger)) {
-            final BigDecimal big1 = toBig(n1);
-            final BigDecimal big2 = toBig(n2);
+            final BigDecimal big1 = toBigDecimal(n1);
+            final BigDecimal big2 = toBigDecimal(n2);
             if ((big1 == null) || (big2 == null)) {
                 return null;
             }
@@ -168,7 +168,7 @@ public class Numbers {
      * @return the {@code BigDecimal} instance or null.
      */
     @Nullable
-    public static BigDecimal toBig(@NotNull final Number n) {
+    public static BigDecimal toBigDecimal(@NotNull final Number n) {
 
         if (n instanceof Double) {
             return new BigDecimal(n.doubleValue());
@@ -208,9 +208,9 @@ public class Numbers {
      * @return the {@code BigDecimal} instance.
      */
     @NotNull
-    public static BigDecimal toBigOptimistic(@NotNull final Number n) {
+    public static BigDecimal toBigDecimalOptimistic(@NotNull final Number n) {
 
-        final BigDecimal bigDecimal = toBig(n);
+        final BigDecimal bigDecimal = toBigDecimal(n);
         return (bigDecimal == null) ? new BigDecimal(n.doubleValue()) : bigDecimal;
     }
 
@@ -222,9 +222,9 @@ public class Numbers {
      * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
      */
     @NotNull
-    public static BigDecimal toBigSafe(@NotNull final Number n) {
+    public static BigDecimal toBigDecimalSafe(@NotNull final Number n) {
 
-        final BigDecimal bigDecimal = toBig(n);
+        final BigDecimal bigDecimal = toBigDecimal(n);
         if (bigDecimal == null) {
             throw new IllegalArgumentException(
                     "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");

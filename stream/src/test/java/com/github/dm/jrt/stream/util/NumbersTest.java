@@ -255,15 +255,15 @@ public class NumbersTest {
     @Test
     public void testToBig() {
 
-        assertThat(Numbers.toBig(3)).isEqualTo(new BigDecimal(3));
-        assertThat(Numbers.toBig((byte) 2)).isEqualTo(new BigDecimal(2));
-        assertThat(Numbers.toBig((short) -1)).isEqualTo(new BigDecimal(-1));
-        assertThat(Numbers.toBig(-1L)).isEqualTo(new BigDecimal(-1L));
-        assertThat(Numbers.toBig(2.5f)).isEqualTo(new BigDecimal(2.5f));
-        assertThat(Numbers.toBig(2.5)).isEqualTo(new BigDecimal(2.5));
-        assertThat(Numbers.toBig(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
-        assertThat(Numbers.toBig(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
-        assertThat(Numbers.toBig(new Number() {
+        assertThat(Numbers.toBigDecimal(3)).isEqualTo(new BigDecimal(3));
+        assertThat(Numbers.toBigDecimal((byte) 2)).isEqualTo(new BigDecimal(2));
+        assertThat(Numbers.toBigDecimal((short) -1)).isEqualTo(new BigDecimal(-1));
+        assertThat(Numbers.toBigDecimal(-1L)).isEqualTo(new BigDecimal(-1L));
+        assertThat(Numbers.toBigDecimal(2.5f)).isEqualTo(new BigDecimal(2.5f));
+        assertThat(Numbers.toBigDecimal(2.5)).isEqualTo(new BigDecimal(2.5));
+        assertThat(Numbers.toBigDecimal(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
+        assertThat(Numbers.toBigDecimal(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
+        assertThat(Numbers.toBigDecimal(new Number() {
 
             @Override
             public int intValue() {
@@ -294,15 +294,15 @@ public class NumbersTest {
     @Test
     public void testToBigOptimistic() {
 
-        assertThat(Numbers.toBigOptimistic(3)).isEqualTo(new BigDecimal(3));
-        assertThat(Numbers.toBigOptimistic((byte) 2)).isEqualTo(new BigDecimal(2));
-        assertThat(Numbers.toBigOptimistic((short) -1)).isEqualTo(new BigDecimal(-1));
-        assertThat(Numbers.toBigOptimistic(-1L)).isEqualTo(new BigDecimal(-1L));
-        assertThat(Numbers.toBigOptimistic(2.5f)).isEqualTo(new BigDecimal(2.5f));
-        assertThat(Numbers.toBigOptimistic(2.5)).isEqualTo(new BigDecimal(2.5));
-        assertThat(Numbers.toBigOptimistic(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
-        assertThat(Numbers.toBigOptimistic(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
-        assertThat(Numbers.toBigOptimistic(new Number() {
+        assertThat(Numbers.toBigDecimalOptimistic(3)).isEqualTo(new BigDecimal(3));
+        assertThat(Numbers.toBigDecimalOptimistic((byte) 2)).isEqualTo(new BigDecimal(2));
+        assertThat(Numbers.toBigDecimalOptimistic((short) -1)).isEqualTo(new BigDecimal(-1));
+        assertThat(Numbers.toBigDecimalOptimistic(-1L)).isEqualTo(new BigDecimal(-1L));
+        assertThat(Numbers.toBigDecimalOptimistic(2.5f)).isEqualTo(new BigDecimal(2.5f));
+        assertThat(Numbers.toBigDecimalOptimistic(2.5)).isEqualTo(new BigDecimal(2.5));
+        assertThat(Numbers.toBigDecimalOptimistic(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
+        assertThat(Numbers.toBigDecimalOptimistic(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
+        assertThat(Numbers.toBigDecimalOptimistic(new Number() {
 
             @Override
             public int intValue() {
@@ -333,17 +333,17 @@ public class NumbersTest {
     @Test
     public void testToBigSafe() {
 
-        assertThat(Numbers.toBigSafe(3)).isEqualTo(new BigDecimal(3));
-        assertThat(Numbers.toBigSafe((byte) 2)).isEqualTo(new BigDecimal(2));
-        assertThat(Numbers.toBigSafe((short) -1)).isEqualTo(new BigDecimal(-1));
-        assertThat(Numbers.toBigSafe(-1L)).isEqualTo(new BigDecimal(-1L));
-        assertThat(Numbers.toBigSafe(2.5f)).isEqualTo(new BigDecimal(2.5f));
-        assertThat(Numbers.toBigSafe(2.5)).isEqualTo(new BigDecimal(2.5));
-        assertThat(Numbers.toBigSafe(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
-        assertThat(Numbers.toBigSafe(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
+        assertThat(Numbers.toBigDecimalSafe(3)).isEqualTo(new BigDecimal(3));
+        assertThat(Numbers.toBigDecimalSafe((byte) 2)).isEqualTo(new BigDecimal(2));
+        assertThat(Numbers.toBigDecimalSafe((short) -1)).isEqualTo(new BigDecimal(-1));
+        assertThat(Numbers.toBigDecimalSafe(-1L)).isEqualTo(new BigDecimal(-1L));
+        assertThat(Numbers.toBigDecimalSafe(2.5f)).isEqualTo(new BigDecimal(2.5f));
+        assertThat(Numbers.toBigDecimalSafe(2.5)).isEqualTo(new BigDecimal(2.5));
+        assertThat(Numbers.toBigDecimalSafe(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
+        assertThat(Numbers.toBigDecimalSafe(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
 
         try {
-            assertThat(Numbers.toBigSafe(new Number() {
+            assertThat(Numbers.toBigDecimalSafe(new Number() {
 
                 @Override
                 public int intValue() {

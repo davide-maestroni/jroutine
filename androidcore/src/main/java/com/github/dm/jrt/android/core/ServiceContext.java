@@ -72,7 +72,7 @@ public abstract class ServiceContext {
     public static ServiceContext serviceFrom(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
 
-        return serviceFrom(context, new Intent(context, serviceClass));
+        return new IntentServiceContext(context, new Intent(context, serviceClass));
     }
 
     /**
@@ -82,10 +82,24 @@ public abstract class ServiceContext {
      * @param context the context.
      * @param service the service intent.
      * @return the service context.
+     * @throws java.lang.IllegalArgumentException if the component of the specified intent does not
+     *                                            inherit from {@link InvocationService}.
      */
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context,
             @NotNull final Intent service) {
+
+        final String className = service.getComponent().getClassName();
+        try {
+            final Class<?> serviceClass = Class.forName(className);
+            if (!InvocationService.class.isAssignableFrom(serviceClass)) {
+                throw new IllegalArgumentException(
+                        "service class must inherit from " + InvocationService.class.getName());
+            }
+
+        } catch (final ClassNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
 
         return new IntentServiceContext(context, service);
     }

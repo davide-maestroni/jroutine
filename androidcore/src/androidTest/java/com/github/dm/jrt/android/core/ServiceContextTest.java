@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core;
 
 import android.annotation.TargetApi;
+import android.app.Service;
 import android.content.Intent;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
@@ -104,6 +105,14 @@ public class ServiceContextTest extends ActivityInstrumentationTestCase2<TestAct
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            serviceFrom(getActivity(), new Intent(getActivity(), Service.class));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

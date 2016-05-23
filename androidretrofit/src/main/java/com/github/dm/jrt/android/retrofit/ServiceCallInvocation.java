@@ -21,6 +21,7 @@ import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -62,34 +63,11 @@ public class ServiceCallInvocation extends
      */
     public static final int REQUEST_DATA_INDEX = -1;
 
-    private final OkHttpClient mClient;
-
     private MediaType mMediaType;
 
     private ByteArrayOutputStream mOutputStream;
 
     private RequestData mRequestData;
-
-    /**
-     * Constructor.
-     *
-     * @throws java.lang.UnsupportedOperationException if called.
-     */
-    @SuppressWarnings("unused")
-    public ServiceCallInvocation() {
-
-        mClient = ConstantConditions.unsupported();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param client the OkHttp client.
-     */
-    public ServiceCallInvocation(@NotNull final OkHttpClient client) {
-
-        mClient = ConstantConditions.notNull("http client instance", client);
-    }
 
     public void onInput(final ParcelableSelectable<Object> input,
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
@@ -120,13 +98,13 @@ public class ServiceCallInvocation extends
 
     @Override
     public void onResult(@NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws
-            IOException {
+            Exception {
 
         final ByteArrayOutputStream byteStream = mOutputStream;
         final Request request = mRequestData.requestWithBody(
                 (byteStream != null) ? RequestBody.create(mMediaType, byteStream.toByteArray())
                         : null);
-        final ResponseBody responseBody = mClient.newCall(request).execute().body();
+        final ResponseBody responseBody = getClient().newCall(request).execute().body();
         final MediaType mediaType = responseBody.contentType();
         if (mediaType != null) {
             result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
@@ -149,5 +127,14 @@ public class ServiceCallInvocation extends
         mRequestData = null;
         mOutputStream = null;
         mMediaType = null;
+    }
+
+    @NotNull
+    private OkHttpClient getClient() throws Exception {
+
+        return (OkHttpClient) ConstantConditions.notNull("http client instance",
+                ContextInvocationTarget.instanceOf(OkHttpClient.class)
+                                       .getInvocationTarget(getContext())
+                                       .getTarget());
     }
 }

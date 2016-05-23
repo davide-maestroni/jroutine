@@ -64,14 +64,16 @@ public class ServiceContextTest extends ActivityInstrumentationTestCase2<TestAct
         assertThat(serviceContext).isEqualTo(serviceContext);
         assertThat(serviceContext).isNotEqualTo(null);
         assertThat(serviceContext).isNotEqualTo("test");
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), new Intent()));
+        assertThat(serviceContext).isNotEqualTo(
+                serviceFrom(getActivity(), InvocationService.class));
         assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intent));
         assertThat(serviceContext.hashCode()).isEqualTo(
                 serviceFrom(getActivity(), intent).hashCode());
         final Intent intentExtra = new Intent(getActivity(), TestService.class);
         intentExtra.putExtra("test", true);
         serviceContext = serviceFrom(getActivity(), intentExtra);
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), new Intent()));
+        assertThat(serviceContext).isNotEqualTo(
+                serviceFrom(getActivity(), InvocationService.class));
         final Intent intentExtra2 = new Intent(getActivity(), TestService.class);
         intentExtra2.putExtra("test", false);
         assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));

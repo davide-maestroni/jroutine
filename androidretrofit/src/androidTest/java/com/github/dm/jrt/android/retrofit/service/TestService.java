@@ -16,23 +16,13 @@
 
 package com.github.dm.jrt.android.retrofit.service;
 
-import org.jetbrains.annotations.NotNull;
-
-import okhttp3.OkHttpClient;
+import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
  * Test service.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
-public class TestService extends RetrofitInvocationService {
+public class TestService extends InvocationService {
 
-    private final OkHttpClient mClient = new OkHttpClient();
-
-    @NotNull
-    @Override
-    protected OkHttpClient getHttpClient() {
-
-        return mClient;
-    }
 }

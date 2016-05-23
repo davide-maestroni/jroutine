@@ -21,7 +21,6 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.retrofit.service.RetrofitInvocationService;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -60,9 +59,6 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * {@code StreamChannel} return types.
  * <br>
  * If properly configured, the routine invocations will run in a dedicated Android service.
- * <br>
- * Note, however, that the service class specified in the context must inherit from
- * {@link RetrofitInvocationService}.
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */
@@ -128,37 +124,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      *
      * @param context the service context.
      * @return the factory instance.
-     * @throws java.lang.IllegalArgumentException if the service class specified in the context
-     *                                            does inherit from
-     *                                            {@link RetrofitInvocationService}.
      */
     @NotNull
     public static ServiceAdapterFactory defaultFactory(@Nullable final ServiceContext context) {
 
         return (context == null) ? defaultFactory()
-                : new ServiceAdapterFactory(verifyContext(context),
-                        InvocationConfiguration.defaultConfiguration(),
+                : new ServiceAdapterFactory(context, InvocationConfiguration.defaultConfiguration(),
                         ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
-    }
-
-    @Nullable
-    private static ServiceContext verifyContext(@Nullable final ServiceContext context) {
-
-        if (context != null) {
-            final String className = context.getServiceIntent().getComponent().getClassName();
-            try {
-                final Class<?> serviceClass = Class.forName(className);
-                if (!RetrofitInvocationService.class.isAssignableFrom(serviceClass)) {
-                    throw new IllegalArgumentException("service class must inherit from "
-                            + RetrofitInvocationService.class.getName());
-                }
-
-            } catch (final ClassNotFoundException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        return context;
     }
 
     @Override
@@ -321,14 +293,11 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          *
          * @param context the service context.
          * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the service class specified in the context
-         *                                            does inherit from
-         *                                            {@link RetrofitInvocationService}.
          */
         @NotNull
         public Builder with(@Nullable final ServiceContext context) {
 
-            mServiceContext = verifyContext(context);
+            mServiceContext = context;
             return this;
         }
     }

@@ -430,25 +430,6 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    public void testInvalidContext() {
-
-        try {
-            ServiceAdapterFactory.defaultFactory(serviceFrom(getActivity()));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-            ServiceAdapterFactory.builder().with(serviceFrom(getActivity()));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
     public void testOutputChannelAdapter() throws IOException {
 
         testOutputChannelAdapter(serviceFrom(getActivity(), TestService.class));

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android.core;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -89,10 +90,10 @@ public abstract class ServiceContext {
     public static ServiceContext serviceFrom(@NotNull final Context context,
             @NotNull final Intent service) {
 
-        final String className = service.getComponent().getClassName();
+        final ComponentName component = service.getComponent();
         try {
-            final Class<?> serviceClass = Class.forName(className);
-            if (!InvocationService.class.isAssignableFrom(serviceClass)) {
+            if ((component == null) || !InvocationService.class.isAssignableFrom(
+                    Class.forName(component.getClassName()))) {
                 throw new IllegalArgumentException(
                         "service class must inherit from " + InvocationService.class.getName());
             }

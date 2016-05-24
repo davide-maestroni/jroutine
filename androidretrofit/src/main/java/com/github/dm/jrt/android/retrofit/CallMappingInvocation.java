@@ -62,11 +62,8 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
         final RequestBody body = request.body();
         if (body != null) {
             final MediaType mediaType = body.contentType();
-            if (mediaType != null) {
-                result.pass(
-                        new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
-            }
-
+            result.pass(new ParcelableSelectable<Object>(
+                    (mediaType != null) ? mediaType.toString() : null, MEDIA_TYPE_INDEX));
             final Buffer buffer = new Buffer();
             body.writeTo(buffer);
             if (buffer.size() > 0) {

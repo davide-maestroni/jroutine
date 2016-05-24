@@ -23,20 +23,29 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.BufferedSink;
+
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
  * Implementation of a context invocation handling OkHttp requests.
@@ -63,14 +72,18 @@ public class ServiceCallInvocation extends
      */
     public static final int REQUEST_DATA_INDEX = -1;
 
-    private MediaType mMediaType;
+    private boolean mHasMediaType;
 
-    private ByteArrayOutputStream mOutputStream;
+    private IOChannel<ParcelableByteBuffer> mInputChannel;
+
+    private boolean mIsRequest;
+
+    private MediaType mMediaType;
 
     private RequestData mRequestData;
 
     public void onInput(final ParcelableSelectable<Object> input,
-            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
+            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
 
         switch (input.index) {
             case REQUEST_DATA_INDEX:
@@ -78,21 +91,26 @@ public class ServiceCallInvocation extends
                 break;
 
             case MEDIA_TYPE_INDEX:
+                mHasMediaType = true;
                 final String mediaType = input.data();
-                mMediaType = MediaType.parse(mediaType);
+                mMediaType = (mediaType != null) ? MediaType.parse(mediaType) : null;
                 break;
 
             case BYTES_INDEX:
-                if (mOutputStream == null) {
-                    mOutputStream = new ByteArrayOutputStream();
+                if (mInputChannel == null) {
+                    mInputChannel = JRoutineCore.io().buildChannel();
                 }
 
                 final ParcelableByteBuffer buffer = input.data();
-                ParcelableByteChannel.inputStream(buffer).transferTo(mOutputStream);
+                mInputChannel.pass(buffer);
                 break;
 
             default:
                 throw new IllegalArgumentException("unknown selectable index: " + input.index);
+        }
+
+        if (mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
+            asyncRequest(result);
         }
     }
 
@@ -100,11 +118,72 @@ public class ServiceCallInvocation extends
     public void onResult(@NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws
             Exception {
 
-        final ByteArrayOutputStream byteStream = mOutputStream;
-        final Request request = mRequestData.requestWithBody(
-                (byteStream != null) ? RequestBody.create(mMediaType, byteStream.toByteArray())
-                        : null);
-        final ResponseBody responseBody = getClient().newCall(request).execute().body();
+        final IOChannel<ParcelableByteBuffer> inputChannel = mInputChannel;
+        if (inputChannel != null) {
+            inputChannel.close();
+            asyncRequest(result);
+
+        } else {
+            syncRequest(result);
+        }
+    }
+
+    @Override
+    public void onTerminate() {
+
+        mRequestData = null;
+        mMediaType = null;
+        mInputChannel = null;
+        mHasMediaType = false;
+    }
+
+    private void asyncRequest(
+            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
+
+        if (mIsRequest) {
+            return;
+        }
+
+        mIsRequest = true;
+        final Request request =
+                mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
+        final IOChannel<ParcelableSelectable<Object>> outputChannel =
+                JRoutineCore.io().buildChannel();
+        outputChannel.bind(result);
+        getClient().newCall(request).enqueue(new Callback() {
+
+            public void onFailure(final Call call, final IOException e) {
+
+                outputChannel.abort(e);
+            }
+
+            public void onResponse(final Call call, final Response response) throws IOException {
+
+                try {
+                    publishResult(response.body(), outputChannel);
+
+                } catch (final IOException e) {
+                    outputChannel.abort(e);
+
+                } finally {
+                    outputChannel.close();
+                }
+            }
+        });
+    }
+
+    @NotNull
+    private OkHttpClient getClient() throws Exception {
+
+        return (OkHttpClient) ConstantConditions.notNull("http client instance",
+                ContextInvocationTarget.instanceOf(OkHttpClient.class)
+                                       .getInvocationTarget(getContext())
+                                       .getTarget());
+    }
+
+    private void publishResult(@NotNull final ResponseBody responseBody,
+            @NotNull final InputChannel<ParcelableSelectable<Object>> result) throws IOException {
+
         final MediaType mediaType = responseBody.contentType();
         if (mediaType != null) {
             result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
@@ -121,20 +200,54 @@ public class ServiceCallInvocation extends
         }
     }
 
-    @Override
-    public void onTerminate() {
+    private void syncRequest(
+            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
 
-        mRequestData = null;
-        mOutputStream = null;
-        mMediaType = null;
+        final Request request = mRequestData.requestWithBody(null);
+        final ResponseBody responseBody = getClient().newCall(request).execute().body();
+        publishResult(responseBody, result);
     }
 
-    @NotNull
-    private OkHttpClient getClient() throws Exception {
+    /**
+     * Asynchronous request body.
+     */
+    private static class AsyncRequestBody extends RequestBody {
 
-        return (OkHttpClient) ConstantConditions.notNull("http client instance",
-                ContextInvocationTarget.instanceOf(OkHttpClient.class)
-                                       .getInvocationTarget(getContext())
-                                       .getTarget());
+        private final IOChannel<ParcelableByteBuffer> mInputChannel;
+
+        private final MediaType mMediaType;
+
+        /**
+         * Constructor.
+         *
+         * @param mediaType    the media type.
+         * @param inputChannel the input channel.
+         */
+        private AsyncRequestBody(@Nullable final MediaType mediaType,
+                @NotNull final IOChannel<ParcelableByteBuffer> inputChannel) {
+
+            mMediaType = mediaType;
+            mInputChannel = inputChannel;
+        }
+
+        @Override
+        public MediaType contentType() {
+
+            return mMediaType;
+        }
+
+        @Override
+        public void writeTo(final BufferedSink sink) throws IOException {
+
+            final OutputStream outputStream = sink.outputStream();
+            try {
+                for (final ParcelableByteBuffer buffer : mInputChannel.afterMax(infinity())) {
+                    ParcelableByteChannel.inputStream(buffer).transferTo(outputStream);
+                }
+
+            } finally {
+                outputStream.close();
+            }
+        }
     }
 }

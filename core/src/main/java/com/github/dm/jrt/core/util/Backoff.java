@@ -21,7 +21,8 @@ package com.github.dm.jrt.core.util;
  * exceeds a specified limit.
  * <br>
  * The implementation should be stateless and rely only on the passed excess count to compute the
- * delay.
+ * delay. In fact, the implementing class is likely to be called from different threads and with
+ * unrelated count numbers.
  * <p>
  * Created by davide-maestroni on 05/09/2016.
  */
@@ -30,7 +31,7 @@ public interface Backoff {
     /**
      * Gets the delay for the specified count.
      *
-     * @param count the count exceeding the limit (it is expected to be positive).
+     * @param count the count exceeding the limit (it must be positive).
      * @return the delay in milliseconds.
      */
     long getDelay(int count);

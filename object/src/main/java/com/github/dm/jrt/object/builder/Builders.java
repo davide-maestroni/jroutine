@@ -649,15 +649,15 @@ public class Builders {
             } else if (annotationType == OutputOrder.class) {
                 builder.withOutputOrder(((OutputOrder) annotation).value());
 
-            } else if (annotationType == Priority.class) {
-                builder.withPriority(((Priority) annotation).value());
-
             } else if (annotationType == OutputTimeout.class) {
                 final OutputTimeout timeoutAnnotation = (OutputTimeout) annotation;
                 builder.withOutputTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
 
             } else if (annotationType == OutputTimeoutAction.class) {
                 builder.withOutputTimeoutAction(((OutputTimeoutAction) annotation).value());
+
+            } else if (annotationType == Priority.class) {
+                builder.withPriority(((Priority) annotation).value());
             }
         }
 

@@ -16,13 +16,8 @@
 
 package com.github.dm.jrt.core.runner;
 
-import com.github.dm.jrt.core.util.ConstantConditions;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -35,9 +30,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 01/23/2015.
  */
-class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
-
-    private final ThreadPoolExecutor mExecutor;
+class DynamicScheduledThreadExecutor extends ScheduledThreadExecutor {
 
     /**
      * Constructor.
@@ -56,70 +49,8 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
             final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
 
-        super(1);
-        mExecutor =
-                new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                        new NonRejectingQueue());
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> schedule(final Runnable command, final long delay,
-            final TimeUnit unit) {
-
-        return super.schedule(new CommandRunnable(mExecutor, command), delay, unit);
-    }
-
-    @NotNull
-    @Override
-    public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay,
-            final TimeUnit unit) {
-
-        return ConstantConditions.unsupported();
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay,
-            final long period, final TimeUnit unit) {
-
-        return ConstantConditions.unsupported();
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
-            final long initialDelay, final long delay, final TimeUnit unit) {
-
-        return ConstantConditions.unsupported();
-    }
-
-    /**
-     * Runnable executing another runnable.
-     */
-    private static class CommandRunnable implements Runnable {
-
-        private final Runnable mCommand;
-
-        private final ThreadPoolExecutor mExecutor;
-
-        /**
-         * Constructor.
-         *
-         * @param executor the executor instance.
-         * @param command  the command to execute.
-         */
-        private CommandRunnable(@NotNull final ThreadPoolExecutor executor,
-                @NotNull final Runnable command) {
-
-            mExecutor = executor;
-            mCommand = command;
-        }
-
-        public void run() {
-
-            mExecutor.execute(mCommand);
-        }
+        super(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
+                new NonRejectingQueue()));
     }
 
     /**

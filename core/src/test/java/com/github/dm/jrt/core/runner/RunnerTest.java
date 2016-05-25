@@ -220,6 +220,7 @@ public class RunnerTest {
     public void testScheduledRunner() throws InterruptedException {
 
         testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(Runners.scheduledRunner(Executors.newCachedThreadPool()));
         testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
         testRunner(new RunnerDecorator(
                 new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));

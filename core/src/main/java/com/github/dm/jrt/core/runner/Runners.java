@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -132,6 +133,26 @@ public class Runners {
     }
 
     /**
+     * Returns a runner employing the specified executor service.
+     * <p>
+     * Be aware that the created runner will not fully comply with the interface contract. Java
+     * executor services do not in fact publish the used threads, so that knowing in advance whether
+     * a thread belongs to the managed pool is not feasible. This issue actually exposes routines
+     * employing the runner to possible deadlocks, in case the specified service is not exclusively
+     * accessed by the runner itself.
+     * <br>
+     * Be then careful when employing runners returned by this method.
+     *
+     * @param service the executor service.
+     * @return the runner instance.
+     */
+    @NotNull
+    public static Runner scheduledRunner(@NotNull final ExecutorService service) {
+
+        return scheduledRunner(new ScheduledThreadExecutor(service));
+    }
+
+    /**
      * Returns the shared instance of a thread pool asynchronous runner.
      *
      * @return the runner instance.
@@ -143,7 +164,7 @@ public class Runners {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
                 sSharedRunner = dynamicPoolRunner(Math.max(2, processors >> 1),
-                        Math.max(2, (processors << 2) - 1), 30L, TimeUnit.SECONDS);
+                        Math.max(2, (processors << 2) - 1), 10L, TimeUnit.SECONDS);
             }
 
             return sSharedRunner;

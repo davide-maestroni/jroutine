@@ -78,28 +78,6 @@ public class InvocationTest {
     }
 
     @Test
-    public void testComparableFilterInvocation() {
-
-        final TestComparableMappingInvocation factory =
-                new TestComparableMappingInvocation(asArgs(1));
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
-
-            @NotNull
-            @Override
-            public Invocation<Object, Object> newInvocation() {
-
-                return new TemplateInvocation<Object, Object>() {};
-            }
-        });
-        assertThat(factory).isNotEqualTo(new TestComparableMappingInvocation(asArgs(2)));
-        assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableMappingInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableMappingInvocation(asArgs(1)));
-    }
-
-    @Test
     public void testComparableInvocationFactory() {
 
         final TestComparableInvocationFactory factory =
@@ -119,6 +97,28 @@ public class InvocationTest {
         assertThat(factory.hashCode()).isEqualTo(
                 new TestComparableInvocationFactory(asArgs(1)).hashCode());
         assertThat(factory).isEqualTo(new TestComparableInvocationFactory(asArgs(1)));
+    }
+
+    @Test
+    public void testComparableMappingInvocation() {
+
+        final TestComparableMappingInvocation factory =
+                new TestComparableMappingInvocation(asArgs(1));
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+
+            @NotNull
+            @Override
+            public Invocation<Object, Object> newInvocation() {
+
+                return new TemplateInvocation<Object, Object>() {};
+            }
+        });
+        assertThat(factory).isNotEqualTo(new TestComparableMappingInvocation(asArgs(2)));
+        assertThat(factory.hashCode()).isEqualTo(
+                new TestComparableMappingInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableMappingInvocation(asArgs(1)));
     }
 
     @Test

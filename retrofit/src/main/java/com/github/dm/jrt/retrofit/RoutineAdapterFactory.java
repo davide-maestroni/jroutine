@@ -38,19 +38,21 @@ import java.lang.reflect.Method;
 public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
     private static final RoutineAdapterFactory sFactory =
-            new RoutineAdapterFactory(InvocationConfiguration.defaultConfiguration(),
+            new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
                     InvocationMode.ASYNC);
 
     /**
      * Constructor.
      *
-     * @param configuration  the invocation configuration.
-     * @param invocationMode the invocation mode.
+     * @param delegateFactory the delegate factory.
+     * @param configuration   the invocation configuration.
+     * @param invocationMode  the invocation mode.
      */
-    private RoutineAdapterFactory(@NotNull final InvocationConfiguration configuration,
+    private RoutineAdapterFactory(@Nullable final ConfigurableAdapterFactory delegateFactory,
+            @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
 
-        super(configuration, invocationMode);
+        super(delegateFactory, configuration, invocationMode);
     }
 
     /**
@@ -89,6 +91,8 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();
 
+        private ConfigurableAdapterFactory mDelegateFactory;
+
         private InvocationMode mInvocationMode = InvocationMode.ASYNC;
 
         /**
@@ -113,7 +117,20 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
         @NotNull
         public RoutineAdapterFactory buildFactory() {
 
-            return new RoutineAdapterFactory(mConfiguration, mInvocationMode);
+            return new RoutineAdapterFactory(mDelegateFactory, mConfiguration, mInvocationMode);
+        }
+
+        /**
+         * Sets the delegate factory to be used to execute the calls.
+         *
+         * @param factory the factory instance.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder delegateFactory(@Nullable final ConfigurableAdapterFactory factory) {
+
+            mDelegateFactory = factory;
+            return this;
         }
 
         @NotNull

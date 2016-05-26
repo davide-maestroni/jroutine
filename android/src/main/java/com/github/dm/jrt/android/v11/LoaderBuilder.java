@@ -105,7 +105,6 @@ public class LoaderBuilder {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
@@ -133,7 +132,6 @@ public class LoaderBuilder {
      *                                            the specified objects as parameters is found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
@@ -160,7 +158,6 @@ public class LoaderBuilder {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
@@ -188,7 +185,6 @@ public class LoaderBuilder {
      *                                            the specified objects as parameters is found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {

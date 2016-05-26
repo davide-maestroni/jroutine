@@ -330,7 +330,6 @@ public class InvocationService extends Service {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void initRoutine(@NotNull final Message message) throws Exception {
 
         final Bundle data = message.peekData();
@@ -348,7 +347,7 @@ public class InvocationService extends Service {
                     "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
-        final Class<? extends ContextInvocation<?, ?>> targetClass =
+        @SuppressWarnings("unchecked") final Class<? extends ContextInvocation<?, ?>> targetClass =
                 (Class<? extends ContextInvocation<?, ?>>) data.getSerializable(
                         KEY_TARGET_INVOCATION);
         if (targetClass == null) {
@@ -373,9 +372,9 @@ public class InvocationService extends Service {
 
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final Level logLevel = (Level) data.getSerializable(KEY_LOG_LEVEL);
-            final Class<? extends Runner> runnerClass =
+            @SuppressWarnings("unchecked") final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
-            final Class<? extends Log> logClass =
+            @SuppressWarnings("unchecked") final Class<? extends Log> logClass =
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final RoutineInfo routineInfo =
                     new RoutineInfo(targetClass, args, outputOrderType, runnerClass, logClass,

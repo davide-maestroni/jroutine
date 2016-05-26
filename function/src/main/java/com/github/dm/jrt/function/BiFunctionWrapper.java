@@ -160,7 +160,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
-    @SuppressWarnings("unchecked")
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
             @NotNull final Comparator<? super IN> comparator) {
 
@@ -168,7 +167,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
         synchronized (mMaxFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMaxFunctions;
-            BiFunctionWrapper<IN, IN, IN> function =
+            @SuppressWarnings("unchecked") BiFunctionWrapper<IN, IN, IN> function =
                     (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
             if (function == null) {
                 function = new BiFunctionWrapper<IN, IN, IN>(new MaxByFunction<IN>(comparator));
@@ -205,7 +204,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
-    @SuppressWarnings("unchecked")
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
             @NotNull final Comparator<? super IN> comparator) {
 
@@ -213,7 +211,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
         synchronized (mMinFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMinFunctions;
-            BiFunctionWrapper<IN, IN, IN> function =
+            @SuppressWarnings("unchecked") BiFunctionWrapper<IN, IN, IN> function =
                     (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
             if (function == null) {
                 function = new BiFunctionWrapper<IN, IN, IN>(new MinByFunction<IN>(comparator));

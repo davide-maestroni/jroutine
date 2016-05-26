@@ -68,7 +68,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
 
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
     protected OutputChannel<List<? extends OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
 
@@ -78,7 +77,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         final Object mutex = new Object();
         final int size = channels.size();
         final boolean[] closed = new boolean[size];
-        final SimpleQueue<OUT>[] queues = new SimpleQueue[size];
+        @SuppressWarnings("unchecked") final SimpleQueue<OUT>[] queues = new SimpleQueue[size];
         for (int i = 0; i < size; ++i) {
             queues[i] = new SimpleQueue<OUT>();
         }
@@ -138,7 +137,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
          * @param placeholder the placeholder instance.
          * @param channel     the I/O channel.
          */
-        @SuppressWarnings("unchecked")
         private JoinOutputConsumer(final int limit, @Nullable final Backoff backoff,
                 final int maxSize, @NotNull final Object mutex, final int index,
                 final boolean isFlush, @NotNull final boolean[] closed,

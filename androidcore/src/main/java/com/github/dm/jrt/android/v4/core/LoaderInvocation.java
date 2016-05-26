@@ -216,7 +216,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static void purgeLoaderInternal(@NotNull final LoaderContextCompat context,
             final int loaderId, @NotNull final List<?> inputs) {
 
@@ -243,63 +242,13 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 continue;
             }
 
-            final InvocationLoader<Object, Object> loader =
+            @SuppressWarnings("unchecked") final InvocationLoader<Object, Object> loader =
                     (InvocationLoader<Object, Object>) callbacks.mLoader;
             if ((loader.getInvocationCount() == 0) && (loaderId == callbackArray.keyAt(i)) && loader
                     .areSameInputs(inputs)) {
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.removeAt(i);
                 continue;
-            }
-
-            ++i;
-        }
-
-        if (callbackArray.size() == 0) {
-            callbackMap.remove(component);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void purgeLoadersInternal(@NotNull final LoaderContextCompat context,
-            final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory,
-            @NotNull final List<?> inputs) {
-
-        final Object component = context.getComponent();
-        final WeakIdentityHashMap<Object,
-                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
-                callbackMap = sCallbacks;
-        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
-        if (callbackArray == null) {
-            return;
-        }
-
-        final LoaderManager loaderManager = context.getLoaderManager();
-        if (loaderManager == null) {
-            return;
-        }
-
-        int i = 0;
-        while (i < callbackArray.size()) {
-            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-            if (callbacks == null) {
-                callbackArray.removeAt(i);
-                continue;
-            }
-
-            final InvocationLoader<Object, Object> loader =
-                    (InvocationLoader<Object, Object>) callbacks.mLoader;
-            if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
-                    == 0)) {
-                final int id = callbackArray.keyAt(i);
-                if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
-                        && loader.areSameInputs(inputs)) {
-
-                    loaderManager.destroyLoader(id);
-                    callbackArray.removeAt(i);
-                    continue;
-                }
             }
 
             ++i;
@@ -355,6 +304,55 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
     }
 
+    private static void purgeLoadersInternal(@NotNull final LoaderContextCompat context,
+            final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory,
+            @NotNull final List<?> inputs) {
+
+        final Object component = context.getComponent();
+        final WeakIdentityHashMap<Object,
+                SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
+                callbackMap = sCallbacks;
+        final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
+                callbackMap.get(component);
+        if (callbackArray == null) {
+            return;
+        }
+
+        final LoaderManager loaderManager = context.getLoaderManager();
+        if (loaderManager == null) {
+            return;
+        }
+
+        int i = 0;
+        while (i < callbackArray.size()) {
+            final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
+            if (callbacks == null) {
+                callbackArray.removeAt(i);
+                continue;
+            }
+
+            @SuppressWarnings("unchecked") final InvocationLoader<Object, Object> loader =
+                    (InvocationLoader<Object, Object>) callbacks.mLoader;
+            if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
+                    == 0)) {
+                final int id = callbackArray.keyAt(i);
+                if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
+                        && loader.areSameInputs(inputs)) {
+
+                    loaderManager.destroyLoader(id);
+                    callbackArray.removeAt(i);
+                    continue;
+                }
+            }
+
+            ++i;
+        }
+
+        if (callbackArray.size() == 0) {
+            callbackMap.remove(component);
+        }
+    }
+
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
@@ -375,7 +373,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void onCall(@NotNull final List<? extends IN> inputs,
             @NotNull final ResultChannel<OUT> result) throws Exception {
 
@@ -408,7 +405,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         final WeakReference<RoutineLoaderCallbacks<?>> callbackReference =
                 callbackArray.get(loaderId);
-        RoutineLoaderCallbacks<OUT> callbacks =
+        @SuppressWarnings("unchecked") RoutineLoaderCallbacks<OUT> callbacks =
                 (callbackReference != null) ? (RoutineLoaderCallbacks<OUT>) callbackReference.get()
                         : null;
         if (clashType == ClashType.ABORT_BOTH) {
@@ -496,7 +493,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
             final int loaderId, @NotNull final List<? extends IN> inputs) {
 
@@ -511,7 +507,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
 
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
-        final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
+        @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
+                (InvocationLoader<IN, OUT>) loader;
         if (!(factory instanceof MissingLoaderInvocationFactory)
                 && !invocationLoader.getInvocationFactory().equals(factory)) {
             logger.wrn("clashing loader ID [%d]: %s", loaderId,

@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamsCompat;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -35,6 +36,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
+import com.github.dm.jrt.retrofit.ConfigurableAdapterFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +50,8 @@ import java.lang.reflect.Type;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Implementation of a call adapter factory supporting {@code OutputChannel}, {@code StreamChannel}
@@ -81,8 +85,11 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             };
 
     private static final LoaderAdapterFactoryCompat sFactory =
-            new LoaderAdapterFactoryCompat(null, InvocationConfiguration.defaultConfiguration(),
+            new LoaderAdapterFactoryCompat(null, null,
+                    InvocationConfiguration.defaultConfiguration(),
                     LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+
+    private final ConfigurableAdapterFactory mDelegateFactory;
 
     private final LoaderConfiguration mLoaderConfiguration;
 
@@ -92,18 +99,21 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
      * Constructor.
      *
      * @param context                 the loader context.
+     * @param delegateFactory         the delegate factory.
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the service configuration.
      * @param invocationMode          the invocation mode.
      */
     private LoaderAdapterFactoryCompat(@Nullable final LoaderContextCompat context,
+            @Nullable final ConfigurableAdapterFactory delegateFactory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationMode invocationMode) {
 
-        super(invocationConfiguration, invocationMode);
+        super(delegateFactory, invocationConfiguration, invocationMode);
         mLoaderContext = context;
         mLoaderConfiguration = loaderConfiguration;
+        mDelegateFactory = delegateFactory;
     }
 
     /**
@@ -126,17 +136,38 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
     @NotNull
     public static LoaderAdapterFactoryCompat with(@Nullable final LoaderContextCompat context) {
 
-        return (context == null) ? sFactory : new LoaderAdapterFactoryCompat(context,
+        return (context == null) ? sFactory : new LoaderAdapterFactoryCompat(context, null,
                 InvocationConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+    }
+
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+            @NotNull final Retrofit retrofit) {
+
+        if (LoaderStreamChannelCompat.class == returnRawType) {
+            return new LoaderStreamChannelAdapter(mLoaderContext, invocationMode,
+                    buildRoutine(configuration, invocationMode, returnRawType, responseType,
+                            annotations, retrofit), responseType);
+        }
+
+        final CallAdapter<?> callAdapter =
+                super.get(configuration, invocationMode, returnRawType, responseType, annotations,
+                        retrofit);
+        return (callAdapter != null) ? new CallAdapterDecorator<Object>(
+                (CallAdapter<Object>) callAdapter) : null;
     }
 
     @NotNull
     @Override
     protected Routine<? extends Call<?>, ?> buildRoutine(
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
-            @NotNull final Type returnRawType, @NotNull final Annotation[] annotations,
+            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
 
         final LoaderContextCompat loaderContext = mLoaderContext;
@@ -146,8 +177,10 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
                     Builders.withAnnotations(configuration, annotations);
             final LoaderConfiguration loaderConfiguration =
                     AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
+            final ContextInvocationFactory<Call<Object>, Object> factory =
+                    getFactory(configuration, invocationMode, responseType, annotations, retrofit);
             return JRoutineLoaderCompat.with(loaderContext)
-                                       .on(sCallInvocationFactory)
+                                       .on(factory)
                                        .invocationConfiguration()
                                        .with(invocationConfiguration)
                                        .apply()
@@ -157,7 +190,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
                                        .buildRoutine();
         }
 
-        return super.buildRoutine(configuration, invocationMode, responseType, returnRawType,
+        return super.buildRoutine(configuration, invocationMode, returnRawType, responseType,
                 annotations, retrofit);
     }
 
@@ -172,25 +205,23 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         return super.extractResponseType(returnType);
     }
 
-    @Nullable
-    @Override
-    @SuppressWarnings("unchecked")
-    protected CallAdapter<?> getAdapter(@NotNull final InvocationConfiguration configuration,
+    @NotNull
+    private ContextInvocationFactory<Call<Object>, Object> getFactory(
+            @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
-            @NotNull final Type returnRawType, @NotNull final Annotation[] annotations,
-            @NotNull final Retrofit retrofit) {
+            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
 
-        if (LoaderStreamChannelCompat.class == returnRawType) {
-            return new LoaderStreamChannelAdapter(mLoaderContext, invocationMode,
-                    buildRoutine(configuration, invocationMode, responseType, returnRawType,
-                            annotations, retrofit), responseType);
+        final ConfigurableAdapterFactory delegateFactory = mDelegateFactory;
+        if (delegateFactory == null) {
+            return sCallInvocationFactory;
         }
 
-        final CallAdapter<?> callAdapter =
-                super.getAdapter(configuration, invocationMode, responseType, returnRawType,
-                        annotations, retrofit);
-        return (callAdapter != null) ? new CallAdapterDecorator<Object>(
-                (CallAdapter<Object>) callAdapter) : null;
+        @SuppressWarnings("unchecked") final CallAdapter<OutputChannel> callAdapter =
+                (CallAdapter<OutputChannel>) delegateFactory.get(configuration, invocationMode,
+                        OutputChannel.class, responseType, annotations, retrofit);
+        return (callAdapter != null) ? new CallAdapterInvocationFactory(
+                asArgs(delegateFactory, configuration, invocationMode, responseType, annotations,
+                        retrofit), callAdapter) : sCallInvocationFactory;
     }
 
     /**
@@ -207,6 +238,8 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             implements ConfigurableBuilder<Builder>, LoaderConfigurableBuilder<Builder>,
             InvocationConfiguration.Configurable<Builder>,
             LoaderConfiguration.Configurable<Builder> {
+
+        private ConfigurableAdapterFactory mDelegateFactory;
 
         private InvocationConfiguration mInvocationConfiguration =
                 InvocationConfiguration.defaultConfiguration();
@@ -249,8 +282,21 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         @NotNull
         public LoaderAdapterFactoryCompat buildFactory() {
 
-            return new LoaderAdapterFactoryCompat(mLoaderContext, mInvocationConfiguration,
-                    mLoaderConfiguration, mInvocationMode);
+            return new LoaderAdapterFactoryCompat(mLoaderContext, mDelegateFactory,
+                    mInvocationConfiguration, mLoaderConfiguration, mInvocationMode);
+        }
+
+        /**
+         * Sets the delegate factory to be used to execute the calls.
+         *
+         * @param factory the factory instance.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder delegateFactory(@Nullable final ConfigurableAdapterFactory factory) {
+
+            mDelegateFactory = factory;
+            return this;
         }
 
         @NotNull
@@ -319,6 +365,59 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         public <R> T adapt(final Call<R> call) {
 
             return mAdapter.adapt(ComparableCall.of(call));
+        }
+    }
+
+    /**
+     * Context invocation employing a call adapter.
+     */
+    private static class CallAdapterInvocation
+            extends TemplateContextInvocation<Call<Object>, Object> {
+
+        private final CallAdapter<OutputChannel> mCallAdapter;
+
+        /**
+         * Constructor.
+         *
+         * @param callAdapter the call adapter instance.
+         */
+        private CallAdapterInvocation(@NotNull final CallAdapter<OutputChannel> callAdapter) {
+
+            mCallAdapter = callAdapter;
+        }
+
+        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
+
+            result.pass(mCallAdapter.adapt(input));
+        }
+    }
+
+    /**
+     * Context invocation factory employing a call adapter.
+     */
+    private static class CallAdapterInvocationFactory
+            extends ContextInvocationFactory<Call<Object>, Object> {
+
+        private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param args        the factory arguments.
+         * @param callAdapter the call adapter instance.
+         */
+        private CallAdapterInvocationFactory(@Nullable final Object[] args,
+                @NotNull final CallAdapter<OutputChannel> callAdapter) {
+
+            super(args);
+            mInvocation = new CallAdapterInvocation(callAdapter);
+        }
+
+        @NotNull
+        @Override
+        public ContextInvocation<Call<Object>, Object> newInvocation() {
+
+            return mInvocation;
         }
     }
 

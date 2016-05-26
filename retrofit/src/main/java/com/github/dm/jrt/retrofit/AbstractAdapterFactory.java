@@ -41,13 +41,16 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Abstract implementation of a call adapter factory supporting {@code OutputChannel} and
  * {@code StreamChannel} return types.
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
-public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
+public abstract class AbstractAdapterFactory extends CallAdapter.Factory
+        implements ConfigurableAdapterFactory {
 
     private static final MappingInvocation<Call<Object>, Object> sCallInvocation =
             new MappingInvocation<Call<Object>, Object>(null) {
@@ -61,17 +64,22 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
     private final InvocationConfiguration mConfiguration;
 
+    private final ConfigurableAdapterFactory mDelegateFactory;
+
     private final InvocationMode mInvocationMode;
 
     /**
      * Constructor.
      *
-     * @param configuration  the invocation configuration.
-     * @param invocationMode the invocation mode.
+     * @param delegateFactory the delegate factory.
+     * @param configuration   the invocation configuration.
+     * @param invocationMode  the invocation mode.
      */
-    protected AbstractAdapterFactory(@NotNull final InvocationConfiguration configuration,
+    protected AbstractAdapterFactory(@Nullable final ConfigurableAdapterFactory delegateFactory,
+            @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
 
+        mDelegateFactory = delegateFactory;
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
@@ -91,13 +99,33 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             final ParameterizedType parameterizedType = (ParameterizedType) returnType;
             final Type responseType = extractResponseType(parameterizedType);
             if (responseType != null) {
-                return getAdapter(mConfiguration, invocationMode, responseType,
-                        (parameterizedType).getRawType(), annotations, retrofit);
+                return get(mConfiguration, invocationMode, parameterizedType.getRawType(),
+                        responseType, annotations, retrofit);
             }
 
         } else if (returnType instanceof Class) {
-            return getAdapter(mConfiguration, invocationMode, Object.class, returnType, annotations,
+            return get(mConfiguration, invocationMode, returnType, Object.class, annotations,
                     retrofit);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+            @NotNull final Retrofit retrofit) {
+
+        if (OutputChannel.class == returnRawType) {
+            return new OutputChannelAdapter(invocationMode,
+                    buildRoutine(configuration, invocationMode, returnRawType, responseType,
+                            annotations, retrofit), responseType);
+
+        } else if (StreamChannel.class == returnRawType) {
+            return new StreamChannelAdapter(invocationMode,
+                    buildRoutine(configuration, invocationMode, returnRawType, responseType,
+                            annotations, retrofit), responseType);
         }
 
         return null;
@@ -108,8 +136,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      *
      * @param configuration  the invocation configuration.
      * @param invocationMode the invocation mode.
-     * @param responseType   the type of the call response.
      * @param returnRawType  the return raw type to be adapted.
+     * @param responseType   the type of the call response.
      * @param annotations    the method annotations.
      * @param retrofit       the Retrofit instance.
      * @return the routine instance.
@@ -118,14 +146,16 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     @SuppressWarnings("UnusedParameters")
     protected Routine<? extends Call<?>, ?> buildRoutine(
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
-            @NotNull final Type returnRawType, @NotNull final Annotation[] annotations,
+            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
 
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
                 Builders.withAnnotations(configuration, annotations);
-        return JRoutineCore.on(sCallInvocation)
+        final MappingInvocation<Call<Object>, Object> factory =
+                getFactory(configuration, invocationMode, responseType, annotations, retrofit);
+        return JRoutineCore.on(factory)
                            .invocationConfiguration()
                            .with(invocationConfiguration)
                            .apply()
@@ -142,45 +172,33 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
 
         final Type rawType = returnType.getRawType();
-        if (StreamChannel.class == rawType) {
-            return returnType.getActualTypeArguments()[1];
-
-        } else if (OutputChannel.class == rawType) {
+        if (OutputChannel.class == rawType) {
             return returnType.getActualTypeArguments()[0];
+
+        } else if (StreamChannel.class == rawType) {
+            return returnType.getActualTypeArguments()[1];
         }
 
         return null;
     }
 
-    /**
-     * Gets the adapter used to convert a Retrofit call into the method return type.
-     *
-     * @param configuration  the invocation configuration.
-     * @param invocationMode the invocation mode.
-     * @param responseType   the type of the call response.
-     * @param returnRawType  the return raw type to be adapted.
-     * @param annotations    the method annotations.
-     * @param retrofit       the Retrofit instance.
-     * @return the call adapter or null.
-     */
-    @Nullable
-    protected CallAdapter<?> getAdapter(@NotNull final InvocationConfiguration configuration,
+    @NotNull
+    private MappingInvocation<Call<Object>, Object> getFactory(
+            @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
-            @NotNull final Type returnRawType, @NotNull final Annotation[] annotations,
-            @NotNull final Retrofit retrofit) {
+            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
 
-        if (StreamChannel.class == returnRawType) {
-            return new StreamChannelAdapter(invocationMode,
-                    buildRoutine(configuration, invocationMode, responseType, returnRawType,
-                            annotations, retrofit), responseType);
-
-        } else if (OutputChannel.class == returnRawType) {
-            return new OutputChannelAdapter(invocationMode,
-                    buildRoutine(configuration, invocationMode, responseType, returnRawType,
-                            annotations, retrofit), responseType);
+        final ConfigurableAdapterFactory delegateFactory = mDelegateFactory;
+        if (delegateFactory == null) {
+            return sCallInvocation;
         }
 
-        return null;
+        @SuppressWarnings("unchecked") final CallAdapter<OutputChannel<?>> callAdapter =
+                (CallAdapter<OutputChannel<?>>) delegateFactory.get(configuration, invocationMode,
+                        OutputChannel.class, responseType, annotations, retrofit);
+        return (callAdapter != null) ? new CallAdapterInvocation(
+                asArgs(delegateFactory, configuration, invocationMode, responseType, annotations,
+                        retrofit), callAdapter) : sCallInvocation;
     }
 
     /**
@@ -221,6 +239,32 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         protected Routine<Call<?>, ?> getRoutine() {
 
             return mRoutine;
+        }
+    }
+
+    /**
+     * Mapping invocation employing a call adapter.
+     */
+    private static class CallAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
+
+        private final CallAdapter<OutputChannel<?>> mCallAdapter;
+
+        /**
+         * Constructor.
+         *
+         * @param args        the factory arguments.
+         * @param callAdapter the call adapter instance.
+         */
+        private CallAdapterInvocation(@Nullable final Object[] args,
+                @NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
+
+            super(args);
+            mCallAdapter = callAdapter;
+        }
+
+        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
+
+            result.pass(mCallAdapter.adapt(input));
         }
     }
 

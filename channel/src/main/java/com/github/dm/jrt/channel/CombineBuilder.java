@@ -136,7 +136,6 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
             }
         }
 
-        @SuppressWarnings("unchecked")
         public void onOutput(final Selectable<? extends IN> selectable) {
 
             final int index = selectable.index - mStartIndex;
@@ -144,7 +143,8 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
                 return;
             }
 
-            final IOChannel<IN> channel = (IOChannel<IN>) mChannelList.get(index);
+            @SuppressWarnings("unchecked") final IOChannel<IN> channel =
+                    (IOChannel<IN>) mChannelList.get(index);
             if (channel != null) {
                 channel.pass(selectable.data);
             }

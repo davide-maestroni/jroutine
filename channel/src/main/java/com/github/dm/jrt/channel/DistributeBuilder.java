@@ -143,7 +143,6 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
             }
         }
 
-        @SuppressWarnings("unchecked")
         public void onOutput(final List<? extends IN> inputs) {
 
             final int inputSize = inputs.size();
@@ -156,7 +155,8 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
             final IN placeholder = mPlaceholder;
             final boolean isFlush = mIsFlush;
             for (int i = 0; i < size; ++i) {
-                final IOChannel<IN> channel = (IOChannel<IN>) channels.get(i);
+                @SuppressWarnings("unchecked") final IOChannel<IN> channel =
+                        (IOChannel<IN>) channels.get(i);
                 if (i < inputSize) {
                     channel.pass(inputs.get(i));
 

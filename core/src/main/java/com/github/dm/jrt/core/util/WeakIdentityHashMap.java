@@ -205,7 +205,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mEntrySet;
     }
 
-    @SuppressWarnings("unchecked")
     private void cleanUp() {
 
         final HashMap<IdentityWeakReference, V> map = mMap;

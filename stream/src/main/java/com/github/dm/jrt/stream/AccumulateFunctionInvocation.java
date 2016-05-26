@@ -88,7 +88,6 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
             @NotNull final Supplier<? extends OUT> supplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {

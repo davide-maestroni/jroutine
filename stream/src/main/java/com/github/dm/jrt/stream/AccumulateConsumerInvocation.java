@@ -88,7 +88,6 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
             @NotNull final Supplier<? extends OUT> supplier,
             @NotNull final BiConsumer<? super OUT, ? super IN> consumer) {

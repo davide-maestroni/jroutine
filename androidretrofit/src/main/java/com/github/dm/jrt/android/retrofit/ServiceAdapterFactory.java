@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.retrofit.ConfigurableAdapterFactory;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
@@ -62,7 +63,8 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */
-public class ServiceAdapterFactory extends CallAdapter.Factory {
+public class ServiceAdapterFactory extends CallAdapter.Factory
+        implements ConfigurableAdapterFactory {
 
     private static final ServiceAdapterFactory sFactory =
             new ServiceAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
@@ -144,44 +146,54 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             }
         }
 
-        // Use annotations to configure the routine
-        final InvocationConfiguration invocationConfiguration =
-                Builders.withAnnotations(mInvocationConfiguration, annotations);
-        final ServiceContext serviceContext = mServiceContext;
-        if ((serviceContext == null) || (invocationMode == InvocationMode.SYNC) || (invocationMode
-                == InvocationMode.SERIAL)) {
-            return RoutineAdapterFactory.builder()
-                                        .invocationMode(invocationMode)
-                                        .invocationConfiguration()
-                                        .with(invocationConfiguration)
-                                        .apply()
-                                        .buildFactory()
-                                        .get(returnType, annotations, retrofit);
-        }
-
         Type rawType = null;
         Type responseType = Object.class;
         if (returnType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) returnType;
             rawType = parameterizedType.getRawType();
-            if (StreamChannel.class == rawType) {
-                responseType = parameterizedType.getActualTypeArguments()[1];
-
-            } else if (OutputChannel.class == rawType) {
+            if (OutputChannel.class == rawType) {
                 responseType = parameterizedType.getActualTypeArguments()[0];
+
+            } else if (StreamChannel.class == rawType) {
+                responseType = parameterizedType.getActualTypeArguments()[1];
             }
 
         } else if (returnType instanceof Class) {
             rawType = returnType;
         }
 
-        if (StreamChannel.class == rawType) {
-            return new StreamChannelAdapter(invocationConfiguration,
+        return (rawType != null) ? get(mInvocationConfiguration, invocationMode, rawType,
+                responseType, annotations, retrofit) : null;
+    }
+
+    @Nullable
+    public CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+            @NotNull final Retrofit retrofit) {
+
+        final ServiceContext serviceContext = mServiceContext;
+        if ((serviceContext == null) || (invocationMode == InvocationMode.SYNC) || (invocationMode
+                == InvocationMode.SERIAL)) {
+            return RoutineAdapterFactory.builder()
+                                        .invocationConfiguration()
+                                        .with(mInvocationConfiguration)
+                                        .apply()
+                                        .buildFactory()
+                                        .get(configuration, invocationMode, returnRawType,
+                                                responseType, annotations, retrofit);
+        }
+
+        // Use annotations to configure the routine
+        final InvocationConfiguration invocationConfiguration =
+                Builders.withAnnotations(configuration, annotations);
+        if (OutputChannel.class == returnRawType) {
+            return new OutputChannelAdapter(invocationConfiguration,
                     retrofit.responseBodyConverter(responseType, annotations),
                     buildRoutine(invocationConfiguration), responseType);
 
-        } else if (OutputChannel.class == rawType) {
-            return new OutputChannelAdapter(invocationConfiguration,
+        } else if (StreamChannel.class == returnRawType) {
+            return new StreamChannelAdapter(invocationConfiguration,
                     retrofit.responseBodyConverter(responseType, annotations),
                     buildRoutine(invocationConfiguration), responseType);
         }
@@ -190,7 +202,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
             @NotNull final InvocationConfiguration invocationConfiguration) {
 

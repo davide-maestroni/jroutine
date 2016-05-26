@@ -85,7 +85,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine1.asyncCall().bind(routine2.invokeCall()).result().afterMax(seconds(20).all();
+ *         routine1.asyncCall().bind(routine2.asyncInvoke()).result().afterMax(seconds(20).all();
  *     </code>
  * </pre>
  * <p>

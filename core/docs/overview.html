@@ -45,6 +45,14 @@
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .afterMax(seconds(3))
                                    .next();
+                // Or:
+                // final Double rms = parseRoutine.parallelCall(args)
+                //                                .bind(squareRoutine.parallelInvoke())
+                //                                .result()
+                //                                .bind(meanRoutine.asyncInvoke())
+                //                                .result()
+                //                                .afterMax(seconds(3))
+                //                                .next();
                 System.out.println(rms);
                 System.exit(0);
             }
@@ -120,6 +128,14 @@
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .afterMax(seconds(3))
                                    .next();
+                // Or:
+                // final Double rms = parseRoutine.parallelCall(args)
+                //                                .bind(squareRoutine.parallelInvoke())
+                //                                .result()
+                //                                .bind(meanRoutine.asyncInvoke())
+                //                                .result()
+                //                                .afterMax(seconds(3))
+                //                                .next();
                 System.out.println(rms);
                 System.exit(0);
             }

@@ -36,13 +36,26 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * <b>Some usage examples</b>
  * <p>
- * <b>Example 1:</b> Asynchronously merge the output of two routines.
+ * <b>Example 1:</b> Configure and build a routine.
+ * <pre>
+ *     <code>
+ *
+ *         final Routine&lt;Input, Result&gt; routine =
+ *                 JRoutineCore.on(myFactory)
+ *                             .invocationConfiguration()
+ *                             .withLogLevel(Level.WARNING)
+ *                             .apply()
+ *                             .buildRoutine();
+ *     </code>
+ * </pre>
+ * <p>
+ * <b>Example 2:</b> Asynchronously merge the output of two routines.
  * <pre>
  *     <code>
  *
  *         final IOChannel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
- *         channel.pass(doSomething1.asyncCall())
- *                .pass(doSomething2.asyncCall())
+ *         channel.pass(routine1.asyncCall())
+ *                .pass(routine2.asyncCall())
  *                .close();
  *                .afterMax(seconds(20))
  *                .allInto(results);
@@ -52,8 +65,8 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final OutputChannel&lt;Result&gt; output1 = doSomething1.asyncCall();
- *         final OutputChannel&lt;Result&gt; output2 = doSomething2.asyncCall();
+ *         final OutputChannel&lt;Result&gt; output1 = routine1.asyncCall();
+ *         final OutputChannel&lt;Result&gt; output2 = routine2.asyncCall();
  *         output1.afterMax(seconds(20)).allInto(results);
  *         output2.afterMax(seconds(20)).allInto(results);
  *     </code>
@@ -61,15 +74,22 @@ import org.jetbrains.annotations.NotNull;
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
  * configured)
  * <p>
- * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
+ * <b>Example 3:</b> Asynchronously concatenate the output of two routines.
  * <pre>
  *     <code>
  *
- *         doSomething2.asyncCall(doSomething1.asyncCall()).afterMax(seconds(20).allInto(results);
+ *         routine2.asyncCall(routine1.asyncCall()).afterMax(seconds(20).all();
+ *     </code>
+ * </pre>
+ * Or, in an equivalent way:
+ * <pre>
+ *     <code>
+ *
+ *         routine1.asyncCall().bind(routine2.invokeCall()).result().afterMax(seconds(20).all();
  *     </code>
  * </pre>
  * <p>
- * <b>Example 3:</b> Asynchronously feed a routine from a different thread.
+ * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
  * <pre>
  *     <code>
  *
@@ -93,6 +113,8 @@ import org.jetbrains.annotations.NotNull;
  * </pre>
  * <p>
  * Created by davide-maestroni on 09/07/2014.
+ *
+ * @see com.github.dm.jrt.core.routine.Routine Routine
  */
 public class JRoutineCore {
 

@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
@@ -246,7 +248,7 @@ public class ServiceBuilder {
     @NotNull
     public ServiceAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
 
-        return on(ContextInvocationTarget.classOfType(targetClass));
+        return on(classOfType(targetClass));
     }
 
     /**
@@ -266,7 +268,7 @@ public class ServiceBuilder {
     @NotNull
     public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
 
-        return on(ContextInvocationTarget.instanceOf(targetClass));
+        return on(instanceOf(targetClass));
     }
 
     /**
@@ -288,6 +290,6 @@ public class ServiceBuilder {
     public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
 
-        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
+        return on(instanceOf(targetClass, factoryArgs));
     }
 }

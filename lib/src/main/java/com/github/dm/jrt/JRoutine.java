@@ -40,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.object.InvocationTarget.classOfType;
+import static com.github.dm.jrt.object.InvocationTarget.instance;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features.
@@ -336,7 +338,7 @@ public class JRoutine extends Streams {
     @NotNull
     public static AutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
 
-        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.classOfType(targetClass));
+        return new DefaultAutoProxyRoutineBuilder(classOfType(targetClass));
     }
 
     /**
@@ -412,7 +414,7 @@ public class JRoutine extends Streams {
     @NotNull
     public static AutoProxyRoutineBuilder onInstance(@NotNull final Object object) {
 
-        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.instance(object));
+        return new DefaultAutoProxyRoutineBuilder(instance(object));
     }
 
     /**

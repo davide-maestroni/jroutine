@@ -46,6 +46,8 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
@@ -409,7 +411,7 @@ public class LoaderBuilder {
     @NotNull
     public LoaderAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
 
-        return on(ContextInvocationTarget.classOfType(targetClass));
+        return on(classOfType(targetClass));
     }
 
     /**
@@ -541,7 +543,7 @@ public class LoaderBuilder {
     @NotNull
     public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
 
-        return on(ContextInvocationTarget.instanceOf(targetClass));
+        return on(instanceOf(targetClass));
     }
 
     /**
@@ -564,7 +566,7 @@ public class LoaderBuilder {
     public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
 
-        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
+        return on(instanceOf(targetClass, factoryArgs));
     }
 
     /**

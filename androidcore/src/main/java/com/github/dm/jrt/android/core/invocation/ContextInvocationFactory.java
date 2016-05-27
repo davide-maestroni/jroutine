@@ -283,6 +283,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         }
 
         @NotNull
+        @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return (ContextInvocation<IN, OUT>) mFactory.newInvocation();

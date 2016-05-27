@@ -109,6 +109,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         final BuilderType builderType = mBuilderType;
@@ -128,18 +129,21 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
+    @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
 
         return newObjectBuilder().method(name);
     }
 
     @NotNull
+    @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
 
@@ -147,12 +151,14 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return newObjectBuilder().method(method);
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     invocationConfiguration() {
 
@@ -161,6 +167,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     objectConfiguration() {
 
@@ -169,6 +176,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public ServiceAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
@@ -176,6 +184,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
+    @Override
     public ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     serviceConfiguration() {
 

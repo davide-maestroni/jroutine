@@ -30,6 +30,7 @@ import java.util.List;
  */
 public class AndroidLog implements com.github.dm.jrt.core.log.Log {
 
+    @Override
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
@@ -41,6 +42,7 @@ public class AndroidLog implements com.github.dm.jrt.core.log.Log {
         }
     }
 
+    @Override
     public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
@@ -52,6 +54,7 @@ public class AndroidLog implements com.github.dm.jrt.core.log.Log {
         }
     }
 
+    @Override
     public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 

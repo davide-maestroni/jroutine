@@ -66,6 +66,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
         mOutputChannel = ConstantConditions.notNull("output I/O channel", channel);
     }
 
+    @Override
     public void onComplete() {
 
         final ResponseBody responseBody =
@@ -78,11 +79,13 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
         }
     }
 
+    @Override
     public void onError(@NotNull final RoutineException error) {
 
         mOutputChannel.abort(error);
     }
 
+    @Override
     public void onOutput(final ParcelableSelectable<Object> output) throws IOException {
 
         switch (output.index) {

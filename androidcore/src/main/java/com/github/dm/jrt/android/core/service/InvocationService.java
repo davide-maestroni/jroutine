@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
@@ -646,13 +647,15 @@ public class InvocationService extends Service {
             mOutMessenger = ConstantConditions.notNull("output messenger", messenger);
         }
 
-        public void onComplete() throws Exception {
+        @Override
+        public void onComplete() throws RemoteException {
 
             mInvocation.recycle();
             mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
         }
 
-        public void onError(@NotNull final RoutineException error) throws Exception {
+        @Override
+        public void onError(@NotNull final RoutineException error) throws RemoteException {
 
             mInvocation.recycle();
             final Message message = Message.obtain(null, MSG_ABORT);
@@ -660,7 +663,8 @@ public class InvocationService extends Service {
             mOutMessenger.send(message);
         }
 
-        public void onOutput(final Object o) throws Exception {
+        @Override
+        public void onOutput(final Object o) throws RemoteException {
 
             final Message message = Message.obtain(null, MSG_DATA);
             putValue(message.getData(), o);

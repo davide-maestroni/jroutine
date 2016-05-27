@@ -62,6 +62,7 @@ public interface LoaderProxyRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
@@ -93,6 +94,7 @@ public interface LoaderProxyRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
@@ -101,11 +103,13 @@ public interface LoaderProxyRoutineBuilder
      * @return the invocation configuration builder.
      */
     @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> objectConfiguration();
 }

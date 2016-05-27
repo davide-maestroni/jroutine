@@ -22,7 +22,8 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-javaCompatibility = JavaVersion.VERSION_1_6
+compileJavaCompatibility = JavaVersion.VERSION_1_6
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'

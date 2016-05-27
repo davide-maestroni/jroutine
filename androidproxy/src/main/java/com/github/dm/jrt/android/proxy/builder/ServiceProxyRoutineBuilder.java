@@ -59,6 +59,7 @@ public interface ServiceProxyRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
@@ -87,17 +88,20 @@ public interface ServiceProxyRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder> objectConfiguration();
 }

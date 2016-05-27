@@ -54,6 +54,7 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
         super(null);
     }
 
+    @Override
     public void onInput(final Call<?> input,
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
 

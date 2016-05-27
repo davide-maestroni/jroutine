@@ -67,6 +67,7 @@ class AsyncTaskRunner implements Runner {
         mExecutor = executor;
     }
 
+    @Override
     public void cancel(@NotNull final Execution execution) {
 
         synchronized (mTasks) {
@@ -80,11 +81,13 @@ class AsyncTaskRunner implements Runner {
         }
     }
 
+    @Override
     public boolean isExecutionThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }
 
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
@@ -131,6 +134,7 @@ class AsyncTaskRunner implements Runner {
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)
+        @Override
         public void run() {
 
             final Executor executor = mExecutor;

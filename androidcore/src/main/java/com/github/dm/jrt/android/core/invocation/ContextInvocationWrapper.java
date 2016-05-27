@@ -44,6 +44,7 @@ public class ContextInvocationWrapper<IN, OUT> extends InvocationDecorator<IN, O
         super(invocation);
     }
 
+    @Override
     public void onContext(@NotNull final Context context) {
 
     }

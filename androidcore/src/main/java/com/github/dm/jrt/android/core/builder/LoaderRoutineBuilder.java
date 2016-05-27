@@ -52,6 +52,7 @@ public interface LoaderRoutineBuilder<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     LoaderRoutine<IN, OUT> buildRoutine();
 
     /**
@@ -60,5 +61,6 @@ public interface LoaderRoutineBuilder<IN, OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
+    @Override
     Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocationConfiguration();
 }

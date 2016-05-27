@@ -23,7 +23,8 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-javaCompatibility = JavaVersion.VERSION_1_5
+compileJavaCompatibility = JavaVersion.VERSION_1_5
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     compile 'com.intellij:annotations:12.0'
@@ -31,7 +32,7 @@ dependencies {
     testCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
     testCompile 'com.squareup.retrofit2:converter-gson:2.0.0'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {

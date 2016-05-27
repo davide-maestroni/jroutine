@@ -90,6 +90,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
+    @Override
     public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
@@ -97,6 +98,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
+    @Override
     public Routine<IN, OUT> buildRoutine() {
 
         return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
@@ -104,6 +106,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
+    @Override
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
     serviceConfiguration() {
 

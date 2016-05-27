@@ -51,16 +51,19 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
         mIndex = index;
     }
 
+    @Override
     public void onComplete() {
 
         mChannel.close();
     }
 
+    @Override
     public void onError(@NotNull final RoutineException error) {
 
         mChannel.abort(error);
     }
 
+    @Override
     public void onOutput(final IN input) {
 
         mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));

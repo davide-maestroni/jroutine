@@ -73,6 +73,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
@@ -80,6 +81,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
@@ -87,6 +89,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
@@ -95,6 +98,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -123,12 +127,14 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
     invocationConfiguration() {
 
@@ -137,6 +143,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder> objectConfiguration() {
 
         final ObjectConfiguration config = mObjectConfiguration;
@@ -144,6 +151,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
     serviceConfiguration() {
 

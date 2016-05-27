@@ -86,6 +86,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         mLogger = logger.subContextLogger(this);
     }
 
+    @Override
     public void onComplete() {
 
         final boolean deliverResult;
@@ -106,6 +107,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         }
     }
 
+    @Override
     public void onError(@NotNull final RoutineException error) {
 
         final boolean deliverResult;
@@ -121,6 +123,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         }
     }
 
+    @Override
     public void onOutput(final OUT output) {
 
         final boolean deliverResult;
@@ -163,6 +166,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
      */
     private class Result implements InvocationResult<OUT> {
 
+        @Override
         public void abort() {
 
             synchronized (mMutex) {
@@ -172,6 +176,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         }
 
         @Nullable
+        @Override
         public RoutineException getAbortException() {
 
             synchronized (mMutex) {
@@ -179,6 +184,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
             }
         }
 
+        @Override
         public long getResultTimestamp() {
 
             synchronized (mMutex) {
@@ -186,6 +192,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
             }
         }
 
+        @Override
         public boolean isError() {
 
             synchronized (mMutex) {
@@ -193,6 +200,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
             }
         }
 
+        @Override
         public boolean passTo(@NotNull final Collection<IOChannel<OUT>> newChannels,
                 @NotNull final Collection<IOChannel<OUT>> oldChannels,
                 @NotNull final Collection<IOChannel<OUT>> abortedChannels) {

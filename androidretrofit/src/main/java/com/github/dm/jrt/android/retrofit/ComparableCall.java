@@ -212,31 +212,37 @@ public class ComparableCall<T> implements Call<T> {
         return result;
     }
 
+    @Override
     public Response<T> execute() throws IOException {
 
         return mCall.execute();
     }
 
+    @Override
     public void enqueue(final Callback<T> callback) {
 
         mCall.enqueue(callback);
     }
 
+    @Override
     public boolean isExecuted() {
 
         return mCall.isExecuted();
     }
 
+    @Override
     public void cancel() {
 
         mCall.cancel();
     }
 
+    @Override
     public boolean isCanceled() {
 
         return mCall.isCanceled();
     }
 
+    @Override
     public Request request() {
 
         return mCall.request();

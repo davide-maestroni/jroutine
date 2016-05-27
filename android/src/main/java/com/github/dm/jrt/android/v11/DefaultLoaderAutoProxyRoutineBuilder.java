@@ -110,6 +110,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         final BuilderType builderType = mBuilderType;
@@ -129,18 +130,21 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
+    @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
 
         return newObjectBuilder().method(name);
     }
 
     @NotNull
+    @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
 
@@ -148,12 +152,14 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
 
         return newObjectBuilder().method(method);
     }
 
     @NotNull
+    @Override
     public Builder<? extends LoaderAutoProxyRoutineBuilder> invocationConfiguration() {
 
         return new InvocationConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(
@@ -161,6 +167,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     objectConfiguration() {
 
@@ -169,6 +176,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public LoaderAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
@@ -176,6 +184,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     loaderConfiguration() {
 

@@ -153,11 +153,13 @@ public class ServiceCallInvocation extends
         outputChannel.bind(result);
         getClient().newCall(request).enqueue(new Callback() {
 
+            @Override
             public void onFailure(final Call call, final IOException e) {
 
                 outputChannel.abort(e);
             }
 
+            @Override
             public void onResponse(final Call call, final Response response) throws IOException {
 
                 try {

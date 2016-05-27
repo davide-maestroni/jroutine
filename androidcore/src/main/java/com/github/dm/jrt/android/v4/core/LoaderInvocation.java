@@ -605,6 +605,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             mLoaderId = loaderId;
         }
 
+        @Override
         public void run() {
 
             purgeLoaderInternal(mContext, mLoaderId);
@@ -637,6 +638,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             mLoaderId = loaderId;
         }
 
+        @Override
         public void run() {
 
             purgeLoadersInternal(mContext, mLoaderId, mFactory);
@@ -674,6 +676,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             mInputs = new ArrayList<Object>(inputs);
         }
 
+        @Override
         public void run() {
 
             purgeLoadersInternal(mContext, mLoaderId, mFactory, mInputs);
@@ -706,6 +709,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             mInputs = new ArrayList<Object>(inputs);
         }
 
+        @Override
         public void run() {
 
             purgeLoaderInternal(mContext, mLoaderId, mInputs);
@@ -754,12 +758,14 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             mLogger = logger.subContextLogger(this);
         }
 
+        @Override
         public Loader<InvocationResult<OUT>> onCreateLoader(final int id, final Bundle args) {
 
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
 
+        @Override
         public void onLoadFinished(final Loader<InvocationResult<OUT>> loader,
                 final InvocationResult<OUT> data) {
 
@@ -813,6 +819,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             }
         }
 
+        @Override
         public void onLoaderReset(final Loader<InvocationResult<OUT>> loader) {
 
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());

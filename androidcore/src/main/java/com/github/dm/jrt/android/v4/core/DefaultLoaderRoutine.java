@@ -119,6 +119,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         return invocation;
     }
 
+    @Override
     public void purge(@Nullable final IN input) {
 
         final LoaderContextCompat context = mContext;
@@ -127,6 +128,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         }
     }
 
+    @Override
     public void purge(@Nullable final IN... inputs) {
 
         final LoaderContextCompat context = mContext;
@@ -143,6 +145,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         }
     }
 
+    @Override
     public void purge(@Nullable final Iterable<? extends IN> inputs) {
 
         final LoaderContextCompat context = mContext;

@@ -52,12 +52,14 @@ public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     TYPE buildProxy();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     invocationConfiguration();
 
@@ -65,5 +67,6 @@ public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> objectConfiguration();
 }

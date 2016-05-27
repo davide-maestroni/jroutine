@@ -247,11 +247,13 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         public static final Creator<DefaultTargetInvocationFactory> CREATOR =
                 new Creator<DefaultTargetInvocationFactory>() {
 
+                    @Override
                     public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
 
                         return new DefaultTargetInvocationFactory(source);
                     }
 
+                    @Override
                     public DefaultTargetInvocationFactory[] newArray(final int size) {
 
                         return new DefaultTargetInvocationFactory[size];
@@ -290,11 +292,13 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
             mFactoryArgs = cloneArgs(factoryArgs);
         }
 
+        @Override
         public int describeContents() {
 
             return 0;
         }
 
+        @Override
         public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);

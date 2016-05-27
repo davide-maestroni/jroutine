@@ -57,6 +57,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
     /**
@@ -78,6 +79,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
@@ -103,6 +105,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name);
 
     /**
@@ -127,6 +130,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name,
             @NotNull Class<?>... parameterTypes);
 
@@ -150,6 +154,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);
 
     /**
@@ -158,11 +163,13 @@ public interface LoaderObjectRoutineBuilder
      * @return the invocation configuration builder.
      */
     @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     ObjectConfiguration.Builder<? extends LoaderObjectRoutineBuilder> objectConfiguration();
 }

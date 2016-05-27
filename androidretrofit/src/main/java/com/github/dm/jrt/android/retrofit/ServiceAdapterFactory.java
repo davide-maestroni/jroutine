@@ -167,6 +167,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
     }
 
     @Nullable
+    @Override
     public CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
@@ -247,6 +248,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
         }
 
         @NotNull
+        @Override
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
 
             mInvocationConfiguration =
@@ -255,6 +257,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
         }
 
         @NotNull
+        @Override
         public Builder apply(@NotNull final ServiceConfiguration configuration) {
 
             mServiceConfiguration =
@@ -294,6 +297,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
         }
 
         @NotNull
+        @Override
         public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
 
             return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
@@ -337,6 +341,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
             mRoutine = routine;
         }
 
+        @Override
         public Type responseType() {
 
             return mResponseType;
@@ -383,6 +388,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
             mRoutine = routine;
         }
 
+        @Override
         public OutputChannel<Object> apply(
                 final OutputChannel<ParcelableSelectable<Object>> channel) {
 
@@ -437,6 +443,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
                                .asyncCall(call);
         }
 
+        @Override
         public <OUT> OutputChannel adapt(final Call<OUT> call) {
 
             final IOChannel<Object> ioChannel = JRoutineCore.io()
@@ -481,6 +488,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory
             mConverter = converter;
         }
 
+        @Override
         public <OUT> StreamChannel adapt(final Call<OUT> call) {
 
             final Function<Function<OutputChannel<Call<OUT>>,

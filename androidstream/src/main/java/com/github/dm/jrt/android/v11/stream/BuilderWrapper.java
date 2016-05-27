@@ -50,6 +50,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     }
 
     @NotNull
+    @Override
     public ChannelsBuilder<LoaderStreamChannel<OUT, OUT>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
@@ -59,6 +60,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     }
 
     @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public LoaderStreamChannel<OUT, OUT> buildChannels() {
 
@@ -67,6 +69,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     }
 
     @NotNull
+    @Override
     public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>> channelConfiguration
             () {
 

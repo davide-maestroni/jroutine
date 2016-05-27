@@ -59,6 +59,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             ServiceConfiguration.defaultConfiguration();
 
     @NotNull
+    @Override
     public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
 
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
@@ -66,6 +67,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final ServiceConfiguration configuration) {
 
@@ -74,6 +76,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
 
@@ -83,6 +86,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
@@ -131,6 +135,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     invocationConfiguration() {
 
@@ -139,6 +144,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     objectConfiguration() {
 
@@ -147,6 +153,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     serviceConfiguration() {
 

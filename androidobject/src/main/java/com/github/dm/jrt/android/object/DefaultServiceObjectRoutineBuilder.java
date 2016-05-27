@@ -152,6 +152,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
@@ -159,6 +160,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
@@ -167,6 +169,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
@@ -174,6 +177,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -187,12 +191,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
 
@@ -220,6 +226,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
@@ -244,12 +251,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return method(method.getName(), method.getParameterTypes());
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     invocationConfiguration() {
 
@@ -258,6 +267,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration
             () {
 
@@ -266,6 +276,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     serviceConfiguration() {
 
@@ -520,6 +531,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mServiceConfiguration = builder.mServiceConfiguration;
         }
 
+        @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
 

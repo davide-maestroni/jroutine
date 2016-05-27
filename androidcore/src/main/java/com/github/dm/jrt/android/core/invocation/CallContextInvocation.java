@@ -36,6 +36,7 @@ public abstract class CallContextInvocation<IN, OUT> extends CallInvocation<IN, 
 
     private Context mContext;
 
+    @Override
     public void onContext(@NotNull final Context context) throws Exception {
 
         mContext = context;

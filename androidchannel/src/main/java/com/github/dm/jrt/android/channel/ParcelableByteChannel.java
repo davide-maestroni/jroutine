@@ -338,6 +338,7 @@ public class ParcelableByteChannel {
         public static final Creator<ParcelableByteBuffer> CREATOR =
                 new Creator<ParcelableByteBuffer>() {
 
+                    @Override
                     public ParcelableByteBuffer createFromParcel(final Parcel in) {
 
                         final byte[] data = in.createByteArray();
@@ -359,6 +360,7 @@ public class ParcelableByteChannel {
                         return new ParcelableByteBuffer(null);
                     }
 
+                    @Override
                     public ParcelableByteBuffer[] newArray(final int size) {
 
                         return new ParcelableByteBuffer[size];
@@ -380,11 +382,13 @@ public class ParcelableByteChannel {
             mBuffer = buffer;
         }
 
+        @Override
         public int describeContents() {
 
             return 0;
         }
 
+        @Override
         public void writeToParcel(final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
@@ -530,16 +534,19 @@ public class ParcelableByteChannel {
             mChannel = ConstantConditions.notNull("I/O channel", channel);
         }
 
+        @Override
         public void onComplete() {
 
             mChannel.close();
         }
 
+        @Override
         public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }
 
+        @Override
         public void onOutput(final ByteBuffer output) {
 
             mChannel.pass(new ParcelableByteBuffer(output));

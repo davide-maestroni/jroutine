@@ -70,6 +70,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
@@ -77,6 +78,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
@@ -84,6 +86,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
@@ -92,6 +95,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -120,12 +124,14 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
     invocationConfiguration() {
 
@@ -134,6 +140,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> objectConfiguration() {
 
         final ObjectConfiguration config = mObjectConfiguration;
@@ -141,6 +148,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;

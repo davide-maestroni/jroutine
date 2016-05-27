@@ -53,6 +53,7 @@ class HandlerRunner implements Runner {
         mHandler = handler;
     }
 
+    @Override
     public void cancel(@NotNull final Execution execution) {
 
         final ExecutionDecorator decorator;
@@ -63,11 +64,13 @@ class HandlerRunner implements Runner {
         mHandler.removeCallbacks(decorator);
     }
 
+    @Override
     public boolean isExecutionThread() {
 
         return (Thread.currentThread() == mThread);
     }
 
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 

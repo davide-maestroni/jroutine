@@ -148,6 +148,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
         public static final Creator<ClassContextInvocationTarget> CREATOR =
                 new Creator<ClassContextInvocationTarget>() {
 
+                    @Override
                     @SuppressWarnings("unchecked")
                     public ClassContextInvocationTarget createFromParcel(final Parcel source) {
 
@@ -155,6 +156,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
                                 (Class<?>) source.readSerializable());
                     }
 
+                    @Override
                     public ClassContextInvocationTarget[] newArray(final int size) {
 
                         return new ClassContextInvocationTarget[size];
@@ -179,6 +181,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
             mTargetClass = targetClass;
         }
 
+        @Override
         public int describeContents() {
 
             return 0;
@@ -210,6 +213,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
             return (mTargetClass == type);
         }
 
+        @Override
         public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
@@ -229,6 +233,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
         public static final Creator<ObjectContextInvocationTarget> CREATOR =
                 new Creator<ObjectContextInvocationTarget>() {
 
+                    @Override
                     @SuppressWarnings("unchecked")
                     public ObjectContextInvocationTarget createFromParcel(final Parcel source) {
 
@@ -237,6 +242,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
                                 source.readArray(ContextInvocationTarget.class.getClassLoader()));
                     }
 
+                    @Override
                     public ObjectContextInvocationTarget[] newArray(final int size) {
 
                         return new ObjectContextInvocationTarget[size];
@@ -312,11 +318,13 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
             return isAssignableTo(type);
         }
 
+        @Override
         public int describeContents() {
 
             return 0;
         }
 
+        @Override
         public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);

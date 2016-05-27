@@ -60,6 +60,7 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
         return (ContextInvocationFactory<DATA, DATA>) sFactory;
     }
 
+    @Override
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
         result.pass(input);

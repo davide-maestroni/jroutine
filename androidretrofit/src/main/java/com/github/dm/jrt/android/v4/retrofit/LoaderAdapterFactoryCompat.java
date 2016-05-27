@@ -259,6 +259,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         }
 
         @NotNull
+        @Override
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
 
             mInvocationConfiguration =
@@ -267,6 +268,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         }
 
         @NotNull
+        @Override
         public Builder apply(@NotNull final LoaderConfiguration configuration) {
 
             mLoaderConfiguration =
@@ -300,6 +302,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         }
 
         @NotNull
+        @Override
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
 
             return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
@@ -319,6 +322,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
         }
 
         @NotNull
+        @Override
         public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
 
             return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
@@ -357,11 +361,13 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             mAdapter = wrapped;
         }
 
+        @Override
         public Type responseType() {
 
             return mAdapter.responseType();
         }
 
+        @Override
         public <R> T adapt(final Call<R> call) {
 
             return mAdapter.adapt(ComparableCall.of(call));
@@ -386,6 +392,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             mCallAdapter = callAdapter;
         }
 
+        @Override
         public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
 
             result.pass(mCallAdapter.adapt(input));
@@ -448,6 +455,7 @@ public class LoaderAdapterFactoryCompat extends AbstractAdapterFactory {
             mInvocationMode = invocationMode;
         }
 
+        @Override
         public <OUT> LoaderStreamChannelCompat adapt(final Call<OUT> call) {
 
             final InvocationMode invocationMode = mInvocationMode;

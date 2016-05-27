@@ -48,6 +48,7 @@ class SelectableTransform<IN, OUT> implements
         mIndex = index;
     }
 
+    @Override
     public Function<OutputChannel<IN>, OutputChannel<ParcelableSelectable<OUT>>> apply(
             final StreamConfiguration configuration,
             final Function<OutputChannel<IN>, OutputChannel<OUT>> function) {

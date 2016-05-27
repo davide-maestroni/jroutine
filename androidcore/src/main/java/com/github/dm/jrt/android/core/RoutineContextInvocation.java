@@ -97,6 +97,7 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
         }
 
         @NotNull
+        @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return new RoutineContextInvocation<IN, OUT>(mFactory.newInvocation());

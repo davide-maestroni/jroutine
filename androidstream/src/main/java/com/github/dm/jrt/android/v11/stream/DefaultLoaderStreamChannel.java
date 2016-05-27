@@ -938,18 +938,21 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
         return loaderConfiguration().withCacheStrategy(strategyType).apply();
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> factoryId(final int factoryId) {
 
         return loaderConfiguration().withFactoryId(factoryId).apply();
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderStreamChannel<IN, OUT>>
     loaderConfiguration() {
 
@@ -958,12 +961,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> loaderId(final int loaderId) {
 
         return loaderConfiguration().withLoaderId(loaderId).apply();
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -983,6 +988,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
@@ -998,6 +1004,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
@@ -1020,6 +1027,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
@@ -1037,6 +1045,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -1057,6 +1066,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(final int count,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
@@ -1072,12 +1082,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> staleAfter(@Nullable final UnitDuration staleTime) {
 
         return loaderConfiguration().withResultStaleTime(staleTime).apply();
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
@@ -1085,6 +1097,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderStreamChannel<IN, OUT>>
     streamLoaderConfiguration() {
 
@@ -1094,6 +1107,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> with(@Nullable final LoaderContext context) {
 
         mLoaderContext = context;
@@ -1183,24 +1197,28 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
         }
 
         @NotNull
+        @Override
         public ChannelConfiguration asChannelConfiguration() {
 
             return mWrappedConfiguration.asChannelConfiguration();
         }
 
         @NotNull
+        @Override
         public InvocationConfiguration asInvocationConfiguration() {
 
             return mWrappedConfiguration.asInvocationConfiguration();
         }
 
         @NotNull
+        @Override
         public InvocationMode getInvocationMode() {
 
             return mWrappedConfiguration.getInvocationMode();
         }
 
         @NotNull
+        @Override
         public LoaderConfiguration asLoaderConfiguration() {
 
             if (mLoaderConfiguration == null) {
@@ -1212,6 +1230,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
         }
 
         @Nullable
+        @Override
         public LoaderContext getLoaderContext() {
 
             return mLoaderContext;
@@ -1219,6 +1238,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("loader configuration", configuration);

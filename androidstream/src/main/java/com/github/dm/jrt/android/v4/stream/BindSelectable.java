@@ -55,6 +55,7 @@ class BindSelectable<OUT> extends DeepEqualObject
         mIndex = index;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
 

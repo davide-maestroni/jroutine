@@ -949,6 +949,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> cache(
             @Nullable final CacheStrategyType strategyType) {
 
@@ -956,12 +957,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> factoryId(final int factoryId) {
 
         return loaderConfiguration().withFactoryId(factoryId).apply();
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     loaderConfiguration() {
 
@@ -970,12 +973,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> loaderId(final int loaderId) {
 
         return loaderConfiguration().withLoaderId(loaderId).apply();
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -995,6 +1000,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
@@ -1010,6 +1016,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
@@ -1032,6 +1039,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
@@ -1049,6 +1057,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -1069,6 +1078,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
@@ -1084,12 +1094,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> staleAfter(@Nullable final UnitDuration staleTime) {
 
         return loaderConfiguration().withResultStaleTime(staleTime).apply();
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
@@ -1097,6 +1109,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamLoaderConfiguration() {
 
@@ -1106,6 +1119,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> with(@Nullable final LoaderContextCompat context) {
 
         mLoaderContext = context;
@@ -1182,7 +1196,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
          * @param context                   the loader context.
          * @param streamLoaderConfiguration the stream loader configuration.
          * @param loaderConfiguration       the loader configuration.
-         * @param streamConfiguration       the stream invocation configuration.
+         * @param streamConfiguration       the stream configuration.
          */
         protected DefaultLoaderStreamConfigurationCompat(
                 @Nullable final LoaderContextCompat context,
@@ -1197,24 +1211,28 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
 
         @NotNull
+        @Override
         public ChannelConfiguration asChannelConfiguration() {
 
             return mWrappedConfiguration.asChannelConfiguration();
         }
 
         @NotNull
+        @Override
         public InvocationConfiguration asInvocationConfiguration() {
 
             return mWrappedConfiguration.asInvocationConfiguration();
         }
 
         @NotNull
+        @Override
         public InvocationMode getInvocationMode() {
 
             return mWrappedConfiguration.getInvocationMode();
         }
 
         @NotNull
+        @Override
         public LoaderConfiguration asLoaderConfiguration() {
 
             if (mLoaderConfiguration == null) {
@@ -1226,6 +1244,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
 
         @Nullable
+        @Override
         public LoaderContextCompat getLoaderContext() {
 
             return mLoaderContext;
@@ -1233,6 +1252,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> apply(
             @NotNull final LoaderConfiguration configuration) {
 

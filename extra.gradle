@@ -46,13 +46,35 @@ Project.metaClass.isWorkingBranch = { String branch ->
 
     (branch != null) && branch.equals(delegate.workingBranch)
 }
-Project.metaClass.getJavaCompatibility = {
+Project.metaClass.getCompileJavaCompatibility = {
 
-    sourceCompatibility
+    compileJava.sourceCompatibility
 }
-Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
+Project.metaClass.setCompileJavaCompatibility = { JavaVersion javaVersion ->
 
-    tasks.withType(JavaCompile) {
+    compileJava {
+        def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
+        if ((javaHome != null) && (javaHome.length() > 0)) {
+            def jarPath = "${javaHome}/jre/lib/rt.jar"
+            if (!file(jarPath).exists()) {
+                // Mac OS workaround
+                jarPath = "${javaHome}/../Classes/classes.jar"
+            }
+            if (file(jarPath).exists()) {
+                options.bootClasspath = jarPath
+            }
+        }
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+}
+Project.metaClass.getCompileTestJavaCompatibility = {
+
+    compileTestJava.sourceCompatibility
+}
+Project.metaClass.setCompileTestJavaCompatibility = { JavaVersion javaVersion ->
+
+    compileTestJava {
         def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
         if ((javaHome != null) && (javaHome.length() > 0)) {
             def jarPath = "${javaHome}/jre/lib/rt.jar"

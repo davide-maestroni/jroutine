@@ -56,6 +56,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     @NotNull
+    @Override
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
@@ -63,6 +64,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
 
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
@@ -70,6 +72,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public LoaderProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
 
@@ -79,6 +82,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
@@ -134,6 +138,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     invocationConfiguration() {
 
@@ -142,6 +147,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     objectConfiguration() {
 
@@ -150,6 +156,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     loaderConfiguration() {
 

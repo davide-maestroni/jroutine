@@ -174,6 +174,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             mOutMessenger = outMessenger;
         }
 
+        @Override
         public void onComplete() throws RemoteException {
 
             final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
@@ -182,6 +183,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             mOutMessenger.send(message);
         }
 
+        @Override
         public void onError(@NotNull final RoutineException error) throws RemoteException {
 
             final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
@@ -190,6 +192,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             mOutMessenger.send(message);
         }
 
+        @Override
         public void onOutput(final IN input) throws RemoteException {
 
             final Message message = Message.obtain(null, InvocationService.MSG_DATA);
@@ -281,6 +284,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             // Unbind on main thread to avoid crashing the IPC
             AndroidRunners.mainRunner().run(new Execution() {
 
+                @Override
                 public void run() {
 
                     final Context serviceContext = mContext.getServiceContext();
@@ -353,6 +357,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             mLogger = logger;
         }
 
+        @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
 
             final Logger logger = mLogger;
@@ -383,6 +388,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             }
         }
 
+        @Override
         public void onServiceDisconnected(final ComponentName name) {
 
             mLogger.dbg("service disconnected: %s", name);

@@ -53,6 +53,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
         mChannels = channelMap;
     }
 
+    @Override
     public void onComplete() {
 
         final SparseArray<IOChannel<OUT>> channels = mChannels;
@@ -62,6 +63,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
         }
     }
 
+    @Override
     public void onError(@NotNull final RoutineException error) {
 
         final SparseArray<IOChannel<OUT>> channels = mChannels;
@@ -71,6 +73,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
         }
     }
 
+    @Override
     public void onOutput(final Selectable<? extends OUT> selectable) {
 
         final IOChannel<OUT> channel = mChannels.get(selectable.index);

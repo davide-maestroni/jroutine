@@ -54,6 +54,7 @@ public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
+    @Override
     TYPE buildProxy();
 
     /**
@@ -62,6 +63,7 @@ public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>
      * @return the invocation configuration builder.
      */
     @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     invocationConfiguration();
 
@@ -69,5 +71,6 @@ public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>
      * {@inheritDoc}
      */
     @NotNull
+    @Override
     ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> objectConfiguration();
 }

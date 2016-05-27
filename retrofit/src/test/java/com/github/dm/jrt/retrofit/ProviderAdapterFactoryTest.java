@@ -230,7 +230,8 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    return Streams.<List>streamOf(Collections.emptyList());
+                    final List<Object> result = Collections.emptyList();
+                    return Streams.<List<Object>>streamOf(result);
                 }
             };
         }

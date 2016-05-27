@@ -23,11 +23,12 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-javaCompatibility = JavaVersion.VERSION_1_6
+compileJavaCompatibility = JavaVersion.VERSION_1_6
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.assertj:assertj-core:2.4.1'
 }
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'

@@ -84,6 +84,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
+    @Override
     public LoaderRoutineBuilder<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
 
@@ -101,6 +102,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
+    @Override
     public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
@@ -108,6 +110,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
+    @Override
     public LoaderRoutine<IN, OUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
@@ -124,6 +127,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
     loaderConfiguration() {
 
@@ -131,16 +135,19 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
     }
 
+    @Override
     public void purge(@Nullable final IN input) {
 
         buildRoutine().purge(input);
     }
 
+    @Override
     public void purge(@Nullable final IN... inputs) {
 
         buildRoutine().purge(inputs);
     }
 
+    @Override
     public void purge(@Nullable final Iterable<? extends IN> inputs) {
 
         buildRoutine().purge(inputs);

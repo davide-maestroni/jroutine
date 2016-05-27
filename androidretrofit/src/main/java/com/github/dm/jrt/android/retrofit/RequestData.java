@@ -41,11 +41,13 @@ public class RequestData implements Parcelable {
 
     public static final Creator<RequestData> CREATOR = new Creator<RequestData>() {
 
+        @Override
         public RequestData createFromParcel(final Parcel in) {
 
             return new RequestData(in);
         }
 
+        @Override
         public RequestData[] newArray(final int size) {
 
             return new RequestData[size];
@@ -121,11 +123,13 @@ public class RequestData implements Parcelable {
         return bundle;
     }
 
+    @Override
     public int describeContents() {
 
         return 0;
     }
 
+    @Override
     public void writeToParcel(final Parcel dest, final int flags) {
 
         dest.writeString(mUrl);

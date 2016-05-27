@@ -52,6 +52,7 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
      * @return the loader configuration builder.
      */
     @NotNull
+    @Override
     Builder<? extends LoaderChannelBuilder> loaderConfiguration();
 
     /**

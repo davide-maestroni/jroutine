@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +35,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Call;
+import retrofit2.CallAdapter;
 import retrofit2.Callback;
 import retrofit2.Response;
 
@@ -71,6 +73,19 @@ public class ComparableCall<T> implements Call<T> {
     public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
 
         return new ComparableCall<T>(wrapped);
+    }
+
+    /**
+     * Wraps the specified adapter so to make the passed call comparable.
+     *
+     * @param callAdapter the adapter to wrap.
+     * @param <T>         the response type.
+     * @return the wrapped adapter.
+     */
+    @NotNull
+    public static <T> CallAdapter<T> wrap(@NotNull final CallAdapter<T> callAdapter) {
+
+        return new CallAdapterDecorator<T>(callAdapter);
     }
 
     private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
@@ -246,5 +261,37 @@ public class ComparableCall<T> implements Call<T> {
     public Request request() {
 
         return mCall.request();
+    }
+
+    /**
+     * Call adapter decorator making the adapted instance comparable.
+     *
+     * @param <T> the adapted type.
+     */
+    private static class CallAdapterDecorator<T> implements CallAdapter<T> {
+
+        private final CallAdapter<T> mAdapter;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped adapter instance.
+         */
+        private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
+
+            mAdapter = ConstantConditions.notNull("call adapter instance", wrapped);
+        }
+
+        @Override
+        public Type responseType() {
+
+            return mAdapter.responseType();
+        }
+
+        @Override
+        public <OUT> T adapt(final Call<OUT> call) {
+
+            return mAdapter.adapt(ComparableCall.of(call));
+        }
     }
 }

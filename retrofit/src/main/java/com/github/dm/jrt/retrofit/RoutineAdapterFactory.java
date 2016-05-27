@@ -29,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import retrofit2.CallAdapter;
+
 /**
  * Implementation of a call adapter factory supporting {@code OutputChannel} and
  * {@code StreamChannel} return types.
@@ -48,7 +50,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      * @param configuration   the invocation configuration.
      * @param invocationMode  the invocation mode.
      */
-    private RoutineAdapterFactory(@Nullable final ConfigurableAdapterFactory delegateFactory,
+    private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
 
@@ -91,7 +93,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();
 
-        private ConfigurableAdapterFactory mDelegateFactory;
+        private CallAdapter.Factory mDelegateFactory;
 
         private InvocationMode mInvocationMode = InvocationMode.ASYNC;
 
@@ -127,7 +129,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          * @return this builder.
          */
         @NotNull
-        public Builder delegateFactory(@Nullable final ConfigurableAdapterFactory factory) {
+        public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
 
             mDelegateFactory = factory;
             return this;

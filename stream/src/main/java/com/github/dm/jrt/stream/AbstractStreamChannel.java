@@ -259,6 +259,58 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> append(@Nullable final OUT output) {
+
+        return append(JRoutineCore.io().of(output));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> append(@Nullable final OUT... outputs) {
+
+        return append(JRoutineCore.io().of(outputs));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> append(@Nullable final Iterable<? extends OUT> outputs) {
+
+        return append(JRoutineCore.io().of(outputs));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> append(@NotNull final OutputChannel<? extends OUT> channel) {
+
+        return buildChannel(getBinding().andThen(
+                new BindConcat<OUT>(mStreamConfiguration.asChannelConfiguration(), channel)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> appendGet(final long count,
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(supplier)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> appendGet(@NotNull final Supplier<? extends OUT> supplier) {
+
+        return appendGet(1, supplier);
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> appendGetMore(final long count,
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(consumer)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> appendGetMore(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return appendGetMore(1, consumer);
+    }
+
+    @NotNull
     public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> applyFlatTransform(
             @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
                     StreamChannel<BEFORE, AFTER>> function) {
@@ -315,6 +367,28 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> asyncOn(@Nullable final Runner runner) {
+
+        final InvocationMode invocationMode = mStreamConfiguration.getInvocationMode();
+        final MappingInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
+        final StreamChannel<IN, OUT> channel =
+                streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
+        if (invocationMode == InvocationMode.ASYNC) {
+            return channel.async();
+        }
+
+        if (invocationMode == InvocationMode.PARALLEL) {
+            return channel.parallel();
+        }
+
+        if (invocationMode == InvocationMode.SYNC) {
+            return channel.sync();
+        }
+
+        return channel.serial();
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> backoffOn(@Nullable final Runner runner, final int limit,
             @NotNull final Backoff backoff) {
 
@@ -365,58 +439,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         return collect(supplier, (BiConsumer<? super AFTER, ? super OUT>) sCollectConsumer);
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> append(@Nullable final OUT output) {
-
-        return append(JRoutineCore.io().of(output));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> append(@Nullable final OUT... outputs) {
-
-        return append(JRoutineCore.io().of(outputs));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> append(@Nullable final Iterable<? extends OUT> outputs) {
-
-        return append(JRoutineCore.io().of(outputs));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> append(@NotNull final OutputChannel<? extends OUT> channel) {
-
-        return buildChannel(getBinding().andThen(
-                new BindConcat<OUT>(mStreamConfiguration.asChannelConfiguration(), channel)));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> appendGet(final long count,
-            @NotNull final Supplier<? extends OUT> supplier) {
-
-        return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(supplier)));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> appendGet(@NotNull final Supplier<? extends OUT> supplier) {
-
-        return appendGet(1, supplier);
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> appendGetMore(final long count,
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(consumer)));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> appendGetMore(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return appendGetMore(1, consumer);
     }
 
     @NotNull
@@ -657,35 +679,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> runOn(@Nullable final Runner runner) {
-
-        final InvocationMode invocationMode = mStreamConfiguration.getInvocationMode();
-        final MappingInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
-        final StreamChannel<IN, OUT> channel =
-                streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
-        if (invocationMode == InvocationMode.ASYNC) {
-            return channel.async();
-        }
-
-        if (invocationMode == InvocationMode.PARALLEL) {
-            return channel.parallel();
-        }
-
-        if (invocationMode == InvocationMode.SYNC) {
-            return channel.sync();
-        }
-
-        return channel.serial();
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> runOnShared() {
-
-        return runOn(null);
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> runSequentially() {
+    public StreamChannel<IN, OUT> sequential() {
 
         return streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
     }

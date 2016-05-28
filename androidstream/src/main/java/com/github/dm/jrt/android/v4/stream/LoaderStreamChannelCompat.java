@@ -273,6 +273,17 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannelCompat<IN, OUT> asyncOn(@Nullable Runner runner);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -599,30 +610,8 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> runOn(@Nullable Runner runner);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> runOnShared();
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> runSequentially();
+    LoaderStreamChannelCompat<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}
@@ -857,7 +846,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
      *
      * @param strategyType the cache strategy type.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -870,7 +859,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * stream, which will force the factory ID to the specified one.
      *
      * @param factoryId the factory ID.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -900,7 +889,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * stream, which will force the routine loader ID.
      *
      * @param loaderId the loader ID.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -915,7 +904,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      *
      * @param factory the context invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
@@ -932,7 +921,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      *
      * @param builder the routine builder instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -952,7 +941,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @param keyFunction the function assigning a key to each output.
      * @param factory     the processing invocation factory.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -973,7 +962,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @param keyFunction the function assigning a key to each output.
      * @param builder     the builder of processing routine instances.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -994,7 +983,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @param count   the number of groups.
      * @param factory the processing invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1014,7 +1003,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @param count   the number of groups.
      * @param builder the builder of processing routine instances.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1026,7 +1015,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).apply()}.
      *
      * @param staleTime the stale time.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -1037,7 +1026,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      *
      * @param time     the time.
      * @param timeUnit the time unit.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -1068,7 +1057,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * loader.
      *
      * @param context the loader context.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -1080,7 +1069,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     interface LoaderStreamConfigurationCompat extends StreamConfiguration {
 
         /**
-         * Gets the stream configuration as a loader one.
+         * Gets the combination of stream and current configuration as a loader one.
          *
          * @return the loader configuration.
          */
@@ -1088,7 +1077,8 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
         LoaderConfiguration asLoaderConfiguration();
 
         /**
-         * Gets the configuration that will be applied to the next concatenated routine.
+         * Gets the configuration that will override the stream one only for the next
+         * concatenated routine.
          *
          * @return the loader configuration.
          */

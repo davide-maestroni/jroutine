@@ -632,7 +632,7 @@ public class StreamChannelTest {
                                   return data.sum / data.count;
                               }
                           })
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(3))
                           .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(Streams.streamOf()
@@ -671,7 +671,7 @@ public class StreamChannelTest {
                                   return data.sum / data.count;
                               }
                           })
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(3))
                           .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(Streams.streamOf()
@@ -710,7 +710,7 @@ public class StreamChannelTest {
                                   return data.sum / data.count;
                               }
                           })
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(3))
                           .next()).isCloseTo(21, Offset.offset(0.1));
     }
@@ -1122,22 +1122,22 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .invocationMode(InvocationMode.ASYNC)
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .invocationMode(InvocationMode.PARALLEL)
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .invocationMode(InvocationMode.SYNC)
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .invocationMode(InvocationMode.SERIAL)
-                          .runOnShared()
+                          .asyncOn(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
     }
@@ -1746,7 +1746,7 @@ public class StreamChannelTest {
                                       return data.sum / data.count;
                                   }
                               })
-                              .runOnShared()
+                              .asyncOn(null)
                               .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
@@ -1797,7 +1797,7 @@ public class StreamChannelTest {
                                       return data.sum / data.count;
                                   }
                               })
-                              .runOnShared()
+                              .asyncOn(null)
                               .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
@@ -1846,7 +1846,7 @@ public class StreamChannelTest {
                                       return data.sum / data.count;
                                   }
                               })
-                              .runOnShared()
+                              .asyncOn(null)
                               .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
@@ -2227,7 +2227,7 @@ public class StreamChannelTest {
     public void testSequential() {
 
         assertThat(Streams.streamOf()
-                          .runSequentially()
+                          .sequential()
                           .thenGetMore(range(1, 1000))
                           .streamInvocationConfiguration()
                           .withInputMaxSize(1)

@@ -157,7 +157,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param output the output to append.
-     * @return the new stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -171,7 +171,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to append.
-     * @return the new stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -185,7 +185,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param outputs the iterable returning the outputs to append.
-     * @return the new stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -199,7 +199,7 @@ public interface StreamChannel<IN, OUT>
      * Note that both the specified channel and this stream will be bound as a result of the call.
      *
      * @param channel the output channel.
-     * @return the new stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -217,7 +217,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -234,7 +234,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -255,7 +255,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -276,7 +276,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -308,7 +308,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function modifying the flow one.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
@@ -327,7 +327,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the bi-function modifying the flow one.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
@@ -341,12 +341,28 @@ public interface StreamChannel<IN, OUT>
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
      * asynchronous mode.
      *
-     * @return this stream.
+     * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
     StreamChannel<IN, OUT> async();
+
+    /**
+     * Short for {@code streamInvocationConfiguration().withRunner(runner).apply().async()
+     * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
+     * <br>
+     * This method is useful to easily make the stream run on the specified runner.
+     * <p>
+     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
+     * the output data through the specified runner.
+     *
+     * @param runner the runner instance.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> asyncOn(@Nullable Runner runner);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -362,7 +378,7 @@ public interface StreamChannel<IN, OUT>
      * @param limit   the maximum number of buffered inputs before starting to slow down the
      *                feeding thread.
      * @param backoff the backoff policy to apply to the feeding thread.
-     * @return the configured stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
@@ -384,7 +400,7 @@ public interface StreamChannel<IN, OUT>
      *                 feeding thread.
      * @param delay    the constant delay to apply to the feeding thread.
      * @param timeUnit the delay time unit.
-     * @return the configured stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified limit or the specified delay are
      *                                            negative.
      */
@@ -407,7 +423,7 @@ public interface StreamChannel<IN, OUT>
      * @param limit  the maximum number of buffered inputs before starting to slow down the
      *               feeding thread.
      * @param delay  the constant delay to apply to the feeding thread.
-     * @return the configured stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
@@ -434,7 +450,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
@@ -461,7 +477,7 @@ public interface StreamChannel<IN, OUT>
      * @param supplier the supplier of initial accumulation values.
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
@@ -480,7 +496,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param supplier the supplier of collections.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
@@ -495,7 +511,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -511,7 +527,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -538,7 +554,7 @@ public interface StreamChannel<IN, OUT>
      * Makes the stream invoke concatenated routines with the specified mode.
      *
      * @param invocationMode the invocation mode.
-     * @return this stream.
+     * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
@@ -553,7 +569,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count the maximum number of outputs.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
@@ -569,7 +585,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -584,7 +600,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -600,7 +616,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -615,7 +631,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param builder the routine builder instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -632,7 +648,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
@@ -651,7 +667,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
@@ -670,7 +686,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -685,7 +701,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -701,7 +717,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -717,7 +733,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param output the output to return.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -733,7 +749,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -749,7 +765,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -768,7 +784,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -786,7 +802,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -808,7 +824,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -830,7 +846,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -844,7 +860,7 @@ public interface StreamChannel<IN, OUT>
      * Note that an ordered stream has a slightly increased cost in memory and computation.
      *
      * @param orderType the order type.
-     * @return the configured stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CONFIG)
@@ -854,7 +870,7 @@ public interface StreamChannel<IN, OUT>
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
      * mode.
      *
-     * @return this stream.
+     * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
@@ -869,7 +885,7 @@ public interface StreamChannel<IN, OUT>
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
      *
      * @param maxInvocations the maximum number of concurrent invocations.
-     * @return the configured stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified number is 0 or negative.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
@@ -885,7 +901,7 @@ public interface StreamChannel<IN, OUT>
      * Note that the invocation will be aborted if an exception escapes the consumer.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -910,7 +926,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the bi-function instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -938,7 +954,7 @@ public interface StreamChannel<IN, OUT>
      * @param supplier the supplier of initial accumulation values.
      * @param function the bi-function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -951,7 +967,7 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that this stream will be bound as a result of the call.
      *
-     * @return the replaying stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(CACHE)
@@ -962,7 +978,7 @@ public interface StreamChannel<IN, OUT>
      * times.
      *
      * @param count the maximum number of retries.
-     * @return the retrying stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -977,7 +993,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count   the maximum number of retries.
      * @param backoff the backoff policy.
-     * @return the retrying stream.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -997,39 +1013,13 @@ public interface StreamChannel<IN, OUT>
      * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
      *
      * @param function the retry function.
-     * @return the retrying stream.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
     StreamChannel<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     function);
-
-    /**
-     * Short for {@code streamInvocationConfiguration().withRunner(runner).apply().async()
-     * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
-     * <br>
-     * This method is useful to easily make the stream run on the specified runner.
-     * <p>
-     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-     * the output data through the specified runner.
-     *
-     * @param runner the runner instance.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> runOn(@Nullable Runner runner);
-
-    /**
-     * Short for {@code runOn(null)}.
-     *
-     * @return the concatenated stream instance.
-     * @see #runOn(Runner)
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> runOnShared();
 
     /**
      * Sets the stream runner so that each input is sequentially passed through the whole chain.
@@ -1044,18 +1034,18 @@ public interface StreamChannel<IN, OUT>
      * Note that the runner will be employed with asynchronous and parallel invocation modes, while
      * the synchronous and serial modes will behave as before.
      *
-     * @return this stream.
+     * @return the new stream instance.
      * @see #async()
      * @see #parallel()
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> runSequentially();
+    StreamChannel<IN, OUT> sequential();
 
     /**
      * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
      *
-     * @return this stream.
+     * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
@@ -1070,7 +1060,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count the number of outputs to skip.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
@@ -1090,7 +1080,7 @@ public interface StreamChannel<IN, OUT>
      * @param keyFunction the function assigning a key to each output.
      * @param function    the function creating the processing stream channels.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1111,7 +1101,7 @@ public interface StreamChannel<IN, OUT>
      * @param keyFunction the function assigning a key to each output.
      * @param factory     the processing invocation factory.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1130,7 +1120,7 @@ public interface StreamChannel<IN, OUT>
      * @param keyFunction the function assigning a key to each output.
      * @param routine     the processing routine instance.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1150,7 +1140,7 @@ public interface StreamChannel<IN, OUT>
      * @param keyFunction the function assigning a key to each output.
      * @param builder     the builder of processing routine instances.
      * @param <AFTER>     the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1169,7 +1159,7 @@ public interface StreamChannel<IN, OUT>
      * @param count    the number of groups.
      * @param function the function creating the processing stream channels.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1191,7 +1181,7 @@ public interface StreamChannel<IN, OUT>
      * @param count   the number of groups.
      * @param factory the processing invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1211,7 +1201,7 @@ public interface StreamChannel<IN, OUT>
      * @param count   the number of groups.
      * @param routine the processing routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1232,7 +1222,7 @@ public interface StreamChannel<IN, OUT>
      * @param count   the number of groups.
      * @param builder the builder of processing routine instances.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1289,7 +1279,7 @@ public interface StreamChannel<IN, OUT>
      * Makes the stream synchronous, that is, the concatenated routines will be invoked in
      * synchronous mode.
      *
-     * @return this stream.
+     * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
@@ -1309,7 +1299,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param output  the output.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -1328,7 +1318,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param outputs the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -1347,7 +1337,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param outputs the iterable returning the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -1368,7 +1358,7 @@ public interface StreamChannel<IN, OUT>
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1389,7 +1379,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -1413,7 +1403,7 @@ public interface StreamChannel<IN, OUT>
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -1437,7 +1427,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
@@ -1466,7 +1456,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1484,7 +1474,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1497,7 +1487,7 @@ public interface StreamChannel<IN, OUT>
      * Both outputs and errors will be automatically passed on.
      *
      * @param runnable the runnable instance.
-     * @return the concatenated stream instance.
+     * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -1509,7 +1499,7 @@ public interface StreamChannel<IN, OUT>
     interface StreamConfiguration {
 
         /**
-         * Gets the stream configuration as a channel one.
+         * Gets the combination of stream and current configuration as a channel one.
          *
          * @return the channel configuration.
          */
@@ -1517,7 +1507,7 @@ public interface StreamChannel<IN, OUT>
         ChannelConfiguration asChannelConfiguration();
 
         /**
-         * Gets the stream configuration as an invocation one.
+         * Gets the combination of stream and current configuration as an invocation one.
          *
          * @return the invocation configuration.
          */
@@ -1525,7 +1515,8 @@ public interface StreamChannel<IN, OUT>
         InvocationConfiguration asInvocationConfiguration();
 
         /**
-         * Gets the configuration that will be applied to the next concatenated routine.
+         * Gets the configuration that will override the stream one only for the next
+         * concatenated routine.
          *
          * @return the invocation configuration.
          */

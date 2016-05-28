@@ -261,96 +261,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> function) {
-
-        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.applyFlatTransform(function);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
-
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransform(function);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransformWith(function);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> async() {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.async();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
-            final int limit, @NotNull final Backoff backoff) {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, backoff);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
-            final int limit, final long delay, @NotNull final TimeUnit timeUnit) {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, delay, timeUnit);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
-            final int limit, @Nullable final UnitDuration delay) {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, delay);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> collect(
-            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, OUT>) super.collect(consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
-            @NotNull final Supplier<? extends AFTER> supplier,
-            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
-
-        checkStatic(wrap(supplier), supplier);
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.collect(supplier, consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
-            @NotNull final Supplier<? extends AFTER> supplier) {
-
-        checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.collectInto(supplier);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<IN, OUT> append(@Nullable final OUT output) {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.append(output);
@@ -413,6 +323,103 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.appendGetMore(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.applyFlatTransform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransform(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransformWith(function);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> async() {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.async();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> asyncOn(@Nullable final Runner runner) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.asyncOn(runner);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
+            final int limit, @NotNull final Backoff backoff) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, backoff);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
+            final int limit, final long delay, @NotNull final TimeUnit timeUnit) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
+            final int limit, @Nullable final UnitDuration delay) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.backoffOn(runner, limit, delay);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> collect(
+            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.collect(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier,
+            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
+
+        checkStatic(wrap(supplier), supplier);
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.collect(supplier, consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
+            @NotNull final Supplier<? extends AFTER> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.collectInto(supplier);
     }
 
     @NotNull
@@ -676,23 +683,9 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> runOn(@Nullable final Runner runner) {
+    public LoaderStreamChannelCompat<IN, OUT> sequential() {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) super.runOn(runner);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> runOnShared() {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.runOnShared();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> runSequentially() {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.runSequentially();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sequential();
     }
 
     @NotNull

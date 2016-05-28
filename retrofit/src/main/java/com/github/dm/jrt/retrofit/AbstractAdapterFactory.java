@@ -423,13 +423,13 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         public <OUT> StreamChannel adapt(final Call<OUT> call) {
 
             final InvocationMode invocationMode = mInvocationMode;
-            final StreamChannel<Call<OUT>, Call<OUT>> stream = Streams.streamOf(call);
+            final StreamChannel<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                stream.async();
+                stream = Streams.streamOf(call).async();
 
             } else {
-                stream.sync();
+                stream = Streams.streamOf(call).sync();
             }
 
             return stream.map(getRoutine()).invocationMode(invocationMode);

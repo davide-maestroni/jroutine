@@ -320,14 +320,13 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
             final InvocationMode invocationMode = mInvocationMode;
             final Call<OUT> comparableCall = ComparableCall.of(call);
-            final LoaderStreamChannel<Call<OUT>, Call<OUT>> stream =
-                    LoaderStreams.streamOf(comparableCall).with(mContext);
+            final LoaderStreamChannel<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                stream.async();
+                stream = LoaderStreams.streamOf(comparableCall).with(mContext).async();
 
             } else {
-                stream.sync();
+                stream = LoaderStreams.streamOf(comparableCall).with(mContext).sync();
             }
 
             return stream.map(getRoutine()).invocationMode(invocationMode);

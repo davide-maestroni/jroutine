@@ -51,14 +51,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.stream.annotation.StreamFlow.BindingType.CONSUMER;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.BindingType.ROUTINE;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.CACHE;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.COLLECT;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.MAP;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.REDUCE;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType.START;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CACHE;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.COLLECT;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CONFIG;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.REDUCE;
+import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.START;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
@@ -168,6 +166,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(MAP)
     <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
             @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
                     AFTER>> function);
@@ -177,6 +176,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
             @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
@@ -190,6 +190,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
@@ -235,7 +236,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
@@ -244,7 +245,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
@@ -254,7 +255,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    @StreamFlow(COLLECT)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -263,7 +264,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concat(@Nullable OUT output);
 
     /**
@@ -271,7 +272,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concat(@Nullable OUT... outputs);
 
     /**
@@ -279,7 +280,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
 
     /**
@@ -287,7 +288,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
@@ -295,7 +296,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concatGet(long count,
             @NotNull Supplier<? extends OUT> supplier);
 
@@ -304,7 +305,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
@@ -312,7 +313,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concatGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
@@ -321,7 +322,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> concatGetMore(
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
@@ -330,7 +331,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
@@ -338,7 +339,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
@@ -347,6 +348,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(CONFIG)
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     invocationConfiguration();
 
@@ -363,7 +365,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> limit(int count);
 
     /**
@@ -371,7 +373,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> function);
 
@@ -380,7 +382,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -389,7 +391,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -398,7 +400,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -407,7 +409,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -416,7 +418,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = ROUTINE)
+    @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
@@ -425,7 +427,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -434,7 +436,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> onError(
             @NotNull Consumer<? super RoutineException> consumer);
 
@@ -443,7 +445,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
@@ -451,7 +453,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable OUT output);
 
     /**
@@ -459,7 +461,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
@@ -467,7 +469,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
@@ -475,7 +477,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGet(long count,
             @NotNull Supplier<? extends OUT> supplier);
 
@@ -484,7 +486,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
@@ -492,7 +494,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
@@ -501,7 +503,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGetMore(
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
@@ -534,7 +536,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
@@ -542,7 +544,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     LoaderStreamChannelCompat<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
@@ -551,7 +553,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
@@ -560,7 +562,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = CACHE, binding = CONSUMER)
+    @StreamFlow(CACHE)
     LoaderStreamChannelCompat<IN, OUT> replay();
 
     /**
@@ -568,7 +570,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = CONSUMER)
+    @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> retry(int count);
 
     /**
@@ -576,7 +578,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = CONSUMER)
+    @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     /**
@@ -584,7 +586,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = COLLECT, binding = CONSUMER)
+    @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     function);
@@ -597,7 +599,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> runOn(@Nullable Runner runner);
 
     /**
@@ -608,7 +610,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> runOnShared();
 
     /**
@@ -635,7 +637,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> skip(int count);
 
     /**
@@ -643,7 +645,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
@@ -654,7 +656,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
@@ -664,7 +666,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
@@ -674,7 +676,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
@@ -684,7 +686,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> function);
@@ -694,7 +696,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -703,7 +705,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -712,7 +714,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -745,6 +747,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(CONFIG)
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamInvocationConfiguration();
 
@@ -761,7 +764,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable AFTER output);
 
     /**
@@ -769,7 +772,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable AFTER... outputs);
 
     /**
@@ -777,7 +780,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
@@ -785,7 +788,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -794,7 +797,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -803,7 +806,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
@@ -812,7 +815,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = REDUCE, binding = ROUTINE)
+    @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
@@ -821,7 +824,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
 
     /**
@@ -829,7 +832,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
@@ -838,7 +841,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
@@ -847,7 +850,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable runnable);
 
     /**
@@ -887,6 +890,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      */
     @NotNull
     @Override
+    @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>> loaderConfiguration();
 
     /**
@@ -915,7 +919,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -931,7 +935,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = ROUTINE)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -951,7 +955,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
@@ -972,7 +976,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
@@ -993,7 +997,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -1014,7 +1018,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    @StreamFlow(value = MAP, binding = CONSUMER)
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -1051,6 +1055,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * @return the invocation configuration builder.
      */
     @NotNull
+    @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamLoaderConfiguration();
 
@@ -1083,11 +1088,27 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
         LoaderConfiguration asLoaderConfiguration();
 
         /**
+         * Gets the configuration that will be applied to the next concatenated routine.
+         *
+         * @return the loader configuration.
+         */
+        @NotNull
+        LoaderConfiguration getCurrentLoaderConfiguration();
+
+        /**
          * Gets the stream loader context.
          *
          * @return the loader context.
          */
         @Nullable
         LoaderContextCompat getLoaderContext();
+
+        /**
+         * Gets the configuration that will be applied to all the concatenated routines.
+         *
+         * @return the loader configuration.
+         */
+        @NotNull
+        LoaderConfiguration getStreamLoaderConfiguration();
     }
 }

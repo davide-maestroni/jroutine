@@ -50,8 +50,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
-import com.github.dm.jrt.stream.annotation.StreamFlow.BindingType;
-import com.github.dm.jrt.stream.annotation.StreamFlow.ModificationType;
+import com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -120,11 +119,9 @@ public class StreamChannelTest {
     public void testAnnotation() {
 
         // Just for coverage...
-        assertThat(ModificationType.values()).containsOnly(ModificationType.START,
-                ModificationType.MAP, ModificationType.REDUCE, ModificationType.CACHE,
-                ModificationType.COLLECT, ModificationType.CONFIG);
-        assertThat(BindingType.values()).containsOnly(BindingType.ROUTINE, BindingType.CONSUMER,
-                BindingType.NONE);
+        assertThat(TransformationType.values()).containsOnly(TransformationType.START,
+                TransformationType.MAP, TransformationType.REDUCE, TransformationType.CACHE,
+                TransformationType.COLLECT, TransformationType.CONFIG);
     }
 
     @Test
@@ -716,61 +713,6 @@ public class StreamChannelTest {
                           .runOnShared()
                           .afterMax(seconds(3))
                           .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
-    @Test
-    public void testConstructor() {
-
-        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
-        final TestStreamChannel streamChannel =
-                new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
-                        InvocationMode.ASYNC, channel, Functions.<OutputChannel<Object>>identity());
-        assertThat(streamChannel.getConfiguration()).isEqualTo(
-                InvocationConfiguration.defaultConfiguration());
-        assertThat(streamChannel.getStreamConfiguration()).isEqualTo(
-                InvocationConfiguration.defaultConfiguration());
-        assertThat(streamChannel.getInvocationMode()).isEqualTo(InvocationMode.ASYNC);
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testConstructorError() {
-
-        try {
-            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, null, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
-        try {
-            new TestStreamChannel(null, InvocationMode.ASYNC, channel, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(), null, channel,
-                    null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, channel, null).apply(null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     @Test
@@ -3110,46 +3052,6 @@ public class StreamChannelTest {
 
             this.sum = sum;
             this.count = count;
-        }
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private static class TestStreamChannel extends AbstractStreamChannel<Object, Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param configuration  the initial invocation configuration.
-         * @param invocationMode the delegation type.
-         * @param sourceChannel  the source output channel.
-         * @param invoke         the invoke function.
-         */
-        protected TestStreamChannel(@NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
-                @NotNull final OutputChannel<Object> sourceChannel,
-                @NotNull final Function<OutputChannel<Object>, OutputChannel<Object>> invoke) {
-
-            super(configuration, invocationMode, sourceChannel, invoke);
-        }
-
-        @NotNull
-        @Override
-        protected <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
-                @NotNull final InvocationConfiguration streamConfiguration,
-                @NotNull final InvocationMode invocationMode,
-                @NotNull final OutputChannel<BEFORE> sourceChannel,
-                @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
-
-            return null;
-        }
-
-        @NotNull
-        @Override
-        protected <AFTER> Routine<? super Object, ? extends AFTER> newRoutine(
-                @NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationFactory<? super Object, ? extends AFTER> factory) {
-
-            return null;
         }
     }
 

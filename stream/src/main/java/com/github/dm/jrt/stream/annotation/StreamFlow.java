@@ -26,9 +26,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation used for documenting stream methods.
  * <p>
- * This annotation is meant to document the effect of a method on the underlying stream. In fact,
- * a method may return a new object or just modify the instance internal configuration, or cause
- * different side effects.
+ * This annotation is meant to document the effect of a method on the underlying stream.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  */
@@ -39,81 +37,56 @@ import java.lang.annotation.Target;
 public @interface StreamFlow {
 
     /**
-     * The stream binding type.
+     * The stream method transformation type.
      *
-     * @return the binding type.
+     * @return the transformation type.
      */
-    BindingType binding() default BindingType.NONE;
+    TransformationType value();
 
     /**
-     * The stream method modification type.
-     *
-     * @return the modification type.
+     * Transformation type enumeration.
      */
-    ModificationType value();
-
-    /**
-     * Binding type enumeration.
-     */
-    enum BindingType {
-
-        /**
-         * Routine binding.
-         * <br>
-         * The stream is bound to a new routine invocation.
-         */
-        ROUTINE,
-        /**
-         * Consumer binding.
-         * <br>
-         * The stream is bound to an output consumer.
-         */
-        CONSUMER,
-        /**
-         * No binding.
-         * <br>
-         * The stream is not bound.
-         */
-        NONE
-    }
-
-    /**
-     * Modification type enumeration.
-     */
-    enum ModificationType {
+    enum TransformationType {
 
         /**
          * A new instance is created and chained to the current one.
          * <br>
-         * Any further attempt to bind or read from the current stream will raise an exception.
+         * The effect on the flow will depend on the logic implemented in the mapping routine or
+         * function.
+         * <br>
+         * A new stream instance is returned by the method, and any further attempt to bind or
+         * read from the current one will raise an exception.
          */
         MAP,
         /**
          * The flow of data is blocked, so that all incoming inputs are collected before a new
          * output is produced.
          * <br>
-         * A new stream instance is returned by the method.
+         * A new stream instance is returned by the method, and any further attempt to bind or
+         * read from the current one will raise an exception.
          */
         REDUCE,
         /**
          * The flow of data is cached, so that all incoming inputs are possibly retained, but
          * outputs are produced anyway without interruption.
          * <br>
-         * A new stream instance is returned by the method.
+         * A new stream instance is returned by the method, and any further attempt to bind or
+         * read from the current one will raise an exception.
          */
         CACHE,
         /**
          * The flow of data is blocked and incoming inputs are possibly retained, so that outputs
          * are produced only when inputs complete.
          * <br>
-         * A new stream instance is returned by the method.
+         * A new stream instance is returned by the method, and any further attempt to bind or
+         * read from the current one will raise an exception.
          */
         COLLECT,
         /**
-         * The current stream configuration is modified and the same instance is returned.
+         * The current stream configuration is modified.
          * <br>
-         * Note that the stream internal configuration is not synchronized, so that modifications
-         * applied on different threads may lead to unpredictable results.
+         * A new stream instance is returned by the method, and any further attempt to bind or
+         * read from the current one will raise an exception.
          */
         CONFIG,
         /**

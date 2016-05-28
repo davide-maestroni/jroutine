@@ -17,13 +17,18 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 
 /**
  * Default implementation of a stream output channel.
@@ -41,47 +46,141 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      */
     DefaultStreamChannel(@NotNull final OutputChannel<IN> channel) {
 
-        super(InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC, channel, null);
+        super(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
+                InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC), channel);
     }
 
     /**
      * Constructor.
      *
-     * @param configuration  the initial invocation configuration.
-     * @param invocationMode the invocation mode.
-     * @param sourceChannel  the source output channel.
-     * @param bind           the binding function.
+     * @param streamConfiguration the stream configuration.
+     * @param sourceChannel       the source output channel.
+     * @param bindingFunction     if null the stream will act as a wrapper of the source output
+     *                            channel.
      */
-    private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode,
+    private DefaultStreamChannel(@NotNull final StreamConfiguration streamConfiguration,
             @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bind) {
+            @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
 
-        super(configuration, invocationMode, sourceChannel, bind);
+        super(streamConfiguration, sourceChannel, bindingFunction);
     }
 
     @NotNull
     @Override
     protected <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
-            @NotNull final InvocationConfiguration streamConfiguration,
-            @NotNull final InvocationMode invocationMode,
+            @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final OutputChannel<BEFORE> sourceChannel,
-            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
+            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> bindingFunction) {
 
-        return new DefaultStreamChannel<BEFORE, AFTER>(streamConfiguration, invocationMode,
-                sourceChannel, invoke);
+        return new DefaultStreamChannel<BEFORE, AFTER>(streamConfiguration, sourceChannel,
+                bindingFunction);
+    }
+
+    @NotNull
+    @Override
+    protected StreamConfiguration newConfiguration(
+            @NotNull final InvocationConfiguration streamConfiguration,
+            @NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode) {
+
+        return new DefaultStreamConfiguration(streamConfiguration, configuration, invocationMode);
+    }
+
+    @NotNull
+    @Override
+    protected StreamConfiguration newConfiguration(
+            @NotNull final InvocationConfiguration streamConfiguration,
+            @NotNull final InvocationMode invocationMode) {
+
+        return new DefaultStreamConfiguration(streamConfiguration,
+                InvocationConfiguration.defaultConfiguration(), invocationMode);
     }
 
     @NotNull
     @Override
     protected <AFTER> Routine<? super OUT, ? extends AFTER> newRoutine(
-            @NotNull final InvocationConfiguration configuration,
+            @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return JRoutineCore.on(factory)
                            .invocationConfiguration()
-                           .with(configuration)
+                           .with(streamConfiguration.asInvocationConfiguration())
                            .apply()
                            .buildRoutine();
+    }
+
+    /**
+     * Default implementation of a stream configuration.
+     */
+    private static class DefaultStreamConfiguration implements StreamConfiguration {
+
+        private final InvocationConfiguration mConfiguration;
+
+        private final InvocationMode mInvocationMode;
+
+        private final InvocationConfiguration mStreamConfiguration;
+
+        private volatile ChannelConfiguration mChannelConfiguration;
+
+        private volatile InvocationConfiguration mInvocationConfiguration;
+
+        /**
+         * Constructor.
+         *
+         * @param streamConfiguration  the stream invocation configuration.
+         * @param currentConfiguration the current invocation configuration.
+         * @param invocationMode       the invocation mode.
+         */
+        private DefaultStreamConfiguration(
+                @NotNull final InvocationConfiguration streamConfiguration,
+                @NotNull final InvocationConfiguration currentConfiguration,
+                @NotNull final InvocationMode invocationMode) {
+
+            mStreamConfiguration = ConstantConditions.notNull("stream invocation configuration",
+                    streamConfiguration);
+            mConfiguration = ConstantConditions.notNull("current invocation configuration",
+                    currentConfiguration);
+            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+        }
+
+        @NotNull
+        public ChannelConfiguration asChannelConfiguration() {
+
+            if (mChannelConfiguration == null) {
+                mChannelConfiguration =
+                        builderFromOutputChannel(asInvocationConfiguration()).apply();
+            }
+
+            return mChannelConfiguration;
+        }
+
+        @NotNull
+        public InvocationConfiguration asInvocationConfiguration() {
+
+            if (mInvocationConfiguration == null) {
+                mInvocationConfiguration =
+                        mStreamConfiguration.builderFrom().with(mConfiguration).apply();
+            }
+
+            return mInvocationConfiguration;
+        }
+
+        @NotNull
+        public InvocationConfiguration getCurrentConfiguration() {
+
+            return mConfiguration;
+        }
+
+        @NotNull
+        public InvocationMode getInvocationMode() {
+
+            return mInvocationMode;
+        }
+
+        @NotNull
+        public InvocationConfiguration getStreamConfiguration() {
+
+            return mStreamConfiguration;
+        }
     }
 }

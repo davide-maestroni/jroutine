@@ -150,6 +150,139 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> skipNext(int count);
 
     /**
+     * Returns a stream appending the specified output to this stream ones.
+     * <br>
+     * The output will be appended to the ones produced by this stream.
+     * <p>
+     * Note that this stream will be bound as a result of the call.
+     *
+     * @param output the output to append.
+     * @return the new stream.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> append(@Nullable OUT output);
+
+    /**
+     * Returns a stream concatenating the specified outputs to this stream ones.
+     * <br>
+     * The outputs will be appended to the ones produced by this stream.
+     * <p>
+     * Note that this stream will be bound as a result of the call.
+     *
+     * @param outputs the outputs to append.
+     * @return the new stream.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> append(@Nullable OUT... outputs);
+
+    /**
+     * Returns a stream appending the specified outputs to this stream ones.
+     * <br>
+     * The outputs will be appended to the ones produced by this stream.
+     * <p>
+     * Note that this stream will be bound as a result of the call.
+     *
+     * @param outputs the iterable returning the outputs to append.
+     * @return the new stream.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
+
+    /**
+     * Returns a stream appending the specified channel outputs to this stream ones.
+     * <br>
+     * The outputs will be appended to the ones produced by this stream.
+     * <p>
+     * Note that both the specified channel and this stream will be bound as a result of the call.
+     *
+     * @param channel the output channel.
+     * @return the new stream.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> append(@NotNull OutputChannel<? extends OUT> channel);
+
+    /**
+     * Concatenates a stream appending the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> appendGet(long count, @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * Concatenates a stream appending the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * Concatenates a stream appending the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> appendGetMore(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * Concatenates a stream appending the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> appendGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
      * Transforms this stream by applying the specified function.
      * <br>
      * This method provides a convenient way to apply a set of configurations and concatenations
@@ -353,139 +486,6 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(COLLECT)
     <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * Returns a stream appending the specified output to this stream ones.
-     * <br>
-     * The output will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param output the output to append.
-     * @return the new stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concat(@Nullable OUT output);
-
-    /**
-     * Returns a stream concatenating the specified outputs to this stream ones.
-     * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param outputs the outputs to append.
-     * @return the new stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concat(@Nullable OUT... outputs);
-
-    /**
-     * Returns a stream appending the specified outputs to this stream ones.
-     * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param outputs the iterable returning the outputs to append.
-     * @return the new stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
-
-    /**
-     * Returns a stream appending the specified channel outputs to this stream ones.
-     * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that both the specified channel and this stream will be bound as a result of the call.
-     *
-     * @param channel the output channel.
-     * @return the new stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
-
-    /**
-     * Concatenates a stream appending the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concatGet(long count, @NotNull Supplier<? extends OUT> supplier);
-
-    /**
-     * Concatenates a stream appending the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called only when the previous routine invocations complete.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param supplier the supplier instance.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
-
-    /**
-     * Concatenates a stream appending the outputs returned by the specified consumer.
-     * <br>
-     * The result channel of the backing routine will be passed to the consumer, so that multiple
-     * or no results may be generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concatGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Concatenates a stream appending the outputs returned by the specified consumer.
-     * <br>
-     * The result channel of the backing routine will be passed to the consumer, so that multiple
-     * or no results may be generated.
-     * <br>
-     * The consumer will be called only when the previous routine invocations complete.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> concatGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Concatenates a stream filtering data based on the values returned by the specified predicate.

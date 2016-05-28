@@ -368,55 +368,55 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concat(@Nullable final OUT output) {
+    public StreamChannel<IN, OUT> append(@Nullable final OUT output) {
 
-        return concat(JRoutineCore.io().of(output));
+        return append(JRoutineCore.io().of(output));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concat(@Nullable final OUT... outputs) {
+    public StreamChannel<IN, OUT> append(@Nullable final OUT... outputs) {
 
-        return concat(JRoutineCore.io().of(outputs));
+        return append(JRoutineCore.io().of(outputs));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+    public StreamChannel<IN, OUT> append(@Nullable final Iterable<? extends OUT> outputs) {
 
-        return concat(JRoutineCore.io().of(outputs));
+        return append(JRoutineCore.io().of(outputs));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
+    public StreamChannel<IN, OUT> append(@NotNull final OutputChannel<? extends OUT> channel) {
 
         return buildChannel(getBinding().andThen(
                 new BindConcat<OUT>(mStreamConfiguration.asChannelConfiguration(), channel)));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGet(final long count,
+    public StreamChannel<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> supplier) {
 
         return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(supplier)));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGet(@NotNull final Supplier<? extends OUT> supplier) {
+    public StreamChannel<IN, OUT> appendGet(@NotNull final Supplier<? extends OUT> supplier) {
 
-        return concatGet(1, supplier);
+        return appendGet(1, supplier);
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGetMore(final long count,
+    public StreamChannel<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> concatGetMore(
+    public StreamChannel<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return concatGetMore(1, consumer);
+        return appendGetMore(1, consumer);
     }
 
     @NotNull

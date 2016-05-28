@@ -342,66 +342,66 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concat(@Nullable final OUT output) {
+    public LoaderStreamChannel<IN, OUT> append(@Nullable final OUT output) {
 
-        return (LoaderStreamChannel<IN, OUT>) super.concat(output);
+        return (LoaderStreamChannel<IN, OUT>) super.append(output);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concat(@Nullable final OUT... outputs) {
+    public LoaderStreamChannel<IN, OUT> append(@Nullable final OUT... outputs) {
 
-        return (LoaderStreamChannel<IN, OUT>) super.concat(outputs);
+        return (LoaderStreamChannel<IN, OUT>) super.append(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+    public LoaderStreamChannel<IN, OUT> append(@Nullable final Iterable<? extends OUT> outputs) {
 
-        return (LoaderStreamChannel<IN, OUT>) super.concat(outputs);
+        return (LoaderStreamChannel<IN, OUT>) super.append(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concat(
+    public LoaderStreamChannel<IN, OUT> append(
             @NotNull final OutputChannel<? extends OUT> channel) {
 
-        return (LoaderStreamChannel<IN, OUT>) super.concat(channel);
+        return (LoaderStreamChannel<IN, OUT>) super.append(channel);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concatGet(final long count,
+    public LoaderStreamChannel<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<IN, OUT>) super.concatGet(count, supplier);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGet(count, supplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concatGet(@NotNull final Supplier<? extends OUT> supplier) {
+    public LoaderStreamChannel<IN, OUT> appendGet(@NotNull final Supplier<? extends OUT> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<IN, OUT>) super.concatGet(supplier);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGet(supplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concatGetMore(final long count,
+    public LoaderStreamChannel<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<IN, OUT>) super.concatGetMore(count, consumer);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(count, consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> concatGetMore(
+    public LoaderStreamChannel<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<IN, OUT>) super.concatGetMore(consumer);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(consumer);
     }
 
     @NotNull

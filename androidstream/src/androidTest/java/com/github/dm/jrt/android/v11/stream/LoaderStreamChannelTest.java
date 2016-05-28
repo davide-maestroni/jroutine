@@ -132,6 +132,175 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         };
     }
 
+    private static void testAppend(final Activity activity) {
+
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .append("test2")
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .append("test2", "test3")
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .append(Arrays.asList("test2", "test3"))
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .append(JRoutineCore.io().of("test2", "test3"))
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    private static void testAppend2(final Activity activity) {
+
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .sync()
+                                .appendGet(new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .sync()
+                                .appendGetMore(new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .sync()
+                                .appendGet(3, new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .sync()
+                                .appendGetMore(3, new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .async()
+                                .appendGet(new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .async()
+                                .appendGetMore(new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .async()
+                                .appendGet(3, new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .async()
+                                .appendGetMore(3, new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .parallel()
+                                .appendGet(new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .parallel()
+                                .appendGetMore(new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .parallel()
+                                .appendGet(3, new Supplier<String>() {
+
+                                    public String get() {
+
+                                        return "TEST2";
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(activity))
+                                .parallel()
+                                .appendGetMore(3, new Consumer<ResultChannel<String>>() {
+
+                                    public void accept(final ResultChannel<String> resultChannel) {
+
+                                        resultChannel.pass("TEST2");
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+    }
+
     private static void testCollect(@NotNull final Activity activity) {
 
         assertThat(LoaderStreams.streamOf(new StringBuilder("test1"), new StringBuilder("test2"),
@@ -258,175 +427,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 })
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1test2test3");
-    }
-
-    private static void testConcat(final Activity activity) {
-
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .concat("test2")
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .concat("test2", "test3")
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .concat(Arrays.asList("test2", "test3"))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .concat(JRoutineCore.io().of("test2", "test3"))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    private static void testConcat2(final Activity activity) {
-
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .sync()
-                                .concatGet(new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .sync()
-                                .concatGetMore(new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .sync()
-                                .concatGet(3, new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .sync()
-                                .concatGetMore(3, new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .async()
-                                .concatGet(new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .async()
-                                .concatGetMore(new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .async()
-                                .concatGet(3, new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .async()
-                                .concatGetMore(3, new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .parallel()
-                                .concatGet(new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .parallel()
-                                .concatGetMore(new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .parallel()
-                                .concatGet(3, new Supplier<String>() {
-
-                                    public String get() {
-
-                                        return "TEST2";
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-        assertThat(LoaderStreams.streamOf("test1")
-                                .with(loaderFrom(activity))
-                                .parallel()
-                                .concatGetMore(3, new Consumer<ResultChannel<String>>() {
-
-                                    public void accept(final ResultChannel<String> resultChannel) {
-
-                                        resultChannel.pass("TEST2");
-                                    }
-                                })
-                                .afterMax(seconds(3))
-                                .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
     }
 
     private static void testConfiguration(@NotNull final Activity activity) {
@@ -1507,6 +1507,24 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 IllegalArgumentException.class);
     }
 
+    public void testAppend() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testAppend(getActivity());
+    }
+
+    public void testAppend2() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testAppend2(getActivity());
+    }
+
     public void testBuilder() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1730,24 +1748,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testConcat() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testConcat(getActivity());
-    }
-
-    public void testConcat2() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testConcat2(getActivity());
     }
 
     public void testConfiguration() {
@@ -1981,7 +1981,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                             public StreamChannel<String, String> apply(
                                                     final StreamChannel<String, String> stream) {
 
-                                                return stream.concat("test2");
+                                                return stream.append("test2");
                                             }
                                         })
                                 .afterMax(seconds(10))
@@ -1997,7 +1997,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
                                                 return ((LoaderStreamChannel<String, String>)
                                                         stream)
-                                                        .concat("test2");
+                                                        .append("test2");
                                             }
                                         })
                                 .afterMax(seconds(10))

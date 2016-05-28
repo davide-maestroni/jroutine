@@ -160,6 +160,72 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> append(@Nullable OUT output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> append(@Nullable OUT... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> append(@NotNull OutputChannel<? extends OUT> channel);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> appendGet(long count, @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> appendGetMore(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> appendGetMore(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
      * <p>
      * Note that this instance will be passed as input parameter to the specified function, and
      * a {@code LoaderStreamChannel} is expected as result.
@@ -256,72 +322,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(COLLECT)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concat(@Nullable OUT output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concat(@Nullable OUT... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concatGet(long count, @NotNull Supplier<? extends OUT> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concatGet(@NotNull Supplier<? extends OUT> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concatGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> concatGetMore(
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}

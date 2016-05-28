@@ -990,6 +990,10 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final StreamConfiguration streamConfiguration) {
 
         synchronized (mMutex) {
+            if (mIsConcat) {
+                throw new IllegalStateException("the channel has already been concatenated");
+            }
+
             mIsConcat = true;
         }
 
@@ -1102,14 +1106,20 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final Function<OutputChannel<IN>, OutputChannel<AFTER>> bindingFunction) {
 
         synchronized (mMutex) {
+            if (mIsConcat) {
+                throw new IllegalStateException("the channel has already been concatenated");
+            }
+
             mIsConcat = true;
         }
 
         sInsideBuild.get().mIsTrue = true;
         try {
             final StreamConfiguration streamConfiguration = mStreamConfiguration;
-            return newChannel(newConfiguration(streamConfiguration.getStreamConfiguration(),
-                    streamConfiguration.getInvocationMode()), mSourceChannel, bindingFunction);
+            return ConstantConditions.notNull("new stream channel instance", newChannel(
+                    newConfiguration(streamConfiguration.getStreamConfiguration(),
+                            streamConfiguration.getInvocationMode()), mSourceChannel,
+                    bindingFunction));
 
         } finally {
             sInsideBuild.get().mIsTrue = false;
@@ -1120,7 +1130,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return newRoutine(mStreamConfiguration, factory);
+        return ConstantConditions.notNull("routine instance",
+                newRoutine(mStreamConfiguration, factory));
     }
 
     @NotNull

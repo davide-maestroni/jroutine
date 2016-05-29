@@ -151,7 +151,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final OutputChannel<IN> sourceChannel,
             @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
 
-        if (!sInsideBuild.get().mIsTrue) {
+        if (!sInsideBuild.get().isTrue) {
             throw new IllegalStateException(
                     "the constructor can be called only inside the invocation of the "
                             + "'newChannel()' method");
@@ -997,13 +997,13 @@ public abstract class AbstractStreamChannel<IN, OUT>
             mIsConcat = true;
         }
 
-        sInsideBuild.get().mIsTrue = true;
+        sInsideBuild.get().isTrue = true;
         try {
             return ConstantConditions.notNull("new stream channel instance",
                     newChannel(streamConfiguration, mSourceChannel, getBinding()));
 
         } finally {
-            sInsideBuild.get().mIsTrue = false;
+            sInsideBuild.get().isTrue = false;
         }
     }
 
@@ -1113,7 +1113,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             mIsConcat = true;
         }
 
-        sInsideBuild.get().mIsTrue = true;
+        sInsideBuild.get().isTrue = true;
         try {
             final StreamConfiguration streamConfiguration = mStreamConfiguration;
             return ConstantConditions.notNull("new stream channel instance", newChannel(
@@ -1122,7 +1122,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     bindingFunction));
 
         } finally {
-            sInsideBuild.get().mIsTrue = false;
+            sInsideBuild.get().isTrue = false;
         }
     }
 
@@ -1195,7 +1195,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
      */
     private static class MutableBoolean {
 
-        private boolean mIsTrue;
+        private boolean isTrue;
     }
 
     @NotNull

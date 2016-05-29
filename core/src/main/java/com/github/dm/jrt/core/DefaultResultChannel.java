@@ -408,7 +408,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void enterInvocation() {
 
-        sInsideInvocation.get().mIsTrue = true;
+        sInsideInvocation.get().isTrue = true;
     }
 
     /**
@@ -416,7 +416,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void exitInvocation() {
 
-        sInsideInvocation.get().mIsTrue = false;
+        sInsideInvocation.get().isTrue = false;
     }
 
     /**
@@ -463,7 +463,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void checkCanWait() {
 
-        if (sInsideInvocation.get().mIsTrue) {
+        if (sInsideInvocation.get().isTrue) {
             throw new ExecutionDeadlockException(
                     "cannot wait inside an invocation execution: " + Thread.currentThread()
                             + "\nTry binding the output channel");
@@ -908,7 +908,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private static class MutableBoolean {
 
-        private boolean mIsTrue;
+        private boolean isTrue;
     }
 
     /**

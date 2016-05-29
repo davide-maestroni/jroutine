@@ -787,7 +787,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
         final Runner runner =
                 mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null);
-        return buildChannel(new BindDelayed<IN, OUT>(runner, delay, timeUnit, getBinding()));
+        return buildChannel(
+                new BindDelayed<IN, OUT>(runner, delay, timeUnit, getBinding())).start();
     }
 
     @NotNull

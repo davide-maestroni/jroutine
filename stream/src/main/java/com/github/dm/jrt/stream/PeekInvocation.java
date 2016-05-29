@@ -32,23 +32,23 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final ConsumerWrapper<? super DATA> mConsumer;
+    private final ConsumerWrapper<? super DATA> mPeekConsumer;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param peekConsumer the consumer instance.
      */
-    PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> consumer) {
+    PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> peekConsumer) {
 
-        super(asArgs(ConstantConditions.notNull("consumer instance", consumer)));
-        mConsumer = consumer;
+        super(asArgs(ConstantConditions.notNull("consumer instance", peekConsumer)));
+        mPeekConsumer = peekConsumer;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
             Exception {
 
-        mConsumer.accept(input);
+        mPeekConsumer.accept(input);
         result.pass(input);
     }
 }

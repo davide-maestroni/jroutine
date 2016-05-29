@@ -36,24 +36,24 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
 
-    private final PredicateWrapper<? super IN> mPredicate;
+    private final PredicateWrapper<? super IN> mFilterPredicate;
 
     /**
      * Constructor.
      *
-     * @param predicate the predicate defining the condition.
+     * @param filterPredicate the predicate defining the condition.
      */
-    AnyMatchInvocationFactory(@NotNull final PredicateWrapper<? super IN> predicate) {
+    AnyMatchInvocationFactory(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
 
-        super(asArgs(ConstantConditions.notNull("predicate instance", predicate)));
-        mPredicate = predicate;
+        super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
+        mFilterPredicate = filterPredicate;
     }
 
     @NotNull
     @Override
     public Invocation<IN, Boolean> newInvocation() {
 
-        return new AnyMatchInvocation<IN>(mPredicate);
+        return new AnyMatchInvocation<IN>(mFilterPredicate);
     }
 
     /**
@@ -63,18 +63,18 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
      */
     private static class AnyMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
 
-        private final PredicateWrapper<? super IN> mPredicate;
+        private final PredicateWrapper<? super IN> mFilterPredicate;
 
         private boolean mIsMatch;
 
         /**
          * Constructor.
          *
-         * @param predicate the predicate defining the condition.
+         * @param filterPredicate the predicate defining the condition.
          */
-        private AnyMatchInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
+        private AnyMatchInvocation(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
 
-            mPredicate = predicate;
+            mFilterPredicate = filterPredicate;
         }
 
         @Override
@@ -87,7 +87,7 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         public void onInput(final IN input, @NotNull final ResultChannel<Boolean> result) throws
                 Exception {
 
-            if (!mIsMatch && mPredicate.test(input)) {
+            if (!mIsMatch && mFilterPredicate.test(input)) {
                 mIsMatch = true;
                 result.pass(true);
             }

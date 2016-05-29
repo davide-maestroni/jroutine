@@ -35,21 +35,22 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
+    private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mCatchConsumer;
 
     private final IOChannel<OUT> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param consumer      the consumer instance.
+     * @param catchConsumer the consumer instance.
      * @param outputChannel the output channel.
      */
     TryCatchOutputConsumer(
-            @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer,
+            @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
+                    catchConsumer,
             @NotNull final IOChannel<OUT> outputChannel) {
 
-        mConsumer = ConstantConditions.notNull("bi-consumer instance", consumer);
+        mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
@@ -62,7 +63,7 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
         final IOChannel<OUT> channel = mOutputChannel;
         try {
-            mConsumer.accept(error, channel);
+            mCatchConsumer.accept(error, channel);
             channel.close();
 
         } catch (final Throwable t) {

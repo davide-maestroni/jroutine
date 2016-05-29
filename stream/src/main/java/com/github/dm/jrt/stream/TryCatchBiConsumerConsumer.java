@@ -33,21 +33,21 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryCatchBiConsumerConsumer<OUT> implements BiConsumer<RoutineException, InputChannel<OUT>> {
 
-    private final Consumer<? super RoutineException> mConsumer;
+    private final Consumer<? super RoutineException> mCatchConsumer;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param catchConsumer the consumer instance.
      */
-    TryCatchBiConsumerConsumer(@NotNull final Consumer<? super RoutineException> consumer) {
+    TryCatchBiConsumerConsumer(@NotNull final Consumer<? super RoutineException> catchConsumer) {
 
-        mConsumer = ConstantConditions.notNull("consumer instance", consumer);
+        mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
     }
 
     public void accept(final RoutineException error, final InputChannel<OUT> channel) throws
             Exception {
 
-        mConsumer.accept(error);
+        mCatchConsumer.accept(error);
     }
 }

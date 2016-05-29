@@ -33,20 +33,20 @@ import org.jetbrains.annotations.NotNull;
  */
 class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final ConsumerWrapper<? super OUT> mConsumer;
-
     private final IOChannel<?> mOutputChannel;
+
+    private final ConsumerWrapper<? super OUT> mOutputConsumer;
 
     /**
      * Constructor.
      *
-     * @param consumer      the consumer instance.
-     * @param outputChannel the output channel.
+     * @param outputConsumer the consumer instance.
+     * @param outputChannel  the output channel.
      */
-    ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> consumer,
+    ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
             @NotNull final IOChannel<?> outputChannel) {
 
-        mConsumer = ConstantConditions.notNull("consumer instance", consumer);
+        mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
@@ -62,6 +62,6 @@ class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     public void onOutput(final OUT output) throws Exception {
 
-        mConsumer.accept(output);
+        mOutputConsumer.accept(output);
     }
 }

@@ -37,19 +37,19 @@ class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChan
 
     private final ChannelConfiguration mConfiguration;
 
-    private final ConsumerWrapper<? super OUT> mConsumer;
+    private final ConsumerWrapper<? super OUT> mOutputConsumer;
 
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param consumer      the consumer instance.
+     * @param configuration  the channel configuration.
+     * @param outputConsumer the consumer instance.
      */
     BindOutputConsumer(@NotNull final ChannelConfiguration configuration,
-            @NotNull final ConsumerWrapper<? super OUT> consumer) {
+            @NotNull final ConsumerWrapper<? super OUT> outputConsumer) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mConsumer = ConstantConditions.notNull("consumer instance", consumer);
+        mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
     }
 
     public OutputChannel<Void> apply(final OutputChannel<OUT> channel) {
@@ -59,7 +59,7 @@ class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChan
                                                       .with(mConfiguration)
                                                       .apply()
                                                       .buildChannel();
-        channel.bind(new ConsumingOutputConsumer<OUT>(mConsumer, ioChannel));
+        channel.bind(new ConsumingOutputConsumer<OUT>(mOutputConsumer, ioChannel));
         return ioChannel;
     }
 }

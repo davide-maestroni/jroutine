@@ -236,7 +236,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @StreamFlow(MAP)
     <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
             @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> function);
+                    AFTER>> transformFunction);
 
     /**
      * {@inheritDoc}
@@ -247,7 +247,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
             @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function);
+                    OutputChannel<AFTER>>> transformFunction);
 
     /**
      * {@inheritDoc}
@@ -261,7 +261,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> transformFunction);
 
     /**
      * {@inheritDoc}
@@ -316,7 +316,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> collect(
-            @NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+            @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
 
     /**
      * {@inheritDoc}
@@ -325,8 +325,8 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
-            @NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+            @NotNull Supplier<? extends AFTER> seedSupplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
 
     /**
      * {@inheritDoc}
@@ -335,7 +335,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(COLLECT)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
-            @NotNull Supplier<? extends AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> collectionSupplier);
 
     /**
      * {@inheritDoc}
@@ -343,7 +343,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
+    LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
      * {@inheritDoc}
@@ -352,7 +352,8 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
+                    mappingFunction);
 
     /**
      * {@inheritDoc}
@@ -386,7 +387,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
-            @NotNull Function<? super OUT, ? extends AFTER> function);
+            @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
     /**
      * {@inheritDoc}
@@ -422,7 +423,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
-            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
+            @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
     /**
      * {@inheritDoc}
@@ -431,7 +432,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAllMore(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
      * {@inheritDoc}
@@ -440,7 +441,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapMore(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
      * {@inheritDoc}
@@ -449,7 +450,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> onError(
-            @NotNull Consumer<? super RoutineException> consumer);
+            @NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * {@inheritDoc}
@@ -457,7 +458,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * {@inheritDoc}
@@ -490,7 +491,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGet(long count,
-            @NotNull Supplier<? extends OUT> supplier);
+            @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -498,7 +499,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+    LoaderStreamChannelCompat<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -507,7 +508,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -516,7 +517,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> orElseGetMore(
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -524,7 +525,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> ordered(@Nullable OrderType orderType);
+    LoaderStreamChannelCompat<IN, OUT> order(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}
@@ -548,7 +549,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
 
     /**
      * {@inheritDoc}
@@ -557,7 +558,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(REDUCE)
     LoaderStreamChannelCompat<IN, OUT> reduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
 
     /**
      * {@inheritDoc}
@@ -565,8 +566,9 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> reduce(
+            @NotNull Supplier<? extends AFTER> seedSupplier,
+            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
 
     /**
      * {@inheritDoc}
@@ -600,7 +602,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    function);
+                    backoffFunction);
 
     /**
      * {@inheritDoc}
@@ -638,7 +640,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
             @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
-                    OUT, ? extends AFTER>> function);
+                    OUT, ? extends AFTER>> streamFunction);
 
     /**
      * {@inheritDoc}
@@ -678,7 +680,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
-                    OUT, ? extends AFTER>> function);
+                    OUT, ? extends AFTER>> streamFunction);
 
     /**
      * {@inheritDoc}
@@ -779,7 +781,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -788,7 +790,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
-            @NotNull Supplier<? extends AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -797,7 +799,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -806,7 +808,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -823,7 +825,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
+            @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
 
     /**
      * {@inheritDoc}
@@ -832,7 +834,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryCatchMore(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> catchConsumer);
 
     /**
      * {@inheritDoc}
@@ -840,7 +842,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable runnable);
+    LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable finallyRunnable);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.

@@ -37,22 +37,23 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindTryCatch<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+    private final BiConsumerWrapper<? super RoutineException, ? super InputChannel<OUT>>
+            mCatchConsumer;
 
-    private final BiConsumerWrapper<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
+    private final ChannelConfiguration mConfiguration;
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param consumer      the error consumer instance.
+     * @param catchConsumer the error consumer instance.
      */
     BindTryCatch(@NotNull final ChannelConfiguration configuration,
             @NotNull final BiConsumerWrapper<? super RoutineException, ? super
-                    InputChannel<OUT>> consumer) {
+                    InputChannel<OUT>> catchConsumer) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mConsumer = ConstantConditions.notNull("consumer instance", consumer);
+        mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
@@ -62,7 +63,7 @@ class BindTryCatch<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OU
                                                      .with(mConfiguration)
                                                      .apply()
                                                      .buildChannel();
-        channel.bind(new TryCatchOutputConsumer<OUT>(mConsumer, ioChannel));
+        channel.bind(new TryCatchOutputConsumer<OUT>(mCatchConsumer, ioChannel));
         return ioChannel;
     }
 }

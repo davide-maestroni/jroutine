@@ -566,7 +566,7 @@ public class StreamChannelTest {
                     }
                 }).afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel(1)
                           .map(new Function<String, String>() {
 
@@ -578,7 +578,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel(1)
                           .map(new Function<String, String>() {
 
@@ -1313,7 +1313,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .mapMore(new BiConsumer<String, ResultChannel<String>>() {
 
@@ -1374,7 +1374,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .map(factory)
                           .afterMax(seconds(3))
@@ -1439,7 +1439,7 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .map(new UpperCase())
                           .afterMax(seconds(3))
@@ -1510,7 +1510,7 @@ public class StreamChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .map(new Function<String, String>() {
 
@@ -2201,7 +2201,7 @@ public class StreamChannelTest {
         }
 
         final AtomicInteger count2 = new AtomicInteger();
-        assertThat(Streams.streamOf("test")
+        assertThat(Streams.streamOf("test") // BUG
                           .map(new UpperCase())
                           .map(factoryOf(ThrowException.class, count2, 1))
                           .retry(1)

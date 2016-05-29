@@ -32,27 +32,27 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final IOChannel<OUT> mOutputChannel;
+    private final Runnable mFinallyRunnable;
 
-    private final Runnable mRunnable;
+    private final IOChannel<OUT> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param runnable      the runnable instance.
-     * @param outputChannel the output channel.
+     * @param finallyRunnable the runnable instance.
+     * @param outputChannel   the output channel.
      */
-    TryFinallyOutputConsumer(@NotNull final Runnable runnable,
+    TryFinallyOutputConsumer(@NotNull final Runnable finallyRunnable,
             @NotNull final IOChannel<OUT> outputChannel) {
 
-        mRunnable = ConstantConditions.notNull("runnable instance", runnable);
+        mFinallyRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
     public void onComplete() {
 
         try {
-            mRunnable.run();
+            mFinallyRunnable.run();
 
         } finally {
             mOutputChannel.close();
@@ -62,7 +62,7 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
     public void onError(@NotNull final RoutineException error) {
 
         try {
-            mRunnable.run();
+            mFinallyRunnable.run();
 
         } finally {
             mOutputChannel.abort(error);

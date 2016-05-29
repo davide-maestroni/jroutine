@@ -863,20 +863,20 @@ public class Streams extends Functions {
      * The generated data will start from the specified first one up to and including the specified
      * last one, by computing each next element through the specified function.
      *
-     * @param start     the first element of the range.
-     * @param end       the last element of the range.
-     * @param increment the function incrementing the current element.
-     * @param <AFTER>   the concatenation output type.
+     * @param start             the first element of the range.
+     * @param end               the last element of the range.
+     * @param incrementFunction the function incrementing the current element.
+     * @param <AFTER>           the concatenation output type.
      * @return the consumer instance.
      */
     @NotNull
     @StreamFlow(MAP)
     public static <AFTER extends Comparable<? super AFTER>> Consumer<InputChannel<AFTER>> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment) {
+            @NotNull final Function<AFTER, AFTER> incrementFunction) {
 
         return new RangeConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.notNull("end element", end), wrap(increment));
+                ConstantConditions.notNull("end element", end), wrap(incrementFunction));
     }
 
     /**
@@ -1116,20 +1116,20 @@ public class Streams extends Functions {
      * The generated data will start from the specified first and will produce the specified number
      * of elements, by computing each next one through the specified function.
      *
-     * @param start   the first element of the sequence.
-     * @param count   the number of generated elements.
-     * @param next    the function computing the next element.
-     * @param <AFTER> the concatenation output type.
+     * @param start        the first element of the sequence.
+     * @param count        the number of generated elements.
+     * @param nextFunction the function computing the next element.
+     * @param <AFTER>      the concatenation output type.
      * @return the consumer instance.
      * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
     @StreamFlow(MAP)
     public static <AFTER> Consumer<InputChannel<AFTER>> sequence(@NotNull final AFTER start,
-            final long count, @NotNull final BiFunction<AFTER, Long, AFTER> next) {
+            final long count, @NotNull final BiFunction<AFTER, Long, AFTER> nextFunction) {
 
         return new SequenceConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.positive("sequence size", count), wrap(next));
+                ConstantConditions.positive("sequence size", count), wrap(nextFunction));
     }
 
     /**
@@ -1742,31 +1742,31 @@ public class Streams extends Functions {
 
         private final OUT mEnd;
 
-        private final Function<OUT, OUT> mIncrement;
+        private final Function<OUT, OUT> mIncrementFunction;
 
         private final OUT mStart;
 
         /**
          * Constructor.
          *
-         * @param start     the first element of the range.
-         * @param end       the last element of the range.
-         * @param increment the function incrementing the current element.
+         * @param start             the first element of the range.
+         * @param end               the last element of the range.
+         * @param incrementFunction the function incrementing the current element.
          */
         private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
-                @NotNull final Function<OUT, OUT> increment) {
+                @NotNull final Function<OUT, OUT> incrementFunction) {
 
-            super(asArgs(start, end, increment));
+            super(asArgs(start, end, incrementFunction));
             mStart = start;
             mEnd = end;
-            mIncrement = increment;
+            mIncrementFunction = incrementFunction;
         }
 
         public void accept(final InputChannel<OUT> result) throws Exception {
 
             final OUT start = mStart;
             final OUT end = mEnd;
-            final Function<OUT, OUT> increment = mIncrement;
+            final Function<OUT, OUT> increment = mIncrementFunction;
             OUT current = start;
             if (start.compareTo(end) <= 0) {
                 while (current.compareTo(end) <= 0) {
@@ -1793,29 +1793,29 @@ public class Streams extends Functions {
 
         private final long mCount;
 
-        private final BiFunctionWrapper<OUT, Long, OUT> mNext;
+        private final BiFunctionWrapper<OUT, Long, OUT> mNextFunction;
 
         private final OUT mStart;
 
         /**
          * Constructor.
          *
-         * @param start the first element of the sequence.
-         * @param count the size of the sequence.
-         * @param next  the function computing the next element.
+         * @param start        the first element of the sequence.
+         * @param count        the size of the sequence.
+         * @param nextFunction the function computing the next element.
          */
         private SequenceConsumer(@NotNull final OUT start, final long count,
-                @NotNull final BiFunctionWrapper<OUT, Long, OUT> next) {
+                @NotNull final BiFunctionWrapper<OUT, Long, OUT> nextFunction) {
 
-            super(asArgs(start, count, next));
+            super(asArgs(start, count, nextFunction));
             mStart = start;
             mCount = count;
-            mNext = next;
+            mNextFunction = nextFunction;
         }
 
         public void accept(final InputChannel<OUT> result) throws Exception {
 
-            final BiFunctionWrapper<OUT, Long, OUT> next = mNext;
+            final BiFunctionWrapper<OUT, Long, OUT> next = mNextFunction;
             OUT current = mStart;
             final long count = mCount;
             final long last = count - 1;

@@ -35,21 +35,21 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
 
     private final long mCount;
 
-    private final SupplierWrapper<? extends DATA> mSupplier;
+    private final SupplierWrapper<? extends DATA> mOutputSupplier;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param supplier the supplier instance.
+     * @param count          the loop count.
+     * @param outputSupplier the supplier instance.
      */
     ConcatLoopSupplierInvocation(final long count,
-            @NotNull final SupplierWrapper<? extends DATA> supplier) {
+            @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", supplier)));
+                ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
-        mSupplier = supplier;
+        mOutputSupplier = outputSupplier;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
@@ -60,7 +60,7 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
     public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
 
         final long count = mCount;
-        final SupplierWrapper<? extends DATA> supplier = mSupplier;
+        final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }

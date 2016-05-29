@@ -33,29 +33,29 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class LoopConsumerInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
-    private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
-
     private final long mCount;
+
+    private final ConsumerWrapper<? super ResultChannel<OUT>> mOutputsConsumer;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param consumer the consumer instance.
+     * @param count           the loop count.
+     * @param outputsConsumer the consumer instance.
      */
     LoopConsumerInvocation(final long count,
-            @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
+            @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> outputsConsumer) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", consumer)));
+                ConstantConditions.notNull("consumer instance", outputsConsumer)));
         mCount = count;
-        mConsumer = consumer;
+        mOutputsConsumer = outputsConsumer;
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         final long count = mCount;
-        final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mConsumer;
+        final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {
             consumer.accept(result);
         }

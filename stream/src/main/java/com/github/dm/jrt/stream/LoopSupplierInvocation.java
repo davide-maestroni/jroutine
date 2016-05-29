@@ -35,27 +35,27 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
     private final long mCount;
 
-    private final SupplierWrapper<? extends OUT> mSupplier;
+    private final SupplierWrapper<? extends OUT> mOutputSupplier;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param supplier the supplier instance.
+     * @param count          the loop count.
+     * @param outputSupplier the supplier instance.
      */
     LoopSupplierInvocation(final long count,
-            @NotNull final SupplierWrapper<? extends OUT> supplier) {
+            @NotNull final SupplierWrapper<? extends OUT> outputSupplier) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", supplier)));
+                ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
-        mSupplier = supplier;
+        mOutputSupplier = outputSupplier;
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         final long count = mCount;
-        final SupplierWrapper<? extends OUT> supplier = mSupplier;
+        final SupplierWrapper<? extends OUT> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }

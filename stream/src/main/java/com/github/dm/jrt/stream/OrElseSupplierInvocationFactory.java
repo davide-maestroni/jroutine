@@ -38,28 +38,28 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
     private final long mCount;
 
-    private final SupplierWrapper<? extends DATA> mSupplier;
+    private final SupplierWrapper<? extends DATA> mOutputSupplier;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param supplier the supplier instance.
+     * @param count          the loop count.
+     * @param outputSupplier the supplier instance.
      */
     OrElseSupplierInvocationFactory(final long count,
-            @NotNull final SupplierWrapper<? extends DATA> supplier) {
+            @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", supplier)));
+                ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
-        mSupplier = supplier;
+        mOutputSupplier = outputSupplier;
     }
 
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() {
 
-        return new OrElseConsumerInvocation<DATA>(mCount, mSupplier);
+        return new OrElseConsumerInvocation<DATA>(mCount, mOutputSupplier);
     }
 
     /**
@@ -71,21 +71,21 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
         private final long mCount;
 
-        private final SupplierWrapper<? extends DATA> mSupplier;
+        private final SupplierWrapper<? extends DATA> mOutputSupplier;
 
         private boolean mHasOutputs;
 
         /**
          * Constructor.
          *
-         * @param count    the loop count.
-         * @param supplier the supplier instance.
+         * @param count          the loop count.
+         * @param outputSupplier the supplier instance.
          */
         OrElseConsumerInvocation(final long count,
-                @NotNull final SupplierWrapper<? extends DATA> supplier) {
+                @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
 
             mCount = count;
-            mSupplier = supplier;
+            mOutputSupplier = outputSupplier;
         }
 
         @Override
@@ -105,7 +105,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
             if (!mHasOutputs) {
                 final long count = mCount;
-                final SupplierWrapper<? extends DATA> supplier = mSupplier;
+                final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;
                 for (long i = 0; i < count; ++i) {
                     result.pass(supplier.get());
                 }

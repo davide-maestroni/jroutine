@@ -41,9 +41,9 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final BiConsumerWrapper<? super OUT, ? super IN> mConsumer;
+    private final BiConsumerWrapper<? super OUT, ? super IN> mAccumulateConsumer;
 
-    private final SupplierWrapper<? extends OUT> mSupplier;
+    private final SupplierWrapper<? extends OUT> mSeedSupplier;
 
     private OUT mAccumulated;
 
@@ -52,47 +52,49 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     /**
      * Constructor.
      *
-     * @param supplier the supplier of initial accumulation values.
-     * @param consumer the accumulating bi-consumer instance.
+     * @param seedSupplier       the supplier of initial accumulation values.
+     * @param accumulateConsumer the accumulating bi-consumer instance.
      */
-    private AccumulateConsumerInvocation(@Nullable final SupplierWrapper<? extends OUT> supplier,
-            @NotNull final BiConsumerWrapper<? super OUT, ? super IN> consumer) {
+    private AccumulateConsumerInvocation(
+            @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
+            @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
 
-        mSupplier = supplier;
-        mConsumer = consumer;
+        mSeedSupplier = seedSupplier;
+        mAccumulateConsumer = accumulateConsumer;
     }
 
     /**
      * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
      * instance.
      *
-     * @param consumer the accumulating bi-consumer instance.
-     * @param <IN>     the input data type.
+     * @param accumulateConsumer the accumulating bi-consumer instance.
+     * @param <IN>               the input data type.
      * @return the invocation factory.
      */
     @NotNull
     public static <IN> InvocationFactory<IN, IN> consumerFactory(
-            @NotNull final BiConsumer<? super IN, ? super IN> consumer) {
+            @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
 
-        return new AccumulateInvocationFactory<IN, IN>(null, wrap(consumer));
+        return new AccumulateInvocationFactory<IN, IN>(null, wrap(accumulateConsumer));
     }
 
     /**
      * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
      * instance.
      *
-     * @param supplier the supplier of initial accumulation values.
-     * @param consumer the accumulating bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
+     * @param seedSupplier       the supplier of initial accumulation values.
+     * @param accumulateConsumer the accumulating bi-consumer instance.
+     * @param <IN>               the input data type.
+     * @param <OUT>              the output data type.
      * @return the invocation factory.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
-            @NotNull final Supplier<? extends OUT> supplier,
-            @NotNull final BiConsumer<? super OUT, ? super IN> consumer) {
+            @NotNull final Supplier<? extends OUT> seedSupplier,
+            @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
 
-        return new AccumulateInvocationFactory<IN, OUT>(wrap(supplier), wrap(consumer));
+        return new AccumulateInvocationFactory<IN, OUT>(wrap(seedSupplier),
+                wrap(accumulateConsumer));
     }
 
     @Override
@@ -107,17 +109,17 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
 
         if (mIsFirst) {
             mIsFirst = false;
-            final SupplierWrapper<? extends OUT> supplier = mSupplier;
+            final SupplierWrapper<? extends OUT> supplier = mSeedSupplier;
             if (supplier != null) {
                 mAccumulated = supplier.get();
-                mConsumer.accept(mAccumulated, input);
+                mAccumulateConsumer.accept(mAccumulated, input);
 
             } else {
                 mAccumulated = (OUT) input;
             }
 
         } else {
-            mConsumer.accept(mAccumulated, input);
+            mAccumulateConsumer.accept(mAccumulated, input);
         }
     }
 
@@ -141,29 +143,30 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      */
     private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final BiConsumerWrapper<? super OUT, ? super IN> mConsumer;
+        private final BiConsumerWrapper<? super OUT, ? super IN> mAccumulateConsumer;
 
-        private final SupplierWrapper<? extends OUT> mSupplier;
+        private final SupplierWrapper<? extends OUT> mSeedSupplier;
 
         /**
          * Constructor.
          *
-         * @param supplier the supplier of initial accumulation values.
-         * @param consumer the accumulating bi-consumer instance.
+         * @param seedSupplier       the supplier of initial accumulation values.
+         * @param accumulateConsumer the accumulating bi-consumer instance.
          */
-        private AccumulateInvocationFactory(@Nullable final SupplierWrapper<? extends OUT> supplier,
-                @NotNull final BiConsumerWrapper<? super OUT, ? super IN> consumer) {
+        private AccumulateInvocationFactory(
+                @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
+                @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
 
-            super(asArgs(supplier, consumer));
-            mSupplier = supplier;
-            mConsumer = consumer;
+            super(asArgs(seedSupplier, accumulateConsumer));
+            mSeedSupplier = seedSupplier;
+            mAccumulateConsumer = accumulateConsumer;
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new AccumulateConsumerInvocation<IN, OUT>(mSupplier, mConsumer);
+            return new AccumulateConsumerInvocation<IN, OUT>(mSeedSupplier, mAccumulateConsumer);
         }
     }
 }

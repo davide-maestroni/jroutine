@@ -1790,7 +1790,7 @@ public class StreamsTest {
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range('a', 'e', new Function<Character, Character>() {
 
@@ -1802,88 +1802,88 @@ public class StreamsTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, -10, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2, 0.7))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2, 0.7f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0L, -9, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, (short) 9, 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (short) 9, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (byte) 10, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, -5))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2.1))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 1.9f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 1f));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0L, -4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (byte) 5))
                           .afterMax(seconds(3))
@@ -2371,7 +2371,7 @@ public class StreamsTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
-                          .ordered(OrderType.BY_CALL)
+                          .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(
                                   sequence('a', 5, new BiFunction<Character, Long, Character>() {

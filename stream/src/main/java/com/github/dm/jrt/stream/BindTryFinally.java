@@ -41,14 +41,14 @@ class BindTryFinally<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param runnable      the final runnable.
+     * @param configuration   the channel configuration.
+     * @param finallyRunnable the final runnable.
      */
     BindTryFinally(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Runnable runnable) {
+            @NotNull final Runnable finallyRunnable) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mRunnable = ConstantConditions.notNull("runnable instance", runnable);
+        mRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {

@@ -41,7 +41,7 @@ class BindSplitKey<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel
 
     private final InvocationMode mInvocationMode;
 
-    private final Function<? super IN, ?> mKey;
+    private final Function<? super IN, ?> mKeyFunction;
 
     private final Routine<? super IN, ? extends OUT> mRoutine;
 
@@ -49,17 +49,17 @@ class BindSplitKey<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel
      * Constructor.
      *
      * @param configuration  the channel configuration.
-     * @param key            the key function.
+     * @param keyFunction    the key function.
      * @param routine        the routine instance.
      * @param invocationMode the invocation mode.
      */
     BindSplitKey(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<? super IN, ?> key,
+            @NotNull final Function<? super IN, ?> keyFunction,
             @NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mKey = ConstantConditions.notNull("key function", key);
+        mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
         mRoutine = ConstantConditions.notNull("routine instance", routine);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
@@ -71,7 +71,7 @@ class BindSplitKey<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel
                                                          .with(mConfiguration)
                                                          .apply()
                                                          .buildChannel();
-        channel.bind(new SplitKeyOutputConsumer<IN, OUT>(outputChannel, mKey, mRoutine,
+        channel.bind(new SplitKeyOutputConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
                 mInvocationMode));
         return outputChannel;
     }

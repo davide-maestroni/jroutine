@@ -44,9 +44,10 @@ import java.util.concurrent.TimeUnit;
  */
 class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
-    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBind;
+    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+            mBackoffFunction;
 
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long> mFunction;
+    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBindingFunction;
 
     private final OutputChannel<IN> mInputChannel;
 
@@ -61,23 +62,23 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     /**
      * Constructor.
      *
-     * @param inputChannel  the input channel.
-     * @param outputChannel the output channel.
-     * @param runner        the runner instance.
-     * @param bindFunction  the binding function.
-     * @param function      the backoff function.
+     * @param inputChannel    the input channel.
+     * @param outputChannel   the output channel.
+     * @param runner          the runner instance.
+     * @param bindingFunction the binding function.
+     * @param backoffFunction the backoff function.
      */
     RetryOutputConsumer(@NotNull final OutputChannel<IN> inputChannel,
             @NotNull final IOChannel<OUT> outputChannel, @NotNull final Runner runner,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    function) {
+                    backoffFunction) {
 
         mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
         mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
         mRunner = ConstantConditions.notNull("runner instance", runner);
-        mBind = ConstantConditions.notNull("binding function", bindFunction);
-        mFunction = ConstantConditions.notNull("backoff function", function);
+        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+        mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     }
 
     public void onComplete() {
@@ -90,7 +91,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         final IOChannel<IN> channel = JRoutineCore.io().buildChannel();
         mInputChannel.bind(new SafeOutputConsumer<IN>(channel));
         try {
-            mBind.apply(channel).bind(this);
+            mBindingFunction.apply(channel).bind(this);
 
         } catch (final Exception e) {
             final RoutineException error = InvocationException.wrapIfNeeded(e);
@@ -153,7 +154,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
         Long delay = null;
         if (!(error instanceof AbortException)) {
-            delay = mFunction.apply(++mCount, error);
+            delay = mBackoffFunction.apply(++mCount, error);
         }
 
         if (delay != null) {

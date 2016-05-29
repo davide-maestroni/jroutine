@@ -36,30 +36,30 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-    private final ConsumerWrapper<? super ResultChannel<DATA>> mConsumer;
-
     private final long mCount;
+
+    private final ConsumerWrapper<? super ResultChannel<DATA>> mOutputsConsumer;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param consumer the consumer instance.
+     * @param count           the loop count.
+     * @param outputsConsumer the consumer instance.
      */
     OrElseConsumerInvocationFactory(final long count,
-            @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> consumer) {
+            @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> outputsConsumer) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", consumer)));
+                ConstantConditions.notNull("consumer instance", outputsConsumer)));
         mCount = count;
-        mConsumer = consumer;
+        mOutputsConsumer = outputsConsumer;
     }
 
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() {
 
-        return new OrElseConsumerInvocation<DATA>(mCount, mConsumer);
+        return new OrElseConsumerInvocation<DATA>(mCount, mOutputsConsumer);
     }
 
     /**
@@ -69,23 +69,23 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      */
     private static class OrElseConsumerInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-        private final ConsumerWrapper<? super ResultChannel<DATA>> mConsumer;
-
         private final long mCount;
+
+        private final ConsumerWrapper<? super ResultChannel<DATA>> mOutputsConsumer;
 
         private boolean mHasOutputs;
 
         /**
          * Constructor.
          *
-         * @param count    the loop count.
-         * @param consumer the consumer instance.
+         * @param count           the loop count.
+         * @param outputsConsumer the consumer instance.
          */
         OrElseConsumerInvocation(final long count,
-                @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> consumer) {
+                @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> outputsConsumer) {
 
             mCount = count;
-            mConsumer = consumer;
+            mOutputsConsumer = outputsConsumer;
         }
 
         @Override
@@ -105,7 +105,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
             if (!mHasOutputs) {
                 final long count = mCount;
-                final ConsumerWrapper<? super ResultChannel<DATA>> consumer = mConsumer;
+                final ConsumerWrapper<? super ResultChannel<DATA>> consumer = mOutputsConsumer;
                 for (long i = 0; i < count; ++i) {
                     consumer.accept(result);
                 }

@@ -39,28 +39,28 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
 
-    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBind;
+    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+            mBackoffFunction;
+
+    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBindingFunction;
 
     private final ChannelConfiguration mConfiguration;
-
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long> mFunction;
 
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param bindFunction  the binding function.
-     * @param function      the backoff function.
+     * @param configuration   the channel configuration.
+     * @param bindingFunction the binding function.
+     * @param backoffFunction the backoff function.
      */
     BindRetry(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    function) {
+                    backoffFunction) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBind = ConstantConditions.notNull("binding function", bindFunction);
-        mFunction = ConstantConditions.notNull("backoff function", function);
-        // TODO: 29/05/16 meaningful names
+        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+        mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
@@ -70,7 +70,8 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
         final IOChannel<OUT> outputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         new RetryOutputConsumer<IN, OUT>(inputChannel, outputChannel,
-                configuration.getRunnerOrElse(Runners.sharedRunner()), mBind, mFunction).run();
+                configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
+                mBackoffFunction).run();
         return outputChannel;
     }
 }

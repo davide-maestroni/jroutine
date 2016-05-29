@@ -33,23 +33,23 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConcatLoopConsumerInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
-    private final ConsumerWrapper<? super ResultChannel<DATA>> mConsumer;
-
     private final long mCount;
+
+    private final ConsumerWrapper<? super ResultChannel<DATA>> mOutputsConsumer;
 
     /**
      * Constructor.
      *
-     * @param count    the loop count.
-     * @param consumer the consumer instance.
+     * @param count           the loop count.
+     * @param outputsConsumer the consumer instance.
      */
     ConcatLoopConsumerInvocation(final long count,
-            @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> consumer) {
+            @NotNull final ConsumerWrapper<? super ResultChannel<DATA>> outputsConsumer) {
 
         super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", consumer)));
+                ConstantConditions.notNull("consumer instance", outputsConsumer)));
         mCount = count;
-        mConsumer = consumer;
+        mOutputsConsumer = outputsConsumer;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
@@ -60,7 +60,7 @@ class ConcatLoopConsumerInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
     public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
 
         final long count = mCount;
-        final ConsumerWrapper<? super ResultChannel<DATA>> consumer = mConsumer;
+        final ConsumerWrapper<? super ResultChannel<DATA>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {
             consumer.accept(result);
         }

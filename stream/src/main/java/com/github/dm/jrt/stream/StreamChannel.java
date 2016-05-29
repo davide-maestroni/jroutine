@@ -288,9 +288,9 @@ public interface StreamChannel<IN, OUT>
      * This method provides a convenient way to apply a set of configurations and concatenations
      * without breaking the fluent chain.
      *
-     * @param function the transformation function.
-     * @param <BEFORE> the concatenation input type.
-     * @param <AFTER>  the concatenation output type.
+     * @param transformFunction the transformation function.
+     * @param <BEFORE>          the concatenation input type.
+     * @param <AFTER>           the concatenation output type.
      * @return the transformed stream.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
@@ -298,7 +298,7 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> applyFlatTransform(
             @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> function);
+                    AFTER>> transformFunction);
 
     /**
      * Transforms the stream by modifying the flow building function.
@@ -306,8 +306,8 @@ public interface StreamChannel<IN, OUT>
      * The returned function will be employed when the flow of input data is initiated (see
      * {@link TransformationType#START}).
      *
-     * @param function the function modifying the flow one.
-     * @param <AFTER>  the concatenation output type.
+     * @param transformFunction the function modifying the flow one.
+     * @param <AFTER>           the concatenation output type.
      * @return the new stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
@@ -315,7 +315,7 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> applyTransform(@NotNull Function<? extends Function<? super
             OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-            OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+            OutputChannel<IN>, ? extends OutputChannel<AFTER>>> transformFunction);
 
     /**
      * Transforms the stream by modifying the flow building function.
@@ -325,8 +325,8 @@ public interface StreamChannel<IN, OUT>
      * The returned function will be employed when the flow of input data is initiated (see
      * {@link TransformationType#START}).
      *
-     * @param function the bi-function modifying the flow one.
-     * @param <AFTER>  the concatenation output type.
+     * @param transformFunction the bi-function modifying the flow one.
+     * @param <AFTER>           the concatenation output type.
      * @return the new stream instance.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
@@ -335,7 +335,7 @@ public interface StreamChannel<IN, OUT>
     <AFTER> StreamChannel<IN, AFTER> applyTransformWith(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> transformFunction);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -449,12 +449,13 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the bi-consumer instance.
+     * @param accumulateConsumer the bi-consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+    StreamChannel<IN, OUT> collect(
+            @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
 
     /**
      * Concatenates a stream accumulating data through the specified consumer.
@@ -474,15 +475,15 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param supplier the supplier of initial accumulation values.
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param seedSupplier       the supplier of initial accumulation values.
+     * @param accumulateConsumer the bi-consumer instance.
+     * @param <AFTER>            the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+    <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
 
     /**
      * Concatenates a stream accumulating the outputs by adding them to the collections returned by
@@ -494,14 +495,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param supplier the supplier of collections.
-     * @param <AFTER>  the concatenation output type.
+     * @param collectionSupplier the supplier of collections.
+     * @param <AFTER>            the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
     <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collectInto(
-            @NotNull Supplier<? extends AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> collectionSupplier);
 
     /**
      * Concatenates a stream filtering data based on the values returned by the specified predicate.
@@ -510,12 +511,12 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param predicate the predicate instance.
+     * @param filterPredicate the predicate instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
+    StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
      * Concatenates a stream mapping this stream outputs by applying the specified function to each
@@ -525,14 +526,15 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param mappingFunction the function instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> flatMap(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
+                    mappingFunction);
 
     /**
      * Gets the invocation configuration builder related only to the next concatenated routine
@@ -583,13 +585,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param mappingFunction the function instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(@NotNull Function<? super OUT, ? extends AFTER> function);
+    <AFTER> StreamChannel<IN, AFTER> map(
+            @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
     /**
      * Concatenates a stream mapping this stream outputs through the specified invocation factory.
@@ -646,14 +649,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param mappingFunction the function instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> mapAll(
-            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
+            @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
     /**
      * Concatenates a stream mapping the whole collection of outputs through the specified consumer.
@@ -665,14 +668,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param mappingConsumer the bi-consumer instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> mapAllMore(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
      * Concatenates a stream mapping this stream outputs through the specified consumer.
@@ -684,14 +687,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param mappingConsumer the bi-consumer instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> mapMore(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
      * Concatenates a consumer handling invocation exceptions.
@@ -700,12 +703,12 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that this stream will be bound as a result of the call.
      *
-     * @param consumer the consumer instance.
+     * @param errorConsumer the consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
+    StreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * Concatenates a consumer handling this stream outputs.
@@ -716,12 +719,12 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the consumer instance.
+     * @param outputConsumer the consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
+    StreamChannel<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * Concatenates a stream producing the specified output in case this one produced none.
@@ -782,14 +785,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param count    the number of generated outputs.
-     * @param supplier the supplier instance.
+     * @param count          the number of generated outputs.
+     * @param outputSupplier the supplier instance.
      * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
+    StreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a stream producing the outputs returned by the specified supplier in case this
@@ -801,12 +804,12 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param supplier the supplier instance.
+     * @param outputSupplier the supplier instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+    StreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a stream producing the outputs returned by the specified consumer in case this
@@ -822,15 +825,15 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
      * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> orElseGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
 
     /**
      * Concatenates a stream producing the outputs returned by the specified consumer in case this
@@ -845,12 +848,13 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the consumer instance.
+     * @param outputsConsumer the consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    StreamChannel<IN, OUT> orElseGetMore(
+            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
@@ -864,7 +868,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> ordered(@Nullable OrderType orderType);
+    StreamChannel<IN, OUT> order(@Nullable OrderType orderType);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
@@ -900,12 +904,12 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that the invocation will be aborted if an exception escapes the consumer.
      *
-     * @param consumer the consumer instance.
+     * @param peekConsumer the consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
+    StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
 
     /**
      * Concatenates a stream accumulating data through the specified function.
@@ -925,13 +929,13 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param function the bi-function instance.
+     * @param accumulateFunction the bi-function instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
     StreamChannel<IN, OUT> reduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
 
     /**
      * Concatenates a stream accumulating data through the specified function.
@@ -951,15 +955,15 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param supplier the supplier of initial accumulation values.
-     * @param function the bi-function instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param seedSupplier       the supplier of initial accumulation values.
+     * @param accumulateFunction the bi-function instance.
+     * @param <AFTER>            the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
+    <AFTER> StreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
+            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
@@ -1012,14 +1016,14 @@ public interface StreamChannel<IN, OUT>
      * Note that no retry will be attempted in case of an explicit abortion, that is, if the error
      * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
      *
-     * @param function the retry function.
+     * @param backoffFunction the retry function.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(COLLECT)
     StreamChannel<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    function);
+                    backoffFunction);
 
     /**
      * Sets the stream runner so that each input is sequentially passed through the whole chain.
@@ -1077,16 +1081,16 @@ public interface StreamChannel<IN, OUT>
      * Note that the created channels will employ the same configuration and invocation mode as this
      * stream.
      *
-     * @param keyFunction the function assigning a key to each output.
-     * @param function    the function creating the processing stream channels.
-     * @param <AFTER>     the concatenation output type.
+     * @param keyFunction    the function assigning a key to each output.
+     * @param streamFunction the function creating the processing stream channels.
+     * @param <AFTER>        the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> function);
+                    super OUT, ? extends AFTER>> streamFunction);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -1156,9 +1160,9 @@ public interface StreamChannel<IN, OUT>
      * Note that the created channels will employ the same configuration and invocation mode as this
      * stream.
      *
-     * @param count    the number of groups.
-     * @param function the function creating the processing stream channels.
-     * @param <AFTER>  the concatenation output type.
+     * @param count          the number of groups.
+     * @param streamFunction the function creating the processing stream channels.
+     * @param <AFTER>        the concatenation output type.
      * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
@@ -1166,7 +1170,7 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> function);
+                    super OUT, ? extends AFTER>> streamFunction);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -1355,16 +1359,16 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param count    the number of generated outputs.
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param count          the number of generated outputs.
+     * @param outputSupplier the supplier instance.
+     * @param <AFTER>        the concatenation output type.
      * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGet(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
      * Concatenates a stream generating the outputs returned by the specified supplier.
@@ -1377,13 +1381,13 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param outputSupplier the supplier instance.
+     * @param <AFTER>        the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> StreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
      * Concatenates a stream generating the outputs returned by the specified consumer.
@@ -1400,16 +1404,16 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
 
     /**
      * Concatenates a stream generating the outputs returned by the specified consumer.
@@ -1425,14 +1429,14 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param outputsConsumer the consumer instance.
+     * @param <AFTER>         the concatenation output type.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGetMore(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
 
     /**
      * Returns a new stream making this one selectable.
@@ -1455,13 +1459,13 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that this stream will be bound as a result of the call.
      *
-     * @param function the function instance.
+     * @param catchFunction the function instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> tryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
+            @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
 
     /**
      * Concatenates a consumer handling invocation exceptions.
@@ -1473,25 +1477,25 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that this stream will be bound as a result of the call.
      *
-     * @param consumer the bi-consumer instance.
+     * @param catchConsumer the bi-consumer instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> tryCatchMore(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> catchConsumer);
 
     /**
      * Concatenates a runnable always called when outputs complete, even if an error occurred.
      * <br>
      * Both outputs and errors will be automatically passed on.
      *
-     * @param runnable the runnable instance.
+     * @param finallyRunnable the runnable instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> tryFinally(@NotNull Runnable runnable);
+    StreamChannel<IN, OUT> tryFinally(@NotNull Runnable finallyRunnable);
 
     /**
      * Interface defining a stream configuration.

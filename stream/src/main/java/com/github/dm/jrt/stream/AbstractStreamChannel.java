@@ -30,13 +30,10 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -788,10 +785,9 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> startAfter(final long delay, @NotNull final TimeUnit timeUnit) {
 
-        final Runner runner = mStreamConfiguration.asInvocationConfiguration()
-                                                  .getRunnerOrElse(Runners.sharedRunner());
-        runner.run(new BindExecution(this), delay, timeUnit);
-        return this;
+        final Runner runner =
+                mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null);
+        return buildChannel(new BindDelayed<IN, OUT>(runner, delay, timeUnit, getBinding()));
     }
 
     @NotNull
@@ -1148,34 +1144,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
                         return (OutputChannel<OUT>) channel;
                     }
                 });
-    }
-
-    /**
-     * Delayed binding execution.
-     */
-    private static class BindExecution implements Execution {
-
-        private final AbstractStreamChannel<?, ?> mStream;
-
-        /**
-         * Constructor.
-         *
-         * @param stream the stream channel.
-         */
-        private BindExecution(@NotNull final AbstractStreamChannel<?, ?> stream) {
-
-            mStream = stream;
-        }
-
-        public void run() {
-
-            try {
-                mStream.bind();
-
-            } catch (final Throwable t) {
-                InvocationInterruptedException.throwIfInterrupt(t);
-            }
-        }
     }
 
     /**

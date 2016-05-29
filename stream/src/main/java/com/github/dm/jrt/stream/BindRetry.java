@@ -60,6 +60,7 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBind = ConstantConditions.notNull("binding function", bindFunction);
         mFunction = ConstantConditions.notNull("backoff function", function);
+        // TODO: 29/05/16 meaningful names
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {

@@ -561,7 +561,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 LoaderStreams.streamOf("test4", "test5", "test6");
         assertThat(LoaderStreams.blend(channel2, channel1)
                                 .channelConfiguration()
-                                .withChannelOrder(OrderType.BY_CALL)
+                                .withOrder(OrderType.BY_CALL)
                                 .withOutputTimeout(seconds(10))
                                 .apply()
                                 .buildChannels()
@@ -1512,10 +1512,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -1562,10 +1560,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1624,10 +1620,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1665,10 +1659,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;

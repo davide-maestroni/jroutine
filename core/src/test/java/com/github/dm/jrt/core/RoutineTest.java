@@ -2014,8 +2014,8 @@ public class RoutineTest {
 
         final IOChannel<String> channel1 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelLimit(1)
-                                                       .withChannelBackoff(millis(1000))
+                                                       .withLimit(1)
+                                                       .withBackoff(millis(1000))
                                                        .apply()
                                                        .buildChannel();
         new Thread() {
@@ -2031,8 +2031,8 @@ public class RoutineTest {
 
         final IOChannel<String> channel2 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelLimit(1)
-                                                       .withChannelBackoff(millis(1000))
+                                                       .withLimit(1)
+                                                       .withBackoff(millis(1000))
                                                        .apply()
                                                        .buildChannel();
         new Thread() {
@@ -2048,8 +2048,8 @@ public class RoutineTest {
 
         final IOChannel<String> channel3 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelLimit(1)
-                                                       .withChannelBackoff(millis(1000))
+                                                       .withLimit(1)
+                                                       .withBackoff(millis(1000))
                                                        .apply()
                                                        .buildChannel();
         new Thread() {
@@ -2065,8 +2065,8 @@ public class RoutineTest {
 
         final IOChannel<String> channel4 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelLimit(1)
-                                                       .withChannelBackoff(millis(1000))
+                                                       .withLimit(1)
+                                                       .withBackoff(millis(1000))
                                                        .apply()
                                                        .buildChannel();
         new Thread() {

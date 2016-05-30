@@ -497,10 +497,8 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -541,10 +539,8 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
         final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);
@@ -567,10 +563,8 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
         final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);

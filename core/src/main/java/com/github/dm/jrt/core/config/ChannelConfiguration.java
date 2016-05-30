@@ -171,11 +171,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
         }
 
         final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOrElse(null))
-                      .withChannelLimit(initialConfiguration.getInputLimitOrElse(
+        return builder.withOrder(initialConfiguration.getInputOrderTypeOrElse(null))
+                      .withLimit(initialConfiguration.getInputLimitOrElse(
                               ChannelConfiguration.DEFAULT))
-                      .withChannelBackoff(initialConfiguration.getInputBackoffOrElse(null))
-                      .withChannelMaxSize(initialConfiguration.getInputMaxSizeOrElse(
+                      .withBackoff(initialConfiguration.getInputBackoffOrElse(null))
+                      .withMaxSize(initialConfiguration.getInputMaxSizeOrElse(
                               ChannelConfiguration.DEFAULT));
     }
 
@@ -218,11 +218,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
         }
 
         final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOrElse(null))
-                      .withChannelLimit(initialConfiguration.getOutputLimitOrElse(
+        return builder.withOrder(initialConfiguration.getOutputOrderTypeOrElse(null))
+                      .withLimit(initialConfiguration.getOutputLimitOrElse(
                               ChannelConfiguration.DEFAULT))
-                      .withChannelBackoff(initialConfiguration.getOutputBackoffOrElse(null))
-                      .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOrElse(
+                      .withBackoff(initialConfiguration.getOutputBackoffOrElse(null))
+                      .withMaxSize(initialConfiguration.getOutputMaxSizeOrElse(
                               ChannelConfiguration.DEFAULT));
     }
 
@@ -255,7 +255,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public Backoff getChannelBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
+    public Backoff getBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
 
         final Backoff channelBackoff = mChannelBackoff;
         return (channelBackoff != null) ? channelBackoff : valueIfNotSet;
@@ -268,34 +268,10 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the limit.
      */
-    public int getChannelLimitOrElse(final int valueIfNotSet) {
+    public int getLimitOrElse(final int valueIfNotSet) {
 
         final int limit = mChannelLimit;
         return (limit != DEFAULT) ? limit : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum number of buffered data (DEFAULT by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the maximum size.
-     */
-    public int getChannelMaxSizeOrElse(final int valueIfNotSet) {
-
-        final int maxSize = mChannelMaxSize;
-        return (maxSize != DEFAULT) ? maxSize : valueIfNotSet;
-    }
-
-    /**
-     * Returns the data order (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the order type.
-     */
-    public OrderType getChannelOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
-
-        final OrderType orderType = mChannelOrderType;
-        return (orderType != null) ? orderType : valueIfNotSet;
     }
 
     /**
@@ -320,6 +296,30 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         final Log log = mLog;
         return (log != null) ? log : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum number of buffered data (DEFAULT by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the maximum size.
+     */
+    public int getMaxSizeOrElse(final int valueIfNotSet) {
+
+        final int maxSize = mChannelMaxSize;
+        return (maxSize != DEFAULT) ? maxSize : valueIfNotSet;
+    }
+
+    /**
+     * Returns the data order (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the order type.
+     */
+    public OrderType getOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
+
+        final OrderType orderType = mChannelOrderType;
+        return (orderType != null) ? orderType : valueIfNotSet;
     }
 
     /**
@@ -369,11 +369,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
     @NotNull
     public InvocationConfiguration.Builder<InvocationConfiguration> toInputChannelConfiguration() {
 
-        return toInvocationConfiguration().withInputOrder(getChannelOrderTypeOrElse(null))
-                                          .withInputLimit(getChannelLimitOrElse(
-                                                  InvocationConfiguration.DEFAULT))
-                                          .withInputBackoff(getChannelBackoffOrElse(null))
-                                          .withInputMaxSize(getChannelMaxSizeOrElse(
+        return toInvocationConfiguration().withInputOrder(getOrderTypeOrElse(null))
+                                          .withInputLimit(
+                                                  getLimitOrElse(InvocationConfiguration.DEFAULT))
+                                          .withInputBackoff(getBackoffOrElse(null))
+                                          .withInputMaxSize(getMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT));
     }
 
@@ -402,11 +402,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
     @NotNull
     public InvocationConfiguration.Builder<InvocationConfiguration> toOutputChannelConfiguration() {
 
-        return toInvocationConfiguration().withOutputOrder(getChannelOrderTypeOrElse(null))
-                                          .withOutputLimit(getChannelLimitOrElse(
-                                                  InvocationConfiguration.DEFAULT))
-                                          .withOutputBackoff(getChannelBackoffOrElse(null))
-                                          .withOutputMaxSize(getChannelMaxSizeOrElse(
+        return toInvocationConfiguration().withOutputOrder(getOrderTypeOrElse(null))
+                                          .withOutputLimit(
+                                                  getLimitOrElse(InvocationConfiguration.DEFAULT))
+                                          .withOutputBackoff(getBackoffOrElse(null))
+                                          .withOutputMaxSize(getMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT));
     }
 
@@ -523,22 +523,22 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
             final OrderType orderType = configuration.mChannelOrderType;
             if (orderType != null) {
-                withChannelOrder(orderType);
+                withOrder(orderType);
             }
 
             final int limit = configuration.mChannelLimit;
             if (limit != DEFAULT) {
-                withChannelLimit(limit);
+                withLimit(limit);
             }
 
             final Backoff channelBackoff = configuration.mChannelBackoff;
             if (channelBackoff != null) {
-                withChannelBackoff(channelBackoff);
+                withBackoff(channelBackoff);
             }
 
             final int maxSize = configuration.mChannelMaxSize;
             if (maxSize != DEFAULT) {
-                withChannelMaxSize(maxSize);
+                withMaxSize(maxSize);
             }
 
             final Log log = configuration.mLog;
@@ -567,10 +567,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the specified delay is negative.
          */
         @NotNull
-        public Builder<TYPE> withChannelBackoff(final long delay,
-                @NotNull final TimeUnit timeUnit) {
+        public Builder<TYPE> withBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
 
-            return withChannelBackoff(constantDelay(delay, timeUnit));
+            return withBackoff(constantDelay(delay, timeUnit));
         }
 
         /**
@@ -588,7 +587,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withChannelBackoff(@Nullable final Backoff backoff) {
+        public Builder<TYPE> withBackoff(@Nullable final Backoff backoff) {
 
             mChannelBackoff = backoff;
             return this;
@@ -605,9 +604,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withChannelBackoff(@Nullable final UnitDuration delay) {
+        public Builder<TYPE> withBackoff(@Nullable final UnitDuration delay) {
 
-            return withChannelBackoff((delay != null) ? constantDelay(delay) : null);
+            return withBackoff((delay != null) ? constantDelay(delay) : null);
         }
 
         /**
@@ -625,50 +624,13 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the limit is negative.
          */
         @NotNull
-        public Builder<TYPE> withChannelLimit(final int limit) {
+        public Builder<TYPE> withLimit(final int limit) {
 
             if (limit != DEFAULT) {
                 ConstantConditions.notNegative("channel limit", limit);
             }
 
             mChannelLimit = limit;
-            return this;
-        }
-
-        /**
-         * Sets the maximum number of data that the channel can retain before they are consumed. A
-         * {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is up to the specific
-         * implementation to choose a default one.
-         *
-         * @param maxSize the maximum size.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the number is less than 1.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelMaxSize(final int maxSize) {
-
-            if (maxSize != DEFAULT) {
-                ConstantConditions.positive("channel buffer size", maxSize);
-            }
-
-            mChannelMaxSize = maxSize;
-            return this;
-        }
-
-        /**
-         * Sets the order in which data are collected from the channel. A null value means that it
-         * is up to the specific implementation to choose a default one.
-         * <p>
-         * Note that this is just the initial configuration, since the channel order can be
-         * dynamically changed through the dedicated methods.
-         *
-         * @param orderType the order type.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelOrder(@Nullable final OrderType orderType) {
-
-            mChannelOrderType = orderType;
             return this;
         }
 
@@ -697,6 +659,43 @@ public final class ChannelConfiguration extends DeepEqualObject {
         public Builder<TYPE> withLogLevel(@Nullable final Level level) {
 
             mLogLevel = level;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of data that the channel can retain before they are consumed. A
+         * {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is up to the specific
+         * implementation to choose a default one.
+         *
+         * @param maxSize the maximum size.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the number is less than 1.
+         */
+        @NotNull
+        public Builder<TYPE> withMaxSize(final int maxSize) {
+
+            if (maxSize != DEFAULT) {
+                ConstantConditions.positive("channel buffer size", maxSize);
+            }
+
+            mChannelMaxSize = maxSize;
+            return this;
+        }
+
+        /**
+         * Sets the order in which data are collected from the channel. A null value means that it
+         * is up to the specific implementation to choose a default one.
+         * <p>
+         * Note that this is just the initial configuration, since the channel order can be
+         * dynamically changed through the dedicated methods.
+         *
+         * @param orderType the order type.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withOrder(@Nullable final OrderType orderType) {
+
+            mChannelOrderType = orderType;
             return this;
         }
 

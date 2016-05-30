@@ -884,8 +884,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final CountLog countLog = new CountLog();
         final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
         final ChannelConfiguration configuration = builder.withRunner(AndroidRunners.taskRunner())
-                                                          .withChannelMaxSize(3)
-                                                          .withChannelBackoff(seconds(10))
+                                                          .withMaxSize(3)
+                                                          .withBackoff(seconds(10))
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
                                                           .apply();

@@ -909,10 +909,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testMap() {
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -948,10 +946,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMerge() {
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -993,10 +989,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1029,10 +1023,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+        final IOChannelBuilder builder =
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;

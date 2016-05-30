@@ -85,9 +85,9 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         int i = 0;
         final boolean isFlush = mIsFlush;
         final OUT placeholder = mPlaceholder;
-        final int limit = configuration.getChannelLimitOrElse(Integer.MAX_VALUE);
-        final Backoff backoff = configuration.getChannelBackoffOrElse(null);
-        final int maxSize = configuration.getChannelMaxSizeOrElse(Integer.MAX_VALUE);
+        final int limit = configuration.getLimitOrElse(Integer.MAX_VALUE);
+        final Backoff backoff = configuration.getBackoffOrElse(null);
+        final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
         for (final OutputChannel<? extends OUT> channel : channels) {
             channel.bind(new JoinOutputConsumer<OUT>(limit, backoff, maxSize, mutex, i++, isFlush,
                     closed, queues, placeholder, ioChannel));

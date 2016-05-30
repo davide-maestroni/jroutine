@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.UnitDuration;
 
@@ -165,7 +166,9 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         final boolean isComplete;
         final RoutineException abortException;
         final IOChannel<OUT> outputChannel;
+        final IOChannel<OUT> cachedChannel;
         final IOChannel<OUT> channel;
+        final ArrayList<OUT> cached;
         synchronized (mMutex) {
             final IdentityHashMap<OutputConsumer<? super OUT>, IOChannel<OUT>> consumers =
                     mConsumers;
@@ -180,15 +183,18 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
                 consumers.put(consumer, outputChannel);
             }
 
-            channel = createOutputChannel().pass(mCached);
-            if (abortException != null) {
-                channel.abort(abortException);
+            mOutputChannel = (channel = createOutputChannel());
+            cachedChannel = JRoutineCore.io().buildChannel();
+            channel.pass(cachedChannel);
+            cached = new ArrayList<OUT>(mCached);
+        }
 
-            } else if (isComplete) {
-                channel.close();
-            }
+        cachedChannel.pass(cached).close();
+        if (abortException != null) {
+            channel.abort(abortException);
 
-            mOutputChannel = channel;
+        } else if (isComplete) {
+            channel.close();
         }
 
         outputChannel.bind(consumer);
@@ -340,6 +346,11 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     @NotNull
     private IOChannel<OUT> createOutputChannel() {
 
-        return JRoutineCore.io().channelConfiguration().with(mConfiguration).apply().buildChannel();
+        return JRoutineCore.io()
+                           .channelConfiguration()
+                           .with(mConfiguration)
+                           .withOrder(OrderType.BY_CALL)
+                           .apply()
+                           .buildChannel();
     }
 }

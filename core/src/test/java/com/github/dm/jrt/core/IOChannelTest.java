@@ -230,7 +230,7 @@ public class IOChannelTest {
         final UnitDuration timeout = seconds(1);
         final IOChannel<String> ioChannel1 = JRoutineCore.io()
                                                          .channelConfiguration()
-                                                         .withChannelOrder(OrderType.BY_CALL)
+                                                         .withOrder(OrderType.BY_CALL)
                                                          .apply()
                                                          .buildChannel();
 
@@ -343,7 +343,7 @@ public class IOChannelTest {
         try {
             JRoutineCore.io()
                         .channelConfiguration()
-                        .withChannelMaxSize(1)
+                        .withMaxSize(1)
                         .apply()
                         .buildChannel()
                         .pass("test1", "test2");
@@ -591,11 +591,11 @@ public class IOChannelTest {
         final UnitDuration timeout = seconds(1);
         final IOChannel<Object> channel = JRoutineCore.io()
                                                       .channelConfiguration()
-                                                      .withChannelOrder(OrderType.BY_CALL)
+                                                      .withOrder(OrderType.BY_CALL)
                                                       .withRunner(Runners.sharedRunner())
-                                                      .withChannelMaxSize(1)
-                                                      .withChannelBackoff(1, TimeUnit.MILLISECONDS)
-                                                      .withChannelBackoff(seconds(1))
+                                                      .withMaxSize(1)
+                                                      .withBackoff(1, TimeUnit.MILLISECONDS)
+                                                      .withBackoff(seconds(1))
                                                       .withLogLevel(Level.DEBUG)
                                                       .withLog(new NullLog())
                                                       .apply()

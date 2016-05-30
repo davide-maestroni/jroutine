@@ -33,15 +33,15 @@ public class ExceptionTest {
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void testStreamException() {
 
-        assertThat(StreamException.wrap(new NullPointerException()).getCause()).isExactlyInstanceOf(
-                NullPointerException.class);
-        assertThat(StreamException.wrap(null)).hasNoCause();
-        assertThat(StreamException.wrap(new NullPointerException())).isExactlyInstanceOf(
+        assertThat(StreamException.wrapIfNeeded(new NullPointerException())
+                                  .getCause()).isExactlyInstanceOf(NullPointerException.class);
+        assertThat(StreamException.wrapIfNeeded(null)).hasNoCause();
+        assertThat(StreamException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
                 StreamException.class);
-        assertThat(StreamException.wrap(new RoutineException())).isExactlyInstanceOf(
+        assertThat(StreamException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
                 StreamException.class);
-        assertThat(StreamException.wrap(StreamException.wrap(null))).isExactlyInstanceOf(
-                StreamException.class);
-        assertThat(StreamException.wrap(StreamException.wrap(null))).hasNoCause();
+        assertThat(StreamException.wrapIfNeeded(
+                StreamException.wrapIfNeeded(null))).isExactlyInstanceOf(StreamException.class);
+        assertThat(StreamException.wrapIfNeeded(StreamException.wrapIfNeeded(null))).hasNoCause();
     }
 }

@@ -43,13 +43,13 @@ public class StreamException extends RoutineException {
      * <br>
      * If the cause is an instance of
      * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, its cause will be
-     * wrapped.
+     * wrapped instead.
      *
      * @param cause the throwable to wrap.
-     * @return the throwable or an invocation exception wrapping it.
+     * @return the throwable or a stream exception wrapping it.
      */
     @NotNull
-    public static StreamException wrap(@Nullable final Throwable cause) {
+    public static StreamException wrapIfNeeded(@Nullable final Throwable cause) {
 
         if (cause instanceof StreamException) {
             return (StreamException) cause;

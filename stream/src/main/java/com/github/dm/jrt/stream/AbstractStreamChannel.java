@@ -318,7 +318,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             return ConstantConditions.notNull("transformed stream", transformFunction.apply(this));
 
         } catch (final Exception e) {
-            throw StreamException.wrap(e);
+            throw StreamException.wrapIfNeeded(e);
         }
     }
 
@@ -336,7 +336,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                             .apply(getBindingFunction())));
 
         } catch (final Exception e) {
-            throw StreamException.wrap(e);
+            throw StreamException.wrapIfNeeded(e);
         }
     }
 
@@ -355,7 +355,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                             .apply(mStreamConfiguration, getBindingFunction())));
 
         } catch (final Exception e) {
-            throw StreamException.wrap(e);
+            throw StreamException.wrapIfNeeded(e);
         }
     }
 
@@ -1092,7 +1092,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
                 } catch (final Exception e) {
                     inputChannel.abort(InvocationException.wrapIfNeeded(e));
-                    throw StreamException.wrap(e);
+                    throw StreamException.wrapIfNeeded(e);
                 }
 
                 inputChannel.pass(mSourceChannel).close();

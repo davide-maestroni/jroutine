@@ -166,9 +166,9 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         final boolean isComplete;
         final RoutineException abortException;
         final IOChannel<OUT> outputChannel;
-        final IOChannel<OUT> cachedChannel;
-        final IOChannel<OUT> channel;
-        final ArrayList<OUT> cached;
+        final IOChannel<OUT> inputChannel;
+        final IOChannel<OUT> newChannel;
+        final ArrayList<OUT> cachedOutputs;
         synchronized (mMutex) {
             final IdentityHashMap<OutputConsumer<? super OUT>, IOChannel<OUT>> consumers =
                     mConsumers;
@@ -183,18 +183,18 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
                 consumers.put(consumer, outputChannel);
             }
 
-            mOutputChannel = (channel = createOutputChannel());
-            cachedChannel = JRoutineCore.io().buildChannel();
-            channel.pass(cachedChannel);
-            cached = new ArrayList<OUT>(mCached);
+            mOutputChannel = (newChannel = createOutputChannel());
+            inputChannel = JRoutineCore.io().buildChannel();
+            newChannel.pass(inputChannel);
+            cachedOutputs = new ArrayList<OUT>(mCached);
         }
 
-        cachedChannel.pass(cached).close();
+        inputChannel.pass(cachedOutputs).close();
         if (abortException != null) {
-            channel.abort(abortException);
+            newChannel.abort(abortException);
 
         } else if (isComplete) {
-            channel.close();
+            newChannel.close();
         }
 
         outputChannel.bind(consumer);

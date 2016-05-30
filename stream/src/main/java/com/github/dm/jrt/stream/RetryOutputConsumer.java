@@ -94,10 +94,15 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             mBindingFunction.apply(channel).bind(this);
 
         } catch (final Exception e) {
-            final RoutineException ex = InvocationException.wrapIfNeeded(e);
-            mOutputChannel.abort(ex);
-            mInputChannel.abort(ex);
+            abort(e);
         }
+    }
+
+    private void abort(@NotNull final Exception error) {
+
+        final RoutineException ex = InvocationException.wrapIfNeeded(error);
+        mOutputChannel.abort(ex);
+        mInputChannel.abort(ex);
     }
 
     /**
@@ -158,9 +163,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
                 delay = mBackoffFunction.apply(++mCount, error);
 
             } catch (final Exception e) {
-                final RoutineException ex = InvocationException.wrapIfNeeded(e);
-                mOutputChannel.abort(ex);
-                mInputChannel.abort(ex);
+                abort(e);
             }
         }
 

@@ -48,7 +48,6 @@ public class UnitDurationTest {
     private static Method getMethod(final String name) {
 
         try {
-
             return TimeUnit.class.getMethod(name, long.class);
 
         } catch (final NoSuchMethodException ignored) {
@@ -61,7 +60,6 @@ public class UnitDurationTest {
     private static TimeUnit getUnit(final String name) {
 
         try {
-
             return TimeUnit.valueOf(name);
 
         } catch (final IllegalArgumentException ignored) {
@@ -76,7 +74,6 @@ public class UnitDurationTest {
     public void testCheckError() {
 
         try {
-
             UnitDuration.seconds(1).waitTrue(null, new Condition() {
 
                 public boolean isTrue() {
@@ -84,7 +81,6 @@ public class UnitDurationTest {
                     return false;
                 }
             });
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -94,9 +90,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             synchronized (this) {
-
                 UnitDuration.seconds(1).waitTrue(this, null);
             }
 
@@ -109,9 +103,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.seconds(1).waitTrue(null, null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -125,10 +117,8 @@ public class UnitDurationTest {
     public void testDayConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(UnitDuration.days(sRandom.nextInt(MAX_DURATION)), true);
-
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
-
             testConversions(UnitDuration.fromUnit(sRandom.nextInt(MAX_DURATION), days), true);
         }
     }
@@ -137,9 +127,7 @@ public class UnitDurationTest {
     public void testDayError() {
 
         try {
-
             UnitDuration.days(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -147,13 +135,9 @@ public class UnitDurationTest {
         }
 
         try {
-
             final TimeUnit days = getUnit("DAYS");
-
             if (days != null) {
-
                 UnitDuration.fromUnit(-1, days);
-
                 fail();
             }
 
@@ -166,9 +150,7 @@ public class UnitDurationTest {
     public void testDayOverflowError() {
 
         try {
-
             UnitDuration.days(Long.MAX_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -176,9 +158,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.days(Long.MIN_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -198,13 +178,23 @@ public class UnitDurationTest {
     }
 
     @Test
+    public void testFloatTime() {
+
+        assertThat(UnitDuration.days(1.6)).isEqualTo(UnitDuration.hours(38));
+        assertThat(UnitDuration.hours(1.6)).isEqualTo(UnitDuration.minutes(96));
+        assertThat(UnitDuration.minutes(1.6)).isEqualTo(UnitDuration.seconds(96));
+        assertThat(UnitDuration.seconds(1.6)).isEqualTo(UnitDuration.millis(1600));
+        assertThat(UnitDuration.millis(1.6)).isEqualTo(UnitDuration.micros(1600));
+        assertThat(UnitDuration.micros(1.6)).isEqualTo(UnitDuration.nanos(1600));
+        assertThat(UnitDuration.nanos(1.6)).isEqualTo(UnitDuration.nanos(2));
+    }
+
+    @Test
     public void testHourConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(UnitDuration.hours(sRandom.nextInt(MAX_DURATION)), true);
-
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
-
             testConversions(UnitDuration.fromUnit(sRandom.nextInt(MAX_DURATION), hours), true);
         }
     }
@@ -213,9 +203,7 @@ public class UnitDurationTest {
     public void testHourError() {
 
         try {
-
             UnitDuration.hours(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -223,13 +211,9 @@ public class UnitDurationTest {
         }
 
         try {
-
             final TimeUnit hours = getUnit("HOURS");
-
             if (hours != null) {
-
                 UnitDuration.fromUnit(-1, hours);
-
                 fail();
             }
 
@@ -242,9 +226,7 @@ public class UnitDurationTest {
     public void testHourOverflowError() {
 
         try {
-
             UnitDuration.hours(Long.MAX_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -252,9 +234,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.hours(Long.MIN_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -278,20 +258,16 @@ public class UnitDurationTest {
             public void run() {
 
                 super.run();
-
                 try {
-
                     UnitDuration.millis(100).sleep();
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
             }
         };
 
         thread.start();
-
         UnitDuration.seconds(1).join(thread);
     }
 
@@ -300,9 +276,7 @@ public class UnitDurationTest {
     public void testJoinError() {
 
         try {
-
             UnitDuration.seconds(1).join(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -324,9 +298,7 @@ public class UnitDurationTest {
     public void testMicroError() {
 
         try {
-
             UnitDuration.micros(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -334,9 +306,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.fromUnit(-1, TimeUnit.MICROSECONDS);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -356,9 +326,7 @@ public class UnitDurationTest {
     public void testMilliError() {
 
         try {
-
             UnitDuration.millis(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -366,9 +334,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.fromUnit(-1, TimeUnit.MILLISECONDS);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -401,10 +367,8 @@ public class UnitDurationTest {
     public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
 
         testConversions(UnitDuration.minutes(sRandom.nextInt(MAX_DURATION)), true);
-
         final TimeUnit minutes = getUnit("MINUTES");
         if (minutes != null) {
-
             testConversions(UnitDuration.fromUnit(sRandom.nextInt(MAX_DURATION), minutes), true);
         }
     }
@@ -413,9 +377,7 @@ public class UnitDurationTest {
     public void testMinuteError() {
 
         try {
-
             UnitDuration.minutes(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -423,13 +385,9 @@ public class UnitDurationTest {
         }
 
         try {
-
             final TimeUnit minutes = getUnit("MINUTES");
-
             if (minutes != null) {
-
                 UnitDuration.fromUnit(-1, minutes);
-
                 fail();
             }
 
@@ -442,9 +400,7 @@ public class UnitDurationTest {
     public void testMinuteOverflowError() {
 
         try {
-
             UnitDuration.minutes(Long.MAX_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -452,9 +408,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.minutes(Long.MIN_VALUE);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -474,9 +428,7 @@ public class UnitDurationTest {
     public void testNanoError() {
 
         try {
-
             UnitDuration.nanos(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -484,9 +436,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.fromUnit(-1, TimeUnit.NANOSECONDS);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -527,9 +477,7 @@ public class UnitDurationTest {
     public void testSecondError() {
 
         try {
-
             UnitDuration.seconds(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -537,9 +485,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.seconds(1).to(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -547,9 +493,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.fromUnit(-1, TimeUnit.SECONDS);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -586,25 +530,18 @@ public class UnitDurationTest {
     public void testSleepMilli() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
-
         UnitDuration.millis(100).sleep();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
         startTime = System.currentTimeMillis();
-
         UnitDuration.millis(100).sleepAtLeast();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
         startTime = System.currentTimeMillis() - 1000;
         assertThat(UnitDuration.millis(100).sleepSinceMillis(startTime)).isFalse();
-
         startTime = System.currentTimeMillis();
         assertThat(UnitDuration.millis(100).sleepSinceMillis(startTime)).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
         startTime = System.currentTimeMillis() - 1000;
         assertThat(zero().sleepSinceMillis(startTime)).isFalse();
-
         startTime = System.currentTimeMillis();
         assertThat(zero().sleepSinceMillis(startTime)).isFalse();
     }
@@ -613,25 +550,18 @@ public class UnitDurationTest {
     public void testSleepNano() throws InterruptedException {
 
         long startTime = System.nanoTime();
-
         UnitDuration.nanos(11573573).sleep();
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
-
         startTime = System.nanoTime();
-
         UnitDuration.nanos(11573573).sleepAtLeast();
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
-
         startTime = System.nanoTime() - 100000000;
         assertThat(UnitDuration.nanos(11573573).sleepSinceNanos(startTime)).isFalse();
-
         startTime = System.nanoTime();
         assertThat(UnitDuration.nanos(11573573).sleepSinceNanos(startTime)).isTrue();
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
-
         startTime = System.nanoTime() - 100000000;
         assertThat(zero().sleepSinceNanos(startTime)).isFalse();
-
         startTime = System.nanoTime();
         assertThat(zero().sleepSinceNanos(startTime)).isFalse();
     }
@@ -640,12 +570,9 @@ public class UnitDurationTest {
     public void testSleepZero() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
-
         zero().sleep();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
         startTime = System.currentTimeMillis();
-
         zero().sleepAtLeast();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
     }
@@ -655,9 +582,7 @@ public class UnitDurationTest {
     public void testUnitError() {
 
         try {
-
             UnitDuration.fromUnit(0, null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -695,9 +620,7 @@ public class UnitDurationTest {
     public void testWaitError() {
 
         try {
-
             UnitDuration.seconds(1).wait(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -712,79 +635,63 @@ public class UnitDurationTest {
     public void testWaitMilli() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             UnitDuration.millis(100).wait(this);
         }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
         Thread thread = new Thread() {
 
             @Override
             public void run() {
 
                 super.run();
-
                 try {
-
                     synchronized (this) {
-
                         UnitDuration.millis(500).sleepAtLeast();
                         notifyAll();
                     }
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
             }
         };
         thread.start();
-
         synchronized (thread) {
-
             infinity().wait(thread);
         }
 
         startTime = System.currentTimeMillis() - 1000;
         synchronized (this) {
-
             assertThat(UnitDuration.millis(100).waitSinceMillis(this, startTime)).isFalse();
         }
 
         startTime = System.currentTimeMillis();
         synchronized (this) {
-
             assertThat(UnitDuration.millis(100).waitSinceMillis(this, startTime)).isTrue();
         }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
         thread = new Thread() {
 
             @Override
             public void run() {
 
                 super.run();
-
                 try {
-
                     synchronized (this) {
-
                         UnitDuration.millis(500).sleepAtLeast();
                         notifyAll();
                     }
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
             }
         };
         thread.start();
-
         synchronized (thread) {
-
             infinity().waitSinceMillis(thread, System.currentTimeMillis());
         }
     }
@@ -795,42 +702,34 @@ public class UnitDurationTest {
 
         long startTime = System.nanoTime() - 100000000;
         synchronized (this) {
-
             assertThat(UnitDuration.nanos(10000573).waitSinceNanos(this, startTime)).isFalse();
         }
 
         startTime = System.nanoTime();
         synchronized (this) {
-
             assertThat(UnitDuration.nanos(10000573).waitSinceNanos(this, startTime)).isTrue();
         }
-        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10000573);
 
+        assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(10000573);
         final Thread thread = new Thread() {
 
             @Override
             public void run() {
 
                 super.run();
-
                 try {
-
                     synchronized (this) {
-
                         UnitDuration.millis(500).sleepAtLeast();
                         notifyAll();
                     }
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
             }
         };
         thread.start();
-
         synchronized (thread) {
-
             infinity().waitSinceNanos(thread, System.nanoTime());
         }
     }
@@ -840,9 +739,7 @@ public class UnitDurationTest {
     public void testWaitSinceError() {
 
         try {
-
             UnitDuration.seconds(1).waitSinceMillis(null, System.currentTimeMillis());
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -852,9 +749,7 @@ public class UnitDurationTest {
         }
 
         try {
-
             UnitDuration.seconds(1).waitSinceNanos(null, System.nanoTime());
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -884,32 +779,25 @@ public class UnitDurationTest {
         };
 
         long startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             assertThat(UnitDuration.millis(100).waitTrue(this, alwaysFalse)).isFalse();
         }
+
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
-
         startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             assertThat(UnitDuration.millis(100).waitTrue(this, alwaysTrue)).isTrue();
         }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
         final Thread thread = new Thread() {
 
             @Override
             public void run() {
 
                 super.run();
-
                 try {
-
                     synchronized (this) {
-
                         UnitDuration.millis(500).sleepAtLeast();
                         notifyAll();
                     }
@@ -921,9 +809,7 @@ public class UnitDurationTest {
             }
         };
         thread.start();
-
         synchronized (thread) {
-
             assertThat(infinity().waitTrue(thread, new Condition() {
 
                 private boolean mToggle = true;
@@ -956,19 +842,16 @@ public class UnitDurationTest {
         };
 
         long startTime = System.nanoTime();
-
         synchronized (this) {
-
             assertThat(UnitDuration.nanos(10573).waitTrue(this, alwaysFalse)).isFalse();
         }
+
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(100);
-
         startTime = System.nanoTime();
-
         synchronized (this) {
-
             assertThat(UnitDuration.nanos(10573).waitTrue(this, alwaysTrue)).isTrue();
         }
+
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(0);
     }
 
@@ -992,19 +875,16 @@ public class UnitDurationTest {
         };
 
         long startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             assertThat(zero().waitTrue(this, alwaysFalse)).isFalse();
         }
+
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
-
         startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             assertThat(zero().waitTrue(this, alwaysTrue)).isTrue();
         }
+
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
     }
 
@@ -1013,34 +893,28 @@ public class UnitDurationTest {
     public void testWaitZero() throws InterruptedException {
 
         long startTime = System.currentTimeMillis();
-
         synchronized (this) {
-
             zero().wait(this);
         }
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
         startTime = System.currentTimeMillis() - 1000;
         synchronized (this) {
-
             assertThat(zero().waitSinceMillis(this, startTime)).isFalse();
         }
 
         startTime = System.currentTimeMillis();
         synchronized (this) {
-
             assertThat(zero().waitSinceMillis(this, startTime)).isFalse();
         }
 
         startTime = System.nanoTime() - 100000000;
         synchronized (this) {
-
             assertThat(zero().waitSinceNanos(this, startTime)).isFalse();
         }
 
         startTime = System.nanoTime();
         synchronized (this) {
-
             assertThat(zero().waitSinceNanos(this, startTime)).isFalse();
         }
     }
@@ -1049,10 +923,8 @@ public class UnitDurationTest {
     public void testZeroDay() {
 
         assertThat(UnitDuration.days(0).isZero()).isTrue();
-
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
-
             assertThat(UnitDuration.fromUnit(0, days).isZero()).isTrue();
         }
     }
@@ -1061,10 +933,8 @@ public class UnitDurationTest {
     public void testZeroHour() {
 
         assertThat(UnitDuration.hours(0).isZero()).isTrue();
-
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
-
             assertThat(UnitDuration.fromUnit(0, hours).isZero()).isTrue();
         }
     }
@@ -1087,10 +957,8 @@ public class UnitDurationTest {
     public void testZeroMinute() {
 
         assertThat(UnitDuration.minutes(0).isZero()).isTrue();
-
         final TimeUnit minutes = getUnit("MINUTES");
         if (minutes != null) {
-
             assertThat(UnitDuration.fromUnit(0, minutes).isZero()).isTrue();
         }
     }
@@ -1114,27 +982,22 @@ public class UnitDurationTest {
 
         final long value = time.value;
         final TimeUnit unit = time.unit;
-
         assertThat(time.toNanos()).isEqualTo(unit.toNanos(value));
         assertThat(time.toMicros()).isEqualTo(unit.toMicros(value));
         assertThat(time.toMillis()).isEqualTo(unit.toMillis(value));
         assertThat(time.toSeconds()).isEqualTo(unit.toSeconds(value));
-
         final Method toMinutes = getMethod("toMinutes");
         if (toMinutes != null) {
-
             assertThat(time.toMinutes()).isEqualTo((Long) toMinutes.invoke(unit, value));
         }
 
         final Method toHours = getMethod("toHours");
         if (toHours != null) {
-
             assertThat(time.toHours()).isEqualTo((Long) toHours.invoke(unit, value));
         }
 
         final Method toDays = getMethod("toDays");
         if (toDays != null) {
-
             assertThat(time.toDays()).isEqualTo((Long) toDays.invoke(unit, value));
         }
 
@@ -1145,22 +1008,18 @@ public class UnitDurationTest {
         assertThat(time.to(TimeUnit.MILLISECONDS)).isEqualTo(
                 TimeUnit.MILLISECONDS.convert(value, unit));
         assertThat(time.to(TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS.convert(value, unit));
-
         final TimeUnit minutes = getUnit("MINUTES");
         if (minutes != null) {
-
             assertThat(time.to(minutes)).isEqualTo(minutes.convert(value, unit));
         }
 
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
-
             assertThat(time.to(hours)).isEqualTo(hours.convert(value, unit));
         }
 
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
-
             assertThat(time.to(days)).isEqualTo(days.convert(value, unit));
         }
 
@@ -1180,9 +1039,7 @@ public class UnitDurationTest {
                 UnitDuration.fromUnit(time.hoursTime().to(time.unit), time.unit));
         assertThat(time.daysTime()).isEqualTo(
                 UnitDuration.fromUnit(time.daysTime().to(time.unit), time.unit));
-
         if (isFirst) {
-
             testConversions(time.nanosTime(), false);
             testConversions(time.microsTime(), false);
             testConversions(time.millisTime(), false);

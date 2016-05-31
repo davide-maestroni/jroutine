@@ -54,6 +54,26 @@ public class UnitDuration extends UnitTime {
 
     /**
      * Creates and returns an object representing the specified number of days.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param days the number of days.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration days(final double days) {
+
+        if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
+            throw new IllegalArgumentException("time value overflow: " + days + " days");
+        }
+
+        final double seconds = days * SECONDS_IN_DAY;
+        return fromUnit(seconds - (seconds % SECONDS_IN_HOUR), TimeUnit.SECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of days.
      *
      * @param days the number of days.
      * @return the time instance.
@@ -72,6 +92,29 @@ public class UnitDuration extends UnitTime {
     /**
      * Creates and returns an object representing the specified time value in the specified time
      * unit.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param time the time value.
+     * @param unit the time unit.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration fromUnit(final double time, @NotNull final TimeUnit unit) {
+
+        final int ordinal = unit.ordinal();
+        if ((ordinal == 0) || (Math.rint(time) == time)) {
+            return fromUnit(Math.round(time), unit);
+        }
+
+        final TimeUnit toUnit = TimeUnit.values()[ordinal - 1];
+        return fromUnit(Math.round(toUnit.convert(1, unit) * time), toUnit);
+    }
+
+    /**
+     * Creates and returns an object representing the specified time value in the specified time
+     * unit.
      *
      * @param time the time value.
      * @param unit the time unit.
@@ -82,6 +125,26 @@ public class UnitDuration extends UnitTime {
     public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
 
         return new UnitDuration(time, unit);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of hours.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param hours the number of hours
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration hours(final double hours) {
+
+        if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
+            throw new IllegalArgumentException("time value overflow: " + hours + " hours");
+        }
+
+        final double seconds = hours * SECONDS_IN_HOUR;
+        return fromUnit(seconds - (seconds % SECONDS_IN_MINUTE), TimeUnit.SECONDS);
     }
 
     /**
@@ -114,6 +177,21 @@ public class UnitDuration extends UnitTime {
 
     /**
      * Creates and returns an object representing the specified number of microseconds.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param micros the number of microseconds.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration micros(final double micros) {
+
+        return fromUnit(micros, TimeUnit.MICROSECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of microseconds.
      *
      * @param micros the number of microseconds.
      * @return the time duration instance.
@@ -127,6 +205,21 @@ public class UnitDuration extends UnitTime {
 
     /**
      * Creates and returns an object representing the specified number of milliseconds.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param millis the number of milliseconds.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration millis(final double millis) {
+
+        return fromUnit(millis, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of milliseconds.
      *
      * @param millis the number of milliseconds.
      * @return the time duration instance.
@@ -136,6 +229,26 @@ public class UnitDuration extends UnitTime {
     public static UnitDuration millis(final long millis) {
 
         return fromUnit(millis, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of minutes.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param minutes the number of minutes.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration minutes(final double minutes) {
+
+        if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
+            throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
+        }
+
+        final double seconds = minutes * SECONDS_IN_MINUTE;
+        return fromUnit(seconds - (seconds % 1), TimeUnit.SECONDS);
     }
 
     /**
@@ -157,6 +270,21 @@ public class UnitDuration extends UnitTime {
 
     /**
      * Creates and returns an object representing the specified number of nanoseconds.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param nanos the number of nanoseconds.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration nanos(final double nanos) {
+
+        return fromUnit(nanos, TimeUnit.NANOSECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of nanoseconds.
      *
      * @param nanos the number of nanoseconds.
      * @return the time duration instance.
@@ -166,6 +294,21 @@ public class UnitDuration extends UnitTime {
     public static UnitDuration nanos(final long nanos) {
 
         return fromUnit(nanos, TimeUnit.NANOSECONDS);
+    }
+
+    /**
+     * Creates and returns an object representing the specified number of seconds.
+     * <br>
+     * The returned time will have at maximum the same precision as the next more granular time
+     * unit.
+     *
+     * @param seconds the number of seconds.
+     * @return the time instance.
+     */
+    @NotNull
+    public static UnitDuration seconds(final double seconds) {
+
+        return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
     /**

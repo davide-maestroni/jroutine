@@ -672,9 +672,9 @@ public class Streams extends Functions {
     @NotNull
     @StreamFlow(REDUCE)
     @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> meanFloating() {
+    public static <N extends Number> InvocationFactory<N, Number> meanFloat() {
 
-        return (InvocationFactory<N, Number>) MeanFloatingInvocation.factoryOf();
+        return (InvocationFactory<N, Number>) MeanFloatInvocation.factoryOf();
     }
 
     /**
@@ -689,9 +689,9 @@ public class Streams extends Functions {
     @NotNull
     @StreamFlow(REDUCE)
     @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> meanRounded() {
+    public static <N extends Number> InvocationFactory<N, Number> meanRound() {
 
-        return (InvocationFactory<N, Number>) MeanRoundedInvocation.factoryOf();
+        return (InvocationFactory<N, Number>) MeanRoundInvocation.factoryOf();
     }
 
     /**

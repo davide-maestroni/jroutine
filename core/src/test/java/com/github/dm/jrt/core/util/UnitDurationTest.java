@@ -187,6 +187,14 @@ public class UnitDurationTest {
         assertThat(UnitDuration.millis(1.6)).isEqualTo(UnitDuration.micros(1600));
         assertThat(UnitDuration.micros(1.6)).isEqualTo(UnitDuration.nanos(1600));
         assertThat(UnitDuration.nanos(1.6)).isEqualTo(UnitDuration.nanos(2));
+
+        assertThat(UnitDuration.days(3.0)).isEqualTo(UnitDuration.days(3));
+        assertThat(UnitDuration.hours(3.0)).isEqualTo(UnitDuration.hours(3));
+        assertThat(UnitDuration.minutes(3.0)).isEqualTo(UnitDuration.minutes(3));
+        assertThat(UnitDuration.seconds(3.0)).isEqualTo(UnitDuration.seconds(3));
+        assertThat(UnitDuration.millis(3.0)).isEqualTo(UnitDuration.millis(3));
+        assertThat(UnitDuration.micros(3.0)).isEqualTo(UnitDuration.micros(3));
+        assertThat(UnitDuration.nanos(3.0)).isEqualTo(UnitDuration.nanos(3));
     }
 
     @Test

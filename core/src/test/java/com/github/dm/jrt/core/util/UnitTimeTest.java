@@ -172,6 +172,21 @@ public class UnitTimeTest {
         assertThat(UnitTime.millis(-1.6)).isEqualTo(UnitTime.micros(-1600));
         assertThat(UnitTime.micros(-1.6)).isEqualTo(UnitTime.nanos(-1600));
         assertThat(UnitTime.nanos(-1.6)).isEqualTo(UnitTime.nanos(-2));
+
+        assertThat(UnitTime.days(3.0)).isEqualTo(UnitTime.days(3));
+        assertThat(UnitTime.hours(3.0)).isEqualTo(UnitTime.hours(3));
+        assertThat(UnitTime.minutes(3.0)).isEqualTo(UnitTime.minutes(3));
+        assertThat(UnitTime.seconds(3.0)).isEqualTo(UnitTime.seconds(3));
+        assertThat(UnitTime.millis(3.0)).isEqualTo(UnitTime.millis(3));
+        assertThat(UnitTime.micros(3.0)).isEqualTo(UnitTime.micros(3));
+        assertThat(UnitTime.nanos(3.0)).isEqualTo(UnitTime.nanos(3));
+        assertThat(UnitTime.days(-3.0)).isEqualTo(UnitTime.days(-3));
+        assertThat(UnitTime.hours(-3.0)).isEqualTo(UnitTime.hours(-3));
+        assertThat(UnitTime.minutes(-3.0)).isEqualTo(UnitTime.minutes(-3));
+        assertThat(UnitTime.seconds(-3.0)).isEqualTo(UnitTime.seconds(-3));
+        assertThat(UnitTime.millis(-3.0)).isEqualTo(UnitTime.millis(-3));
+        assertThat(UnitTime.micros(-3.0)).isEqualTo(UnitTime.micros(-3));
+        assertThat(UnitTime.nanos(-3.0)).isEqualTo(UnitTime.nanos(-3));
     }
 
     @Test

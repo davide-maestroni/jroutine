@@ -40,4 +40,14 @@
         </Or>
         <Bug pattern="WA_NOT_IN_LOOP"/>
     </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.core.util.UnitDuration"/>
+        <Method name="fromUnit"/>
+        <Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.core.util.UnitTime"/>
+        <Method name="fromUnit"/>
+        <Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
+    </Match>
 </FindBugsFilter>

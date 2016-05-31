@@ -174,7 +174,7 @@ public class UnitDurationTest {
         }
 
         try {
-            UnitDuration.days(Double.MIN_VALUE);
+            UnitDuration.days(-Double.MAX_VALUE);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -274,7 +274,7 @@ public class UnitDurationTest {
         }
 
         try {
-            UnitDuration.hours(Double.MIN_VALUE);
+            UnitDuration.hours(-Double.MAX_VALUE);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -464,7 +464,7 @@ public class UnitDurationTest {
         }
 
         try {
-            UnitDuration.minutes(Double.MIN_VALUE);
+            UnitDuration.minutes(-Double.MAX_VALUE);
             fail();
 
         } catch (final IllegalArgumentException ignored) {

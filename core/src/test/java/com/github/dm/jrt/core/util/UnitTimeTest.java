@@ -142,6 +142,22 @@ public class UnitTimeTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+            UnitTime.days(Double.MAX_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            UnitTime.days(Double.MIN_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
@@ -217,6 +233,22 @@ public class UnitTimeTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+            UnitTime.hours(Double.MAX_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            UnitTime.hours(Double.MIN_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
@@ -275,6 +307,22 @@ public class UnitTimeTest {
 
         try {
             UnitTime.minutes(Long.MIN_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            UnitTime.minutes(Double.MAX_VALUE);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            UnitTime.minutes(Double.MIN_VALUE);
             fail();
 
         } catch (final IllegalArgumentException ignored) {

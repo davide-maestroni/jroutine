@@ -45,11 +45,11 @@
                                           .map(Integer::parseInt)
                                           .map(integer -&gt; integer * integer)
                                           .async()
-                                          .map(floatingMean())
-                                          .runSequentially()
+                                          .map(meanFloat())
+                                          .sequential()
                                           .map(Float.class::cast)
                                           .map(Math::sqrt)
-                                          .runOnShared()
+                                          .mapOn(null)
                                           .afterMax(seconds(1))
                                           .next();
                 System.out.println(rms);

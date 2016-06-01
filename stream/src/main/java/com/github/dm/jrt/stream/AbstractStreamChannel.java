@@ -30,7 +30,6 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -368,23 +367,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> asyncOn(@Nullable final Runner runner) {
 
-        final InvocationMode invocationMode = mStreamConfiguration.getInvocationMode();
-        final MappingInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
-        final StreamChannel<IN, OUT> channel =
-                streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
-        if (invocationMode == InvocationMode.ASYNC) {
-            return channel.async();
-        }
-
-        if (invocationMode == InvocationMode.PARALLEL) {
-            return channel.parallel();
-        }
-
-        if (invocationMode == InvocationMode.SYNC) {
-            return channel.sync();
-        }
-
-        return channel.serial();
+        return async().streamInvocationConfiguration().withRunner(runner).apply();
     }
 
     @NotNull
@@ -530,6 +513,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer) {
 
         return map(consumerMapping(mappingConsumer));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> mapOn(@Nullable final Runner runner) {
+
+        return asyncOn(runner).map(IdentityInvocation.<OUT>factoryOf());
     }
 
     @NotNull
@@ -682,7 +671,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> sequential() {
 
-        return streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
+        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
     }
 
     @NotNull

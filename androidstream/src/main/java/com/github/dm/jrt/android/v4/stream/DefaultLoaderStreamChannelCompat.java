@@ -532,6 +532,13 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> mapOn(@Nullable final Runner runner) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.mapOn(runner);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> onError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
 

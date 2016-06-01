@@ -349,19 +349,17 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> async();
 
     /**
-     * Short for {@code streamInvocationConfiguration().withRunner(runner).apply().async()
-     * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
+     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).apply()}.
      * <br>
-     * This method is useful to easily make the stream run on the specified runner.
+     * This method is useful to easily set the stream runner.
      * <p>
-     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-     * the output data through the specified runner.
+     * Note that output data will not be automatically delivered through the runner.
      *
      * @param runner the runner instance.
      * @return the new stream instance.
      */
     @NotNull
-    @StreamFlow(MAP)
+    @StreamFlow(CONFIG)
     StreamChannel<IN, OUT> asyncOn(@Nullable Runner runner);
 
     /**
@@ -697,6 +695,22 @@ public interface StreamChannel<IN, OUT>
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
+     * Short for {@code asyncOn(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
+     * <br>
+     * This method is useful to easily make the stream run on the specified runner.
+     * <p>
+     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
+     * the output data through the specified runner.
+     *
+     * @param runner the runner instance.
+     * @return the new stream instance.
+     * @see #asyncOn(Runner)
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> mapOn(@Nullable Runner runner);
+
+    /**
      * Concatenates a consumer handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
@@ -1026,14 +1040,18 @@ public interface StreamChannel<IN, OUT>
                     backoffFunction);
 
     /**
-     * Sets the stream runner so that each input is sequentially passed through the whole chain.
+     * Short for
+     * {@code async().streamInvocationConfiguration().withRunner(sequentialRunner).apply()}.
+     * <br>
+     * This method is useful to set the stream runner so that each input is sequentially passed
+     * through the whole chain as soon as it is fed to the stream.
      * <p>
-     * On the contrary of the default synchronous runner, the set one will make so that each routine
-     * in the chain will be passed any input as soon as it is produced by the previous one. Such
-     * behavior will decrease memory demands at the expenses of a deeper stack of calls. In fact,
-     * the default synchronous runner breaks up routine calls so to perform them in a sequential
-     * loop. The main drawback of this approach is that all input data are accumulated before
-     * actually being processed by the routine invocation.
+     * On the contrary of the default synchronous runner, the set one makes so that each routine
+     * in the chain is be passed any input as soon as it is produced by the previous one. Such
+     * behavior decreases memory demands at the expense of a deeper stack of calls. In fact, the
+     * default synchronous runner breaks up routine calls so to perform them in a loop. The main
+     * drawback of the latter approach is that all input data are accumulated before actually being
+     * processed by the next routine invocation.
      * <p>
      * Note that the runner will be employed with asynchronous and parallel invocation modes, while
      * the synchronous and serial modes will behave as before.

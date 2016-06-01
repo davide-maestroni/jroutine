@@ -40,7 +40,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -245,9 +244,9 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static BufferInputStream inputStream(
-            @NotNull final List<? extends ParcelableByteBuffer> buffers) {
+            @NotNull final Iterable<? extends ParcelableByteBuffer> buffers) {
 
-        final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.size());
+        final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>();
         for (final ParcelableByteBuffer buffer : buffers) {
             final ByteBuffer byteBuffer = buffer.getBuffer();
             if (byteBuffer != null) {
@@ -328,7 +327,7 @@ public class ParcelableByteChannel {
      *
      * @see ParcelableByteChannel#inputStream(ParcelableByteBuffer)
      * @see ParcelableByteChannel#inputStream(ParcelableByteBuffer...)
-     * @see ParcelableByteChannel#inputStream(List)
+     * @see ParcelableByteChannel#inputStream(Iterable)
      */
     public static class ParcelableByteBuffer extends DeepEqualObject implements Parcelable {
 

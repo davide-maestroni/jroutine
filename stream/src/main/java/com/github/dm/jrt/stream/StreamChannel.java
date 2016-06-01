@@ -1023,7 +1023,7 @@ public interface StreamChannel<IN, OUT>
      * return null.
      * <br>
      * For each retry the function is called passing the retry count (starting from 1) and the error
-     * which caused the failure. If the function returns a non-null value, that will represent the
+     * which caused the failure. If the function returns a non-null value, it will represent the
      * number of milliseconds to wait before a further retry. While, in case the function returns
      * null, the flow of data will be aborted with the passed error as reason.
      * <p>

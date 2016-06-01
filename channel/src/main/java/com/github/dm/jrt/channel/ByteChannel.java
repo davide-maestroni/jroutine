@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -192,7 +191,8 @@ public class ByteChannel {
      *                                         of the specified buffers.
      */
     @NotNull
-    public static BufferInputStream inputStream(@NotNull final List<? extends ByteBuffer> buffers) {
+    public static BufferInputStream inputStream(
+            @NotNull final Iterable<? extends ByteBuffer> buffers) {
 
         return new MultiBufferInputStream(buffers);
     }
@@ -581,10 +581,10 @@ public class ByteChannel {
          *
          * @param buffers the list of input streams whose data have to be concatenated.
          */
-        private MultiBufferInputStream(@NotNull final List<? extends ByteBuffer> buffers) {
+        private MultiBufferInputStream(@NotNull final Iterable<? extends ByteBuffer> buffers) {
 
             final ArrayList<BufferInputStream> streams =
-                    (mStreams = new ArrayList<BufferInputStream>(buffers.size()));
+                    (mStreams = new ArrayList<BufferInputStream>());
             for (final ByteBuffer buffer : buffers) {
                 streams.add(buffer.getStream());
             }
@@ -821,7 +821,7 @@ public class ByteChannel {
      *
      * @see ByteChannel#inputStream(ByteBuffer)
      * @see ByteChannel#inputStream(ByteBuffer...)
-     * @see ByteChannel#inputStream(List)
+     * @see ByteChannel#inputStream(Iterable)
      */
     public class ByteBuffer {
 

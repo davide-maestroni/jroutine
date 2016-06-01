@@ -59,6 +59,11 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * {@code StreamChannel} return types.
  * <br>
  * If properly configured, the routine invocations will run in a dedicated Android service.
+ * <br>
+ * Note, however, that a different {@code OkHttpClient} instance will be created by the service. In
+ * order to properly configure it, the target service class should implement
+ * {@link com.github.dm.jrt.android.object.builder.FactoryContext}, and return the configured
+ * instance when requested.
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */

@@ -32,7 +32,6 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -76,8 +75,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
     private static final LocalMutableBoolean sInsideInvocation = new LocalMutableBoolean();
-
-    private static final Runner sSyncRunner = Runners.syncRunner();
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -467,6 +464,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             + "\nTry binding the output channel");
         }
 
+        // TODO: 05/06/16 remove??
         if (mRunner.isExecutionThread()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on the channel runner thread: " + Thread.currentThread()
@@ -575,35 +573,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (abortException != null) {
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private void forceExecution(@NotNull final Execution execution) {
-
-        final SimpleQueue<WrappedExecution> queue = mExecutionQueue;
-        synchronized (mMutex) {
-            if (mIsWaitingExecution) {
-                queue.add(new WrappedExecution(execution));
-                return;
-            }
-
-            mIsWaitingExecution = true;
-        }
-
-        sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
-        final WrappedExecution nextExecution;
-        synchronized (mMutex) {
-            if (!queue.isEmpty()) {
-                nextExecution = queue.removeFirst();
-
-            } else {
-                mIsWaitingExecution = false;
-                nextExecution = null;
-            }
-        }
-
-        if (nextExecution != null) {
-            mRunner.run(nextExecution, 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -1631,7 +1600,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void run() {
 
-            forceExecution(mExecution);
+            final Execution execution = mExecution;
+            synchronized (mMutex) {
+                if (mIsWaitingExecution) {
+                    mExecutionQueue.add(new WrappedExecution(execution));
+                    return;
+                }
+
+                mIsWaitingExecution = true;
+            }
+
+            try {
+                execution.run();
+
+            } finally {
+                nextExecution();
+            }
         }
     }
 
@@ -2428,8 +2412,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void run() {
 
-            sSyncRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
-            nextExecution();
+            try {
+                mExecution.run();
+
+            } finally {
+                nextExecution();
+            }
         }
     }
 

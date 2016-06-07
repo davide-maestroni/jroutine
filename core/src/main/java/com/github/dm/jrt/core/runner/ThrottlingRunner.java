@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 07/18/2015.
  */
-class ThrottlingRunner implements Runner {
+class ThrottlingRunner extends RunnerDecorator {
 
     private final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> mExecutions =
             new WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>>();
@@ -42,8 +42,6 @@ class ThrottlingRunner implements Runner {
     private final Object mMutex = new Object();
 
     private final LinkedList<PendingExecution> mQueue = new LinkedList<PendingExecution>();
-
-    private final Runner mRunner;
 
     private int mRunningCount;
 
@@ -56,11 +54,12 @@ class ThrottlingRunner implements Runner {
      */
     ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
-        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
+        super(wrapped);
         mMaxRunning =
                 ConstantConditions.positive("maximum number of running executions", maxExecutions);
     }
 
+    @Override
     public void cancel(@NotNull final Execution execution) {
 
         ThrottlingExecution throttlingExecution = null;
@@ -81,15 +80,11 @@ class ThrottlingRunner implements Runner {
         }
 
         if (throttlingExecution != null) {
-            mRunner.cancel(throttlingExecution);
+            super.cancel(throttlingExecution);
         }
     }
 
-    public boolean isExecutionThread() {
-
-        return mRunner.isExecutionThread();
-    }
-
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
@@ -105,7 +100,7 @@ class ThrottlingRunner implements Runner {
         }
 
         if (throttlingExecution != null) {
-            mRunner.run(throttlingExecution, delay, timeUnit);
+            super.run(throttlingExecution, delay, timeUnit);
         }
     }
 
@@ -158,7 +153,7 @@ class ThrottlingRunner implements Runner {
                 throttlingExecution = getThrottlingExecution(mExecution);
             }
 
-            mRunner.run(throttlingExecution, mDelay, mTimeUnit);
+            ThrottlingRunner.super.run(throttlingExecution, mDelay, mTimeUnit);
         }
     }
 

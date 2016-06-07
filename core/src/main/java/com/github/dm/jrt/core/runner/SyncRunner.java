@@ -16,53 +16,31 @@
 
 package com.github.dm.jrt.core.runner;
 
-import com.github.dm.jrt.core.util.ConstantConditions;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Implementation of a decorator of a runner object.
+ * Base abstract implementation of a synchronous runner.
+ * <br>
+ * For a synchronous runner any thread is an execution thread while no one is managed.
  * <p>
- * Created by davide-maestroni on 09/22/2014.
+ * Created by davide-maestroni on 06/06/2016.
  */
-public class RunnerDecorator extends Runner {
-
-    private final Runner mRunner;
-
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    public RunnerDecorator(@NotNull final Runner wrapped) {
-
-        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
-    }
+public abstract class SyncRunner extends Runner {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
 
-        mRunner.cancel(execution);
     }
 
     @Override
     public boolean isExecutionThread() {
 
-        return mRunner.isExecutionThread();
+        return true;
     }
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
 
-        return mRunner.isManagedThread(thread);
-    }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-
-        mRunner.run(execution, delay, timeUnit);
+        return false;
     }
 }

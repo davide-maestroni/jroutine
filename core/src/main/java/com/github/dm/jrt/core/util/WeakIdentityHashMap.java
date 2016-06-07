@@ -31,7 +31,7 @@ import java.util.Set;
  * Map implementation combining the features of {@link java.util.IdentityHashMap} and
  * {@link java.util.WeakHashMap}.
  * <p>
- * Note that the map entries might change each time the object is explicitly accessed.
+ * Note that iterating through the map keys might produce one or more null values.
  * <p>
  * Created by davide-maestroni on 11/17/2014.
  *
@@ -97,15 +97,32 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mMap.hashCode();
     }
 
+    /**
+     * Removes from this map all the entries whose key has no more strong references.
+     *
+     * @return this map.
+     */
+    @NotNull
+    public WeakIdentityHashMap<K, V> prune() {
+
+        final HashMap<IdentityWeakReference, V> map = mMap;
+        final ReferenceQueue<Object> queue = mQueue;
+        IdentityWeakReference reference = (IdentityWeakReference) queue.poll();
+        while (reference != null) {
+            map.remove(reference);
+            reference = (IdentityWeakReference) queue.poll();
+        }
+
+        return this;
+    }
+
     public int size() {
 
-        cleanUp();
         return mMap.size();
     }
 
     public boolean isEmpty() {
 
-        cleanUp();
         return mMap.isEmpty();
     }
 
@@ -116,7 +133,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public boolean containsValue(final Object o) {
 
-        cleanUp();
         return mMap.containsValue(o);
     }
 
@@ -127,18 +143,19 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public V put(final K k, final V v) {
 
-        cleanUp();
+        prune();
         return mMap.put(new IdentityWeakReference(k, mQueue), v);
     }
 
     public V remove(final Object o) {
 
+        prune();
         return mMap.remove(new IdentityWeakReference(o));
     }
 
     public void putAll(@NotNull final Map<? extends K, ? extends V> map) {
 
-        cleanUp();
+        prune();
         final ReferenceQueue<Object> queue = mQueue;
         final HashMap<IdentityWeakReference, V> referenceMap = mMap;
         for (final Entry<? extends K, ? extends V> entry : map.entrySet()) {
@@ -205,23 +222,14 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         return mEntrySet;
     }
 
-    private void cleanUp() {
-
-        final HashMap<IdentityWeakReference, V> map = mMap;
-        final ReferenceQueue<Object> queue = mQueue;
-        IdentityWeakReference reference = (IdentityWeakReference) queue.poll();
-        while (reference != null) {
-            map.remove(reference);
-            reference = (IdentityWeakReference) queue.poll();
-        }
-    }
-
     /**
      * Weak reference using object identity for comparison.
      */
     private static class IdentityWeakReference extends WeakReference<Object> {
 
         private final int mHashCode;
+
+        private final boolean mIsNull;
 
         /**
          * Constructor.
@@ -234,6 +242,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
                 final ReferenceQueue<? super Object> queue) {
 
             super(referent, queue);
+            mIsNull = (referent == null);
             mHashCode = System.identityHashCode(referent);
         }
 
@@ -246,6 +255,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         private IdentityWeakReference(final Object referent) {
 
             super(referent);
+            mIsNull = (referent == null);
             mHashCode = System.identityHashCode(referent);
         }
 
@@ -267,6 +277,10 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             }
 
             final IdentityWeakReference that = (IdentityWeakReference) obj;
+            if (mIsNull) {
+                return that.mIsNull;
+            }
+
             if (mHashCode != that.mHashCode) {
                 return false;
             }

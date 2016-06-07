@@ -74,7 +74,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sConsumerMutexes =
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
-    private static final LocalMutableBoolean sInsideInvocation = new LocalMutableBoolean();
+    private static final ThreadLocal<Boolean> sInsideInvocation = new ThreadLocal<Boolean>() {
+
+        @Override
+        protected Boolean initialValue() {
+
+            return false;
+        }
+    };
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -403,7 +410,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void enterInvocation() {
 
-        sInsideInvocation.get().isTrue = true;
+        sInsideInvocation.set(true);
     }
 
     /**
@@ -411,7 +418,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void exitInvocation() {
 
-        sInsideInvocation.get().isTrue = false;
+        sInsideInvocation.set(false);
     }
 
     /**
@@ -458,18 +465,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void checkCanWait() {
 
-        if (sInsideInvocation.get().isTrue) {
+        if (sInsideInvocation.get() || Runner.isManagedThread()) {
             throw new ExecutionDeadlockException(
-                    "cannot wait inside an invocation execution: " + Thread.currentThread()
-                            + "\nTry binding the output channel");
-        }
-
-        // TODO: 05/06/16 remove??
-        if (mRunner.isExecutionThread()) {
-            throw new ExecutionDeadlockException(
-                    "cannot wait on the channel runner thread: " + Thread.currentThread()
-                            + "\nTry binding the output channel or employing a different runner "
-                            + "than: " + mRunner);
+                    "cannot wait on a runner thread: " + Thread.currentThread()
+                            + "\nTry binding the output channel to another channel or an output "
+                            + "consumer");
         }
 
         if (mIsWaitingInvocation) {
@@ -481,7 +481,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (mOutputCount > mMaxOutput) {
             throw new OutputDeadlockException(
-                    "maximum output channel size has been reached: " + mMaxOutput);
+                    "maximum output channel size has been exceeded: " + mMaxOutput);
         }
     }
 
@@ -873,26 +873,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param timeUnit the delay time unit.
          */
         void onAbort(@NotNull RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
-    }
-
-    /**
-     * Thread local implementation storing a mutable boolean.
-     */
-    private static class LocalMutableBoolean extends ThreadLocal<MutableBoolean> {
-
-        @Override
-        protected MutableBoolean initialValue() {
-
-            return new MutableBoolean();
-        }
-    }
-
-    /**
-     * Simple data class storing a boolean.
-     */
-    private static class MutableBoolean {
-
-        private boolean isTrue;
     }
 
     /**

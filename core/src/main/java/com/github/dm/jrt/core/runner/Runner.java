@@ -16,19 +16,21 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * The runner interface defines an object responsible for executing routine invocations inside
+ * The runner class defines an object responsible for executing routine invocations inside
  * specifically managed threads.
  * <p>
  * The implementation can both be synchronous or asynchronous, it can allocate specialized threads
  * or share a pool of them between different instances.
  * <br>
  * The only requirement is that the specified execution is called each time a run method is invoked,
- * even if the same execution instance is passed several times as parameter.
+ * even if the same execution instance is passed several times as input parameter.
  * <p>
  * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
  * unless the run method is called inside one of the managed thread. While, a proper synchronous
@@ -45,7 +47,42 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/07/2014.
  */
-public interface Runner {
+public abstract class Runner {
+
+    private static final Object sMutex = new Object();
+
+    private static volatile WeakIdentityHashMap<Runner, Void> sRunners =
+            new WeakIdentityHashMap<Runner, Void>();
+
+    /**
+     * Constructor.
+     */
+    public Runner() {
+
+        synchronized (sMutex) {
+            // Copy-on-write pattern
+            sRunners = new WeakIdentityHashMap<Runner, Void>(sRunners) {{
+                put(Runner.this, null);
+            }};
+        }
+    }
+
+    /**
+     * Checks if the calling thread belongs to the ones managed by a runner.
+     *
+     * @return whether the calling thread is managed by a runner.
+     */
+    public static boolean isManagedThread() {
+
+        final Thread thread = Thread.currentThread();
+        for (final Runner runner : sRunners.keySet()) {
+            if ((runner != null) && runner.isManagedThread(thread)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Cancels the specified execution if not already run.
@@ -62,19 +99,31 @@ public interface Runner {
      *
      * @param execution the execution.
      */
-    void cancel(@NotNull Execution execution);
+    public abstract void cancel(@NotNull Execution execution);
 
     /**
-     * Checks if the calling thread belongs to the ones managed by the runner implementation.
+     * Checks if the calling thread may be employed to run executions.
      * <p>
      * The implementation of this method is not strictly mandatory, even if, the classes always
      * returning false effectively prevent the correct detection of possible deadlocks.
      * <br>
      * A synchronous runner implementation will always return true.
      *
-     * @return whether the calling thread is managed by the runner.
+     * @return whether the calling thread is employed by the runner.
      */
-    boolean isExecutionThread();
+    public abstract boolean isExecutionThread();
+
+    /**
+     * Checks if the specified thread belongs to the ones managed by the runner implementation.
+     * <p>
+     * The implementation of this method is not strictly mandatory, even if, the classes always
+     * returning false effectively prevent the correct detection of possible deadlocks.
+     * <br>
+     * A synchronous runner implementation will always return false.
+     *
+     * @return whether the thread is managed by the runner.
+     */
+    public abstract boolean isManagedThread(@NotNull Thread thread);
 
     /**
      * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
@@ -84,5 +133,5 @@ public interface Runner {
      * @param delay     the execution delay.
      * @param timeUnit  the delay time unit.
      */
-    void run(@NotNull Execution execution, long delay, @NotNull TimeUnit timeUnit);
+    public abstract void run(@NotNull Execution execution, long delay, @NotNull TimeUnit timeUnit);
 }

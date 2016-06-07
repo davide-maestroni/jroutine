@@ -85,7 +85,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
                     final LoaderStreamConfigurationCompat streamConfiguration =
                             mStreamConfiguration;
-                    return (LoaderStreamChannelCompat<IN, OUT>) buildChannel(
+                    return (LoaderStreamChannelCompat<IN, OUT>) newChannel(
                             newConfiguration(streamConfiguration.getStreamConfiguration(),
                                     configuration, streamConfiguration.getInvocationMode()));
                 }
@@ -98,7 +98,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                 public LoaderStreamChannelCompat<IN, OUT> apply(
                         @NotNull final LoaderConfiguration configuration) {
 
-                    return (LoaderStreamChannelCompat<IN, OUT>) buildChannel(
+                    return (LoaderStreamChannelCompat<IN, OUT>) newChannel(
                             newConfiguration(configuration,
                                     mStreamConfiguration.getCurrentLoaderConfiguration()));
                 }
@@ -114,7 +114,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
                     final LoaderStreamConfigurationCompat streamConfiguration =
                             mStreamConfiguration;
-                    return (LoaderStreamChannelCompat<IN, OUT>) buildChannel(
+                    return (LoaderStreamChannelCompat<IN, OUT>) newChannel(
                             newConfiguration(configuration,
                                     streamConfiguration.getCurrentConfiguration(),
                                     streamConfiguration.getInvocationMode()));
@@ -1180,7 +1180,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> with(@Nullable final LoaderContextCompat context) {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) buildChannel(newConfiguration(context));
+        return (LoaderStreamChannelCompat<IN, OUT>) newChannel(newConfiguration(context));
     }
 
     @NotNull
@@ -1345,7 +1345,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public LoaderStreamChannelCompat<IN, OUT> apply(
             @NotNull final LoaderConfiguration configuration) {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) buildChannel(
+        return (LoaderStreamChannelCompat<IN, OUT>) newChannel(
                 newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
                         configuration));
     }

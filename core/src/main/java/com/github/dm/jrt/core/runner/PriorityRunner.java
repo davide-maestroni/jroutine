@@ -290,7 +290,7 @@ public class PriorityRunner {
     /**
      * Enqueuing runner implementation.
      */
-    private class QueuingRunner implements Runner {
+    private class QueuingRunner extends RunnerDecorator {
 
         private final int mPriority;
 
@@ -301,9 +301,11 @@ public class PriorityRunner {
          */
         private QueuingRunner(final int priority) {
 
+            super(mRunner);
             mPriority = priority;
         }
 
+        @Override
         public void cancel(@NotNull final Execution execution) {
 
             final WeakHashMap<PriorityExecution, Void> priorityExecutions;
@@ -312,7 +314,6 @@ public class PriorityRunner {
             }
 
             if (priorityExecutions != null) {
-                final Runner runner = mRunner;
                 final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
                 final Map<PriorityExecution, ImmediateExecution> immediateExecutions =
                         mImmediateExecutions;
@@ -323,25 +324,21 @@ public class PriorityRunner {
                         final ImmediateExecution immediateExecution =
                                 immediateExecutions.remove(priorityExecution);
                         if (immediateExecution != null) {
-                            runner.cancel(immediateExecution);
+                            super.cancel(immediateExecution);
                         }
 
                     } else {
                         final DelayedExecution delayedExecution =
                                 delayedExecutions.remove(priorityExecution);
                         if (delayedExecution != null) {
-                            runner.cancel(delayedExecution);
+                            super.cancel(delayedExecution);
                         }
                     }
                 }
             }
         }
 
-        public boolean isExecutionThread() {
-
-            return mRunner.isExecutionThread();
-        }
-
+        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
@@ -366,12 +363,12 @@ public class PriorityRunner {
                         new ImmediateExecution(priorityExecution);
                 mImmediateExecutions.put(priorityExecution, immediateExecution);
                 mQueue.put(priorityExecution);
-                mRunner.run(immediateExecution, 0, timeUnit);
+                super.run(immediateExecution, 0, timeUnit);
 
             } else {
                 final DelayedExecution delayedExecution = new DelayedExecution(priorityExecution);
                 mDelayedExecutions.put(priorityExecution, delayedExecution);
-                mRunner.run(delayedExecution, delay, timeUnit);
+                super.run(delayedExecution, delay, timeUnit);
             }
 
             localExecutions.remove(priorityExecution);

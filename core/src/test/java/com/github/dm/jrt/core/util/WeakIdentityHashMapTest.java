@@ -381,7 +381,7 @@ public class WeakIdentityHashMapTest {
             System.gc();
             Thread.sleep(100);
 
-            if (!map.containsValue("test2")) {
+            if (!map.prune().containsValue("test2")) {
 
                 return;
             }

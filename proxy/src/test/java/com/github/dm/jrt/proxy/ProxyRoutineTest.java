@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.JRoutineObject;
@@ -1290,20 +1291,9 @@ public class ProxyRoutineTest {
         }
     }
 
-    private static class TestRunner implements Runner {
+    private static class TestRunner extends SyncRunner {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
-
-        @Override
-        public void cancel(@NotNull final Execution execution) {
-
-        }
-
-        @Override
-        public boolean isExecutionThread() {
-
-            return true;
-        }
 
         @Override
         public void run(@NotNull final Execution execution, final long delay,

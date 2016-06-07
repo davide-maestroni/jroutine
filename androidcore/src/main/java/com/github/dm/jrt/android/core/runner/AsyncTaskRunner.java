@@ -23,7 +23,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
-class AsyncTaskRunner implements Runner {
+class AsyncTaskRunner extends AsyncRunner {
 
     private static final Void[] NO_PARAMS = new Void[0];
 
@@ -82,9 +82,9 @@ class AsyncTaskRunner implements Runner {
     }
 
     @Override
-    public boolean isExecutionThread() {
+    public boolean isManagedThread(@NotNull final Thread thread) {
 
-        return mThreads.containsKey(Thread.currentThread());
+        return mThreads.containsKey(thread);
     }
 
     @Override

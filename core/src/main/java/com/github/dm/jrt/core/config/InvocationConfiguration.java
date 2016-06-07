@@ -59,7 +59,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * they are passed to the channels, at the cost of a slightly increase in memory usage and
  * computation.</li>
  * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
- * order to avoid excessive memory consumption. In case the maximum number is reached when passing
+ * order to avoid excessive memory consumption. In case the maximum number is exceeded when passing
  * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
  * <li>The backoff policy to be applied to the calling thread when the buffered input data exceed
  * the channel core limit.</li>
@@ -70,7 +70,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * they are passed to the channels, at the cost of a slightly increase in memory usage and
  * computation.</li>
  * <li>The core number of output data buffered in the channel. The channel buffer can be limited in
- * order to avoid excessive memory consumption. In case the maximum number is reached when passing
+ * order to avoid excessive memory consumption. In case the maximum number is exceeded when passing
  * an output, the call will block until enough data are consumed or the specified delay elapses.
  * </li>
  * <li>The backoff policy to be applied to the calling thread when the buffered output data exceed
@@ -793,7 +793,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
          * <br>
-         * When the maximum capacity is reached, the invocation will be aborted with an
+         * When the maximum capacity is exceeded, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param inputMaxSize the maximum size.
@@ -965,7 +965,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
          * <br>
-         * When the maximum capacity is reached, the invocation will be aborted with an
+         * When the maximum capacity is exceeded, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param outputMaxSize the maximum size.

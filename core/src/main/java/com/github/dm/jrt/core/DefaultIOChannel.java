@@ -28,13 +28,17 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +49,9 @@ import java.util.concurrent.TimeUnit;
  * @param <DATA> the data type.
  */
 class DefaultIOChannel<DATA> implements IOChannel<DATA> {
+
+    private static final Map<Runner, WeakReference<IORunner>> sRunners =
+            Collections.synchronizedMap(new WeakIdentityHashMap<Runner, WeakReference<IORunner>>());
 
     private static final Runner sSyncRunner = Runners.syncRunner();
 
@@ -62,10 +69,18 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration().apply();
         final Logger logger = invocationConfiguration.newLogger(this);
+        final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        final Map<Runner, WeakReference<IORunner>> runners = sRunners;
+        final WeakReference<IORunner> runnerReference = runners.get(runner);
+        IORunner ioRunner = (runnerReference != null) ? runnerReference.get() : null;
+        if (ioRunner == null) {
+            ioRunner = new IORunner(runner);
+            runners.put(runner, new WeakReference<IORunner>(ioRunner));
+        }
+
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
-        final IORunner runner = new IORunner(configuration.getRunnerOrElse(Runners.sharedRunner()));
         final DefaultResultChannel<DATA> inputChannel =
-                new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler, runner,
+                new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler, ioRunner,
                         logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = inputChannel;

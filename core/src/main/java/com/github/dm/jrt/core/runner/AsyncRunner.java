@@ -18,28 +18,23 @@ package com.github.dm.jrt.core.runner;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Class implementing a queued synchronous runner.
+ * Base abstract implementation of an asynchronous runner.
+ * <br>
+ * For an asynchronous runner the execution threads are the same as the managed ones.
  * <p>
- * The runner maintains an internal buffer of executions that are consumed only when the last one
- * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
- * <p>
- * Created by davide-maestroni on 09/18/2014.
+ * Created by davide-maestroni on 06/06/2016.
  */
-class QueuedRunner extends SyncRunner {
+public abstract class AsyncRunner extends Runner {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
 
-        LocalRunner.cancel(execution);
     }
 
     @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
+    public boolean isExecutionThread() {
 
-        LocalRunner.run(execution, delay, timeUnit);
+        return isManagedThread(Thread.currentThread());
     }
 }

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 10/14/2014.
  */
-class ScheduledRunner implements Runner {
+class ScheduledRunner extends AsyncRunner {
 
     private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
             new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
@@ -53,6 +53,7 @@ class ScheduledRunner implements Runner {
         mService = ConstantConditions.notNull("executor service", service);
     }
 
+    @Override
     public void cancel(@NotNull final Execution execution) {
 
         final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
@@ -67,11 +68,13 @@ class ScheduledRunner implements Runner {
         }
     }
 
-    public boolean isExecutionThread() {
+    @Override
+    public boolean isManagedThread(@NotNull final Thread thread) {
 
-        return mThreads.containsKey(Thread.currentThread());
+        return mThreads.containsKey(thread);
     }
 
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 

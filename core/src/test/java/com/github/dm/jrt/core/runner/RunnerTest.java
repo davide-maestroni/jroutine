@@ -378,8 +378,15 @@ public class RunnerTest {
     public void testZeroDelayRunnerCancel() throws InterruptedException {
 
         final AtomicReference<Runner> runner = new AtomicReference<Runner>();
-        runner.set(Runners.zeroDelayRunner(Runners.syncRunner()));
-        final Execution execution = new Execution() {
+        runner.set(Runners.zeroDelayRunner(new RunnerDecorator(Runners.syncRunner()) {
+
+            @Override
+            public boolean isManagedThread(@NotNull final Thread thread) {
+
+                return true;
+            }
+        }));
+        final TestExecution testExecution1 = new TestExecution() {
 
             private boolean mIsFirst = true;
 
@@ -395,9 +402,10 @@ public class RunnerTest {
                 }
             }
         };
-        runner.get().run(execution, 0, TimeUnit.MILLISECONDS);
+        runner.get().run(testExecution1, 0, TimeUnit.MILLISECONDS);
+        assertThat(testExecution1.isRun()).isFalse();
 
-        final TestExecution testExecution = new TestExecution() {
+        final TestExecution testExecution2 = new TestExecution() {
 
             private boolean mIsFirst = true;
 
@@ -413,8 +421,8 @@ public class RunnerTest {
                 }
             }
         };
-        runner.get().run(testExecution, 0, TimeUnit.MILLISECONDS);
-        assertThat(testExecution.isRun()).isTrue();
+        runner.get().run(testExecution2, 0, TimeUnit.MILLISECONDS);
+        assertThat(testExecution2.isRun()).isTrue();
     }
 
     @Test
@@ -529,6 +537,11 @@ public class RunnerTest {
 
         private boolean mIsRun;
 
+        public void run() {
+
+            mIsRun = true;
+        }
+
         private boolean isRun() {
 
             return mIsRun;
@@ -537,11 +550,6 @@ public class RunnerTest {
         private void reset() {
 
             mIsRun = false;
-        }
-
-        public void run() {
-
-            mIsRun = true;
         }
     }
 
@@ -618,7 +626,7 @@ public class RunnerTest {
         }
     }
 
-    private static class TestRunner implements Runner {
+    private static class TestRunner extends AsyncRunner {
 
         private Execution mLastCancelExecution;
 
@@ -626,21 +634,19 @@ public class RunnerTest {
 
         private Thread mThread;
 
+        @Override
         public void cancel(@NotNull final Execution execution) {
 
             mLastCancelExecution = execution;
         }
 
-        public boolean isExecutionThread() {
+        @Override
+        public boolean isManagedThread(@NotNull final Thread thread) {
 
-            return (Thread.currentThread() == mThread);
+            return (thread == mThread);
         }
 
-        private void setExecutionThread(final Thread thread) {
-
-            mThread = thread;
-        }
-
+        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
@@ -655,6 +661,11 @@ public class RunnerTest {
         private Execution getLastExecution() {
 
             return mLastExecution;
+        }
+
+        private void setExecutionThread(final Thread thread) {
+
+            mThread = thread;
         }
     }
 }

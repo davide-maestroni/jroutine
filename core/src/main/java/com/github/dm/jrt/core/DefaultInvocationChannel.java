@@ -361,7 +361,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         if (mInputCount > mMaxInput) {
             throw new InputDeadlockException(
-                    "maximum input channel size has been reached: " + mMaxInput);
+                    "maximum input channel size has been exceeded: " + mMaxInput);
         }
     }
 

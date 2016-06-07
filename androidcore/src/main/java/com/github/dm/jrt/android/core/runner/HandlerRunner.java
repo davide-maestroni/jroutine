@@ -20,7 +20,7 @@ import android.os.Handler;
 
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.ExecutionDecorator;
-import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 04/09/2016.
  */
-class HandlerRunner implements Runner {
+class HandlerRunner extends AsyncRunner {
 
     private final WeakIdentityHashMap<Execution, ExecutionDecorator> mExecutions =
             new WeakIdentityHashMap<Execution, ExecutionDecorator>();
@@ -65,9 +65,9 @@ class HandlerRunner implements Runner {
     }
 
     @Override
-    public boolean isExecutionThread() {
+    public boolean isManagedThread(@NotNull final Thread thread) {
 
-        return (Thread.currentThread() == mThread);
+        return (mThread == thread);
     }
 
     @Override

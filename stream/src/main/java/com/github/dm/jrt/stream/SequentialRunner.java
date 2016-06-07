@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 05/13/2016.
  */
-class SequentialRunner implements Runner {
+class SequentialRunner extends SyncRunner {
 
     /**
      * Constructor.
@@ -45,15 +45,7 @@ class SequentialRunner implements Runner {
 
     }
 
-    public void cancel(@NotNull final Execution execution) {
-
-    }
-
-    public boolean isExecutionThread() {
-
-        return true;
-    }
-
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 

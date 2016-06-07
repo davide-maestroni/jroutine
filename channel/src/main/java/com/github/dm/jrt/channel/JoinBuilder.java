@@ -217,7 +217,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
                     final int size = myQueue.size();
                     if (size > mMaxSize) {
                         mChannel.abort(new OutputDeadlockException(
-                                "maximum output channel size has been reached: " + mMaxSize));
+                                "maximum output channel size has been exceeded: " + mMaxSize));
                         return;
                     }
 

@@ -87,7 +87,7 @@ public class ProxyRoutineTest {
                                                        .withRunner(runner)
                                                        .apply()
                                                        .buildProxy(PriorityPass.class);
-        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
+        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyBreak();
 
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
 

@@ -290,7 +290,7 @@ public class RoutineTest {
                                                                      AgingPriority.HIGH_PRIORITY)
                                                              .apply()
                                                              .buildRoutine();
-        final OutputChannel<Object> output1 = routine1.asyncCall("test1").eventuallyExit();
+        final OutputChannel<Object> output1 = routine1.asyncCall("test1").eventuallyBreak();
         final InvocationChannel<Object, Object> input2 = routine2.asyncInvoke();
 
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
@@ -1808,7 +1808,7 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())
                                .asyncCall("test1")
-                               .eventuallyExit()
+                               .eventuallyBreak()
                                .afterMax(seconds(1))
                                .next(2)).containsExactly("test1");
 
@@ -1878,7 +1878,7 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())
                                .asyncCall()
-                               .eventuallyExit()
+                               .eventuallyBreak()
                                .afterMax(seconds(1))
                                .nextOrElse(2)).isEqualTo(2);
 
@@ -2310,7 +2310,7 @@ public class RoutineTest {
                             .apply()
                             .buildRoutine();
         final Iterator<String> iterator =
-                routine1.asyncCall("test").afterMax(millis(500)).eventuallyExit().iterator();
+                routine1.asyncCall("test").afterMax(millis(500)).eventuallyBreak().iterator();
 
         assertThat(iterator.next()).isEqualTo("test");
 
@@ -2336,7 +2336,7 @@ public class RoutineTest {
 
         try {
 
-            routine1.syncCall().immediately().eventuallyExit().iterator().next();
+            routine1.syncCall().immediately().eventuallyBreak().iterator().next();
 
             fail();
 
@@ -2539,7 +2539,7 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())
                                .asyncCall("test1")
-                               .eventuallyExit()
+                               .eventuallyBreak()
                                .afterMax(seconds(1))
                                .skipNext(2)
                                .all()).isEmpty();
@@ -2831,7 +2831,7 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withOutputTimeoutAction(TimeoutActionType.EXIT)
+                            .withOutputTimeoutAction(TimeoutActionType.BREAK)
                             .apply()
                             .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");

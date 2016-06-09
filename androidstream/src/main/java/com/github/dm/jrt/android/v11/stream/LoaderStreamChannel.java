@@ -132,7 +132,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> eventuallyExit();
+    LoaderStreamChannel<IN, OUT> eventuallyBreak();
 
     /**
      * {@inheritDoc}
@@ -678,7 +678,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> streamFunction);
 
@@ -688,7 +688,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -697,7 +697,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -706,7 +706,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -987,7 +987,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -1008,7 +1008,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**

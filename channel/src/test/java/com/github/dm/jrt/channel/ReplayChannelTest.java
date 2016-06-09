@@ -197,7 +197,7 @@ public class ReplayChannelTest {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
-        channel.eventuallyExit();
+        channel.eventuallyBreak();
         try {
             channel.remove();
             fail();

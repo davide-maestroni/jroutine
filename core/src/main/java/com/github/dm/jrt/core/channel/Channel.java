@@ -273,7 +273,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -302,7 +302,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -343,7 +343,7 @@ public interface Channel {
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -361,7 +361,7 @@ public interface Channel {
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -380,7 +380,7 @@ public interface Channel {
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -402,7 +402,7 @@ public interface Channel {
          * @see #eventuallyThrow()
          */
         @NotNull
-        OutputChannel<OUT> eventuallyExit();
+        OutputChannel<OUT> eventuallyBreak();
 
         /**
          * Tells the channel to throw an
@@ -418,7 +418,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          */
         @NotNull
         OutputChannel<OUT> eventuallyThrow();
@@ -472,7 +472,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         boolean hasNext();
@@ -504,7 +504,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         OUT next();
@@ -552,7 +552,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull
@@ -589,7 +589,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         OUT nextOrElse(OUT output);
@@ -618,7 +618,7 @@ public interface Channel {
          * @see #immediately()
          * @see #eventuallyAbort()
          * @see #eventuallyAbort(Throwable)
-         * @see #eventuallyExit()
+         * @see #eventuallyBreak()
          * @see #eventuallyThrow()
          */
         @NotNull

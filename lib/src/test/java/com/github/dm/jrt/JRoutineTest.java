@@ -81,7 +81,7 @@ public class JRoutineTest {
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
                                                         .withOutputTimeoutAction(
-                                                                TimeoutActionType.EXIT)
+                                                                TimeoutActionType.BREAK)
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .apply()

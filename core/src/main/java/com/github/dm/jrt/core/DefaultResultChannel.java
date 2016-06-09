@@ -426,8 +426,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         final TimeoutActionType action = mTimeoutActionType;
         final OutputChannel<OUT> outputChannel =
                 new DefaultOutputChannel().afterMax(mExecutionTimeout);
-        if (action == TimeoutActionType.EXIT) {
-            outputChannel.eventuallyExit();
+        if (action == TimeoutActionType.BREAK) {
+            outputChannel.eventuallyBreak();
 
         } else if (action == TimeoutActionType.ABORT) {
             outputChannel.eventuallyAbort();
@@ -1082,10 +1082,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        public OutputChannel<OUT> eventuallyExit() {
+        public OutputChannel<OUT> eventuallyBreak() {
 
             synchronized (mMutex) {
-                mTimeoutActionType = TimeoutActionType.EXIT;
+                mTimeoutActionType = TimeoutActionType.BREAK;
                 mTimeoutException = null;
             }
 

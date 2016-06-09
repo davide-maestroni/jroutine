@@ -126,7 +126,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyExit();
+    StreamChannel<IN, OUT> eventuallyBreak();
 
     /**
      * {@inheritDoc}
@@ -1186,7 +1186,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction);
 
@@ -1208,7 +1208,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -1228,7 +1228,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -1249,7 +1249,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**

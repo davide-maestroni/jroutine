@@ -100,7 +100,7 @@ public class ObjectRoutineTest {
                                                         .withRunner(runner)
                                                         .apply()
                                                         .buildProxy(PriorityPass.class);
-        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
+        final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyBreak();
 
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
 
@@ -127,7 +127,7 @@ public class ObjectRoutineTest {
                                                               .withMaxInstances(1)
                                                               .withCoreInstances(1)
                                                               .withOutputTimeoutAction(
-                                                                      TimeoutActionType.EXIT)
+                                                                      TimeoutActionType.BREAK)
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .apply()
@@ -2587,7 +2587,7 @@ public class ObjectRoutineTest {
     private static class TestTimeout {
 
         @Alias("test")
-        @OutputTimeoutAction(TimeoutActionType.EXIT)
+        @OutputTimeoutAction(TimeoutActionType.BREAK)
         public int getInt() throws InterruptedException {
 
             Thread.sleep(100);

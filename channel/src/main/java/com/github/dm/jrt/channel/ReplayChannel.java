@@ -222,9 +222,9 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public OutputChannel<OUT> eventuallyExit() {
+    public OutputChannel<OUT> eventuallyBreak() {
 
-        mOutputChannel.eventuallyExit();
+        mOutputChannel.eventuallyBreak();
         return this;
     }
 

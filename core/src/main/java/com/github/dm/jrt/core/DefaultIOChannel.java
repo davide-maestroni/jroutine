@@ -220,9 +220,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> eventuallyExit() {
+    public IOChannel<DATA> eventuallyBreak() {
 
-        mOutputChannel.eventuallyExit();
+        mOutputChannel.eventuallyBreak();
         return this;
     }
 

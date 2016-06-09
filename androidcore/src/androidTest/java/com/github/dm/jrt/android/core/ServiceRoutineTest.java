@@ -217,7 +217,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                              .invocationConfiguration()
                                                              .withOutputTimeout(millis(10))
                                                              .withOutputTimeoutAction(
-                                                                     TimeoutActionType.EXIT)
+                                                                     TimeoutActionType.BREAK)
                                                              .apply()
                                                              .asyncCall("test1");
         assertThat(channel.all()).isEmpty();

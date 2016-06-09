@@ -233,9 +233,9 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> eventuallyExit() {
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyBreak() {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyExit();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyBreak();
     }
 
     @NotNull
@@ -761,38 +761,38 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
 
         checkStatic(wrap(streamFunction), streamFunction);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, streamFunction);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitIn(count, streamFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         checkStatic("factory", factory);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, factory);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitIn(count, factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         checkStatic("routine", routine);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, routine);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitIn(count, routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, builder);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitIn(count, builder);
     }
 
     @NotNull
@@ -1113,7 +1113,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
@@ -1123,7 +1123,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
 
         checkStatic("factory", factory);
-        return splitBy(count, JRoutineLoaderCompat.with(loaderContext)
+        return splitIn(count, JRoutineLoaderCompat.with(loaderContext)
                                                   .on(factory)
                                                   .invocationConfiguration()
                                                   .with(streamConfiguration
@@ -1137,11 +1137,11 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitIn(final int count,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
-        return splitBy(count, builder.invocationConfiguration()
+        return splitIn(count, builder.invocationConfiguration()
                                      .with(null)
                                      .with(streamConfiguration.asInvocationConfiguration())
                                      .apply()

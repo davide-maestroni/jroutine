@@ -1593,8 +1593,8 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
-        assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
-        assertThat(channel.eventuallyExit().nextOrElse("test4")).isEqualTo("test4");
+        assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
+        assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
         final Iterator<String> iterator = LoaderStreams.streamOf("test1", "test2", "test3")
                                                        .with(loaderFrom(getActivity()))
                                                        .iterator();
@@ -1619,7 +1619,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            channel.eventuallyExit().next();
+            channel.eventuallyBreak().next();
             fail();
 
         } catch (final NoSuchElementException ignored) {
@@ -3037,7 +3037,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .with(loaderFrom(getActivity()))
                                 .thenGetMore(range(1, 3))
-                                .splitBy(2, sqrFunction())
+                                .splitIn(2, sqrFunction())
                                 .afterMax(seconds(3))
                                 .all()).containsOnly(1L, 4L, 9L);
         assertThat(LoaderStreams.streamOf()
@@ -3051,7 +3051,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .with(loaderFrom(getActivity()))
                                 .then("test1", "test2", "test3")
-                                .splitBy(2, factory)
+                                .splitIn(2, factory)
                                 .afterMax(seconds(3))
                                 .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreams.streamOf()
@@ -3064,7 +3064,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf()
                                 .with(loaderFrom(getActivity()))
                                 .then("test1", "test2", "test3")
-                                .splitBy(2, builder)
+                                .splitIn(2, builder)
                                 .afterMax(seconds(3))
                                 .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreams.streamOf()
@@ -3077,7 +3077,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 JRoutineLoader.with(loaderFrom(getActivity())).on(factory);
         assertThat(LoaderStreams.streamOf()
                                 .then("test1", "test2", "test3")
-                                .splitBy(2, loaderBuilder)
+                                .splitIn(2, loaderBuilder)
                                 .afterMax(seconds(3))
                                 .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreams.streamOf()

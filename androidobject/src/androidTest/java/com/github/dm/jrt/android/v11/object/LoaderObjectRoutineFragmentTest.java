@@ -112,7 +112,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                     .withMaxInstances(1)
                                                                     .withCoreInstances(1)
                                                                     .withOutputTimeoutAction(
-                                                                            TimeoutActionType.EXIT)
+                                                                            TimeoutActionType.BREAK)
                                                                     .withLogLevel(Level.DEBUG)
                                                                     .withLog(new NullLog())
                                                                     .apply()
@@ -2086,7 +2086,7 @@ public class LoaderObjectRoutineFragmentTest
     private static class TestTimeout {
 
         @Alias("test")
-        @OutputTimeoutAction(TimeoutActionType.EXIT)
+        @OutputTimeoutAction(TimeoutActionType.BREAK)
         public int getInt() throws InterruptedException {
 
             Thread.sleep(100);

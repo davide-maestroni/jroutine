@@ -454,7 +454,7 @@ public class ByteChannelTest {
         final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.close();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
         final byte[] b = new byte[16];
 
         try {
@@ -498,9 +498,9 @@ public class ByteChannelTest {
         }
 
         stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
         stream.close();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
     }
 
     @Test
@@ -1047,16 +1047,16 @@ public class ByteChannelTest {
 
         stream.write(new byte[0]);
         stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
         stream.write(b, 8, 0);
         stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
         stream.write(new ByteArrayInputStream(new byte[0]));
         stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
         stream.writeAll(new ByteArrayInputStream(new byte[0]));
         stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
+        assertThat(channel.eventuallyBreak().all()).isEmpty();
     }
 
     @Test

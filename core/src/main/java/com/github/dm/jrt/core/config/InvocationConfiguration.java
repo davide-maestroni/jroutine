@@ -471,7 +471,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
     public enum TimeoutActionType {
 
         /**
-         * Throw.
+         * Throw exception.
          * <br>
          * If no result is available after the specified timeout, the called method will throw an
          * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
@@ -484,7 +484,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * If no result is available after the specified timeout, the called method will stop its
          * execution and exit immediately.
          */
-        EXIT,
+        BREAK,
         /**
          * Abort invocation.
          * <br>

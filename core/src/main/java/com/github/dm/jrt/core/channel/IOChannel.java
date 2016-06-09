@@ -138,7 +138,7 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<DATA> eventuallyExit();
+    IOChannel<DATA> eventuallyBreak();
 
     /**
      * {@inheritDoc}

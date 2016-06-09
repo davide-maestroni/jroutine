@@ -230,9 +230,9 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> eventuallyExit() {
+    public StreamChannel<IN, OUT> eventuallyBreak() {
 
-        bind().eventuallyExit();
+        bind().eventuallyBreak();
         return this;
     }
 
@@ -728,22 +728,22 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
 
-        return splitBy(count, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
+        return splitIn(count, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return splitBy(count, buildRoutine(factory));
+        return splitIn(count, buildRoutine(factory));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
@@ -753,10 +753,10 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
-        return splitBy(count, builder.invocationConfiguration()
+        return splitIn(count, builder.invocationConfiguration()
                                      .with(null)
                                      .with(mStreamConfiguration.asInvocationConfiguration())
                                      .apply()

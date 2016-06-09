@@ -26,14 +26,7 @@ package com.github.dm.jrt.core.util;
  */
 public class LocalFence {
 
-    private final ThreadLocal<Count> mCount = new ThreadLocal<Count>() {
-
-        @Override
-        protected Count initialValue() {
-
-            return new Count();
-        }
-    };
+    private final LocalCount mCount = new LocalCount();
 
     /**
      * Enters the fence on the current thread.
@@ -62,7 +55,7 @@ public class LocalFence {
     }
 
     /**
-     * Local count implementation.
+     * Count implementation.
      */
     private static class Count {
 
@@ -81,6 +74,18 @@ public class LocalFence {
         private void incValue() {
 
             ++mCount;
+        }
+    }
+
+    /**
+     * Local count implementation.
+     */
+    private static class LocalCount extends ThreadLocal<Count> {
+
+        @Override
+        protected Count initialValue() {
+
+            return new Count();
         }
     }
 }

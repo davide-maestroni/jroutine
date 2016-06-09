@@ -35,10 +35,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,8 +48,8 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultIOChannel<DATA> implements IOChannel<DATA> {
 
-    private static final Map<Runner, WeakReference<IORunner>> sRunners =
-            Collections.synchronizedMap(new WeakIdentityHashMap<Runner, WeakReference<IORunner>>());
+    private static final WeakIdentityHashMap<Runner, WeakReference<IORunner>> sRunners =
+            new WeakIdentityHashMap<Runner, WeakReference<IORunner>>();
 
     private static final Runner sSyncRunner = Runners.syncRunner();
 
@@ -69,13 +67,16 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration().apply();
         final Logger logger = invocationConfiguration.newLogger(this);
-        final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
-        final Map<Runner, WeakReference<IORunner>> runners = sRunners;
-        final WeakReference<IORunner> runnerReference = runners.get(runner);
-        IORunner ioRunner = (runnerReference != null) ? runnerReference.get() : null;
-        if (ioRunner == null) {
-            ioRunner = new IORunner(runner);
-            runners.put(runner, new WeakReference<IORunner>(ioRunner));
+        final Runner wrapped = configuration.getRunnerOrElse(Runners.sharedRunner());
+        IORunner ioRunner;
+        synchronized (sRunners) {
+            final WeakIdentityHashMap<Runner, WeakReference<IORunner>> runners = sRunners;
+            final WeakReference<IORunner> runner = runners.get(wrapped);
+            ioRunner = (runner != null) ? runner.get() : null;
+            if (ioRunner == null) {
+                ioRunner = new IORunner(wrapped);
+                runners.put(wrapped, new WeakReference<IORunner>(ioRunner));
+            }
         }
 
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
@@ -367,6 +368,12 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         public IORunner(@NotNull final Runner wrapped) {
 
             super(wrapped);
+        }
+
+        @Override
+        public boolean isExecutionThread() {
+
+            return true;
         }
 
         @Override

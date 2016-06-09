@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.core.util.UnitDuration.Condition;
@@ -74,14 +75,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sConsumerMutexes =
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
-    private static final ThreadLocal<Boolean> sInsideInvocation = new ThreadLocal<Boolean>() {
-
-        @Override
-        protected Boolean initialValue() {
-
-            return false;
-        }
-    };
+    private static final LocalFence sInvocationFence = new LocalFence();
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -410,7 +404,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void enterInvocation() {
 
-        sInsideInvocation.set(true);
+        sInvocationFence.enter();
     }
 
     /**
@@ -418,7 +412,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     void exitInvocation() {
 
-        sInsideInvocation.set(false);
+        sInvocationFence.exit();
     }
 
     /**
@@ -465,7 +459,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void checkCanWait() {
 
-        if (sInsideInvocation.get() || Runner.isManagedThread()) {
+        if (sInvocationFence.isInside() || Runner.isManagedThread()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on a runner thread: " + Thread.currentThread()
                             + "\nTry binding the output channel to another channel or an output "

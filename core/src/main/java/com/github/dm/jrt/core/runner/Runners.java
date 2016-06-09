@@ -129,7 +129,7 @@ public class Runners {
     @NotNull
     public static Runner scheduledRunner(@NotNull final ScheduledExecutorService service) {
 
-        return new ScheduledRunner(service);
+        return ScheduledRunner.getInstance(service);
     }
 
     /**
@@ -198,7 +198,7 @@ public class Runners {
     }
 
     /**
-     * Returns a runner employing a shared synchronous runner, when executions are enqueued with a 0
+     * Returns a runner employing a shared synchronous one when executions are enqueued with a 0
      * delay on one of the managed threads.
      *
      * @param wrapped the wrapped instance.
@@ -207,6 +207,6 @@ public class Runners {
     @NotNull
     public static Runner zeroDelayRunner(@NotNull final Runner wrapped) {
 
-        return new ZeroDelayRunner(wrapped);
+        return ZeroDelayRunner.getInstance(wrapped);
     }
 }

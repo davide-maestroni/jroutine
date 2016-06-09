@@ -771,7 +771,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
                                    public Object apply(final String s) {
 
-                                       return LoaderStreamsCompat.streamOf(s)
+                                       return LoaderStreamsCompat.streamOf()
                                                                  .with(loaderFrom(activity))
                                                                  .invocationConfiguration()
                                                                  .withRunner(runner1)

@@ -37,6 +37,7 @@ import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -87,14 +88,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                 }
             };
 
-    private static final ThreadLocal<Boolean> sInsideNew = new ThreadLocal<Boolean>() {
-
-        @Override
-        protected Boolean initialValue() {
-
-            return false;
-        }
-    };
+    private static final LocalFence sNewChannelFence = new LocalFence();
 
     private static final SequentialRunner sSequentialRunner = new SequentialRunner();
 
@@ -156,7 +150,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final OutputChannel<IN> sourceChannel,
             @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
 
-        if (!sInsideNew.get()) {
+        if (!sNewChannelFence.isInside()) {
             throw new IllegalStateException(
                     "the constructor can be called only inside the invocation of the "
                             + "'newChannel()' method");
@@ -994,14 +988,14 @@ public abstract class AbstractStreamChannel<IN, OUT>
             mIsConcat = true;
         }
 
-        final ThreadLocal<Boolean> isInside = sInsideNew;
-        isInside.set(true);
+        final LocalFence fence = sNewChannelFence;
+        fence.enter();
         try {
             return ConstantConditions.notNull("new stream channel instance",
                     newChannel(streamConfiguration, mSourceChannel, getBindingFunction()));
 
         } finally {
-            isInside.set(false);
+            fence.exit();
         }
     }
 
@@ -1129,8 +1123,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
             mIsConcat = true;
         }
 
-        final ThreadLocal<Boolean> isInside = sInsideNew;
-        isInside.set(true);
+        final LocalFence fence = sNewChannelFence;
+        fence.enter();
         try {
             final StreamConfiguration streamConfiguration = mStreamConfiguration;
             return ConstantConditions.notNull("new stream channel instance", newChannel(
@@ -1139,7 +1133,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     bindingFunction));
 
         } finally {
-            isInside.set(false);
+            fence.exit();
         }
     }
 

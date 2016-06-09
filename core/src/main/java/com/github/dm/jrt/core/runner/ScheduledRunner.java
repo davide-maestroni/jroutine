@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -35,6 +36,9 @@ import java.util.concurrent.TimeUnit;
  */
 class ScheduledRunner extends AsyncRunner {
 
+    private static final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>
+            sRunners = new WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>();
+
     private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
             new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
 
@@ -48,9 +52,33 @@ class ScheduledRunner extends AsyncRunner {
      *
      * @param service the executor service.
      */
-    ScheduledRunner(@NotNull final ScheduledExecutorService service) {
+    private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
 
         mService = ConstantConditions.notNull("executor service", service);
+    }
+
+    /**
+     * Returns a runner instance employing the specified service.
+     *
+     * @param service the executor service.
+     * @return the runner.
+     */
+    @NotNull
+    static ScheduledRunner getInstance(@NotNull final ScheduledExecutorService service) {
+
+        ScheduledRunner scheduledRunner;
+        synchronized (sRunners) {
+            final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>> runners =
+                    sRunners;
+            final WeakReference<ScheduledRunner> runner = runners.get(service);
+            scheduledRunner = (runner != null) ? runner.get() : null;
+            if (scheduledRunner == null) {
+                scheduledRunner = new ScheduledRunner(service);
+                runners.put(service, new WeakReference<ScheduledRunner>(scheduledRunner));
+            }
+        }
+
+        return scheduledRunner;
     }
 
     @Override

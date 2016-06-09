@@ -43,7 +43,28 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     ScheduledThreadExecutor(@NotNull final ExecutorService service) {
 
         super(1);
-        mExecutor = service;
+        mExecutor = ConstantConditions.notNull("executor service", service);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return mExecutor.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+
+        final ScheduledThreadExecutor that = (ScheduledThreadExecutor) o;
+        return mExecutor.equals(that.mExecutor);
     }
 
     @NotNull

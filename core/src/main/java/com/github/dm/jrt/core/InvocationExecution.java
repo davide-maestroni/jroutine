@@ -100,8 +100,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             resultChannel.stopWaitingInvocation();
             final int count = mExecutionCount;
             mExecutionCount = 1;
+            resultChannel.enterInvocation();
             try {
-                resultChannel.enterInvocation();
                 for (int i = 0; i < count; ++i) {
                     execute(invocation);
                 }
@@ -257,8 +257,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 final InputIterator<IN> inputIterator = mInputIterator;
                 final InvocationManager<IN, OUT> manager = mInvocationManager;
                 final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+                resultChannel.enterInvocation();
                 try {
-                    resultChannel.enterInvocation();
                     final RoutineException exception = inputIterator.getAbortException();
                     mLogger.dbg(exception, "aborting invocation");
                     try {

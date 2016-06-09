@@ -76,9 +76,7 @@ public class RunnerTest {
     public void testNullPriorityRunner() {
 
         try {
-
             Runners.priorityRunner(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -97,9 +95,7 @@ public class RunnerTest {
     public void testPoolRunnerError() {
 
         try {
-
             Runners.poolRunner(-1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -198,9 +194,7 @@ public class RunnerTest {
     public void testRunnerDecoratorError() {
 
         try {
-
             new RunnerDecorator(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -219,11 +213,11 @@ public class RunnerTest {
     @Test
     public void testScheduledRunner() throws InterruptedException {
 
-        testRunner(new ScheduledRunner(Executors.newSingleThreadScheduledExecutor()));
+        testRunner(ScheduledRunner.getInstance(Executors.newSingleThreadScheduledExecutor()));
         testRunner(Runners.scheduledRunner(Executors.newCachedThreadPool()));
         testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
         testRunner(new RunnerDecorator(
-                new ScheduledRunner(Executors.newSingleThreadScheduledExecutor())));
+                ScheduledRunner.getInstance(Executors.newSingleThreadScheduledExecutor())));
     }
 
     @Test
@@ -231,9 +225,7 @@ public class RunnerTest {
     public void testScheduledRunnerError() {
 
         try {
-
-            new ScheduledRunner(null);
-
+            ScheduledRunner.getInstance(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -241,9 +233,7 @@ public class RunnerTest {
         }
 
         try {
-
             Runners.scheduledRunner(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -326,9 +316,7 @@ public class RunnerTest {
     public void testThrottlingRunnerError() {
 
         try {
-
             new ThrottlingRunner(null, 5);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -336,9 +324,7 @@ public class RunnerTest {
         }
 
         try {
-
             Runners.throttlingRunner(null, 5);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -346,9 +332,7 @@ public class RunnerTest {
         }
 
         try {
-
             new ThrottlingRunner(Runners.sharedRunner(), 0);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -356,9 +340,7 @@ public class RunnerTest {
         }
 
         try {
-
             Runners.throttlingRunner(Runners.sharedRunner(), -1);
-
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -369,9 +351,9 @@ public class RunnerTest {
     @Test
     public void testZeroDelayRunner() throws InterruptedException {
 
-        testRunner(new ZeroDelayRunner(Runners.sharedRunner()));
+        testRunner(ZeroDelayRunner.getInstance(Runners.sharedRunner()));
         testRunner(Runners.zeroDelayRunner(Runners.poolRunner()));
-        testRunner(new RunnerDecorator(new ZeroDelayRunner(Runners.sharedRunner())));
+        testRunner(new RunnerDecorator(ZeroDelayRunner.getInstance(Runners.sharedRunner())));
     }
 
     @Test
@@ -430,7 +412,7 @@ public class RunnerTest {
     public void testZeroDelayRunnerError() {
 
         try {
-            new ZeroDelayRunner(null);
+            ZeroDelayRunner.getInstance(null);
             fail();
 
         } catch (final NullPointerException ignored) {

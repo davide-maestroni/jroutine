@@ -20,15 +20,19 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Runner decorator employing a shared synchronous runner, when executions are enqueued with a 0
+ * Runner decorator employing a shared synchronous runner when executions are enqueued with a 0
  * delay on one of the managed threads.
  * <p>
  * Created by davide-maestroni on 04/09/2016.
  */
 class ZeroDelayRunner extends RunnerDecorator {
+
+    private static final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> sRunners =
+            new WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>>();
 
     private static final QueuedRunner sSyncRunner = new QueuedRunner();
 
@@ -40,9 +44,36 @@ class ZeroDelayRunner extends RunnerDecorator {
      *
      * @param wrapped the wrapped instance.
      */
-    ZeroDelayRunner(@NotNull final Runner wrapped) {
+    private ZeroDelayRunner(@NotNull final Runner wrapped) {
 
         super(wrapped);
+    }
+
+    /**
+     * Returns an instance wrapping the specified runner.
+     *
+     * @param wrapped the wrapped instance.
+     * @return the zero delay runner.
+     */
+    @NotNull
+    static ZeroDelayRunner getInstance(@NotNull final Runner wrapped) {
+
+        if (wrapped instanceof ZeroDelayRunner) {
+            return (ZeroDelayRunner) wrapped;
+        }
+
+        ZeroDelayRunner zeroDelayRunner;
+        synchronized (sRunners) {
+            final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> runners = sRunners;
+            final WeakReference<ZeroDelayRunner> runner = runners.get(wrapped);
+            zeroDelayRunner = (runner != null) ? runner.get() : null;
+            if (zeroDelayRunner == null) {
+                zeroDelayRunner = new ZeroDelayRunner(wrapped);
+                runners.put(wrapped, new WeakReference<ZeroDelayRunner>(zeroDelayRunner));
+            }
+        }
+
+        return zeroDelayRunner;
     }
 
     @Override

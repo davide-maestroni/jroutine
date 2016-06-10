@@ -459,7 +459,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void checkCanWait() {
 
-        if (sInvocationFence.isInside() || Runner.isManagedThread()) {
+        if (sInvocationFence.isInside()) {
+            throw new ExecutionDeadlockException(
+                    "cannot wait inside an invocation: " + Thread.currentThread()
+                            + "\nTry binding the output channel to another channel or an output "
+                            + "consumer");
+        }
+
+        if (Runner.isManagedThread()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on a runner thread: " + Thread.currentThread()
                             + "\nTry binding the output channel to another channel or an output "

@@ -93,7 +93,8 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
                                                                      .withMaxInstances(1)
                                                                      .withCoreInstances(1)
                                                                      .withOutputTimeoutAction(
-                                                                             TimeoutActionType.BREAK)
+                                                                             TimeoutActionType
+                                                                                     .BREAK)
                                                                      .withLogLevel(Level.DEBUG)
                                                                      .withLog(new NullLog())
                                                                      .apply()

@@ -96,9 +96,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
                 public LoaderStreamChannel<IN, OUT> apply(
                         @NotNull final LoaderConfiguration configuration) {
 
-                    return (LoaderStreamChannel<IN, OUT>) newChannel(
-                            newConfiguration(configuration,
-                                    mStreamConfiguration.getCurrentLoaderConfiguration()));
+                    return (LoaderStreamChannel<IN, OUT>) newChannel(newConfiguration(configuration,
+                            mStreamConfiguration.getCurrentLoaderConfiguration()));
                 }
             };
 
@@ -111,10 +110,9 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
                         @NotNull final InvocationConfiguration configuration) {
 
                     final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-                    return (LoaderStreamChannel<IN, OUT>) newChannel(
-                            newConfiguration(configuration,
-                                    streamConfiguration.getCurrentConfiguration(),
-                                    streamConfiguration.getInvocationMode()));
+                    return (LoaderStreamChannel<IN, OUT>) newChannel(newConfiguration(configuration,
+                            streamConfiguration.getCurrentConfiguration(),
+                            streamConfiguration.getInvocationMode()));
                 }
             };
 

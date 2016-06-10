@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.core.runner;
 
 import android.os.Handler;
 
+import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.ExecutionDecorator;
-import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

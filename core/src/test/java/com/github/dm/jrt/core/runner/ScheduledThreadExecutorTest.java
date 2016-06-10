@@ -19,9 +19,11 @@ package com.github.dm.jrt.core.runner;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -30,6 +32,20 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 05/24/2016.
  */
 public class ScheduledThreadExecutorTest {
+
+    @Test
+    public void testEquals() {
+
+        final ExecutorService pool = Executors.newCachedThreadPool();
+        final ScheduledThreadExecutor executor = new ScheduledThreadExecutor(pool);
+        assertThat(executor).isEqualTo(executor);
+        assertThat(executor).isNotEqualTo(null);
+        assertThat(executor).isNotEqualTo("test");
+        assertThat(executor).isNotEqualTo(
+                new ScheduledThreadExecutor(Executors.newCachedThreadPool()));
+        assertThat(executor).isEqualTo(new ScheduledThreadExecutor(pool));
+        assertThat(executor.hashCode()).isEqualTo(new ScheduledThreadExecutor(pool).hashCode());
+    }
 
     @Test
     public void testUnsupportedMethods() {

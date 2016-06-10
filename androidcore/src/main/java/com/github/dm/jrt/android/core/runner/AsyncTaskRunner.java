@@ -22,8 +22,8 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 
-import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.AsyncRunner;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

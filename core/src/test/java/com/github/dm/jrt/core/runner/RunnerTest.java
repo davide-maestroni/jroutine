@@ -27,6 +27,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -213,11 +214,14 @@ public class RunnerTest {
     @Test
     public void testScheduledRunner() throws InterruptedException {
 
-        testRunner(ScheduledRunner.getInstance(Executors.newSingleThreadScheduledExecutor()));
+        final ScheduledExecutorService executorService =
+                Executors.newSingleThreadScheduledExecutor();
+        final ScheduledRunner instance = ScheduledRunner.getInstance(executorService);
+        assertThat(instance).isSameAs(ScheduledRunner.getInstance(executorService));
+        testRunner(instance);
         testRunner(Runners.scheduledRunner(Executors.newCachedThreadPool()));
-        testRunner(Runners.scheduledRunner(Executors.newSingleThreadScheduledExecutor()));
-        testRunner(new RunnerDecorator(
-                ScheduledRunner.getInstance(Executors.newSingleThreadScheduledExecutor())));
+        testRunner(Runners.scheduledRunner(executorService));
+        testRunner(new RunnerDecorator(instance));
     }
 
     @Test
@@ -351,9 +355,12 @@ public class RunnerTest {
     @Test
     public void testZeroDelayRunner() throws InterruptedException {
 
-        testRunner(ZeroDelayRunner.getInstance(Runners.sharedRunner()));
+        final ZeroDelayRunner instance = ZeroDelayRunner.getInstance(Runners.sharedRunner());
+        assertThat(instance).isSameAs(ZeroDelayRunner.getInstance(Runners.sharedRunner()));
+        assertThat(instance).isSameAs(ZeroDelayRunner.getInstance(instance));
+        testRunner(instance);
         testRunner(Runners.zeroDelayRunner(Runners.poolRunner()));
-        testRunner(new RunnerDecorator(ZeroDelayRunner.getInstance(Runners.sharedRunner())));
+        testRunner(new RunnerDecorator(instance));
     }
 
     @Test

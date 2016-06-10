@@ -121,6 +121,7 @@ public abstract class Runner {
      * <br>
      * A synchronous runner implementation will always return false.
      *
+     * @param thread the thread.
      * @return whether the thread is managed by the runner.
      */
     public abstract boolean isManagedThread(@NotNull Thread thread);

@@ -35,9 +35,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private IOChannel<IN> mInputChannel;
+    private IOChannel<IN> mInputChannel = null;
 
-    private OutputChannel<OUT> mOutputChannel;
+    private OutputChannel<OUT> mOutputChannel = null;
 
     @Override
     public final void onAbort(@NotNull final RoutineException reason) {

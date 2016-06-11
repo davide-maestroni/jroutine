@@ -46,7 +46,7 @@ public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN
     }
 
     @Override
-    public final void onInitialize() {
+    public final void onInitialize() throws Exception {
 
         final IOChannel<IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
         mOutputChannel = ConstantConditions.notNull("stream channel", onInputs(inputChannel));
@@ -81,7 +81,9 @@ public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN
      *
      * @param channel the input channel.
      * @return the output channel.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract OutputChannel<OUT> onInputs(@NotNull OutputChannel<IN> channel);
+    protected abstract OutputChannel<OUT> onInputs(@NotNull OutputChannel<IN> channel) throws
+            Exception;
 }

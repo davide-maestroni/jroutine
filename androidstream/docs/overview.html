@@ -83,7 +83,8 @@
                              .factoryId(11)
                              .map(loadUri())
                              .onError(showToast(this))
-                             .onOutput(showImage(imageView));
+                             .onOutput(showImage(imageView))
+                             .start();
             }
         }
     </code>

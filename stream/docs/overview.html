@@ -49,7 +49,6 @@
                                           .sequential()
                                           .map(Float.class::cast)
                                           .map(Math::sqrt)
-                                          .mapOn(null)
                                           .afterMax(seconds(1))
                                           .next();
                 System.out.println(rms);

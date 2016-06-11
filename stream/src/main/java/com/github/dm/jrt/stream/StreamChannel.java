@@ -360,7 +360,23 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> asyncOn(@Nullable Runner runner);
+    StreamChannel<IN, OUT> async(@Nullable Runner runner);
+
+    /**
+     * Short for {@code async(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
+     * <br>
+     * This method is useful to easily make the stream run on the specified runner.
+     * <p>
+     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
+     * the output data through the specified runner.
+     *
+     * @param runner the runner instance.
+     * @return the new stream instance.
+     * @see #async(Runner)
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> asyncMap(@Nullable Runner runner);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -693,22 +709,6 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
-
-    /**
-     * Short for {@code asyncOn(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
-     * <br>
-     * This method is useful to easily make the stream run on the specified runner.
-     * <p>
-     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-     * the output data through the specified runner.
-     *
-     * @param runner the runner instance.
-     * @return the new stream instance.
-     * @see #asyncOn(Runner)
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> mapOn(@Nullable Runner runner);
 
     /**
      * Concatenates a consumer handling invocation exceptions.

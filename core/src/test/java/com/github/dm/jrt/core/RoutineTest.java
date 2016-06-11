@@ -21,12 +21,12 @@ import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
+import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -2350,7 +2350,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
     }
@@ -2726,7 +2726,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2736,7 +2736,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2747,7 +2747,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2757,7 +2757,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2767,7 +2767,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2781,7 +2781,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2791,7 +2791,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2802,7 +2802,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2812,7 +2812,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -2822,7 +2822,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 

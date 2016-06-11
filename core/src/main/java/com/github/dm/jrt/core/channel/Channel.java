@@ -100,6 +100,9 @@ public interface Channel {
          * <p>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
          * abortion will not prevent the invocation from completing, as pending input data do.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @param delay the delay.
          * @return this channel.
@@ -114,6 +117,9 @@ public interface Channel {
          * <p>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
          * abortion will not prevent the invocation from completing, as pending input data do.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @param delay    the delay value.
          * @param timeUnit the delay time unit.
@@ -128,6 +134,9 @@ public interface Channel {
 
         /**
          * Tells the channel to not delay the transfer of data.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
@@ -141,6 +150,9 @@ public interface Channel {
          * pass methods.
          * <p>
          * By default no particular order is applied.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
@@ -158,6 +170,9 @@ public interface Channel {
          * dedicated runner handles the specific execution.
          * <p>
          * This is the default behavior.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
@@ -230,6 +245,9 @@ public interface Channel {
          * to be available.
          * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @param timeout the maximum timeout.
          * @return this channel.
@@ -242,6 +260,9 @@ public interface Channel {
          * to be available.
          * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @param timeout  the maximum timeout value.
          * @param timeUnit the timeout time unit.
@@ -259,15 +280,14 @@ public interface Channel {
          * invocation completes or is aborted, or the timeout elapses.
          *
          * @return the list of results.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -288,15 +308,14 @@ public interface Channel {
          *
          * @param results the collection to fill.
          * @return this channel.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -353,8 +372,12 @@ public interface Channel {
          * Tells the channel to abort the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
          * <p>
-         * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException} exception will be thrown.
+         * By default an
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+         * exception will be thrown.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @see #afterMax(UnitDuration)
@@ -371,8 +394,12 @@ public interface Channel {
          * Tells the channel to abort the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
          * <p>
-         * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException} exception will be thrown.
+         * By default an
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+         * exception will be thrown.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @param reason the throwable object identifying the reason of the invocation abortion.
          * @return this channel.
@@ -390,8 +417,12 @@ public interface Channel {
          * Tells the channel to break the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
          * <p>
-         * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException} exception will be thrown.
+         * By default an
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+         * exception will be thrown.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @see #afterMax(UnitDuration)
@@ -406,11 +437,14 @@ public interface Channel {
 
         /**
          * Tells the channel to throw an
-         * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException} in case, after a read method is invoked, no result is
-         * available before the timeout has elapsed.
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException} in
+         * case, after a read method is invoked, no result is available before the timeout has
+         * elapsed.
          * <p>
          * This is the default behavior.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          * @see #afterMax(UnitDuration)
@@ -458,15 +492,14 @@ public interface Channel {
          * available, the routine invocation completes or is aborted, or the timeout elapses.
          *
          * @return whether at least one result is available.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -484,21 +517,20 @@ public interface Channel {
          * available, the routine invocation completes or is aborted, or the timeout elapses.
          *
          * @return the first available result.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
-         * @throws java.util.NoSuchElementException                         if no output is
-         *                                                                  available (it might be
-         *                                                                  thrown also in the case
-         *                                                                  the read timeout elapses
-         *                                                                  and no timeout exception
-         *                                                                  is set to be thrown).
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
+         * @throws java.util.NoSuchElementException                      if no output is
+         *                                                               available (it might be
+         *                                                               thrown also in the case the
+         *                                                               read timeout elapses and no
+         *                                                               timeout exception is set to
+         *                                                               be thrown).
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -513,6 +545,9 @@ public interface Channel {
          * Tells the channel to not wait for results to be available.
          * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
+         * <p>
+         * Note that the implementing class should ensure that calls of this method from different
+         * threads will not interfere with each others.
          *
          * @return this channel.
          */
@@ -538,15 +573,14 @@ public interface Channel {
          *
          * @param count the number of outputs to read.
          * @return the first {@code count} available results.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -569,21 +603,20 @@ public interface Channel {
          *
          * @param output the default output to return.
          * @return the first available result.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
-         * @throws java.util.NoSuchElementException                         if no output is
-         *                                                                  available (it might be
-         *                                                                  thrown also in the case
-         *                                                                  the read timeout elapses
-         *                                                                  and no timeout exception
-         *                                                                  is set to be thrown).
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
+         * @throws java.util.NoSuchElementException                      if no output is
+         *                                                               available (it might be
+         *                                                               thrown also in the case the
+         *                                                               read timeout elapses and no
+         *                                                               timeout exception is set to
+         *                                                               be thrown).
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -604,15 +637,14 @@ public interface Channel {
          *
          * @param count the number of outputs to skip.
          * @return this channel.
-         * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
-         *                                                                  throw an exception when
-         *                                                                  the timeout elapses.
-         * @throws com.github.dm.jrt.core.error.RoutineException            if the execution has
-         *                                                                  been aborted.
-         * @throws java.lang.IllegalStateException                          if this channel is
-         *                                                                  already bound to a
-         *                                                                  consumer or another
-         *                                                                  channel.
+         * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to
+         *                                                               throw an exception when the
+         *                                                               timeout elapses.
+         * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+         *                                                               aborted.
+         * @throws java.lang.IllegalStateException                       if this channel is already
+         *                                                               bound to a consumer or
+         *                                                               another channel.
          * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()

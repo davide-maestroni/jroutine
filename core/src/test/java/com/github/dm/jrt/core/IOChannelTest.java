@@ -18,8 +18,8 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.DeadlockException;
@@ -118,7 +118,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -141,7 +141,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -164,7 +164,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -187,7 +187,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -307,7 +307,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -330,7 +330,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -370,7 +370,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -393,7 +393,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -540,7 +540,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -563,7 +563,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 
@@ -696,7 +696,7 @@ public class IOChannelTest {
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
     }

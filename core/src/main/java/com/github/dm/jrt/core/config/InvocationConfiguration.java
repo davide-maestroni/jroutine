@@ -474,8 +474,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * Throw exception.
          * <br>
          * If no result is available after the specified timeout, the called method will throw an
-         * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException}.
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
          */
         THROW,
         /**

@@ -515,7 +515,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return data.sum / data.count;
                                     }
                                 })
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(LoaderStreams.streamOf()
@@ -555,7 +555,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return data.sum / data.count;
                                     }
                                 })
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(LoaderStreams.streamOf()
@@ -595,7 +595,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return data.sum / data.count;
                                     }
                                 })
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
     }
@@ -2022,25 +2022,25 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
                                 .with(loaderFrom(getActivity()))
                                 .invocationMode(InvocationMode.ASYNC)
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
                                 .with(loaderFrom(getActivity()))
                                 .invocationMode(InvocationMode.PARALLEL)
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
                                 .with(loaderFrom(getActivity()))
                                 .invocationMode(InvocationMode.SYNC)
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
                                 .with(loaderFrom(getActivity()))
                                 .invocationMode(InvocationMode.SERIAL)
-                                .mapOn(null)
+                                .asyncMap(null)
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2", "test3");
     }

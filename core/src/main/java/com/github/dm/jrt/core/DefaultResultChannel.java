@@ -18,9 +18,9 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
+import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
 /**
@@ -82,8 +83,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private final SimpleQueue<WrappedExecution> mExecutionQueue =
             new SimpleQueue<WrappedExecution>();
 
-    private final UnitDuration mExecutionTimeout;
-
     private final AbortHandler mHandler;
 
     private final Condition mHasOutputs;
@@ -99,6 +98,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private final int mOutputLimit;
 
     private final NestedQueue<Object> mOutputQueue;
+
+    private final UnitDuration mOutputTimeout;
 
     private final Runner mRunner;
 
@@ -150,7 +151,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mHandler = ConstantConditions.notNull("abort handler", handler);
         mRunner = ConstantConditions.notNull("runner instance", runner);
         mResultOrder = configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY);
-        mExecutionTimeout = configuration.getOutputTimeoutOrElse(zero());
+        mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
         mTimeoutActionType = configuration.getOutputTimeoutActionOrElse(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
         mOutputBackoff = configuration.getOutputBackoffOrElse(Backoffs.zeroDelay());
@@ -423,17 +424,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     @NotNull
     OutputChannel<OUT> getOutput() {
 
-        final TimeoutActionType action = mTimeoutActionType;
-        final OutputChannel<OUT> outputChannel =
-                new DefaultOutputChannel().afterMax(mExecutionTimeout);
-        if (action == TimeoutActionType.BREAK) {
-            outputChannel.eventuallyBreak();
-
-        } else if (action == TimeoutActionType.ABORT) {
-            outputChannel.eventuallyAbort();
-        }
-
-        return outputChannel;
+        return new DefaultOutputChannel(mOutputTimeout, mTimeoutActionType);
     }
 
     /**
@@ -619,7 +610,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             } else if (timeout == 0) {
                 logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit, timeoutAction);
                 if (timeoutAction == TimeoutActionType.THROW) {
-                    throw new ExecutionTimeoutException(
+                    throw new OutputTimeoutException(
                             "timeout while waiting to know if more outputs are coming [" + timeout
                                     + " " + timeUnit + "]");
 
@@ -657,7 +648,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
-                        throw new ExecutionTimeoutException(
+                        throw new OutputTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
                                         + timeout + " " + timeUnit + "]");
 
@@ -734,7 +725,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
-                        throw new ExecutionTimeoutException(
+                        throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");
                     }
@@ -771,7 +762,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
-                        throw new ExecutionTimeoutException(
+                        throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");
                     }
@@ -979,31 +970,38 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      */
     private class DefaultOutputChannel implements OutputChannel<OUT> {
 
+        private final LocalValue<UnitDuration> mOutputTimeout;
+
         private final Logger mSubLogger = mLogger.subContextLogger(this);
 
-        private long mExecutionTimeout = 0;
+        private final LocalValue<TimeoutActionType> mTimeoutActionType;
 
-        private TimeUnit mExecutionTimeoutUnit = TimeUnit.MILLISECONDS;
+        private final LocalValue<Throwable> mTimeoutException = new LocalValue<Throwable>(null);
 
-        private TimeoutActionType mTimeoutActionType = TimeoutActionType.THROW;
+        /**
+         * Constructor.
+         *
+         * @param timeout       the execution timeout.
+         * @param timeoutAction the timeout action.
+         */
+        private DefaultOutputChannel(@NotNull final UnitDuration timeout,
+                @NotNull final TimeoutActionType timeoutAction) {
 
-        private Throwable mTimeoutException;
+            mOutputTimeout = new LocalValue<UnitDuration>(timeout);
+            mTimeoutActionType = new LocalValue<TimeoutActionType>(timeoutAction);
+        }
 
         @NotNull
         public OutputChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
-            return afterMax(timeout.value, timeout.unit);
+            mOutputTimeout.set(ConstantConditions.notNull("output timeout", timeout));
+            return this;
         }
 
         @NotNull
         public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-            synchronized (mMutex) {
-                mExecutionTimeout = ConstantConditions.notNegative("output timeout", timeout);
-                mExecutionTimeoutUnit = ConstantConditions.notNull("output timeout unit", timeUnit);
-            }
-
-            return this;
+            return afterMax(fromUnit(timeout, timeUnit));
         }
 
         @NotNull
@@ -1051,62 +1049,42 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @NotNull
         public Iterator<OUT> eventualIterator() {
 
-            final long timeout;
-            final TimeUnit timeUnit;
-            final TimeoutActionType timeoutAction;
-            final Throwable timeoutException;
             synchronized (mMutex) {
                 verifyBound();
-                timeout = mExecutionTimeout;
-                timeUnit = mExecutionTimeoutUnit;
-                timeoutAction = mTimeoutActionType;
-                timeoutException = mTimeoutException;
             }
 
-            return new EventualIterator(timeout, timeUnit, timeoutAction, timeoutException);
+            final UnitDuration timeout = mOutputTimeout.get();
+            return new EventualIterator(timeout.value, timeout.unit, mTimeoutActionType.get(),
+                    mTimeoutException.get());
         }
 
         @NotNull
         public OutputChannel<OUT> eventuallyAbort() {
 
-            synchronized (mMutex) {
-                mTimeoutActionType = TimeoutActionType.ABORT;
-                mTimeoutException = null;
-            }
-
-            return this;
+            return eventuallyAbort(null);
         }
 
         @NotNull
         public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-            synchronized (mMutex) {
-                mTimeoutActionType = TimeoutActionType.ABORT;
-                mTimeoutException = reason;
-            }
-
+            mTimeoutActionType.set(TimeoutActionType.ABORT);
+            mTimeoutException.set(reason);
             return this;
         }
 
         @NotNull
         public OutputChannel<OUT> eventuallyBreak() {
 
-            synchronized (mMutex) {
-                mTimeoutActionType = TimeoutActionType.BREAK;
-                mTimeoutException = null;
-            }
-
+            mTimeoutActionType.set(TimeoutActionType.BREAK);
+            mTimeoutException.set(null);
             return this;
         }
 
         @NotNull
         public OutputChannel<OUT> eventuallyThrow() {
 
-            synchronized (mMutex) {
-                mTimeoutActionType = TimeoutActionType.THROW;
-                mTimeoutException = null;
-            }
-
+            mTimeoutActionType.set(TimeoutActionType.THROW);
+            mTimeoutException.set(null);
             return this;
         }
 
@@ -1118,23 +1096,23 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     return mAbortException;
                 }
 
-                final long executionTimeout = mExecutionTimeout;
-                if (executionTimeout > 0) {
+                final UnitDuration outputTimeout = mOutputTimeout.get();
+                final long timeout = outputTimeout.value;
+                if (timeout > 0) {
                     checkCanWait();
                 }
 
-                final TimeUnit executionTimeoutUnit = mExecutionTimeoutUnit;
+                final TimeUnit timeoutUnit = outputTimeout.unit;
                 final boolean isDone;
                 try {
-                    isDone = UnitDuration.waitTrue(executionTimeout, executionTimeoutUnit, mMutex,
-                            new Condition() {
+                    isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
 
-                                public boolean isTrue() {
+                        public boolean isTrue() {
 
-                                    return mState.isDone() || (mAbortException != null)
-                                            || mIsWaitingInvocation;
-                                }
-                            });
+                            return mState.isDone() || (mAbortException != null)
+                                    || mIsWaitingInvocation;
+                        }
+                    });
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);
@@ -1145,8 +1123,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 if (!isDone) {
-                    mSubLogger.wrn("waiting error timeout: [%d %s]", executionTimeout,
-                            executionTimeoutUnit);
+                    mSubLogger.wrn("waiting error timeout: [%d %s]", timeout, timeoutUnit);
                 }
 
                 return mAbortException;
@@ -1160,22 +1137,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     return true;
                 }
 
-                final long executionTimeout = mExecutionTimeout;
-                if (executionTimeout > 0) {
+                final UnitDuration outputTimeout = mOutputTimeout.get();
+                final long timeout = outputTimeout.value;
+                if (timeout > 0) {
                     checkCanWait();
                 }
 
-                final TimeUnit executionTimeoutUnit = mExecutionTimeoutUnit;
+                final TimeUnit timeoutUnit = outputTimeout.unit;
                 final boolean isDone;
                 try {
-                    isDone = UnitDuration.waitTrue(executionTimeout, executionTimeoutUnit, mMutex,
-                            new Condition() {
+                    isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
 
-                                public boolean isTrue() {
+                        public boolean isTrue() {
 
-                                    return mState.isDone() || mIsWaitingInvocation;
-                                }
-                            });
+                            return mState.isDone() || mIsWaitingInvocation;
+                        }
+                    });
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);
@@ -1186,8 +1163,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 if (!isDone) {
-                    mSubLogger.wrn("waiting done timeout: [%d %s]", executionTimeout,
-                            executionTimeoutUnit);
+                    mSubLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
                 }
 
                 return isDone;
@@ -1196,34 +1172,16 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public boolean hasNext() {
 
-            final long timeout;
-            final TimeUnit timeUnit;
-            final TimeoutActionType timeoutAction;
-            final Throwable timeoutException;
-            synchronized (mMutex) {
-                timeout = mExecutionTimeout;
-                timeUnit = mExecutionTimeoutUnit;
-                timeoutAction = mTimeoutActionType;
-                timeoutException = mTimeoutException;
-            }
-
-            return isNextAvailable(timeout, timeUnit, timeoutAction, timeoutException);
+            final UnitDuration outputTimeout = mOutputTimeout.get();
+            return isNextAvailable(outputTimeout.value, outputTimeout.unit,
+                    mTimeoutActionType.get(), mTimeoutException.get());
         }
 
         public OUT next() {
 
-            final long timeout;
-            final TimeUnit timeUnit;
-            final TimeoutActionType timeoutAction;
-            final Throwable timeoutException;
-            synchronized (mMutex) {
-                timeout = mExecutionTimeout;
-                timeUnit = mExecutionTimeoutUnit;
-                timeoutAction = mTimeoutActionType;
-                timeoutException = mTimeoutException;
-            }
-
-            return readNext(timeout, timeUnit, timeoutAction, timeoutException);
+            final UnitDuration outputTimeout = mOutputTimeout.get();
+            return readNext(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
+                    mTimeoutException.get());
         }
 
         @NotNull
@@ -1257,19 +1215,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public OUT nextOrElse(final OUT output) {
 
-            final long timeout;
-            final TimeUnit timeUnit;
-            final TimeoutActionType timeoutAction;
-            final Throwable timeoutException;
-            synchronized (mMutex) {
-                timeout = mExecutionTimeout;
-                timeUnit = mExecutionTimeoutUnit;
-                timeoutAction = mTimeoutActionType;
-                timeoutException = mTimeoutException;
-            }
-
+            final UnitDuration timeout = mOutputTimeout.get();
             try {
-                return readNext(timeout, timeUnit, timeoutAction, timeoutException);
+                return readNext(timeout.value, timeout.unit, mTimeoutActionType.get(),
+                        mTimeoutException.get());
 
             } catch (final NoSuchElementException ignored) {
 
@@ -1282,17 +1231,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> skipNext(final int count) {
 
             if (count > 0) {
-                final long timeout;
-                final TimeUnit timeUnit;
-                final TimeoutActionType timeoutAction;
-                final Throwable timeoutException;
-                synchronized (mMutex) {
-                    timeout = mExecutionTimeout;
-                    timeUnit = mExecutionTimeoutUnit;
-                    timeoutAction = mTimeoutActionType;
-                    timeoutException = mTimeoutException;
-                }
-
+                final UnitDuration outputTimeout = mOutputTimeout.get();
+                final long timeout = outputTimeout.value;
+                final TimeUnit timeoutUnit = outputTimeout.unit;
+                final TimeoutActionType timeoutAction = mTimeoutActionType.get();
+                final Throwable timeoutException = mTimeoutException.get();
                 final Iterator<OUT> iterator = eventualIterator();
                 try {
                     for (int i = 0; i < count; ++i) {
@@ -1300,11 +1243,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     }
 
                 } catch (final NoSuchElementException ignored) {
-                    mSubLogger.wrn("skipping output timeout: [%d %s] => [%s]", timeout, timeUnit,
+                    mSubLogger.wrn("skipping output timeout: [%d %s] => [%s]", timeout, timeoutUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.THROW) {
-                        throw new ExecutionTimeoutException(
-                                "timeout while waiting for outputs [" + timeout + " " + timeUnit
+                        throw new OutputTimeoutException(
+                                "timeout while waiting for outputs [" + timeout + " " + timeoutUnit
                                         + "]");
 
                     } else if (timeoutAction == TimeoutActionType.ABORT) {
@@ -1330,19 +1273,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         @NotNull
         public Iterator<OUT> iterator() {
 
-            final long timeout;
-            final TimeUnit timeUnit;
-            final TimeoutActionType timeoutAction;
-            final Throwable timeoutException;
             synchronized (mMutex) {
                 verifyBound();
-                timeout = mExecutionTimeout;
-                timeUnit = mExecutionTimeoutUnit;
-                timeoutAction = mTimeoutActionType;
-                timeoutException = mTimeoutException;
             }
 
-            return new DefaultIterator(timeout, timeUnit, timeoutAction, timeoutException);
+            final UnitDuration timeout = mOutputTimeout.get();
+            return new DefaultIterator(timeout.value, timeout.unit, mTimeoutActionType.get(),
+                    mTimeoutException.get());
         }
 
         public void remove() {

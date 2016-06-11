@@ -31,7 +31,7 @@ import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
+import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -255,7 +255,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
             fail();
 
-        } catch (final ExecutionTimeoutException ignored) {
+        } catch (final OutputTimeoutException ignored) {
 
         }
 

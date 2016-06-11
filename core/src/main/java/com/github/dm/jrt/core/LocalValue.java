@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.channel;
-
-import com.github.dm.jrt.core.error.TimeoutException;
+package com.github.dm.jrt.core;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating that no result became available before the specific timeout elapsed.
+ * Thread local with an initial immutable value.
  * <p>
- * Created by davide-maestroni on 11/25/2014.
+ * Created by davide-maestroni on 06/11/2016.
+ *
+ * @param <T> the value type.
  */
-public class ExecutionTimeoutException extends TimeoutException {
+class LocalValue<T> extends ThreadLocal<T> {
+
+    private final T mInitialValue;
 
     /**
      * Constructor.
      *
-     * @param message the error message.
+     * @param initialValue the initial value.
      */
-    public ExecutionTimeoutException(@Nullable final String message) {
+    LocalValue(@Nullable final T initialValue) {
 
-        super(message);
+        mInitialValue = initialValue;
+    }
+
+    @Override
+    protected T initialValue() {
+
+        return mInitialValue;
     }
 }

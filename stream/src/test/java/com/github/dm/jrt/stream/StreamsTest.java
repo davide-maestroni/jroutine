@@ -1240,11 +1240,11 @@ public class StreamsTest {
         channel2.close();
 
         assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
-                          .mapOn(null)
+                          .asyncMap(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly("0", "1", "2", "3");
         assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
-                          .mapOn(null)
+                          .asyncMap(null)
                           .afterMax(seconds(1))
                           .all()).containsExactly(0, 1, 2, 3);
     }

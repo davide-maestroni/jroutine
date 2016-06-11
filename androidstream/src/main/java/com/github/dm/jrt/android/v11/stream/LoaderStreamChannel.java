@@ -276,7 +276,18 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> asyncOn(@Nullable Runner runner);
+    LoaderStreamChannel<IN, OUT> async(@Nullable Runner runner);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> asyncMap(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
@@ -437,17 +448,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> mapOn(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}

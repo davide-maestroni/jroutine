@@ -366,9 +366,15 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> asyncOn(@Nullable final Runner runner) {
+    public StreamChannel<IN, OUT> async(@Nullable final Runner runner) {
 
         return async().streamInvocationConfiguration().withRunner(runner).apply();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> asyncMap(@Nullable final Runner runner) {
+
+        return async(runner).map(IdentityInvocation.<OUT>factoryOf());
     }
 
     @NotNull
@@ -514,12 +520,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer) {
 
         return map(consumerMapping(mappingConsumer));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> mapOn(@Nullable final Runner runner) {
-
-        return asyncOn(runner).map(IdentityInvocation.<OUT>factoryOf());
     }
 
     @NotNull

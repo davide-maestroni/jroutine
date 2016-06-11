@@ -365,9 +365,16 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> asyncOn(@Nullable final Runner runner) {
+    public LoaderStreamChannelCompat<IN, OUT> async(@Nullable final Runner runner) {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) super.asyncOn(runner);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.async(runner);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> asyncMap(@Nullable final Runner runner) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.asyncMap(runner);
     }
 
     @NotNull
@@ -528,13 +535,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         checkStatic(wrap(mappingConsumer), mappingConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.mapMore(mappingConsumer);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> mapOn(@Nullable final Runner runner) {
-
-        return (LoaderStreamChannelCompat<IN, OUT>) super.mapOn(runner);
     }
 
     @NotNull

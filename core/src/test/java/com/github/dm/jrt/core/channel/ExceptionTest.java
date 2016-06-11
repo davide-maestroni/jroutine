@@ -48,12 +48,6 @@ public class ExceptionTest {
     }
 
     @Test
-    public void testExecutionTimeoutException() {
-
-        assertThat(new ExecutionTimeoutException("")).hasNoCause();
-    }
-
-    @Test
     public void testInputDeadlockException() {
 
         assertThat(new InputDeadlockException("")).hasNoCause();
@@ -63,5 +57,11 @@ public class ExceptionTest {
     public void testOutputDeadlockException() {
 
         assertThat(new OutputDeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testOutputTimeoutException() {
+
+        assertThat(new OutputTimeoutException("")).hasNoCause();
     }
 }

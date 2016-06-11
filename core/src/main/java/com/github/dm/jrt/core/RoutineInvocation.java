@@ -17,9 +17,6 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -38,15 +35,11 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
+public class RoutineInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
 
     private final InvocationMode mInvocationMode;
 
     private final Routine<IN, OUT> mRoutine;
-
-    private IOChannel<IN> mInputChannel;
-
-    private OutputChannel<OUT> mOutputChannel;
 
     /**
      * Constructor.
@@ -59,8 +52,6 @@ public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         mRoutine = routine;
         mInvocationMode = invocationMode;
-        mInputChannel = null;
-        mOutputChannel = null;
     }
 
     /**
@@ -79,51 +70,20 @@ public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
-    public void onAbort(@NotNull final RoutineException reason) {
-
-        mInputChannel.abort(reason);
-    }
-
     public void onDestroy() {
 
         mRoutine.purge();
     }
 
-    public void onInitialize() {
+    @NotNull
+    @Override
+    protected OutputChannel<OUT> onInputs(@NotNull final OutputChannel<IN> channel) {
 
         final InvocationMode invocationMode = mInvocationMode;
-        final IOChannel<IN> inputChannel = JRoutineCore.io().buildChannel();
-        mInputChannel = inputChannel;
-        mOutputChannel = (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(inputChannel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(inputChannel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(inputChannel)
-                                : mRoutine.serialCall(inputChannel);
-    }
-
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-        final OutputChannel<OUT> outputChannel = mOutputChannel;
-        if (!outputChannel.isBound()) {
-            outputChannel.bind(result);
-        }
-
-        mInputChannel.pass(input);
-    }
-
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        final OutputChannel<OUT> outputChannel = mOutputChannel;
-        if (!outputChannel.isBound()) {
-            outputChannel.bind(result);
-        }
-
-        mInputChannel.close();
-    }
-
-    public void onTerminate() {
-
-        mInputChannel = null;
-        mOutputChannel = null;
+        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
+                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
+                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
+                                : mRoutine.serialCall(channel);
     }
 
     /**

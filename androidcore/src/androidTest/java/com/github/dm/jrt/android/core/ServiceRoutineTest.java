@@ -29,6 +29,7 @@ import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
@@ -39,6 +40,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -429,6 +431,15 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         assertThat(result.skipNext(1).size()).isEqualTo(0);
     }
 
+    public void testTransform() {
+
+        assertThat(JRoutineService.with(serviceFrom(getActivity()))
+                                  .on(factoryOf(TestTransform.class))
+                                  .asyncCall("test1", "test2", "test3")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST1", "TEST2", "TEST3");
+    }
+
     private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
@@ -634,11 +645,38 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
+    private static class TestTransform extends TransformContextInvocation<String, String> {
+
+        @NotNull
+        @Override
+        protected OutputChannel<String> onInputs(@NotNull final OutputChannel<String> channel) {
+
+            return JRoutineCore.on(new UpperCaseInvocation()).asyncCall(channel);
+        }
+    }
+
     private static class TextCommandInvocation extends TemplateContextInvocation<Void, String> {
 
         public void onResult(@NotNull final ResultChannel<String> result) {
 
             result.pass("test1", "test2", "test3");
+        }
+    }
+
+    private static class UpperCaseInvocation extends MappingInvocation<String, String> {
+
+        /**
+         * Constructor.
+         */
+        protected UpperCaseInvocation() {
+
+            super(null);
+        }
+
+        @Override
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+
+            result.pass(input.toUpperCase());
         }
     }
 }

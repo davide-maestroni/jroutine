@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class RoutineInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
+public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
 
     private final InvocationMode mInvocationMode;
 
@@ -77,7 +77,7 @@ public class RoutineInvocation<IN, OUT> extends TransformInvocation<IN, OUT> {
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> onInputs(@NotNull final OutputChannel<IN> channel) {
+    protected OutputChannel<OUT> onChannel(@NotNull final OutputChannel<IN> channel) {
 
         final InvocationMode invocationMode = mInvocationMode;
         return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)

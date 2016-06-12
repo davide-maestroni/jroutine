@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.core;
 import android.content.Context;
 
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.core.TransformInvocation;
+import com.github.dm.jrt.core.StreamInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TransformContextInvocation<IN, OUT> extends TransformInvocation<IN, OUT>
+public abstract class StreamContextInvocation<IN, OUT> extends StreamInvocation<IN, OUT>
         implements ContextInvocation<IN, OUT> {
 
     private Context mContext;

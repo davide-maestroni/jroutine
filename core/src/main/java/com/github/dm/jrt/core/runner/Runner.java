@@ -75,7 +75,7 @@ public abstract class Runner {
     public static boolean isManagedThread() {
 
         final Thread thread = Thread.currentThread();
-        for (final Runner runner : sRunners.keySet()) {
+        for (final Runner runner : sRunners.prune().keySet()) {
             if ((runner != null) && runner.isManagedThread(thread)) {
                 return true;
             }

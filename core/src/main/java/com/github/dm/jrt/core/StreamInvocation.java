@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
     private IOChannel<IN> mInputChannel = null;
 
@@ -49,7 +49,7 @@ public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN
     public final void onInitialize() throws Exception {
 
         final IOChannel<IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
-        mOutputChannel = ConstantConditions.notNull("stream channel", onInputs(inputChannel));
+        mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
     }
 
     @Override
@@ -84,6 +84,6 @@ public abstract class TransformInvocation<IN, OUT> extends TemplateInvocation<IN
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract OutputChannel<OUT> onInputs(@NotNull OutputChannel<IN> channel) throws
+    protected abstract OutputChannel<OUT> onChannel(@NotNull OutputChannel<IN> channel) throws
             Exception;
 }

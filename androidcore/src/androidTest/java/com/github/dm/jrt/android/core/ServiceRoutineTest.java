@@ -645,11 +645,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class TestTransform extends TransformContextInvocation<String, String> {
+    private static class TestTransform extends StreamContextInvocation<String, String> {
 
         @NotNull
         @Override
-        protected OutputChannel<String> onInputs(@NotNull final OutputChannel<String> channel) {
+        protected OutputChannel<String> onChannel(@NotNull final OutputChannel<String> channel) {
 
             return JRoutineCore.on(new UpperCaseInvocation()).asyncCall(channel);
         }

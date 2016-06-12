@@ -35,9 +35,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private IOChannel<IN> mInputChannel = null;
+    private IOChannel<IN> mInputChannel;
 
-    private OutputChannel<OUT> mOutputChannel = null;
+    private OutputChannel<OUT> mOutputChannel;
+
+    /**
+     * Constructor.
+     */
+    public StreamInvocation() {
+
+        mInputChannel = null;
+        mOutputChannel = null;
+    }
 
     @Override
     public final void onAbort(@NotNull final RoutineException reason) {
@@ -55,25 +64,22 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     @Override
     public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-        final OutputChannel<OUT> stream = mOutputChannel;
-        if (!stream.isBound()) {
-            stream.bind(result);
-        }
-
+        bind(result);
         mInputChannel.pass(input);
     }
 
     @Override
     public final void onResult(@NotNull final ResultChannel<OUT> result) {
 
+        bind(result);
         mInputChannel.close();
     }
 
     @Override
     public final void onTerminate() {
 
-        mInputChannel = null;
         mOutputChannel = null;
+        mInputChannel = null;
     }
 
     /**
@@ -86,4 +92,12 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     @NotNull
     protected abstract OutputChannel<OUT> onChannel(@NotNull OutputChannel<IN> channel) throws
             Exception;
+
+    private void bind(@NotNull final ResultChannel<OUT> result) {
+
+        final OutputChannel<OUT> outputChannel = mOutputChannel;
+        if (!outputChannel.isBound()) {
+            outputChannel.bind(result);
+        }
+    }
 }

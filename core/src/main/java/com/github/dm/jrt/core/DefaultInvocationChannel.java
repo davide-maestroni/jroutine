@@ -204,17 +204,17 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     @NotNull
     public InvocationChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
 
-        return after(delay.value, delay.unit);
+        synchronized (mMutex) {
+            mState.after(delay);
+        }
+
+        return this;
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
-        synchronized (mMutex) {
-            mState.after(delay, timeUnit);
-        }
-
-        return this;
+        return after(fromUnit(delay, timeUnit));
     }
 
     @NotNull
@@ -699,7 +699,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     private class ExceptionChannelState extends ResultChannelState {
 
         @Override
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
             throw exception();
         }
@@ -807,7 +807,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 @Nullable final Throwable reason) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
-            if (delay.value == 0) {
+            if (delay.isZero()) {
                 mLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
                 mState = new AbortedChannelState();
@@ -821,12 +821,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         /**
          * Called to set the specified input delay.
          *
-         * @param delay    the delay value.
-         * @param timeUnit the delay unit.
+         * @param delay the input delay.
          */
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
-            mInputDelay.set(fromUnit(delay, timeUnit));
+            mInputDelay.set(ConstantConditions.notNull("input delay", delay));
         }
 
         /**
@@ -1060,7 +1059,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;
             checkMaxSize();
-            if (delay.value == 0) {
+            if (delay.isZero()) {
                 mInputQueue.addAll(list);
                 if (!mIsPendingExecution) {
                     ++mPendingExecutionCount;
@@ -1090,7 +1089,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
             checkMaxSize();
-            if (delay.value == 0) {
+            if (delay.isZero()) {
                 mInputQueue.add(input);
                 if (!mIsPendingExecution) {
                     ++mPendingExecutionCount;
@@ -1128,7 +1127,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             checkMaxSize();
             final ArrayList<IN> list = new ArrayList<IN>(size);
             Collections.addAll(list, inputs);
-            if (delay.value == 0) {
+            if (delay.isZero()) {
                 mInputQueue.addAll(list);
                 if (!mIsPendingExecution) {
                     ++mPendingExecutionCount;
@@ -1209,7 +1208,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }
 
         @Override
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
             throw exception();
         }
@@ -1310,19 +1309,19 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
+        Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
+
+            mLogger.dbg(reason, "avoiding aborting after delay since channel is closed");
+            return null;
+        }
+
+        @Nullable
+        @Override
         Execution onConsumerOutput(final IN input, @NotNull final NestedQueue<IN> queue,
                 final long delay, @NotNull final TimeUnit timeUnit,
                 @NotNull final OrderType orderType) {
 
             throw exception();
-        }
-
-        @Nullable
-        @Override
-        Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
-
-            mLogger.dbg(reason, "avoiding aborting after delay since channel is closed");
-            return null;
         }
 
         @Override

@@ -101,6 +101,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final UnitDuration mOutputTimeout;
 
+    private final LocalValue<UnitDuration> mResultDelay;
+
+    private final LocalValue<OrderType> mResultOrder;
+
     private final Runner mRunner;
 
     private final TimeoutActionType mTimeoutActionType;
@@ -127,12 +131,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private int mPendingOutputCount;
 
-    private long mResultDelay = 0;
-
-    private TimeUnit mResultDelayUnit = TimeUnit.MILLISECONDS;
-
-    private OrderType mResultOrder;
-
     private OutputChannelState mState;
 
     /**
@@ -150,12 +148,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = ConstantConditions.notNull("abort handler", handler);
         mRunner = ConstantConditions.notNull("runner instance", runner);
-        mResultOrder = configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY);
+        mResultOrder = new LocalValue<OrderType>(
+                configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY));
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
         mTimeoutActionType = configuration.getOutputTimeoutActionOrElse(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
         mOutputBackoff = configuration.getOutputBackoffOrElse(Backoffs.zeroDelay());
         mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
+        mResultDelay = new LocalValue<UnitDuration>(zero());
         mOutputQueue = new NestedQueue<Object>() {
 
             @Override
@@ -199,17 +199,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     @NotNull
     public ResultChannel<OUT> after(@NotNull final UnitDuration delay) {
 
-        return after(delay.value, delay.unit);
+        synchronized (mMutex) {
+            mState.after(delay);
+        }
+
+        return this;
     }
 
     @NotNull
     public ResultChannel<OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
-        synchronized (mMutex) {
-            mState.after(delay, timeUnit);
-        }
-
-        return this;
+        return after(fromUnit(delay, timeUnit));
     }
 
     @NotNull
@@ -256,20 +256,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     @NotNull
     public ResultChannel<OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
 
-        final long delay;
-        final TimeUnit timeUnit;
+        final UnitDuration delay = mResultDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            delay = mResultDelay;
-            timeUnit = mResultDelayUnit;
-            execution = mState.pass(outputs);
+            execution = mState.pass(delay, outputs);
         }
 
-        if (delay == 0) {
+        if (delay.isZero()) {
             runFlush(false);
 
         } else if (execution != null) {
-            runExecution(execution, delay, timeUnit);
+            runExecution(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -284,20 +281,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     @NotNull
     public ResultChannel<OUT> pass(@Nullable final OUT output) {
 
-        final long delay;
-        final TimeUnit timeUnit;
+        final UnitDuration delay = mResultDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            delay = mResultDelay;
-            timeUnit = mResultDelayUnit;
-            execution = mState.pass(output);
+            execution = mState.pass(delay, output);
         }
 
-        if (delay == 0) {
+        if (delay.isZero()) {
             runFlush(false);
 
         } else if (execution != null) {
-            runExecution(execution, delay, timeUnit);
+            runExecution(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -312,20 +306,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     @NotNull
     public ResultChannel<OUT> pass(@Nullable final OUT... outputs) {
 
-        final long delay;
-        final TimeUnit timeUnit;
+        final UnitDuration delay = mResultDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            delay = mResultDelay;
-            timeUnit = mResultDelayUnit;
-            execution = mState.pass(outputs);
+            execution = mState.pass(delay, outputs);
         }
 
-        if (delay == 0) {
+        if (delay.isZero()) {
             runFlush(false);
 
         } else if (execution != null) {
-            runExecution(execution, delay, timeUnit);
+            runExecution(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -347,7 +338,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         RoutineException abortException = InvocationException.wrapIfNeeded(reason);
         synchronized (mMutex) {
-            abortException = mState.abortInvocation(abortException, 0, TimeUnit.MILLISECONDS);
+            abortException = mState.abortInvocation(abortException, zero());
         }
 
         if (abortException != null) {
@@ -1344,9 +1335,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         private DefaultOutputConsumer() {
 
-            mDelay = mResultDelay;
-            mDelayUnit = mResultDelayUnit;
-            final OrderType order = (mOrderType = mResultOrder);
+            final UnitDuration delay = mResultDelay.get();
+            mDelay = delay.value;
+            mDelayUnit = delay.unit;
+            final OrderType order = (mOrderType = mResultOrder.get());
             mQueue = (order == OrderType.BY_CALL) ? mOutputQueue.addNested() : mOutputQueue;
         }
 
@@ -1648,7 +1640,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
             throw abortException();
         }
@@ -1705,21 +1697,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        Execution pass(@Nullable final Iterable<? extends OUT> outputs) {
+        Execution pass(@NotNull final UnitDuration delay,
+                @Nullable final Iterable<? extends OUT> outputs) {
 
             throw abortException();
         }
 
         @Nullable
         @Override
-        Execution pass(@Nullable final OUT output) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT output) {
 
             throw abortException();
         }
 
         @Nullable
         @Override
-        Execution pass(@Nullable final OUT... outputs) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT... outputs) {
 
             throw abortException();
         }
@@ -1746,8 +1739,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        RoutineException abortInvocation(@Nullable final Throwable reason, final long delay,
-                @NotNull final TimeUnit timeUnit) {
+        RoutineException abortInvocation(@Nullable final Throwable reason,
+                @NotNull final UnitDuration delay) {
 
             mLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
@@ -1852,17 +1845,16 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         /**
          * Called when the invocation is aborted.
          *
-         * @param reason   the reason of the abortion.
-         * @param delay    the abortion delay.
-         * @param timeUnit the abortion delay unit.
+         * @param reason the reason of the abortion.
+         * @param delay  the abortion delay.
          * @return the abort exception or null.
          */
         @Nullable
-        RoutineException abortInvocation(@Nullable final Throwable reason, final long delay,
-                @NotNull final TimeUnit timeUnit) {
+        RoutineException abortInvocation(@Nullable final Throwable reason,
+                @NotNull final UnitDuration delay) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
-            if (delay == 0) {
+            if (delay.isZero()) {
                 mLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
             }
@@ -1888,13 +1880,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         /**
          * Called when a delay is set to the result channel.
          *
-         * @param delay    the delay.
-         * @param timeUnit the delay unit.
+         * @param delay the delay.
          */
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
-            mResultDelay = ConstantConditions.notNegative("input delay", delay);
-            mResultDelayUnit = ConstantConditions.notNull("input delay unit", timeUnit);
+            mResultDelay.set(ConstantConditions.notNull("result delay", delay));
         }
 
         /**
@@ -2076,7 +2066,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         void orderBy(@NotNull final OrderType orderType) {
 
-            mResultOrder = orderType;
+            mResultOrder.set(ConstantConditions.notNull("order type", orderType));
         }
 
         /**
@@ -2102,11 +2092,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         /**
          * Called when some outputs are passed to the result channel.
          *
+         * @param delay   the result delay;
          * @param outputs the outputs.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution pass(@Nullable final Iterable<? extends OUT> outputs) {
+        Execution pass(@NotNull final UnitDuration delay,
+                @Nullable final Iterable<? extends OUT> outputs) {
 
             if (outputs == null) {
                 mLogger.wrn("passing null iterable");
@@ -2119,55 +2111,53 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             final int size = list.size();
-            final long delay = mResultDelay;
-            mLogger.dbg("passing iterable [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs, delay,
-                    mResultDelayUnit);
+            mLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
             mOutputCount += size;
             checkMaxSize();
-            if (delay == 0) {
+            if (delay.isZero()) {
                 mOutputQueue.addAll(list);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
-                    list);
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                            : mOutputQueue, list);
         }
 
         /**
          * Called when an output is passed to the result channel.
          *
+         * @param delay  the result delay;
          * @param output the output.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution pass(@Nullable final OUT output) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT output) {
 
-            final long delay = mResultDelay;
-            mLogger.dbg("passing output [#%d+1]: %s [%d %s]", mOutputCount, output, delay,
-                    mResultDelayUnit);
+            mLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
             checkMaxSize();
-            if (delay == 0) {
+            if (delay.isZero()) {
                 mOutputQueue.add(output);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedOutputExecution(
-                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
-                    output);
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                            : mOutputQueue, output);
         }
 
         /**
          * Called when some outputs are passed to the result channel.
          *
+         * @param delay   the result delay;
          * @param outputs the outputs.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution pass(@Nullable final OUT... outputs) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT... outputs) {
 
             if (outputs == null) {
                 mLogger.wrn("passing null output array");
@@ -2175,22 +2165,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             final int size = outputs.length;
-            final long delay = mResultDelay;
-            mLogger.dbg("passing array [#%d+%d]: %s [%d %s]", mOutputCount, size, outputs, delay,
-                    mResultDelayUnit);
+            mLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
             mOutputCount += size;
             checkMaxSize();
             final ArrayList<OUT> list = new ArrayList<OUT>(size);
             Collections.addAll(list, outputs);
-            if (delay == 0) {
+            if (delay.isZero()) {
                 mOutputQueue.addAll(list);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
-                    list);
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                            : mOutputQueue, list);
         }
 
         /**
@@ -2218,7 +2206,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        void after(final long delay, @NotNull final TimeUnit timeUnit) {
+        void after(@NotNull final UnitDuration delay) {
 
             throw exception();
         }
@@ -2291,21 +2279,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        Execution pass(@Nullable final Iterable<? extends OUT> outputs) {
+        Execution pass(@NotNull final UnitDuration delay,
+                @Nullable final Iterable<? extends OUT> outputs) {
 
             throw exception();
         }
 
         @Nullable
         @Override
-        Execution pass(@Nullable final OUT output) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT output) {
 
             throw exception();
         }
 
         @Nullable
         @Override
-        Execution pass(@Nullable final OUT... outputs) {
+        Execution pass(@NotNull final UnitDuration delay, @Nullable final OUT... outputs) {
 
             throw exception();
         }
@@ -2341,21 +2330,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     public boolean abort(@Nullable final Throwable reason) {
 
-        final long delay;
-        final TimeUnit timeUnit;
+        final UnitDuration delay = mResultDelay.get();
         final RoutineException abortException;
         synchronized (mMutex) {
-            delay = mResultDelay;
-            timeUnit = mResultDelayUnit;
-            abortException = mState.abortInvocation(reason, delay, timeUnit);
+            abortException = mState.abortInvocation(reason, delay);
         }
 
         if (abortException != null) {
-            if (delay == 0) {
+            if (delay.isZero()) {
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
 
             } else {
-                runExecution(new DelayedAbortExecution(abortException), delay, timeUnit);
+                runExecution(new DelayedAbortExecution(abortException), delay.value, delay.unit);
             }
 
             return true;

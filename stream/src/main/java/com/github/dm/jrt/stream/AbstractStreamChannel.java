@@ -493,11 +493,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
-        return map(builder.invocationConfiguration()
-                          .with(null)
-                          .with(mStreamConfiguration.asInvocationConfiguration())
-                          .apply()
-                          .buildRoutine());
+        return map(buildRoutine(builder));
     }
 
     @NotNull
@@ -621,6 +617,75 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> streamFunction) {
+
+        return parallel(count, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        return parallel(count, buildRoutine(factory));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        return newChannel(getBindingFunction().andThen(
+                new BindSplitCount<OUT, AFTER>(streamConfiguration.asChannelConfiguration(), count,
+                        routine, streamConfiguration.getInvocationMode())));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return parallel(count, buildRoutine(builder));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallelBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> streamFunction) {
+
+        return parallelBy(keyFunction,
+                new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallelBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        return parallelBy(keyFunction, buildRoutine(factory));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallelBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        return newChannel(getBindingFunction().andThen(
+                new BindSplitKey<OUT, AFTER>(streamConfiguration.asChannelConfiguration(),
+                        keyFunction, routine, streamConfiguration.getInvocationMode())));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> parallelBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return parallelBy(keyFunction, buildRoutine(builder));
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> peek(@NotNull final Consumer<? super OUT> peekConsumer) {
 
         return map(new PeekInvocation<OUT>(wrap(peekConsumer)));
@@ -685,82 +750,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> skip(final int count) {
 
         return map(new SkipInvocationFactory<OUT>(count));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> keyFunction,
-            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction) {
-
-        return splitBy(keyFunction, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> keyFunction,
-            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-
-        return splitBy(keyFunction, buildRoutine(factory));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> keyFunction,
-            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
-
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return newChannel(getBindingFunction().andThen(
-                new BindSplitKey<OUT, AFTER>(streamConfiguration.asChannelConfiguration(),
-                        keyFunction, routine, streamConfiguration.getInvocationMode())));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> keyFunction,
-            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-
-        return splitBy(keyFunction, builder.invocationConfiguration()
-                                           .with(null)
-                                           .with(mStreamConfiguration.asInvocationConfiguration())
-                                           .apply()
-                                           .buildRoutine());
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction) {
-
-        return splitIn(count, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-
-        return splitIn(count, buildRoutine(factory));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
-
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return newChannel(getBindingFunction().andThen(
-                new BindSplitCount<OUT, AFTER>(streamConfiguration.asChannelConfiguration(), count,
-                        routine, streamConfiguration.getInvocationMode())));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-
-        return splitIn(count, builder.invocationConfiguration()
-                                     .with(null)
-                                     .with(mStreamConfiguration.asInvocationConfiguration())
-                                     .apply()
-                                     .buildRoutine());
     }
 
     @NotNull
@@ -1091,6 +1080,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
 
         return mChannel;
+    }
+
+    @NotNull
+    private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return builder.invocationConfiguration()
+                      .with(null)
+                      .with(mStreamConfiguration.asInvocationConfiguration())
+                      .apply()
+                      .buildRoutine();
     }
 
     @NotNull

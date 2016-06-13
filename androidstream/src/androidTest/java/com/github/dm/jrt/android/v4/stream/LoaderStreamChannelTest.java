@@ -2854,13 +2854,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .thenGetMore(range(1, 3))
-                                      .splitIn(2, sqrFunction())
+                                      .parallel(2, sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .thenGetMore(range(1, 3))
-                                      .splitBy(Functions.<Integer>identity(), sqrFunction())
+                                      .parallelBy(Functions.<Integer>identity(), sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         final ContextInvocationFactory<String, String> factory =
@@ -2868,38 +2868,38 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .then("test1", "test2", "test3")
-                                      .splitIn(2, factory)
+                                      .parallel(2, factory)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .then("test1", "test2", "test3")
-                                      .splitBy(Functions.<String>identity(), factory)
+                                      .parallelBy(Functions.<String>identity(), factory)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
         final RoutineBuilder<String, String> builder = JRoutineCore.on(new UpperCase());
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .then("test1", "test2", "test3")
-                                      .splitIn(2, builder)
+                                      .parallel(2, builder)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .then("test1", "test2", "test3")
-                                      .splitBy(Functions.<String>identity(), builder)
+                                      .parallelBy(Functions.<String>identity(), builder)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
         final LoaderRoutineBuilder<String, String> loaderBuilder =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory);
         assertThat(LoaderStreamsCompat.streamOf()
                                       .then("test1", "test2", "test3")
-                                      .splitIn(2, loaderBuilder)
+                                      .parallel(2, loaderBuilder)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(LoaderStreamsCompat.streamOf()
                                       .then("test1", "test2", "test3")
-                                      .splitBy(Functions.<String>identity(), loaderBuilder)
+                                      .parallelBy(Functions.<String>identity(), loaderBuilder)
                                       .afterMax(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
     }

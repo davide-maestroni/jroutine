@@ -912,6 +912,169 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> parallel(int maxInvocations);
 
     /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different channel instance.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available channels.
+     * <p>
+     * Note that the created channels will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count          the number of groups.
+     * @param streamFunction the function creating the processing stream channels.
+     * @param <AFTER>        the concatenation output type.
+     * @return the new stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> streamFunction);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param factory the processing invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the new stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * The stream configuration will be ignored.
+     *
+     * @param count   the number of groups.
+     * @param routine the processing routine instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the new stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param builder the builder of processing routine instances.
+     * @param <AFTER> the concatenation output type.
+     * @return the new stream instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different channel instance.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created channels will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction    the function assigning a key to each output.
+     * @param streamFunction the function creating the processing stream channels.
+     * @param <AFTER>        the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> streamFunction);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param factory     the processing invocation factory.
+     * @param <AFTER>     the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * The stream configuration will be ignored.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param routine     the processing routine instance.
+     * @param <AFTER>     the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param builder     the builder of processing routine instances.
+     * @param <AFTER>     the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
      * Concatenates a stream based on the specified peeking consumer.
      * <br>
      * Outputs will be automatically passed on.
@@ -1088,169 +1251,6 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> skip(int count);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different channel instance.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created channels will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction    the function assigning a key to each output.
-     * @param streamFunction the function creating the processing stream channels.
-     * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param factory     the processing invocation factory.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * The stream configuration will be ignored.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param routine     the processing routine instance.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param builder     the builder of processing routine instances.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different channel instance.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available channels.
-     * <p>
-     * Note that the created channels will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param count          the number of groups.
-     * @param streamFunction the function creating the processing stream channels.
-     * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available
-     * invocations.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param count   the number of groups.
-     * @param factory the processing invocation factory.
-     * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available
-     * invocations.
-     * <p>
-     * The stream configuration will be ignored.
-     *
-     * @param count   the number of groups.
-     * @param routine the processing routine instance.
-     * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available
-     * invocations.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param count   the number of groups.
-     * @param builder the builder of processing routine instances.
-     * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Initiates the flow of this stream.

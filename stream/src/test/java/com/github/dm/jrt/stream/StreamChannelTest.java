@@ -2306,22 +2306,22 @@ public class StreamChannelTest {
                 };
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
-                          .splitIn(2, sqr)
+                          .parallel(2, sqr)
                           .afterMax(seconds(3))
                           .all()).containsOnly(1L, 4L, 9L);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
-                          .splitBy(Functions.<Integer>identity(), sqr)
+                          .parallelBy(Functions.<Integer>identity(), sqr)
                           .afterMax(seconds(3))
                           .all()).containsOnly(1L, 4L, 9L);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
-                          .splitIn(2, JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
+                          .parallel(2, JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
                           .afterMax(seconds(3))
                           .all()).containsOnly(1, 2, 3);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
-                          .splitBy(Functions.<Integer>identity(),
+                          .parallelBy(Functions.<Integer>identity(),
                                   JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
                           .afterMax(seconds(3))
                           .all()).containsOnly(1, 2, 3);

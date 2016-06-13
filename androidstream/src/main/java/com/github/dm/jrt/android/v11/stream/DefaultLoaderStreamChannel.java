@@ -22,6 +22,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -698,82 +699,82 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic(wrap(streamFunction), streamFunction);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, streamFunction);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallelBy(keyFunction, streamFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, factory);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallelBy(keyFunction, factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("routine", routine);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, routine);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallelBy(keyFunction, routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
         checkStatic(wrap(keyFunction), keyFunction);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, builder);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallelBy(keyFunction, builder);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
 
         checkStatic(wrap(streamFunction), streamFunction);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitIn(count, streamFunction);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallel(count, streamFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         checkStatic("factory", factory);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitIn(count, factory);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallel(count, factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         checkStatic("routine", routine);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitIn(count, routine);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallel(count, routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
-        return (LoaderStreamChannel<IN, AFTER>) super.splitIn(count, builder);
+        return (LoaderStreamChannel<IN, AFTER>) super.parallel(count, builder);
     }
 
     @NotNull
@@ -1008,21 +1009,12 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        final LoaderContext loaderContext = streamConfiguration.getLoaderContext();
+        final LoaderContext loaderContext = mStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             throw new IllegalStateException("the loader context is null");
         }
 
-        return map(JRoutineLoader.with(loaderContext)
-                                 .on(factory)
-                                 .invocationConfiguration()
-                                 .with(streamConfiguration.asInvocationConfiguration())
-                                 .apply()
-                                 .loaderConfiguration()
-                                 .with(streamConfiguration.asLoaderConfiguration())
-                                 .apply()
-                                 .buildRoutine());
+        return map(JRoutineLoader.with(loaderContext).on(factory));
     }
 
     @NotNull
@@ -1030,21 +1022,35 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        return map(builder.invocationConfiguration()
-                          .with(null)
-                          .with(streamConfiguration.asInvocationConfiguration())
-                          .apply()
-                          .loaderConfiguration()
-                          .with(null)
-                          .with(streamConfiguration.asLoaderConfiguration())
-                          .apply()
-                          .buildRoutine());
+        return map(buildRoutine(builder));
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
+        final LoaderContext loaderContext = streamConfiguration.getLoaderContext();
+        if (loaderContext == null) {
+            throw new IllegalStateException("the loader context is null");
+        }
+
+        checkStatic("factory", factory);
+        return parallel(count, JRoutineLoader.with(loaderContext).on(factory));
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallel(final int count,
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        return parallel(count, buildRoutine(builder));
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -1056,75 +1062,17 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return splitBy(keyFunction, JRoutineLoader.with(loaderContext)
-                                                  .on(factory)
-                                                  .invocationConfiguration()
-                                                  .with(streamConfiguration
-                                                          .asInvocationConfiguration())
-                                                  .apply()
-                                                  .loaderConfiguration()
-                                                  .with(streamConfiguration.asLoaderConfiguration())
-                                                  .apply()
-                                                  .buildRoutine());
+        return parallelBy(keyFunction, JRoutineLoader.with(loaderContext).on(factory));
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
+    public <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
 
         checkStatic(wrap(keyFunction), keyFunction);
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        return splitBy(keyFunction, builder.invocationConfiguration()
-                                           .with(null)
-                                           .with(streamConfiguration.asInvocationConfiguration())
-                                           .apply()
-                                           .loaderConfiguration()
-                                           .with(null)
-                                           .with(streamConfiguration.asLoaderConfiguration())
-                                           .apply()
-                                           .buildRoutine());
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
-
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        final LoaderContext loaderContext = streamConfiguration.getLoaderContext();
-        if (loaderContext == null) {
-            throw new IllegalStateException("the loader context is null");
-        }
-
-        checkStatic("factory", factory);
-        return splitIn(count, JRoutineLoader.with(loaderContext)
-                                            .on(factory)
-                                            .invocationConfiguration()
-                                            .with(streamConfiguration.asInvocationConfiguration())
-                                            .apply()
-                                            .loaderConfiguration()
-                                            .with(streamConfiguration.asLoaderConfiguration())
-                                            .apply()
-                                            .buildRoutine());
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(final int count,
-            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
-
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        return splitIn(count, builder.invocationConfiguration()
-                                     .with(null)
-                                     .with(streamConfiguration.asInvocationConfiguration())
-                                     .apply()
-                                     .loaderConfiguration()
-                                     .with(null)
-                                     .with(streamConfiguration.asLoaderConfiguration())
-                                     .apply()
-                                     .buildRoutine());
+        return parallelBy(keyFunction, buildRoutine(builder));
     }
 
     @NotNull
@@ -1156,6 +1104,22 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, OUT> with(@Nullable final LoaderContext context) {
 
         return (LoaderStreamChannel<IN, OUT>) newChannel(newConfiguration(context));
+    }
+
+    @NotNull
+    private <AFTER> LoaderRoutine<? super OUT, ? extends AFTER> buildRoutine(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+
+        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
+        return builder.invocationConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asInvocationConfiguration())
+                      .apply()
+                      .loaderConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asLoaderConfiguration())
+                      .apply()
+                      .buildRoutine();
     }
 
     @NotNull

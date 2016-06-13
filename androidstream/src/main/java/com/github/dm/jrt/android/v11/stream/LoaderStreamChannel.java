@@ -554,6 +554,80 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
+                    OUT, ? extends AFTER>> streamFunction);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
+                    OUT, ? extends AFTER>> streamFunction);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
 
     /**
@@ -634,80 +708,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> skip(int count);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
-                    OUT, ? extends AFTER>> streamFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
-                    OUT, ? extends AFTER>> streamFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * {@inheritDoc}
@@ -934,46 +934,6 @@ public interface LoaderStreamChannel<IN, OUT>
      * Splits the outputs produced by this stream, so that each group will be processed by a
      * different routine invocation.
      * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param factory     the processing invocation factory.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param builder     the builder of processing routine instances.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      * <p>
@@ -987,7 +947,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -1008,7 +968,47 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitIn(int count,
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallel(int count,
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param factory     the processing invocation factory.
+     * @param <AFTER>     the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param builder     the builder of processing routine instances.
+     * @param <AFTER>     the concatenation output type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**

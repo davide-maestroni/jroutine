@@ -49,7 +49,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
      * @param args the constructor arguments.
      */
     private ContextInvocationTarget(@Nullable final Object[] args) {
-
         super(args);
     }
 
@@ -63,7 +62,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> classOfType(
             @NotNull final Class<TYPE> targetClass) {
-
         return new ClassContextInvocationTarget<TYPE>(targetClass);
     }
 
@@ -79,7 +77,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
             @NotNull final Class<TYPE> targetClass) {
-
         return instanceOf(targetClass, (Object[]) null);
     }
 
@@ -94,7 +91,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
             @NotNull final Class<TYPE> targetClass, @Nullable final Object... factoryArgs) {
-
         return new ObjectContextInvocationTarget<TYPE>(targetClass, factoryArgs);
     }
 
@@ -151,14 +147,12 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
                     @Override
                     @SuppressWarnings("unchecked")
                     public ClassContextInvocationTarget createFromParcel(final Parcel source) {
-
                         return new ClassContextInvocationTarget(
                                 (Class<?>) source.readSerializable());
                     }
 
                     @Override
                     public ClassContextInvocationTarget[] newArray(final int size) {
-
                         return new ClassContextInvocationTarget[size];
                     }
                 };
@@ -171,7 +165,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
          * @param targetClass the target class.
          */
         private ClassContextInvocationTarget(@NotNull final Class<TYPE> targetClass) {
-
             super(asArgs(targetClass));
             if (targetClass.isPrimitive()) {
                 // The parceling of primitive classes is broken...
@@ -183,39 +176,33 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
 
         @Override
         public int describeContents() {
-
             return 0;
         }
 
         @NotNull
         @Override
         public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) {
-
             return InvocationTarget.classOfType(mTargetClass);
         }
 
         @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
-
             return mTargetClass;
         }
 
         @Override
         public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
-
             return otherClass.isAssignableFrom(mTargetClass);
         }
 
         @Override
         public boolean isOfType(@NotNull final Class<?> type) {
-
             return (mTargetClass == type);
         }
 
         @Override
         public void writeToParcel(final Parcel dest, final int flags) {
-
             dest.writeSerializable(mTargetClass);
         }
     }
@@ -236,7 +223,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
                     @Override
                     @SuppressWarnings("unchecked")
                     public ObjectContextInvocationTarget createFromParcel(final Parcel source) {
-
                         return new ObjectContextInvocationTarget(
                                 (Class<?>) source.readSerializable(),
                                 source.readArray(ContextInvocationTarget.class.getClassLoader()));
@@ -244,7 +230,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
 
                     @Override
                     public ObjectContextInvocationTarget[] newArray(final int size) {
-
                         return new ObjectContextInvocationTarget[size];
                     }
                 };
@@ -261,7 +246,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
          */
         private ObjectContextInvocationTarget(@NotNull final Class<TYPE> targetClass,
                 @Nullable final Object[] factoryArgs) {
-
             super(asArgs(targetClass, cloneArgs(factoryArgs)));
             if (targetClass.isPrimitive()) {
                 // The parceling of primitive classes is broken...
@@ -277,7 +261,6 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
         public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) throws
                 Exception {
-
             TYPE target = null;
             final Class<TYPE> targetClass = mTargetClass;
             final Object[] factoryArgs = mFactoryArgs;
@@ -302,31 +285,26 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
         @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
-
             return mTargetClass;
         }
 
         @Override
         public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
-
             return otherClass.isAssignableFrom(mTargetClass);
         }
 
         @Override
         public boolean isOfType(@NotNull final Class<?> type) {
-
             return isAssignableTo(type);
         }
 
         @Override
         public int describeContents() {
-
             return 0;
         }
 
         @Override
         public void writeToParcel(final Parcel dest, final int flags) {
-
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);
         }

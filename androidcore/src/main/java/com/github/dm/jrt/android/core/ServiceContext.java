@@ -43,7 +43,6 @@ public abstract class ServiceContext {
      * Avoid explicit instantiation.
      */
     private ServiceContext() {
-
     }
 
     /**
@@ -57,7 +56,6 @@ public abstract class ServiceContext {
      */
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context) {
-
         return serviceFrom(context, InvocationService.class);
     }
 
@@ -72,7 +70,6 @@ public abstract class ServiceContext {
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
-
         return new IntentServiceContext(context, new Intent(context, serviceClass));
     }
 
@@ -89,7 +86,6 @@ public abstract class ServiceContext {
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context,
             @NotNull final Intent service) {
-
         final ComponentName component = service.getComponent();
         try {
             if ((component == null) || !InvocationService.class.isAssignableFrom(
@@ -107,7 +103,6 @@ public abstract class ServiceContext {
 
     private static boolean bundleEquals(@Nullable final Bundle bundle1,
             @Nullable final Bundle bundle2) {
-
         if (bundle1 == bundle2) {
             return true;
         }
@@ -141,7 +136,6 @@ public abstract class ServiceContext {
     }
 
     private static int bundleHashCode(@Nullable final Bundle bundle) {
-
         if (bundle == null) {
             return 0;
         }
@@ -196,7 +190,6 @@ public abstract class ServiceContext {
          */
         private IntentServiceContext(@NotNull final Context context,
                 @NotNull final Intent service) {
-
             mContext = new WeakReference<Context>(
                     ConstantConditions.notNull("service context", context));
             mIntent = ConstantConditions.notNull("service intent", service);
@@ -204,7 +197,6 @@ public abstract class ServiceContext {
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -222,7 +214,6 @@ public abstract class ServiceContext {
 
         @Override
         public int hashCode() {
-
             final Context referent = mContext.get();
             int result = (referent != null) ? referent.hashCode() : 0;
             result = 31 * result + mIntent.filterHashCode();
@@ -233,14 +224,12 @@ public abstract class ServiceContext {
         @Nullable
         @Override
         public Context getServiceContext() {
-
             return mContext.get();
         }
 
         @NotNull
         @Override
         public Intent getServiceIntent() {
-
             return mIntent;
         }
     }

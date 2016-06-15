@@ -41,34 +41,27 @@ public abstract class MappingInvocation<IN, OUT> extends InvocationFactory<IN, O
      * @param args the constructor arguments.
      */
     protected MappingInvocation(@Nullable final Object[] args) {
-
         super(args);
     }
 
     @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() {
-
         return this;
     }
 
     public final void onAbort(@NotNull final RoutineException reason) {
-
     }
 
     public final void onDestroy() {
-
     }
 
     public final void onInitialize() {
-
     }
 
     public final void onResult(@NotNull final ResultChannel<OUT> result) {
-
     }
 
     public final void onTerminate() {
-
     }
 }

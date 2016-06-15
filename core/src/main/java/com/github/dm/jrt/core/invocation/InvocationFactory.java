@@ -78,7 +78,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
      * @param args the constructor arguments.
      */
     protected InvocationFactory(@Nullable final Object[] args) {
-
         super(args);
     }
 
@@ -94,7 +93,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-
         return factoryOf(invocationClass, (Object[]) null);
     }
 
@@ -120,7 +118,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-
         return new DefaultInvocationFactory<IN, OUT>(invocationClass, args);
     }
 
@@ -136,7 +133,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-
         return factoryOf(invocationToken.getRawClass());
     }
 
@@ -162,7 +158,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-
         return factoryOf(invocationToken.getRawClass(), args);
     }
 
@@ -178,7 +173,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> invocation) {
-
         return factoryOf(tokenOf(invocation));
     }
 
@@ -203,7 +197,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-
         return factoryOf(tokenOf(invocation), args);
     }
 
@@ -244,7 +237,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
         private DefaultInvocationFactory(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
-
             super(asArgs(invocationClass, cloneArgs(args)));
             final Object[] invocationArgs = (mArgs = cloneArgs(args));
             mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);
@@ -253,7 +245,6 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() throws Exception {
-
             return mConstructor.newInstance(mArgs);
         }
     }

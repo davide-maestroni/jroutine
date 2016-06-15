@@ -89,7 +89,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
             @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType,
             @Nullable final UnitDuration staleTime) {
-
         super(asArgs(loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
                 staleTime));
         mLoaderId = loaderId;
@@ -107,7 +106,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static Builder<LoaderConfiguration> builder() {
-
         return new Builder<LoaderConfiguration>(sDefaultConfigurable);
     }
 
@@ -120,7 +118,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
     @NotNull
     public static Builder<LoaderConfiguration> builderFrom(
             @Nullable final LoaderConfiguration initialConfiguration) {
-
         return (initialConfiguration == null) ? builder()
                 : new Builder<LoaderConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
@@ -132,7 +129,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static LoaderConfiguration defaultConfiguration() {
-
         return sDefaultConfiguration;
     }
 
@@ -143,7 +139,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Builder<LoaderConfiguration> builderFrom() {
-
         return builderFrom(this);
     }
 
@@ -155,7 +150,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     public CacheStrategyType getCacheStrategyTypeOrElse(
             @Nullable final CacheStrategyType valueIfNotSet) {
-
         final CacheStrategyType strategyType = mStrategyType;
         return (strategyType != null) ? strategyType : valueIfNotSet;
     }
@@ -168,7 +162,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     public ClashResolutionType getClashResolutionTypeOrElse(
             @Nullable final ClashResolutionType valueIfNotSet) {
-
         final ClashResolutionType resolutionType = mResolutionType;
         return (resolutionType != null) ? resolutionType : valueIfNotSet;
     }
@@ -180,7 +173,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @return the factory ID.
      */
     public int getFactoryIdOrElse(final int valueIfNotSet) {
-
         final int factoryId = mFactoryId;
         return (factoryId != AUTO) ? factoryId : valueIfNotSet;
     }
@@ -193,7 +185,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     public ClashResolutionType getInputClashResolutionTypeOrElse(
             @Nullable final ClashResolutionType valueIfNotSet) {
-
         final ClashResolutionType resolutionType = mInputResolutionType;
         return (resolutionType != null) ? resolutionType : valueIfNotSet;
     }
@@ -205,7 +196,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @return the loader ID.
      */
     public int getLoaderIdOrElse(final int valueIfNotSet) {
-
         final int loaderId = mLoaderId;
         return (loaderId != AUTO) ? loaderId : valueIfNotSet;
     }
@@ -217,7 +207,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @return the results stale time.
      */
     public UnitDuration getResultStaleTimeOrElse(@Nullable final UnitDuration valueIfNotSet) {
-
         final UnitDuration staleTime = mStaleTime;
         return (staleTime != null) ? staleTime : valueIfNotSet;
     }
@@ -329,7 +318,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @param configurable the configurable instance.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             mLoaderId = AUTO;
             mFactoryId = AUTO;
@@ -343,7 +331,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final LoaderConfiguration initialConfiguration) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
@@ -355,7 +342,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public TYPE apply() {
-
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -369,7 +355,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
-
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
@@ -417,7 +402,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withCacheStrategy(@Nullable final CacheStrategyType strategyType) {
-
             mStrategyType = strategyType;
             return this;
         }
@@ -433,7 +417,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withClashResolution(
                 @Nullable final ClashResolutionType resolutionType) {
-
             mResolutionType = resolutionType;
             return this;
         }
@@ -446,7 +429,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withFactoryId(final int factoryId) {
-
             mFactoryId = factoryId;
             return this;
         }
@@ -462,7 +444,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withInputClashResolution(
                 @Nullable final ClashResolutionType resolutionType) {
-
             mInputResolutionType = resolutionType;
             return this;
         }
@@ -475,7 +456,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withLoaderId(final int loaderId) {
-
             mLoaderId = loaderId;
             return this;
         }
@@ -490,7 +470,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withResultStaleTime(@Nullable final UnitDuration staleTime) {
-
             mStaleTime = staleTime;
             return this;
         }
@@ -506,19 +485,16 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withResultStaleTime(final long time,
                 @NotNull final TimeUnit timeUnit) {
-
             return withResultStaleTime(fromUnit(time, timeUnit));
         }
 
         @NotNull
         private LoaderConfiguration buildConfiguration() {
-
             return new LoaderConfiguration(mLoaderId, mFactoryId, mResolutionType,
                     mInputResolutionType, mStrategyType, mStaleTime);
         }
 
         private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
-
             mLoaderId = configuration.mLoaderId;
             mFactoryId = configuration.mFactoryId;
             mResolutionType = configuration.mResolutionType;
@@ -535,7 +511,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         @NotNull
         public LoaderConfiguration apply(@NotNull final LoaderConfiguration configuration) {
-
             return configuration;
         }
     }

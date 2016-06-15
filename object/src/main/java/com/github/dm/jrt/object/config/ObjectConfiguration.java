@@ -58,7 +58,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
      * @param fieldNames the shared field names.
      */
     private ObjectConfiguration(@Nullable final Set<String> fieldNames) {
-
         super(asArgs(fieldNames));
         mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
     }
@@ -70,7 +69,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static Builder<ObjectConfiguration> builder() {
-
         return new Builder<ObjectConfiguration>(sDefaultConfigurable);
     }
 
@@ -83,7 +81,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
     @NotNull
     public static Builder<ObjectConfiguration> builderFrom(
             @Nullable final ObjectConfiguration initialConfiguration) {
-
         return (initialConfiguration == null) ? builder()
                 : new Builder<ObjectConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
@@ -95,7 +92,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static ObjectConfiguration defaultConfiguration() {
-
         return sDefaultConfiguration;
     }
 
@@ -106,7 +102,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Builder<ObjectConfiguration> builderFrom() {
-
         return builderFrom(this);
     }
 
@@ -117,7 +112,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
      * @return the field names.
      */
     public Set<String> getSharedFieldsOrElse(@Nullable final Set<String> valueIfNotSet) {
-
         final Set<String> fieldNames = mFieldNames;
         return (fieldNames != null) ? fieldNames : valueIfNotSet;
     }
@@ -156,7 +150,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
          * @param configurable the configurable instance.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
         }
 
@@ -168,14 +161,12 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final ObjectConfiguration initialConfiguration) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
 
         @NotNull
         private static Set<String> toSet(@NotNull final String[] values) {
-
             final HashSet<String> set = new HashSet<String>();
             Collections.addAll(set, values);
             return set;
@@ -188,7 +179,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         @NotNull
         public TYPE apply() {
-
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -202,7 +192,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> with(@Nullable final ObjectConfiguration configuration) {
-
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
@@ -223,7 +212,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withSharedFields() {
-
             mFieldNames = Collections.emptySet();
             return this;
         }
@@ -236,7 +224,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
-
             mFieldNames = (fieldNames != null) ? toSet(fieldNames) : null;
             return this;
         }
@@ -249,19 +236,16 @@ public final class ObjectConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withSharedFields(@Nullable final Collection<String> fieldNames) {
-
             mFieldNames = (fieldNames != null) ? new HashSet<String>(fieldNames) : null;
             return this;
         }
 
         @NotNull
         private ObjectConfiguration buildConfiguration() {
-
             return new ObjectConfiguration(mFieldNames);
         }
 
         private void setConfiguration(@NotNull final ObjectConfiguration configuration) {
-
             mFieldNames = configuration.mFieldNames;
         }
     }
@@ -273,7 +257,6 @@ public final class ObjectConfiguration extends DeepEqualObject {
 
         @NotNull
         public ObjectConfiguration apply(@NotNull final ObjectConfiguration configuration) {
-
             return configuration;
         }
     }

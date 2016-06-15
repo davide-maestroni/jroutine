@@ -58,7 +58,6 @@ public class ComparableCall<T> implements Call<T> {
      */
     @SuppressWarnings("unchecked")
     private ComparableCall(@NotNull final Call<?> wrapped) {
-
         mCall = (Call<T>) ConstantConditions.notNull("call instance", wrapped);
     }
 
@@ -71,7 +70,6 @@ public class ComparableCall<T> implements Call<T> {
      */
     @NotNull
     public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
-
         return new ComparableCall<T>(wrapped);
     }
 
@@ -84,12 +82,10 @@ public class ComparableCall<T> implements Call<T> {
      */
     @NotNull
     public static <T> CallAdapter<T> wrap(@NotNull final CallAdapter<T> callAdapter) {
-
         return new CallAdapterDecorator<T>(callAdapter);
     }
 
     private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
-
         if (b1 == b2) {
             return true;
         }
@@ -119,7 +115,6 @@ public class ComparableCall<T> implements Call<T> {
     }
 
     private static boolean equals(@Nullable final Headers h1, @Nullable final Headers h2) {
-
         if (h1 == h2) {
             return true;
         }
@@ -147,20 +142,17 @@ public class ComparableCall<T> implements Call<T> {
     }
 
     private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
-
         return (o1 == o2) || !((o1 == null) || (o2 == null)) && o1.equals(o2);
     }
 
     @Override
     @SuppressWarnings("CloneDoesntCallSuperClone")
     public Call<T> clone() {
-
         return new ComparableCall<T>(mCall.clone());
     }
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
@@ -180,7 +172,6 @@ public class ComparableCall<T> implements Call<T> {
 
     @Override
     public int hashCode() {
-
         final Request request = mCall.request();
         int result = 0;
         final HttpUrl url = request.url();
@@ -229,37 +220,31 @@ public class ComparableCall<T> implements Call<T> {
 
     @Override
     public Response<T> execute() throws IOException {
-
         return mCall.execute();
     }
 
     @Override
     public void enqueue(final Callback<T> callback) {
-
         mCall.enqueue(callback);
     }
 
     @Override
     public boolean isExecuted() {
-
         return mCall.isExecuted();
     }
 
     @Override
     public void cancel() {
-
         mCall.cancel();
     }
 
     @Override
     public boolean isCanceled() {
-
         return mCall.isCanceled();
     }
 
     @Override
     public Request request() {
-
         return mCall.request();
     }
 
@@ -278,19 +263,16 @@ public class ComparableCall<T> implements Call<T> {
          * @param wrapped the wrapped adapter instance.
          */
         private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
-
             mAdapter = ConstantConditions.notNull("call adapter instance", wrapped);
         }
 
         @Override
         public Type responseType() {
-
             return mAdapter.responseType();
         }
 
         @Override
         public <OUT> T adapt(final Call<OUT> call) {
-
             return mAdapter.adapt(ComparableCall.of(call));
         }
     }

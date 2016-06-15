@@ -51,13 +51,11 @@ class BindTryCatch<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OU
     BindTryCatch(@NotNull final ChannelConfiguration configuration,
             @NotNull final BiConsumerWrapper<? super RoutineException, ? super
                     InputChannel<OUT>> catchConsumer) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(mConfiguration)

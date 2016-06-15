@@ -57,7 +57,6 @@ class LocalRunner {
      * Constructor.
      */
     private LocalRunner() {
-
         mExecutionTimeNs = new long[INITIAL_CAPACITY];
         mExecutions = new Execution[INITIAL_CAPACITY];
         mDelays = new long[INITIAL_CAPACITY];
@@ -70,7 +69,6 @@ class LocalRunner {
      * @param execution the execution.
      */
     public static void cancel(@NotNull final Execution execution) {
-
         sRunner.get().removeExecution(execution);
     }
 
@@ -83,13 +81,11 @@ class LocalRunner {
      */
     public static void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         sRunner.get().addExecution(execution, delay, timeUnit);
     }
 
     private static void resizeArray(@NotNull final long[] src, @NotNull final long[] dst,
             final int first) {
-
         final int remainder = src.length - first;
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
@@ -97,7 +93,6 @@ class LocalRunner {
 
     private static <T> void resizeArray(@NotNull final T[] src, @NotNull final T[] dst,
             final int first) {
-
         final int remainder = src.length - first;
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
@@ -105,7 +100,6 @@ class LocalRunner {
 
     private void add(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         final int i = mLast;
         mExecutionTimeNs[i] = System.nanoTime();
         mExecutions[i] = execution;
@@ -128,7 +122,6 @@ class LocalRunner {
 
     private void addExecution(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         add(execution, delay, timeUnit);
         if (!mIsRunning) {
             run();
@@ -136,7 +129,6 @@ class LocalRunner {
     }
 
     private void ensureCapacity(final int capacity) {
-
         final int size = mExecutions.length;
         if (capacity <= size) {
             return;
@@ -170,7 +162,6 @@ class LocalRunner {
     }
 
     private void removeExecution(@NotNull final Execution execution) {
-
         final Execution[] executions = mExecutions;
         final int length = executions.length;
         final int last = mLast;
@@ -189,7 +180,6 @@ class LocalRunner {
     }
 
     private void run() {
-
         mIsRunning = true;
         try {
             while (mFirst != mLast) {
@@ -281,7 +271,6 @@ class LocalRunner {
     private static class EmptyExecution implements Execution {
 
         public void run() {
-
         }
     }
 
@@ -292,7 +281,6 @@ class LocalRunner {
 
         @Override
         protected LocalRunner initialValue() {
-
             return new LocalRunner();
         }
     }

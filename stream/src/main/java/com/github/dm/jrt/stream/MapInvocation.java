@@ -45,13 +45,11 @@ class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
      */
     MapInvocation(@NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
             OUT>> function) {
-
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         final OutputChannel<? extends OUT> channel = mFunction.apply(input);
         if (channel != null) {
             channel.bind(result);

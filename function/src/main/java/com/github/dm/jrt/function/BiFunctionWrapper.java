@@ -49,7 +49,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
             new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object in1, final Object in2) {
-
                     return in1;
                 }
             });
@@ -62,7 +61,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
 
                         public Comparable<Object> apply(final Comparable<Object> in1,
                                 final Comparable<Object> in2) {
-
                             return (in1.compareTo(in2) >= 0) ? in1 : in2;
                         }
                     });
@@ -75,7 +73,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
 
                         public Comparable<Object> apply(final Comparable<Object> in1,
                                 final Comparable<Object> in2) {
-
                             return (in1.compareTo(in2) <= 0) ? in1 : in2;
                         }
                     });
@@ -84,7 +81,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
             new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object in1, final Object in2) {
-
                     return in2;
                 }
             });
@@ -99,7 +95,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @param biFunction the wrapped supplier.
      */
     private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
-
         this(ConstantConditions.notNull("bi-function instance", biFunction),
                 FunctionWrapper.<OUT>identity());
     }
@@ -112,7 +107,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
             @NotNull final FunctionWrapper<?, ? extends OUT> function) {
-
         super(asArgs(biFunction, function));
         mBiFunction = biFunction;
         mFunction = function;
@@ -130,7 +124,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
-
         return (BiFunctionWrapper<IN1, IN2, IN1>) sFirst;
     }
 
@@ -146,7 +139,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> max() {
-
         return (BiFunctionWrapper<IN, IN, IN>) sMax;
     }
 
@@ -162,7 +154,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
             @NotNull final Comparator<? super IN> comparator) {
-
         ConstantConditions.notNull("comparator", comparator);
         synchronized (mMaxFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
@@ -190,7 +181,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> min() {
-
         return (BiFunctionWrapper<IN, IN, IN>) sMin;
     }
 
@@ -206,7 +196,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
             @NotNull final Comparator<? super IN> comparator) {
-
         ConstantConditions.notNull("comparator", comparator);
         synchronized (mMinFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
@@ -234,7 +223,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
-
         return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
     }
 
@@ -258,7 +246,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
-
         if (function instanceof BiFunctionWrapper) {
             return (BiFunctionWrapper<IN1, IN2, OUT>) function;
         }
@@ -277,12 +264,10 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     @NotNull
     public <AFTER> BiFunctionWrapper<IN1, IN2, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
-
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
     }
 
     public boolean hasStaticScope() {
-
         return Reflection.hasStaticScope(mBiFunction) && mFunction.hasStaticScope();
     }
 
@@ -302,13 +287,11 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
          * @param comparator the input comparator.
          */
         private MaxByFunction(@NotNull final Comparator<? super IN> comparator) {
-
             super(asArgs(comparator));
             mComparator = comparator;
         }
 
         public IN apply(final IN in1, final IN in2) {
-
             return (mComparator.compare(in1, in2) > 0) ? in1 : in2;
         }
     }
@@ -329,20 +312,17 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
          * @param comparator the input comparator.
          */
         private MinByFunction(@NotNull final Comparator<? super IN> comparator) {
-
             super(asArgs(comparator));
             mComparator = comparator;
         }
 
         public IN apply(final IN in1, final IN in2) {
-
             return (mComparator.compare(in1, in2) < 0) ? in1 : in2;
         }
     }
 
     @SuppressWarnings("unchecked")
     public OUT apply(final IN1 in1, final IN2 in2) throws Exception {
-
         return ((FunctionWrapper<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
     }
 }

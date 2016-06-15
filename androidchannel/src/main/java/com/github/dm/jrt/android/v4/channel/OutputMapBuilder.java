@@ -66,7 +66,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
     OutputMapBuilder(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Set<Integer> indexes) {
-
         mChannel = ConstantConditions.notNull("output channel", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
@@ -82,7 +81,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
     @SuppressWarnings("unchecked")
     protected SparseArrayCompat<OutputChannel<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final HashSet<Integer> indexes = mIndexes;
         final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
         synchronized (sOutputChannels) {
@@ -143,7 +141,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
          */
         private SelectInfo(@NotNull final ChannelConfiguration configuration,
                 @NotNull final HashSet<Integer> indexes) {
-
             super(asArgs(configuration, indexes));
         }
     }

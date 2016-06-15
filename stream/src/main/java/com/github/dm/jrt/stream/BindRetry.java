@@ -57,14 +57,12 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
             @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
         mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
-
         final ChannelConfiguration configuration = mConfiguration;
         final OutputChannel<IN> inputChannel = Channels.replay(channel).buildChannels();
         final IOChannel<OUT> outputChannel =

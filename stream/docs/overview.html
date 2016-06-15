@@ -44,10 +44,8 @@
                                           .parallel()
                                           .map(Integer::parseInt)
                                           .map(integer -&gt; integer * integer)
-                                          .async()
-                                          .map(meanFloat())
                                           .sequential()
-                                          .map(Float.class::cast)
+                                          .map(averageFloat())
                                           .map(Math::sqrt)
                                           .afterMax(seconds(1))
                                           .next();

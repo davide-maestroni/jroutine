@@ -35,13 +35,11 @@ class LocalValue<T> extends ThreadLocal<T> {
      * @param initialValue the initial value.
      */
     LocalValue(@Nullable final T initialValue) {
-
         mInitialValue = initialValue;
     }
 
     @Override
     protected T initialValue() {
-
         return mInitialValue;
     }
 }

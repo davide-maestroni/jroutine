@@ -35,12 +35,10 @@ public class ExecutionDecorator implements Execution {
      * @param wrapped the wrapped instance.
      */
     public ExecutionDecorator(@NotNull final Execution wrapped) {
-
         mExecution = ConstantConditions.notNull("execution instance", wrapped);
     }
 
     public void run() {
-
         mExecution.run();
     }
 }

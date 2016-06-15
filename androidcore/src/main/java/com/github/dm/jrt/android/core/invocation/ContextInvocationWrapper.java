@@ -40,12 +40,10 @@ public class ContextInvocationWrapper<IN, OUT> extends InvocationDecorator<IN, O
      * @param invocation the wrapped invocation.
      */
     public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
-
         super(invocation);
     }
 
     @Override
     public void onContext(@NotNull final Context context) {
-
     }
 }

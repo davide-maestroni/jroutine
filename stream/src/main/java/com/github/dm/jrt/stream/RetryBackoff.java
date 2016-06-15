@@ -42,13 +42,11 @@ class RetryBackoff implements BiFunction<Integer, RoutineException, Long> {
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     RetryBackoff(final int count, @NotNull final Backoff backoff) {
-
         mCount = ConstantConditions.positive("max retries", count);
         mBackoff = ConstantConditions.notNull("backoff policy", backoff);
     }
 
     public Long apply(final Integer count, final RoutineException error) {
-
         if (count <= mCount) {
             return mBackoff.getDelay(count);
         }

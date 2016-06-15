@@ -46,7 +46,6 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      *                                            null object.
      */
     ConcatBuilder(@NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         final ArrayList<OutputChannel<? extends OUT>> channelList =
                 new ArrayList<OutputChannel<? extends OUT>>();
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -68,7 +67,6 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
     @NotNull
     @Override
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(configuration)

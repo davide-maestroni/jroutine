@@ -42,7 +42,6 @@ public class Functions {
      * Avoid explicit instantiation.
      */
     protected Functions() {
-
         ConstantConditions.avoid();
     }
 
@@ -57,7 +56,6 @@ public class Functions {
      */
     @NotNull
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
-
         return BiConsumerWrapper.biSink();
     }
 
@@ -74,7 +72,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
-
         return FunctionWrapper.castTo(type);
     }
 
@@ -91,7 +88,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final ClassToken<? extends OUT> token) {
-
         return FunctionWrapper.castTo(token);
     }
 
@@ -106,7 +102,6 @@ public class Functions {
      */
     @NotNull
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
-
         return SupplierWrapper.constant(result);
     }
 
@@ -129,7 +124,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> consumerCall(
             @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
         return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
     }
 
@@ -151,7 +145,6 @@ public class Functions {
     @NotNull
     public static <OUT> CommandInvocation<OUT> consumerCommand(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
         return new ConsumerCommandInvocation<OUT>(wrap(consumer));
     }
 
@@ -174,7 +167,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> MappingInvocation<IN, OUT> consumerMapping(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
         return new ConsumerMappingInvocation<IN, OUT>(wrap(consumer));
     }
 
@@ -189,7 +181,6 @@ public class Functions {
      */
     @NotNull
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
-
         return BiFunctionWrapper.first();
     }
 
@@ -212,7 +203,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> functionCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-
         return new FunctionInvocationFactory<IN, OUT>(wrap(function));
     }
 
@@ -235,7 +225,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> MappingInvocation<IN, OUT> functionMapping(
             @NotNull final Function<? super IN, ? extends OUT> function) {
-
         return new FunctionMappingInvocation<IN, OUT>(wrap(function));
     }
 
@@ -249,7 +238,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> FunctionWrapper<IN, IN> identity() {
-
         return FunctionWrapper.identity();
     }
 
@@ -264,7 +252,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isEqualTo(@Nullable final Object targetRef) {
-
         return PredicateWrapper.isEqualTo(targetRef);
     }
 
@@ -280,7 +267,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
-
         return PredicateWrapper.isInstanceOf(type);
     }
 
@@ -294,7 +280,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isNotNull() {
-
         return PredicateWrapper.isNotNull();
     }
 
@@ -308,7 +293,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isNull() {
-
         return PredicateWrapper.isNull();
     }
 
@@ -323,7 +307,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isSameAs(@Nullable final Object targetRef) {
-
         return PredicateWrapper.isSameAs(targetRef);
     }
 
@@ -338,7 +321,6 @@ public class Functions {
      */
     @NotNull
     public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> max() {
-
         return BiFunctionWrapper.max();
     }
 
@@ -352,9 +334,9 @@ public class Functions {
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
+    @NotNull
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
             @NotNull final Comparator<? super IN> comparator) {
-
         return BiFunctionWrapper.maxBy(comparator);
     }
 
@@ -369,7 +351,6 @@ public class Functions {
      */
     @NotNull
     public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> min() {
-
         return BiFunctionWrapper.min();
     }
 
@@ -383,9 +364,9 @@ public class Functions {
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
+    @NotNull
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
             @NotNull final Comparator<? super IN> comparator) {
-
         return BiFunctionWrapper.minBy(comparator);
     }
 
@@ -399,7 +380,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> negative() {
-
         return PredicateWrapper.negative();
     }
 
@@ -412,7 +392,6 @@ public class Functions {
      */
     @NotNull
     public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
-
         return new OutputConsumerBuilder<Object>(consumer, Functions.<RoutineException>sink(),
                 Functions.sink());
     }
@@ -427,7 +406,6 @@ public class Functions {
     @NotNull
     public static OutputConsumerBuilder<Object> onError(
             @NotNull final Consumer<RoutineException> consumer) {
-
         return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), consumer,
                 Functions.sink());
     }
@@ -442,7 +420,6 @@ public class Functions {
      */
     @NotNull
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
-
         return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
                 Functions.<RoutineException>sink(), consumer);
     }
@@ -457,7 +434,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> positive() {
-
         return PredicateWrapper.positive();
     }
 
@@ -482,7 +458,6 @@ public class Functions {
     @NotNull
     public static <IN> MappingInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
-
         return new PredicateMappingInvocation<IN>(wrap(predicate));
     }
 
@@ -497,7 +472,6 @@ public class Functions {
      */
     @NotNull
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
-
         return BiFunctionWrapper.second();
     }
 
@@ -511,7 +485,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> ConsumerWrapper<IN> sink() {
-
         return ConsumerWrapper.sink();
     }
 
@@ -533,7 +506,6 @@ public class Functions {
     @NotNull
     public static <OUT> CommandInvocation<OUT> supplierCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
-
         return new SupplierCommandInvocation<OUT>(wrap(supplier));
     }
 
@@ -556,7 +528,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-
         return new SupplierInvocationFactory<IN, OUT>(wrap(supplier));
     }
 
@@ -579,7 +550,6 @@ public class Functions {
     @NotNull
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
-
         return BiConsumerWrapper.wrap(consumer);
     }
 
@@ -603,7 +573,6 @@ public class Functions {
     @NotNull
     public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
-
         return BiFunctionWrapper.wrap(function);
     }
 
@@ -624,7 +593,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
-
         return ConsumerWrapper.wrap(consumer);
     }
 
@@ -647,7 +615,6 @@ public class Functions {
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
             @NotNull final Function<IN, OUT> function) {
-
         return FunctionWrapper.wrap(function);
     }
 
@@ -668,7 +635,6 @@ public class Functions {
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
-
         return PredicateWrapper.wrap(predicate);
     }
 
@@ -689,7 +655,6 @@ public class Functions {
      */
     @NotNull
     public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
-
         return SupplierWrapper.wrap(supplier);
     }
 }

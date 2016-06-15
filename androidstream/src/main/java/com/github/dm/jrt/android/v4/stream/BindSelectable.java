@@ -49,7 +49,6 @@ class BindSelectable<OUT> extends DeepEqualObject
      * @param index         the selectable index.
      */
     BindSelectable(@NotNull final ChannelConfiguration configuration, final int index) {
-
         super(asArgs(ConstantConditions.notNull("channel configuration", configuration), index));
         mConfiguration = configuration;
         mIndex = index;
@@ -58,7 +57,6 @@ class BindSelectable<OUT> extends DeepEqualObject
     @Override
     @SuppressWarnings("unchecked")
     public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
-
         final OutputChannel<? extends ParcelableSelectable<OUT>> outputChannel =
                 SparseChannelsCompat.toSelectable(channel, mIndex)
                                     .channelConfiguration()

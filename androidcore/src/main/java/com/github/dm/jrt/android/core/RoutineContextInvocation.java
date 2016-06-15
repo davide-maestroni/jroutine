@@ -45,7 +45,6 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
      * @param invocation the wrapped invocation.
      */
     private RoutineContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
-
         super(invocation);
     }
 
@@ -67,7 +66,6 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, final int routineId,
             @NotNull final InvocationMode invocationMode) {
-
         return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, invocationMode);
     }
 
@@ -91,7 +89,6 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
          */
         private DelegatingContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
                 final int routineId, @NotNull final InvocationMode invocationMode) {
-
             super(asArgs(routineId, invocationMode));
             mFactory = RoutineInvocation.factoryFrom(routine, invocationMode);
         }
@@ -99,7 +96,6 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
             return new RoutineContextInvocation<IN, OUT>(mFactory.newInvocation());
         }
     }

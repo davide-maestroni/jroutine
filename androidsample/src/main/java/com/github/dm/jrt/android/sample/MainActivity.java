@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
                 LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-
         super.onResume();
         final LoaderAdapterFactoryCompat adapterFactory =
                 LoaderAdapterFactoryCompat.with(loaderFrom(this));
@@ -76,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NotNull final RoutineException error) {
-
                 final Throwable cause = error.getCause();
                 Toast.makeText(MainActivity.this,
                         (cause != null) ? cause.getMessage() : "Cannot load repository list",
@@ -85,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onOutput(final List<Repo> output) {
-
                 final ArrayAdapter<Repo> adapter = mRepoAdapter;
                 for (final Repo repo : output) {
                     adapter.setNotifyOnChange(false);

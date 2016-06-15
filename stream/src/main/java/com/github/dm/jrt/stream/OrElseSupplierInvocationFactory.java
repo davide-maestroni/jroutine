@@ -48,7 +48,6 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      */
     OrElseSupplierInvocationFactory(final long count,
             @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
-
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
@@ -58,7 +57,6 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() {
-
         return new OrElseConsumerInvocation<DATA>(mCount, mOutputSupplier);
     }
 
@@ -83,26 +81,22 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
          */
         OrElseConsumerInvocation(final long count,
                 @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
-
             mCount = count;
             mOutputSupplier = outputSupplier;
         }
 
         @Override
         public void onInitialize() {
-
             mHasOutputs = false;
         }
 
         @Override
         public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
             mHasOutputs = true;
             result.pass(input);
         }
 
         public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
-
             if (!mHasOutputs) {
                 final long count = mCount;
                 final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;

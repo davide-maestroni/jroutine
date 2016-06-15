@@ -45,15 +45,16 @@ class LoopConsumerInvocation<OUT> extends GenerateInvocation<Object, OUT> {
      */
     LoopConsumerInvocation(final long count,
             @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> outputsConsumer) {
-
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("consumer instance", outputsConsumer)));
         mCount = count;
         mOutputsConsumer = outputsConsumer;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+    }
 
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
         final long count = mCount;
         final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {

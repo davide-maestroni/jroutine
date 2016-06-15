@@ -63,7 +63,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
      * @param configuration the channel configuration.
      */
     DefaultIOChannel(@NotNull final ChannelConfiguration configuration) {
-
         final InvocationConfiguration invocationConfiguration =
                 configuration.toOutputChannelConfiguration().apply();
         final Logger logger = invocationConfiguration.newLogger(this);
@@ -90,249 +89,209 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     public boolean abort() {
-
         return mInputChannel.abort() || mOutputChannel.abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-
         return mInputChannel.abort(reason) || mOutputChannel.abort(reason);
     }
 
     public boolean isEmpty() {
-
         return mInputChannel.isEmpty() && mOutputChannel.isEmpty();
     }
 
     public boolean isOpen() {
-
         return mInputChannel.isOpen();
     }
 
     public int size() {
-
         return mInputChannel.size();
     }
 
     @NotNull
     public IOChannel<DATA> after(@NotNull final UnitDuration delay) {
-
         mInputChannel.after(delay);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
-
         mInputChannel.after(delay, timeUnit);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> now() {
-
         mInputChannel.now();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> orderByCall() {
-
         mInputChannel.orderByCall();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> orderByDelay() {
-
         mInputChannel.orderByDelay();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
-
         mInputChannel.pass(channel);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
-
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> pass(@Nullable final DATA input) {
-
         mInputChannel.pass(input);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> pass(@Nullable final DATA... inputs) {
-
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> afterMax(@NotNull final UnitDuration timeout) {
-
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-
         mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> allInto(@NotNull final Collection<? super DATA> results) {
-
         mOutputChannel.allInto(results);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> bind(@NotNull final OutputConsumer<? super DATA> consumer) {
-
         mOutputChannel.bind(consumer);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> eventuallyAbort() {
-
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> eventuallyAbort(@Nullable final Throwable reason) {
-
         mOutputChannel.eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> eventuallyBreak() {
-
         mOutputChannel.eventuallyBreak();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> eventuallyThrow() {
-
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> immediately() {
-
         mOutputChannel.immediately();
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> skipNext(final int count) {
-
         mOutputChannel.skipNext(count);
         return this;
     }
 
     @NotNull
     public InputChannel<DATA> asInput() {
-
         return this;
     }
 
     @NotNull
     public OutputChannel<DATA> asOutput() {
-
         return this;
     }
 
     @NotNull
     public IOChannel<DATA> close() {
-
         mInputChannel.close();
         return this;
     }
 
     @NotNull
     public List<DATA> all() {
-
         return mOutputChannel.all();
     }
 
     @NotNull
     public <IN extends InputChannel<? super DATA>> IN bind(@NotNull final IN channel) {
-
         return mOutputChannel.bind(channel);
     }
 
     @NotNull
     public Iterator<DATA> eventualIterator() {
-
         return mOutputChannel.eventualIterator();
     }
 
     @Nullable
     public RoutineException getError() {
-
         return mOutputChannel.getError();
     }
 
     public boolean hasCompleted() {
-
         return mOutputChannel.hasCompleted();
     }
 
     public boolean hasNext() {
-
         return mOutputChannel.hasNext();
     }
 
     public DATA next() {
-
         return mOutputChannel.next();
     }
 
     public boolean isBound() {
-
         return mOutputChannel.isBound();
     }
 
     @NotNull
     public List<DATA> next(final int count) {
-
         return mOutputChannel.next(count);
     }
 
     public DATA nextOrElse(final DATA output) {
-
         return mOutputChannel.nextOrElse(output);
     }
 
     public void throwError() {
-
         mOutputChannel.throwError();
     }
 
     public Iterator<DATA> iterator() {
-
         return mOutputChannel.iterator();
     }
 
     public void remove() {
-
         mOutputChannel.remove();
     }
 
@@ -345,12 +304,10 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
 
         public void onAbort(@NotNull final RoutineException reason, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             mChannel.close(reason);
         }
 
         private void setChannel(@NotNull final DefaultResultChannel<?> channel) {
-
             mChannel = channel;
         }
     }
@@ -366,20 +323,17 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
          * @param wrapped the wrapped instance.
          */
         public IORunner(@NotNull final Runner wrapped) {
-
             super(wrapped);
         }
 
         @Override
         public boolean isExecutionThread() {
-
             return true;
         }
 
         @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             if (delay == 0) {
                 sSyncRunner.run(execution, delay, timeUnit);
 

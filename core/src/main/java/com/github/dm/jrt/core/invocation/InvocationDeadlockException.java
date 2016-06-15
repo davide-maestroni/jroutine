@@ -34,7 +34,6 @@ public class InvocationDeadlockException extends DeadlockException {
      * @param message the error message.
      */
     public InvocationDeadlockException(@Nullable final String message) {
-
         super(message);
     }
 }

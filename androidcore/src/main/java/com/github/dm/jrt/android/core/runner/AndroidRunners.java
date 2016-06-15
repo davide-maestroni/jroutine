@@ -41,7 +41,6 @@ public class AndroidRunners {
      * Avoid explicit instantiation.
      */
     protected AndroidRunners() {
-
         ConstantConditions.avoid();
     }
 
@@ -53,7 +52,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner handlerRunner(@NotNull final Handler handler) {
-
         return new HandlerRunner(handler);
     }
 
@@ -65,7 +63,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner handlerRunner(@NotNull final HandlerThread thread) {
-
         if (!thread.isAlive()) {
             thread.start();
         }
@@ -81,7 +78,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner looperRunner(@NotNull final Looper looper) {
-
         return new HandlerRunner(new Handler(looper));
     }
 
@@ -92,7 +88,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner mainRunner() {
-
         return sMainRunner;
     }
 
@@ -104,7 +99,6 @@ public class AndroidRunners {
     @NotNull
     @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
-
         return looperRunner(Looper.myLooper());
     }
 
@@ -119,7 +113,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner taskRunner() {
-
         return taskRunner(null);
     }
 
@@ -138,7 +131,6 @@ public class AndroidRunners {
      */
     @NotNull
     public static Runner taskRunner(@Nullable final Executor executor) {
-
         return new AsyncTaskRunner(executor);
     }
 }

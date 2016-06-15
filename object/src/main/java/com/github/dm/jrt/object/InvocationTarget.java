@@ -38,7 +38,6 @@ public abstract class InvocationTarget<TYPE> {
      * Avoid explicit instantiation.
      */
     private InvocationTarget() {
-
     }
 
     /**
@@ -51,7 +50,6 @@ public abstract class InvocationTarget<TYPE> {
     @NotNull
     public static <TYPE> InvocationTarget<TYPE> classOfType(
             @NotNull final Class<TYPE> targetClass) {
-
         return new ClassInvocationTarget<TYPE>(targetClass);
     }
 
@@ -64,7 +62,6 @@ public abstract class InvocationTarget<TYPE> {
      */
     @NotNull
     public static <TYPE> InvocationTarget<TYPE> instance(@NotNull final TYPE target) {
-
         return new InstanceInvocationTarget<TYPE>(target);
     }
 
@@ -115,32 +112,27 @@ public abstract class InvocationTarget<TYPE> {
          * @param targetClass the target class.
          */
         private ClassInvocationTarget(@NotNull final Class<TYPE> targetClass) {
-
             mTargetClass = ConstantConditions.notNull("target class", targetClass);
         }
 
         @Nullable
         @Override
         public Object getTarget() {
-
             return mTargetClass;
         }
 
         @Override
         public int hashCode() {
-
             return mTargetClass.hashCode();
         }
 
         @Override
         public boolean isOfType(@NotNull final Class<?> type) {
-
             return (mTargetClass == type);
         }
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -156,13 +148,11 @@ public abstract class InvocationTarget<TYPE> {
         @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
-
             return mTargetClass;
         }
 
         @Override
         public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
-
             return otherClass.isAssignableFrom(mTargetClass);
         }
     }
@@ -185,20 +175,17 @@ public abstract class InvocationTarget<TYPE> {
          */
         @SuppressWarnings("unchecked")
         private InstanceInvocationTarget(@NotNull final TYPE target) {
-
             mTarget = new WeakReference<TYPE>(target);
             mTargetClass = (Class<? extends TYPE>) target.getClass();
         }
 
         @Override
         public boolean isOfType(@NotNull final Class<?> type) {
-
             return type.isInstance(mTarget.get());
         }
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -215,7 +202,6 @@ public abstract class InvocationTarget<TYPE> {
 
         @Override
         public int hashCode() {
-
             final Object referent = mTarget.get();
             int result = (referent != null) ? referent.hashCode() : 0;
             result = 31 * result + mTargetClass.hashCode();
@@ -225,20 +211,17 @@ public abstract class InvocationTarget<TYPE> {
         @Nullable
         @Override
         public Object getTarget() {
-
             return mTarget.get();
         }
 
         @NotNull
         @Override
         public Class<? extends TYPE> getTargetClass() {
-
             return mTargetClass;
         }
 
         @Override
         public boolean isAssignableTo(@NotNull final Class<?> otherClass) {
-
             return otherClass.isInstance(mTarget.get());
         }
     }

@@ -38,13 +38,11 @@ class ParcelableValue implements Parcelable {
 
         @Override
         public ParcelableValue createFromParcel(final Parcel source) {
-
             return new ParcelableValue(source.readValue(ParcelableValue.class.getClassLoader()));
         }
 
         @Override
         public ParcelableValue[] newArray(final int size) {
-
             return new ParcelableValue[size];
         }
     };
@@ -57,19 +55,16 @@ class ParcelableValue implements Parcelable {
      * @param value the wrapped value.
      */
     ParcelableValue(@Nullable final Object value) {
-
         mValue = value;
     }
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-
         dest.writeValue(mValue);
     }
 
@@ -79,7 +74,6 @@ class ParcelableValue implements Parcelable {
      * @return the value.
      */
     public Object getValue() {
-
         return mValue;
     }
 }

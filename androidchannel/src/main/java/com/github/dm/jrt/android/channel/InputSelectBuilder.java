@@ -47,7 +47,6 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
      */
     InputSelectBuilder(@NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
-
         mChannel = ConstantConditions.notNull("input channel", channel);
         mIndex = index;
     }
@@ -55,7 +54,6 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
     @NotNull
     @Override
     protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<IN> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         final IOChannel<ParcelableSelectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();

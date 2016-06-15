@@ -45,7 +45,6 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
      * @param wrapped the wrapped instance.
      */
     BuilderWrapper(@NotNull final ChannelsBuilder<? extends OutputChannel<? extends OUT>> wrapped) {
-
         mBuilder = ConstantConditions.notNull("wrapped builder", wrapped);
     }
 
@@ -53,7 +52,6 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     @Override
     public ChannelsBuilder<LoaderStreamChannel<OUT, OUT>> apply(
             @NotNull final ChannelConfiguration configuration) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBuilder.channelConfiguration().with(null).with(configuration).apply();
         return this;
@@ -63,7 +61,6 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     @Override
     @SuppressWarnings("unchecked")
     public LoaderStreamChannel<OUT, OUT> buildChannels() {
-
         return new DefaultLoaderStreamChannel<OUT, OUT>(
                 (OutputChannel<OUT>) mBuilder.buildChannels());
     }
@@ -72,7 +69,6 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     @Override
     public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>> channelConfiguration
             () {
-
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>>(this, config);
     }

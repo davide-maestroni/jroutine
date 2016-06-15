@@ -45,7 +45,6 @@ public class AndroidBuilders {
      * Avoid explicit instantiation.
      */
     protected AndroidBuilders() {
-
         ConstantConditions.avoid();
     }
 
@@ -67,7 +66,6 @@ public class AndroidBuilders {
     public static LoaderConfiguration withAnnotations(
             @Nullable final LoaderConfiguration configuration,
             @Nullable final Annotation... annotations) {
-
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 LoaderConfiguration.builderFrom(configuration);
         if (annotations == null) {
@@ -117,7 +115,6 @@ public class AndroidBuilders {
     @NotNull
     public static LoaderConfiguration withAnnotations(
             @Nullable final LoaderConfiguration configuration, @NotNull final Method method) {
-
         return withAnnotations(configuration, method.getDeclaredAnnotations());
     }
 }

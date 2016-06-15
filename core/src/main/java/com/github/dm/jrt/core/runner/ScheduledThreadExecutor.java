@@ -41,20 +41,17 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
      * @param service the executor service.
      */
     ScheduledThreadExecutor(@NotNull final ExecutorService service) {
-
         super(1);
         mExecutor = ConstantConditions.notNull("executor service", service);
     }
 
     @Override
     public int hashCode() {
-
         return mExecutor.hashCode();
     }
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
@@ -71,7 +68,6 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     @Override
     public ScheduledFuture<?> schedule(final Runnable command, final long delay,
             final TimeUnit unit) {
-
         return super.schedule(new CommandRunnable(mExecutor, command), delay, unit);
     }
 
@@ -79,7 +75,6 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     @Override
     public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay,
             final TimeUnit unit) {
-
         return ConstantConditions.unsupported();
     }
 
@@ -87,7 +82,6 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay,
             final long period, final TimeUnit unit) {
-
         return ConstantConditions.unsupported();
     }
 
@@ -95,7 +89,6 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
             final long initialDelay, final long delay, final TimeUnit unit) {
-
         return ConstantConditions.unsupported();
     }
 
@@ -116,13 +109,11 @@ class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
          */
         private CommandRunnable(@NotNull final ExecutorService service,
                 @NotNull final Runnable command) {
-
             mService = service;
             mCommand = command;
         }
 
         public void run() {
-
             mService.execute(mCommand);
         }
     }

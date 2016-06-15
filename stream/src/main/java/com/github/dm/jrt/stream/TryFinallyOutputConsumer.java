@@ -44,13 +44,11 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
      */
     TryFinallyOutputConsumer(@NotNull final Runnable finallyRunnable,
             @NotNull final IOChannel<OUT> outputChannel) {
-
         mFinallyRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
     public void onComplete() {
-
         try {
             mFinallyRunnable.run();
 
@@ -60,7 +58,6 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         try {
             mFinallyRunnable.run();
 
@@ -70,7 +67,6 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
     }
 
     public void onOutput(final OUT output) {
-
         mOutputChannel.pass(output);
     }
 }

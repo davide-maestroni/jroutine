@@ -38,7 +38,6 @@ class RoutineExceptionWrapper {
      * @param cause the cause exception.
      */
     private RoutineExceptionWrapper(@Nullable final Throwable cause) {
-
         mCause = cause;
     }
 
@@ -50,7 +49,6 @@ class RoutineExceptionWrapper {
      */
     @NotNull
     static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
-
         return new RoutineExceptionWrapper(t);
     }
 
@@ -61,7 +59,6 @@ class RoutineExceptionWrapper {
      */
     @NotNull
     RoutineException raise() {
-
         return InvocationException.wrapIfNeeded(mCause);
     }
 }

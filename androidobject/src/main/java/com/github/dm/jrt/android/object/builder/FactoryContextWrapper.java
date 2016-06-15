@@ -36,13 +36,11 @@ public abstract class FactoryContextWrapper extends ContextWrapper implements Fa
      * @param base the base context.
      */
     public FactoryContextWrapper(@NotNull final Context base) {
-
         super(base.getApplicationContext());
     }
 
     @Override
     public Context getApplicationContext() {
-
         return this;
     }
 }

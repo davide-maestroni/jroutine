@@ -1858,6 +1858,32 @@ public class StreamChannelTest {
     }
 
     @Test
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public void testOnComplete() {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(Streams.streamOf("test").onComplete(new Runnable() {
+
+            public void run() {
+                isComplete.set(true);
+            }
+        }).afterMax(seconds(3)).all()).isEmpty();
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(Streams.streamOf("test").map(new Function<String, String>() {
+
+            public String apply(final String s) throws Exception {
+                throw new NoSuchElementException();
+            }
+        }).onComplete(new Runnable() {
+
+            public void run() {
+                isComplete.set(true);
+            }
+        }).afterMax(seconds(3)).getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
+    }
+
+    @Test
     public void testOrElse() {
 
         assertThat(
@@ -2002,6 +2028,31 @@ public class StreamChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("test1", "test2", "test3");
         assertThat(data).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    public void testPeekComplete() {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(Streams.streamOf("test1", "test2", "test3").async().peekComplete(new Runnable() {
+
+            public void run() {
+                isComplete.set(true);
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "test2", "test3");
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(Streams.streamOf("test").map(new Function<String, String>() {
+
+            public String apply(final String s) throws Exception {
+                throw new NoSuchElementException();
+            }
+        }).peekComplete(new Runnable() {
+
+            public void run() {
+                isComplete.set(true);
+            }
+        }).afterMax(seconds(3)).getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
     }
 
     @Test
@@ -2240,8 +2291,7 @@ public class StreamChannelTest {
                                   return Math.sqrt(number.doubleValue());
                               }
                           })
-                          .map(Streams.mean())
-                          .map(Streams.castTo(Double.class))
+                          .map(Streams.averageDouble())
                           .next()).isCloseTo(21, Offset.offset(0.1));
     }
 

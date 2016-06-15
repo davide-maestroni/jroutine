@@ -33,7 +33,6 @@ public class AndroidLog implements com.github.dm.jrt.core.log.Log {
     @Override
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         if (throwable != null) {
             Log.d(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
@@ -45,7 +44,6 @@ public class AndroidLog implements com.github.dm.jrt.core.log.Log {
     @Override
     public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         if (throwable != null) {
             Log.e(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
@@ -57,7 +55,6 @@ public class AndroidLog implements com.github.dm.jrt.core.log.Log {
     @Override
     public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         if (throwable != null) {
             Log.w(contexts.get(contexts.size() - 1).toString(), message, throwable);
 

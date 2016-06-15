@@ -49,7 +49,6 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
      */
     private RoutineInvocation(@NotNull final Routine<IN, OUT> routine,
             @NotNull final InvocationMode invocationMode) {
-
         mRoutine = routine;
         mInvocationMode = invocationMode;
     }
@@ -66,19 +65,16 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, @NotNull final InvocationMode invocationMode) {
-
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
     public void onDestroy() {
-
         mRoutine.purge();
     }
 
     @NotNull
     @Override
     protected OutputChannel<OUT> onChannel(@NotNull final OutputChannel<IN> channel) {
-
         final InvocationMode invocationMode = mInvocationMode;
         return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
                 : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
@@ -106,7 +102,6 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
          */
         private RoutineInvocationFactory(@NotNull final Routine<IN, OUT> routine,
                 @NotNull final InvocationMode invocationMode) {
-
             super(asArgs(ConstantConditions.notNull("routine instance", routine),
                     ConstantConditions.notNull("invocation mode", invocationMode)));
             mRoutine = routine;
@@ -116,7 +111,6 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
-
             return new RoutineInvocation<IN, OUT>(mRoutine, mInvocationMode);
         }
     }

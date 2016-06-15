@@ -43,7 +43,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      */
     @NotNull
     public static LogSet of(@NotNull final Log... logs) {
-
         return new LogSet().appendAll(logs);
     }
 
@@ -55,7 +54,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      */
     @NotNull
     public static LogSet of(@NotNull final Collection<? extends Log> logs) {
-
         return new LogSet().appendAll(logs);
     }
 
@@ -72,7 +70,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      * @see #add(Object)
      */
     public boolean addAll(@NotNull final Log... logs) {
-
         boolean result = true;
         for (final Log log : logs) {
             result &= add(log);
@@ -96,7 +93,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      */
     @NotNull
     public LogSet append(final Log log) {
-
         add(log);
         return this;
     }
@@ -115,7 +111,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      */
     @NotNull
     public LogSet appendAll(final Log... logs) {
-
         addAll(logs);
         return this;
     }
@@ -135,14 +130,12 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      */
     @NotNull
     public LogSet appendAll(final Collection<? extends Log> logs) {
-
         addAll(logs);
         return this;
     }
 
     @Override
     public boolean contains(final Object o) {
-
         if (o instanceof LogSet) {
             return super.containsAll((LogSet) o);
         }
@@ -152,7 +145,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean remove(final Object o) {
-
         if (o instanceof LogSet) {
             return super.removeAll((LogSet) o);
         }
@@ -162,7 +154,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean add(final Log log) {
-
         ConstantConditions.notNull("log instance", log);
         if (log instanceof LogSet) {
             return super.addAll((LogSet) log);
@@ -173,7 +164,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean containsAll(final Collection<?> c) {
-
         for (final Object o : c) {
             if (!contains(o)) {
                 return false;
@@ -185,7 +175,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean addAll(final Collection<? extends Log> c) {
-
         boolean result = true;
         for (final Log log : c) {
             result &= add(log);
@@ -196,7 +185,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean removeAll(final Collection<?> c) {
-
         boolean result = true;
         for (final Object o : c) {
             result &= remove(o);
@@ -207,7 +195,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     @Override
     public boolean retainAll(final Collection<?> c) {
-
         final ArrayList<Object> list = new ArrayList<Object>(c.size());
         for (final Object o : c) {
             if (o instanceof LogSet) {
@@ -229,7 +216,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      * @see #contains(Object)
      */
     public boolean containsAll(final Log... logs) {
-
         for (final Log log : logs) {
             if (!contains(log)) {
                 return false;
@@ -241,7 +227,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         for (final Log log : this) {
             log.dbg(contexts, message, throwable);
         }
@@ -249,7 +234,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         for (final Log log : this) {
             log.err(contexts, message, throwable);
         }
@@ -257,7 +241,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         for (final Log log : this) {
             log.wrn(contexts, message, throwable);
         }
@@ -271,7 +254,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      * @see #remove(Object)
      */
     public boolean removeAll(final Log... logs) {
-
         boolean result = true;
         for (final Log log : logs) {
             result &= remove(log);
@@ -290,7 +272,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
      * @see #remove(Object)
      */
     public boolean retainAll(final Log... logs) {
-
         final ArrayList<Object> list = new ArrayList<Object>(logs.length);
         for (final Log log : logs) {
             if (log instanceof LogSet) {

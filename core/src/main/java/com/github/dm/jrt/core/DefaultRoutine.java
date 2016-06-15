@@ -44,7 +44,6 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      */
     DefaultRoutine(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationFactory<IN, OUT> factory) {
-
         super(configuration);
         mFactory = ConstantConditions.notNull("invocation factory", factory);
     }
@@ -53,7 +52,6 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     @Override
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
             Exception {
-
         final Logger logger = getLogger();
         final InvocationFactory<IN, OUT> factory = mFactory;
         logger.dbg("creating a new invocation instance with factory: %s", factory);

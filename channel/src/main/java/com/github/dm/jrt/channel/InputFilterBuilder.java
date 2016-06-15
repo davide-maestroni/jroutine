@@ -46,7 +46,6 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
      * @param index   the selectable index.
      */
     InputFilterBuilder(@NotNull final InputChannel<? super IN> channel, final int index) {
-
         mChannel = ConstantConditions.notNull("input channel", channel);
         mIndex = index;
     }
@@ -54,7 +53,6 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
     @NotNull
     @Override
     protected IOChannel<Selectable<IN>> build(@NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<Selectable<IN>> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
@@ -81,23 +79,19 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
          */
         private FilterOutputConsumer(@NotNull final IOChannel<? super IN> channel,
                 final int index) {
-
             mChannel = channel;
             mIndex = index;
         }
 
         public void onComplete() {
-
             mChannel.close();
         }
 
         public void onError(@NotNull final RoutineException error) {
-
             mChannel.abort(error);
         }
 
         public void onOutput(final Selectable<IN> selectable) {
-
             if (selectable.index == mIndex) {
                 mChannel.pass(selectable.data);
             }

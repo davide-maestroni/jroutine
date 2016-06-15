@@ -45,7 +45,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
      */
     JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         final ArrayList<OutputChannel<? extends OUT>> channelList =
                 new ArrayList<OutputChannel<? extends OUT>>();
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -70,7 +69,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
     @Override
     protected OutputChannel<List<? extends OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
         final IOChannel<List<? extends OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
@@ -142,7 +140,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
                 final boolean isFlush, @NotNull final boolean[] closed,
                 @NotNull final SimpleQueue<OUT>[] queues, @Nullable final OUT placeholder,
                 @NotNull final IOChannel<List<? extends OUT>> channel) {
-
             mLimit = limit;
             mBackoff = backoff;
             mMaxSize = maxSize;
@@ -156,7 +153,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         }
 
         public void onComplete() {
-
             boolean isClosed = true;
             synchronized (mMutex) {
                 mClosed[mIndex] = true;
@@ -178,12 +174,10 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         }
 
         public void onError(@NotNull final RoutineException error) {
-
             mChannel.abort(error);
         }
 
         public void onOutput(final OUT output) throws InterruptedException {
-
             final SimpleQueue<OUT>[] queues = mQueues;
             final SimpleQueue<OUT> myQueue = queues[mIndex];
             final ArrayList<OUT> outputs;
@@ -231,7 +225,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         }
 
         private void flush() {
-
             final IOChannel<List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;

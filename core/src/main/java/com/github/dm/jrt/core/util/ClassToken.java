@@ -59,7 +59,6 @@ public abstract class ClassToken<TYPE> {
      */
     @NotNull
     public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
-
         ConstantConditions.notNull("token raw type", rawClass);
         final ClassToken<TYPE> classToken = new DefaultClassToken<TYPE>();
         classToken.mGenericType = rawClass;
@@ -77,7 +76,6 @@ public abstract class ClassToken<TYPE> {
     @NotNull
     @SuppressWarnings("unchecked")
     public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final TYPE object) {
-
         return tokenOf((Class<TYPE>) object.getClass());
     }
 
@@ -91,7 +89,6 @@ public abstract class ClassToken<TYPE> {
      */
     @SuppressWarnings("unchecked")
     public final TYPE cast(final Object object) {
-
         return (TYPE) object;
     }
 
@@ -102,7 +99,6 @@ public abstract class ClassToken<TYPE> {
      */
     @NotNull
     public final Type getGenericType() {
-
         if (mGenericType == null) {
             Class<?> subClass = getClass();
             Class<?> superClass = subClass.getSuperclass();
@@ -134,7 +130,6 @@ public abstract class ClassToken<TYPE> {
     @NotNull
     @SuppressWarnings("unchecked")
     public final Class<TYPE> getRawClass() {
-
         if (mRawClass == null) {
             final Type type = getGenericType();
             if (type instanceof Class) {
@@ -155,13 +150,11 @@ public abstract class ClassToken<TYPE> {
 
     @Override
     public int hashCode() {
-
         return getRawClass().hashCode();
     }
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
@@ -183,7 +176,6 @@ public abstract class ClassToken<TYPE> {
      *                                         token.
      */
     public final boolean isAssignableFrom(@NotNull final ClassToken<?> other) {
-
         return getRawClass().isAssignableFrom(other.getRawClass());
     }
 
@@ -195,7 +187,6 @@ public abstract class ClassToken<TYPE> {
      *                                         token.
      */
     public final boolean isInterface() {
-
         return getRawClass().isInterface();
     }
 

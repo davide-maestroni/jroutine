@@ -98,7 +98,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      */
     DefaultServiceObjectRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
-
         mContext = ConstantConditions.notNull("service context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
@@ -106,7 +105,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Nullable
     private static Set<String> fieldsWithShareAnnotation(
             @NotNull final ObjectConfiguration configuration, @NotNull final Method method) {
-
         final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
         if (sharedFieldsAnnotation != null) {
             final HashSet<String> set = new HashSet<String>();
@@ -120,7 +118,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     private static Class<?>[] forNames(@NotNull final String[] names) throws
             ClassNotFoundException {
-
         // The forName() of primitive classes is broken...
         final int length = names.length;
         final Class<?>[] classes = new Class[length];
@@ -141,7 +138,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     @NotNull
     private static String[] toNames(@NotNull final Class<?>[] classes) {
-
         final int length = classes.length;
         final String[] names = new String[length];
         for (int i = 0; i < length; ++i) {
@@ -154,7 +150,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
-
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
@@ -162,7 +157,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -171,7 +165,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -179,7 +172,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -193,7 +185,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
@@ -201,7 +192,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Override
     @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
         if (targetMethod == null) {
@@ -230,7 +220,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final Set<String> sharedFields =
@@ -253,7 +242,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-
         return method(method.getName(), method.getParameterTypes());
     }
 
@@ -261,7 +249,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Override
     public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
@@ -270,7 +257,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Override
     public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration
             () {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
@@ -279,7 +265,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Override
     public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     serviceConfiguration() {
-
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
@@ -311,7 +296,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          */
         private MethodAliasInvocation(@Nullable final Set<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
-
             mSharedFields = sharedFields;
             mTarget = target;
             mAliasName = name;
@@ -319,7 +303,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             super.onContext(context);
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
@@ -332,26 +315,22 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onInitialize() {
-
             mChannel = mRoutine.syncInvoke();
         }
 
         @Override
         public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
                 Exception {
-
             mChannel.pass(input);
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<Object> result) {
-
             result.pass(mChannel.result());
         }
 
         @Override
         public void onTerminate() {
-
             mChannel = null;
         }
     }
@@ -389,7 +368,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         private MethodSignatureInvocation(@Nullable final Set<String> sharedFields,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
                 @NotNull final String[] parameterTypes) throws ClassNotFoundException {
-
             mSharedFields = sharedFields;
             mTarget = target;
             mMethodName = name;
@@ -398,7 +376,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             super.onContext(context);
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
@@ -411,26 +388,22 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onInitialize() {
-
             mChannel = mRoutine.syncInvoke();
         }
 
         @Override
         public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
                 Exception {
-
             mChannel.pass(input);
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<Object> result) {
-
             result.pass(mChannel.result());
         }
 
         @Override
         public void onTerminate() {
-
             mChannel = null;
         }
     }
@@ -472,7 +445,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 @NotNull final String[] targetParameterTypes, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) throws ClassNotFoundException,
                 NoSuchMethodException {
-
             mSharedFields = sharedFields;
             mTarget = target;
             mTargetMethod = target.getTargetClass()
@@ -483,7 +455,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             super.onContext(context);
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             final Object mutexTarget =
@@ -496,7 +467,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         @Override
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
-
             callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }
@@ -523,7 +493,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
          * @param builder the builder instance.
          */
         private ProxyInvocationHandler(@NotNull final DefaultServiceObjectRoutineBuilder builder) {
-
             mContext = builder.mContext;
             mTarget = builder.mTarget;
             mInvocationConfiguration = builder.mInvocationConfiguration;
@@ -534,7 +503,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
-
             final ContextInvocationTarget<?> target = mTarget;
             final MethodInfo methodInfo = getTargetMethodInfo(target.getTargetClass(), method);
             final Method targetMethod = methodInfo.method;

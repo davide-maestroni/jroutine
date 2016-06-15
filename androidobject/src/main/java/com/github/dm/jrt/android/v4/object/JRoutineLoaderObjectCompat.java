@@ -82,7 +82,6 @@ public class JRoutineLoaderObjectCompat {
      * Avoid explicit instantiation.
      */
     protected JRoutineLoaderObjectCompat() {
-
         ConstantConditions.avoid();
     }
 
@@ -94,7 +93,6 @@ public class JRoutineLoaderObjectCompat {
      */
     @NotNull
     public static LoaderObjectBuilderCompat with(@NotNull final LoaderContextCompat context) {
-
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContextCompat, LoaderObjectBuilderCompat> builders = sBuilders;
             LoaderObjectBuilderCompat builder = builders.get(context);
@@ -120,7 +118,6 @@ public class JRoutineLoaderObjectCompat {
          * @param context the loader context.
          */
         private LoaderObjectBuilderCompat(@NotNull final LoaderContextCompat context) {
-
             mContext = ConstantConditions.notNull("loader context", context);
         }
 
@@ -145,7 +142,6 @@ public class JRoutineLoaderObjectCompat {
          */
         @NotNull
         public LoaderObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
-
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }
     }

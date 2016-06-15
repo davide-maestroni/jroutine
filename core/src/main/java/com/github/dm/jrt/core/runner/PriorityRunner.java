@@ -59,7 +59,6 @@ public class PriorityRunner {
 
                 @Override
                 protected HashSet<PriorityExecution> initialValue() {
-
                     return new HashSet<PriorityExecution>();
                 }
             };
@@ -91,7 +90,6 @@ public class PriorityRunner {
      * @param wrapped the wrapped instance.
      */
     private PriorityRunner(@NotNull final Runner wrapped) {
-
         mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
     }
@@ -106,7 +104,6 @@ public class PriorityRunner {
      */
     @NotNull
     static PriorityRunner getInstance(@NotNull final Runner wrapped) {
-
         if (wrapped instanceof QueuingRunner) {
             return ((QueuingRunner) wrapped).enclosingRunner();
         }
@@ -124,7 +121,6 @@ public class PriorityRunner {
     }
 
     private static int compareLong(final long l1, final long l2) {
-
         return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
     }
 
@@ -136,7 +132,6 @@ public class PriorityRunner {
      */
     @NotNull
     public Runner getRunner(final int priority) {
-
         synchronized (mRunners) {
             final WeakHashMap<QueuingRunner, Void> runners = mRunners;
             for (final QueuingRunner runner : runners.keySet()) {
@@ -161,7 +156,6 @@ public class PriorityRunner {
         private static final long serialVersionUID = -1;
 
         public int compare(final PriorityExecution e1, final PriorityExecution e2) {
-
             final int thisPriority = e1.mPriority;
             final long thisAge = e1.mAge;
             final int thatPriority = e2.mPriority;
@@ -184,12 +178,10 @@ public class PriorityRunner {
          * @param execution the priority execution.
          */
         private DelayedExecution(@NotNull final PriorityExecution execution) {
-
             mExecution = execution;
         }
 
         public void run() {
-
             final PriorityExecution execution = mExecution;
             mDelayedExecutions.remove(execution);
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
@@ -219,12 +211,10 @@ public class PriorityRunner {
          * @param execution the priority execution.
          */
         private ImmediateExecution(@NotNull final PriorityExecution execution) {
-
             mExecution = execution;
         }
 
         public void run() {
-
             final PriorityExecution execution = mExecution;
             mImmediateExecutions.remove(execution);
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
@@ -261,14 +251,12 @@ public class PriorityRunner {
          */
         private PriorityExecution(@NotNull final Execution execution, final int priority,
                 final long age) {
-
             mExecution = execution;
             mPriority = priority;
             mAge = age;
         }
 
         public void run() {
-
             final Execution execution = mExecution;
             synchronized (mExecutions) {
                 final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
@@ -300,14 +288,12 @@ public class PriorityRunner {
          * @param priority the execution priority.
          */
         private QueuingRunner(final int priority) {
-
             super(mRunner);
             mPriority = priority;
         }
 
         @Override
         public void cancel(@NotNull final Execution execution) {
-
             final WeakHashMap<PriorityExecution, Void> priorityExecutions;
             synchronized (mExecutions) {
                 priorityExecutions = mExecutions.remove(execution);
@@ -341,7 +327,6 @@ public class PriorityRunner {
         @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
             synchronized (mExecutions) {
@@ -376,7 +361,6 @@ public class PriorityRunner {
 
         @NotNull
         private PriorityRunner enclosingRunner() {
-
             return PriorityRunner.this;
         }
     }

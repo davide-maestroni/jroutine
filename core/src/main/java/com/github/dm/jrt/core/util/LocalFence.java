@@ -32,7 +32,6 @@ public class LocalFence {
      * Enters the fence on the current thread.
      */
     public void enter() {
-
         mCount.get().incValue();
     }
 
@@ -40,7 +39,6 @@ public class LocalFence {
      * Exits the fence on the current thread.
      */
     public void exit() {
-
         mCount.get().decValue();
     }
 
@@ -50,7 +48,6 @@ public class LocalFence {
      * @return whether the thread is in the fence.
      */
     public boolean isInside() {
-
         return mCount.get().getValue() > 0;
     }
 
@@ -62,17 +59,14 @@ public class LocalFence {
         private int mCount;
 
         private void decValue() {
-
             mCount = ConstantConditions.notNegative("count", mCount - 1);
         }
 
         private int getValue() {
-
             return mCount;
         }
 
         private void incValue() {
-
             ++mCount;
         }
     }
@@ -84,7 +78,6 @@ public class LocalFence {
 
         @Override
         protected Count initialValue() {
-
             return new Count();
         }
     }

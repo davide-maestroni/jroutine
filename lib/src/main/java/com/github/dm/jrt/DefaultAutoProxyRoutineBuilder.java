@@ -53,7 +53,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
                 @NotNull
                 public DefaultAutoProxyRoutineBuilder apply(
                         @NotNull final InvocationConfiguration configuration) {
-
                     mInvocationConfiguration = configuration;
                     return DefaultAutoProxyRoutineBuilder.this;
                 }
@@ -68,7 +67,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
                 @NotNull
                 public DefaultAutoProxyRoutineBuilder apply(
                         @NotNull final ObjectConfiguration configuration) {
-
                     mObjectConfiguration = configuration;
                     return DefaultAutoProxyRoutineBuilder.this;
                 }
@@ -82,7 +80,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
      *                                            interface.
      */
     DefaultAutoProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
             throw new IllegalArgumentException(
@@ -94,7 +91,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         final BuilderType builderType = mBuilderType;
         if (builderType == null) {
             final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
@@ -113,33 +109,28 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-
         return newObjectBuilder().method(name);
     }
 
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         return newObjectBuilder().method(name, parameterTypes);
     }
 
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-
         return newObjectBuilder().method(method);
     }
 
     @NotNull
     public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(
                 mInvocationConfigurable, config);
@@ -147,7 +138,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
                 config);
@@ -155,14 +145,12 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     public AutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-
         mBuilderType = builderType;
         return this;
     }
 
     @NotNull
     private ObjectRoutineBuilder newObjectBuilder() {
-
         return JRoutineObject.on(mTarget)
                              .invocationConfiguration()
                              .with(mInvocationConfiguration)
@@ -174,7 +162,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     private ProxyRoutineBuilder newProxyBuilder() {
-
         return JRoutineProxy.on(mTarget)
                             .invocationConfiguration()
                             .with(mInvocationConfiguration)

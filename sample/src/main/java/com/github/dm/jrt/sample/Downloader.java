@@ -60,7 +60,6 @@ public class Downloader {
      * @param maxParallelDownloads the max number of parallel downloads running at the same time.
      */
     public Downloader(final int maxParallelDownloads) {
-
         // The read connection invocation is stateless so we can just use a single instance of it
         mReadConnection = JRoutineCore.on(new ReadConnection())
                                       .invocationConfiguration()
@@ -81,7 +80,6 @@ public class Downloader {
      * @return the file name.
      */
     public static String getFileName(final URI uri) {
-
         final String path = uri.getPath();
         final String fileName = path.substring(path.lastIndexOf('/') + 1);
         if (fileName.equals("")) {
@@ -103,7 +101,6 @@ public class Downloader {
      * @throws java.net.URISyntaxException if one of the specified URIs is not correctly formatted.
      */
     public static void main(final String args[]) throws IOException, URISyntaxException {
-
         final File downloadDir = new File(args[0]);
         final Downloader downloader = new Downloader(Integer.parseInt(args[1]));
         for (int i = 2; i < args.length; ++i) {
@@ -119,7 +116,6 @@ public class Downloader {
      * @return whether the download was running and has been successfully aborted.
      */
     public boolean abort(final URI uri) {
-
         final OutputChannel<Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort();
     }
@@ -133,7 +129,6 @@ public class Downloader {
      * elapsed.
      */
     public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
-
         final OutputChannel<Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort() && channel.afterMax(timeout).hasCompleted();
     }
@@ -145,7 +140,6 @@ public class Downloader {
      * @param dstFile the destination file.
      */
     public void download(final URI uri, final File dstFile) {
-
         final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
         // Check if we are already downloading the same resource
         if (!downloads.containsKey(uri)) {
@@ -179,7 +173,6 @@ public class Downloader {
      * @return whether the resource was downloaded.
      */
     public boolean isDownloaded(final URI uri) {
-
         return waitDone(uri, zero());
     }
 
@@ -190,7 +183,6 @@ public class Downloader {
      * @return whether the resource is downloading.
      */
     public boolean isDownloading(final URI uri) {
-
         return mDownloads.containsKey(uri);
     }
 
@@ -202,7 +194,6 @@ public class Downloader {
      * @return whether the resource was successfully downloaded.
      */
     public boolean waitDone(final URI uri, final UnitDuration timeout) {
-
         final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
         final OutputChannel<Boolean> channel = downloads.get(uri);
         // Check if the output channel is in the map, that is, the resource is currently downloading

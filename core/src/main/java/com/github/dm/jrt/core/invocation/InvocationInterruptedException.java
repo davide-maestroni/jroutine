@@ -31,7 +31,6 @@ public class InvocationInterruptedException extends InvocationException {
      * @param cause the wrapped exception.
      */
     public InvocationInterruptedException(@Nullable final InterruptedException cause) {
-
         super(cause);
         Thread.currentThread().interrupt();
     }
@@ -45,14 +44,11 @@ public class InvocationInterruptedException extends InvocationException {
      *                                        {@code InterruptedException}.
      */
     public static void throwIfInterrupt(@Nullable final Throwable t) {
-
         if (t instanceof InvocationInterruptedException) {
-
             throw ((InvocationInterruptedException) t);
         }
 
         if (t instanceof InterruptedException) {
-
             throw new InvocationInterruptedException((InterruptedException) t);
         }
     }

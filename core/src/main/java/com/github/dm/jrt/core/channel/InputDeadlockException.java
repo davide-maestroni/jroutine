@@ -33,7 +33,6 @@ public class InputDeadlockException extends DeadlockException {
      * @param message the error message.
      */
     public InputDeadlockException(@Nullable final String message) {
-
         super(message);
     }
 }

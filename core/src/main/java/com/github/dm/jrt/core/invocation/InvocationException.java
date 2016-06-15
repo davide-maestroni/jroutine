@@ -34,7 +34,6 @@ public class InvocationException extends RoutineException {
      * @param cause the wrapped exception.
      */
     public InvocationException(@Nullable final Throwable cause) {
-
         super(cause);
     }
 
@@ -47,7 +46,6 @@ public class InvocationException extends RoutineException {
      */
     @NotNull
     public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
-
         return (cause instanceof RoutineException) ? (RoutineException) cause
                 : new InvocationException(cause);
     }

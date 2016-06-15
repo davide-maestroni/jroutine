@@ -51,7 +51,6 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
      */
     CombineBuilder(final int startIndex,
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         final ArrayList<InputChannel<? extends IN>> channelList =
                 new ArrayList<InputChannel<? extends IN>>();
         for (final InputChannel<? extends IN> channel : channels) {
@@ -76,7 +75,6 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
     @SuppressWarnings("unchecked")
     protected IOChannel<Selectable<? extends IN>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final ArrayList<InputChannel<? extends IN>> channels = mChannels;
         final ArrayList<IOChannel<? extends IN>> channelList =
                 new ArrayList<IOChannel<? extends IN>>(channels.size());
@@ -116,28 +114,24 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
          */
         private SortingArrayOutputConsumer(final int startIndex,
                 @NotNull final ArrayList<IOChannel<? extends IN>> channels) {
-
             mStartIndex = startIndex;
             mChannelList = channels;
             mSize = channels.size();
         }
 
         public void onComplete() {
-
             for (final IOChannel<? extends IN> channel : mChannelList) {
                 channel.close();
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
-
             for (final IOChannel<? extends IN> channel : mChannelList) {
                 channel.abort(error);
             }
         }
 
         public void onOutput(final Selectable<? extends IN> selectable) {
-
             final int index = selectable.index - mStartIndex;
             if ((index < 0) || (index >= mSize)) {
                 return;

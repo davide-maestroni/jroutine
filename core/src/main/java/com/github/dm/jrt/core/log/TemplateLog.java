@@ -54,7 +54,6 @@ public abstract class TemplateLog implements Log {
      */
     @NotNull
     public static String printStackTrace(@NotNull final Throwable throwable) {
-
         final StringWriter writer = new StringWriter();
         throwable.printStackTrace(new PrintWriter(writer));
         return writer.toString();
@@ -62,7 +61,6 @@ public abstract class TemplateLog implements Log {
 
     private static String format(@NotNull final Level level, @NotNull final List<Object> contexts,
             @Nullable final String message) {
-
         return String.format(LOG_FORMAT,
                 new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(new Date()),
                 Thread.currentThread().getName(), contexts.toString(), level, message);
@@ -70,19 +68,16 @@ public abstract class TemplateLog implements Log {
 
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         log(Level.DEBUG, contexts, message, throwable);
     }
 
     public void err(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         log(Level.ERROR, contexts, message, throwable);
     }
 
     public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
-
         log(Level.WARNING, contexts, message, throwable);
     }
 
@@ -96,7 +91,6 @@ public abstract class TemplateLog implements Log {
      */
     protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
-
         String formatted = format(level, contexts, message);
         if (throwable != null) {
             formatted += String.format(EXCEPTION_FORMAT, printStackTrace(throwable));
@@ -111,6 +105,5 @@ public abstract class TemplateLog implements Log {
      * @param message the message.
      */
     protected void log(@NotNull final String message) {
-
     }
 }

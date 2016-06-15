@@ -29,7 +29,6 @@ public class ConstantConditions {
      * Avoid explicit instantiation.
      */
     protected ConstantConditions() {
-
         avoid();
     }
 
@@ -39,7 +38,6 @@ public class ConstantConditions {
      * @throws java.lang.AssertionError if the method is called.
      */
     public static void avoid() {
-
         throw new AssertionError("method " + buildMethodName() + " cannot be called");
     }
 
@@ -51,7 +49,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     public static int notNegative(final int number) {
-
         return notNegative("number", number);
     }
 
@@ -64,7 +61,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     public static int notNegative(final String name, final int number) {
-
         return (int) notNegative(name, (long) number);
     }
 
@@ -76,7 +72,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     public static long notNegative(final long number) {
-
         return notNegative("number", number);
     }
 
@@ -89,7 +84,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     public static long notNegative(final String name, final long number) {
-
         if (number < 0) {
             throw new IllegalArgumentException(
                     "the " + name + " must not be negative, but is: " + number);
@@ -108,7 +102,6 @@ public class ConstantConditions {
      */
     @NotNull
     public static <TYPE> TYPE notNull(final TYPE object) {
-
         return notNull("object", object);
     }
 
@@ -123,7 +116,6 @@ public class ConstantConditions {
      */
     @NotNull
     public static <TYPE> TYPE notNull(final String name, final TYPE object) {
-
         if (object == null) {
             throw new NullPointerException("the " + name + " must not be null");
         }
@@ -139,7 +131,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
      */
     public static int positive(final int number) {
-
         return positive("number", number);
     }
 
@@ -152,7 +143,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
      */
     public static int positive(final String name, final int number) {
-
         return (int) positive(name, (long) number);
     }
 
@@ -164,7 +154,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
      */
     public static long positive(final long number) {
-
         return positive("number", number);
     }
 
@@ -177,7 +166,6 @@ public class ConstantConditions {
      * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
      */
     public static long positive(final String name, final long number) {
-
         if (number <= 0) {
             throw new IllegalArgumentException(
                     "the " + name + " must be positive, but is: " + number);
@@ -194,14 +182,12 @@ public class ConstantConditions {
      * @throws java.lang.UnsupportedOperationException if the method is called.
      */
     public static <R> R unsupported() {
-
         throw new UnsupportedOperationException(
                 "method " + buildMethodName() + " is not supported");
     }
 
     @NotNull
     private static String buildMethodName() {
-
         final StackTraceElement traceElement = Thread.currentThread().getStackTrace()[3];
         return traceElement.getClassName() + "#" + traceElement.getMethodName();
     }

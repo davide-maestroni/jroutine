@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -29,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 04/19/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
 abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
@@ -40,34 +40,24 @@ abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
      * @param args the constructor arguments.
      */
     GenerateInvocation(@Nullable final Object[] args) {
-
         super(args);
     }
 
     @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() {
-
         return this;
     }
 
     public final void onAbort(@NotNull final RoutineException reason) {
-
     }
 
     public final void onDestroy() {
-
     }
 
     public final void onInitialize() {
-
-    }
-
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
     }
 
     public final void onTerminate() {
-
     }
 }

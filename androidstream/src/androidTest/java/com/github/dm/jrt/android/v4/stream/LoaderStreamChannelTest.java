@@ -988,6 +988,40 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    private static void testOnComplete(final FragmentActivity activity) {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(LoaderStreamsCompat.streamOf("test")
+                                      .with(loaderFrom(activity))
+                                      .onComplete(new Runnable() {
+
+                                          public void run() {
+                                              isComplete.set(true);
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .all()).isEmpty();
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(LoaderStreamsCompat.streamOf("test")
+                                      .with(loaderFrom(activity))
+                                      .map(new Function<String, String>() {
+
+                                          public String apply(final String s) throws Exception {
+                                              throw new NoSuchElementException();
+                                          }
+                                      })
+                                      .onComplete(new Runnable() {
+
+                                          public void run() {
+                                              isComplete.set(true);
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
+    }
+
     private static void testOrElse(final FragmentActivity activity) {
 
         assertThat(LoaderStreamsCompat.streamOf("test")
@@ -1106,6 +1140,39 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .afterMax(seconds(10))
                                       .all()).containsExactly("test1", "test2", "test3");
         assertThat(data).containsExactly("test1", "test2", "test3");
+    }
+
+    private static void testPeekComplete(final FragmentActivity activity) {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .peekComplete(new Runnable() {
+
+                                          public void run() {
+                                              isComplete.set(true);
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .all()).containsExactly("test1", "test2", "test3");
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(LoaderStreamsCompat.streamOf("test")
+                                      .with(loaderFrom(activity))
+                                      .map(new Function<String, String>() {
+
+                                          public String apply(final String s) throws Exception {
+                                              throw new NoSuchElementException();
+                                          }
+                                      })
+                                      .peekComplete(new Runnable() {
+
+                                          public void run() {
+                                              isComplete.set(true);
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
     }
 
     private static void testReduce(@NotNull final FragmentActivity activity) {
@@ -2557,6 +2624,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testOnComplete() {
+        testOnComplete(getActivity());
+    }
+
     public void testOrElse() {
 
         testOrElse(getActivity());
@@ -2633,6 +2704,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testPeek() {
 
         testPeek(getActivity());
+    }
+
+    public void testPeekComplete() {
+        testPeekComplete(getActivity());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -2800,8 +2875,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .withOutputMaxSize(1)
                                       .apply()
                                       .map(sqrt())
-                                      .map(LoaderStreamsCompat.<Double>mean())
-                                      .map(LoaderStreamsCompat.castTo(Double.class))
+                                      .map(LoaderStreamsCompat.<Double>averageDouble())
                                       .next()).isCloseTo(21, Offset.offset(0.1));
     }
 

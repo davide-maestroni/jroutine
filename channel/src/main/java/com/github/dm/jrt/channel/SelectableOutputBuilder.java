@@ -45,7 +45,6 @@ class SelectableOutputBuilder<OUT>
      * @param index   the selectable index.
      */
     SelectableOutputBuilder(@NotNull final OutputChannel<? extends OUT> channel, final int index) {
-
         mChannel = ConstantConditions.notNull("output channel", channel);
         mIndex = index;
     }
@@ -54,7 +53,6 @@ class SelectableOutputBuilder<OUT>
     @Override
     protected OutputChannel<? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<Selectable<OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         mChannel.bind(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));

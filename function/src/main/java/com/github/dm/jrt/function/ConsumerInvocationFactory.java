@@ -48,7 +48,6 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     ConsumerInvocationFactory(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
             ResultChannel<OUT>> consumer) {
-
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
         mInvocation = new ConsumerInvocation<IN, OUT>(consumer);
     }
@@ -56,7 +55,6 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @NotNull
     @Override
     public Invocation<IN, OUT> newInvocation() {
-
         return mInvocation;
     }
 
@@ -77,14 +75,12 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
          */
         private ConsumerInvocation(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
                 ResultChannel<OUT>> consumer) {
-
             mConsumer = consumer;
         }
 
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
                 @NotNull final ResultChannel<OUT> result) throws Exception {
-
             mConsumer.accept(new ArrayList<IN>(inputs), result);
         }
     }

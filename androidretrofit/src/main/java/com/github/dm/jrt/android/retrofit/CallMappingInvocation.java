@@ -50,14 +50,12 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
      * Constructor.
      */
     CallMappingInvocation() {
-
         super(null);
     }
 
     @Override
     public void onInput(final Call<?> input,
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
-
         final Request request = input.request();
         result.pass(new ParcelableSelectable<Object>(RequestData.of(request), REQUEST_DATA_INDEX));
         final RequestBody body = request.body();

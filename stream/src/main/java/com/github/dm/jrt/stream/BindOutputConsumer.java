@@ -47,13 +47,11 @@ class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChan
      */
     BindOutputConsumer(@NotNull final ChannelConfiguration configuration,
             @NotNull final ConsumerWrapper<? super OUT> outputConsumer) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
     }
 
     public OutputChannel<Void> apply(final OutputChannel<OUT> channel) {
-
         final IOChannel<Void> ioChannel = JRoutineCore.io()
                                                       .channelConfiguration()
                                                       .with(mConfiguration)

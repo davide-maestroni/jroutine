@@ -42,13 +42,11 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
      * Constructor.
      */
     protected ReadConnection() {
-
         super(null);
     }
 
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
             IOException {
-
         final URLConnection connection = uri.toURL().openConnection();
         connection.setConnectTimeout(3000);
         if (connection instanceof HttpURLConnection) {

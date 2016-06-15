@@ -71,7 +71,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param args the constructor arguments.
      */
     private TargetInvocationFactory(@Nullable final Object[] args) {
-
         super(args);
     }
 
@@ -92,7 +91,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
-
         return factoryOf(targetClass, (Object[]) null);
     }
 
@@ -116,7 +114,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
             @Nullable final Object... factoryArgs) {
-
         if (ContextInvocation.class.isAssignableFrom(targetClass)) {
             return new DefaultTargetInvocationFactory<IN, OUT>(
                     (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
@@ -145,7 +142,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
-
         return factoryOf(targetToken.getRawClass());
     }
 
@@ -168,7 +164,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
             @Nullable final Object... factoryArgs) {
-
         return factoryOf(targetToken.getRawClass(), factoryArgs);
     }
 
@@ -189,7 +184,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> targetInvocation) {
-
         return factoryOf(tokenOf(targetInvocation));
     }
 
@@ -212,7 +206,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> targetInvocation,
             @Nullable final Object... factoryArgs) {
-
         return factoryOf(tokenOf(targetInvocation), factoryArgs);
     }
 
@@ -249,13 +242,11 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
 
                     @Override
                     public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
-
                         return new DefaultTargetInvocationFactory(source);
                     }
 
                     @Override
                     public DefaultTargetInvocationFactory[] newArray(final int size) {
-
                         return new DefaultTargetInvocationFactory[size];
                     }
                 };
@@ -271,7 +262,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
          */
         @SuppressWarnings("unchecked")
         private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
-
             this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
                     source.readArray(TargetInvocationFactory.class.getClassLoader()));
         }
@@ -285,7 +275,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         private DefaultTargetInvocationFactory(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
-
             super(asArgs(ConstantConditions.notNull("target invocation class", targetClass),
                     cloneArgs(factoryArgs)));
             mTargetClass = targetClass;
@@ -294,13 +283,11 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
 
         @Override
         public int describeContents() {
-
             return 0;
         }
 
         @Override
         public void writeToParcel(final Parcel dest, final int flags) {
-
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);
         }
@@ -308,14 +295,12 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         @NotNull
         @Override
         public Object[] getFactoryArgs() {
-
             return mFactoryArgs;
         }
 
         @NotNull
         @Override
         public Class<? extends ContextInvocation<IN, OUT>> getInvocationClass() {
-
             return mTargetClass;
         }
     }
@@ -339,7 +324,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         public TargetInvocationWrapper(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) throws
                 Exception {
-
             this(invocationClass, (Object[]) null);
         }
 
@@ -353,7 +337,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         public TargetInvocationWrapper(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object... invocationArgs) throws Exception {
-
             super(newInvocation(invocationClass, invocationArgs));
         }
 
@@ -361,7 +344,6 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
         private static <IN, OUT> Invocation<IN, OUT> newInvocation(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object... invocationArgs) throws Exception {
-
             final Object[] args = (invocationArgs != null) ? invocationArgs : Reflection.NO_ARGS;
             return Reflection.findConstructor(invocationClass, args).newInstance(args);
         }

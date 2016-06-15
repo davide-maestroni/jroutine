@@ -45,7 +45,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      * @param channel the wrapped output channel.
      */
     DefaultStreamChannel(@NotNull final OutputChannel<IN> channel) {
-
         super(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC), channel);
     }
@@ -61,7 +60,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
     private DefaultStreamChannel(@NotNull final StreamConfiguration streamConfiguration,
             @NotNull final OutputChannel<IN> sourceChannel,
             @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
-
         super(streamConfiguration, sourceChannel, bindingFunction);
     }
 
@@ -71,7 +69,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
             @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final OutputChannel<BEFORE> sourceChannel,
             @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> bindingFunction) {
-
         return new DefaultStreamChannel<BEFORE, AFTER>(streamConfiguration, sourceChannel,
                 bindingFunction);
     }
@@ -82,7 +79,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
-
         return new DefaultStreamConfiguration(streamConfiguration, configuration, invocationMode);
     }
 
@@ -91,7 +87,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
     protected StreamConfiguration newConfiguration(
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode) {
-
         return new DefaultStreamConfiguration(streamConfiguration,
                 InvocationConfiguration.defaultConfiguration(), invocationMode);
     }
@@ -101,7 +96,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
     protected <AFTER> Routine<? super OUT, ? extends AFTER> newRoutine(
             @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-
         return JRoutineCore.on(factory)
                            .invocationConfiguration()
                            .with(streamConfiguration.asInvocationConfiguration())
@@ -135,7 +129,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
                 @NotNull final InvocationConfiguration streamConfiguration,
                 @NotNull final InvocationConfiguration currentConfiguration,
                 @NotNull final InvocationMode invocationMode) {
-
             mStreamConfiguration = ConstantConditions.notNull("stream invocation configuration",
                     streamConfiguration);
             mConfiguration = ConstantConditions.notNull("current invocation configuration",
@@ -145,7 +138,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
 
         @NotNull
         public ChannelConfiguration asChannelConfiguration() {
-
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
                         builderFromOutputChannel(asInvocationConfiguration()).apply();
@@ -156,7 +148,6 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
 
         @NotNull
         public InvocationConfiguration asInvocationConfiguration() {
-
             if (mInvocationConfiguration == null) {
                 mInvocationConfiguration =
                         mStreamConfiguration.builderFrom().with(mConfiguration).apply();
@@ -167,19 +158,16 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
 
         @NotNull
         public InvocationConfiguration getCurrentConfiguration() {
-
             return mConfiguration;
         }
 
         @NotNull
         public InvocationMode getInvocationMode() {
-
             return mInvocationMode;
         }
 
         @NotNull
         public InvocationConfiguration getStreamConfiguration() {
-
             return mStreamConfiguration;
         }
     }

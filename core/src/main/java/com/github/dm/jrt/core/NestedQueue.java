@@ -43,7 +43,6 @@ class NestedQueue<E> {
      * Constructor.
      */
     NestedQueue() {
-
     }
 
     /**
@@ -56,7 +55,6 @@ class NestedQueue<E> {
      */
     @Nullable
     private static Object prune(@NotNull final NestedQueue<?> queue) {
-
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
         if (simpleQueue.isEmpty()) {
             return EMPTY_ELEMENT;
@@ -89,7 +87,6 @@ class NestedQueue<E> {
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     public void add(@Nullable final E element) {
-
         checkOpen();
         mQueue.add(element);
     }
@@ -103,7 +100,6 @@ class NestedQueue<E> {
      * @throws java.lang.IllegalStateException if the queue has been already closed.
      */
     public void addAll(@NotNull final Iterable<? extends E> elements) {
-
         checkOpen();
         mQueue.addAll(elements);
     }
@@ -116,7 +112,6 @@ class NestedQueue<E> {
      */
     @NotNull
     public NestedQueue<E> addNested() {
-
         checkOpen();
         final InnerNestedQueue<E> queue = new InnerNestedQueue<E>();
         mQueue.add(queue);
@@ -127,7 +122,6 @@ class NestedQueue<E> {
      * Clears the queue.
      */
     public void clear() {
-
         mQueue.clear();
     }
 
@@ -138,38 +132,7 @@ class NestedQueue<E> {
      * be safely removed.
      */
     public void close() {
-
         mClosed = true;
-    }
-
-    /**
-     * Removes all the elements from this queue and add them to the specified collection.
-     *
-     * @param collection the collection to fill.
-     */
-    @SuppressWarnings("unchecked")
-    public void drainTo(@NotNull final Collection<? super E> collection) {
-
-        if (prune(this) == EMPTY_ELEMENT) {
-            return;
-        }
-
-        final SimpleQueue<Object> queue = mQueue;
-        while (!queue.isEmpty()) {
-            final Object element = queue.peekFirst();
-            if (element instanceof InnerNestedQueue) {
-                final NestedQueue<E> nested = (NestedQueue<E>) element;
-                nested.drainTo(collection);
-                if (!nested.mClosed || !nested.mQueue.isEmpty()) {
-                    return;
-                }
-
-                queue.removeFirst();
-
-            } else {
-                collection.add((E) queue.removeFirst());
-            }
-        }
     }
 
     /**
@@ -178,7 +141,6 @@ class NestedQueue<E> {
      * @return whether the queue is empty.
      */
     public boolean isEmpty() {
-
         final Object element = prune(this);
         return (element == EMPTY_ELEMENT) || ((element instanceof InnerNestedQueue)
                 && ((InnerNestedQueue<?>) element).isEmpty());
@@ -192,7 +154,6 @@ class NestedQueue<E> {
      */
     @SuppressWarnings("unchecked")
     public E removeFirst() {
-
         final Object element = prune(this);
         if (element instanceof InnerNestedQueue) {
             return ((InnerNestedQueue<E>) element).removeFirst();
@@ -201,8 +162,36 @@ class NestedQueue<E> {
         return (E) mQueue.removeFirst();
     }
 
-    private void checkOpen() {
+    /**
+     * Removes all the elements from this queue and add them to the specified collection.
+     *
+     * @param collection the collection to fill.
+     */
+    @SuppressWarnings("unchecked")
+    public void transferTo(@NotNull final Collection<? super E> collection) {
+        if (prune(this) == EMPTY_ELEMENT) {
+            return;
+        }
 
+        final SimpleQueue<Object> queue = mQueue;
+        while (!queue.isEmpty()) {
+            final Object element = queue.peekFirst();
+            if (element instanceof InnerNestedQueue) {
+                final NestedQueue<E> nested = (NestedQueue<E>) element;
+                nested.transferTo(collection);
+                if (!nested.mClosed || !nested.mQueue.isEmpty()) {
+                    return;
+                }
+
+                queue.removeFirst();
+
+            } else {
+                collection.add((E) queue.removeFirst());
+            }
+        }
+    }
+
+    private void checkOpen() {
         if (mClosed) {
             throw new IllegalStateException("the queue is closed");
         }

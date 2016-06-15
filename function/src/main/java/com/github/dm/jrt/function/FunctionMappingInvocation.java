@@ -42,13 +42,11 @@ class FunctionMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
      * @param function the function instance.
      */
     FunctionMappingInvocation(@NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
-
         super(asArgs(ConstantConditions.notNull("function wrapper", function)));
         mFunction = function;
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         result.pass(mFunction.apply(input));
     }
 }

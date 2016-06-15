@@ -74,7 +74,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-
         final HashSet<String> types = new HashSet<String>();
         types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
         types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat");
@@ -84,7 +83,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @Override
     public synchronized void init(final ProcessingEnvironment processingEnv) {
-
         super.init(processingEnv);
         mIdAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
@@ -112,7 +110,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String buildRoutineFieldsInit(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             final int size) {
-
         final TypeElement serviceProxyElement = mServiceProxyElement;
         final StringBuilder builder = new StringBuilder();
         for (int i = 1; i <= size; ++i) {
@@ -137,7 +134,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getHeaderTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement) throws
             IOException {
-
         final TypeElement serviceProxyElement = mServiceProxyElement;
         final TypeElement loaderProxyCompatElement = mLoaderProxyCompatElement;
         final TypeElement loaderProxyElement = mLoaderProxyElement;
@@ -173,7 +169,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-
         if (annotationElement != mServiceProxyElement) {
             if (mMethodHeaderV1 == null) {
                 mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
@@ -195,7 +190,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-
         if (mMethodInvocationFooter == null) {
             mMethodInvocationFooter =
                     parseTemplate("/android/templates/method_invocation_footer.txt");
@@ -209,7 +203,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     protected String getMethodInvocationHeaderTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-
         if (mMethodInvocationHeader == null) {
             mMethodInvocationHeader =
                     parseTemplate("/android/templates/method_invocation_header.txt");
@@ -220,7 +213,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     private String buildInvocationOptions(@NotNull final ExecutableElement methodElement) {
-
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
         final Integer loaderId =

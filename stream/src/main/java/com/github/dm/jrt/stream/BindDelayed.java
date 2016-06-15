@@ -57,7 +57,6 @@ class BindDelayed<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<
      */
     BindDelayed(@Nullable final Runner runner, final long delay, @NotNull final TimeUnit timeUnit,
             @NotNull final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
-
         mRunner = runner;
         mDelay = ConstantConditions.notNegative("delay value", delay);
         mTimeUnit = ConstantConditions.notNull("delay time unit", timeUnit);
@@ -65,7 +64,6 @@ class BindDelayed<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<IN> channel) throws Exception {
-
         final IOChannel<IN> inputChannel =
                 JRoutineCore.io().channelConfiguration().withRunner(mRunner).apply().buildChannel();
         final OutputChannel<OUT> outOutputChannel = mBindingFunction.apply(inputChannel);

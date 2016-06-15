@@ -43,7 +43,6 @@ public class JRoutineProxy {
      * Avoid explicit instantiation.
      */
     protected JRoutineProxy() {
-
         ConstantConditions.avoid();
     }
 
@@ -64,7 +63,6 @@ public class JRoutineProxy {
      */
     @NotNull
     public static ProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
-
         return new DefaultProxyRoutineBuilder(target);
     }
 }

@@ -64,7 +64,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      */
     DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
-
         mContext = ConstantConditions.notNull("loader context", context);
         mTarget = ConstantConditions.notNull("context invocation target", target);
     }
@@ -72,7 +71,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
@@ -80,7 +78,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -88,7 +85,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -97,7 +93,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -126,7 +121,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
@@ -134,7 +128,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
@@ -142,7 +135,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
@@ -150,7 +142,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaderConfiguration() {
-
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
@@ -179,7 +170,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContextCompat context,
                 @NotNull final ContextInvocationTarget<?> target,
                 @NotNull final Class<? super TYPE> interfaceClass) {
-
             mContext = context;
             mTarget = target;
             mInterfaceClass = interfaceClass;
@@ -188,21 +178,18 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         @NotNull
         @Override
         protected Class<? super TYPE> getInterfaceClass() {
-
             return mInterfaceClass;
         }
 
         @Nullable
         @Override
         protected Object getInvocationContext() {
-
             return mContext.getComponent();
         }
 
         @NotNull
         @Override
         protected Class<?> getTargetClass() {
-
             return mTarget.getTargetClass();
         }
 
@@ -212,7 +199,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final LoaderConfiguration loaderConfiguration) throws Exception {
-
             final LoaderContextCompat context = mContext;
             final ContextInvocationTarget<?> target = mTarget;
             final Class<? super TYPE> interfaceClass = mInterfaceClass;

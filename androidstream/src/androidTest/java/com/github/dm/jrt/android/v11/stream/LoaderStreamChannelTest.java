@@ -966,6 +966,40 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .all()).containsExactly("TEST1", "TEST2");
     }
 
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    private static void testOnComplete(final Activity activity) {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(LoaderStreams.streamOf("test")
+                                .with(loaderFrom(activity))
+                                .onComplete(new Runnable() {
+
+                                    public void run() {
+                                        isComplete.set(true);
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).isEmpty();
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(LoaderStreams.streamOf("test")
+                                .with(loaderFrom(activity))
+                                .map(new Function<String, String>() {
+
+                                    public String apply(final String s) throws Exception {
+                                        throw new NoSuchElementException();
+                                    }
+                                })
+                                .onComplete(new Runnable() {
+
+                                    public void run() {
+                                        isComplete.set(true);
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
+    }
+
     private static void testOrElse(final Activity activity) {
 
         assertThat(LoaderStreams.streamOf("test")
@@ -1086,6 +1120,39 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(data).containsExactly("test1", "test2", "test3");
+    }
+
+    private static void testPeekComplete(final Activity activity) {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(activity))
+                                .peekComplete(new Runnable() {
+
+                                    public void run() {
+                                        isComplete.set(true);
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        assertThat(LoaderStreams.streamOf("test")
+                                .with(loaderFrom(activity))
+                                .map(new Function<String, String>() {
+
+                                    public String apply(final String s) throws Exception {
+                                        throw new NoSuchElementException();
+                                    }
+                                })
+                                .peekComplete(new Runnable() {
+
+                                    public void run() {
+                                        isComplete.set(true);
+                                    }
+                                })
+                                .afterMax(seconds(3))
+                                .getError()).isExactlyInstanceOf(InvocationException.class);
+        assertThat(isComplete.get()).isFalse();
     }
 
     private static void testReduce(@NotNull final Activity activity) {
@@ -2679,6 +2746,14 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testOnComplete() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testOnComplete(getActivity());
+    }
+
     public void testOrElse() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -2775,6 +2850,14 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         testPeek(getActivity());
+    }
+
+    public void testPeekComplete() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testPeekComplete(getActivity());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -2972,8 +3055,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .withOutputMaxSize(1)
                                 .apply()
                                 .map(sqrt())
-                                .map(LoaderStreams.<Double>mean())
-                                .map(LoaderStreams.castTo(Double.class))
+                                .map(LoaderStreams.<Double>averageDouble())
                                 .next()).isCloseTo(21, Offset.offset(0.1));
     }
 

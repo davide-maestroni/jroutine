@@ -711,6 +711,21 @@ public interface StreamChannel<IN, OUT>
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
 
     /**
+     * Concatenates a consumer handling the outputs completion.
+     * <br>
+     * The stream outputs will be no further propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, Void> onComplete(@NotNull Runnable action);
+
+    /**
      * Concatenates a consumer handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
@@ -1089,6 +1104,21 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
 
     /**
+     * Concatenates a stream calling the specified runnable when the previous routine invocations
+     * complete.
+     * <br>
+     * Outputs will be automatically passed on.
+     * <p>
+     * Note that the invocation will be aborted if an exception escapes the consumer.
+     *
+     * @param peekAction the runnable instance.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, OUT> peekComplete(@NotNull Runnable peekAction);
+
+    /**
      * Concatenates a stream accumulating data through the specified function.
      * <br>
      * The output will be computed as follows:
@@ -1260,6 +1290,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> start();
+    // TODO: 15/06/16 bind, bindAfter(delay, OutputConsumer)?
 
     /**
      * Initiates the flow of this stream after the specified delay.
@@ -1508,12 +1539,12 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Both outputs and errors will be automatically passed on.
      *
-     * @param finallyRunnable the runnable instance.
+     * @param action the runnable instance.
      * @return the new stream instance.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> tryFinally(@NotNull Runnable finallyRunnable);
+    StreamChannel<IN, OUT> tryFinally(@NotNull Runnable action);
 
     /**
      * Interface defining a stream configuration.

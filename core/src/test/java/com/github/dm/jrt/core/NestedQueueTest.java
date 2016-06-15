@@ -248,25 +248,25 @@ public class NestedQueueTest {
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
 
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).containsExactly(13);
 
         list.clear();
         nested0.close();
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).containsExactly(7, 11, 5, -77, -33);
 
         list.clear();
         nested3.close();
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).isEmpty();
 
         nested1.close();
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).isEmpty();
 
         nested2.close();
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).containsExactly(1);
     }
 
@@ -293,7 +293,7 @@ public class NestedQueueTest {
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
 
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
     }
 

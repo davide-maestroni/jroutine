@@ -53,7 +53,6 @@ class ThrottlingRunner extends RunnerDecorator {
      * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
      */
     ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
-
         super(wrapped);
         mMaxRunning =
                 ConstantConditions.positive("maximum number of running executions", maxExecutions);
@@ -61,7 +60,6 @@ class ThrottlingRunner extends RunnerDecorator {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         ThrottlingExecution throttlingExecution = null;
         synchronized (mMutex) {
             final Iterator<PendingExecution> iterator = mQueue.iterator();
@@ -87,7 +85,6 @@ class ThrottlingRunner extends RunnerDecorator {
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         ThrottlingExecution throttlingExecution = null;
         synchronized (mMutex) {
             final LinkedList<PendingExecution> queue = mQueue;
@@ -106,7 +103,6 @@ class ThrottlingRunner extends RunnerDecorator {
 
     @NotNull
     private ThrottlingExecution getThrottlingExecution(@NotNull final Execution execution) {
-
         final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> executions =
                 mExecutions;
         final WeakReference<ThrottlingExecution> executionReference = executions.get(execution);
@@ -140,14 +136,12 @@ class ThrottlingRunner extends RunnerDecorator {
          */
         private PendingExecution(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             mExecution = execution;
             mDelay = delay;
             mTimeUnit = timeUnit;
         }
 
         public void run() {
-
             final ThrottlingExecution throttlingExecution;
             synchronized (mMutex) {
                 throttlingExecution = getThrottlingExecution(mExecution);
@@ -171,12 +165,10 @@ class ThrottlingRunner extends RunnerDecorator {
          * @param execution the execution.
          */
         private ThrottlingExecution(@NotNull final Execution execution) {
-
             mExecution = execution;
         }
 
         public void run() {
-
             final int maxRunning = mMaxRunning;
             final Execution execution = mExecution;
             final LinkedList<PendingExecution> queue = mQueue;

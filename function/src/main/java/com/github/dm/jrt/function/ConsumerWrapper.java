@@ -51,7 +51,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      * @param consumer the wrapped consumer.
      */
     private ConsumerWrapper(@NotNull final Consumer<?> consumer) {
-
         this(Collections.<Consumer<?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
     }
@@ -62,7 +61,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      * @param consumers the list of wrapped consumers.
      */
     private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
-
         super(asArgs(consumers));
         mConsumers = consumers;
     }
@@ -78,7 +76,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> ConsumerWrapper<IN> sink() {
-
         return (ConsumerWrapper<IN>) sSink;
     }
 
@@ -99,7 +96,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      */
     @NotNull
     public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
-
         if (consumer instanceof ConsumerWrapper) {
             return (ConsumerWrapper<IN>) consumer;
         }
@@ -116,7 +112,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      */
     @NotNull
     public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
-
         ConstantConditions.notNull("consumer instance", after);
         final List<Consumer<?>> consumers = mConsumers;
         final ArrayList<Consumer<?>> newConsumers =
@@ -133,7 +128,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
     }
 
     public boolean hasStaticScope() {
-
         for (final Consumer<?> consumer : mConsumers) {
             if (!Reflection.hasStaticScope(consumer)) {
                 return false;
@@ -145,7 +139,6 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
 
     @SuppressWarnings("unchecked")
     public void accept(final IN in) throws Exception {
-
         for (final Consumer<?> consumer : mConsumers) {
             ((Consumer<Object>) consumer).accept(in);
         }

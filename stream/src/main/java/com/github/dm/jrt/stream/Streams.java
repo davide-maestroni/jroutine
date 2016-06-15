@@ -25,17 +25,14 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,73 +40,26 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CACHE;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.COLLECT;
+import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.REDUCE;
-import static com.github.dm.jrt.stream.util.Numbers.toBigDecimalSafe;
 
 /**
  * Utility class acting as a factory of stream output channels.
  * <p>
  * Created by davide-maestroni on 11/26/2015.
  */
-public class Streams extends Functions {
-
-    private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
-            new MappingInvocation<Iterable<?>, Object>(null) {
-
-                @SuppressWarnings("unchecked")
-                public void onInput(final Iterable<?> input,
-                        @NotNull final ResultChannel<Object> result) {
-
-                    result.pass((Iterable) input);
-                }
-            };
+public class Streams extends Operators {
 
     /**
      * Avoid explicit instantiation.
      */
     protected Streams() {
-
         ConstantConditions.avoid();
-    }
-
-    /**
-     * Returns a factory of invocations verifying that all the inputs satisfy a specific conditions.
-     *
-     * @param predicate the predicate defining the condition.
-     * @param <IN>      the input data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    public static <IN> InvocationFactory<IN, Boolean> allMatch(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return new AllMatchInvocationFactory<IN>(wrap(predicate));
-    }
-
-    /**
-     * Returns a factory of invocations verifying that any of the inputs satisfy a specific
-     * conditions.
-     *
-     * @param predicate the predicate defining the condition.
-     * @param <IN>      the input data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <IN> InvocationFactory<IN, Boolean> anyMatch(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return new AnyMatchInvocationFactory<IN>(wrap(predicate));
     }
 
     /**
@@ -128,7 +78,6 @@ public class Streams extends Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> asFactory(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
                     super IN, ? extends OUT>> function) {
-
         return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
 
@@ -149,7 +98,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> blend(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<OUT>(Channels.blend(channels));
     }
 
@@ -170,7 +118,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<OUT>(Channels.<OUT>blend(channels));
     }
 
@@ -189,7 +136,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             @NotNull final InputChannel<?>... channels) {
-
         return Channels.combine(channels);
     }
 
@@ -213,7 +159,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex, @NotNull final InputChannel<?>... channels) {
-
         return Channels.combine(startIndex, channels);
     }
 
@@ -238,7 +183,6 @@ public class Streams extends Functions {
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex,
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         return Channels.combine(startIndex, channels);
     }
 
@@ -261,7 +205,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         return Channels.combine(channels);
     }
 
@@ -284,7 +227,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             @NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
-
         return Channels.combine(channels);
     }
 
@@ -307,7 +249,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> concat(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<OUT>(Channels.concat(channels));
     }
 
@@ -330,22 +271,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
-    }
-
-    /**
-     * Returns an factory of invocations counting the number of input data.
-     *
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, Long> count() {
-
-        return (InvocationFactory<DATA, Long>) CountInvocation.factoryOf();
     }
 
     /**
@@ -367,7 +293,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @NotNull final InputChannel<?>... channels) {
-
         return Channels.distribute(channels);
     }
 
@@ -390,7 +315,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         return Channels.distribute(channels);
     }
 
@@ -416,7 +340,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @Nullable final IN placeholder, @NotNull final InputChannel<?>... channels) {
-
         return Channels.distribute(placeholder, channels);
     }
 
@@ -443,64 +366,7 @@ public class Streams extends Functions {
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @Nullable final IN placeholder,
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         return Channels.distribute(placeholder, channels);
-    }
-
-    /**
-     * Returns a factory of invocations grouping the input data in collections of the specified
-     * size.
-     * <p>
-     * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
-     * be:
-     * <pre>
-     *     <code>
-     *
-     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
-     *     </code>
-     * </pre>
-     *
-     * @param size   the group size.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the size is not positive.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
-
-        return new GroupByInvocationFactory<DATA>(size);
-    }
-
-    /**
-     * Returns a factory of invocations grouping the input data in collections of the specified
-     * size.
-     * <br>
-     * If the inputs complete and the last group length is less than the target size, the missing
-     * spaces will be filled with the specified placeholder instance.
-     * <p>
-     * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
-     * be:
-     * <pre>
-     *     <code>
-     *
-     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, PH)]
-     *     </code>
-     * </pre>
-     *
-     * @param size        the group size.
-     * @param placeholder the placeholder object used to fill the missing data needed to reach
-     *                    the group size.
-     * @param <DATA>      the data type.
-     * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the size is not positive.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size,
-            @Nullable final DATA placeholder) {
-
-        return new GroupByInvocationFactory<DATA>(size, placeholder);
     }
 
     /**
@@ -523,7 +389,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
             extends OUT>>> join(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(channels));
     }
 
@@ -546,7 +411,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
             extends OUT>>> join(@NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<List<? extends OUT>>(Channels.<OUT>join(channels));
     }
 
@@ -574,7 +438,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
             extends OUT>>> join(@Nullable final OUT placeholder,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
     }
 
@@ -602,96 +465,7 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
             extends OUT>>> join(@Nullable final OUT placeholder,
             @NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
-    }
-
-    /**
-     * Returns an factory of invocations passing at max the specified number of input data and
-     * discarding the following ones.
-     * <p>
-     * Given a numeric sequence of inputs starting from 0, and a limit count of 5, the final output
-     * will be:
-     * <pre>
-     *     <code>
-     *
-     *         [0, 1, 2, 3, 4]
-     *     </code>
-     * </pre>
-     *
-     * @param count  the maximum number of data to pass.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
-
-        return new LimitInvocationFactory<DATA>(count);
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean value of the input numbers.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> mean() {
-
-        return (InvocationFactory<N, Number>) MeanInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean value of the input numbers by employing a
-     * {@code BigDecimal}.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    public static InvocationFactory<Number, BigDecimal> meanBig() {
-
-        return MeanBigInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean value of the input numbers in floating
-     * precision.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> meanFloat() {
-
-        return (InvocationFactory<N, Number>) MeanFloatInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations computing the mean of the input numbers rounded to nearest
-     * number.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> meanRound() {
-
-        return (InvocationFactory<N, Number>) MeanRoundInvocation.factoryOf();
     }
 
     /**
@@ -713,7 +487,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(startIndex, channels));
     }
 
@@ -736,7 +509,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(final int startIndex,
             @NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(startIndex, channels));
     }
 
@@ -758,7 +530,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
     }
 
@@ -780,7 +551,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(
             @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
     }
 
@@ -801,40 +571,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(channels));
-    }
-
-    /**
-     * Returns a factory of invocations verifying that none of the inputs satisfy a specific
-     * conditions.
-     *
-     * @param predicate the predicate defining the condition.
-     * @param <IN>      the input data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    public static <IN> InvocationFactory<IN, Boolean> noneMatch(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return new AllMatchInvocationFactory<IN>(wrap(predicate).negate());
-    }
-
-    /**
-     * Returns a factory of invocations verifying that not all the inputs satisfy a specific
-     * conditions.
-     *
-     * @param predicate the predicate defining the condition.
-     * @param <IN>      the input data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <IN> InvocationFactory<IN, Boolean> notAllMatch(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return new AnyMatchInvocationFactory<IN>(wrap(predicate).negate());
     }
 
     /**
@@ -853,7 +590,6 @@ public class Streams extends Functions {
     public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
                     super IN, ? extends OUT>> function) {
-
         return JRoutineCore.on(asFactory(function));
     }
 
@@ -874,7 +610,6 @@ public class Streams extends Functions {
     public static <AFTER extends Comparable<? super AFTER>> Consumer<InputChannel<AFTER>> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> incrementFunction) {
-
         return new RangeConsumer<AFTER>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.notNull("end element", end), wrap(incrementFunction));
     }
@@ -898,7 +633,6 @@ public class Streams extends Functions {
     @SuppressWarnings("unchecked")
     public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
             @NotNull final N end) {
-
         return (Consumer<InputChannel<N>>) numberRange(start, end);
     }
 
@@ -919,7 +653,6 @@ public class Streams extends Functions {
     @SuppressWarnings("unchecked")
     public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
             @NotNull final N end, @NotNull final N increment) {
-
         return (Consumer<InputChannel<N>>) numberRange(start, end, increment);
     }
 
@@ -938,7 +671,6 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> replay(
             @NotNull final OutputChannel<OUT> channel) {
-
         return new BuilderWrapper<OUT>(Channels.replay(channel));
     }
 
@@ -959,7 +691,6 @@ public class Streams extends Functions {
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
-
         return Channels.select(channel, index);
     }
 
@@ -985,7 +716,6 @@ public class Streams extends Functions {
     select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
-
         return Channels.select(channel, indexes);
     }
 
@@ -1011,7 +741,6 @@ public class Streams extends Functions {
     select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final int... indexes) {
-
         return Channels.select(channel, indexes);
     }
 
@@ -1037,7 +766,6 @@ public class Streams extends Functions {
     select(
             final int startIndex, final int rangeSize,
             @NotNull final InputChannel<? super Selectable<DATA>> channel) {
-
         return Channels.select(startIndex, rangeSize, channel);
     }
 
@@ -1060,7 +788,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
-
         return new MapBuilderWrapper<OUT>(Channels.select(startIndex, rangeSize, channel));
     }
 
@@ -1083,7 +810,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
-
         return new MapBuilderWrapper<OUT>(Channels.select(channel, indexes));
     }
 
@@ -1106,7 +832,6 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
-
         return new MapBuilderWrapper<OUT>(Channels.select(channel, indexes));
     }
 
@@ -1127,61 +852,8 @@ public class Streams extends Functions {
     @StreamFlow(MAP)
     public static <AFTER> Consumer<InputChannel<AFTER>> sequence(@NotNull final AFTER start,
             final long count, @NotNull final BiFunction<AFTER, Long, AFTER> nextFunction) {
-
         return new SequenceConsumer<AFTER>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.positive("sequence size", count), wrap(nextFunction));
-    }
-
-    /**
-     * Returns an factory of invocations skipping the specified number of input data.
-     * <p>
-     * Given a numeric sequence of inputs starting from 0, and a skip count of 5, the final output
-     * will be:
-     * <pre>
-     *     <code>
-     *
-     *         [5, 6, 7, ...]
-     *     </code>
-     * </pre>
-     *
-     * @param count  the number of data to skip.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
-
-        return new SkipInvocationFactory<DATA>(count);
-    }
-
-    /**
-     * Returns an factory of invocations sorting inputs in their natural order.
-     *
-     * @param <IN> the input data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    @StreamFlow(COLLECT)
-    public static <IN extends Comparable<? super IN>> InvocationFactory<IN, IN> sort() {
-
-        return SortInvocation.factoryOf();
-    }
-
-    /**
-     * Returns an factory of invocations sorting input data by the specified comparator.
-     *
-     * @param comparator the comparator instance.
-     * @param <DATA>     the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    @StreamFlow(COLLECT)
-    public static <DATA> InvocationFactory<DATA, DATA> sortBy(
-            @NotNull final Comparator<? super DATA> comparator) {
-
-        return new SortByInvocationFactory<DATA>(comparator);
     }
 
     /**
@@ -1195,7 +867,6 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf() {
-
         return streamOf(JRoutineCore.io().<OUT>of());
     }
 
@@ -1211,7 +882,6 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
-
         return streamOf(JRoutineCore.io().of(outputs));
     }
 
@@ -1227,7 +897,6 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
-
         return streamOf(JRoutineCore.io().of(output));
     }
 
@@ -1243,7 +912,6 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
-
         return streamOf(JRoutineCore.io().of(outputs));
     }
 
@@ -1261,66 +929,7 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
-
         return new DefaultStreamChannel<OUT, OUT>(output);
-    }
-
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers.
-     * <br>
-     * The result will have the type matching the input with the highest precision.
-     *
-     * @param <N> the number type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, Number> sum() {
-
-        return (InvocationFactory<N, Number>) SumInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers by employing a
-     * {@code BigDecimal}.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    public static InvocationFactory<Number, BigDecimal> sumBig() {
-
-        return SumBigInvocation.factoryOf();
-    }
-
-    /**
-     * Returns an factory of invocations collecting inputs into a list.
-     *
-     * @param <IN> the input data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    @StreamFlow(COLLECT)
-    public static <IN> InvocationFactory<? super IN, List<IN>> toList() {
-
-        return ToListInvocation.factoryOf();
-    }
-
-    /**
-     * Returns an factory of invocations collecting inputs into a map.
-     *
-     * @param keyFunction the key function.
-     * @param <IN>        the input data type.
-     * @param <KEY>       the map key type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    @StreamFlow(COLLECT)
-    public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
-            @NotNull final Function<? super IN, KEY> keyFunction) {
-
-        return new ToMapInvocationFactory<IN, KEY>(wrap(keyFunction));
     }
 
     /**
@@ -1341,7 +950,6 @@ public class Streams extends Functions {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
-
         return Channels.toSelectable(channel, index);
     }
 
@@ -1363,55 +971,13 @@ public class Streams extends Functions {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
-
         return new BuilderWrapper<Selectable<OUT>>(Channels.toSelectable(channel, index));
-    }
-
-    /**
-     * Returns an factory of invocations collecting inputs into a set.
-     *
-     * @param <IN> the input data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    @StreamFlow(COLLECT)
-    public static <IN> InvocationFactory<? super IN, Set<IN>> toSet() {
-
-        return ToSetInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a bi-consumer unfolding iterable inputs into the returned elements.
-     *
-     * @param <IN> the input data type.
-     * @return the bi-consumer instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    @SuppressWarnings("unchecked")
-    public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
-
-        return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
-    }
-
-    /**
-     * Returns a factory of invocations filtering inputs which are not unique.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @StreamFlow(CACHE)
-    public static <DATA> InvocationFactory<DATA, DATA> unique() {
-
-        return UniqueInvocation.factoryOf();
     }
 
     @NotNull
     private static <N extends Number> Consumer<? extends InputChannel<? extends Number>>
     numberRange(
             @NotNull final N start, @NotNull final N end) {
-
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)) {
             final BigDecimal startValue = toBigDecimalSafe(start);
             final BigDecimal endValue = toBigDecimalSafe(end);
@@ -1471,7 +1037,6 @@ public class Streams extends Functions {
     private static <N extends Number> Consumer<? extends InputChannel<? extends Number>>
     numberRange(
             @NotNull final N start, @NotNull final N end, @NotNull final N increment) {
-
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)
                 || (increment instanceof BigDecimal)) {
             final BigDecimal startValue = toBigDecimalSafe(start);
@@ -1558,13 +1123,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private BigDecimalInc(final BigDecimal incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public BigDecimal apply(final BigDecimal bigDecimal) {
-
             return bigDecimal.add(mIncValue);
         }
     }
@@ -1582,13 +1145,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private BigIntegerInc(final BigInteger incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public BigInteger apply(final BigInteger bigInteger) {
-
             return bigInteger.add(mIncValue);
         }
     }
@@ -1606,13 +1167,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private ByteInc(final byte incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Byte apply(final Byte aByte) {
-
             return (byte) (aByte + mIncValue);
         }
     }
@@ -1630,13 +1189,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private DoubleInc(final double incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Double apply(final Double aDouble) {
-
             return aDouble + mIncValue;
         }
     }
@@ -1654,13 +1211,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private FloatInc(final float incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Float apply(final Float aFloat) {
-
             return aFloat + mIncValue;
         }
     }
@@ -1678,13 +1233,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private IntegerInc(final int incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Integer apply(final Integer integer) {
-
             return integer + mIncValue;
         }
     }
@@ -1702,13 +1255,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private LongInc(final long incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Long apply(final Long aLong) {
-
             return aLong + mIncValue;
         }
     }
@@ -1727,7 +1278,6 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private NumberInc(@NotNull final N incValue) {
-
             super(asArgs(incValue));
         }
     }
@@ -1755,7 +1305,6 @@ public class Streams extends Functions {
          */
         private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
                 @NotNull final Function<OUT, OUT> incrementFunction) {
-
             super(asArgs(start, end, incrementFunction));
             mStart = start;
             mEnd = end;
@@ -1763,7 +1312,6 @@ public class Streams extends Functions {
         }
 
         public void accept(final InputChannel<OUT> result) throws Exception {
-
             final OUT start = mStart;
             final OUT end = mEnd;
             final Function<OUT, OUT> increment = mIncrementFunction;
@@ -1806,7 +1354,6 @@ public class Streams extends Functions {
          */
         private SequenceConsumer(@NotNull final OUT start, final long count,
                 @NotNull final BiFunctionWrapper<OUT, Long, OUT> nextFunction) {
-
             super(asArgs(start, count, nextFunction));
             mStart = start;
             mCount = count;
@@ -1814,7 +1361,6 @@ public class Streams extends Functions {
         }
 
         public void accept(final InputChannel<OUT> result) throws Exception {
-
             final BiFunctionWrapper<OUT, Long, OUT> next = mNextFunction;
             OUT current = mStart;
             final long count = mCount;
@@ -1841,13 +1387,11 @@ public class Streams extends Functions {
          * @param incValue the incrementation value.
          */
         private ShortInc(final short incValue) {
-
             super(incValue);
             mIncValue = incValue;
         }
 
         public Short apply(final Short aShort) {
-
             return (short) (aShort + mIncValue);
         }
     }

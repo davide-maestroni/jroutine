@@ -51,7 +51,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
      * @param args the constructor arguments.
      */
     protected ContextInvocationFactory(@Nullable final Object[] args) {
-
         super(args);
     }
 
@@ -68,7 +67,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
             @NotNull final InvocationFactory<IN, OUT> factory) {
-
         return new WrappingContextInvocationFactory<IN, OUT>(factory);
     }
 
@@ -92,7 +90,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-
         return factoryOf(invocationClass, (Object[]) null);
     }
 
@@ -120,7 +117,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-
         if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
             return new DefaultContextInvocationFactory<IN, OUT>(
                     (Class<? extends ContextInvocation<IN, OUT>>) invocationClass, args);
@@ -149,7 +145,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-
         return factoryOf(invocationToken.getRawClass());
     }
 
@@ -176,7 +171,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-
         return factoryOf(invocationToken.getRawClass(), args);
     }
 
@@ -192,7 +186,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> fromFactory(@NotNull final Context context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-
         return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
     }
 
@@ -232,7 +225,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
          */
         private AdaptingContextInvocationFactory(@NotNull final Context context,
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-
             super(asArgs(ConstantConditions.notNull("routine context", context),
                     ConstantConditions.notNull("context invocation factory", factory)));
             mContext = context;
@@ -242,7 +234,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() throws Exception {
-
             final ContextInvocation<IN, OUT> invocation = mFactory.newInvocation();
             invocation.onContext(mContext);
             return invocation;
@@ -271,7 +262,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         private DefaultContextInvocationFactory(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
-
             super(asArgs(invocationClass, cloneArgs(args)));
             if (!Reflection.hasStaticScope(invocationClass)) {
                 throw new IllegalArgumentException("the invocation class must have a static scope: "
@@ -285,7 +275,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
             return (ContextInvocation<IN, OUT>) mFactory.newInvocation();
         }
     }
@@ -308,7 +297,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
          */
         private WrappingContextInvocationFactory(
                 @NotNull final InvocationFactory<IN, OUT> factory) {
-
             super(asArgs(factory));
             final Class<? extends InvocationFactory> factoryClass = factory.getClass();
             if (!Reflection.hasStaticScope(factoryClass)) {
@@ -323,7 +311,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
             return new ContextInvocationWrapper<IN, OUT>(mFactory.newInvocation());
         }
     }

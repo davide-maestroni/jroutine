@@ -43,13 +43,11 @@ public class RequestData implements Parcelable {
 
         @Override
         public RequestData createFromParcel(final Parcel in) {
-
             return new RequestData(in);
         }
 
         @Override
         public RequestData[] newArray(final int size) {
-
             return new RequestData[size];
         }
     };
@@ -66,7 +64,6 @@ public class RequestData implements Parcelable {
      * @param request the request.
      */
     private RequestData(@NotNull final Request request) {
-
         mUrl = request.url().toString();
         mMethod = request.method();
         mHeaders = toBundle(request.headers());
@@ -78,7 +75,6 @@ public class RequestData implements Parcelable {
      * @param in the input parcel.
      */
     private RequestData(@NotNull final Parcel in) {
-
         mUrl = in.readString();
         mMethod = in.readString();
         mHeaders = in.readBundle(RequestData.class.getClassLoader());
@@ -92,13 +88,11 @@ public class RequestData implements Parcelable {
      */
     @NotNull
     public static RequestData of(@NotNull final Request request) {
-
         return new RequestData(request);
     }
 
     @NotNull
     private static Headers fromBundle(@NotNull final Bundle bundle) {
-
         final Headers.Builder builder = new Headers.Builder();
         for (final String key : bundle.keySet()) {
             final ArrayList<String> values = bundle.getStringArrayList(key);
@@ -114,7 +108,6 @@ public class RequestData implements Parcelable {
 
     @NotNull
     private static Bundle toBundle(@NotNull final Headers headers) {
-
         final Bundle bundle = new Bundle();
         for (final String name : headers.names()) {
             bundle.putStringArrayList(name, new ArrayList<String>(headers.values(name)));
@@ -125,13 +118,11 @@ public class RequestData implements Parcelable {
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-
         dest.writeString(mUrl);
         dest.writeString(mMethod);
         dest.writeBundle(mHeaders);
@@ -145,7 +136,6 @@ public class RequestData implements Parcelable {
      */
     @NotNull
     public Request requestWithBody(@Nullable final RequestBody body) {
-
         return new Builder().url(mUrl).headers(fromBundle(mHeaders)).method(mMethod, body).build();
     }
 }

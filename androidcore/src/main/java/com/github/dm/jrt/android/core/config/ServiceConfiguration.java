@@ -76,7 +76,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Object[] runnerArgs, @Nullable final Class<? extends Log> logClass,
             @Nullable final Object[] logArgs) {
-
         super(asArgs(looper, runnerClass, runnerArgs, logClass, logArgs));
         mLooper = looper;
         mRunnerClass = runnerClass;
@@ -92,7 +91,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static Builder<ServiceConfiguration> builder() {
-
         return new Builder<ServiceConfiguration>(sDefaultConfigurable);
     }
 
@@ -105,7 +103,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
     @NotNull
     public static Builder<ServiceConfiguration> builderFrom(
             @Nullable final ServiceConfiguration initialConfiguration) {
-
         return (initialConfiguration == null) ? builder()
                 : new Builder<ServiceConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
@@ -117,12 +114,10 @@ public final class ServiceConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static ServiceConfiguration defaultConfiguration() {
-
         return sDefaultConfiguration;
     }
 
     private static Object[] cloneOrNull(@Nullable final Object[] args) {
-
         return (args != null) ? args.clone() : null;
     }
 
@@ -133,7 +128,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Builder<ServiceConfiguration> builderFrom() {
-
         return builderFrom(this);
     }
 
@@ -144,7 +138,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @return the constructor arguments.
      */
     public Object[] getLogArgsOrElse(@Nullable final Object... valueIfNotSet) {
-
         final Object[] logArgs = mLogArgs;
         return (logArgs != null) ? cloneOrNull(logArgs) : valueIfNotSet;
     }
@@ -157,7 +150,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      */
     public Class<? extends Log> getLogClassOrElse(
             @Nullable final Class<? extends Log> valueIfNotSet) {
-
         final Class<? extends Log> logClass = mLogClass;
         return (logClass != null) ? logClass : valueIfNotSet;
     }
@@ -169,7 +161,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @return the looper instance.
      */
     public Looper getMessageLooperOrElse(@Nullable final Looper valueIfNotSet) {
-
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
     }
@@ -181,7 +172,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @return the constructor arguments.
      */
     public Object[] getRunnerArgsOrElse(@Nullable final Object... valueIfNotSet) {
-
         final Object[] runnerArgs = mRunnerArgs;
         return (runnerArgs != null) ? cloneOrNull(runnerArgs) : valueIfNotSet;
     }
@@ -194,7 +184,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
      */
     public Class<? extends Runner> getRunnerClassOrElse(
             @Nullable final Class<? extends Runner> valueIfNotSet) {
-
         final Class<? extends Runner> runnerClass = mRunnerClass;
         return (runnerClass != null) ? runnerClass : valueIfNotSet;
     }
@@ -241,7 +230,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          * @param configurable the configurable instance.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
         }
 
@@ -253,7 +241,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final ServiceConfiguration initialConfiguration) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
@@ -265,7 +252,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public TYPE apply() {
-
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -279,7 +265,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
-
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
@@ -321,7 +306,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withLogArgs(@Nullable final Object... args) {
-
             mLogArgs = cloneOrNull(args);
             return this;
         }
@@ -335,7 +319,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
-
             mLogClass = logClass;
             return this;
         }
@@ -349,7 +332,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withMessageLooper(@Nullable final Looper looper) {
-
             mLooper = looper;
             return this;
         }
@@ -362,7 +344,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withRunnerArgs(@Nullable final Object... args) {
-
             mRunnerArgs = cloneOrNull(args);
             return this;
         }
@@ -376,20 +357,17 @@ public final class ServiceConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
-
             mRunnerClass = runnerClass;
             return this;
         }
 
         @NotNull
         private ServiceConfiguration buildConfiguration() {
-
             return new ServiceConfiguration(mLooper, mRunnerClass, mRunnerArgs, mLogClass,
                     mLogArgs);
         }
 
         private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
-
             mLooper = configuration.mLooper;
             mRunnerClass = configuration.mRunnerClass;
             mRunnerArgs = configuration.mRunnerArgs;
@@ -405,7 +383,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
         @NotNull
         public ServiceConfiguration apply(@NotNull final ServiceConfiguration configuration) {
-
             return configuration;
         }
     }

@@ -38,7 +38,6 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     @Override
     public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
         if (mInputs == null) {
             mInputs = new ArrayList<IN>();
         }
@@ -48,7 +47,6 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     @Override
     public final void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
         final ArrayList<IN> inputs = mInputs;
         final ArrayList<IN> clone;
         if (inputs == null) {
@@ -63,7 +61,6 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     @Override
     public final void onTerminate() {
-
         final ArrayList<IN> inputs = mInputs;
         if (inputs != null) {
             inputs.clear();

@@ -27,7 +27,6 @@ public class InvocationTypeException extends LoaderInvocationException {
      * Constructor.
      */
     public InvocationTypeException() {
-
     }
 
     /**
@@ -36,7 +35,6 @@ public class InvocationTypeException extends LoaderInvocationException {
      * @param id the loader ID.
      */
     public InvocationTypeException(final int id) {
-
         super(id);
     }
 }

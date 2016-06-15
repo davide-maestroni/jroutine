@@ -37,32 +37,27 @@ public class RunnerDecorator extends Runner {
      * @param wrapped the wrapped instance.
      */
     public RunnerDecorator(@NotNull final Runner wrapped) {
-
         mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
     }
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         mRunner.cancel(execution);
     }
 
     @Override
     public boolean isExecutionThread() {
-
         return mRunner.isExecutionThread();
     }
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-
         return mRunner.isManagedThread(thread);
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         mRunner.run(execution, delay, timeUnit);
     }
 }

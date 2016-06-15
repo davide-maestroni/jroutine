@@ -35,7 +35,6 @@ public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
      * Avoid instantiation.
      */
     private IdentityInvocation() {
-
         super(null);
     }
 
@@ -48,12 +47,10 @@ public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
     @NotNull
     @SuppressWarnings("unchecked")
     public static <DATA> MappingInvocation<DATA, DATA> factoryOf() {
-
         return (MappingInvocation<DATA, DATA>) sInvocation;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
         result.pass(input);
     }
 }

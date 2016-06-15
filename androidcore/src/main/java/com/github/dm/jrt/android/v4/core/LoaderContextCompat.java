@@ -43,7 +43,6 @@ public abstract class LoaderContextCompat {
      * Avoid explicit instantiation.
      */
     private LoaderContextCompat() {
-
     }
 
     /**
@@ -54,7 +53,6 @@ public abstract class LoaderContextCompat {
      */
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final Fragment fragment) {
-
         return new FragmentContextCompat(fragment, fragment.getActivity());
     }
 
@@ -73,7 +71,6 @@ public abstract class LoaderContextCompat {
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-
         return new FragmentContextCompat(fragment, context);
     }
 
@@ -85,7 +82,6 @@ public abstract class LoaderContextCompat {
      */
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final FragmentActivity activity) {
-
         return new ActivityContextCompat(activity, activity);
     }
 
@@ -104,7 +100,6 @@ public abstract class LoaderContextCompat {
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
-
         return new ActivityContextCompat(activity, context);
     }
 
@@ -151,7 +146,6 @@ public abstract class LoaderContextCompat {
          */
         private ActivityContextCompat(@NotNull final FragmentActivity activity,
                 @NotNull final Context context) {
-
             mActivity = new WeakReference<FragmentActivity>(
                     ConstantConditions.notNull("activity", activity));
             final Class<? extends Context> contextClass = context.getClass();
@@ -165,7 +159,6 @@ public abstract class LoaderContextCompat {
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -187,13 +180,11 @@ public abstract class LoaderContextCompat {
         @Nullable
         @Override
         public Object getComponent() {
-
             return mActivity.get();
         }
 
         @Override
         public int hashCode() {
-
             final FragmentActivity activity = mActivity.get();
             int result = (activity != null) ? activity.hashCode() : 0;
             final Context context = mContext.get();
@@ -204,14 +195,12 @@ public abstract class LoaderContextCompat {
         @Nullable
         @Override
         public Context getLoaderContext() {
-
             return mContext.get();
         }
 
         @Nullable
         @Override
         public LoaderManager getLoaderManager() {
-
             final FragmentActivity activity = mActivity.get();
             return (activity != null) ? activity.getSupportLoaderManager() : null;
         }
@@ -236,7 +225,6 @@ public abstract class LoaderContextCompat {
          */
         private FragmentContextCompat(@NotNull final Fragment fragment,
                 @NotNull final Context context) {
-
             mFragment =
                     new WeakReference<Fragment>(ConstantConditions.notNull("fragment", fragment));
             final Class<? extends Context> contextClass = context.getClass();
@@ -250,7 +238,6 @@ public abstract class LoaderContextCompat {
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -271,7 +258,6 @@ public abstract class LoaderContextCompat {
 
         @Override
         public int hashCode() {
-
             final Fragment fragment = mFragment.get();
             int result = (fragment != null) ? fragment.hashCode() : 0;
             final Context context = mContext.get();
@@ -282,14 +268,12 @@ public abstract class LoaderContextCompat {
         @Nullable
         @Override
         public Context getLoaderContext() {
-
             return mContext.get();
         }
 
         @Nullable
         @Override
         public LoaderManager getLoaderManager() {
-
             final Fragment fragment = mFragment.get();
             return (fragment != null) ? fragment.getLoaderManager() : null;
         }
@@ -297,7 +281,6 @@ public abstract class LoaderContextCompat {
         @Nullable
         @Override
         public Object getComponent() {
-
             return mFragment.get();
         }
     }

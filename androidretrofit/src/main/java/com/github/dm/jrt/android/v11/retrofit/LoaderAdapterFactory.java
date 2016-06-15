@@ -77,7 +77,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationMode invocationMode) {
-
         super(delegateFactory, invocationConfiguration, invocationMode);
         mLoaderContext = context;
         mLoaderConfiguration = loaderConfiguration;
@@ -90,7 +89,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      */
     @NotNull
     public static Builder builder() {
-
         return new Builder();
     }
 
@@ -102,7 +100,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      */
     @NotNull
     public static LoaderAdapterFactory with(@Nullable final LoaderContext context) {
-
         return (context == null) ? sFactory : new LoaderAdapterFactory(context, null,
                 InvocationConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
@@ -115,7 +112,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-
         final LoaderContext loaderContext = mLoaderContext;
         if (loaderContext != null) {
             // Use annotations to configure the routine
@@ -143,7 +139,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     @Nullable
     @Override
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
-
         if (LoaderStreamChannel.class == returnType.getRawType()) {
             return returnType.getActualTypeArguments()[1];
         }
@@ -157,7 +152,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-
         if (LoaderStreamChannel.class == returnRawType) {
             return new LoaderStreamChannelAdapter(mLoaderContext, invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
@@ -201,13 +195,11 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          * Constructor.
          */
         private Builder() {
-
         }
 
         @NotNull
         @Override
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
-
             mInvocationConfiguration =
                     ConstantConditions.notNull("invocation configuration", configuration);
             return this;
@@ -216,7 +208,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @NotNull
         @Override
         public Builder apply(@NotNull final LoaderConfiguration configuration) {
-
             mLoaderConfiguration =
                     ConstantConditions.notNull("loader configuration", configuration);
             return this;
@@ -229,7 +220,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          */
         @NotNull
         public LoaderAdapterFactory buildFactory() {
-
             return new LoaderAdapterFactory(mLoaderContext, mDelegateFactory,
                     mInvocationConfiguration, mLoaderConfiguration, mInvocationMode);
         }
@@ -242,7 +232,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          */
         @NotNull
         public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
-
             mDelegateFactory = factory;
             return this;
         }
@@ -250,7 +239,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @NotNull
         @Override
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
-
             return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
         }
 
@@ -262,7 +250,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          */
         @NotNull
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
         }
@@ -270,7 +257,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @NotNull
         @Override
         public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
-
             return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
         }
 
@@ -282,7 +268,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          */
         @NotNull
         public Builder with(@Nullable final LoaderContext context) {
-
             mLoaderContext = context;
             return this;
         }
@@ -309,7 +294,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
                 @NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
-
             super(routine, responseType);
             mContext = context;
             mInvocationMode = invocationMode;
@@ -317,7 +301,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
         @Override
         public <OUT> LoaderStreamChannel adapt(final Call<OUT> call) {
-
             final InvocationMode invocationMode = mInvocationMode;
             final Call<OUT> comparableCall = ComparableCall.of(call);
             final LoaderStreamChannel<Call<OUT>, Call<OUT>> stream;

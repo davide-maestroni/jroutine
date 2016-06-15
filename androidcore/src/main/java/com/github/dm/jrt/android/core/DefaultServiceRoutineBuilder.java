@@ -45,7 +45,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
                 @NotNull
                 public ServiceRoutineBuilder<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
-
                     return DefaultServiceRoutineBuilder.this.apply(configuration);
                 }
             };
@@ -65,7 +64,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
      */
     DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
-
         mContext = ConstantConditions.notNull("service context", context);
         mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
     }
@@ -74,7 +72,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @Override
     public ServiceRoutineBuilder<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
-
         super.apply(configuration);
         return this;
     }
@@ -83,7 +80,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @Override
     public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
     invocationConfiguration() {
-
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(mConfigurable,
                 config);
@@ -92,7 +88,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @NotNull
     @Override
     public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
-
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
@@ -100,7 +95,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @NotNull
     @Override
     public Routine<IN, OUT> buildRoutine() {
-
         return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
                 mServiceConfiguration);
     }
@@ -109,7 +103,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @Override
     public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
     serviceConfiguration() {
-
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
     }

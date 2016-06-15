@@ -35,7 +35,6 @@ public class Logs {
      * Avoid explicit instantiation.
      */
     protected Logs() {
-
         ConstantConditions.avoid();
     }
 
@@ -46,7 +45,6 @@ public class Logs {
      */
     @NotNull
     public static NullLog nullLog() {
-
         return sNullLog;
     }
 
@@ -57,7 +55,6 @@ public class Logs {
      */
     @NotNull
     public static SystemLog systemLog() {
-
         return sSystemLog;
     }
 }

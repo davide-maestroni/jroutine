@@ -51,7 +51,6 @@ public class Reflection {
      * Avoid explicit instantiation.
      */
     protected Reflection() {
-
         ConstantConditions.avoid();
     }
 
@@ -63,7 +62,6 @@ public class Reflection {
      */
     @NotNull
     public static Object[] asArgs(@Nullable final Object... args) {
-
         return (args != null) ? args : Reflection.NO_ARGS;
     }
 
@@ -77,7 +75,6 @@ public class Reflection {
      */
     @NotNull
     public static Class<?> boxingClass(@NotNull final Class<?> type) {
-
         if (!type.isPrimitive()) {
             return type;
         }
@@ -95,7 +92,6 @@ public class Reflection {
      */
     @NotNull
     public static Object[] cloneArgs(@Nullable final Object... args) {
-
         return (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
 
@@ -116,7 +112,6 @@ public class Reflection {
     @SuppressWarnings("unchecked")
     public static <TYPE> Constructor<TYPE> findConstructor(@NotNull final Class<TYPE> type,
             @NotNull final Object... args) {
-
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), args);
         if (constructor == null) {
             constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), args);
@@ -144,7 +139,6 @@ public class Reflection {
     @NotNull
     public static Method findMethod(@NotNull final Class<?> type, @NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         Method method;
         try {
             method = type.getMethod(name, parameterTypes);
@@ -168,7 +162,6 @@ public class Reflection {
      * @return whether the class has a static scope.
      */
     public static boolean hasStaticScope(@NotNull final Class<?> type) {
-
         return ((type.getEnclosingClass() == null) || Modifier.isStatic(type.getModifiers()));
     }
 
@@ -179,7 +172,6 @@ public class Reflection {
      * @return whether the instance has a static scope.
      */
     public static boolean hasStaticScope(@NotNull final Object instance) {
-
         return hasStaticScope(instance.getClass());
     }
 
@@ -191,7 +183,6 @@ public class Reflection {
      */
     @NotNull
     public static Constructor<?> makeAccessible(@NotNull final Constructor<?> constructor) {
-
         if (!constructor.isAccessible()) {
             AccessController.doPrivileged(new SetAccessibleConstructorAction(constructor));
         }
@@ -207,7 +198,6 @@ public class Reflection {
      */
     @NotNull
     public static Method makeAccessible(@NotNull final Method method) {
-
         if (!method.isAccessible()) {
             AccessController.doPrivileged(new SetAccessibleMethodAction(method));
         }
@@ -218,7 +208,6 @@ public class Reflection {
     @Nullable
     private static Constructor<?> findBestMatchingConstructor(
             @NotNull final Constructor<?>[] constructors, @NotNull final Object[] args) {
-
         final int argsLength = args.length;
         Constructor<?> bestMatch = null;
         int maxConfidence = 0;
@@ -281,12 +270,10 @@ public class Reflection {
          * @param constructor the constructor instance.
          */
         private SetAccessibleConstructorAction(@NotNull final Constructor<?> constructor) {
-
             mmConstructor = constructor;
         }
 
         public Void run() {
-
             mmConstructor.setAccessible(true);
             return null;
         }
@@ -305,12 +292,10 @@ public class Reflection {
          * @param method the method instance.
          */
         private SetAccessibleMethodAction(@NotNull final Method method) {
-
             mMethod = method;
         }
 
         public Void run() {
-
             mMethod.setAccessible(true);
             return null;
         }

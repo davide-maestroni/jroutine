@@ -27,7 +27,6 @@ public class InvocationClashException extends LoaderInvocationException {
      * Constructor.
      */
     public InvocationClashException() {
-
     }
 
     /**
@@ -36,7 +35,6 @@ public class InvocationClashException extends LoaderInvocationException {
      * @param id the loader ID.
      */
     public InvocationClashException(final int id) {
-
         super(id);
     }
 }

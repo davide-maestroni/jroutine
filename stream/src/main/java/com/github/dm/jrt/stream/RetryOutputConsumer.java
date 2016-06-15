@@ -73,7 +73,6 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
             @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
-
         mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
         mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
         mRunner = ConstantConditions.notNull("runner instance", runner);
@@ -82,12 +81,10 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     }
 
     public void onComplete() {
-
         mOutputChannel.pass(mOutputs).close();
     }
 
     public void run() {
-
         final IOChannel<IN> channel = JRoutineCore.io().buildChannel();
         mInputChannel.bind(new SafeOutputConsumer<IN>(channel));
         try {
@@ -99,7 +96,6 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     }
 
     private void abort(@NotNull final Exception error) {
-
         final RoutineException ex = InvocationException.wrapIfNeeded(error);
         mOutputChannel.abort(ex);
         mInputChannel.abort(ex);
@@ -120,43 +116,35 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
          * @param channel the I/O channel.
          */
         private SafeOutputConsumer(@NotNull final IOChannel<IN> channel) {
-
             mChannel = channel;
         }
 
         public void onComplete() {
-
             try {
                 mChannel.close();
 
             } catch (final Exception ignored) {
-
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
-
             try {
                 mChannel.abort(error);
 
             } catch (final Exception ignored) {
-
             }
         }
 
         public void onOutput(final IN output) {
-
             try {
                 mChannel.pass(output);
 
             } catch (final Exception ignored) {
-
             }
         }
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         Long delay = null;
         if (!(error instanceof AbortException)) {
             try {
@@ -178,7 +166,6 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     }
 
     public void onOutput(final OUT output) {
-
         mOutputs.add(output);
     }
 }

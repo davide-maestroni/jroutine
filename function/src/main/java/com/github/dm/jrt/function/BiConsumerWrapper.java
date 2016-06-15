@@ -53,7 +53,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      * @param consumer the wrapped consumer.
      */
     private BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
-
         this(Collections.<BiConsumer<?, ?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
     }
@@ -64,7 +63,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      * @param consumers the list of wrapped consumers.
      */
     private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
-
         super(asArgs(consumers));
         mConsumers = consumers;
     }
@@ -81,7 +79,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
-
         return (BiConsumerWrapper<IN1, IN2>) sBiSink;
     }
 
@@ -104,7 +101,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     @NotNull
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
-
         if (consumer instanceof BiConsumerWrapper) {
             return (BiConsumerWrapper<IN1, IN2>) consumer;
         }
@@ -122,7 +118,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     @NotNull
     public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
-
         ConstantConditions.notNull("consumer instance", after);
         final List<BiConsumer<?, ?>> consumers = mConsumers;
         final ArrayList<BiConsumer<?, ?>> newConsumers =
@@ -139,7 +134,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     }
 
     public boolean hasStaticScope() {
-
         for (final BiConsumer<?, ?> consumer : mConsumers) {
             if (!Reflection.hasStaticScope(consumer)) {
                 return false;
@@ -151,7 +145,6 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
 
     @SuppressWarnings("unchecked")
     public void accept(final IN1 in1, final IN2 in2) throws Exception {
-
         for (final BiConsumer<?, ?> consumer : mConsumers) {
             ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
         }

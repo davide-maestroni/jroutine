@@ -89,7 +89,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
-
         mContext = ConstantConditions.notNull("loader context", context);
         mTarget = ConstantConditions.notNull("context invocation target", target);
     }
@@ -97,7 +96,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public LoaderObjectRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
@@ -105,7 +103,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @Override
     @NotNull
     public LoaderObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -113,7 +110,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public LoaderObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -122,7 +118,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -136,14 +131,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
-
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
         if (targetMethod == null) {
@@ -174,14 +167,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         return method(findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
     @NotNull
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
-
         final ObjectConfiguration objectConfiguration =
                 Builders.withAnnotations(mObjectConfiguration, method);
         final MethodContextInvocationFactory<IN, OUT> factory =
@@ -206,7 +197,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @Override
     public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
@@ -214,7 +204,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public ObjectConfiguration.Builder<? extends LoaderObjectRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
@@ -222,7 +211,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     @Override
     public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaderConfiguration() {
-
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
@@ -256,7 +244,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private AliasContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
-
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
             mAliasName = name;
@@ -264,13 +251,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
-
             mChannel.abort(reason);
         }
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             final Object targetInstance = mInstance;
@@ -287,32 +272,27 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onDestroy() {
-
             mRoutine = null;
             mInstance = null;
         }
 
         @Override
         public void onInitialize() {
-
             mChannel = mRoutine.syncInvoke();
         }
 
         @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             mChannel.pass(input);
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             result.pass(mChannel.result());
         }
 
         @Override
         public void onTerminate() {
-
             mChannel = null;
         }
     }
@@ -343,7 +323,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         private AliasContextInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
-
             super(asArgs(targetMethod, objectConfiguration, target, name));
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -353,7 +332,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
-
             return new AliasContextInvocation<IN, OUT>(mObjectConfiguration, mTarget, mName);
         }
     }
@@ -387,7 +365,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          */
         private MethodContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
             mMethod = method;
@@ -395,44 +372,37 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
-
             mChannel.abort(reason);
         }
 
         @Override
         public void onDestroy() {
-
             mRoutine = null;
             mInstance = null;
         }
 
         @Override
         public void onInitialize() {
-
             mChannel = mRoutine.syncInvoke();
         }
 
         @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             mChannel.pass(input);
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             result.pass(mChannel.result());
         }
 
         @Override
         public void onTerminate() {
-
             mChannel = null;
         }
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             final Object targetInstance = mInstance;
@@ -474,7 +444,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         private MethodContextInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-
             super(asArgs(targetMethod, objectConfiguration, target, method));
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -484,7 +453,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
-
             return new MethodContextInvocation<IN, OUT>(mObjectConfiguration, mTarget, mMethod);
         }
     }
@@ -521,7 +489,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-
             mTargetMethod = targetMethod;
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -531,7 +498,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
-
             super.onContext(context);
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             final Object mutexTarget =
@@ -548,14 +514,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onDestroy() {
-
             mInstance = null;
         }
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
-
             callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }
@@ -589,7 +553,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-
             super(asArgs(targetMethod, objectConfiguration, target, inputMode, outputMode));
             mTargetMethod = targetMethod;
             mObjectConfiguration = objectConfiguration;
@@ -601,7 +564,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @NotNull
         @Override
         public ContextInvocation<Object, Object> newInvocation() {
-
             return new ProxyInvocation(mTargetMethod, mObjectConfiguration, mTarget, mInputMode,
                     mOutputMode);
         }
@@ -628,7 +590,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param builder the builder instance.
          */
         private ProxyInvocationHandler(@NotNull final DefaultLoaderObjectRoutineBuilder builder) {
-
             mContext = builder.mContext;
             mTarget = builder.mTarget;
             mInvocationConfiguration = builder.mInvocationConfiguration;
@@ -639,7 +600,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
-
             final ContextInvocationTarget<?> target = mTarget;
             final MethodInfo methodInfo =
                     Builders.getTargetMethodInfo(target.getTargetClass(), method);

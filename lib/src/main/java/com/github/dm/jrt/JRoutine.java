@@ -40,6 +40,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.function.Functions.consumerCall;
+import static com.github.dm.jrt.function.Functions.consumerCommand;
+import static com.github.dm.jrt.function.Functions.consumerMapping;
+import static com.github.dm.jrt.function.Functions.functionCall;
+import static com.github.dm.jrt.function.Functions.functionMapping;
+import static com.github.dm.jrt.function.Functions.predicateFilter;
+import static com.github.dm.jrt.function.Functions.supplierCommand;
+import static com.github.dm.jrt.function.Functions.supplierFactory;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 
@@ -54,7 +62,6 @@ public class JRoutine extends Streams {
      * Avoid explicit instantiation.
      */
     protected JRoutine() {
-
         ConstantConditions.avoid();
     }
 
@@ -65,7 +72,6 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static IOChannelBuilder io() {
-
         return JRoutineCore.io();
     }
 
@@ -82,7 +88,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-
         return on(factoryOf(invocationClass));
     }
 
@@ -108,7 +113,6 @@ public class JRoutine extends Streams {
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-
         return on(factoryOf(invocationClass, args));
     }
 
@@ -125,7 +129,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-
         return on(factoryOf(invocationToken));
     }
 
@@ -151,7 +154,6 @@ public class JRoutine extends Streams {
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-
         return on(factoryOf(invocationToken, args));
     }
 
@@ -165,7 +167,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> on(
             @NotNull final CommandInvocation<OUT> invocation) {
-
         return on((InvocationFactory<Void, OUT>) invocation);
     }
 
@@ -180,7 +181,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final MappingInvocation<IN, OUT> invocation) {
-
         return on((InvocationFactory<IN, OUT>) invocation);
     }
 
@@ -197,7 +197,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Invocation<IN, OUT> invocation) {
-
         return on(factoryOf(invocation));
     }
 
@@ -222,7 +221,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-
         return on(factoryOf(invocation, args));
     }
 
@@ -240,7 +238,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final InvocationFactory<IN, OUT> factory) {
-
         return JRoutineCore.on(factory);
     }
 
@@ -261,7 +258,6 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static AutoProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
-
         return new DefaultAutoProxyRoutineBuilder(target);
     }
 
@@ -285,7 +281,6 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static AutoProxyRoutineBuilder on(@NotNull final Object object) {
-
         return (object instanceof Class) ? onClassOfType((Class<?>) object) : onInstance(object);
     }
 
@@ -301,7 +296,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
             @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
         return JRoutineCore.on(consumerCall(consumer));
     }
 
@@ -317,7 +311,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-
         return JRoutineCore.on(functionCall(function));
     }
 
@@ -337,7 +330,6 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static AutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
-
         return new DefaultAutoProxyRoutineBuilder(classOfType(targetClass));
     }
 
@@ -351,7 +343,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> onCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
-
         return JRoutineCore.on(supplierCommand(supplier));
     }
 
@@ -365,7 +356,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> onCommandMore(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
         return JRoutineCore.on(consumerCommand(consumer));
     }
 
@@ -380,7 +370,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-
         return JRoutineCore.on(supplierFactory(supplier));
     }
 
@@ -394,7 +383,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN> RoutineBuilder<IN, IN> onFilter(
             @NotNull final Predicate<? super IN> predicate) {
-
         return JRoutineCore.on(predicateFilter(predicate));
     }
 
@@ -413,7 +401,6 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static AutoProxyRoutineBuilder onInstance(@NotNull final Object object) {
-
         return new DefaultAutoProxyRoutineBuilder(instance(object));
     }
 
@@ -428,7 +415,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onMapping(
             @NotNull final Function<? super IN, ? extends OUT> function) {
-
         return JRoutineCore.on(functionMapping(function));
     }
 
@@ -443,7 +429,6 @@ public class JRoutine extends Streams {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onMappingMore(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
         return JRoutineCore.on(consumerMapping(consumer));
     }
 }

@@ -41,34 +41,27 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
      * @param args the constructor arguments.
      */
     protected CommandInvocation(@Nullable final Object[] args) {
-
         super(args);
     }
 
     @NotNull
     @Override
     public final Invocation<Void, OUT> newInvocation() {
-
         return this;
     }
 
     public final void onAbort(@NotNull final RoutineException reason) {
-
     }
 
     public final void onDestroy() {
-
     }
 
     public final void onInitialize() {
-
     }
 
     public final void onInput(final Void input, @NotNull final ResultChannel<OUT> result) {
-
     }
 
     public final void onTerminate() {
-
     }
 }

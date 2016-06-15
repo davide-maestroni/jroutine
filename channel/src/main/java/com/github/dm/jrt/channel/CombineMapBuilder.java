@@ -47,7 +47,6 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
      *                                            object.
      */
     CombineMapBuilder(@NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
-
         if (channels.isEmpty()) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -66,7 +65,6 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
     @SuppressWarnings("unchecked")
     protected IOChannel<Selectable<? extends IN>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final HashMap<Integer, InputChannel<? extends IN>> channelMap = mChannelMap;
         final HashMap<Integer, IOChannel<IN>> ioChannelMap =
                 new HashMap<Integer, IOChannel<IN>>(channelMap.size());

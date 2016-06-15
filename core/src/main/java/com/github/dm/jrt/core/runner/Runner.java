@@ -58,7 +58,6 @@ public abstract class Runner {
      * Constructor.
      */
     public Runner() {
-
         synchronized (sMutex) {
             // Copy-on-write pattern
             sRunners = new WeakIdentityHashMap<Runner, Void>(sRunners) {{
@@ -73,7 +72,6 @@ public abstract class Runner {
      * @return whether the calling thread is managed by a runner.
      */
     public static boolean isManagedThread() {
-
         final Thread thread = Thread.currentThread();
         for (final Runner runner : sRunners.prune().keySet()) {
             if ((runner != null) && runner.isManagedThread(thread)) {

@@ -45,23 +45,19 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
      */
     SelectableOutputConsumer(@NotNull final IOChannel<? super Selectable<OUT>> channel,
             final int index) {
-
         mChannel = ConstantConditions.notNull("I/O channel", channel);
         mIndex = index;
     }
 
     public void onComplete() {
-
         mChannel.close();
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         mChannel.abort(error);
     }
 
     public void onOutput(final IN input) {
-
         mChannel.pass(new Selectable<OUT>(input, mIndex));
     }
 }

@@ -40,7 +40,6 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
      * @param wrapped the wrapped factory instance.
      */
     public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
-
         super(asArgs(ConstantConditions.notNull("wrapped factory", wrapped)));
         mFactory = wrapped;
     }
@@ -48,7 +47,6 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
     @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() throws Exception {
-
         return decorate(mFactory.newInvocation());
     }
 

@@ -33,7 +33,6 @@ public class AndroidLogs {
      * Avoid explicit instantiation.
      */
     protected AndroidLogs() {
-
         ConstantConditions.avoid();
     }
 
@@ -44,7 +43,6 @@ public class AndroidLogs {
      */
     @NotNull
     public static AndroidLog androidLog() {
-
         return sAndroidLog;
     }
 }

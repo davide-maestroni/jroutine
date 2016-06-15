@@ -56,7 +56,6 @@ class DefaultProxyRoutineBuilder
      *                                            interface.
      */
     DefaultProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
             throw new IllegalArgumentException(
@@ -68,7 +67,6 @@ class DefaultProxyRoutineBuilder
 
     @NotNull
     public ProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -76,14 +74,12 @@ class DefaultProxyRoutineBuilder
 
     @NotNull
     public ProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -108,21 +104,18 @@ class DefaultProxyRoutineBuilder
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration
             () {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
     public ObjectConfiguration.Builder<? extends ProxyRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
@@ -146,7 +139,6 @@ class DefaultProxyRoutineBuilder
          */
         private TargetProxyObjectBuilder(@NotNull final InvocationTarget<?> target,
                 @NotNull final Class<? super TYPE> interfaceClass) {
-
             mTarget = target;
             mInterfaceClass = interfaceClass;
         }
@@ -154,14 +146,12 @@ class DefaultProxyRoutineBuilder
         @NotNull
         @Override
         protected Class<? super TYPE> getInterfaceClass() {
-
             return mInterfaceClass;
         }
 
         @Nullable
         @Override
         protected Object getTarget() {
-
             return mTarget.getTarget();
         }
 
@@ -170,7 +160,6 @@ class DefaultProxyRoutineBuilder
         @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration) throws Exception {
-
             final Object target = mTarget;
             final Class<? super TYPE> interfaceClass = mInterfaceClass;
             final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);

@@ -62,7 +62,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
     private ProviderAdapterFactory(@Nullable final CallAdapter.Factory missingAnnotationFactory,
             @Nullable final CallAdapter.Factory missingNameFactory,
             @NotNull final Map<String, Factory> factories) {
-
         mMissingAnnotationFactory = missingAnnotationFactory;
         mMissingNameFactory = missingNameFactory;
         mFactories = factories;
@@ -75,7 +74,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
      */
     @NotNull
     public static Builder builder() {
-
         return new Builder();
     }
 
@@ -89,7 +87,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
     @NotNull
     public static ProviderAdapterFactory withFactory(@NotNull final String name,
             @NotNull final CallAdapter.Factory factory) {
-
         return new ProviderAdapterFactory(null, null,
                 Collections.singletonMap(ConstantConditions.notNull("factory name", name),
                         ConstantConditions.notNull("factory instance", factory)));
@@ -98,7 +95,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
-
         String factoryName = null;
         for (final Annotation annotation : annotations) {
             if (annotation.annotationType() == CallAdapterFactory.class) {
@@ -114,7 +110,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
     @Nullable
     private CallAdapter<?> getDefault(final boolean hasAnnotation, final Type returnType,
             final Annotation[] annotations, final Retrofit retrofit) {
-
         final Factory factory = (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;
         return (factory != null) ? factory.get(returnType, annotations, retrofit) : null;
     }
@@ -134,7 +129,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          * Constructor.
          */
         private Builder() {
-
         }
 
         /**
@@ -148,7 +142,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder add(@NotNull final String name, @NotNull final CallAdapter.Factory factory) {
-
             mFactories.put(ConstantConditions.notNull("factory name", name),
                     ConstantConditions.notNull("factory instance", factory));
             return this;
@@ -161,7 +154,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public ProviderAdapterFactory buildFactory() {
-
             return new ProviderAdapterFactory(mMissingAnnotationFactory, mMissingNameFactory,
                     new HashMap<String, CallAdapter.Factory>(mFactories));
         }
@@ -174,7 +166,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder whenMissing(@Nullable final CallAdapter.Factory factory) {
-
             mMissingAnnotationFactory = factory;
             mMissingNameFactory = factory;
             return this;
@@ -188,7 +179,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder whenMissingAnnotation(@Nullable final CallAdapter.Factory factory) {
-
             mMissingAnnotationFactory = factory;
             return this;
         }
@@ -201,7 +191,6 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder whenMissingName(@Nullable final CallAdapter.Factory factory) {
-
             mMissingNameFactory = factory;
             return this;
         }

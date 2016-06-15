@@ -45,7 +45,6 @@ class SupplierContextInvocationFactory<IN, OUT> extends ContextInvocationFactory
     SupplierContextInvocationFactory(
             @NotNull final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends
                     OUT>> supplier) {
-
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;
     }
@@ -54,7 +53,6 @@ class SupplierContextInvocationFactory<IN, OUT> extends ContextInvocationFactory
     @Override
     @SuppressWarnings("unchecked")
     public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
         return (ContextInvocation<IN, OUT>) mSupplier.get();
     }
 }

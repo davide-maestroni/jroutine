@@ -62,14 +62,12 @@ class DefaultLoaderChannelBuilder
      * @param context the context instance.
      */
     DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
-
         mContext = ConstantConditions.notNull("loader context", context);
     }
 
     @NotNull
     @Override
     public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
-
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
@@ -77,7 +75,6 @@ class DefaultLoaderChannelBuilder
     @NotNull
     @Override
     public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
-
         mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
     }
@@ -85,7 +82,6 @@ class DefaultLoaderChannelBuilder
     @NotNull
     @Override
     public <OUT> OutputChannel<OUT> buildChannel() {
-
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         if (loaderId == LoaderConfiguration.AUTO) {
@@ -140,14 +136,12 @@ class DefaultLoaderChannelBuilder
     @NotNull
     @Override
     public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
-
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @Override
     public void purge() {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
@@ -156,7 +150,6 @@ class DefaultLoaderChannelBuilder
 
     @Override
     public void purge(@Nullable final Object input) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
@@ -166,7 +159,6 @@ class DefaultLoaderChannelBuilder
 
     @Override
     public void purge(@Nullable final Object... inputs) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList;
@@ -184,7 +176,6 @@ class DefaultLoaderChannelBuilder
 
     @Override
     public void purge(@Nullable final Iterable<?> inputs) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList;
@@ -206,7 +197,6 @@ class DefaultLoaderChannelBuilder
     @NotNull
     @Override
     public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
-
         final ChannelConfiguration config = mChannelConfiguration;
         return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }

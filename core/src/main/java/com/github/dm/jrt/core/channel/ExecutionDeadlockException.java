@@ -33,7 +33,6 @@ public class ExecutionDeadlockException extends DeadlockException {
      * @param message the error message.
      */
     public ExecutionDeadlockException(@Nullable final String message) {
-
         super(message);
     }
 }

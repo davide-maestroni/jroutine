@@ -48,14 +48,12 @@ class HandlerRunner extends AsyncRunner {
      * @param handler the handler to employ.
      */
     HandlerRunner(@NotNull final Handler handler) {
-
         mThread = handler.getLooper().getThread();
         mHandler = handler;
     }
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         final ExecutionDecorator decorator;
         synchronized (mExecutions) {
             decorator = mExecutions.remove(execution);
@@ -66,14 +64,12 @@ class HandlerRunner extends AsyncRunner {
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-
         return (mThread == thread);
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         ExecutionDecorator decorator;
         synchronized (mExecutions) {
             final WeakIdentityHashMap<Execution, ExecutionDecorator> executions = mExecutions;

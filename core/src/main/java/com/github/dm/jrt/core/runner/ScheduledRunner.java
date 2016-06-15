@@ -53,7 +53,6 @@ class ScheduledRunner extends AsyncRunner {
      * @param service the executor service.
      */
     private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
-
         mService = ConstantConditions.notNull("executor service", service);
     }
 
@@ -65,7 +64,6 @@ class ScheduledRunner extends AsyncRunner {
      */
     @NotNull
     static ScheduledRunner getInstance(@NotNull final ScheduledExecutorService service) {
-
         ScheduledRunner scheduledRunner;
         synchronized (sRunners) {
             final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>> runners =
@@ -83,7 +81,6 @@ class ScheduledRunner extends AsyncRunner {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
         synchronized (mFutures) {
             scheduledFutures = mFutures.remove(execution);
@@ -98,14 +95,12 @@ class ScheduledRunner extends AsyncRunner {
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-
         return mThreads.containsKey(thread);
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution), delay, timeUnit);
         synchronized (mFutures) {
@@ -136,13 +131,11 @@ class ScheduledRunner extends AsyncRunner {
          * @param wrapped the wrapped execution.
          */
         private ExecutionWrapper(@NotNull final Execution wrapped) {
-
             mExecution = wrapped;
             mCurrentThread = Thread.currentThread();
         }
 
         public void run() {
-
             final Thread currentThread = Thread.currentThread();
             if (currentThread != mCurrentThread) {
                 mThreads.put(currentThread, null);

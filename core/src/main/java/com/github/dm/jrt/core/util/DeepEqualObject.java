@@ -38,7 +38,6 @@ public abstract class DeepEqualObject {
      * @param args the constructor arguments.
      */
     protected DeepEqualObject(@Nullable final Object[] args) {
-
         mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
 
@@ -49,19 +48,16 @@ public abstract class DeepEqualObject {
      */
     @SuppressWarnings("unused")
     private DeepEqualObject() {
-
         this(null);
     }
 
     @Override
     public int hashCode() {
-
         return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
     }
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
@@ -76,7 +72,6 @@ public abstract class DeepEqualObject {
 
     @Override
     public String toString() {
-
         return super.toString() + "{" + Arrays.deepToString(mArgs) + "}";
     }
 }

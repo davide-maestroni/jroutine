@@ -58,7 +58,6 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     private AccumulateFunctionInvocation(
             @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> accumulateFunction) {
-
         mSeedSupplier = seedSupplier;
         mAccumulateFunction = accumulateFunction;
     }
@@ -72,9 +71,8 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN> InvocationFactory<IN, IN> functionFactory(
+    static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> accumulateFunction) {
-
         return new AccumulateInvocationFactory<IN, IN>(null, wrap(accumulateFunction));
     }
 
@@ -89,24 +87,21 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+    static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
             @NotNull final Supplier<? extends OUT> seedSupplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> accumulateFunction) {
-
         return new AccumulateInvocationFactory<IN, OUT>(wrap(seedSupplier),
                 wrap(accumulateFunction));
     }
 
     @Override
     public void onInitialize() {
-
         mIsFirst = true;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         if (mIsFirst) {
             mIsFirst = false;
             final SupplierWrapper<? extends OUT> supplier = mSeedSupplier;
@@ -124,13 +119,13 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
 
     @Override
     public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        result.pass(mAccumulated);
+        if (!mIsFirst) {
+            result.pass(mAccumulated);
+        }
     }
 
     @Override
     public void onTerminate() {
-
         mAccumulated = null;
     }
 
@@ -156,7 +151,6 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
                 @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
                 @NotNull final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT>
                         accumulateFunction) {
-
             super(asArgs(seedSupplier, accumulateFunction));
             mSeedSupplier = seedSupplier;
             mAccumulateFunction = accumulateFunction;
@@ -165,7 +159,6 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
-
             return new AccumulateFunctionInvocation<IN, OUT>(mSeedSupplier, mAccumulateFunction);
         }
     }

@@ -48,7 +48,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadExecutor {
      */
     DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
             final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
-
         super(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
                 new NonRejectingQueue()));
     }
@@ -64,7 +63,6 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadExecutor {
 
         @Override
         public boolean offer(final Runnable runnable) {
-
             try {
                 put(runnable);
 

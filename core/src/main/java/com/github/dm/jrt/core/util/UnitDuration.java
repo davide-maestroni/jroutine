@@ -48,7 +48,6 @@ public class UnitDuration extends UnitTime {
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     protected UnitDuration(final long duration, @NotNull final TimeUnit unit) {
-
         super(ConstantConditions.notNegative("time duration", duration), unit);
     }
 
@@ -63,7 +62,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration days(final double days) {
-
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
@@ -81,7 +79,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration days(final long days) {
-
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
@@ -102,7 +99,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration fromUnit(final double time, @NotNull final TimeUnit unit) {
-
         final int ordinal = unit.ordinal();
         if ((ordinal == 0) || (Math.rint(time) == time)) {
             return fromUnit(Math.round(time), unit);
@@ -123,7 +119,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
-
         return new UnitDuration(time, unit);
     }
 
@@ -138,7 +133,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration hours(final double hours) {
-
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
@@ -156,7 +150,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration hours(final long hours) {
-
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
@@ -171,7 +164,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration infinity() {
-
         return sInfinity;
     }
 
@@ -186,7 +178,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration micros(final double micros) {
-
         return fromUnit(micros, TimeUnit.MICROSECONDS);
     }
 
@@ -199,7 +190,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration micros(final long micros) {
-
         return fromUnit(micros, TimeUnit.MICROSECONDS);
     }
 
@@ -214,7 +204,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration millis(final double millis) {
-
         return fromUnit(millis, TimeUnit.MILLISECONDS);
     }
 
@@ -227,7 +216,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration millis(final long millis) {
-
         return fromUnit(millis, TimeUnit.MILLISECONDS);
     }
 
@@ -242,7 +230,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration minutes(final double minutes) {
-
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
@@ -260,7 +247,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration minutes(final long minutes) {
-
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
@@ -279,7 +265,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration nanos(final double nanos) {
-
         return fromUnit(nanos, TimeUnit.NANOSECONDS);
     }
 
@@ -292,7 +277,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration nanos(final long nanos) {
-
         return fromUnit(nanos, TimeUnit.NANOSECONDS);
     }
 
@@ -307,7 +291,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration seconds(final double seconds) {
-
         return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
@@ -320,7 +303,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration seconds(final long seconds) {
-
         return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
@@ -334,7 +316,6 @@ public class UnitDuration extends UnitTime {
      */
     public static void sleepAtLeast(final long time, @NotNull final TimeUnit unit) throws
             InterruptedException {
-
         if (time == 0) {
             return;
         }
@@ -371,7 +352,6 @@ public class UnitDuration extends UnitTime {
      */
     public static boolean sleepSinceMillis(final long time, @NotNull final TimeUnit unit,
             final long milliTime) throws InterruptedException {
-
         if (time == 0) {
             return false;
         }
@@ -399,7 +379,6 @@ public class UnitDuration extends UnitTime {
      */
     public static boolean sleepSinceNanos(final long time, @NotNull final TimeUnit unit,
             final long nanoTime) throws InterruptedException {
-
         if (time == 0) {
             return false;
         }
@@ -424,7 +403,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration timeSinceMillis(final long milliTime) {
-
         return millis(Math.max(0, System.currentTimeMillis() - milliTime));
     }
 
@@ -439,7 +417,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration timeSinceNanos(final long nanoTime) {
-
         return nanos(Math.max(0, System.nanoTime() - nanoTime));
     }
 
@@ -455,7 +432,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration timeUntilMillis(final long milliTime) {
-
         return millis(Math.max(0, milliTime - System.currentTimeMillis()));
     }
 
@@ -471,7 +447,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration timeUntilNanos(final long nanoTime) {
-
         return nanos(Math.max(0, nanoTime - System.nanoTime()));
     }
 
@@ -487,7 +462,6 @@ public class UnitDuration extends UnitTime {
      */
     public static void wait(final long time, @NotNull final TimeUnit unit,
             @NotNull final Object target) throws InterruptedException {
-
         if (time == 0) {
             return;
         }
@@ -516,7 +490,6 @@ public class UnitDuration extends UnitTime {
      */
     public static boolean waitSinceMillis(final long time, @NotNull final TimeUnit unit,
             @NotNull final Object target, final long milliTime) throws InterruptedException {
-
         if (time == 0) {
             return false;
         }
@@ -551,7 +524,6 @@ public class UnitDuration extends UnitTime {
      */
     public static boolean waitSinceNanos(final long time, @NotNull final TimeUnit unit,
             @NotNull final Object target, final long nanoTime) throws InterruptedException {
-
         if (time == 0) {
             return false;
         }
@@ -586,7 +558,6 @@ public class UnitDuration extends UnitTime {
     public static boolean waitTrue(final long time, @NotNull final TimeUnit unit,
             @NotNull final Object target, @NotNull final Condition condition) throws
             InterruptedException {
-
         if (time == 0) {
             return condition.isTrue();
         }
@@ -626,7 +597,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration zero() {
-
         return sZero;
     }
 
@@ -638,7 +608,6 @@ public class UnitDuration extends UnitTime {
      */
     @NotNull
     public static UnitDuration zero(@NotNull final TimeUnit unit) {
-
         final HashMap<TimeUnit, UnitDuration> zeroes = sZeroes;
         UnitDuration zero = zeroes.get(unit);
         if (zero == null) {
@@ -657,7 +626,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration daysTime() {
-
         return days(toDays());
     }
 
@@ -669,7 +637,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration hoursTime() {
-
         return hours(toHours());
     }
 
@@ -681,7 +648,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration microsTime() {
-
         return micros(toMicros());
     }
 
@@ -693,7 +659,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration millisTime() {
-
         return millis(toMillis());
     }
 
@@ -708,7 +673,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration minus(@NotNull final UnitTime time) {
-
         if (unit.compareTo(time.unit) > 0) {
             final long newTime = to(time.unit) - time.value;
             return (newTime >= 0) ? fromUnit(newTime, time.unit)
@@ -727,7 +691,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration minutesTime() {
-
         return minutes(toMinutes());
     }
 
@@ -739,7 +702,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration nanosTime() {
-
         return nanos(toNanos());
     }
 
@@ -754,7 +716,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration plus(@NotNull final UnitTime time) {
-
         if (unit.compareTo(time.unit) > 0) {
             final long newTime = to(time.unit) + time.value;
             return (newTime >= 0) ? fromUnit(newTime, time.unit)
@@ -773,7 +734,6 @@ public class UnitDuration extends UnitTime {
     @NotNull
     @Override
     public UnitDuration secondsTime() {
-
         return seconds(toSeconds());
     }
 
@@ -783,7 +743,6 @@ public class UnitDuration extends UnitTime {
      * @return whether this duration is infinite.
      */
     public boolean isInfinite() {
-
         return (this == sInfinity);
     }
 
@@ -794,7 +753,6 @@ public class UnitDuration extends UnitTime {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void join(@NotNull final Thread target) throws InterruptedException {
-
         unit.timedJoin(target, value);
     }
 
@@ -804,7 +762,6 @@ public class UnitDuration extends UnitTime {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void sleep() throws InterruptedException {
-
         unit.sleep(value);
     }
 
@@ -815,7 +772,6 @@ public class UnitDuration extends UnitTime {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void sleepAtLeast() throws InterruptedException {
-
         sleepAtLeast(value, unit);
     }
 
@@ -830,7 +786,6 @@ public class UnitDuration extends UnitTime {
      * @see System#currentTimeMillis()
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
-
         return sleepSinceMillis(value, unit, milliTime);
     }
 
@@ -845,7 +800,6 @@ public class UnitDuration extends UnitTime {
      * @see System#nanoTime()
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
-
         return sleepSinceNanos(value, unit, nanoTime);
     }
 
@@ -856,7 +810,6 @@ public class UnitDuration extends UnitTime {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
     public void wait(@NotNull final Object target) throws InterruptedException {
-
         wait(isInfinite() ? -1 : value, unit, target);
     }
 
@@ -872,7 +825,6 @@ public class UnitDuration extends UnitTime {
      */
     public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
             InterruptedException {
-
         return waitSinceMillis(isInfinite() ? -1 : value, unit, target, milliTime);
     }
 
@@ -888,7 +840,6 @@ public class UnitDuration extends UnitTime {
      */
     public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
             InterruptedException {
-
         return waitSinceNanos(isInfinite() ? -1 : value, unit, target, nanoTime);
     }
 
@@ -903,7 +854,6 @@ public class UnitDuration extends UnitTime {
      */
     public boolean waitTrue(@NotNull final Object target, @NotNull final Condition condition) throws
             InterruptedException {
-
         return waitTrue(isInfinite() ? -1 : value, unit, target, condition);
     }
 

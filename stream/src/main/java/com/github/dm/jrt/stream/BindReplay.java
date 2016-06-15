@@ -41,12 +41,10 @@ class BindReplay<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>
      * @param configuration the channel configuration.
      */
     BindReplay(@NotNull final ChannelConfiguration configuration) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
         return Channels.replay(channel)
                        .channelConfiguration()
                        .with(mConfiguration)

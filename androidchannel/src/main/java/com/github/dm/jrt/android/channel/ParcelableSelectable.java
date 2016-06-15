@@ -40,13 +40,11 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
 
                 @Override
                 public ParcelableSelectable createFromParcel(final Parcel source) {
-
                     return new ParcelableSelectable(source);
                 }
 
                 @Override
                 public ParcelableSelectable[] newArray(final int size) {
-
                     return new ParcelableSelectable[size];
                 }
             };
@@ -58,7 +56,6 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
      * @param index the channel index.
      */
     public ParcelableSelectable(final DATA data, final int index) {
-
         super(data, index);
     }
 
@@ -69,20 +66,17 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
      */
     @SuppressWarnings("unchecked")
     protected ParcelableSelectable(@NotNull final Parcel source) {
-
         super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()),
                 source.readInt());
     }
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-
         dest.writeValue(data);
         dest.writeInt(index);
     }

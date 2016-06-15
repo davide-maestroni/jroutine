@@ -47,40 +47,34 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
      * @param file the output file.
      */
     public WriteFile(@NotNull final File file) {
-
         mFile = file;
     }
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onAbort(@NotNull final RoutineException reason) throws IOException {
-
         closeStream();
         mFile.delete();
     }
 
     @Override
     public void onInitialize() throws FileNotFoundException {
-
         mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 
     @Override
     public void onInput(final ByteBuffer buffer,
             @NotNull final ResultChannel<Boolean> result) throws IOException {
-
         ByteChannel.inputStream(buffer).transferTo(mOutputStream);
     }
 
     @Override
     public void onResult(@NotNull final ResultChannel<Boolean> result) throws IOException {
-
         closeStream();
         result.pass(true);
     }
 
     private void closeStream() throws IOException {
-
         mOutputStream.close();
     }
 }

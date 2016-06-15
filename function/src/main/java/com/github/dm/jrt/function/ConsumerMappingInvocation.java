@@ -43,13 +43,11 @@ class ConsumerMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
      */
     ConsumerMappingInvocation(
             @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
-
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         mConsumer.accept(input, result);
     }
 }

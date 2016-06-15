@@ -72,17 +72,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
     public JRoutineAndroidTest() {
-
         super(TestActivity.class);
     }
 
     private static void testCallFunction(final Activity activity) {
-
         final Routine<String, String> routine =
                 JRoutineAndroid.with(activity).onCall(new Function<List<String>, String>() {
 
                     public String apply(final List<String> strings) {
-
                         final StringBuilder builder = new StringBuilder();
                         for (final String string : strings) {
                             builder.append(string);
@@ -96,12 +93,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     private static void testConsumerCommand(final Activity activity) {
-
         final Routine<Void, String> routine =
                 JRoutineAndroid.with(activity).onCommandMore(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> result) {
-
                         result.pass("test", "1");
                     }
                 }).buildRoutine();
@@ -109,14 +104,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     private static void testConsumerFunction(final Activity activity) {
-
         final Routine<String, String> routine = //
                 JRoutineAndroid.with(activity)
                                .onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
 
                                    public void accept(final List<String> strings,
                                            final ResultChannel<String> result) {
-
                                        final StringBuilder builder = new StringBuilder();
                                        for (final String string : strings) {
                                            builder.append(string);
@@ -131,14 +124,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     private static void testConsumerMapping(final Activity activity) {
-
         final Routine<Object, String> routine = //
                 JRoutineAndroid.with(activity)
                                .onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
 
                                    public void accept(final Object o,
                                            final ResultChannel<String> result) {
-
                                        result.pass(o.toString());
                                    }
                                })

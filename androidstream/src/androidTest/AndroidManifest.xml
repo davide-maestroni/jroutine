@@ -33,6 +33,9 @@
             android:name="com.github.dm.jrt.android.v4.stream.TestActivity"
             android:label="test">
         </activity>
+        <service
+            android:name="com.github.dm.jrt.android.core.service.InvocationService"
+            android:process=":test"/>
     </application>
 
 </manifest>

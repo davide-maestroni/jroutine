@@ -30,7 +30,6 @@ public class MainRunner extends HandlerRunner {
      * Constructor.
      */
     public MainRunner() {
-
         super(new Handler(Looper.getMainLooper()));
     }
 }

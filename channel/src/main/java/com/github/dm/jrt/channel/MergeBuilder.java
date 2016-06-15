@@ -33,7 +33,6 @@ class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectab
      */
     MergeBuilder(final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         final ArrayList<OutputChannel<? extends OUT>> channelList =
                 new ArrayList<OutputChannel<? extends OUT>>();
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -57,7 +56,6 @@ class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectab
     @Override
     protected OutputChannel<? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<Selectable<OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         int i = mStartIndex;

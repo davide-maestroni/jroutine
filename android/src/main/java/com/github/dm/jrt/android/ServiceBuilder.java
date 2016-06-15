@@ -49,7 +49,6 @@ public class ServiceBuilder {
      * @param context the service context.
      */
     protected ServiceBuilder(@NotNull final ServiceContext context) {
-
         mContext = ConstantConditions.notNull("service context", context);
     }
 
@@ -69,7 +68,6 @@ public class ServiceBuilder {
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-
         return on(factoryOf(invocationClass));
     }
 
@@ -92,7 +90,6 @@ public class ServiceBuilder {
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-
         return on(factoryOf(invocationClass, args));
     }
 
@@ -112,7 +109,6 @@ public class ServiceBuilder {
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-
         return on(factoryOf(invocationToken));
     }
 
@@ -135,7 +131,6 @@ public class ServiceBuilder {
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-
         return on(factoryOf(invocationToken, args));
     }
 
@@ -156,7 +151,6 @@ public class ServiceBuilder {
      */
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation) {
-
         return on(tokenOf(invocation));
     }
 
@@ -179,7 +173,6 @@ public class ServiceBuilder {
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation,
             @Nullable final Object... args) {
-
         return on(tokenOf(invocation), args);
     }
 
@@ -204,7 +197,6 @@ public class ServiceBuilder {
      */
     @NotNull
     public ServiceAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
-
         return new DefaultServiceAutoProxyRoutineBuilder(mContext, target);
     }
 
@@ -227,7 +219,6 @@ public class ServiceBuilder {
     @NotNull
     public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
-
         return JRoutineService.with(mContext).on(target);
     }
 
@@ -247,7 +238,6 @@ public class ServiceBuilder {
      */
     @NotNull
     public ServiceAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
-
         return on(classOfType(targetClass));
     }
 
@@ -267,7 +257,6 @@ public class ServiceBuilder {
      */
     @NotNull
     public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
-
         return on(instanceOf(targetClass));
     }
 
@@ -289,7 +278,6 @@ public class ServiceBuilder {
     @NotNull
     public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
-
         return on(instanceOf(targetClass, factoryArgs));
     }
 }

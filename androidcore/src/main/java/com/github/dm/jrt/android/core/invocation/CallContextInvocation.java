@@ -38,7 +38,6 @@ public abstract class CallContextInvocation<IN, OUT> extends CallInvocation<IN, 
 
     @Override
     public void onContext(@NotNull final Context context) throws Exception {
-
         mContext = context;
     }
 
@@ -48,7 +47,6 @@ public abstract class CallContextInvocation<IN, OUT> extends CallInvocation<IN, 
      * @return the context of this invocation.
      */
     protected Context getContext() {
-
         return mContext;
     }
 }

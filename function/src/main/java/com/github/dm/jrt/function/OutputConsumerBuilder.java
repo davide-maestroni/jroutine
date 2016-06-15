@@ -48,24 +48,20 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     OutputConsumerBuilder(@NotNull final Consumer<Void> onComplete,
             @NotNull final Consumer<RoutineException> onError,
             @NotNull final Consumer<OUT> onOutput) {
-
         mOnOutput = wrap(onOutput);
         mOnError = wrap(onError);
         mOnComplete = wrap(onComplete);
     }
 
     public void onComplete() throws Exception {
-
         mOnComplete.accept(null);
     }
 
     public void onError(@NotNull final RoutineException error) throws Exception {
-
         mOnError.accept(error);
     }
 
     public void onOutput(final OUT output) throws Exception {
-
         mOnOutput.accept(output);
     }
 
@@ -78,7 +74,6 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      */
     @NotNull
     public OutputConsumerBuilder<OUT> thenComplete(@NotNull final Consumer<Void> consumer) {
-
         return new OutputConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
     }
 
@@ -92,7 +87,6 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     @NotNull
     public OutputConsumerBuilder<OUT> thenError(
             @NotNull final Consumer<? super RoutineException> consumer) {
-
         return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
     }
 
@@ -105,7 +99,6 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      */
     @NotNull
     public OutputConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> consumer) {
-
         return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
     }
 }

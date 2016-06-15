@@ -122,7 +122,6 @@ public class InvocationService extends Service {
      */
     @SuppressWarnings("unused")
     public InvocationService() {
-
         this(Logger.getDefaultLog(), Logger.getDefaultLevel());
     }
 
@@ -133,7 +132,6 @@ public class InvocationService extends Service {
      * @param logLevel the log level.
      */
     public InvocationService(@Nullable final Log log, @Nullable final Level logLevel) {
-
         mLogger = Logger.newLogger(log, logLevel, this);
     }
 
@@ -145,7 +143,6 @@ public class InvocationService extends Service {
      */
     @Nullable
     public static Throwable getAbortError(@NotNull final Message message) {
-
         final Bundle data = message.peekData();
         if (data == null) {
             return null;
@@ -163,7 +160,6 @@ public class InvocationService extends Service {
      */
     @Nullable
     public static Object getValue(@NotNull final Message message) {
-
         final Bundle data = message.peekData();
         if (data == null) {
             return null;
@@ -183,7 +179,6 @@ public class InvocationService extends Service {
      */
     public static void putError(@NotNull final Bundle bundle, @NotNull final String invocationId,
             @Nullable final Throwable error) {
-
         putInvocationId(bundle, invocationId);
         putError(bundle, error);
     }
@@ -209,7 +204,6 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Object[] runnerArgs, @Nullable final Class<? extends Log> logClass,
             @Nullable final Object[] logArgs) {
-
         bundle.putString(KEY_INVOCATION_ID,
                 ConstantConditions.notNull("invocation ID", invocationId));
         bundle.putSerializable(KEY_TARGET_INVOCATION,
@@ -234,7 +228,6 @@ public class InvocationService extends Service {
      */
     public static void putInvocationId(@NotNull final Bundle bundle,
             @NotNull final String invocationId) {
-
         bundle.putString(KEY_INVOCATION_ID, invocationId);
     }
 
@@ -247,18 +240,15 @@ public class InvocationService extends Service {
      */
     public static void putValue(@NotNull final Bundle bundle, @NotNull final String invocationId,
             @Nullable final Object value) {
-
         putInvocationId(bundle, invocationId);
         putValue(bundle, value);
     }
 
     private static void putError(@NotNull final Bundle bundle, @Nullable final Throwable error) {
-
         bundle.putSerializable(KEY_ABORT_EXCEPTION, error);
     }
 
     private static void putValue(@NotNull final Bundle bundle, @Nullable final Object value) {
-
         bundle.putParcelable(KEY_DATA_VALUE, new ParcelableValue(value));
     }
 
@@ -275,13 +265,11 @@ public class InvocationService extends Service {
     public ContextInvocationFactory<?, ?> getInvocationFactory(
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
             @Nullable final Object... args) throws Exception {
-
         return factoryOf((Class<? extends ContextInvocation<Object, Object>>) targetClass, args);
     }
 
     @Override
     public void onDestroy() {
-
         final ArrayList<RoutineState> routineStates;
         synchronized (mMutex) {
             routineStates = new ArrayList<RoutineState>(mRoutines.values());
@@ -296,13 +284,11 @@ public class InvocationService extends Service {
 
     @Override
     public final IBinder onBind(@NotNull final Intent intent) {
-
         return mInMessenger.getBinder();
     }
 
     @NotNull
     private RoutineInvocation getInvocation(@NotNull final Message message) {
-
         final Bundle data = message.peekData();
         if (data == null) {
             mLogger.err("the service message has no data");
@@ -332,7 +318,6 @@ public class InvocationService extends Service {
     }
 
     private void initRoutine(@NotNull final Message message) throws Exception {
-
         final Bundle data = message.peekData();
         if (data == null) {
             mLogger.err("the service message has no data");
@@ -448,7 +433,6 @@ public class InvocationService extends Service {
         private ContextRoutine(@NotNull final Context context,
                 @NotNull final InvocationConfiguration configuration,
                 @NotNull final ContextInvocationFactory<?, ?> factory) {
-
             super(configuration);
             mContext = context;
             mFactory = factory;
@@ -459,7 +443,6 @@ public class InvocationService extends Service {
         @SuppressWarnings("unchecked")
         protected Invocation<Object, Object> newInvocation(
                 @NotNull final InvocationType type) throws Exception {
-
             final ContextInvocationFactory<?, ?> factory = mFactory;
             getLogger().dbg("creating a new instance");
             final ContextInvocation<?, ?> invocation = factory.newInvocation();
@@ -481,13 +464,11 @@ public class InvocationService extends Service {
          * @param service the service.
          */
         private IncomingHandler(@NotNull final InvocationService service) {
-
             mService = new WeakReference<InvocationService>(service);
         }
 
         @Override
         public void handleMessage(@NotNull final Message msg) {
-
             final InvocationService service = mService.get();
             if (service == null) {
                 super.handleMessage(msg);
@@ -577,7 +558,6 @@ public class InvocationService extends Service {
                 @NotNull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nullable final Level logLevel) {
-
             super(asArgs(invocationClass, factoryArgs, outputOrder, runnerClass, logClass,
                     logLevel));
         }
@@ -598,7 +578,6 @@ public class InvocationService extends Service {
          * @param routine the routine instance.
          */
         private RoutineState(@NotNull final ContextRoutine routine) {
-
             mRoutine = routine;
         }
 
@@ -609,7 +588,6 @@ public class InvocationService extends Service {
          */
         @NotNull
         InvocationChannel<Object, Object> invoke() {
-
             ++mInvocationCount;
             return mRoutine.asyncInvoke();
         }
@@ -620,7 +598,6 @@ public class InvocationService extends Service {
          * @return the running routines count.
          */
         int releaseInvocation() {
-
             return --mInvocationCount;
         }
     }
@@ -642,21 +619,18 @@ public class InvocationService extends Service {
          */
         private ServiceOutputConsumer(@NotNull final RoutineInvocation invocation,
                 @NotNull final Messenger messenger) {
-
             mInvocation = invocation;
             mOutMessenger = ConstantConditions.notNull("output messenger", messenger);
         }
 
         @Override
         public void onComplete() throws RemoteException {
-
             mInvocation.recycle();
             mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
         }
 
         @Override
         public void onError(@NotNull final RoutineException error) throws RemoteException {
-
             mInvocation.recycle();
             final Message message = Message.obtain(null, MSG_ABORT);
             putError(message.getData(), error);
@@ -665,7 +639,6 @@ public class InvocationService extends Service {
 
         @Override
         public void onOutput(final Object o) throws RemoteException {
-
             final Message message = Message.obtain(null, MSG_DATA);
             putValue(message.getData(), o);
             mOutMessenger.send(message);
@@ -698,7 +671,6 @@ public class InvocationService extends Service {
         private RoutineInvocation(@NotNull final String id,
                 @NotNull final InvocationChannel<Object, Object> channel,
                 @NotNull final RoutineInfo info, @NotNull final RoutineState state) {
-
             mId = id;
             mChannel = channel;
             mRoutineInfo = info;
@@ -713,7 +685,6 @@ public class InvocationService extends Service {
          * @param reason the throwable object identifying the reason of the routine abortion.
          */
         void abort(@Nullable final Throwable reason) {
-
             mIoChannel.abort(reason);
         }
 
@@ -725,7 +696,6 @@ public class InvocationService extends Service {
          *                                                       or already bound to a consumer.
          */
         void bind(@NotNull final OutputConsumer<Object> consumer) {
-
             mChannel.result().bind(consumer);
         }
 
@@ -733,7 +703,6 @@ public class InvocationService extends Service {
          * Closes the channel.
          */
         void close() {
-
             mIoChannel.close();
         }
 
@@ -745,7 +714,6 @@ public class InvocationService extends Service {
          * @throws java.lang.IllegalStateException               if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
-
             mIoChannel.pass(input);
         }
 
@@ -753,7 +721,6 @@ public class InvocationService extends Service {
          * Recycles this invocation, that is, removes it from the service cache.
          */
         void recycle() {
-
             synchronized (mMutex) {
                 mInvocations.remove(mId);
                 if (mRoutineState.releaseInvocation() <= 0) {

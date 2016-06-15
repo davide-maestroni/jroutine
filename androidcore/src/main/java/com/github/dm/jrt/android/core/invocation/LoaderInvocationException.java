@@ -32,7 +32,6 @@ public class LoaderInvocationException extends RoutineException {
      * Constructor.
      */
     public LoaderInvocationException() {
-
         this(-1);
     }
 
@@ -42,7 +41,6 @@ public class LoaderInvocationException extends RoutineException {
      * @param id the loader ID.
      */
     public LoaderInvocationException(final int id) {
-
         mId = id;
     }
 
@@ -52,7 +50,6 @@ public class LoaderInvocationException extends RoutineException {
      * @return the loader ID.
      */
     public int getId() {
-
         return mId;
     }
 }

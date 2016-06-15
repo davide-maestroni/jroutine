@@ -31,7 +31,6 @@ public class TimeoutException extends RoutineException {
      * @param message the error message.
      */
     public TimeoutException(@Nullable final String message) {
-
         super(message);
     }
 }

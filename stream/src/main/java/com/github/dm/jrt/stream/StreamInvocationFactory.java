@@ -50,7 +50,6 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends
             StreamChannel<? super IN, ? extends OUT>> function) {
-
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }
@@ -58,7 +57,6 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @NotNull
     @Override
     public Invocation<IN, OUT> newInvocation() {
-
         return new StreamInvocation<IN, OUT>(mFunction);
     }
 
@@ -85,28 +83,23 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
          */
         private StreamInvocation(@NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                 StreamChannel<? super IN, ? extends OUT>> function) {
-
             mFunction = function;
         }
 
         public void onAbort(@NotNull final RoutineException reason) {
-
             mInputChannel.abort(reason);
         }
 
         public void onDestroy() {
-
         }
 
         public void onInitialize() throws Exception {
-
             final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             mOutputChannel = mFunction.apply(Streams.streamOf(ioChannel));
             mInputChannel = ioChannel;
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
@@ -116,7 +109,6 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
@@ -126,7 +118,6 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
         }
 
         public void onTerminate() {
-
             mInputChannel = null;
             mOutputChannel = null;
         }

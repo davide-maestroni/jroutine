@@ -48,7 +48,6 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     FunctionInvocationFactory(
             @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
-
         super(asArgs(ConstantConditions.notNull("function wrapper", function)));
         mInvocation = new FunctionInvocation<IN, OUT>(function);
     }
@@ -56,7 +55,6 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @NotNull
     @Override
     public Invocation<IN, OUT> newInvocation() {
-
         return mInvocation;
     }
 
@@ -77,14 +75,12 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
          */
         private FunctionInvocation(
                 @NotNull FunctionWrapper<? super List<IN>, ? extends OUT> function) {
-
             mFunction = function;
         }
 
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
                 @NotNull final ResultChannel<OUT> result) throws Exception {
-
             result.pass(mFunction.apply(new ArrayList<IN>(inputs)));
         }
     }

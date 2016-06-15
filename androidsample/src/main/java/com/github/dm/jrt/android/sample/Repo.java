@@ -36,38 +36,31 @@ public class Repo {
     private String mName;
 
     public String getId() {
-
         return mId;
     }
 
     public void setId(final String id) {
-
         mId = id;
     }
 
     public String getName() {
-
         return mName;
     }
 
     public void setName(final String name) {
-
         mName = name;
     }
 
     public boolean isPrivate() {
-
         return mIsPrivate;
     }
 
     public void setPrivate(final boolean isPrivate) {
-
         mIsPrivate = isPrivate;
     }
 
     @Override
     public String toString() {
-
         return mName;
     }
 }

@@ -61,14 +61,12 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
      */
     ConverterOutputConsumer(@NotNull final Converter<ResponseBody, ?> converter,
             @NotNull final IOChannel<Object> channel) {
-
         mConverter = ConstantConditions.notNull("converter instance", converter);
         mOutputChannel = ConstantConditions.notNull("output I/O channel", channel);
     }
 
     @Override
     public void onComplete() {
-
         final ResponseBody responseBody =
                 ResponseBody.create(mMediaType, mOutputStream.toByteArray());
         try {
@@ -81,13 +79,11 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
 
     @Override
     public void onError(@NotNull final RoutineException error) {
-
         mOutputChannel.abort(error);
     }
 
     @Override
     public void onOutput(final ParcelableSelectable<Object> output) throws IOException {
-
         switch (output.index) {
             case MEDIA_TYPE_INDEX:
                 final String mediaType = output.data();

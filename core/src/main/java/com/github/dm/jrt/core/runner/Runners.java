@@ -42,7 +42,6 @@ public class Runners {
      * Avoid explicit instantiation.
      */
     protected Runners() {
-
         ConstantConditions.avoid();
     }
 
@@ -68,7 +67,6 @@ public class Runners {
     @NotNull
     public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
             final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
-
         return scheduledRunner(
                 new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
                         keepAliveUnit));
@@ -81,7 +79,6 @@ public class Runners {
      */
     @NotNull
     public static Runner poolRunner() {
-
         return poolRunner((Runtime.getRuntime().availableProcessors() << 1) - 1);
     }
 
@@ -94,7 +91,6 @@ public class Runners {
      */
     @NotNull
     public static Runner poolRunner(final int poolSize) {
-
         return scheduledRunner(Executors.newScheduledThreadPool(poolSize));
     }
 
@@ -108,7 +104,6 @@ public class Runners {
      */
     @NotNull
     public static PriorityRunner priorityRunner(@NotNull final Runner wrapped) {
-
         return PriorityRunner.getInstance(wrapped);
     }
 
@@ -128,7 +123,6 @@ public class Runners {
      */
     @NotNull
     public static Runner scheduledRunner(@NotNull final ScheduledExecutorService service) {
-
         return ScheduledRunner.getInstance(service);
     }
 
@@ -148,7 +142,6 @@ public class Runners {
      */
     @NotNull
     public static Runner scheduledRunner(@NotNull final ExecutorService service) {
-
         return scheduledRunner(new ScheduledThreadExecutor(service));
     }
 
@@ -159,7 +152,6 @@ public class Runners {
      */
     @NotNull
     public static Runner sharedRunner() {
-
         synchronized (sMutex) {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
@@ -178,7 +170,6 @@ public class Runners {
      */
     @NotNull
     public static Runner syncRunner() {
-
         return sQueuedRunner;
     }
 
@@ -193,7 +184,6 @@ public class Runners {
      */
     @NotNull
     public static Runner throttlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
-
         return new ThrottlingRunner(wrapped, maxExecutions);
     }
 
@@ -206,7 +196,6 @@ public class Runners {
      */
     @NotNull
     public static Runner zeroDelayRunner(@NotNull final Runner wrapped) {
-
         return ZeroDelayRunner.getInstance(wrapped);
     }
 }

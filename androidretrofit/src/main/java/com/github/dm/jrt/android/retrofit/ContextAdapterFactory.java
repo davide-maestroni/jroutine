@@ -52,7 +52,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
 
                 public void onInput(final Call<Object> input,
                         @NotNull final ResultChannel<Object> result) throws IOException {
-
                     result.pass(input.execute().body());
                 }
             };
@@ -63,7 +62,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
                 @NotNull
                 @Override
                 public ContextInvocation<Call<Object>, Object> newInvocation() {
-
                     return sCallInvocation;
                 }
             };
@@ -80,7 +78,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     protected ContextAdapterFactory(@Nullable final Factory delegateFactory,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
-
         super(delegateFactory, configuration, invocationMode);
         mDelegateFactory = delegateFactory;
     }
@@ -100,7 +97,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
             @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-
         final CallAdapter.Factory delegateFactory = mDelegateFactory;
         if (delegateFactory == null) {
             return sCallInvocationFactory;
@@ -141,13 +137,11 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
          * @param callAdapter the call adapter instance.
          */
         private BodyAdapterInvocation(@NotNull final CallAdapter<?> callAdapter) {
-
             mCallAdapter = callAdapter;
         }
 
         @Override
         public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
-
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -168,7 +162,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
          */
         private BodyAdapterInvocationFactory(@Nullable final Object[] args,
                 @NotNull final CallAdapter<?> callAdapter) {
-
             super(args);
             mInvocation = new BodyAdapterInvocation(callAdapter);
         }
@@ -176,7 +169,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
         @NotNull
         @Override
         public ContextInvocation<Call<Object>, Object> newInvocation() {
-
             return mInvocation;
         }
     }
@@ -195,13 +187,11 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
          * @param callAdapter the call adapter instance.
          */
         private ChannelAdapterInvocation(@NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
-
             mCallAdapter = callAdapter;
         }
 
         @Override
         public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
-
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -222,7 +212,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
          */
         private ChannelAdapterInvocationFactory(@Nullable final Object[] args,
                 @NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
-
             super(args);
             mInvocation = new ChannelAdapterInvocation(callAdapter);
         }
@@ -230,7 +219,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
         @NotNull
         @Override
         public ContextInvocation<Call<Object>, Object> newInvocation() {
-
             return mInvocation;
         }
     }

@@ -73,7 +73,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration) {
-
         super(invocationConfiguration);
         final int factoryId = loaderConfiguration.getFactoryIdOrElse(LoaderConfiguration.AUTO);
         mContext = ConstantConditions.notNull("loader context", context);
@@ -88,7 +87,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
 
     @Override
     public void purge() {
-
         super.purge();
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
@@ -100,7 +98,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
     @Override
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
             Exception {
-
         final Logger logger = getLogger();
         if (type == InvocationType.ASYNC) {
             return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
@@ -121,7 +118,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
 
     @Override
     public void purge(@Nullable final IN input) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             purgeLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
@@ -130,7 +126,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
 
     @Override
     public void purge(@Nullable final IN... inputs) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<IN> inputList;
@@ -147,7 +142,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
 
     @Override
     public void purge(@Nullable final Iterable<? extends IN> inputs) {
-
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<IN> inputList;
@@ -184,7 +178,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
          */
         protected FactoryWrapper(@NotNull final ContextInvocationFactory<IN, OUT> factory,
                 final int factoryId) {
-
             super(asArgs(factoryId));
             mFactory = factory;
         }
@@ -192,7 +185,6 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
             return mFactory.newInvocation();
         }
     }

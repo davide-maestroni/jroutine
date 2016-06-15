@@ -38,9 +38,9 @@
             public static void main(final String[] args) {
 
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.on(functionFilter(Integer::parseInt)).buildRoutine();
+                        JRoutineCore.on(functionMapping(Integer::parseInt)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.on(functionFilter(integer -> {
+                        JRoutineCore.on(functionMapping(integer -> {
                                 final int input = integer;
                                 return (input * input);
                         })).buildRoutine();

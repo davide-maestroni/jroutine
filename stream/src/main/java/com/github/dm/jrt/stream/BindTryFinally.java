@@ -46,13 +46,11 @@ class BindTryFinally<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
      */
     BindTryFinally(@NotNull final ChannelConfiguration configuration,
             @NotNull final Runnable finallyRunnable) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(mConfiguration)

@@ -95,7 +95,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration,
             @NotNull final InvocationMode invocationMode) {
-
         mServiceContext = context;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
@@ -109,7 +108,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      */
     @NotNull
     public static Builder builder() {
-
         return new Builder();
     }
 
@@ -120,7 +118,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      */
     @NotNull
     public static ServiceAdapterFactory defaultFactory() {
-
         return sFactory;
     }
 
@@ -132,7 +129,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      */
     @NotNull
     public static ServiceAdapterFactory defaultFactory(@Nullable final ServiceContext context) {
-
         return (context == null) ? defaultFactory()
                 : new ServiceAdapterFactory(context, InvocationConfiguration.defaultConfiguration(),
                         ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
@@ -141,7 +137,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
-
         InvocationMode invocationMode = mInvocationMode;
         for (final Annotation annotation : annotations) {
             if (annotation.annotationType() == Invoke.class) {
@@ -199,7 +194,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @NotNull
     private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
             @NotNull final InvocationConfiguration invocationConfiguration) {
-
         return JRoutineService.with(ConstantConditions.notNull("service context", mServiceContext))
                               .on(factoryOf(ServiceCallInvocation.class))
                               .invocationConfiguration()
@@ -238,13 +232,11 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          * Constructor.
          */
         private Builder() {
-
         }
 
         @NotNull
         @Override
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
-
             mInvocationConfiguration =
                     ConstantConditions.notNull("invocation configuration", configuration);
             return this;
@@ -253,7 +245,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull
         @Override
         public Builder apply(@NotNull final ServiceConfiguration configuration) {
-
             mServiceConfiguration =
                     ConstantConditions.notNull("service configuration", configuration);
             return this;
@@ -266,14 +257,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public ServiceAdapterFactory buildFactory() {
-
             return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
                     mServiceConfiguration, mInvocationMode);
         }
 
         @NotNull
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
-
             return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
         }
 
@@ -285,7 +274,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
         }
@@ -293,7 +281,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull
         @Override
         public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
-
             return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
         }
 
@@ -305,7 +292,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         public Builder with(@Nullable final ServiceContext context) {
-
             mServiceContext = context;
             return this;
         }
@@ -330,14 +316,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
                 @NotNull final Type responseType) {
-
             mResponseType = responseType;
             mRoutine = routine;
         }
 
         @Override
         public Type responseType() {
-
             return mResponseType;
         }
 
@@ -348,7 +332,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         protected Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> getRoutine() {
-
             return mRoutine;
         }
     }
@@ -376,7 +359,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Converter<ResponseBody, ?> converter,
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine) {
-
             mConfiguration = configuration;
             mConverter = converter;
             mRoutine = routine;
@@ -385,7 +367,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @Override
         public OutputChannel<Object> apply(
                 final OutputChannel<ParcelableSelectable<Object>> channel) {
-
             final IOChannel<Object> ioChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
@@ -420,7 +401,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
                 @NotNull final Type responseType) {
-
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mChannelConfiguration = builderFromOutputChannel(configuration).apply();
@@ -429,7 +409,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @NotNull
         private OutputChannel<ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
-
             return JRoutineCore.on(sInvocation)
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
@@ -439,7 +418,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> OutputChannel adapt(final Call<OUT> call) {
-
             final IOChannel<Object> ioChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mChannelConfiguration)
@@ -475,7 +453,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
                 @NotNull final Type responseType) {
-
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mChannelConfiguration = builderFromOutputChannel(configuration).apply();
@@ -484,7 +461,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> StreamChannel adapt(final Call<OUT> call) {
-
             final Function<Function<OutputChannel<Call<OUT>>,
                     OutputChannel<ParcelableSelectable<Object>>>,
                     Function<OutputChannel<Call<OUT>>, OutputChannel<Object>>>
@@ -496,7 +472,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                         public Function<OutputChannel<Call<OUT>>, OutputChannel<Object>> apply(
                                 final Function<OutputChannel<Call<OUT>>,
                                         OutputChannel<ParcelableSelectable<Object>>> function) {
-
                             return wrap(function).andThen(
                                     new BindService(mChannelConfiguration, mConverter,
                                             getRoutine()));

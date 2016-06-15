@@ -48,7 +48,6 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
      */
     CombineMapBuilder(
             @NotNull final SparseArrayCompat<? extends InputChannel<? extends IN>> channels) {
-
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -66,7 +65,6 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
     @SuppressWarnings("unchecked")
     protected IOChannel<Selectable<? extends IN>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final SparseArrayCompat<? extends InputChannel<? extends IN>> channelMap = mChannelMap;
         final int size = channelMap.size();
         final SparseArrayCompat<IOChannel<IN>> ioChannelMap =

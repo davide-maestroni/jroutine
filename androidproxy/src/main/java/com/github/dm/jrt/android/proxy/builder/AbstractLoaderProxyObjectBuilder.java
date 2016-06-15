@@ -58,7 +58,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @NotNull
     @Override
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final LoaderConfiguration configuration) {
-
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
@@ -66,7 +65,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @NotNull
     @Override
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -75,7 +73,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @Override
     public LoaderProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -85,7 +82,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @Override
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
-
         synchronized (sContextProxies) {
             final Object context = getInvocationContext();
             if (context == null) {
@@ -141,7 +137,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -150,7 +145,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @Override
     public ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -159,7 +153,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @Override
     public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     loaderConfiguration() {
-
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -221,7 +214,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final LoaderConfiguration loaderConfiguration) {
-
             super(asArgs(itf, invocationConfiguration, objectConfiguration, loaderConfiguration));
         }
     }

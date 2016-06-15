@@ -70,7 +70,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     InvocationExecution(@NotNull final InvocationManager<IN, OUT> manager,
             @NotNull final InputIterator<IN> inputs,
             @NotNull final DefaultResultChannel<OUT> result, @NotNull final Logger logger) {
-
         mInvocationManager = ConstantConditions.notNull("invocation manager", manager);
         mInputIterator = ConstantConditions.notNull("input iterator", inputs);
         mResultChannel = ConstantConditions.notNull("result channel", result);
@@ -84,7 +83,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      */
     @NotNull
     public Execution abort() {
-
         if (mAbortExecution == null) {
             mAbortExecution = new AbortExecution();
         }
@@ -93,7 +91,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
-
         synchronized (mMutex) {
             mIsWaitingInvocation = false;
             final DefaultResultChannel<OUT> resultChannel = mResultChannel;
@@ -117,7 +114,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     public void run() {
-
         final Invocation<IN, OUT> invocation;
         synchronized (mMutex) {
             if (mIsWaitingInvocation) {
@@ -146,7 +142,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     private void execute(@NotNull final Invocation<IN, OUT> invocation) {
-
         final InputIterator<IN> inputIterator = mInputIterator;
         final InvocationManager<IN, OUT> manager = mInvocationManager;
         final DefaultResultChannel<OUT> resultChannel = mResultChannel;
@@ -251,7 +246,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     private class AbortExecution implements Execution, InvocationObserver<IN, OUT> {
 
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
-
             synchronized (mMutex) {
                 mIsWaitingAbortInvocation = false;
                 final InputIterator<IN> inputIterator = mInputIterator;
@@ -300,7 +294,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         }
 
         public void onError(@NotNull final Throwable error) {
-
             synchronized (mMutex) {
                 final DefaultResultChannel<OUT> resultChannel = mResultChannel;
                 resultChannel.stopWaitingInvocation();
@@ -309,7 +302,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         }
 
         public void run() {
-
             final Invocation<IN, OUT> invocation;
             synchronized (mMutex) {
                 if (mIsWaitingAbortInvocation) {
@@ -338,7 +330,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     public void onError(@NotNull final Throwable error) {
-
         synchronized (mMutex) {
             final DefaultResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();

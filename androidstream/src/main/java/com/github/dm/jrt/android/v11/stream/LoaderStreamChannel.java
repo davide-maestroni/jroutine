@@ -455,6 +455,14 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
+    LoaderStreamChannel<IN, Void> onComplete(@NotNull Runnable action);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
@@ -629,6 +637,14 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, OUT> peekComplete(@NotNull Runnable peekAction);
 
     /**
      * {@inheritDoc}
@@ -842,7 +858,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannel<IN, OUT> tryFinally(@NotNull Runnable finallyRunnable);
+    LoaderStreamChannel<IN, OUT> tryFinally(@NotNull Runnable action);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.

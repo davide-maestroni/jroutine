@@ -38,7 +38,6 @@ public abstract class StreamContextInvocation<IN, OUT> extends StreamInvocation<
 
     @Override
     public void onContext(@NotNull final Context context) throws Exception {
-
         mContext = context;
     }
 
@@ -48,7 +47,6 @@ public abstract class StreamContextInvocation<IN, OUT> extends StreamInvocation<
      * @return the context of this invocation.
      */
     protected Context getContext() {
-
         return mContext;
     }
 }

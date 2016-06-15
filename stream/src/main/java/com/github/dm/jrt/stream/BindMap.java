@@ -47,13 +47,11 @@ class BindMap<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>
     @SuppressWarnings("unchecked")
     BindMap(@NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
-
         mRoutine = (Routine<IN, OUT>) ConstantConditions.notNull("routine instance", routine);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
-
         final InvocationMode invocationMode = mInvocationMode;
         if (invocationMode == InvocationMode.ASYNC) {
             return mRoutine.asyncCall(channel);

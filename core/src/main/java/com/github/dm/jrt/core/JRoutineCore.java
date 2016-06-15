@@ -122,7 +122,6 @@ public class JRoutineCore {
      * Avoid explicit instantiation.
      */
     protected JRoutineCore() {
-
         ConstantConditions.avoid();
     }
 
@@ -133,7 +132,6 @@ public class JRoutineCore {
      */
     @NotNull
     public static IOChannelBuilder io() {
-
         return new DefaultIOChannelBuilder();
     }
 
@@ -151,7 +149,6 @@ public class JRoutineCore {
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final InvocationFactory<IN, OUT> factory) {
-
         return new DefaultRoutineBuilder<IN, OUT>(factory);
     }
 }

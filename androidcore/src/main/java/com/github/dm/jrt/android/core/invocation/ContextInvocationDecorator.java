@@ -42,49 +42,41 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
      * @param wrapped the wrapped invocation instance.
      */
     public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
-
         mInvocation = ConstantConditions.notNull("wrapped invocation instance", wrapped);
     }
 
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
-
         mInvocation.onAbort(reason);
     }
 
     @Override
     public void onDestroy() throws Exception {
-
         mInvocation.onDestroy();
     }
 
     @Override
     public void onInitialize() throws Exception {
-
         mInvocation.onInitialize();
     }
 
     @Override
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         mInvocation.onInput(input, result);
     }
 
     @Override
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
         mInvocation.onResult(result);
     }
 
     @Override
     public void onTerminate() throws Exception {
-
         mInvocation.onTerminate();
     }
 
     @Override
     public void onContext(@NotNull final Context context) throws Exception {
-
         mInvocation.onContext(context);
     }
 }

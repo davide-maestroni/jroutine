@@ -63,13 +63,11 @@ class AsyncTaskRunner extends AsyncRunner {
      * @param executor the executor.
      */
     AsyncTaskRunner(@Nullable final Executor executor) {
-
         mExecutor = executor;
     }
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         synchronized (mTasks) {
             final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
             if (executionTasks != null) {
@@ -83,14 +81,12 @@ class AsyncTaskRunner extends AsyncRunner {
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-
         return mThreads.containsKey(thread);
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
         synchronized (mTasks) {
             final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks = mTasks;
@@ -127,7 +123,6 @@ class AsyncTaskRunner extends AsyncRunner {
          */
         private ExecutionTask(@NotNull final Execution execution, @Nullable final Executor executor,
                 @NotNull final Map<Thread, Void> threads) {
-
             mExecution = execution;
             mExecutor = executor;
             mThreads = threads;
@@ -136,7 +131,6 @@ class AsyncTaskRunner extends AsyncRunner {
         @TargetApi(VERSION_CODES.HONEYCOMB)
         @Override
         public void run() {
-
             final Executor executor = mExecutor;
             if ((executor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
                 executeOnExecutor(executor, NO_PARAMS);
@@ -148,7 +142,6 @@ class AsyncTaskRunner extends AsyncRunner {
 
         @Override
         protected Void doInBackground(@NotNull final Void... voids) {
-
             final Thread currentThread = Thread.currentThread();
             if (currentThread != Looper.getMainLooper().getThread()) {
                 mThreads.put(currentThread, null);

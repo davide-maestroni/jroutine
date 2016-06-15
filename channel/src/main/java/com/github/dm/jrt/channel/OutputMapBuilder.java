@@ -63,7 +63,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
      */
     OutputMapBuilder(@NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Set<Integer> indexes) {
-
         mChannel = ConstantConditions.notNull("output channel", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
@@ -79,7 +78,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
     @SuppressWarnings("unchecked")
     protected Map<Integer, OutputChannel<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final HashSet<Integer> indexes = mIndexes;
         final OutputChannel<? extends Selectable<? extends OUT>> channel = mChannel;
         synchronized (sOutputChannels) {
@@ -139,7 +137,6 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
          */
         private SelectInfo(@NotNull final ChannelConfiguration configuration,
                 @NotNull final HashSet<Integer> indexes) {
-
             super(asArgs(configuration, indexes));
         }
     }

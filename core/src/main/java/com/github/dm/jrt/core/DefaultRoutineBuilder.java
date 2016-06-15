@@ -41,13 +41,11 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
      * @param factory the invocation factory.
      */
     DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
-
         mFactory = ConstantConditions.notNull("invocation factory", factory);
     }
 
     @NotNull
     public Routine<IN, OUT> buildRoutine() {
-
         return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);
     }
 }

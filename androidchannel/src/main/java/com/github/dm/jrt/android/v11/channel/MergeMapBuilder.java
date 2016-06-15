@@ -49,7 +49,6 @@ class MergeMapBuilder<OUT>
      *                                            object.
      */
     MergeMapBuilder(@NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
-
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -66,7 +65,6 @@ class MergeMapBuilder<OUT>
     @Override
     protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final SparseArray<? extends OutputChannel<? extends OUT>> channelMap = mChannelMap;
         final IOChannel<ParcelableSelectable<OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();

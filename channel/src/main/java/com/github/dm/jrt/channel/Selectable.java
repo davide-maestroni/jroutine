@@ -42,7 +42,6 @@ public class Selectable<DATA> {
      * @param index the channel index.
      */
     public Selectable(final DATA data, final int index) {
-
         this.data = data;
         this.index = index;
     }
@@ -55,13 +54,11 @@ public class Selectable<DATA> {
      */
     @SuppressWarnings("unchecked")
     public <TYPE extends DATA> TYPE data() {
-
         return (TYPE) data;
     }
 
     @Override
     public int hashCode() {
-
         int result = (data != null) ? data.hashCode() : 0;
         result = 31 * result + index;
         return result;
@@ -69,7 +66,6 @@ public class Selectable<DATA> {
 
     @Override
     public boolean equals(final Object o) {
-
         if (this == o) {
             return true;
         }
@@ -85,7 +81,6 @@ public class Selectable<DATA> {
 
     @Override
     public String toString() {
-
         return "Selectable{data=" + data + ", index=" + index + "}";
     }
 }

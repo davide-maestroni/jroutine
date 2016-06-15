@@ -53,7 +53,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
-
         super(delegateFactory, configuration, invocationMode);
     }
 
@@ -64,7 +63,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      */
     @NotNull
     public static Builder builder() {
-
         return new Builder();
     }
 
@@ -75,7 +73,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      */
     @NotNull
     public static RoutineAdapterFactory defaultFactory() {
-
         return sFactory;
     }
 
@@ -101,12 +98,10 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          * Constructor.
          */
         private Builder() {
-
         }
 
         @NotNull
         public Builder apply(@NotNull final InvocationConfiguration configuration) {
-
             mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
             return this;
         }
@@ -118,7 +113,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          */
         @NotNull
         public RoutineAdapterFactory buildFactory() {
-
             return new RoutineAdapterFactory(mDelegateFactory, mConfiguration, mInvocationMode);
         }
 
@@ -130,14 +124,12 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          */
         @NotNull
         public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
-
             mDelegateFactory = factory;
             return this;
         }
 
         @NotNull
         public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
-
             return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
         }
 
@@ -149,7 +141,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          */
         @NotNull
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
         }

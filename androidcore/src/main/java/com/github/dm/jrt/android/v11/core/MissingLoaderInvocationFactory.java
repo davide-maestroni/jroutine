@@ -43,7 +43,6 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
      * @param id the loader ID.
      */
     MissingLoaderInvocationFactory(final int id) {
-
         super(asArgs(id));
         mId = id;
     }
@@ -51,7 +50,6 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
     @NotNull
     @Override
     public ContextInvocation<Void, OUT> newInvocation() {
-
         return new MissingLoaderInvocation<OUT>(mId);
     }
 
@@ -70,13 +68,11 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
          * @param id the loader ID.
          */
         private MissingLoaderInvocation(final int id) {
-
             mId = id;
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             result.abort(new MissingLoaderException(mId));
         }
     }

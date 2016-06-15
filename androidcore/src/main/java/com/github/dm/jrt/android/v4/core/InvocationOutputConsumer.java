@@ -71,12 +71,10 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
      */
     InvocationOutputConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
-
         ConstantConditions.notNull("loader instance", loader);
         mDeliverResult = new Execution() {
 
             public void run() {
-
                 loader.deliverResult(createResult());
             }
         };
@@ -85,7 +83,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     @Override
     public void onComplete() {
-
         final boolean deliverResult;
         synchronized (mMutex) {
             mIsComplete = true;
@@ -106,7 +103,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     @Override
     public void onError(@NotNull final RoutineException error) {
-
         final boolean deliverResult;
         synchronized (mMutex) {
             mIsComplete = true;
@@ -122,7 +118,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     @Override
     public void onOutput(final OUT output) {
-
         final boolean deliverResult;
         synchronized (mMutex) {
             if (mAbortException != null) {
@@ -147,14 +142,12 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
      */
     @NotNull
     InvocationResult<OUT> createResult() {
-
         // Need to create a new instance each time to trick the loader manager into thinking that a
         // brand new result is available
         return new Result();
     }
 
     private void deliverResult() {
-
         sMainRunner.run(mDeliverResult, 0, TimeUnit.MILLISECONDS);
     }
 
@@ -165,7 +158,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
         @Override
         public void abort() {
-
             synchronized (mMutex) {
                 mIsComplete = true;
                 mAbortException = new AbortException(null);
@@ -175,7 +167,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         @Nullable
         @Override
         public RoutineException getAbortException() {
-
             synchronized (mMutex) {
                 return mAbortException;
             }
@@ -183,7 +174,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
         @Override
         public long getResultTimestamp() {
-
             synchronized (mMutex) {
                 return mResultTimestamp;
             }
@@ -191,7 +181,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
         @Override
         public boolean isError() {
-
             synchronized (mMutex) {
                 return (mAbortException != null);
             }
@@ -201,7 +190,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         public boolean passTo(@NotNull final Collection<IOChannel<OUT>> newChannels,
                 @NotNull final Collection<IOChannel<OUT>> oldChannels,
                 @NotNull final Collection<IOChannel<OUT>> abortedChannels) {
-
             synchronized (mMutex) {
                 final Logger logger = mLogger;
                 final ArrayList<OUT> lastResults = mLastResults;

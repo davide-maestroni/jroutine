@@ -67,7 +67,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
      */
     DefaultServiceProxyRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
-
         mContext = ConstantConditions.notNull("service context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
@@ -75,7 +74,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -83,7 +81,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
-
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
@@ -91,7 +88,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -100,7 +96,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -129,7 +124,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
@@ -137,7 +131,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
@@ -145,7 +138,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
@@ -154,7 +146,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
     serviceConfiguration() {
-
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
@@ -183,7 +174,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         private TargetServiceProxyObjectBuilder(@NotNull final ServiceContext context,
                 @NotNull final ContextInvocationTarget<?> target,
                 @NotNull final Class<? super TYPE> interfaceClass) {
-
             mContext = context;
             mTarget = target;
             mInterfaceClass = interfaceClass;
@@ -192,21 +182,18 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         @NotNull
         @Override
         protected Class<? super TYPE> getInterfaceClass() {
-
             return mInterfaceClass;
         }
 
         @Nullable
         @Override
         protected Context getInvocationContext() {
-
             return mContext.getServiceContext();
         }
 
         @NotNull
         @Override
         protected Class<?> getTargetClass() {
-
             return mTarget.getTargetClass();
         }
 
@@ -216,7 +203,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) throws Exception {
-
             final ServiceContext context = mContext;
             final ContextInvocationTarget<?> target = mTarget;
             final Class<? super TYPE> interfaceClass = mInterfaceClass;

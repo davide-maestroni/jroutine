@@ -35,7 +35,6 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
                 @NotNull
                 @Override
                 public ContextInvocation<Object, Object> newInvocation() {
-
                     return new IdentityContextInvocation<Object>();
                 }
             };
@@ -44,7 +43,6 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
      * Avoid instantiation.
      */
     private IdentityContextInvocation() {
-
     }
 
     /**
@@ -56,13 +54,11 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
     @NotNull
     @SuppressWarnings("unchecked")
     public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
-
         return (ContextInvocationFactory<DATA, DATA>) sFactory;
     }
 
     @Override
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
         result.pass(input);
     }
 }

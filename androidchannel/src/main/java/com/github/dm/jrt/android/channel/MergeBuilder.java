@@ -51,7 +51,6 @@ class MergeBuilder<OUT>
      */
     MergeBuilder(final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         final ArrayList<OutputChannel<? extends OUT>> channelList =
                 new ArrayList<OutputChannel<? extends OUT>>();
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -75,7 +74,6 @@ class MergeBuilder<OUT>
     @Override
     protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<ParcelableSelectable<OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         int i = mStartIndex;

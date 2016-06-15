@@ -89,7 +89,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @param unit  the time unit.
      */
     protected UnitTime(final long value, @NotNull final TimeUnit unit) {
-
         this.value = value;
         this.unit = ConstantConditions.notNull("time unit", unit);
     }
@@ -102,7 +101,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime current() {
-
         return millis(System.currentTimeMillis());
     }
 
@@ -115,7 +113,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime currentNano() {
-
         return nanos(System.nanoTime());
     }
 
@@ -130,7 +127,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime days(final double days) {
-
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
@@ -147,7 +143,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime days(final long days) {
-
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
@@ -168,7 +163,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime fromUnit(final double time, @NotNull final TimeUnit unit) {
-
         final int ordinal = unit.ordinal();
         if ((ordinal == 0) || (Math.rint(time) == time)) {
             return fromUnit(Math.round(time), unit);
@@ -188,7 +182,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime fromUnit(final long time, @NotNull final TimeUnit unit) {
-
         return new UnitTime(time, ConstantConditions.notNull("time unit", unit));
     }
 
@@ -203,7 +196,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime hours(final double hours) {
-
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
@@ -220,7 +212,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime hours(final long hours) {
-
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
@@ -239,7 +230,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime micros(final double micros) {
-
         return fromUnit(micros, TimeUnit.MICROSECONDS);
     }
 
@@ -251,7 +241,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime micros(final long micros) {
-
         return fromUnit(micros, TimeUnit.MICROSECONDS);
     }
 
@@ -266,7 +255,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime millis(final double millis) {
-
         return fromUnit(millis, TimeUnit.MILLISECONDS);
     }
 
@@ -278,7 +266,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime millis(final long millis) {
-
         return fromUnit(millis, TimeUnit.MILLISECONDS);
     }
 
@@ -293,7 +280,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime minutes(final double minutes) {
-
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
@@ -310,7 +296,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime minutes(final long minutes) {
-
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
@@ -329,7 +314,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime nanos(final double nanos) {
-
         return fromUnit(nanos, TimeUnit.NANOSECONDS);
     }
 
@@ -341,7 +325,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime nanos(final long nanos) {
-
         return fromUnit(nanos, TimeUnit.NANOSECONDS);
     }
 
@@ -356,7 +339,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime seconds(final double seconds) {
-
         return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
@@ -368,17 +350,14 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public static UnitTime seconds(final long seconds) {
-
         return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
     private static int compareLong(final long l1, final long l2) {
-
         return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
     }
 
     public int compareTo(@NotNull final UnitTime o) {
-
         final int unitCompare = unit.compareTo(o.unit);
         if (unitCompare == 0) {
             return compareLong(value, o.value);
@@ -400,26 +379,22 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime daysTime() {
-
         return days(toDays());
     }
 
     @Override
     public int hashCode() {
-
         final long value = toNanos();
         return (int) (value ^ (value >>> 32));
     }
 
     @Override
     public boolean equals(final Object o) {
-
         return (this == o) || (o instanceof UnitTime) && (compareTo((UnitTime) o) == 0);
     }
 
     @Override
     public String toString() {
-
         return value + " " + unit.toString();
     }
 
@@ -430,7 +405,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime hoursTime() {
-
         return hours(toHours());
     }
 
@@ -441,7 +415,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return whether this time is greater or equal.
      */
     public boolean isGreaterOrEquals(@NotNull final UnitTime other) {
-
         return compareTo(other) >= 0;
     }
 
@@ -452,7 +425,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return whether this time is greater.
      */
     public boolean isGreaterThan(@NotNull final UnitTime other) {
-
         return compareTo(other) > 0;
     }
 
@@ -463,7 +435,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return whether this time is less or equal.
      */
     public boolean isLessOrEquals(@NotNull final UnitTime other) {
-
         return compareTo(other) <= 0;
     }
 
@@ -474,7 +445,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return whether this time is less.
      */
     public boolean isLessThan(@NotNull final UnitTime other) {
-
         return compareTo(other) < 0;
     }
 
@@ -484,7 +454,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return whether this time value is zero.
      */
     public boolean isZero() {
-
         return (value == 0);
     }
 
@@ -495,7 +464,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime microsTime() {
-
         return micros(toMicros());
     }
 
@@ -506,7 +474,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime millisTime() {
-
         return millis(toMillis());
     }
 
@@ -520,7 +487,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime minus(@NotNull final UnitTime time) {
-
         if (unit.compareTo(time.unit) > 0) {
             return fromUnit(to(time.unit) - time.value, time.unit);
         }
@@ -535,7 +501,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime minutesTime() {
-
         return minutes(toMinutes());
     }
 
@@ -546,7 +511,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime nanosTime() {
-
         return nanos(toNanos());
     }
 
@@ -560,7 +524,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime plus(@NotNull final UnitTime time) {
-
         if (unit.compareTo(time.unit) > 0) {
             return fromUnit(to(time.unit) + time.value, time.unit);
         }
@@ -575,7 +538,6 @@ public class UnitTime implements Comparable<UnitTime> {
      */
     @NotNull
     public UnitTime secondsTime() {
-
         return seconds(toSeconds());
     }
 
@@ -586,7 +548,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the time value in the specified unit.
      */
     public long to(@NotNull final TimeUnit timeUnit) {
-
         return timeUnit.convert(value, unit);
     }
 
@@ -596,7 +557,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of days.
      */
     public long toDays() {
-
         return unit.toSeconds(value) / SECONDS_IN_DAY;
     }
 
@@ -606,7 +566,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of hours.
      */
     public long toHours() {
-
         return unit.toSeconds(value) / SECONDS_IN_HOUR;
     }
 
@@ -616,7 +575,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of microseconds.
      */
     public long toMicros() {
-
         return unit.toMicros(value);
     }
 
@@ -626,7 +584,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of milliseconds.
      */
     public long toMillis() {
-
         return unit.toMillis(value);
     }
 
@@ -636,7 +593,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of minutes.
      */
     public long toMinutes() {
-
         return unit.toSeconds(value) / SECONDS_IN_MINUTE;
     }
 
@@ -646,7 +602,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of nanoseconds.
      */
     public long toNanos() {
-
         return unit.toNanos(value);
     }
 
@@ -656,7 +611,6 @@ public class UnitTime implements Comparable<UnitTime> {
      * @return the number of seconds.
      */
     public long toSeconds() {
-
         return unit.toSeconds(value);
     }
 }

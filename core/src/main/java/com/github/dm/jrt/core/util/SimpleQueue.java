@@ -41,7 +41,6 @@ public class SimpleQueue<E> {
 
     private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
             final int first) {
-
         final int remainder = src.length - first;
         System.arraycopy(src, 0, dst, 0, first);
         System.arraycopy(src, first, dst, dst.length - remainder, remainder);
@@ -55,7 +54,6 @@ public class SimpleQueue<E> {
      * @param element the element to add.
      */
     public void add(@Nullable final E element) {
-
         final int i = mLast;
         final int newLast = (i + 1) & (mQueue.length - 1);
         mQueue[i] = element;
@@ -74,7 +72,6 @@ public class SimpleQueue<E> {
      * @param elements the element iterable.
      */
     public void addAll(@NotNull final Iterable<? extends E> elements) {
-
         for (final E element : elements) {
             add(element);
         }
@@ -84,7 +81,6 @@ public class SimpleQueue<E> {
      * Clears the queue.
      */
     public void clear() {
-
         mFirst = 0;
         mLast = 0;
         Arrays.fill(mQueue, null);
@@ -96,7 +92,6 @@ public class SimpleQueue<E> {
      * @param collection the collection to fill.
      */
     public void drainTo(@NotNull final Collection<? super E> collection) {
-
         while (!isEmpty()) {
             collection.add(removeFirst());
         }
@@ -108,7 +103,6 @@ public class SimpleQueue<E> {
      * @return whether the queue is empty.
      */
     public boolean isEmpty() {
-
         return mFirst == mLast;
     }
 
@@ -120,7 +114,6 @@ public class SimpleQueue<E> {
      */
     @SuppressWarnings("unchecked")
     public E peekFirst() {
-
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -136,7 +129,6 @@ public class SimpleQueue<E> {
      */
     @SuppressWarnings("unchecked")
     public E removeFirst() {
-
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -155,14 +147,12 @@ public class SimpleQueue<E> {
      * @return the size.
      */
     public int size() {
-
         final int first = mFirst;
         final int last = mLast;
         return (last >= first) ? last - first : mQueue.length + last - first;
     }
 
     private void doubleCapacity() {
-
         final int size = mQueue.length;
         final int newSize = size << 1;
         if (newSize < size) {

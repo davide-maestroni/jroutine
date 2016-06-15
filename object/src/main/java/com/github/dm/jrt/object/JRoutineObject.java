@@ -72,7 +72,6 @@ public class JRoutineObject {
      * Avoid explicit instantiation.
      */
     protected JRoutineObject() {
-
         ConstantConditions.avoid();
     }
 
@@ -93,7 +92,6 @@ public class JRoutineObject {
      */
     @NotNull
     public static ObjectRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
-
         return new DefaultObjectRoutineBuilder(target);
     }
 }

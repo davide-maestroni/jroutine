@@ -76,7 +76,6 @@ public class JRoutineServiceObject {
      * Avoid explicit instantiation.
      */
     protected JRoutineServiceObject() {
-
         ConstantConditions.avoid();
     }
 
@@ -88,7 +87,6 @@ public class JRoutineServiceObject {
      */
     @NotNull
     public static ServiceObjectBuilder with(@NotNull final ServiceContext context) {
-
         synchronized (sBuilders) {
             final WeakHashMap<ServiceContext, ServiceObjectBuilder> builders = sBuilders;
             ServiceObjectBuilder builder = builders.get(context);
@@ -114,7 +112,6 @@ public class JRoutineServiceObject {
          * @param context the service context.
          */
         private ServiceObjectBuilder(@NotNull final ServiceContext context) {
-
             mContext = ConstantConditions.notNull("service context", context);
         }
 
@@ -135,7 +132,6 @@ public class JRoutineServiceObject {
          */
         @NotNull
         public ServiceObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
-
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }
     }

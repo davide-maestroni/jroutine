@@ -44,7 +44,6 @@ class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     SupplierInvocationFactory(
             @NotNull final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>>
                     supplier) {
-
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;
     }
@@ -53,7 +52,6 @@ class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @Override
     @SuppressWarnings("unchecked")
     public Invocation<IN, OUT> newInvocation() throws Exception {
-
         return (Invocation<IN, OUT>) mSupplier.get();
     }
 }

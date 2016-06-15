@@ -50,7 +50,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
     @NotNull
     public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -58,7 +57,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
     @NotNull
     public ProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -66,7 +64,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
-
         final Object target = getTarget();
         synchronized (sProxies) {
             final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
@@ -99,14 +96,12 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
     public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -154,7 +149,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
         private ClassInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration) {
-
             super(asArgs(itf, invocationConfiguration, objectConfiguration));
         }
     }

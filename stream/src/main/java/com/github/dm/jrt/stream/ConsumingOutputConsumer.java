@@ -45,23 +45,19 @@ class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
      */
     ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
             @NotNull final IOChannel<?> outputChannel) {
-
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
     public void onComplete() {
-
         mOutputChannel.close();
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         mOutputChannel.abort(error);
     }
 
     public void onOutput(final OUT output) throws Exception {
-
         mOutputConsumer.accept(output);
     }
 }

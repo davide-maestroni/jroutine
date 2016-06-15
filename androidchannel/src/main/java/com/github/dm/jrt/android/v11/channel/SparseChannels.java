@@ -46,7 +46,6 @@ public class SparseChannels extends AndroidChannels {
      * Avoid explicit instantiation.
      */
     protected SparseChannels() {
-
         ConstantConditions.avoid();
     }
 
@@ -69,7 +68,6 @@ public class SparseChannels extends AndroidChannels {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             @NotNull final SparseArray<? extends InputChannel<? extends IN>> channels) {
-
         return new CombineMapBuilder<IN>(channels);
     }
 
@@ -92,7 +90,6 @@ public class SparseChannels extends AndroidChannels {
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
-
         return new MergeMapBuilder<OUT>(channels);
     }
 
@@ -118,7 +115,6 @@ public class SparseChannels extends AndroidChannels {
     selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final int... indexes) {
-
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final int index : indexes) {
             indexSet.add(index);
@@ -149,7 +145,6 @@ public class SparseChannels extends AndroidChannels {
     selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
-
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
             indexSet.add(index);
@@ -180,7 +175,6 @@ public class SparseChannels extends AndroidChannels {
     selectParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
-
         ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
@@ -210,7 +204,6 @@ public class SparseChannels extends AndroidChannels {
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
-
         ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
@@ -240,7 +233,6 @@ public class SparseChannels extends AndroidChannels {
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
-
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final int index : indexes) {
             indexSet.add(index);
@@ -268,7 +260,6 @@ public class SparseChannels extends AndroidChannels {
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
-
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
             indexSet.add(index);
@@ -301,7 +292,6 @@ public class SparseChannels extends AndroidChannels {
         private InputMapBuilder(
                 @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
                 @NotNull final HashSet<Integer> indexes) {
-
             mChannel = ConstantConditions.notNull("input channel", channel);
             final HashSet<Integer> indexSet =
                     new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
@@ -316,7 +306,6 @@ public class SparseChannels extends AndroidChannels {
         @Override
         protected SparseArray<IOChannel<IN>> build(
                 @NotNull final ChannelConfiguration configuration) {
-
             final HashSet<Integer> indexes = mIndexes;
             final InputChannel<? super ParcelableSelectable<DATA>> channel = mChannel;
             final SparseArray<IOChannel<IN>> channelMap =

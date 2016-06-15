@@ -60,7 +60,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                 @NotNull
                 public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final InvocationConfiguration configuration) {
-
                     mInvocationConfiguration = configuration;
                     return DefaultLoaderAutoProxyRoutineBuilderCompat.this;
                 }
@@ -75,7 +74,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                 @NotNull
                 public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final LoaderConfiguration configuration) {
-
                     mLoaderConfiguration = configuration;
                     return DefaultLoaderAutoProxyRoutineBuilderCompat.this;
                 }
@@ -90,7 +88,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                 @NotNull
                 public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final ObjectConfiguration configuration) {
-
                     mObjectConfiguration = configuration;
                     return DefaultLoaderAutoProxyRoutineBuilderCompat.this;
                 }
@@ -104,7 +101,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
      */
     DefaultLoaderAutoProxyRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
-
         mContext = ConstantConditions.notNull("loader context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
@@ -112,7 +108,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         final BuilderType builderType = mBuilderType;
         if (builderType == null) {
             final LoaderProxyCompat proxyAnnotation = itf.getAnnotation(LoaderProxyCompat.class);
@@ -132,14 +127,12 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @NotNull
     @Override
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return buildProxy(itf.getRawClass());
     }
 
     @NotNull
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
-
         return newObjectBuilder().method(name);
     }
 
@@ -147,21 +140,18 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         return newObjectBuilder().method(name, parameterTypes);
     }
 
     @NotNull
     @Override
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
-
         return newObjectBuilder().method(method);
     }
 
     @NotNull
     @Override
     public Builder<? extends LoaderAutoProxyRoutineBuilder> invocationConfiguration() {
-
         return new Builder<LoaderAutoProxyRoutineBuilder>(mInvocationConfigurable,
                 mInvocationConfiguration);
     }
@@ -170,7 +160,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @Override
     public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     objectConfiguration() {
-
         return new ObjectConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mProxyConfigurable,
                 mObjectConfiguration);
     }
@@ -178,7 +167,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @NotNull
     @Override
     public LoaderAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-
         mBuilderType = builderType;
         return this;
     }
@@ -187,14 +175,12 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @Override
     public LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     loaderConfiguration() {
-
         return new LoaderConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mLoaderConfigurable,
                 mLoaderConfiguration);
     }
 
     @NotNull
     private LoaderObjectRoutineBuilder newObjectBuilder() {
-
         return JRoutineLoaderObjectCompat.with(mContext)
                                          .on(mTarget)
                                          .invocationConfiguration()
@@ -210,7 +196,6 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
 
     @NotNull
     private LoaderProxyRoutineBuilder newProxyBuilder() {
-
         return JRoutineLoaderProxyCompat.with(mContext)
                                         .on(mTarget)
                                         .invocationConfiguration()

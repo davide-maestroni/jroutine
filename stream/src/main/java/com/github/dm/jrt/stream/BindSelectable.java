@@ -45,14 +45,12 @@ class BindSelectable<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
      * @param index         the selectable index.
      */
     BindSelectable(@NotNull final ChannelConfiguration configuration, final int index) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mIndex = index;
     }
 
     @SuppressWarnings("unchecked")
     public OutputChannel<Selectable<OUT>> apply(final OutputChannel<OUT> channel) {
-
         final OutputChannel<? extends Selectable<OUT>> outputChannel =
                 Channels.toSelectable(channel, mIndex)
                         .channelConfiguration()

@@ -43,7 +43,6 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      * @param supplier the initial wrapped supplier.
      */
     private SupplierWrapper(@NotNull final Supplier<?> supplier) {
-
         this(ConstantConditions.notNull("supplier instance", supplier),
                 FunctionWrapper.<OUT>identity());
     }
@@ -56,7 +55,6 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      */
     private SupplierWrapper(@NotNull final Supplier<?> supplier,
             @NotNull final FunctionWrapper<?, OUT> function) {
-
         super(asArgs(supplier, function));
         mSupplier = supplier;
         mFunction = function;
@@ -73,7 +71,6 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      */
     @NotNull
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
-
         return new SupplierWrapper<OUT>(new ConstantSupplier<OUT>(result));
     }
 
@@ -94,7 +91,6 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      */
     @NotNull
     public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
-
         if (supplier instanceof SupplierWrapper) {
             return (SupplierWrapper<OUT>) supplier;
         }
@@ -113,18 +109,15 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
     @NotNull
     public <AFTER> SupplierWrapper<AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
-
         return new SupplierWrapper<AFTER>(mSupplier, mFunction.andThen(after));
     }
 
     @SuppressWarnings("unchecked")
     public OUT get() throws Exception {
-
         return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
     }
 
     public boolean hasStaticScope() {
-
         return Reflection.hasStaticScope(mSupplier) && mFunction.hasStaticScope();
     }
 
@@ -143,13 +136,11 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
          * @param result the object to return.
          */
         private ConstantSupplier(final OUT result) {
-
             super(asArgs(result));
             mResult = result;
         }
 
         public OUT get() {
-
             return mResult;
         }
     }

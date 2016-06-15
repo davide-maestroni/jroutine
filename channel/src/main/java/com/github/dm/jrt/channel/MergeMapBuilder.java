@@ -31,7 +31,6 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selec
      *                                            object.
      */
     MergeMapBuilder(@NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
-
         if (channels.isEmpty()) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -49,7 +48,6 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selec
     @Override
     protected OutputChannel<? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final IOChannel<Selectable<OUT>> ioChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : mChannelMap

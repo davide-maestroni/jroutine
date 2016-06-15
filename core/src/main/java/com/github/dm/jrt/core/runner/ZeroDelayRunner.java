@@ -45,7 +45,6 @@ class ZeroDelayRunner extends RunnerDecorator {
      * @param wrapped the wrapped instance.
      */
     private ZeroDelayRunner(@NotNull final Runner wrapped) {
-
         super(wrapped);
     }
 
@@ -57,7 +56,6 @@ class ZeroDelayRunner extends RunnerDecorator {
      */
     @NotNull
     static ZeroDelayRunner getInstance(@NotNull final Runner wrapped) {
-
         if (wrapped instanceof ZeroDelayRunner) {
             return (ZeroDelayRunner) wrapped;
         }
@@ -78,7 +76,6 @@ class ZeroDelayRunner extends RunnerDecorator {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
         final ExecutionDecorator decorator;
         synchronized (mExecutions) {
             decorator = mExecutions.remove(execution);
@@ -94,7 +91,6 @@ class ZeroDelayRunner extends RunnerDecorator {
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         if ((delay == 0) && isManagedThread(Thread.currentThread())) {
             ExecutionDecorator decorator;
             synchronized (mExecutions) {

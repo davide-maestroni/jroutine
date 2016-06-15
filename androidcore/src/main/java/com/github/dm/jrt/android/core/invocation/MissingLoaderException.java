@@ -28,7 +28,6 @@ public class MissingLoaderException extends LoaderInvocationException {
      * Constructor.
      */
     public MissingLoaderException() {
-
     }
 
     /**
@@ -37,7 +36,6 @@ public class MissingLoaderException extends LoaderInvocationException {
      * @param id the loader ID.
      */
     public MissingLoaderException(final int id) {
-
         super(id);
     }
 }

@@ -41,13 +41,14 @@ class GenerateOutputInvocation<OUT> extends GenerateInvocation<Object, OUT> {
      * @param outputs the list of outputs.
      */
     GenerateOutputInvocation(@NotNull final List<OUT> outputs) {
-
         super(asArgs(outputs));
         mOutputs = outputs;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+    }
 
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
         result.pass(mOutputs);
     }
 }

@@ -44,7 +44,6 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      * @param outputs the list of outputs.
      */
     OrElseInvocationFactory(@NotNull final List<DATA> outputs) {
-
         super(asArgs(outputs));
         mOutputs = outputs;
     }
@@ -52,7 +51,6 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() {
-
         return new OrElseInvocation<DATA>(mOutputs);
     }
 
@@ -73,26 +71,22 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
          * @param outputs the list of outputs.
          */
         OrElseInvocation(@NotNull final List<DATA> outputs) {
-
             mOutputs = outputs;
         }
 
         @Override
         public void onInitialize() {
-
             mHasOutputs = false;
         }
 
         @Override
         public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
             mHasOutputs = true;
             result.pass(input);
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<DATA> result) {
-
             if (!mHasOutputs) {
                 result.pass(mOutputs);
             }

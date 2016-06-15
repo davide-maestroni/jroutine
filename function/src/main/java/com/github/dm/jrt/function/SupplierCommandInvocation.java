@@ -41,13 +41,11 @@ class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
      * @param supplier the supplier instance.
      */
     public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
-
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
         result.pass(mSupplier.get());
     }
 }

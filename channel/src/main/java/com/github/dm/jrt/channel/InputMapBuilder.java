@@ -36,7 +36,6 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
      */
     InputMapBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final Set<Integer> indexes) {
-
         mChannel = ConstantConditions.notNull("input channel", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
@@ -50,7 +49,6 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
     @NotNull
     @Override
     protected Map<Integer, IOChannel<IN>> build(@NotNull final ChannelConfiguration configuration) {
-
         final HashSet<Integer> indexes = mIndexes;
         final InputChannel<? super Selectable<DATA>> channel = mChannel;
         final HashMap<Integer, IOChannel<IN>> channelMap =

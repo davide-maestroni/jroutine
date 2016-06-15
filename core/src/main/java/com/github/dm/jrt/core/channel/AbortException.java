@@ -34,7 +34,6 @@ public class AbortException extends RoutineException {
      * @param cause the wrapped exception.
      */
     public AbortException(@Nullable final Throwable cause) {
-
         super(cause);
     }
 
@@ -47,7 +46,6 @@ public class AbortException extends RoutineException {
      */
     @NotNull
     public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
-
         return (cause instanceof RoutineException) ? (RoutineException) cause
                 : new AbortException(cause);
     }

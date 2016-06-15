@@ -107,7 +107,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
-
         mContext = ConstantConditions.notNull("loader context", context);
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
         mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
@@ -128,7 +127,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      */
     static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
-
         sMainRunner.run(new PurgeExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
     }
 
@@ -141,7 +139,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final List<?> inputs) {
-
         sMainRunner.run(new PurgeInputsExecution(context, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
     }
@@ -155,7 +152,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory) {
-
         sMainRunner.run(new PurgeFactoryExecution(context, factory, loaderId), 0,
                 TimeUnit.MILLISECONDS);
     }
@@ -170,14 +166,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
-
         sMainRunner.run(new PurgeFactoryInputsExecution(context, factory, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
     }
 
     private static void purgeLoaderInternal(@NotNull final LoaderContextCompat context,
             final int loaderId) {
-
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -218,7 +212,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private static void purgeLoaderInternal(@NotNull final LoaderContextCompat context,
             final int loaderId, @NotNull final List<?> inputs) {
-
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -261,7 +254,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private static void purgeLoadersInternal(@NotNull final LoaderContextCompat context,
             final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory) {
-
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -307,7 +299,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private static void purgeLoadersInternal(@NotNull final LoaderContextCompat context,
             final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory,
             @NotNull final List<?> inputs) {
-
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -338,7 +329,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 final int id = callbackArray.keyAt(i);
                 if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
-
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
                     continue;
@@ -355,7 +345,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
-
         super.onAbort(reason);
         final Context loaderContext = mContext.getLoaderContext();
         if (loaderContext == null) {
@@ -375,7 +364,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     @Override
     protected void onCall(@NotNull final List<? extends IN> inputs,
             @NotNull final ResultChannel<OUT> result) throws Exception {
-
         final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
         final Context loaderContext = context.getLoaderContext();
@@ -466,7 +454,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             @NotNull final LoaderManager loaderManager,
             @Nullable final InvocationLoader<IN, OUT> loader,
             @NotNull final List<? extends IN> inputs, final int loaderId) throws Exception {
-
         final Logger logger = mLogger;
         final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
                 : new InvocationLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory,
@@ -476,7 +463,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     @NotNull
     private ContextInvocation<IN, OUT> createInvocation(final int loaderId) throws Exception {
-
         final Logger logger = mLogger;
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
         final ContextInvocation<IN, OUT> invocation;
@@ -495,7 +481,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     @NotNull
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
             final int loaderId, @NotNull final List<? extends IN> inputs) {
-
         if (loader == null) {
             return ClashType.NONE;
         }
@@ -570,7 +555,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          */
         private LoaderContextInvocationFactory(@NotNull final LoaderInvocation<IN, OUT> invocation,
                 final int loaderId) {
-
             super(null);
             mInvocation = invocation;
             mLoaderId = loaderId;
@@ -579,7 +563,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-
             return mInvocation.createInvocation(mLoaderId);
         }
     }
@@ -600,14 +583,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          * @param loaderId the loader ID.
          */
         private PurgeExecution(@NotNull final LoaderContextCompat context, final int loaderId) {
-
             mContext = context;
             mLoaderId = loaderId;
         }
 
         @Override
         public void run() {
-
             purgeLoaderInternal(mContext, mLoaderId);
         }
     }
@@ -632,7 +613,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          */
         private PurgeFactoryExecution(@NotNull final LoaderContextCompat context,
                 @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
-
             mContext = context;
             mFactory = factory;
             mLoaderId = loaderId;
@@ -640,7 +620,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public void run() {
-
             purgeLoadersInternal(mContext, mLoaderId, mFactory);
         }
     }
@@ -669,7 +648,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         private PurgeFactoryInputsExecution(@NotNull final LoaderContextCompat context,
                 @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
                 @NotNull final List<?> inputs) {
-
             mContext = context;
             mFactory = factory;
             mLoaderId = loaderId;
@@ -678,7 +656,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public void run() {
-
             purgeLoadersInternal(mContext, mLoaderId, mFactory, mInputs);
         }
     }
@@ -703,7 +680,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          */
         private PurgeInputsExecution(@NotNull final LoaderContextCompat context, final int loaderId,
                 @NotNull final List<?> inputs) {
-
             mContext = context;
             mLoaderId = loaderId;
             mInputs = new ArrayList<Object>(inputs);
@@ -711,7 +687,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public void run() {
-
             purgeLoaderInternal(mContext, mLoaderId, mInputs);
         }
     }
@@ -752,7 +727,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          */
         private RoutineLoaderCallbacks(@NotNull final LoaderManager loaderManager,
                 @NotNull final InvocationLoader<?, OUT> loader, @NotNull final Logger logger) {
-
             mLoaderManager = loaderManager;
             mLoader = loader;
             mLogger = logger.subContextLogger(this);
@@ -760,7 +734,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public Loader<InvocationResult<OUT>> onCreateLoader(final int id, final Bundle args) {
-
             mLogger.dbg("creating Android loader: %d", id);
             return mLoader;
         }
@@ -768,7 +741,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         @Override
         public void onLoadFinished(final Loader<InvocationResult<OUT>> loader,
                 final InvocationResult<OUT> data) {
-
             final Logger logger = mLogger;
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mChannels;
@@ -821,14 +793,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public void onLoaderReset(final Loader<InvocationResult<OUT>> loader) {
-
             mLogger.dbg("resetting Android loader: %d", mLoader.getId());
             reset(new InvocationClashException(mLoader.getId()));
         }
 
         @NotNull
         private OutputChannel<OUT> newChannel() {
-
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
@@ -846,7 +816,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
 
         private void reset(@Nullable final Throwable reason) {
-
             mLogger.dbg("aborting result channels");
             mResultCount = 0;
             final ArrayList<IOChannel<OUT>> channels = mChannels;
@@ -865,7 +834,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
 
         private void setCacheStrategy(@NotNull final CacheStrategyType strategyType) {
-
             mLogger.dbg("setting cache type: %s", strategyType);
             mCacheStrategyType = strategyType;
         }

@@ -44,7 +44,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      *                                        object.
      */
     SortingMapOutputConsumer(@NotNull final SparseArrayCompat<IOChannel<OUT>> channels) {
-
         final SparseArrayCompat<IOChannel<OUT>> channelMap = channels.clone();
         if (channelMap.indexOfValue(null) >= 0) {
             throw new NullPointerException("the map of I/O channels must not contain null objects");
@@ -55,7 +54,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onComplete() {
-
         final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
@@ -65,7 +63,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onError(@NotNull final RoutineException error) {
-
         final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
@@ -75,7 +72,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onOutput(final Selectable<? extends OUT> selectable) {
-
         final IOChannel<OUT> channel = mChannels.get(selectable.index);
         if (channel != null) {
             channel.pass(selectable.data);

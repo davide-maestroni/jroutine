@@ -41,13 +41,11 @@ class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
      * @param consumer the consumer instance.
      */
     ConsumerCommandInvocation(@NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
-
         super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
         mConsumer.accept(result);
     }
 }

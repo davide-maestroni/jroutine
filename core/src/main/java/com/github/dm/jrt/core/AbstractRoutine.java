@@ -93,7 +93,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      * @param configuration the invocation configuration.
      */
     protected AbstractRoutine(@NotNull final InvocationConfiguration configuration) {
-
         mConfiguration = configuration;
         mSyncRunner = Runners.syncRunner();
         final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
@@ -122,7 +121,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private AbstractRoutine(@NotNull final InvocationConfiguration configuration,
             @NotNull final Runner syncRunner, @NotNull final Runner asyncRunner,
             @NotNull final Logger logger) {
-
         mConfiguration = configuration;
         mSyncRunner = syncRunner;
         mAsyncRunner = asyncRunner;
@@ -133,33 +131,28 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
-
         return invoke(InvocationType.ASYNC);
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> parallelInvoke() {
-
         mLogger.dbg("invoking routine: parallel");
         return getElementRoutine().asyncInvoke();
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> serialInvoke() {
-
         mLogger.dbg("invoking routine: serial");
         return getElementRoutine().syncInvoke();
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> syncInvoke() {
-
         return invoke(InvocationType.SYNC);
     }
 
     @Override
     public void purge() {
-
         synchronized (mMutex) {
             final Logger logger = mLogger;
             final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
@@ -204,7 +197,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @SuppressWarnings("UnusedParameters")
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
             @NotNull final InvocationType type) throws Exception {
-
         return invocation;
     }
 
@@ -215,7 +207,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      */
     @NotNull
     protected InvocationConfiguration getConfiguration() {
-
         return mConfiguration;
     }
 
@@ -226,7 +217,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      */
     @NotNull
     protected Logger getLogger() {
-
         return mLogger;
     }
 
@@ -243,7 +233,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     @NotNull
     private Routine<IN, OUT> getElementRoutine() {
-
         if (mElementRoutine == null) {
             mElementRoutine =
                     new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
@@ -254,7 +243,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         protected Invocation<IN, OUT> convertInvocation(
                                 @NotNull final Invocation<IN, OUT> invocation,
                                 @NotNull final InvocationType type) throws Exception {
-
                             // No need to destroy the old one
                             return newInvocation(type);
                         }
@@ -263,7 +251,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         @Override
                         protected Invocation<IN, OUT> newInvocation(
                                 @NotNull final InvocationType type) {
-
                             return (type == InvocationType.ASYNC) ? new ParallelInvocation<IN, OUT>(
                                     AbstractRoutine.this)
                                     : new SerialInvocation<IN, OUT>(AbstractRoutine.this);
@@ -276,7 +263,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     @NotNull
     private DefaultInvocationManager getInvocationManager(@NotNull final InvocationType type) {
-
         if (type == InvocationType.ASYNC) {
             if (mAsyncManager == null) {
                 mAsyncManager = new DefaultInvocationManager(type, mAsyncRunner, mAsyncInvocations,
@@ -296,7 +282,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     @NotNull
     private InvocationChannel<IN, OUT> invoke(@NotNull final InvocationType type) {
-
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %s", type);
         final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
@@ -331,26 +316,22 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
          * @param routine the routine to invoke in parallel mode.
          */
         private ParallelInvocation(@NotNull final Routine<IN, OUT> routine) {
-
             mRoutine = routine;
         }
 
         @Override
         public void onInitialize() {
-
             mHasInputs = false;
         }
 
         @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             mHasInputs = true;
             result.pass(mRoutine.asyncCall(input));
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             if (!mHasInputs) {
                 result.pass(mRoutine.asyncCall());
             }
@@ -375,26 +356,22 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
          * @param routine the routine to invoke in serial mode.
          */
         private SerialInvocation(@NotNull final Routine<IN, OUT> routine) {
-
             mRoutine = routine;
         }
 
         @Override
         public void onInitialize() {
-
             mHasInputs = false;
         }
 
         @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             mHasInputs = true;
             result.pass(mRoutine.syncCall(input));
         }
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             if (!mHasInputs) {
                 result.pass(mRoutine.syncCall());
             }
@@ -414,12 +391,10 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
          * @param invocationManager the invocation manager instance.
          */
         private CreateExecution(@NotNull final DefaultInvocationManager invocationManager) {
-
             mManager = invocationManager;
         }
 
         public void run() {
-
             mManager.create(null, true);
         }
     }
@@ -451,7 +426,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 @NotNull final Runner runner,
                 @NotNull final LinkedList<Invocation<IN, OUT>> primaryInvocations,
                 @NotNull final LinkedList<Invocation<IN, OUT>> fallbackInvocations) {
-
             mInvocationType = type;
             mRunner = runner;
             mPrimaryInvocations = primaryInvocations;
@@ -460,12 +434,10 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         public void create(@NotNull final InvocationObserver<IN, OUT> observer) {
-
             create(observer, false);
         }
 
         public void discard(@NotNull final Invocation<IN, OUT> invocation) {
-
             final boolean hasDelayed;
             synchronized (mMutex) {
                 final Logger logger = mLogger;
@@ -488,7 +460,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         public void recycle(@NotNull final Invocation<IN, OUT> invocation) {
-
             final boolean hasDelayed;
             synchronized (mMutex) {
                 final Logger logger = mLogger;
@@ -507,7 +478,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         invocation.onDestroy();
 
                     } catch (final Throwable t) {
-
                         InvocationInterruptedException.throwIfInterrupt(t);
                         logger.wrn(t, "ignoring exception while destroying invocation instance");
                     }
@@ -525,7 +495,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         @SuppressWarnings("ConstantConditions")
         private void create(@Nullable final InvocationObserver<IN, OUT> observer,
                 final boolean isDelayed) {
-
             InvocationObserver<IN, OUT> invocationObserver = observer;
             try {
                 Throwable error = null;

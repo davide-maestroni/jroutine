@@ -39,14 +39,12 @@ class ReplayChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      * @param channel the output channel.
      */
     ReplayChannelBuilder(@NotNull final OutputChannel<OUT> channel) {
-
         mChannel = ConstantConditions.notNull("output channel", channel);
     }
 
     @NotNull
     @Override
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
-
         return new ReplayChannel<OUT>(configuration, mChannel);
     }
 }

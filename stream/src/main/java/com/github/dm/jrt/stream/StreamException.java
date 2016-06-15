@@ -34,7 +34,6 @@ public class StreamException extends RoutineException {
      * @param cause the wrapped exception.
      */
     private StreamException(@Nullable final Throwable cause) {
-
         super(cause);
     }
 
@@ -50,7 +49,6 @@ public class StreamException extends RoutineException {
      */
     @NotNull
     public static StreamException wrapIfNeeded(@Nullable final Throwable cause) {
-
         if (cause instanceof StreamException) {
             return (StreamException) cause;
         }

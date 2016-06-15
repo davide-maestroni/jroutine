@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -38,7 +37,6 @@ import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.OutputConsumerBuilder;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
@@ -57,7 +55,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -432,174 +429,6 @@ public class JRoutineTest {
     }
 
     @Test
-    public void testOnComplete() throws Exception {
-
-        final TestConsumer<Void> consumer1 = new TestConsumer<Void>();
-        final TestConsumer<Void> consumer2 = new TestConsumer<Void>();
-        final TestConsumer<Void> consumer3 = new TestConsumer<Void>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onComplete(consumer1);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        consumer1.reset();
-        outputConsumer = outputConsumer.thenComplete(consumer2);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        consumer1.reset();
-        consumer2.reset();
-        outputConsumer =
-                JRoutine.onComplete(consumer1).thenComplete(wrap(consumer2).andThen(consumer3));
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        assertThat(consumer3.isCalled()).isTrue();
-        consumer1.reset();
-        final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
-        final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        outputConsumer =
-                JRoutine.onComplete(consumer1).thenOutput(outConsumer).thenError(errorConsumer);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(outConsumer.isCalled()).isTrue();
-        assertThat(errorConsumer.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(errorConsumer.isCalled()).isTrue();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-    }
-
-    @Test
-    public void testOnError() throws Exception {
-
-        final TestConsumer<RoutineException> consumer1 = new TestConsumer<RoutineException>();
-        final TestConsumer<RoutineException> consumer2 = new TestConsumer<RoutineException>();
-        final TestConsumer<RoutineException> consumer3 = new TestConsumer<RoutineException>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onError(consumer1);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isTrue();
-        consumer1.reset();
-        outputConsumer = outputConsumer.thenError(consumer2);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        consumer1.reset();
-        consumer2.reset();
-        outputConsumer = JRoutine.onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        assertThat(consumer3.isCalled()).isTrue();
-        consumer1.reset();
-        final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
-        final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        outputConsumer =
-                JRoutine.onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(outConsumer.isCalled()).isTrue();
-        assertThat(completeConsumer.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(completeConsumer.isCalled()).isTrue();
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isTrue();
-    }
-
-    @Test
-    public void testOnOutput() throws Exception {
-
-        final TestConsumer<Object> consumer1 = new TestConsumer<Object>();
-        final TestConsumer<Object> consumer2 = new TestConsumer<Object>();
-        final TestConsumer<Object> consumer3 = new TestConsumer<Object>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onOutput(consumer1);
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isTrue();
-        consumer1.reset();
-        outputConsumer = outputConsumer.thenOutput(consumer2);
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        consumer1.reset();
-        consumer2.reset();
-        outputConsumer =
-                JRoutine.onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        assertThat(consumer3.isCalled()).isTrue();
-        consumer1.reset();
-        final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        outputConsumer = JRoutine.onOutput(consumer1)
-                                 .thenError(errorConsumer)
-                                 .thenComplete(completeConsumer);
-        outputConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(errorConsumer.isCalled()).isTrue();
-        assertThat(completeConsumer.isCalled()).isFalse();
-        outputConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(completeConsumer.isCalled()).isTrue();
-        outputConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isTrue();
-    }
-
-    @Test
     public void testPendingInputs() {
 
         final InvocationChannel<Object, Object> channel =
@@ -769,26 +598,6 @@ public class JRoutineTest {
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
-        }
-    }
-
-    private static class TestConsumer<OUT> implements Consumer<OUT> {
-
-        private boolean mIsCalled;
-
-        public boolean isCalled() {
-
-            return mIsCalled;
-        }
-
-        public void reset() {
-
-            mIsCalled = false;
-        }
-
-        public void accept(final OUT out) {
-
-            mIsCalled = true;
         }
     }
 }

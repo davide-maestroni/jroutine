@@ -39,49 +39,41 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
      * Constructor.
      */
     DefaultIOChannelBuilder() {
-
     }
 
     @NotNull
     public IOChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> buildChannel() {
-
         return new DefaultIOChannel<DATA>(mConfiguration);
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of() {
-
         return this.<DATA>buildChannel().close();
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
-
         return this.<DATA>buildChannel().pass(input).close();
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final DATA... inputs) {
-
         return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final Iterable<DATA> inputs) {
-
         return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull
     public Builder<? extends IOChannelBuilder> channelConfiguration() {
-
         return new Builder<IOChannelBuilder>(this, mConfiguration);
     }
 }

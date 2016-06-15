@@ -41,13 +41,11 @@ class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
      * @param predicate the predicate instance.
      */
     PredicateMappingInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
-
         super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
         mPredicate = predicate;
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
-
         if (mPredicate.test(input)) {
             result.pass(input);
         }

@@ -413,7 +413,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testCastPredicate() throws Exception {
+    public void testCastFunction() throws Exception {
 
         final FunctionWrapper<Object, Number> function = castTo(Number.class);
         function.apply(1);
@@ -454,7 +454,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testCastPredicateEquals() {
+    public void testCastFunctionEquals() {
 
         final FunctionWrapper<Object, Number> function = castTo(Number.class);
         assertThat(function).isEqualTo(function);
@@ -474,7 +474,7 @@ public class FunctionsTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testCastPredicateError() {
+    public void testCastFunctionError() {
 
         try {
 

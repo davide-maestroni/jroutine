@@ -165,7 +165,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
             @Nullable final OrderType outputOrderType, final int outputLimit,
             @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
             @Nullable final Level logLevel) {
-
         super(asArgs(runner, priority, maxInstances, coreInstances, outputTimeout, actionType,
                 inputOrderType, inputLimit, inputBackoff, inputMaxSize, outputOrderType,
                 outputLimit, outputBackoff, outputMaxSize, log, logLevel));
@@ -194,7 +193,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static Builder<InvocationConfiguration> builder() {
-
         return new Builder<InvocationConfiguration>(sDefaultConfigurable);
     }
 
@@ -207,7 +205,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     @NotNull
     public static Builder<InvocationConfiguration> builderFrom(
             @Nullable final InvocationConfiguration initialConfiguration) {
-
         return (initialConfiguration == null) ? builder()
                 : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
@@ -219,7 +216,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     @NotNull
     public static InvocationConfiguration defaultConfiguration() {
-
         return sDefaultConfiguration;
     }
 
@@ -230,7 +226,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Builder<InvocationConfiguration> builderFrom() {
-
         return builderFrom(this);
     }
 
@@ -241,7 +236,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the maximum number.
      */
     public int getCoreInstancesOrElse(final int valueIfNotSet) {
-
         final int coreInstances = mCoreInstances;
         return (coreInstances != DEFAULT) ? coreInstances : valueIfNotSet;
     }
@@ -254,7 +248,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the backoff policy.
      */
     public Backoff getInputBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
-
         final Backoff inputBackoff = mInputBackoff;
         return (inputBackoff != null) ? inputBackoff : valueIfNotSet;
     }
@@ -267,7 +260,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the limit.
      */
     public int getInputLimitOrElse(final int valueIfNotSet) {
-
         final int inputLimit = mInputLimit;
         return (inputLimit != DEFAULT) ? inputLimit : valueIfNotSet;
     }
@@ -279,7 +271,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the maximum size.
      */
     public int getInputMaxSizeOrElse(final int valueIfNotSet) {
-
         final int inputMaxSize = mInputMaxSize;
         return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
     }
@@ -291,7 +282,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the order type.
      */
     public OrderType getInputOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
-
         final OrderType inputOrderType = mInputOrderType;
         return (inputOrderType != null) ? inputOrderType : valueIfNotSet;
     }
@@ -303,7 +293,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the log level.
      */
     public Level getLogLevelOrElse(@Nullable final Level valueIfNotSet) {
-
         final Level logLevel = mLogLevel;
         return (logLevel != null) ? logLevel : valueIfNotSet;
     }
@@ -315,7 +304,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the log instance.
      */
     public Log getLogOrElse(@Nullable final Log valueIfNotSet) {
-
         final Log log = mLog;
         return (log != null) ? log : valueIfNotSet;
     }
@@ -327,7 +315,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the maximum number.
      */
     public int getMaxInstancesOrElse(final int valueIfNotSet) {
-
         final int maxInstances = mMaxInstances;
         return (maxInstances != DEFAULT) ? maxInstances : valueIfNotSet;
     }
@@ -340,7 +327,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the delay.
      */
     public Backoff getOutputBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
-
         final Backoff outputBackoff = mOutputBackoff;
         return (outputBackoff != null) ? outputBackoff : valueIfNotSet;
     }
@@ -353,7 +339,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the limit.
      */
     public int getOutputLimitOrElse(final int valueIfNotSet) {
-
         final int outputLimit = mOutputLimit;
         return (outputLimit != DEFAULT) ? outputLimit : valueIfNotSet;
     }
@@ -365,7 +350,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the maximum size.
      */
     public int getOutputMaxSizeOrElse(final int valueIfNotSet) {
-
         final int outputMaxSize = mOutputMaxSize;
         return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
     }
@@ -377,7 +361,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the order type.
      */
     public OrderType getOutputOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
-
         final OrderType outputOrderType = mOutputOrderType;
         return (outputOrderType != null) ? outputOrderType : valueIfNotSet;
     }
@@ -391,7 +374,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     public TimeoutActionType getOutputTimeoutActionOrElse(
             @Nullable final TimeoutActionType valueIfNotSet) {
-
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
         return (timeoutActionType != null) ? timeoutActionType : valueIfNotSet;
     }
@@ -404,7 +386,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the timeout.
      */
     public UnitDuration getOutputTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
-
         final UnitDuration outputTimeout = mOutputTimeout;
         return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
     }
@@ -416,7 +397,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the priority.
      */
     public int getPriorityOrElse(final int valueIfNotSet) {
-
         final int priority = mPriority;
         return (priority != DEFAULT) ? priority : valueIfNotSet;
     }
@@ -428,7 +408,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the runner instance.
      */
     public Runner getRunnerOrElse(@Nullable final Runner valueIfNotSet) {
-
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
     }
@@ -441,7 +420,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Logger newLogger(@NotNull final Object context) {
-
         return Logger.newLogger(getLogOrElse(null), getLogLevelOrElse(null), context);
     }
 
@@ -626,7 +604,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @param configurable the configurable instance.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             mPriority = DEFAULT;
             mMaxInstances = DEFAULT;
@@ -645,7 +622,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final InvocationConfiguration initialConfiguration) {
-
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
@@ -657,7 +633,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public TYPE apply() {
-
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -671,7 +646,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
-
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
@@ -694,7 +668,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withCoreInstances(final int coreInstances) {
-
             if (coreInstances != DEFAULT) {
                 ConstantConditions.notNegative("maximum number of retained instances",
                         coreInstances);
@@ -721,7 +694,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputBackoff(@Nullable final Backoff backoff) {
-
             mInputBackoff = backoff;
             return this;
         }
@@ -741,7 +713,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
-
             return withInputBackoff(constantDelay(delay, timeUnit));
         }
 
@@ -758,7 +729,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputBackoff(@Nullable final UnitDuration delay) {
-
             return withInputBackoff((delay != null) ? constantDelay(delay) : null);
         }
 
@@ -778,7 +748,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputLimit(final int inputLimit) {
-
             if (inputLimit != DEFAULT) {
                 ConstantConditions.notNegative("input limit", inputLimit);
             }
@@ -801,7 +770,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
-
             if (inputMaxSize != DEFAULT) {
                 ConstantConditions.positive("input buffer size", inputMaxSize);
             }
@@ -822,7 +790,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
-
             mInputOrderType = orderType;
             return this;
         }
@@ -836,7 +803,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withLog(@Nullable final Log log) {
-
             mLog = log;
             return this;
         }
@@ -850,7 +816,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withLogLevel(@Nullable final Level level) {
-
             mLogLevel = level;
             return this;
         }
@@ -866,7 +831,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withMaxInstances(final int maxInstances) {
-
             if (maxInstances != DEFAULT) {
                 ConstantConditions.positive("maximum number of concurrently running instances",
                         maxInstances);
@@ -893,7 +857,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputBackoff(@Nullable final Backoff backoff) {
-
             mOutputBackoff = backoff;
             return this;
         }
@@ -913,7 +876,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
-
             return withOutputBackoff(constantDelay(delay, timeUnit));
         }
 
@@ -930,7 +892,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputBackoff(@Nullable final UnitDuration delay) {
-
             return withOutputBackoff((delay != null) ? constantDelay(delay) : null);
         }
 
@@ -950,7 +911,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputLimit(final int outputLimit) {
-
             if (outputLimit != DEFAULT) {
                 ConstantConditions.notNegative("output limit", outputLimit);
             }
@@ -973,7 +933,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
-
             if (outputMaxSize != DEFAULT) {
                 ConstantConditions.positive("output buffer size", outputMaxSize);
             }
@@ -994,7 +953,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
-
             mOutputOrderType = orderType;
             return this;
         }
@@ -1013,7 +971,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withOutputTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {
-
             return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
 
@@ -1029,7 +986,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
-
             mOutputTimeout = timeout;
             return this;
         }
@@ -1047,7 +1003,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
-
             mTimeoutActionType = actionType;
             return this;
         }
@@ -1062,7 +1017,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withPriority(final int priority) {
-
             mPriority = priority;
             return this;
         }
@@ -1076,13 +1030,11 @@ public final class InvocationConfiguration extends DeepEqualObject {
          */
         @NotNull
         public Builder<TYPE> withRunner(@Nullable final Runner runner) {
-
             mRunner = runner;
             return this;
         }
 
         private void applyBaseConfiguration(@NotNull final InvocationConfiguration configuration) {
-
             final Runner runner = configuration.mRunner;
             if (runner != null) {
                 withRunner(runner);
@@ -1116,7 +1068,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private void applyChannelConfiguration(
                 @NotNull final InvocationConfiguration configuration) {
-
             final OrderType inputOrderType = configuration.mInputOrderType;
             if (inputOrderType != null) {
                 withInputOrder(inputOrderType);
@@ -1159,7 +1110,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         private void applyLogConfiguration(@NotNull final InvocationConfiguration configuration) {
-
             final Log log = configuration.mLog;
             if (log != null) {
                 withLog(log);
@@ -1173,7 +1123,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         @NotNull
         private InvocationConfiguration buildConfiguration() {
-
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
                     mOutputTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputBackoff,
                     mInputMaxSize, mOutputOrderType, mOutputLimit, mOutputBackoff, mOutputMaxSize,
@@ -1181,7 +1130,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
-
             mRunner = configuration.mRunner;
             mPriority = configuration.mPriority;
             mMaxInstances = configuration.mMaxInstances;
@@ -1208,7 +1156,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         @NotNull
         public InvocationConfiguration apply(@NotNull final InvocationConfiguration configuration) {
-
             return configuration;
         }
     }

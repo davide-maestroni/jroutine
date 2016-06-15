@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
+ * Mapping invocation peeking output data as they are passed along.
+ * <p>
  * Created by davide-maestroni on 04/21/2016.
  *
  * @param <DATA> the data type.
@@ -40,14 +42,12 @@ class PeekInvocation<DATA> extends MappingInvocation<DATA, DATA> {
      * @param peekConsumer the consumer instance.
      */
     PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> peekConsumer) {
-
         super(asArgs(ConstantConditions.notNull("consumer instance", peekConsumer)));
         mPeekConsumer = peekConsumer;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
             Exception {
-
         mPeekConsumer.accept(input);
         result.pass(input);
     }

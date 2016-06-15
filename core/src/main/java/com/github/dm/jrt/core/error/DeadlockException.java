@@ -31,7 +31,6 @@ public class DeadlockException extends RoutineException {
      * @param message the error message.
      */
     public DeadlockException(@Nullable final String message) {
-
         super(message);
     }
 }

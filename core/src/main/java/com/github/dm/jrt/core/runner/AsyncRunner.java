@@ -29,12 +29,10 @@ public abstract class AsyncRunner extends Runner {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
     }
 
     @Override
     public boolean isExecutionThread() {
-
         return isManagedThread(Thread.currentThread());
     }
 }

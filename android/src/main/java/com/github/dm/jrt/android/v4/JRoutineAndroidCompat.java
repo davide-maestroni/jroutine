@@ -47,7 +47,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * Avoid explicit instantiation.
      */
     protected JRoutineAndroidCompat() {
-
         ConstantConditions.avoid();
     }
 
@@ -58,7 +57,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static IOChannelBuilder io() {
-
         return JRoutine.io();
     }
 
@@ -70,7 +68,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity) {
-
         return with(loaderFrom(activity));
     }
 
@@ -84,7 +81,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
-
         return with(loaderFrom(activity, context));
     }
 
@@ -96,7 +92,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context) {
-
         return with(serviceFrom(context));
     }
 
@@ -110,7 +105,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
-
         return with(serviceFrom(context, serviceClass));
     }
 
@@ -124,7 +118,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Intent service) {
-
         return with(serviceFrom(context, service));
     }
 
@@ -136,7 +129,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final Fragment fragment) {
-
         return with(loaderFrom(fragment));
     }
 
@@ -150,7 +142,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-
         return with(loaderFrom(fragment, context));
     }
 
@@ -162,7 +153,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {
-
         return new LoaderBuilderCompat(context);
     }
 
@@ -174,7 +164,6 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      */
     @NotNull
     public static ServiceBuilder with(@NotNull final ServiceContext context) {
-
         return new ServiceBuilder(context) {};
     }
 }

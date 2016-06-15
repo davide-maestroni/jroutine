@@ -29,18 +29,15 @@ public abstract class SyncRunner extends Runner {
 
     @Override
     public void cancel(@NotNull final Execution execution) {
-
     }
 
     @Override
     public boolean isExecutionThread() {
-
         return true;
     }
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-
         return false;
     }
 }

@@ -40,37 +40,30 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
      * @param wrapped the wrapped invocation instance.
      */
     public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
-
         mInvocation = ConstantConditions.notNull("wrapped invocation", wrapped);
     }
 
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
-
         mInvocation.onAbort(reason);
     }
 
     public void onDestroy() throws Exception {
-
         mInvocation.onDestroy();
     }
 
     public void onInitialize() throws Exception {
-
         mInvocation.onInitialize();
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         mInvocation.onInput(input, result);
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
         mInvocation.onResult(result);
     }
 
     public void onTerminate() throws Exception {
-
         mInvocation.onTerminate();
     }
 }

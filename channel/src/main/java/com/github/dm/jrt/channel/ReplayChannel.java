@@ -78,7 +78,6 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
      */
     ReplayChannel(@Nullable final ChannelConfiguration configuration,
             @NotNull final OutputChannel<OUT> channel) {
-
         mConfiguration = (configuration != null) ? configuration
                 : ChannelConfiguration.defaultConfiguration();
         mOutputChannel = createOutputChannel();
@@ -87,17 +86,14 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     public boolean abort() {
-
         return mChannel.abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-
         return mChannel.abort(reason);
     }
 
     public boolean isEmpty() {
-
         if (mChannel.isEmpty()) {
             synchronized (mMutex) {
                 return mCached.isEmpty();
@@ -108,45 +104,38 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     public boolean isOpen() {
-
         return mChannel.isOpen();
     }
 
     public int size() {
-
         return mOutputChannel.size();
     }
 
     @NotNull
     public OutputChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
-
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-
         mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
     @NotNull
     public List<OUT> all() {
-
         return mOutputChannel.all();
     }
 
     @NotNull
     public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
-
         mOutputChannel.allInto(results);
         return this;
     }
 
     @NotNull
     public <IN extends InputChannel<? super OUT>> IN bind(@NotNull final IN channel) {
-
         synchronized (mMutex) {
             final IdentityHashMap<InputChannel<? super OUT>, Void> channels = mChannels;
             if (channels.containsKey(channel)) {
@@ -162,7 +151,6 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     @NotNull
     public OutputChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
-
         final boolean isComplete;
         final RoutineException abortException;
         final IOChannel<OUT> outputChannel;
@@ -203,101 +191,84 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     @NotNull
     public Iterator<OUT> eventualIterator() {
-
         return mOutputChannel.eventualIterator();
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyAbort() {
-
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
-
         mOutputChannel.eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyBreak() {
-
         mOutputChannel.eventuallyBreak();
         return this;
     }
 
     @NotNull
     public OutputChannel<OUT> eventuallyThrow() {
-
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
     @Nullable
     public RoutineException getError() {
-
         return mOutputChannel.getError();
     }
 
     public boolean hasCompleted() {
-
         return mOutputChannel.hasCompleted();
     }
 
     public boolean hasNext() {
-
         return mOutputChannel.hasNext();
     }
 
     public OUT next() {
-
         return mOutputChannel.next();
     }
 
     @NotNull
     public OutputChannel<OUT> immediately() {
-
         mOutputChannel.immediately();
         return this;
     }
 
     public boolean isBound() {
-
         return false;
     }
 
     @NotNull
     public List<OUT> next(final int count) {
-
         return mOutputChannel.next(count);
     }
 
     public OUT nextOrElse(final OUT output) {
-
         return mOutputChannel.nextOrElse(output);
     }
 
     @NotNull
     public OutputChannel<OUT> skipNext(final int count) {
-
         mOutputChannel.skipNext(count);
         return this;
     }
 
     public void throwError() {
-
         mOutputChannel.throwError();
     }
 
     public Iterator<OUT> iterator() {
-
         return mOutputChannel.iterator();
     }
 
     public void onComplete() {
-
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mIsComplete = true;
@@ -311,7 +282,6 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mAbortException = error;
@@ -325,7 +295,6 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     public void onOutput(final OUT output) {
-
         final ArrayList<IOChannel<OUT>> channels;
         synchronized (mMutex) {
             mCached.add(output);
@@ -339,13 +308,11 @@ class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     public void remove() {
-
         mOutputChannel.remove();
     }
 
     @NotNull
     private IOChannel<OUT> createOutputChannel() {
-
         return JRoutineCore.io()
                            .channelConfiguration()
                            .with(mConfiguration)

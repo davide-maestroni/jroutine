@@ -45,15 +45,16 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
      */
     LoopSupplierInvocation(final long count,
             @NotNull final SupplierWrapper<? extends OUT> outputSupplier) {
-
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
         mOutputSupplier = outputSupplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+    }
 
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
         final long count = mCount;
         final SupplierWrapper<? extends OUT> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {

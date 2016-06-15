@@ -43,38 +43,32 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
 
     @NotNull
     public RoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
-
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
-
         return buildRoutine().asyncInvoke();
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> parallelInvoke() {
-
         return buildRoutine().parallelInvoke();
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> serialInvoke() {
-
         return buildRoutine().serialInvoke();
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> syncInvoke() {
-
         return buildRoutine().syncInvoke();
     }
 
     @NotNull
     public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
-
         return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
@@ -85,7 +79,6 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
      */
     @NotNull
     protected InvocationConfiguration getConfiguration() {
-
         return mConfiguration;
     }
 }

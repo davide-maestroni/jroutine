@@ -43,41 +43,35 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
      * Constructor.
      */
     public StreamInvocation() {
-
         mInputChannel = null;
         mOutputChannel = null;
     }
 
     @Override
     public final void onAbort(@NotNull final RoutineException reason) {
-
         mInputChannel.abort(reason);
     }
 
     @Override
     public final void onInitialize() throws Exception {
-
         final IOChannel<IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
         mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
     }
 
     @Override
     public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
         bind(result);
         mInputChannel.pass(input);
     }
 
     @Override
     public final void onResult(@NotNull final ResultChannel<OUT> result) {
-
         bind(result);
         mInputChannel.close();
     }
 
     @Override
     public final void onTerminate() {
-
         mOutputChannel = null;
         mInputChannel = null;
     }
@@ -94,7 +88,6 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
             Exception;
 
     private void bind(@NotNull final ResultChannel<OUT> result) {
-
         final OutputChannel<OUT> outputChannel = mOutputChannel;
         if (!outputChannel.isBound()) {
             outputChannel.bind(result);

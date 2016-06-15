@@ -58,7 +58,6 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     private AccumulateConsumerInvocation(
             @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
             @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
-
         mSeedSupplier = seedSupplier;
         mAccumulateConsumer = accumulateConsumer;
     }
@@ -72,9 +71,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN> InvocationFactory<IN, IN> consumerFactory(
+    static <IN> InvocationFactory<IN, IN> consumerFactory(
             @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
-
         return new AccumulateInvocationFactory<IN, IN>(null, wrap(accumulateConsumer));
     }
 
@@ -89,24 +87,21 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
+    static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
             @NotNull final Supplier<? extends OUT> seedSupplier,
             @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
-
         return new AccumulateInvocationFactory<IN, OUT>(wrap(seedSupplier),
                 wrap(accumulateConsumer));
     }
 
     @Override
     public void onInitialize() {
-
         mIsFirst = true;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
         if (mIsFirst) {
             mIsFirst = false;
             final SupplierWrapper<? extends OUT> supplier = mSeedSupplier;
@@ -125,13 +120,13 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
 
     @Override
     public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        result.pass(mAccumulated);
+        if (!mIsFirst) {
+            result.pass(mAccumulated);
+        }
     }
 
     @Override
     public void onTerminate() {
-
         mAccumulated = null;
     }
 
@@ -156,7 +151,6 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
         private AccumulateInvocationFactory(
                 @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
                 @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
-
             super(asArgs(seedSupplier, accumulateConsumer));
             mSeedSupplier = seedSupplier;
             mAccumulateConsumer = accumulateConsumer;
@@ -165,7 +159,6 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
-
             return new AccumulateConsumerInvocation<IN, OUT>(mSeedSupplier, mAccumulateConsumer);
         }
     }

@@ -61,7 +61,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @NotNull
     @Override
     public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
@@ -70,7 +69,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final ServiceConfiguration configuration) {
-
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
@@ -79,7 +77,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -89,7 +86,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
-
         synchronized (sContextProxies) {
             final Context context = getInvocationContext();
             if (context == null) {
@@ -138,7 +134,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -147,7 +142,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -156,7 +150,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     serviceConfiguration() {
-
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
@@ -218,7 +211,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) {
-
             super(asArgs(itf, invocationConfiguration, objectConfiguration, serviceConfiguration));
         }
     }

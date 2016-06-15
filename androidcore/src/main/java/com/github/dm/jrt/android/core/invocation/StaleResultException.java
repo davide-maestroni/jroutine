@@ -27,7 +27,6 @@ public class StaleResultException extends InvocationClashException {
      * Constructor.
      */
     public StaleResultException() {
-
     }
 
     /**
@@ -36,7 +35,6 @@ public class StaleResultException extends InvocationClashException {
      * @param id the loader ID.
      */
     public StaleResultException(final int id) {
-
         super(id);
     }
 }

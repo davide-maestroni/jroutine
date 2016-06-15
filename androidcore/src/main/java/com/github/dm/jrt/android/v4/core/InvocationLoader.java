@@ -73,7 +73,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
             @NotNull final Logger logger) {
-
         super(context);
         mInvocation = ConstantConditions.notNull("invocation instance", invocation);
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
@@ -89,13 +88,11 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @return whether the inputs are equal.
      */
     public boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
-
         return mInputs.equals(inputs);
     }
 
     @Override
     public void deliverResult(final InvocationResult<OUT> data) {
-
         mLogger.dbg("delivering result: %s", data);
         mResult = data;
         super.deliverResult(data);
@@ -103,7 +100,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
     @Override
     protected void onStartLoading() {
-
         super.onStartLoading();
         final Logger logger = mLogger;
         logger.dbg("start background invocation");
@@ -119,7 +115,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
     @Override
     protected void onReset() {
-
         try {
             mInvocation.onDestroy();
 
@@ -135,7 +130,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
     @Override
     public InvocationResult<OUT> loadInBackground() {
-
         final Logger logger = mLogger;
         final InvocationOutputConsumer<OUT> consumer =
                 new InvocationOutputConsumer<OUT>(this, logger);
@@ -158,7 +152,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @return the invocation count.
      */
     int getInvocationCount() {
-
         return mInvocationCount;
     }
 
@@ -168,7 +161,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @param count the invocation count.
      */
     void setInvocationCount(final int count) {
-
         mInvocationCount = count;
     }
 
@@ -179,7 +171,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      */
     @NotNull
     ContextInvocationFactory<IN, OUT> getInvocationFactory() {
-
         return mFactory;
     }
 
@@ -191,7 +182,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @return whether the result is stale.
      */
     boolean isStaleResult(final long staleTimeMillis) {
-
         final InvocationResult<OUT> result = mResult;
         return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
                 > staleTimeMillis);
@@ -215,7 +205,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
          */
         private LoaderContextInvocationFactory(
                 @NotNull final ContextInvocation<IN, OUT> invocation) {
-
             super(null);
             mInvocation = invocation;
         }
@@ -223,7 +212,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
-
             return mInvocation;
         }
     }

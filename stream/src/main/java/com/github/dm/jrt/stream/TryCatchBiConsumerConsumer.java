@@ -41,13 +41,11 @@ class TryCatchBiConsumerConsumer<OUT> implements BiConsumer<RoutineException, In
      * @param catchConsumer the consumer instance.
      */
     TryCatchBiConsumerConsumer(@NotNull final Consumer<? super RoutineException> catchConsumer) {
-
         mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
     }
 
     public void accept(final RoutineException error, final InputChannel<OUT> channel) throws
             Exception {
-
         mCatchConsumer.accept(error);
     }
 }

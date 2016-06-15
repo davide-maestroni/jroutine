@@ -39,7 +39,6 @@ public abstract class ConverterRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param configuration the invocation configuration.
      */
     protected ConverterRoutine(@NotNull final InvocationConfiguration configuration) {
-
         super(configuration);
     }
 
@@ -47,7 +46,6 @@ public abstract class ConverterRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     @Override
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
             @NotNull final InvocationType type) throws Exception {
-
         try {
             invocation.onDestroy();
 

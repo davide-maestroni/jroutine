@@ -49,7 +49,6 @@ public class JRoutineServiceProxy {
      * Avoid explicit instantiation.
      */
     protected JRoutineServiceProxy() {
-
         ConstantConditions.avoid();
     }
 
@@ -61,7 +60,6 @@ public class JRoutineServiceProxy {
      */
     @NotNull
     public static ServiceProxyBuilder with(@NotNull final ServiceContext context) {
-
         synchronized (sBuilders) {
             final WeakHashMap<ServiceContext, ServiceProxyBuilder> builders = sBuilders;
             ServiceProxyBuilder builder = builders.get(context);
@@ -87,7 +85,6 @@ public class JRoutineServiceProxy {
          * @param context the service context.
          */
         private ServiceProxyBuilder(@NotNull final ServiceContext context) {
-
             mContext = ConstantConditions.notNull("service context", context);
         }
 
@@ -108,7 +105,6 @@ public class JRoutineServiceProxy {
          */
         @NotNull
         public ServiceProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
-
             return new DefaultServiceProxyRoutineBuilder(mContext, target);
         }
     }

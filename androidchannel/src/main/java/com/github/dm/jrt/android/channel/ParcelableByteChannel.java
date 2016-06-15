@@ -105,7 +105,6 @@ public class ParcelableByteChannel {
      * Constructor.
      */
     private ParcelableByteChannel() {
-
         mByteChannel = ByteChannel.byteChannel();
     }
 
@@ -117,7 +116,6 @@ public class ParcelableByteChannel {
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
     private ParcelableByteChannel(final int dataBufferSize) {
-
         mByteChannel = ByteChannel.byteChannel(dataBufferSize);
     }
 
@@ -131,7 +129,6 @@ public class ParcelableByteChannel {
      * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
      */
     private ParcelableByteChannel(final int dataBufferSize, final int corePoolSize) {
-
         mByteChannel = ByteChannel.byteChannel(dataBufferSize, corePoolSize);
     }
 
@@ -142,7 +139,6 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static ParcelableByteChannel byteChannel() {
-
         return new ParcelableByteChannel();
     }
 
@@ -160,7 +156,6 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static ParcelableByteChannel byteChannel(final int dataBufferSize) {
-
         return new ParcelableByteChannel(dataBufferSize);
     }
 
@@ -181,7 +176,6 @@ public class ParcelableByteChannel {
     @NotNull
     public static ParcelableByteChannel byteChannel(final int dataBufferSize,
             final int corePoolSize) {
-
         return new ParcelableByteChannel(dataBufferSize, corePoolSize);
     }
 
@@ -197,7 +191,6 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer buffer) {
-
         final ByteBuffer byteBuffer = buffer.getBuffer();
         if (byteBuffer != null) {
             return ByteChannel.inputStream(byteBuffer);
@@ -219,7 +212,6 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer... buffers) {
-
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.length);
         for (final ParcelableByteBuffer buffer : buffers) {
             final ByteBuffer byteBuffer = buffer.getBuffer();
@@ -245,7 +237,6 @@ public class ParcelableByteChannel {
     @NotNull
     public static BufferInputStream inputStream(
             @NotNull final Iterable<? extends ParcelableByteBuffer> buffers) {
-
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>();
         for (final ParcelableByteBuffer buffer : buffers) {
             final ByteBuffer byteBuffer = buffer.getBuffer();
@@ -266,7 +257,6 @@ public class ParcelableByteChannel {
     @NotNull
     public BufferOutputStream bind(
             @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
-
         IOChannel<ByteBuffer> ioChannel;
         synchronized (mChannels) {
             final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
@@ -294,7 +284,6 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public BufferOutputStream bind(@NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
-
         IOChannel<ByteBuffer> ioChannel;
         synchronized (mIOChannels) {
             final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer>,
@@ -339,7 +328,6 @@ public class ParcelableByteChannel {
 
                     @Override
                     public ParcelableByteBuffer createFromParcel(final Parcel in) {
-
                         final byte[] data = in.createByteArray();
                         if (data.length > 0) {
                             final IOChannel<ByteBuffer> ioChannel =
@@ -361,7 +349,6 @@ public class ParcelableByteChannel {
 
                     @Override
                     public ParcelableByteBuffer[] newArray(final int size) {
-
                         return new ParcelableByteBuffer[size];
                     }
                 };
@@ -376,20 +363,17 @@ public class ParcelableByteChannel {
          * @param buffer the backing byte buffer or null.
          */
         private ParcelableByteBuffer(@Nullable final ByteBuffer buffer) {
-
             super(asArgs(buffer));
             mBuffer = buffer;
         }
 
         @Override
         public int describeContents() {
-
             return 0;
         }
 
         @Override
         public void writeToParcel(final Parcel dest, final int flags) {
-
             final ByteBuffer buffer = mBuffer;
             if (buffer != null) {
                 final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
@@ -415,14 +399,12 @@ public class ParcelableByteChannel {
          * @return the buffer size.
          */
         public int getSize() {
-
             final ByteBuffer buffer = mBuffer;
             return (buffer != null) ? buffer.getSize() : 0;
         }
 
         @Nullable
         private ByteBuffer getBuffer() {
-
             return mBuffer;
         }
     }
@@ -441,19 +423,16 @@ public class ParcelableByteChannel {
          */
         private BufferOutputConsumer(
                 @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
-
             mChannel = ConstantConditions.notNull("input channel", channel);
         }
 
         @Override
         public void onError(@NotNull final RoutineException error) {
-
             mChannel.abort(error);
         }
 
         @Override
         public void onOutput(final ByteBuffer output) {
-
             mChannel.pass(new ParcelableByteBuffer(output));
         }
     }
@@ -465,53 +444,44 @@ public class ParcelableByteChannel {
 
         @Override
         public int read(@NotNull final OutputStream out) throws IOException {
-
             return -1;
         }
 
         @Override
         public int read() {
-
             return -1;
         }
 
         @Override
         public int read(@NotNull final byte[] b) {
-
             return -1;
         }
 
         @Override
         public int read(@NotNull final byte[] b, final int off, final int len) {
-
             return -1;
         }
 
         @Override
         public long skip(final long n) {
-
             return 0;
         }
 
         @Override
         public int available() {
-
             return 0;
         }
 
         @Override
         public void close() {
-
         }
 
         @Override
         public void mark(final int readLimit) {
-
         }
 
         @Override
         public void reset() {
-
         }
     }
 
@@ -529,25 +499,21 @@ public class ParcelableByteChannel {
          */
         private IOBufferOutputConsumer(
                 @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
-
             mChannel = ConstantConditions.notNull("I/O channel", channel);
         }
 
         @Override
         public void onComplete() {
-
             mChannel.close();
         }
 
         @Override
         public void onError(@NotNull final RoutineException error) {
-
             mChannel.abort(error);
         }
 
         @Override
         public void onOutput(final ByteBuffer output) {
-
             mChannel.pass(new ParcelableByteBuffer(output));
         }
     }
@@ -563,12 +529,10 @@ public class ParcelableByteChannel {
          * @param size the initial capacity.
          */
         private ParcelOutputStream(final int size) {
-
             super(size);
         }
 
         private void writeToParcel(@NotNull final Parcel dest) {
-
             dest.writeByteArray(buf, 0, count);
         }
     }

@@ -47,7 +47,6 @@ public abstract class LoaderContext {
      * Avoid explicit instantiation.
      */
     private LoaderContext() {
-
     }
 
     /**
@@ -58,7 +57,6 @@ public abstract class LoaderContext {
      */
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Activity activity) {
-
         checkVersion();
         return new ActivityContext(activity, activity);
     }
@@ -78,7 +76,6 @@ public abstract class LoaderContext {
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Activity activity,
             @NotNull final Context context) {
-
         checkVersion();
         return new ActivityContext(activity, context);
     }
@@ -91,7 +88,6 @@ public abstract class LoaderContext {
      */
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Fragment fragment) {
-
         checkVersion();
         return new FragmentContext(fragment, fragment.getActivity());
     }
@@ -111,13 +107,11 @@ public abstract class LoaderContext {
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-
         checkVersion();
         return new FragmentContext(fragment, context);
     }
 
     private static void checkVersion() {
-
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             throw new UnsupportedOperationException(
                     "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
@@ -169,7 +163,6 @@ public abstract class LoaderContext {
          *                                            a static scope.
          */
         private ActivityContext(@NotNull final Activity activity, @NotNull final Context context) {
-
             mActivity =
                     new WeakReference<Activity>(ConstantConditions.notNull("activity", activity));
             final Class<? extends Context> contextClass = context.getClass();
@@ -183,7 +176,6 @@ public abstract class LoaderContext {
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -205,13 +197,11 @@ public abstract class LoaderContext {
         @Nullable
         @Override
         public Object getComponent() {
-
             return mActivity.get();
         }
 
         @Override
         public int hashCode() {
-
             final Activity activity = mActivity.get();
             int result = (activity != null) ? activity.hashCode() : 0;
             final Context context = mContext.get();
@@ -222,14 +212,12 @@ public abstract class LoaderContext {
         @Nullable
         @Override
         public Context getLoaderContext() {
-
             return mContext.get();
         }
 
         @Nullable
         @Override
         public LoaderManager getLoaderManager() {
-
             final Activity activity = mActivity.get();
             return (activity != null) ? activity.getLoaderManager() : null;
         }
@@ -254,7 +242,6 @@ public abstract class LoaderContext {
          *                                            a static scope.
          */
         private FragmentContext(@NotNull final Fragment fragment, @NotNull final Context context) {
-
             mFragment =
                     new WeakReference<Fragment>(ConstantConditions.notNull("fragment", fragment));
             final Class<? extends Context> contextClass = context.getClass();
@@ -268,7 +255,6 @@ public abstract class LoaderContext {
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -289,7 +275,6 @@ public abstract class LoaderContext {
 
         @Override
         public int hashCode() {
-
             final Fragment fragment = mFragment.get();
             int result = (fragment != null) ? fragment.hashCode() : 0;
             final Context context = mContext.get();
@@ -300,14 +285,12 @@ public abstract class LoaderContext {
         @Nullable
         @Override
         public Context getLoaderContext() {
-
             return mContext.get();
         }
 
         @Nullable
         @Override
         public LoaderManager getLoaderManager() {
-
             final Fragment fragment = mFragment.get();
             return (fragment != null) ? fragment.getLoaderManager() : null;
         }
@@ -315,7 +298,6 @@ public abstract class LoaderContext {
         @Nullable
         @Override
         public Object getComponent() {
-
             return mFragment.get();
         }
     }

@@ -103,7 +103,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             @NotNull final TargetInvocationFactory<IN, OUT> target,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration) {
-
         super(invocationConfiguration);
         final Context serviceContext = context.getServiceContext();
         if (serviceContext == null) {
@@ -137,7 +136,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
     @Override
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
             Exception {
-
         if (type == InvocationType.SYNC) {
             return mFactory.newInvocation();
         }
@@ -168,7 +166,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
          */
         private ConnectionOutputConsumer(@NotNull final String invocationId,
                 @NotNull final Messenger inMessenger, @NotNull final Messenger outMessenger) {
-
             mInvocationId = invocationId;
             mInMessenger = inMessenger;
             mOutMessenger = outMessenger;
@@ -176,7 +173,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onComplete() throws RemoteException {
-
             final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
             putInvocationId(message.getData(), mInvocationId);
             message.replyTo = mInMessenger;
@@ -185,7 +181,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onError(@NotNull final RoutineException error) throws RemoteException {
-
             final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
             putError(message.getData(), mInvocationId, error);
             message.replyTo = mInMessenger;
@@ -194,7 +189,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onOutput(final IN input) throws RemoteException {
-
             final Message message = Message.obtain(null, InvocationService.MSG_DATA);
             putValue(message.getData(), mInvocationId, input);
             message.replyTo = mInMessenger;
@@ -229,7 +223,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
          */
         private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceContext context,
                 @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
-
             super(looper);
             mContext = context;
             mOutputChannel = outputChannel;
@@ -239,7 +232,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         @Override
         @SuppressWarnings("unchecked")
         public void handleMessage(@NotNull final Message msg) {
-
             final Logger logger = mLogger;
             logger.dbg("incoming service message: %s", msg);
             try {
@@ -270,12 +262,10 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         }
 
         private void setConnection(@NotNull final ServiceConnection connection) {
-
             mConnection = connection;
         }
 
         private void unbindService() {
-
             if (mIsUnbound) {
                 return;
             }
@@ -286,7 +276,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
                 @Override
                 public void run() {
-
                     final Context serviceContext = mContext.getServiceContext();
                     if (serviceContext != null) {
                         // Unfortunately there is no way to know if the context is still valid
@@ -346,7 +335,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
                 @NotNull final IncomingHandler<OUT> handler,
                 @NotNull final IOChannel<IN> inputChannel,
                 @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
-
             mInvocationId = invocationId;
             mTargetFactory = target;
             mInvocationConfiguration = invocationConfiguration;
@@ -359,7 +347,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
-
             final Logger logger = mLogger;
             logger.dbg("service connected: %s", name);
             final Messenger outMessenger = new Messenger(service);
@@ -390,7 +377,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-
             mLogger.dbg("service disconnected: %s", name);
             mOutputChannel.abort(new ServiceDisconnectedException(name));
         }
@@ -432,7 +418,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration,
                 @NotNull final Logger logger) {
-
             mContext = context;
             mTargetFactory = target;
             mInvocationConfiguration = invocationConfiguration;
@@ -442,13 +427,11 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
-
             mInputChannel.abort(reason);
         }
 
         @Override
         public void onInitialize() {
-
             final Logger logger = mLogger;
             mInputChannel = JRoutineCore.io()
                                         .channelConfiguration()
@@ -471,7 +454,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
             final IOChannel<OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
@@ -482,7 +464,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) {
-
             final IOChannel<OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
@@ -493,7 +474,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @Override
         public void onTerminate() {
-
             mInputChannel.close();
             mInputChannel = null;
             mOutputChannel = null;
@@ -501,7 +481,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         @NotNull
         private ServiceConnection bindService(@NotNull final IncomingHandler<OUT> handler) {
-
             final ServiceContext context = mContext;
             final Context serviceContext = context.getServiceContext();
             if (serviceContext == null) {

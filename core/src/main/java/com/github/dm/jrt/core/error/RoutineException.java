@@ -29,7 +29,6 @@ public class RoutineException extends RuntimeException {
      * Constructor.
      */
     public RoutineException() {
-
     }
 
     /**
@@ -38,7 +37,6 @@ public class RoutineException extends RuntimeException {
      * @param message the error message.
      */
     public RoutineException(@Nullable final String message) {
-
         super(message);
     }
 
@@ -48,7 +46,6 @@ public class RoutineException extends RuntimeException {
      * @param cause the error cause.
      */
     public RoutineException(@Nullable final Throwable cause) {
-
         super(cause);
     }
 }

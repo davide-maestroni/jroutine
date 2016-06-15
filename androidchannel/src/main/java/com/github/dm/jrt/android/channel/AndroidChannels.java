@@ -39,7 +39,6 @@ public class AndroidChannels extends Channels {
      * Avoid explicit instantiation.
      */
     protected AndroidChannels() {
-
         ConstantConditions.avoid();
     }
 
@@ -63,7 +62,6 @@ public class AndroidChannels extends Channels {
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return new MergeBuilder<OUT>(startIndex, channels);
     }
 
@@ -88,7 +86,6 @@ public class AndroidChannels extends Channels {
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
             @NotNull final OutputChannel<?>... channels) {
-
         return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, Arrays.asList(channels));
     }
 
@@ -111,7 +108,6 @@ public class AndroidChannels extends Channels {
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-
         return merge(0, channels);
     }
 
@@ -133,7 +129,6 @@ public class AndroidChannels extends Channels {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
-
         return merge(0, channels);
     }
 
@@ -155,7 +150,6 @@ public class AndroidChannels extends Channels {
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
-
         return new InputSelectBuilder<DATA, IN>(channel, index);
     }
 
@@ -177,7 +171,6 @@ public class AndroidChannels extends Channels {
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
-
         return new SelectableOutputBuilder<OUT>(channel, index);
     }
 }

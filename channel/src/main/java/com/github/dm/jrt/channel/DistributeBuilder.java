@@ -56,7 +56,6 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
      */
     DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-
         final ArrayList<InputChannel<? extends IN>> channelList =
                 new ArrayList<InputChannel<? extends IN>>();
         for (final InputChannel<? extends IN> channel : channels) {
@@ -82,7 +81,6 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
     @SuppressWarnings("unchecked")
     protected IOChannel<List<? extends IN>> build(
             @NotNull final ChannelConfiguration configuration) {
-
         final ArrayList<InputChannel<? extends IN>> channels = mChannels;
         final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
         for (final InputChannel<?> channel : channels) {
@@ -123,28 +121,24 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
          */
         private DistributeOutputConsumer(final boolean isFlush, @Nullable final IN placeholder,
                 @NotNull final ArrayList<IOChannel<? extends IN>> channels) {
-
             mIsFlush = isFlush;
             mChannels = channels;
             mPlaceholder = placeholder;
         }
 
         public void onComplete() {
-
             for (final IOChannel<? extends IN> channel : mChannels) {
                 channel.close();
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
-
             for (final IOChannel<? extends IN> channel : mChannels) {
                 channel.abort(error);
             }
         }
 
         public void onOutput(final List<? extends IN> inputs) {
-
             final int inputSize = inputs.size();
             final ArrayList<IOChannel<? extends IN>> channels = mChannels;
             final int size = channels.size();

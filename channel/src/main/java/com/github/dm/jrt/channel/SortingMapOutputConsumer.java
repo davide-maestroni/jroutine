@@ -44,7 +44,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      *                                        object.
      */
     SortingMapOutputConsumer(@NotNull final Map<Integer, IOChannel<OUT>> channels) {
-
         final HashMap<Integer, IOChannel<OUT>> channelMap =
                 new HashMap<Integer, IOChannel<OUT>>(channels);
         if (channelMap.containsValue(null)) {
@@ -55,21 +54,18 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
     }
 
     public void onComplete() {
-
         for (final IOChannel<OUT> channel : mChannels.values()) {
             channel.close();
         }
     }
 
     public void onError(@NotNull final RoutineException error) {
-
         for (final IOChannel<OUT> channel : mChannels.values()) {
             channel.abort(error);
         }
     }
 
     public void onOutput(final Selectable<? extends OUT> selectable) {
-
         final IOChannel<OUT> channel = mChannels.get(selectable.index);
         if (channel != null) {
             channel.pass(selectable.data);

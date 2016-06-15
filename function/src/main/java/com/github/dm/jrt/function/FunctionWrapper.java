@@ -44,7 +44,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
             new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
 
                 public Object apply(final Object in) {
-
                     return in;
                 }
             });
@@ -57,7 +56,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      * @param function the wrapped function.
      */
     private FunctionWrapper(@NotNull final Function<?, ?> function) {
-
         this(Collections.<Function<?, ?>>singletonList(
                 ConstantConditions.notNull("function instance", function)));
     }
@@ -68,7 +66,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      * @param functions the list of wrapped functions.
      */
     private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
-
         super(asArgs(functions));
         mFunctions = functions;
     }
@@ -86,7 +83,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
-
         return new FunctionWrapper<IN, OUT>(
                 new ClassCastFunction<IN, OUT>(ConstantConditions.notNull("type", type)));
     }
@@ -104,7 +100,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final ClassToken<? extends OUT> token) {
-
         return castTo(token.getRawClass());
     }
 
@@ -119,7 +114,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> FunctionWrapper<IN, IN> identity() {
-
         return (FunctionWrapper<IN, IN>) sIdentity;
     }
 
@@ -142,7 +136,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
             @NotNull final Function<IN, OUT> function) {
-
         if (function instanceof FunctionWrapper) {
             return (FunctionWrapper<IN, OUT>) function;
         }
@@ -161,7 +154,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     public <AFTER> FunctionWrapper<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
-
         ConstantConditions.notNull("function instance", after);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
@@ -188,7 +180,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     @NotNull
     public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
             @NotNull final Function<? super BEFORE, ? extends IN> before) {
-
         ConstantConditions.notNull("function instance", before);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
@@ -205,7 +196,6 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     }
 
     public boolean hasStaticScope() {
-
         for (final Function<?, ?> function : mFunctions) {
             if (!Reflection.hasStaticScope(function)) {
                 return false;
@@ -232,20 +222,17 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
          * @param type the output class type.
          */
         private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
-
             super(asArgs(type));
             mType = type;
         }
 
         public OUT apply(final IN in) {
-
             return mType.cast(in);
         }
     }
 
     @SuppressWarnings("unchecked")
     public OUT apply(final IN in) throws Exception {
-
         Object result = in;
         for (final Function<?, ?> function : mFunctions) {
             result = ((Function<Object, Object>) function).apply(result);

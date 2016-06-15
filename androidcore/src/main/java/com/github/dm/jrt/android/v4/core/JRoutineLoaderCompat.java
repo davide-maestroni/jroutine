@@ -147,7 +147,6 @@ public class JRoutineLoaderCompat {
      * Avoid explicit instantiation.
      */
     protected JRoutineLoaderCompat() {
-
         ConstantConditions.avoid();
     }
 
@@ -159,7 +158,6 @@ public class JRoutineLoaderCompat {
      */
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {
-
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContextCompat, LoaderBuilderCompat> builders = sBuilders;
             LoaderBuilderCompat builder = builders.get(context);
@@ -185,7 +183,6 @@ public class JRoutineLoaderCompat {
          * @param context the loader context.
          */
         private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
-
             mContext = ConstantConditions.notNull("loader context", context);
         }
 
@@ -213,7 +210,6 @@ public class JRoutineLoaderCompat {
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }
 
@@ -234,7 +230,6 @@ public class JRoutineLoaderCompat {
          */
         @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
-
             return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
                                                             .withLoaderId(loaderId)
                                                             .apply();

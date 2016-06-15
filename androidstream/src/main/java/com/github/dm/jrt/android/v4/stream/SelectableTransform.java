@@ -44,7 +44,6 @@ class SelectableTransform<IN, OUT> implements
      * @param index the selectable index.
      */
     SelectableTransform(final int index) {
-
         mIndex = index;
     }
 
@@ -52,7 +51,6 @@ class SelectableTransform<IN, OUT> implements
     public Function<OutputChannel<IN>, OutputChannel<ParcelableSelectable<OUT>>> apply(
             final StreamConfiguration configuration,
             final Function<OutputChannel<IN>, OutputChannel<OUT>> function) {
-
         return wrap(function).andThen(
                 new BindSelectable<OUT>(configuration.asChannelConfiguration(), mIndex));
     }

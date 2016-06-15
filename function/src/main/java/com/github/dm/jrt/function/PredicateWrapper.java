@@ -52,7 +52,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             new PredicateWrapper<Object>(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
-
                     return false;
                 }
             });
@@ -61,7 +60,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             new PredicateWrapper<Object>(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
-
                     return (o != null);
                 }
             });
@@ -80,7 +78,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      * @param predicate the core predicate.
      */
     private PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
-
         this(predicate, Collections.<Predicate<?>>singletonList(
                 ConstantConditions.notNull("predicate instance", predicate)));
     }
@@ -93,7 +90,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     private PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
-
         super(asArgs(predicates));
         mPredicate = predicate;
         mPredicates = predicates;
@@ -110,7 +106,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isEqualTo(@Nullable final Object targetRef) {
-
         if (targetRef == null) {
             return isNull();
         }
@@ -130,7 +125,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
-
         return new PredicateWrapper<IN>(
                 new InstanceOfPredicate<IN>(ConstantConditions.notNull("type", type)));
     }
@@ -146,7 +140,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> isNotNull() {
-
         return (PredicateWrapper<IN>) sNotNull;
     }
 
@@ -161,7 +154,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> isNull() {
-
         return (PredicateWrapper<IN>) sIsNull;
     }
 
@@ -176,7 +168,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> isSameAs(@Nullable final Object targetRef) {
-
         if (targetRef == null) {
             return isNull();
         }
@@ -195,7 +186,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> negative() {
-
         return (PredicateWrapper<IN>) sNegative;
     }
 
@@ -210,7 +200,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> positive() {
-
         return (PredicateWrapper<IN>) sPositive;
     }
 
@@ -231,7 +220,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
-
         if (predicate instanceof PredicateWrapper) {
             return (PredicateWrapper<IN>) predicate;
         }
@@ -248,7 +236,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
-
         ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
@@ -268,7 +255,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     }
 
     public boolean hasStaticScope() {
-
         for (final Predicate<?> predicate : mPredicates) {
             if (!Reflection.hasStaticScope(predicate)) {
                 return false;
@@ -286,7 +272,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     @SuppressWarnings("unchecked")
     public PredicateWrapper<IN> negate() {
-
         final List<Predicate<?>> predicates = mPredicates;
         final int size = predicates.size();
         final ArrayList<Predicate<?>> newPredicates = new ArrayList<Predicate<?>>(size + 1);
@@ -341,7 +326,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      */
     @NotNull
     public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
-
         ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
@@ -379,13 +363,11 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          */
         private AndPredicate(@NotNull final Predicate<? super IN> predicate,
                 @NotNull final Predicate<? super IN> other) {
-
             mPredicate = predicate;
             mOther = other;
         }
 
         public boolean test(final IN in) throws Exception {
-
             return mPredicate.test(in) && mOther.test(in);
         }
     }
@@ -405,13 +387,11 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          * @param other the other object to test against.
          */
         private EqualToPredicate(@NotNull final Object other) {
-
             super(asArgs(other));
             mOther = other;
         }
 
         public boolean test(final IN in) {
-
             return mOther.equals(in);
         }
     }
@@ -431,13 +411,11 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          * @param type the class type.
          */
         private InstanceOfPredicate(@NotNull final Class<?> type) {
-
             super(asArgs(type));
             mType = type;
         }
 
         public boolean test(final IN in) {
-
             return mType.isInstance(in);
         }
     }
@@ -448,7 +426,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     private static class LogicalPredicate implements Predicate<Object> {
 
         public boolean test(final Object o) {
-
             throw new UnsupportedOperationException("should never be called");
         }
     }
@@ -468,12 +445,10 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          * @param predicate the wrapped predicate.
          */
         private NegatePredicate(@NotNull final Predicate<? super IN> predicate) {
-
             mPredicate = predicate;
         }
 
         public boolean test(final IN in) throws Exception {
-
             return !mPredicate.test(in);
         }
     }
@@ -497,13 +472,11 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          */
         private OrPredicate(@NotNull final Predicate<? super IN> predicate,
                 @NotNull final Predicate<? super IN> other) {
-
             mPredicate = predicate;
             mOther = other;
         }
 
         public boolean test(final IN in) throws Exception {
-
             return mPredicate.test(in) || mOther.test(in);
         }
     }
@@ -523,19 +496,16 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
          * @param other the other object to test against.
          */
         private SameAsPredicate(@NotNull final Object other) {
-
             mOther = other;
         }
 
         @Override
         public int hashCode() {
-
             return mOther.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -549,13 +519,11 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
         }
 
         public boolean test(final IN in) {
-
             return (mOther == in);
         }
     }
 
     public boolean test(final IN in) throws Exception {
-
         return mPredicate.test(in);
     }
 }

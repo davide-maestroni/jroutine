@@ -42,13 +42,11 @@ class SequentialRunner extends SyncRunner {
      * Constructor.
      */
     SequentialRunner() {
-
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-
         if (delay > 0) {
             try {
                 UnitDuration.sleepAtLeast(delay, timeUnit);

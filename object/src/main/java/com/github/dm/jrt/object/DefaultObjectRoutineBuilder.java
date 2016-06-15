@@ -81,7 +81,6 @@ class DefaultObjectRoutineBuilder
      *                                            interface.
      */
     DefaultObjectRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
             throw new IllegalArgumentException(
@@ -93,7 +92,6 @@ class DefaultObjectRoutineBuilder
 
     @NotNull
     public ObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
@@ -101,14 +99,12 @@ class DefaultObjectRoutineBuilder
 
     @NotNull
     public ObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
@@ -121,13 +117,11 @@ class DefaultObjectRoutineBuilder
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
         return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-
         final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
         if (method == null) {
             return method(name, Reflection.NO_PARAMS);
@@ -139,13 +133,11 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
-
         return method(Reflection.findMethod(mTarget.getTargetClass(), name, parameterTypes));
     }
 
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-
         return getRoutine(withAnnotations(mInvocationConfiguration, method),
                 withAnnotations(mObjectConfiguration, method), method, null, null);
     }
@@ -153,14 +145,12 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
     invocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
     public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> objectConfiguration() {
-
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
@@ -171,7 +161,6 @@ class DefaultObjectRoutineBuilder
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-
         final InvocationTarget<?> target = mTarget;
         final Object targetInstance = target.getTarget();
         if (targetInstance == null) {
@@ -234,7 +223,6 @@ class DefaultObjectRoutineBuilder
         private MethodCallInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-
             final Object mutexTarget =
                     (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
@@ -248,7 +236,6 @@ class DefaultObjectRoutineBuilder
         @Override
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
-
             final Object target = mTarget.getTarget();
             if (target == null) {
                 throw new IllegalStateException("the target object has been destroyed");
@@ -285,7 +272,6 @@ class DefaultObjectRoutineBuilder
         private MethodInvocationFactory(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-
             super(asArgs(objectConfiguration, target, method, inputMode, outputMode));
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -297,7 +283,6 @@ class DefaultObjectRoutineBuilder
         @NotNull
         @Override
         public Invocation<Object, Object> newInvocation() {
-
             return new MethodCallInvocation(mObjectConfiguration, mTarget, mMethod, mInputMode,
                     mOutputMode);
         }
@@ -321,7 +306,6 @@ class DefaultObjectRoutineBuilder
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final Method method, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
-
             super(asArgs(invocationConfiguration, objectConfiguration, method, inputMode,
                     outputMode));
         }
@@ -340,14 +324,12 @@ class DefaultObjectRoutineBuilder
          * Constructor.
          */
         private ProxyInvocationHandler() {
-
             mInvocationConfiguration = DefaultObjectRoutineBuilder.this.mInvocationConfiguration;
             mObjectConfiguration = DefaultObjectRoutineBuilder.this.mObjectConfiguration;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
                 Throwable {
-
             final MethodInfo methodInfo = getTargetMethodInfo(mTarget.getTargetClass(), method);
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;

@@ -45,14 +45,12 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
      * @param wrapped the wrapped instance.
      */
     BuilderWrapper(@NotNull final ChannelsBuilder<? extends OutputChannel<? extends OUT>> wrapped) {
-
         mBuilder = ConstantConditions.notNull("wrapped instance", wrapped);
     }
 
     @NotNull
     public ChannelsBuilder<StreamChannel<OUT, OUT>> apply(
             @NotNull final ChannelConfiguration configuration) {
-
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBuilder.channelConfiguration().with(null).with(configuration).apply();
         return this;
@@ -61,13 +59,11 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
     @NotNull
     @SuppressWarnings("unchecked")
     public StreamChannel<OUT, OUT> buildChannels() {
-
         return (StreamChannel<OUT, OUT>) Streams.streamOf(mBuilder.buildChannels());
     }
 
     @NotNull
     public Builder<? extends ChannelsBuilder<StreamChannel<OUT, OUT>>> channelConfiguration() {
-
         return new Builder<ChannelsBuilder<StreamChannel<OUT, OUT>>>(this, mConfiguration);
     }
 }

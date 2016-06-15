@@ -57,7 +57,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
                 public void onInput(final Call<Object> input,
                         @NotNull final ResultChannel<Object> result) throws IOException {
-
                     result.pass(input.execute().body());
                 }
             };
@@ -78,7 +77,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     protected AbstractAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode) {
-
         mDelegateFactory = delegateFactory;
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
@@ -92,14 +90,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      */
     @NotNull
     protected static ParameterizedType getOutputChannelType(@NotNull final Type outputType) {
-
         return new OutputChannelType(ConstantConditions.notNull("outputs type", outputType));
     }
 
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
-
         InvocationMode invocationMode = mInvocationMode;
         for (final Annotation annotation : annotations) {
             if (annotation.annotationType() == Invoke.class) {
@@ -141,7 +137,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
                 Builders.withAnnotations(configuration, annotations);
@@ -162,7 +157,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      */
     @Nullable
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
-
         final Type rawType = returnType.getRawType();
         if (OutputChannel.class == rawType) {
             return returnType.getActualTypeArguments()[0];
@@ -190,7 +184,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-
         if (OutputChannel.class == returnRawType) {
             return new OutputChannelAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
@@ -210,7 +203,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
             @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-
         final CallAdapter.Factory delegateFactory = mDelegateFactory;
         if (delegateFactory == null) {
             return sCallInvocation;
@@ -255,14 +247,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         @SuppressWarnings("unchecked")
         protected BaseAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
-
             mResponseType = ConstantConditions.notNull("response type", responseType);
             mRoutine =
                     ConstantConditions.notNull("routine instance", (Routine<Call<?>, ?>) routine);
         }
 
         public Type responseType() {
-
             return mResponseType;
         }
 
@@ -273,7 +263,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          */
         @NotNull
         protected Routine<Call<?>, ?> getRoutine() {
-
             return mRoutine;
         }
     }
@@ -293,13 +282,11 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          */
         private BodyAdapterInvocation(@Nullable final Object[] args,
                 @NotNull final CallAdapter<?> callAdapter) {
-
             super(args);
             mCallAdapter = callAdapter;
         }
 
         public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
-
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -319,13 +306,11 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          */
         private ChannelAdapterInvocation(@Nullable final Object[] args,
                 @NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
-
             super(args);
             mCallAdapter = callAdapter;
         }
 
         public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
-
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -347,13 +332,11 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         private OutputChannelAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
-
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         public <OUT> OutputChannel adapt(final Call<OUT> call) {
-
             final InvocationMode invocationMode = mInvocationMode;
             final Routine<Call<?>, ?> routine = getRoutine();
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
@@ -378,22 +361,18 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          * @param outputType the output data type.
          */
         private OutputChannelType(@NotNull final Type outputType) {
-
             mTypeArguments = new Type[]{outputType};
         }
 
         public Type[] getActualTypeArguments() {
-
             return mTypeArguments.clone();
         }
 
         public Type getRawType() {
-
             return OutputChannel.class;
         }
 
         public Type getOwnerType() {
-
             return Channel.class;
         }
     }
@@ -415,13 +394,11 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         private StreamChannelAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
-
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         public <OUT> StreamChannel adapt(final Call<OUT> call) {
-
             final InvocationMode invocationMode = mInvocationMode;
             final StreamChannel<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode

@@ -94,7 +94,6 @@ public class Builders {
      * Avoid explicit instantiation.
      */
     protected Builders() {
-
         ConstantConditions.avoid();
     }
 
@@ -114,7 +113,6 @@ public class Builders {
             @NotNull final Method targetMethod, @NotNull final List<?> objects,
             @NotNull final ResultChannel<Object> result, @Nullable final InputMode inputMode,
             @Nullable final OutputMode outputMode) throws Exception {
-
         Reflection.makeAccessible(targetMethod);
         final Object methodResult;
         mutex.acquire();
@@ -182,7 +180,6 @@ public class Builders {
     @Nullable
     public static Method getAnnotatedMethod(@NotNull final Class<?> targetClass,
             @NotNull final String name) {
-
         synchronized (sAliasMethods) {
             final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasMethods = sAliasMethods;
             Map<String, Method> methodMap = aliasMethods.get(targetClass);
@@ -220,7 +217,6 @@ public class Builders {
      */
     @Nullable
     public static InputMode getInputMode(@NotNull final Method method, final int index) {
-
         AsyncIn asyncInputAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
         for (final Annotation annotation : annotations[index]) {
@@ -284,7 +280,6 @@ public class Builders {
      */
     @Nullable
     public static InvocationMode getInvocationMode(@NotNull final Method method) {
-
         final Invoke invokeAnnotation = method.getAnnotation(Invoke.class);
         if (invokeAnnotation == null) {
             return null;
@@ -317,7 +312,6 @@ public class Builders {
     @Nullable
     public static OutputMode getOutputMode(@NotNull final Method method,
             @NotNull final Class<?> targetReturnType) {
-
         final AsyncOut asyncOutputAnnotation = method.getAnnotation(AsyncOut.class);
         if (asyncOutputAnnotation == null) {
             return null;
@@ -357,7 +351,6 @@ public class Builders {
     @NotNull
     public static Mutex getSharedMutex(@Nullable final Object target,
             @Nullable final Collection<String> sharedFields) {
-
         if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
             return Mutex.NO_MUTEX;
         }
@@ -413,7 +406,6 @@ public class Builders {
     @NotNull
     public static MethodInfo getTargetMethodInfo(@NotNull final Class<?> targetClass,
             @NotNull final Method proxyMethod) {
-
         MethodInfo methodInfo;
         synchronized (sMethods) {
             final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethods;
@@ -514,7 +506,6 @@ public class Builders {
             @NotNull final Method method, @NotNull final Object[] args,
             @Nullable final InvocationMode invocationMode, @Nullable final InputMode inputMode,
             @Nullable final OutputMode outputMode) {
-
         final Class<?> returnType = method.getReturnType();
         if (method.isAnnotationPresent(AsyncMethod.class)) {
             if (returnType.isAssignableFrom(InvocationChannel.class)) {
@@ -605,7 +596,6 @@ public class Builders {
     public static InvocationConfiguration withAnnotations(
             @Nullable final InvocationConfiguration configuration,
             @Nullable final Annotation... annotations) {
-
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
         if (annotations == null) {
@@ -689,7 +679,6 @@ public class Builders {
     @NotNull
     public static InvocationConfiguration withAnnotations(
             @Nullable final InvocationConfiguration configuration, @NotNull final Method method) {
-
         return withAnnotations(configuration, method.getDeclaredAnnotations());
     }
 
@@ -705,7 +694,6 @@ public class Builders {
     public static ObjectConfiguration withAnnotations(
             @Nullable final ObjectConfiguration configuration,
             @Nullable final Annotation... annotations) {
-
         final ObjectConfiguration.Builder<ObjectConfiguration> builder =
                 ObjectConfiguration.builderFrom(configuration);
         if (annotations == null) {
@@ -734,13 +722,11 @@ public class Builders {
     @NotNull
     public static ObjectConfiguration withAnnotations(
             @Nullable final ObjectConfiguration configuration, @NotNull final Method method) {
-
         return withAnnotations(configuration, method.getDeclaredAnnotations());
     }
 
     private static void fillMap(@NotNull final Map<String, Method> map,
             @NotNull final Method[] methods) {
-
         for (final Method method : methods) {
             final Alias annotation = method.getAnnotation(Alias.class);
             if (annotation != null) {
@@ -759,7 +745,6 @@ public class Builders {
     @NotNull
     private static Method getTargetMethod(@NotNull final Method method,
             @NotNull final Class<?> targetClass, @NotNull final Class<?>[] targetParameterTypes) {
-
         String name = null;
         Method targetMethod = null;
         final Alias annotation = method.getAnnotation(Alias.class);
@@ -787,7 +772,6 @@ public class Builders {
     private static InvocationChannel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
-
         return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
                 : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                         : (invocationMode == InvocationMode.SERIAL) ? routine.serialInvoke()
@@ -830,7 +814,6 @@ public class Builders {
         private MethodInfo(@NotNull final Method method,
                 @Nullable final InvocationMode invocationMode, @Nullable final InputMode inputMode,
                 @Nullable final OutputMode outputMode) {
-
             this.method = method;
             this.invocationMode = invocationMode;
             this.inputMode = inputMode;
@@ -855,13 +838,11 @@ public class Builders {
          */
         private BuilderMutex(@NotNull final ExchangeMutex mutex,
                 @NotNull final ReentrantLock[] locks) {
-
             mMutex = mutex;
             mLocks = locks;
         }
 
         public void acquire() throws InterruptedException {
-
             mMutex.acquirePartialMutex();
             for (final ReentrantLock lock : mLocks) {
                 lock.lock();
@@ -869,7 +850,6 @@ public class Builders {
         }
 
         public void release() {
-
             final ReentrantLock[] locks = mLocks;
             final int length = locks.length;
             for (int i = length - 1; i >= 0; --i) {
@@ -899,7 +879,6 @@ public class Builders {
          * @throws java.lang.InterruptedException if the current thread is interrupted.
          */
         public void acquirePartialMutex() throws InterruptedException {
-
             synchronized (mMutex) {
                 while (mFullMutexCount > 0) {
                     mMutex.wait();
@@ -913,7 +892,6 @@ public class Builders {
          * Releases a partial mutex.
          */
         public void releasePartialMutex() {
-
             synchronized (mMutex) {
                 --mPartialMutexCount;
                 mMutex.notifyAll();
@@ -921,7 +899,6 @@ public class Builders {
         }
 
         public void acquire() throws InterruptedException {
-
             synchronized (mMutex) {
                 while (mPartialMutexCount > 0) {
                     mMutex.wait();
@@ -934,7 +911,6 @@ public class Builders {
         }
 
         public void release() {
-
             mLock.unlock();
             synchronized (mMutex) {
                 --mFullMutexCount;

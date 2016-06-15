@@ -54,7 +54,6 @@ public class JRoutineLoaderProxy {
      * Avoid explicit instantiation.
      */
     protected JRoutineLoaderProxy() {
-
         ConstantConditions.avoid();
     }
 
@@ -66,7 +65,6 @@ public class JRoutineLoaderProxy {
      */
     @NotNull
     public static LoaderProxyBuilder with(@NotNull final LoaderContext context) {
-
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContext, LoaderProxyBuilder> builders = sBuilders;
             LoaderProxyBuilder builder = builders.get(context);
@@ -92,7 +90,6 @@ public class JRoutineLoaderProxy {
          * @param context the loader context.
          */
         private LoaderProxyBuilder(@NotNull final LoaderContext context) {
-
             mContext = ConstantConditions.notNull("loader context", context);
         }
 
@@ -116,7 +113,6 @@ public class JRoutineLoaderProxy {
          */
         @NotNull
         public LoaderProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
-
             return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }
     }

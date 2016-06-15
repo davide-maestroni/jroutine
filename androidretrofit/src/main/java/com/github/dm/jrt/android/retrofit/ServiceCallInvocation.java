@@ -85,7 +85,6 @@ public class ServiceCallInvocation extends
     @Override
     public void onInput(final ParcelableSelectable<Object> input,
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
-
         switch (input.index) {
             case REQUEST_DATA_INDEX:
                 mRequestData = input.data();
@@ -118,7 +117,6 @@ public class ServiceCallInvocation extends
     @Override
     public void onResult(@NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws
             Exception {
-
         final IOChannel<ParcelableByteBuffer> inputChannel = mInputChannel;
         if (inputChannel != null) {
             inputChannel.close();
@@ -131,7 +129,6 @@ public class ServiceCallInvocation extends
 
     @Override
     public void onTerminate() {
-
         mRequestData = null;
         mMediaType = null;
         mInputChannel = null;
@@ -140,7 +137,6 @@ public class ServiceCallInvocation extends
 
     private void asyncRequest(
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
-
         if (mIsRequest) {
             return;
         }
@@ -155,13 +151,11 @@ public class ServiceCallInvocation extends
 
             @Override
             public void onFailure(final Call call, final IOException e) {
-
                 outputChannel.abort(e);
             }
 
             @Override
             public void onResponse(final Call call, final Response response) throws IOException {
-
                 try {
                     publishResult(response.body(), outputChannel);
 
@@ -177,7 +171,6 @@ public class ServiceCallInvocation extends
 
     @NotNull
     private OkHttpClient getClient() throws Exception {
-
         return (OkHttpClient) ConstantConditions.notNull("http client instance",
                 ContextInvocationTarget.instanceOf(OkHttpClient.class)
                                        .getInvocationTarget(getContext())
@@ -186,7 +179,6 @@ public class ServiceCallInvocation extends
 
     private void publishResult(@NotNull final ResponseBody responseBody,
             @NotNull final InputChannel<ParcelableSelectable<Object>> result) throws IOException {
-
         final MediaType mediaType = responseBody.contentType();
         if (mediaType != null) {
             result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
@@ -205,7 +197,6 @@ public class ServiceCallInvocation extends
 
     private void syncRequest(
             @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
-
         final Request request = mRequestData.requestWithBody(null);
         final ResponseBody responseBody = getClient().newCall(request).execute().body();
         publishResult(responseBody, result);
@@ -228,20 +219,17 @@ public class ServiceCallInvocation extends
          */
         private AsyncRequestBody(@Nullable final MediaType mediaType,
                 @NotNull final IOChannel<ParcelableByteBuffer> inputChannel) {
-
             mMediaType = mediaType;
             mInputChannel = inputChannel;
         }
 
         @Override
         public MediaType contentType() {
-
             return mMediaType;
         }
 
         @Override
         public void writeTo(final BufferedSink sink) throws IOException {
-
             final OutputStream outputStream = sink.outputStream();
             try {
                 for (final ParcelableByteBuffer buffer : mInputChannel.afterMax(infinity())) {

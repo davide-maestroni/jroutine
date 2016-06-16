@@ -46,6 +46,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 public class Operators {
 
+    // TODO: 16/06/16 LruHashMap??
     private static final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> sCastToFactories =
             new WeakIdentityHashMap<Class, InvocationFactory<?, ?>>();
 

@@ -55,5 +55,6 @@ findbugs {
 javadoc {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/")
+    options.links("${prefix}/core/",
+            "${prefix}/function/")
 }

@@ -18,6 +18,5 @@
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
     public ${resultType} ${methodName}() {
-
         return (${resultType}) this.mRoutine${methodCount};
     }

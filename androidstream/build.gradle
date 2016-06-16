@@ -67,12 +67,12 @@ dependencies {
 }
 
 conditionalDependencies {
+    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -90,10 +90,10 @@ tasks.withType(FindBugs) {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/channel/",
-            "${prefix}/stream/",
+    options.links("${prefix}/androidchannel/",
             "${prefix}/androidcore/",
-            "${prefix}/androidchannel/")
+            "${prefix}/channel/",
+            "${prefix}/core/",
+            "${prefix}/function/",
+            "${prefix}/stream/")
 }

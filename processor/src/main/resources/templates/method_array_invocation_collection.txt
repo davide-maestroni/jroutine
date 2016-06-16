@@ -20,7 +20,6 @@
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.ResultChannel<${resultClassName}> result) throws Exception {
-
             int i = 0;
             final ${componentType}[] array = new ${componentType}[objects.size()];
             for (final Object object : objects) {

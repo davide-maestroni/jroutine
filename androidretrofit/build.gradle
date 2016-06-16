@@ -75,13 +75,13 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'retrofit', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'retrofit', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -101,12 +101,12 @@ tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('https://square.github.io/okhttp/3.x/okhttp/',
             'https://square.github.io/retrofit/2.x/retrofit/',
-            "${prefix}/lib/",
-            "${prefix}/core/",
-            "${prefix}/object/",
-            "${prefix}/stream/",
-            "${prefix}/retrofit/",
             "${prefix}/androidcore/",
             "${prefix}/androidobject/",
-            "${prefix}/androidstream/")
+            "${prefix}/androidstream/",
+            "${prefix}/core/",
+            "${prefix}/lib/",
+            "${prefix}/object/",
+            "${prefix}/retrofit/",
+            "${prefix}/stream/")
 }

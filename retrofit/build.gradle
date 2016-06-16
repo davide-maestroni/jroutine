@@ -60,5 +60,7 @@ javadoc {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('https://square.github.io/retrofit/2.x/retrofit/',
-            "${prefix}/core/", "${prefix}/object/", "${prefix}/stream/")
+            "${prefix}/core/",
+            "${prefix}/object/",
+            "${prefix}/stream/")
 }

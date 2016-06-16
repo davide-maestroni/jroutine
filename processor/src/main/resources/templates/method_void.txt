@@ -18,7 +18,6 @@
 
     @SuppressWarnings({"unchecked", "RedundantCast"})
     public void ${methodName}(${paramVars}) {
-
         final com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
         $$routine.${invokeMethod}()${inputParams}.result().hasCompleted();
     }

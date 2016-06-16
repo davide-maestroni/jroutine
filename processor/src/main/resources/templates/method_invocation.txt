@@ -20,7 +20,6 @@
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.ResultChannel<${resultClassName}> result) throws Exception {
-
             if (objects.size() > ${maxParamSize}) {
                 throw new IllegalArgumentException(
                         "wrong number of input parameters for method '${targetMethodName}': was " +

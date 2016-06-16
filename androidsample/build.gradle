@@ -66,21 +66,22 @@ tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('https://square.github.io/retrofit/2.x/retrofit/',
-            "${prefix}/core/",
-            "${prefix}/object/",
-            "${prefix}/function/",
-            "${prefix}/proxy/",
-            "${prefix}/channel/",
-            "${prefix}/stream/",
-            "${prefix}/retrofit/",
-            "${prefix}/lib/",
+            "${prefix}/android/",
+            "${prefix}/androidchannel/",
             "${prefix}/androidcore/",
             "${prefix}/androidobject/",
             "${prefix}/androidproxy/",
-            "${prefix}/androidchannel/",
-            "${prefix}/androidstream/",
             "${prefix}/androidretrofit/",
-            "${prefix}/android/")
+            "${prefix}/androidstream/",
+            "${prefix}/channel/",
+            "${prefix}/core/",
+            "${prefix}/function/",
+            "${prefix}/lib/",
+            "${prefix}/object/",
+            "${prefix}/operator/",
+            "${prefix}/proxy/",
+            "${prefix}/retrofit/",
+            "${prefix}/stream/")
 }
 
 project.gradle.taskGraph.whenReady {

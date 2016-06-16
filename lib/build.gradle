@@ -33,11 +33,12 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'operator', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
@@ -59,10 +60,11 @@ findbugs {
 javadoc {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/",
+    options.links("${prefix}/channel/",
+            "${prefix}/core/",
             "${prefix}/function/",
             "${prefix}/object/",
+            "${prefix}/operator/",
             "${prefix}/proxy/",
-            "${prefix}/channel/",
             "${prefix}/stream/")
 }

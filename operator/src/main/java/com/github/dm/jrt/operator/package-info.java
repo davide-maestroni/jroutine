@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-// GENERATED CODE - PLEASE DO NOT EDIT
-
-    @SuppressWarnings({"unchecked", "RedundantCast"})
-    public ${resultType} ${methodName}(${paramVars}) {
-        final com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-        return $$routine.${invokeMethod}()${inputOptions}${inputParams}.result();
-    }
+/**
+ * Classes implementing operators to be used to create routine instances.
+ * <p>
+ * Created by davide-maestroni on 06/16/2016.
+ */
+package com.github.dm.jrt.operator;

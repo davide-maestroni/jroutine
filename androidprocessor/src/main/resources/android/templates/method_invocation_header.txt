@@ -32,14 +32,12 @@
 
         private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
-
             mSharedFields = sharedFields;
             mContextTarget = target;
         }
 
         @Override
         public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
-
             super.onContext(context);
             final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
             mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);

@@ -67,9 +67,9 @@ dependencies {
 }
 
 conditionalDependencies {
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -83,5 +83,7 @@ findbugs {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/", "${prefix}/object/", "${prefix}/androidcore/")
+    options.links("${prefix}/androidcore/",
+            "${prefix}/core/",
+            "${prefix}/object/")
 }

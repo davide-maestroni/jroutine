@@ -50,20 +50,11 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     /**
      * Constructor.
+     *
+     * @see HashMap#HashMap()
      */
     public WeakIdentityHashMap() {
         mMap = new HashMap<IdentityWeakReference, V>();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param map the initial content.
-     * @see HashMap#HashMap(Map)
-     */
-    public WeakIdentityHashMap(@NotNull final Map<? extends K, ? extends V> map) {
-        mMap = new HashMap<IdentityWeakReference, V>(map.size());
-        putAll(map);
     }
 
     /**
@@ -85,6 +76,17 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
      */
     public WeakIdentityHashMap(final int initialCapacity, final float loadFactor) {
         mMap = new HashMap<IdentityWeakReference, V>(initialCapacity, loadFactor);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param map the initial content.
+     * @see HashMap#HashMap(Map)
+     */
+    public WeakIdentityHashMap(@NotNull final Map<? extends K, ? extends V> map) {
+        mMap = new HashMap<IdentityWeakReference, V>(map.size());
+        putAll(map);
     }
 
     @Override

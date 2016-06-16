@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
@@ -35,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import static com.github.dm.jrt.function.Functions.wrap;
 
@@ -46,48 +44,20 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 public class Operators {
 
-    // TODO: 16/06/16 LruHashMap??
-    private static final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> sCastToFactories =
-            new WeakIdentityHashMap<Class, InvocationFactory<?, ?>>();
-
-    private static final WeakHashMap<Object, InvocationFactory<?, ?>> sEqualToFactories =
-            new WeakHashMap<Object, InvocationFactory<?, ?>>();
-
-    private static final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> sInstanceOfFactories =
-            new WeakIdentityHashMap<Class, InvocationFactory<?, ?>>();
-
     private static final InvocationFactory<?, ?> sMax =
             BinaryOperatorInvocation.functionFactory(Functions.max());
-
-    private static final WeakHashMap<Comparator<?>, InvocationFactory<?, ?>> sMaxFactories =
-            new WeakHashMap<Comparator<?>, InvocationFactory<?, ?>>();
 
     private static final InvocationFactory<?, ?> sMin =
             BinaryOperatorInvocation.functionFactory(Functions.min());
 
-    private static final WeakHashMap<Comparator<?>, InvocationFactory<?, ?>> sMinFactories =
-            new WeakHashMap<Comparator<?>, InvocationFactory<?, ?>>();
-
     private static final InvocationFactory<?, ?> sNone =
             Functions.predicateFilter(Functions.negative());
-
-    private static final WeakHashMap<Object, InvocationFactory<?, ?>> sNotEqualToFactories =
-            new WeakHashMap<Object, InvocationFactory<?, ?>>();
-
-    private static final WeakIdentityHashMap<Class, InvocationFactory<?, ?>>
-            sNotInstanceOfFactories = new WeakIdentityHashMap<Class, InvocationFactory<?, ?>>();
 
     private static final InvocationFactory<?, ?> sNotNull =
             Functions.predicateFilter(Functions.isNotNull());
 
-    private static final WeakIdentityHashMap<Object, InvocationFactory<?, ?>> sNotSameAsFactories =
-            new WeakIdentityHashMap<Object, InvocationFactory<?, ?>>();
-
     private static final InvocationFactory<?, ?> sNull =
             Functions.predicateFilter(Functions.isNull());
-
-    private static final WeakIdentityHashMap<Object, InvocationFactory<?, ?>> sSameAsFactories =
-            new WeakIdentityHashMap<Object, InvocationFactory<?, ?>>();
 
     private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
             new MappingInvocation<Iterable<?>, Object>(null) {
@@ -137,6 +107,8 @@ public class Operators {
      * Returns a factory of invocations computing the average value of the input numbers.
      * <br>
      * The result will have the type matching the input with the highest precision.
+     *
+     * JRoutineCore.on(new Uppercase()).async().pass("test1").next()
      *
      * @param <N> the number type.
      * @return the invocation factory instance.
@@ -247,18 +219,9 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
-        final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> castToFactories =
-                sCastToFactories;
-        InvocationFactory<?, ?> factory = castToFactories.get(type);
-        if (factory == null) {
-            factory = Functions.functionMapping(Functions.castTo(type));
-            castToFactories.put(type, factory);
-        }
-
-        return (InvocationFactory<IN, OUT>) factory;
+        return Functions.functionMapping(Functions.castTo(type));
     }
 
     /**
@@ -359,20 +322,12 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isEqualTo(@Nullable final Object targetRef) {
         if (targetRef == null) {
             return isNull();
         }
 
-        final WeakHashMap<Object, InvocationFactory<?, ?>> equalToFactories = sEqualToFactories;
-        InvocationFactory<?, ?> factory = equalToFactories.get(targetRef);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isEqualTo(targetRef));
-            equalToFactories.put(targetRef, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isEqualTo(targetRef));
     }
 
     /**
@@ -384,17 +339,8 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isInstanceOf(@NotNull final Class<?> type) {
-        final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> instanceOfFactories =
-                sInstanceOfFactories;
-        InvocationFactory<?, ?> factory = instanceOfFactories.get(type);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isInstanceOf(type));
-            instanceOfFactories.put(type, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isInstanceOf(type));
     }
 
     /**
@@ -406,22 +352,13 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isNotEqualTo(
             @Nullable final Object targetRef) {
         if (targetRef == null) {
             return isNotNull();
         }
 
-        final WeakHashMap<Object, InvocationFactory<?, ?>> notEqualToFactories =
-                sNotEqualToFactories;
-        InvocationFactory<?, ?> factory = notEqualToFactories.get(targetRef);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
-            notEqualToFactories.put(targetRef, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
     }
 
     /**
@@ -433,18 +370,9 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isNotInstanceOf(
             @NotNull final Class<?> type) {
-        final WeakIdentityHashMap<Class, InvocationFactory<?, ?>> notInstanceOfFactories =
-                sNotInstanceOfFactories;
-        InvocationFactory<?, ?> factory = notInstanceOfFactories.get(type);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isInstanceOf(type).negate());
-            notInstanceOfFactories.put(type, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isInstanceOf(type).negate());
     }
 
     /**
@@ -468,22 +396,13 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isNotSameAs(
             @Nullable final Object targetRef) {
         if (targetRef == null) {
             return isNotNull();
         }
 
-        final WeakIdentityHashMap<Object, InvocationFactory<?, ?>> notSameAsFactories =
-                sNotSameAsFactories;
-        InvocationFactory<?, ?> factory = notSameAsFactories.get(targetRef);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
-            notSameAsFactories.put(targetRef, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
     }
 
     /**
@@ -507,21 +426,12 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> isSameAs(@Nullable final Object targetRef) {
         if (targetRef == null) {
             return isNull();
         }
 
-        final WeakIdentityHashMap<Object, InvocationFactory<?, ?>> sameAsFactories =
-                sSameAsFactories;
-        InvocationFactory<?, ?> factory = sameAsFactories.get(targetRef);
-        if (factory == null) {
-            factory = Functions.predicateFilter(Functions.isEqualTo(targetRef));
-            sameAsFactories.put(targetRef, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return Functions.predicateFilter(Functions.isEqualTo(targetRef));
     }
 
     /**
@@ -544,7 +454,6 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
-        // TODO: 16/06/16 cache?
         return new LimitInvocationFactory<DATA>(count);
     }
 
@@ -569,17 +478,9 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> maxBy(
             @NotNull final Comparator<? super DATA> comparator) {
-        final WeakHashMap<Comparator<?>, InvocationFactory<?, ?>> maxFactories = sMaxFactories;
-        InvocationFactory<?, ?> factory = maxFactories.get(comparator);
-        if (factory == null) {
-            factory = BinaryOperatorInvocation.functionFactory(Functions.maxBy(comparator));
-            maxFactories.put(comparator, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return BinaryOperatorInvocation.functionFactory(Functions.maxBy(comparator));
     }
 
     /**
@@ -603,17 +504,9 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> minBy(
             @NotNull final Comparator<? super DATA> comparator) {
-        final WeakHashMap<Comparator<?>, InvocationFactory<?, ?>> minFactories = sMinFactories;
-        InvocationFactory<?, ?> factory = minFactories.get(comparator);
-        if (factory == null) {
-            factory = BinaryOperatorInvocation.functionFactory(Functions.minBy(comparator));
-            minFactories.put(comparator, factory);
-        }
-
-        return (InvocationFactory<DATA, DATA>) factory;
+        return BinaryOperatorInvocation.functionFactory(Functions.minBy(comparator));
     }
 
     /**
@@ -675,7 +568,6 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
-        // TODO: 16/06/16 cache?
         return new SkipInvocationFactory<DATA>(count);
     }
 
@@ -700,7 +592,6 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> sortBy(
             @NotNull final Comparator<? super DATA> comparator) {
-        // TODO: 16/06/16 cache?
         return new SortByInvocationFactory<DATA>(comparator);
     }
 

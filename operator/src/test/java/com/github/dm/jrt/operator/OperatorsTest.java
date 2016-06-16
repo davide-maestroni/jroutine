@@ -397,8 +397,8 @@ public class OperatorsTest {
                                .asyncCall(1, 2.5)
                                .afterMax(seconds(3))
                                .all()).containsExactly(1, 2.5);
-        assertThat(Operators.castTo(String.class)).isSameAs(Operators.castTo(String.class));
-        assertThat(Operators.castTo(tokenOf(String.class))).isSameAs(
+        assertThat(Operators.castTo(String.class)).isEqualTo(Operators.castTo(String.class));
+        assertThat(Operators.castTo(tokenOf(String.class))).isEqualTo(
                 Operators.castTo(String.class));
         try {
             Operators.castTo((Class<?>) null);
@@ -430,8 +430,8 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.isEqualTo("test")).isSameAs(Operators.isEqualTo("test"));
-        assertThat(Operators.isEqualTo(null)).isSameAs(Operators.isEqualTo(null));
+        assertThat(Operators.isEqualTo("test")).isEqualTo(Operators.isEqualTo("test"));
+        assertThat(Operators.isEqualTo(null)).isEqualTo(Operators.isEqualTo(null));
     }
 
     @Test
@@ -553,7 +553,7 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.isInstanceOf(String.class)).isSameAs(
+        assertThat(Operators.isInstanceOf(String.class)).isEqualTo(
                 Operators.isInstanceOf(String.class));
         try {
             Operators.isInstanceOf(null);
@@ -617,7 +617,7 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.maxBy(Collections.reverseOrder())).isSameAs(
+        assertThat(Operators.maxBy(Collections.reverseOrder())).isEqualTo(
                 Operators.maxBy(Collections.reverseOrder()));
         try {
             Operators.maxBy(null);
@@ -644,7 +644,7 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.minBy(Collections.reverseOrder())).isSameAs(
+        assertThat(Operators.minBy(Collections.reverseOrder())).isEqualTo(
                 Operators.minBy(Collections.reverseOrder()));
         try {
             Operators.minBy(null);
@@ -718,8 +718,8 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.isNotEqualTo("test")).isSameAs(Operators.isNotEqualTo("test"));
-        assertThat(Operators.isNotEqualTo(null)).isSameAs(Operators.isNotEqualTo(null));
+        assertThat(Operators.isNotEqualTo("test")).isEqualTo(Operators.isNotEqualTo("test"));
+        assertThat(Operators.isNotEqualTo(null)).isEqualTo(Operators.isNotEqualTo(null));
     }
 
     @Test
@@ -733,7 +733,7 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.isNotInstanceOf(String.class)).isSameAs(
+        assertThat(Operators.isNotInstanceOf(String.class)).isEqualTo(
                 Operators.isNotInstanceOf(String.class));
         try {
             Operators.isNotInstanceOf(null);
@@ -752,8 +752,8 @@ public class OperatorsTest {
                                .all()).containsExactly("test", "test1");
         assertThat(JRoutineCore.on(Operators.isNotSameAs(0)).asyncCall().afterMax(seconds(3)).all())
                 .isEmpty();
-        assertThat(Operators.isNotSameAs(ref)).isNotSameAs(Operators.isSameAs(ref));
-        assertThat(Operators.isNotSameAs(null)).isNotSameAs(Operators.isSameAs(null));
+        assertThat(Operators.isNotSameAs(ref)).isNotSameAs(Operators.isEqualTo(ref));
+        assertThat(Operators.isNotSameAs(null)).isNotSameAs(Operators.isEqualTo(null));
     }
 
     @Test
@@ -779,8 +779,8 @@ public class OperatorsTest {
                                .asyncCall()
                                .afterMax(seconds(3))
                                .all()).isEmpty();
-        assertThat(Operators.isSameAs(ref)).isSameAs(Operators.isSameAs(ref));
-        assertThat(Operators.isSameAs(null)).isSameAs(Operators.isSameAs(null));
+        assertThat(Operators.isSameAs(ref)).isEqualTo(Operators.isSameAs(ref));
+        assertThat(Operators.isSameAs(null)).isEqualTo(Operators.isSameAs(null));
     }
 
     @Test

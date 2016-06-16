@@ -19,7 +19,6 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,12 +37,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
         implements BiFunction<IN1, IN2, OUT>, Wrapper {
-
-    private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
-            mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
-
-    private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
-            mMinFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
 
     private static final BiFunctionWrapper<Object, Object, Object> sFirst =
             new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
@@ -154,19 +147,8 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
             @NotNull final Comparator<? super IN> comparator) {
-        ConstantConditions.notNull("comparator", comparator);
-        synchronized (mMaxFunctions) {
-            final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
-                    mMaxFunctions;
-            @SuppressWarnings("unchecked") BiFunctionWrapper<IN, IN, IN> function =
-                    (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
-            if (function == null) {
-                function = new BiFunctionWrapper<IN, IN, IN>(new MaxByFunction<IN>(comparator));
-                functions.put(comparator, function);
-            }
-
-            return function;
-        }
+        return new BiFunctionWrapper<IN, IN, IN>(
+                new MaxByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
     }
 
     /**
@@ -196,19 +178,8 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
             @NotNull final Comparator<? super IN> comparator) {
-        ConstantConditions.notNull("comparator", comparator);
-        synchronized (mMinFunctions) {
-            final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
-                    mMinFunctions;
-            @SuppressWarnings("unchecked") BiFunctionWrapper<IN, IN, IN> function =
-                    (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
-            if (function == null) {
-                function = new BiFunctionWrapper<IN, IN, IN>(new MinByFunction<IN>(comparator));
-                functions.put(comparator, function);
-            }
-
-            return function;
-        }
+        return new BiFunctionWrapper<IN, IN, IN>(
+                new MinByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
     }
 
     /**

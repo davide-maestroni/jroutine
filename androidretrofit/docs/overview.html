@@ -76,7 +76,7 @@
                        .map(Streams.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .start();
+                       .bind();
             }
 
             public interface GitHubService {
@@ -150,7 +150,7 @@
                        .map(Streams.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .start();
+                       .bind();
             }
 
             public interface GitHubService {
@@ -224,7 +224,7 @@
                        .map(Streams.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .start();
+                       .bind();
             }
 
             public interface GitHubService {

@@ -544,6 +544,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
+        // TODO: 16/06/16 cache?
         return new LimitInvocationFactory<DATA>(count);
     }
 
@@ -674,6 +675,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
+        // TODO: 16/06/16 cache?
         return new SkipInvocationFactory<DATA>(count);
     }
 
@@ -698,6 +700,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> sortBy(
             @NotNull final Comparator<? super DATA> comparator) {
+        // TODO: 16/06/16 cache?
         return new SortByInvocationFactory<DATA>(comparator);
     }
 

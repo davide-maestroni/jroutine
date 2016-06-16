@@ -369,6 +369,39 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> bind() {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bind();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> bindAfter(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> bindAfter(@NotNull final UnitDuration delay,
+            @NotNull final OutputConsumer<OUT> consumer) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay, consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> bindAfter(final long delay,
+            @NotNull final TimeUnit timeUnit) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> bindAfter(final long delay,
+            @NotNull final TimeUnit timeUnit, @NotNull final OutputConsumer<OUT> consumer) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay, timeUnit, consumer);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> accumulateConsumer) {
         checkStatic(wrap(accumulateConsumer), accumulateConsumer);
@@ -726,25 +759,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> skip(final int count) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.skip(count);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> start() {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.start();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> startAfter(@NotNull final UnitDuration delay) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.startAfter(delay);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> startAfter(final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.startAfter(delay, timeUnit);
     }
 
     @NotNull

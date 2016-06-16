@@ -1374,7 +1374,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                            .loaderId(11)
                            .async()
                            .map(toUpperCase())
-                           .start();
+                           .bind();
         assertThat(JRoutineLoaderCompat.with(context)
                                        .onId(11)
                                        .buildChannel()
@@ -1387,7 +1387,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                            .apply()
                            .async()
                            .map(toUpperCase())
-                           .start();
+                           .bind();
         assertThat(JRoutineLoaderCompat.with(context)
                                        .onId(21)
                                        .buildChannel()
@@ -1400,7 +1400,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                            .apply()
                            .async()
                            .map(toUpperCase())
-                           .start();
+                           .bind();
         assertThat(JRoutineLoaderCompat.with(context)
                                        .onId(31)
                                        .buildChannel()

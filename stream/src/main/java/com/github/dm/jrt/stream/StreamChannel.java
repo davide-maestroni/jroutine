@@ -446,6 +446,61 @@ public interface StreamChannel<IN, OUT>
             @Nullable UnitDuration delay);
 
     /**
+     * Initiates the flow of this stream.
+     *
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> bind();
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param delay the delay.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay);
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param consumer the consumer instance.
+     * @param delay    the delay.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay,
+            @NotNull OutputConsumer<OUT> consumer);
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * Initiates the flow of this stream after the specified delay.
+     *
+     * @param consumer the consumer instance.
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
+     * @return this stream instance.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit,
+            @NotNull OutputConsumer<OUT> consumer);
+
+    /**
      * Concatenates a stream accumulating data through the specified consumer.
      * <br>
      * The output will be computed as follows:
@@ -1281,37 +1336,6 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> skip(int count);
-
-    /**
-     * Initiates the flow of this stream.
-     *
-     * @return this stream instance.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> start();
-    // TODO: 15/06/16 bind, bindAfter(delay, OutputConsumer)?
-
-    /**
-     * Initiates the flow of this stream after the specified delay.
-     *
-     * @param delay the delay.
-     * @return this stream instance.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> startAfter(@NotNull UnitDuration delay);
-
-    /**
-     * Initiates the flow of this stream after the specified delay.
-     *
-     * @param delay    the delay value.
-     * @param timeUnit the delay time unit.
-     * @return this stream instance.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> startAfter(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

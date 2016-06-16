@@ -28,6 +28,7 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -254,6 +255,62 @@ public class StreamChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testBind() throws InterruptedException {
+
+        final Semaphore semaphore = new Semaphore(0);
+        Streams.streamOf("test").bind(new TemplateOutputConsumer<String>() {
+
+            @Override
+            public void onOutput(final String s) throws Exception {
+                semaphore.release();
+            }
+        });
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).bind();
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test")
+               .bindAfter(10, TimeUnit.MILLISECONDS, new TemplateOutputConsumer<String>() {
+
+                   @Override
+                   public void onOutput(final String s) throws Exception {
+                       semaphore.release();
+                   }
+               });
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).bindAfter(10, TimeUnit.MILLISECONDS);
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test")
+               .bindAfter(millis(10), new TemplateOutputConsumer<String>() {
+
+                   @Override
+                   public void onOutput(final String s) throws Exception {
+                       semaphore.release();
+                   }
+               });
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
+        Streams.streamOf("test").onOutput(new Consumer<String>() {
+
+            public void accept(final String s) throws Exception {
+
+                semaphore.release();
+            }
+        }).bindAfter(millis(10));
+        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
     }
 
     @Test
@@ -2378,36 +2435,6 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testStart() throws InterruptedException {
-
-        final Semaphore semaphore = new Semaphore(0);
-        Streams.streamOf("test").onOutput(new Consumer<String>() {
-
-            public void accept(final String s) throws Exception {
-
-                semaphore.release();
-            }
-        }).start();
-        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
-        Streams.streamOf("test").onOutput(new Consumer<String>() {
-
-            public void accept(final String s) throws Exception {
-
-                semaphore.release();
-            }
-        }).startAfter(10, TimeUnit.MILLISECONDS);
-        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
-        Streams.streamOf("test").onOutput(new Consumer<String>() {
-
-            public void accept(final String s) throws Exception {
-
-                semaphore.release();
-            }
-        }).startAfter(millis(10));
-        assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
-    }
-
-    @Test
     public void testThen() {
 
         assertThat(Streams.streamOf("test1").sync().thenGet(new Supplier<String>() {
@@ -2946,7 +2973,7 @@ public class StreamChannelTest {
                                    }
                                });
         try {
-            stream.start();
+            stream.bind();
             fail();
 
         } catch (final StreamException e) {

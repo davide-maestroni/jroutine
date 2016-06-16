@@ -23,14 +23,10 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.core.ServiceContext;
-import com.github.dm.jrt.android.core.StreamContextInvocation;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
-import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
@@ -44,7 +40,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -56,9 +51,7 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -77,9 +70,6 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
-import static com.github.dm.jrt.function.Functions.castTo;
-import static com.github.dm.jrt.operator.Operators.averageFloat;
-import static com.github.dm.jrt.operator.Operators.averageInteger;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -172,93 +162,6 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 });
             }
         };
-    }
-
-    public void test() {
-
-        final Double res = JRoutineService.with(ServiceContext.serviceFrom(getActivity()))
-                                          .on(TargetInvocationFactory.factoryOf(SInvocation.class))
-                                          .asyncCall("1", "2", "3", "4")
-                                          .afterMax(seconds(10))
-                                          .next();
-        assertThat(res);
-    }
-
-    private static class SInvocation extends StreamContextInvocation<String, Double> {
-
-        @NotNull
-        @Override
-        protected OutputChannel<Double> onChannel(@NotNull final OutputChannel<String> channel) {
-
-            return Streams.streamOf(channel)
-                          .parallel()
-                          .map(new Function<String, Integer>() {
-
-                              @Override
-                              public Integer apply(final String s) throws Exception {
-
-                                  return Integer.parseInt(s);
-                              }
-                          })
-                          .map(new Function<Integer, Integer>() {
-
-                              @Override
-                              public Integer apply(final Integer integer) throws Exception {
-
-                                  final int i = integer;
-                                  return i * i;
-                              }
-                          })
-                          .sequential()
-                          .map(averageFloat())
-                          .map(new Function<Float, Double>() {
-
-                              @Override
-                              public Double apply(final Float aFloat) throws Exception {
-
-                                  return Math.sqrt(aFloat);
-                              }
-                          });
-        }
-    }
-
-    private static class MyInvocation extends CallInvocation<String, Double> {
-
-        @Override
-        protected void onCall(@NotNull final List<? extends String> inputs,
-                @NotNull final ResultChannel<Double> result) {
-
-            Streams.streamOf(inputs)
-                   .parallel()
-                   .map(new Function<String, Integer>() {
-
-                       @Override
-                       public Integer apply(final String s) throws Exception {
-
-                           return Integer.parseInt(s);
-                       }
-                   })
-                   .map(new Function<Integer, Integer>() {
-
-                       @Override
-                       public Integer apply(final Integer integer) throws Exception {
-
-                           final int i = integer;
-                           return i * i;
-                       }
-                   })
-                   .sequential()
-                   .map(averageFloat())
-                   .map(new Function<Float, Double>() {
-
-                       @Override
-                       public Double apply(final Float aFloat) throws Exception {
-
-                           return Math.sqrt(aFloat);
-                       }
-                   })
-                   .bind(result);
-        }
     }
 
     public void testBlend() {
@@ -1568,7 +1471,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .loaderId(11)
                      .async()
                      .map(toUpperCase())
-                     .start();
+                     .bind();
         assertThat(JRoutineLoader.with(context)
                                  .onId(11)
                                  .buildChannel()
@@ -1581,7 +1484,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .apply()
                      .async()
                      .map(toUpperCase())
-                     .start();
+                     .bind();
         assertThat(JRoutineLoader.with(context)
                                  .onId(21)
                                  .buildChannel()
@@ -1594,7 +1497,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .apply()
                      .async()
                      .map(toUpperCase())
-                     .start();
+                     .bind();
         assertThat(JRoutineLoader.with(context)
                                  .onId(31)
                                  .buildChannel()

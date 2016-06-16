@@ -321,6 +321,48 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> bind();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay,
+            @NotNull OutputConsumer<OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit,
+            @NotNull OutputConsumer<OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     @StreamFlow(COLLECT)
     LoaderStreamChannel<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
@@ -724,30 +766,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> skip(int count);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> start();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> startAfter(@NotNull UnitDuration delay);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> startAfter(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}

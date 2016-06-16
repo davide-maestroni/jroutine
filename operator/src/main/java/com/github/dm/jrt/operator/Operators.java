@@ -108,8 +108,6 @@ public class Operators {
      * <br>
      * The result will have the type matching the input with the highest precision.
      *
-     * JRoutineCore.on(new Uppercase()).async().pass("test1").next()
-     *
      * @param <N> the number type.
      * @return the invocation factory instance.
      */

@@ -26,8 +26,6 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -314,8 +312,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onInitialize() {
-            mChannel = mRoutine.syncInvoke();
+        public void onRecycle() {
+            mChannel = mRoutine.sync();
         }
 
         @Override
@@ -387,8 +385,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onInitialize() {
-            mChannel = mRoutine.syncInvoke();
+        public void onRecycle() {
+            mChannel = mRoutine.sync();
         }
 
         @Override

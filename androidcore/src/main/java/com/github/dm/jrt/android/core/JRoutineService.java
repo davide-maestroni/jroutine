@@ -59,7 +59,7 @@ import java.util.WeakHashMap;
  *                     JRoutineService.with(serviceFrom(this))
  *                                    .on(factoryOf(LoadResourceUri.class))
  *                                    .buildRoutine();
- *             routine.asyncCall(RESOURCE_URI)
+ *             routine.async(RESOURCE_URI)
  *                    .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
  *                        &#64;Override

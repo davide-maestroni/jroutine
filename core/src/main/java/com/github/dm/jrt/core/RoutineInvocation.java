@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -68,18 +68,19 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
-    public void onDestroy() {
-        mRoutine.purge();
+    public void onDiscard() {
+        super.onDiscard();
+        mRoutine.clear();
     }
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> onChannel(@NotNull final OutputChannel<IN> channel) {
+    protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
         final InvocationMode invocationMode = mInvocationMode;
-        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
-                                : mRoutine.serialCall(channel);
+        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.async(channel)
+                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallel(channel)
+                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.sync(channel)
+                                : mRoutine.serial(channel);
     }
 
     /**

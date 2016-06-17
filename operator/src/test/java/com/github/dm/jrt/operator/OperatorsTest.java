@@ -977,7 +977,7 @@ public class OperatorsTest {
     public void testUnfold() {
         assertThat(JRoutineCore.on(Operators.<Number>groupBy(3))
                                .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                               .bind(JRoutineCore.on(Operators.<Number>unfold()).parallelInvoke())
+                               .bind(JRoutineCore.on(Operators.<Number>unfold()).parallel())
                                .result()
                                .afterMax(seconds(3))
                                .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

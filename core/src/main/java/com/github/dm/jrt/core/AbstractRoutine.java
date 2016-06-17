@@ -16,14 +16,14 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
 import com.github.dm.jrt.core.runner.Execution;
@@ -130,39 +130,41 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> asyncInvoke() {
+    public Channel<IN, OUT> async() {
+        mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
         return invoke(InvocationType.ASYNC);
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> parallelInvoke() {
-        mLogger.dbg("invoking routine: parallel");
-        return getElementRoutine().asyncInvoke();
+    public Channel<IN, OUT> parallel() {
+        mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
+        return getElementRoutine().async();
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> serialInvoke() {
-        mLogger.dbg("invoking routine: serial");
-        return getElementRoutine().syncInvoke();
+    public Channel<IN, OUT> serial() {
+        mLogger.dbg("invoking routine: %s", InvocationMode.SERIAL);
+        return getElementRoutine().sync();
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> syncInvoke() {
+    public Channel<IN, OUT> sync() {
+        mLogger.dbg("invoking routine: %s", InvocationMode.SYNC);
         return invoke(InvocationType.SYNC);
     }
 
     @Override
-    public void purge() {
+    public void clear() {
         synchronized (mMutex) {
             final Logger logger = mLogger;
             final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
             for (final Invocation<IN, OUT> invocation : syncInvocations) {
                 try {
-                    invocation.onDestroy();
+                    invocation.onDiscard();
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(t, "ignoring exception while discarding invocation instance");
                 }
             }
 
@@ -170,11 +172,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {
                 try {
-                    invocation.onDestroy();
+                    invocation.onDiscard();
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(t, "ignoring exception while discarding invocation instance");
                 }
             }
 
@@ -185,7 +187,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     /**
      * Converts an invocation instance to the specified type.
      * <br>
-     * It's responsibility of the implementing class to call {@link Invocation#onDestroy()} on the
+     * It is responsibility of the implementing class to call {@link Invocation#onDiscard()} on the
      * passed invocation, in case it gets discarded during the conversion.
      *
      * @param invocation the invocation to convert.
@@ -281,12 +283,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     @NotNull
-    private InvocationChannel<IN, OUT> invoke(@NotNull final InvocationType type) {
+    private Channel<IN, OUT> invoke(@NotNull final InvocationType type) {
         final Logger logger = mLogger;
         logger.dbg("invoking routine: %s", type);
         final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
-        return new DefaultInvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(type),
-                runner, logger);
+        return new InvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(type), runner,
+                logger);
     }
 
     /**
@@ -320,21 +322,21 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         @Override
-        public void onInitialize() {
-            mHasInputs = false;
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-            mHasInputs = true;
-            result.pass(mRoutine.asyncCall(input));
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.asyncCall());
+                result.pass(mRoutine.async().close());
             }
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+            mHasInputs = true;
+            result.pass(mRoutine.async(input));
+        }
+
+        @Override
+        public void onRecycle() {
+            mHasInputs = false;
         }
     }
 
@@ -360,21 +362,21 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         @Override
-        public void onInitialize() {
-            mHasInputs = false;
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-            mHasInputs = true;
-            result.pass(mRoutine.syncCall(input));
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.syncCall());
+                result.pass(mRoutine.sync().close());
             }
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+            mHasInputs = true;
+            result.pass(mRoutine.sync(input));
+        }
+
+        @Override
+        public void onRecycle() {
+            mHasInputs = false;
         }
     }
 
@@ -443,11 +445,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 final Logger logger = mLogger;
                 logger.wrn("discarding invocation instance after error: %s", invocation);
                 try {
-                    invocation.onDestroy();
+                    invocation.onDiscard();
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while destroying invocation instance");
+                    logger.wrn(t, "ignoring exception while discarding invocation instance");
                 }
 
                 hasDelayed = !mObservers.isEmpty();
@@ -475,7 +477,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                     logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
                             coreInvocations, coreInvocations, invocation);
                     try {
-                        invocation.onDestroy();
+                        invocation.onDiscard();
 
                     } catch (final Throwable t) {
                         InvocationInterruptedException.throwIfInterrupt(t);

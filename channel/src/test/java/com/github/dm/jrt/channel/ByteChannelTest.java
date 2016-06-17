@@ -20,7 +20,6 @@ import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.junit.Test;
 

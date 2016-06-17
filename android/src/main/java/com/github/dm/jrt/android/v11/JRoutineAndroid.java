@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.LoaderStreams;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the channel builder instance.
      */
     @NotNull
-    public static IOChannelBuilder io() {
+    public static ChannelBuilder io() {
         return JRoutine.io();
     }
 

@@ -16,9 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -35,9 +33,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private IOChannel<IN> mInputChannel;
+    private Channel<IN, IN> mInputChannel;
 
-    private OutputChannel<OUT> mOutputChannel;
+    private Channel<?, OUT> mOutputChannel;
 
     /**
      * Constructor.
@@ -53,27 +51,25 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     }
 
     @Override
-    public final void onInitialize() throws Exception {
-        final IOChannel<IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
-        mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
-    }
-
-    @Override
-    public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-        bind(result);
-        mInputChannel.pass(input);
-    }
-
-    @Override
-    public final void onResult(@NotNull final ResultChannel<OUT> result) {
+    public final void onComplete(@NotNull final Channel<OUT, ?> result) {
         bind(result);
         mInputChannel.close();
     }
 
     @Override
-    public final void onTerminate() {
-        mOutputChannel = null;
-        mInputChannel = null;
+    public void onDiscard() {
+    }
+
+    @Override
+    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+        bind(result);
+        mInputChannel.pass(input);
+    }
+
+    @Override
+    public final void onRecycle() throws Exception {
+        final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
+        mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
     }
 
     /**
@@ -84,11 +80,10 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract OutputChannel<OUT> onChannel(@NotNull OutputChannel<IN> channel) throws
-            Exception;
+    protected abstract Channel<?, OUT> onChannel(@NotNull Channel<?, IN> channel) throws Exception;
 
-    private void bind(@NotNull final ResultChannel<OUT> result) {
-        final OutputChannel<OUT> outputChannel = mOutputChannel;
+    private void bind(@NotNull final Channel<OUT, ?> result) {
+        final Channel<?, OUT> outputChannel = mOutputChannel;
         if (!outputChannel.isBound()) {
             outputChannel.bind(result);
         }

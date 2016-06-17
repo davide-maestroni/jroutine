@@ -35,13 +35,12 @@ public class ConverterRoutineTest {
 
     @Test
     public void testConversion() {
-
         final TestRoutine routine = new TestRoutine();
-        routine.asyncCall();
+        routine.async().close();
         assertThat(AsyncInvocation.sCount).isEqualTo(1);
         assertThat(SyncInvocation.sCount).isEqualTo(0);
-        routine.syncCall();
-        assertThat(AsyncInvocation.sCount).isEqualTo(0);
+        routine.sync().close();
+        assertThat(AsyncInvocation.sCount).isEqualTo(1);
         assertThat(SyncInvocation.sCount).isEqualTo(1);
     }
 
@@ -50,15 +49,7 @@ public class ConverterRoutineTest {
         private static int sCount;
 
         private AsyncInvocation() {
-
             ++sCount;
-        }
-
-        @Override
-        public void onDestroy() throws Exception {
-
-            --sCount;
-            throw new IllegalStateException();
         }
     }
 
@@ -67,14 +58,7 @@ public class ConverterRoutineTest {
         private static int sCount;
 
         private SyncInvocation() {
-
             ++sCount;
-        }
-
-        @Override
-        public void onDestroy() throws Exception {
-
-            --sCount;
         }
     }
 
@@ -84,7 +68,6 @@ public class ConverterRoutineTest {
          * Constructor.
          */
         protected TestRoutine() {
-
             super(InvocationConfiguration.builder()
                                          .withMaxInstances(1)
                                          .withRunner(Runners.syncRunner())
@@ -95,7 +78,6 @@ public class ConverterRoutineTest {
         @Override
         protected Invocation<Object, Object> newInvocation(
                 @NotNull final InvocationType type) throws Exception {
-
             if (type == InvocationType.SYNC) {
                 return new SyncInvocation();
             }

@@ -26,13 +26,10 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.routine.Routine;
 
@@ -497,7 +494,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
@@ -511,7 +508,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .invocationConfiguration()
                               .withInputOrder(OrderType.BY_CALL)
                               .apply()
-                              .asyncCall(channel);
+                              .async(channel);
         final SparseArray<OutputChannel<Object>> channelMap =
                 SparseChannels.selectParcelable(output, Sort.INTEGER, Sort.STRING).buildChannels();
 
@@ -539,7 +536,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
@@ -563,7 +560,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             return;
         }
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();

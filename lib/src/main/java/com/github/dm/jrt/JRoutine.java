@@ -17,9 +17,8 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -71,7 +70,7 @@ public class JRoutine extends Streams {
      * @return the channel builder instance.
      */
     @NotNull
-    public static IOChannelBuilder io() {
+    public static ChannelBuilder io() {
         return JRoutineCore.io();
     }
 

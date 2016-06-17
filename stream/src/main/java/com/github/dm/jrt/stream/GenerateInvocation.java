@@ -52,10 +52,10 @@ abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
     public final void onAbort(@NotNull final RoutineException reason) {
     }
 
-    public final void onDestroy() {
+    public final void onDiscard() {
     }
 
-    public final void onInitialize() {
+    public final void onRecycle() {
     }
 
     public final void onTerminate() {

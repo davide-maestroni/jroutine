@@ -116,7 +116,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     @Override
     protected void onReset() {
         try {
-            mInvocation.onDestroy();
+            mInvocation.onDiscard();
 
         } catch (final Throwable t) {
             InvocationInterruptedException.throwIfInterrupt(t);
@@ -141,7 +141,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                     .withLog(logger.getLog())
                     .withLogLevel(logger.getLogLevel())
                     .apply()
-                    .syncCall(mInputs)
+                    .sync(mInputs)
                     .bind(consumer);
         return consumer.createResult();
     }

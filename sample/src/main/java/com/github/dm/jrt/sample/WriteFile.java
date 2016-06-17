@@ -18,7 +18,6 @@ package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
@@ -58,7 +57,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onInitialize() throws FileNotFoundException {
+    public void onRecycle() throws FileNotFoundException {
         mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 

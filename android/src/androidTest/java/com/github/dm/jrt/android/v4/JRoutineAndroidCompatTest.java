@@ -36,7 +36,6 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
@@ -199,7 +198,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                         return new PassString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+        assertThat(routine.async("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
     }
 
     private static void testSupplierFactory(final FragmentActivity activity) {
@@ -212,7 +211,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                         return new PassString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+        assertThat(routine.async("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
     }
 
     public void testCallFunction() {
@@ -264,17 +263,17 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         final ClassToken<Join<String>> token = new ClassToken<Join<String>>() {};
         assertThat(JRoutineAndroidCompat.with(loaderFrom(getActivity()))
                                         .on(factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(getActivity())
                                         .on(factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(getActivity(), getActivity())
                                         .on(factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
@@ -282,12 +281,12 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                                                           R.id.test_fragment);
         assertThat(JRoutineAndroidCompat.with(fragment)
                                         .on(factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(fragment, getActivity())
                                         .on(factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
     }
@@ -472,23 +471,23 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(TargetInvocationFactory.factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with((Context) getActivity())
                                         .on(TargetInvocationFactory.factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(getActivity(), InvocationService.class)
                                         .on(TargetInvocationFactory.factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(getActivity(),
                 new Intent(getActivity(), InvocationService.class))
                                         .on(TargetInvocationFactory.factoryOf(token))
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
     }
@@ -543,32 +542,32 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(token)
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(token, 2)
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test", "test");
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(PassString.class)
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(PassString.class, 3)
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test", "test", "test");
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(new Pass<String>())
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(serviceFrom(getActivity()))
                                         .on(new Pass<String>(), 2)
-                                        .asyncCall("test")
+                                        .async("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test", "test");
     }

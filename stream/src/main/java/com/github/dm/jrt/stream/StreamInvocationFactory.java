@@ -17,8 +17,6 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -90,10 +88,10 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
             mInputChannel.abort(reason);
         }
 
-        public void onDestroy() {
+        public void onDiscard() {
         }
 
-        public void onInitialize() throws Exception {
+        public void onRecycle() throws Exception {
             final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             mOutputChannel = mFunction.apply(Streams.streamOf(ioChannel));
             mInputChannel = ioChannel;

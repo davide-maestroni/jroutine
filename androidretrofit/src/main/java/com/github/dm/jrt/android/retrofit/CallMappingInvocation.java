@@ -20,8 +20,6 @@ import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
 import org.jetbrains.annotations.NotNull;

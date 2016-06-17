@@ -23,11 +23,8 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
-import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -2876,7 +2873,7 @@ public class StreamChannelTest {
                                                               final OutputChannel<String> channel) {
 
                                                           return JRoutineCore.on(new UpperCase())
-                                                                             .asyncCall(channel);
+                                                                             .async(channel);
                                                       }
                                                   });
                                       }
@@ -2902,7 +2899,7 @@ public class StreamChannelTest {
                                                               final OutputChannel<String> channel) {
 
                                                           return JRoutineCore.on(new UpperCase())
-                                                                             .asyncCall(channel);
+                                                                             .async(channel);
                                                       }
                                                   });
                                       }

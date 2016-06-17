@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -372,7 +371,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                                             .with(mConfiguration)
                                                             .apply()
                                                             .buildChannel();
-            mRoutine.asyncCall(channel).bind(new ConverterOutputConsumer(mConverter, ioChannel));
+            mRoutine.async(channel).bind(new ConverterOutputConsumer(mConverter, ioChannel));
             return ioChannel;
         }
     }
@@ -413,7 +412,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
                                .apply()
-                               .asyncCall(call);
+                               .async(call);
         }
 
         @Override
@@ -423,7 +422,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                                             .with(mChannelConfiguration)
                                                             .apply()
                                                             .buildChannel();
-            getRoutine().asyncCall(invokeCall(call))
+            getRoutine().async(invokeCall(call))
                         .bind(new ConverterOutputConsumer(mConverter, ioChannel));
             return ioChannel;
         }

@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

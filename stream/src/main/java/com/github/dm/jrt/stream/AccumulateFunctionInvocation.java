@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -95,7 +94,7 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     }
 
     @Override
-    public void onInitialize() {
+    public void onRecycle() {
         mIsFirst = true;
     }
 

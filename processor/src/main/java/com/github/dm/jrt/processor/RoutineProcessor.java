@@ -17,7 +17,6 @@
 package com.github.dm.jrt.processor;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -1890,9 +1889,9 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
         method = method.replace("${invokeMethod}",
-                (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
-                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelInvoke"
-                                : (invocationMode == InvocationMode.SERIAL) ? "serialInvoke"
+                (invocationMode == InvocationMode.SYNC) ? "sync"
+                        : (invocationMode == InvocationMode.PARALLEL) ? "parallel"
+                                : (invocationMode == InvocationMode.SERIAL) ? "serial"
                                         : "asyncInvoke");
         writer.append(method);
         String methodInvocationHeader;

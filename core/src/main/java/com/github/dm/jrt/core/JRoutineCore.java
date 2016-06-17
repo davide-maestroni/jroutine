@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
  * scope of a function call. Objects are instantiated when needed and recycled for successive
  * invocations.
  * <p>
- * This class provides also a way to build I/O channel instances, which can be used to pass data
- * without the need to start a routine invocation.
+ * This class provides also a way to build channel instances, which can be used to pass data without
+ * the need to start a routine invocation.
  * <p>
  * <b>Some usage examples</b>
  * <p>
@@ -53,11 +53,11 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
- *         channel.pass(routine1.asyncCall())
- *                .pass(routine2.asyncCall())
+ *         final Channel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
+ *         channel.pass(routine1.async().close())
+ *                .pass(routine2.async().close())
  *                .close();
- *                .afterMax(seconds(20))
+ *                .after(seconds(20))
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -65,10 +65,10 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final OutputChannel&lt;Result&gt; output1 = routine1.asyncCall();
- *         final OutputChannel&lt;Result&gt; output2 = routine2.asyncCall();
- *         output1.afterMax(seconds(20)).allInto(results);
- *         output2.afterMax(seconds(20)).allInto(results);
+ *         final Channel&lt;Void, Result&gt; output1 = routine1.async().close();
+ *         final Channel&lt;Void, Result&gt; output2 = routine2.async().close();
+ *         output1.after(seconds(20)).allInto(results);
+ *         output2.after(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
@@ -78,14 +78,14 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine2.asyncCall(routine1.asyncCall()).afterMax(seconds(20).all();
+ *         routine2.async(routine1.async().close()).after(seconds(20).all();
  *     </code>
  * </pre>
  * Or, in an equivalent way:
  * <pre>
  *     <code>
  *
- *         routine1.asyncCall().bind(routine2.asyncInvoke()).result().afterMax(seconds(20).all();
+ *         routine1.async().close().bind(routine2.async()).close().after(seconds(20).all();
  *     </code>
  * </pre>
  * <p>
@@ -93,22 +93,20 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
+ *         final Routine&lt;Result, Result&gt; routine =
+ *                  JRoutineCore.on(IdentityInvocation.&lt;Result&gt;factoryOf())
+ *                              .buildRoutine();
+ *         final Channel&lt;Result, Result&gt; channel = routine.async();
  *
  *         new Thread() {
  *
  *             &#64;Override
  *             public void run() {
- *
  *                 channel.pass(new Result()).close();
  *             }
- *
  *         }.start();
  *
- *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutineCore.on(IdentityInvocation.&lt;Result&gt;factoryOf())
- *                              .buildRoutine();
- *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
+ *         channel.after(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p>
@@ -126,13 +124,13 @@ public class JRoutineCore {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns a channel builder.
      *
      * @return the channel builder instance.
      */
     @NotNull
-    public static IOChannelBuilder io() {
-        return new DefaultIOChannelBuilder();
+    public static ChannelBuilder io() {
+        return new DefaultChannelBuilder();
     }
 
     /**

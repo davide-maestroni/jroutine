@@ -16,31 +16,31 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a builder of I/O channel objects.
+ * Interface defining a builder of channel objects.
  * <p>
  * Note that the passed inputs might be delivered through the configured runner.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBuilder> {
+public interface ChannelBuilder extends ChannelConfigurableBuilder<ChannelBuilder> {
 
     /**
-     * Builds and returns the I/O channel instance.
+     * Builds and returns a channel instance.
      *
      * @param <DATA> the data type.
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA> buildChannel();
+    <DATA> Channel<DATA, DATA> buildChannel();
 
     /**
-     * Builds and returns an I/O channel returning no data.
+     * Builds and returns a channel returning no data.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -48,10 +48,10 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA> of();
+    <DATA> Channel<DATA, DATA> of();
 
     /**
-     * Builds and returns an I/O channel returning the specified input.
+     * Builds and returns a channel returning the specified input.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -60,10 +60,10 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA> of(@Nullable DATA input);
+    <DATA> Channel<DATA, DATA> of(@Nullable DATA input);
 
     /**
-     * Builds and returns an I/O channel returning the specified inputs.
+     * Builds and returns a channel returning the specified inputs.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -72,10 +72,10 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA> of(@Nullable DATA... inputs);
+    <DATA> Channel<DATA, DATA> of(@Nullable DATA... inputs);
 
     /**
-     * Builds and returns an I/O channel returning the specified inputs.
+     * Builds and returns a channel returning the specified inputs.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -84,5 +84,5 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA> of(@Nullable Iterable<DATA> inputs);
+    <DATA> Channel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
 }

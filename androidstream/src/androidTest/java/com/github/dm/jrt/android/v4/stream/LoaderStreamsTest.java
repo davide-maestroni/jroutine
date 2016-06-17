@@ -31,13 +31,10 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -194,7 +191,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testBlendAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<Object, Object> factory =
                 IdentityContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
@@ -208,7 +205,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(LoaderStreamsCompat.blend(channel1, channel2).buildChannels())
+            routine.async(LoaderStreamsCompat.blend(channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
 
@@ -225,7 +222,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     LoaderStreamsCompat.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                        .buildChannels()).afterMax(seconds(10)).all();
 
@@ -426,7 +423,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testConcatAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<Object, Object> factory =
                 IdentityContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
@@ -440,7 +437,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(LoaderStreamsCompat.concat(channel1, channel2).buildChannels())
+            routine.async(LoaderStreamsCompat.concat(channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
 
@@ -457,7 +454,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     LoaderStreamsCompat.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                        .buildChannels()).afterMax(seconds(10)).all();
 
@@ -1031,7 +1028,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testJoin() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<List<?>, Character> factory = factoryFrom(new CharAt());
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -1048,7 +1045,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 LoaderStreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                    .buildChannels()).afterMax(seconds(10)).all()).containsExactly(
                 's', '2');
@@ -1068,7 +1065,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testJoinAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<List<?>, Character> factory = factoryFrom(new CharAt());
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -1098,7 +1095,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     LoaderStreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                        .buildChannels()).afterMax(seconds(10)).all();
 
@@ -1154,7 +1151,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testJoinPlaceholder() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<List<?>, Character> factory = factoryFrom(new CharAt());
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -1164,7 +1161,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 LoaderStreamsCompat.join(new Object(), channel1, channel2).buildChannels())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
@@ -1172,7 +1169,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 LoaderStreamsCompat.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                    .buildChannels()).afterMax(seconds(10)).all()).containsExactly(
                 's', '2');
@@ -1188,7 +1185,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     LoaderStreamsCompat.join(new Object(), channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -1202,7 +1199,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testJoinPlaceholderAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<List<?>, Character> factory = factoryFrom(new CharAt());
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -1215,7 +1212,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     LoaderStreamsCompat.join((Object) null, channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -1233,7 +1230,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.asyncCall(LoaderStreamsCompat.join(new Object(),
+            routine.async(LoaderStreamsCompat.join(new Object(),
                     Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -1410,7 +1407,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testMap() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
@@ -1424,7 +1421,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                     .invocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
                                     .apply()
-                                    .asyncCall(channel);
+                                    .async(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
                 SparseChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING)
                                     .buildChannels();
@@ -1454,7 +1451,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testMerge() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1512,7 +1509,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
@@ -1546,7 +1543,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -2099,7 +2096,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         private int mFirstIndex;
 
         @Override
-        public void onInitialize() {
+        public void onRecycle() {
 
             mFirstIndex = NO_INDEX;
         }

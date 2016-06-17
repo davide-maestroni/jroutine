@@ -19,7 +19,6 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -341,10 +340,10 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             final Routine<Call<?>, ?> routine = getRoutine();
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                return routine.asyncCall(call);
+                return routine.async(call);
             }
 
-            return routine.syncCall(call);
+            return routine.sync(call);
         }
     }
 

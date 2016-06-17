@@ -23,7 +23,6 @@ import android.test.AndroidTestCase;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -191,7 +190,7 @@ public class RunnerTest extends AndroidTestCase {
                                                            .apply()
                                                            .asyncCall();
         assertThat(JRoutineCore.on(new HandlerInvocationFactory())
-                               .asyncCall(channel)
+                               .async(channel)
                                .afterMax(seconds(30))
                                .next()).isEqualTo(true);
     }
@@ -215,7 +214,7 @@ public class RunnerTest extends AndroidTestCase {
                                                           .asyncCall();
 
         assertThat(JRoutineCore.on(new LooperInvocationFactory())
-                               .asyncCall(channel)
+                               .async(channel)
                                .afterMax(seconds(30))
                                .next()).isEqualTo(true);
     }

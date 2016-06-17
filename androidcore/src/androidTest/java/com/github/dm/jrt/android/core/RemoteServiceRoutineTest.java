@@ -32,9 +32,7 @@ import com.github.dm.jrt.android.core.runner.MainRunner;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
@@ -82,7 +80,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .serviceConfiguration()
                                .withRunnerClass(MainRunner.class)
                                .apply()
-                               .asyncCall(data);
+                               .async(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
@@ -212,7 +210,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.BREAK)
                                .apply()
-                               .asyncCall("test1");
+                               .async("test1");
         assertThat(channel.all()).isEmpty();
         assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
     }
@@ -226,7 +224,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.ABORT)
                                .apply()
-                               .asyncCall("test2");
+                               .async("test2");
 
         try {
 
@@ -250,7 +248,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.THROW)
                                .apply()
-                               .asyncCall("test3");
+                               .async("test3");
 
         try {
 
@@ -391,7 +389,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final MyParcelable p = new MyParcelable(33, -17);
         assertThat(JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                   .on(factoryOf(MyParcelableInvocation.class))
-                                  .asyncCall(p)
+                                  .async(p)
                                   .afterMax(timeout)
                                   .next()).isEqualTo(p);
     }
@@ -647,7 +645,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         @Override
         protected OutputChannel<String> onChannel(@NotNull final OutputChannel<String> channel) {
 
-            return JRoutineCore.on(new UpperCaseInvocation()).asyncCall(channel);
+            return JRoutineCore.on(new UpperCaseInvocation()).async(channel);
         }
     }
 

@@ -23,13 +23,10 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -690,7 +687,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testJoin() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(CharAt.class))
                                                                    .buildRoutine();
@@ -707,7 +704,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 AndroidChannels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                .buildChannels()).afterMax(seconds(10)).all()).containsExactly('s',
                 '2');
@@ -727,7 +724,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testJoinAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(CharAt.class))
                                                                    .buildRoutine();
@@ -757,7 +754,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     AndroidChannels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                    .buildChannels()).afterMax(seconds(10)).all();
 
@@ -793,7 +790,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testJoinPlaceholder() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(CharAt.class))
                                                                    .buildRoutine();
@@ -803,7 +800,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 AndroidChannels.join(new Object(), channel1, channel2).buildChannels())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
@@ -811,7 +808,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 AndroidChannels.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2))
                                .buildChannels()).afterMax(seconds(10)).all()).containsExactly('s',
                 '2');
@@ -827,7 +824,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     AndroidChannels.join(new Object(), channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -841,7 +838,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testJoinPlaceholderAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(CharAt.class))
                                                                    .buildRoutine();
@@ -854,7 +851,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     AndroidChannels.join((Object) null, channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -872,7 +869,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            routine.asyncCall(AndroidChannels.join(new Object(),
+            routine.async(AndroidChannels.join(new Object(),
                     Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels())
                    .afterMax(seconds(10))
                    .all();
@@ -909,7 +906,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testMap() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
@@ -923,7 +920,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .apply()
-                               .asyncCall(channel);
+                               .async(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 AndroidChannels.select(output, Sort.INTEGER, Sort.STRING).buildChannels();
 
@@ -946,7 +943,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMerge() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -989,7 +986,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
@@ -1023,7 +1020,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     @SuppressWarnings("unchecked")
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1363,7 +1360,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         private int mFirstIndex;
 
         @Override
-        public void onInitialize() {
+        public void onRecycle() {
 
             mFirstIndex = NO_INDEX;
         }

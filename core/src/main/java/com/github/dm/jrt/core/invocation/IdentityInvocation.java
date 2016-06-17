@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +50,7 @@ public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
         return (MappingInvocation<DATA, DATA>) sInvocation;
     }
 
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
         result.pass(input);
     }
 }

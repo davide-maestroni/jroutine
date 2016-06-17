@@ -33,8 +33,6 @@ import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
@@ -357,7 +355,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final Routine<IN, OUT> routine =
                 JRoutineCore.on(fromFactory(loaderContext.getApplicationContext(), factory))
                             .buildRoutine();
-        routine.syncInvoke().abort(reason);
+        routine.sync().abort(reason);
         routine.purge();
     }
 

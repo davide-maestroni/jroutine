@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDecorator;
@@ -39,18 +39,14 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<IN, OUT> {
 
-    private static final List<State> TO_ABORT_STATES = Arrays.asList(State.INIT, State.RESULT);
+    private static final List<State> TO_ABORT_STATES = Arrays.asList(State.START, State.COMPLETE);
 
-    private static final List<State> TO_DESTROY_STATES =
-            Arrays.asList(State.INIT, State.ABORT, State.TERM);
+    private static final List<State> TO_INPUT_STATES = Collections.singletonList(State.START);
 
-    private static final List<State> TO_INITIALIZE_STATES = Arrays.asList(State.TERM, null);
+    private static final List<State> TO_RESULT_STATES = Collections.singletonList(State.START);
 
-    private static final List<State> TO_INPUT_STATES = Collections.singletonList(State.INIT);
-
-    private static final List<State> TO_RESULT_STATES = Collections.singletonList(State.INIT);
-
-    private static final List<State> TO_TERMINATE_STATES = Arrays.asList(State.ABORT, State.RESULT);
+    private static final List<State> TO_START_STATES =
+            Arrays.asList(State.ABORT, State.COMPLETE, null);
 
     private State mState;
 
@@ -60,13 +56,11 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
      * @param wrapped the wrapped invocation instance.?
      */
     public LifecycleInvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
-
         super(wrapped);
     }
 
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
-
         if (!TO_ABORT_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
@@ -76,30 +70,17 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     }
 
     @Override
-    public void onDestroy() throws Exception {
-
-        if (!TO_DESTROY_STATES.contains(mState)) {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+        if (!TO_RESULT_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
 
-        mState = State.DESTROY;
-        super.onDestroy();
+        mState = State.COMPLETE;
+        super.onComplete(result);
     }
 
     @Override
-    public void onInitialize() throws Exception {
-
-        if (!TO_INITIALIZE_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
-
-        mState = State.INIT;
-        super.onInitialize();
-    }
-
-    @Override
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         if (!TO_INPUT_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
@@ -108,32 +89,18 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
-        if (!TO_RESULT_STATES.contains(mState)) {
+    public void onRecycle() throws Exception {
+        if (!TO_START_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
 
-        mState = State.RESULT;
-        super.onResult(result);
-    }
-
-    @Override
-    public void onTerminate() throws Exception {
-
-        if (!TO_TERMINATE_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
-
-        mState = State.TERM;
-        super.onTerminate();
+        mState = State.START;
+        super.onRecycle();
     }
 
     private enum State {
-        INIT,
-        RESULT,
+        START,
+        COMPLETE,
         ABORT,
-        TERM,
-        DESTROY
     }
 }

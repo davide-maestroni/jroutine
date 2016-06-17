@@ -29,8 +29,6 @@ import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
@@ -269,14 +267,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDestroy() {
+        public void onDiscard() {
             mRoutine = null;
             mInstance = null;
         }
 
         @Override
-        public void onInitialize() {
-            mChannel = mRoutine.syncInvoke();
+        public void onRecycle() {
+            mChannel = mRoutine.sync();
         }
 
         @Override
@@ -374,14 +372,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDestroy() {
+        public void onDiscard() {
             mRoutine = null;
             mInstance = null;
         }
 
         @Override
-        public void onInitialize() {
-            mChannel = mRoutine.syncInvoke();
+        public void onRecycle() {
+            mChannel = mRoutine.sync();
         }
 
         @Override
@@ -511,7 +509,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDestroy() {
+        public void onDiscard() {
             mInstance = null;
         }
 

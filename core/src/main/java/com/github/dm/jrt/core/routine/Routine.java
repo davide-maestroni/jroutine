@@ -16,8 +16,7 @@
 
 package com.github.dm.jrt.core.routine;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,33 +27,35 @@ import org.jetbrains.annotations.Nullable;
  * The interface takes inspiration from the Go routines, where functions are executed
  * asynchronously and communicate with the external world only through channels. Being Java a
  * strictly object oriented programming language, the routine itself must be an object based on
- * logic implemented in other objects.
+ * logic implemented by other objects.
  * <p>
  * The library includes a routine class based on the implementation of an invocation interface.
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
  * scope of a function call.
  * <br>
- * The paradigm is based on input, result and output channels. A routine can be invoked in
- * different ways (as explained below). Each routine invocation returns an input channel through
- * which the caller can pass the input parameters. When all the parameters has been passed, the
- * input channel is closed and returns the output channel from which to read the invocation
- * results. At the same time a result channel is passed to the invocation implementation, so that
- * the output computed from the input parameters can be published outside.
+ * The paradigm is based on channels. A routine can be invoked in different ways (as explained
+ * below), and each routine invocation returns a channel through which the caller can pass the input
+ * parameters. The channel can then be used to read the invocation results. At the same time a
+ * result channel is passed to the invocation implementation, so that the output computed from the
+ * input parameters can be published outside.
  * <br>
+ * Note that, when all the parameters has been passed, the channel might need to be closed for the
+ * invocation to successfully complete. In fact, some invocation implementations may rely on the
+ * completion notification to produce their results.
+ * <p>
  * The advantage of this approach is that the invocation flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
  * blocking the running thread for the whole duration of the asynchronous invocation.
  * <br>
  * In fact, each channel can abort the execution at any time.
  * <p>
- * The implementing class must provides an automatic synchronization of the invocation member
- * fields, though, in order to avoid concurrency issues, it is up to the caller to ensure that data
- * passed through the routine channels are immutable or, at least, never shared inside and outside
- * the routine.
+ * The class implementing a routine must provide an automatic synchronization of the invocation
+ * member fields, though, in order to avoid concurrency issues, it is up to the caller to ensure
+ * that data passed through the routine channels are immutable or effectively so.
  * <br>
- * Moreover, it is possible to recursively call the same or another routine from inside a routine
- * invocation in a safe way. However, it is not allowed to perform blocking calls (such as
- * reading data from an output channel) in the middle of an execution when shared runner instances
+ * Moreover, it must be possible to recursively call the same or another routine from inside a
+ * routine invocation in a safe way. However, it is not allowed to perform blocking calls (such as
+ * reading output data from a channel) in the middle of an execution when shared runner instances
  * are employed. Additionally, to prevent deadlock or starvation issues, it is encouraged the use of
  * finite timeouts when performing blocking calls.
  * <p>
@@ -98,48 +99,40 @@ import org.jetbrains.annotations.Nullable;
 public interface Routine<IN, OUT> {
 
     /**
-     * Short for {@code asyncInvoke().result()}.
-     *
-     * @return the output channel.
-     */
-    @NotNull
-    OutputChannel<OUT> asyncCall();
-
-    /**
-     * Short for {@code asyncInvoke().pass(input).result()}.
+     * Short for {@code async().pass(input).close()}.
      *
      * @param input the input.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> asyncCall(@Nullable IN input);
+    Channel<IN, OUT> async(@Nullable IN input);
 
     /**
-     * Short for {@code asyncInvoke().pass(inputs).result()}.
+     * Short for {@code async().pass(inputs).close()}.
      *
      * @param inputs the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> asyncCall(@Nullable IN... inputs);
+    Channel<IN, OUT> async(@Nullable IN... inputs);
 
     /**
-     * Short for {@code asyncInvoke().pass(inputs).result()}.
+     * Short for {@code async().pass(inputs).close()}.
      *
      * @param inputs the iterable returning the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> asyncCall(@Nullable Iterable<? extends IN> inputs);
+    Channel<IN, OUT> async(@Nullable Iterable<? extends IN> inputs);
 
     /**
-     * Short for {@code asyncInvoke().pass(inputs).result()}.
+     * Short for {@code async().pass(inputs).close()}.
      *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
+     * @param inputs the channel returning the input data.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> asyncCall(@Nullable OutputChannel<? extends IN> inputs);
+    Channel<IN, OUT> async(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in asynchronous mode.
@@ -147,57 +140,54 @@ public interface Routine<IN, OUT> {
      * @return the invocation channel.
      */
     @NotNull
-    InvocationChannel<IN, OUT> asyncInvoke();
+    Channel<IN, OUT> async();
 
     /**
-     * Short for {@code parallelInvoke().result()}.
-     * <p>
-     * (This method actually makes little sense, and should never need to be called, thought it is
-     * here for completeness)
-     *
-     * @return the output channel.
+     * Makes the routine discard all the cached invocation instances.
+     * <br>
+     * This method is useful to force the release of external resources when done with the routine.
+     * Note however that the routine will still be usable after the method returns.
      */
-    @NotNull
-    OutputChannel<OUT> parallelCall();
+    void clear();
 
     /**
-     * Short for {@code parallelInvoke().pass(input).result()}.
+     * Short for {@code parallel().pass(input).close()}.
      * <p>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
      *
      * @param input the input.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> parallelCall(@Nullable IN input);
+    Channel<IN, OUT> parallel(@Nullable IN input);
 
     /**
-     * Short for {@code parallelInvoke().pass(inputs).result()}.
+     * Short for {@code parallel().pass(inputs).close()}.
      *
      * @param inputs the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> parallelCall(@Nullable IN... inputs);
+    Channel<IN, OUT> parallel(@Nullable IN... inputs);
 
     /**
-     * Short for {@code parallelInvoke().pass(inputs).result()}.
+     * Short for {@code parallel().pass(inputs).close()}.
      *
      * @param inputs the iterable returning the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> parallelCall(@Nullable Iterable<? extends IN> inputs);
+    Channel<IN, OUT> parallel(@Nullable Iterable<? extends IN> inputs);
 
     /**
-     * Short for {@code parallelInvoke().pass(inputs).result()}.
+     * Short for {@code parallel().pass(inputs).close()}.
      *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
+     * @param inputs the channel returning the input data.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> parallelCall(@Nullable OutputChannel<? extends IN> inputs);
+    Channel<IN, OUT> parallel(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in parallel mode.
@@ -205,67 +195,46 @@ public interface Routine<IN, OUT> {
      * @return the invocation channel.
      */
     @NotNull
-    InvocationChannel<IN, OUT> parallelInvoke();
+    Channel<IN, OUT> parallel();
 
     /**
-     * Makes the routine destroy all the cached invocation instances.
-     * <p>
-     * This method is useful to force the release of external resources when done with the routine.
-     * Note however that the routine will still be usable after the method returns.
-     * <p>
-     * Normally it is not needed to call this method.
-     */
-    void purge();
-
-    /**
-     * Short for {@code serialInvoke().result()}.
-     * <p>
-     * (This method actually makes little sense, and should never need to be called, thought it is
-     * here for completeness)
-     *
-     * @return the output channel.
-     */
-    @NotNull
-    OutputChannel<OUT> serialCall();
-
-    /**
-     * Short for {@code serialInvoke().pass(input).result()}.
+     * Short for {@code serial().pass(input).close()}.
      * <p>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
      *
      * @param input the input.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> serialCall(@Nullable IN input);
+    Channel<IN, OUT> serial(@Nullable IN input);
 
     /**
-     * Short for {@code serialInvoke().pass(inputs).result()}.
+     * Short for {@code serial().pass(inputs).close()}.
      *
      * @param inputs the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> serialCall(@Nullable IN... inputs);
+    Channel<IN, OUT> serial(@Nullable IN... inputs);
 
     /**
-     * Short for {@code serialInvoke().pass(inputs).result()}.
+     * Short for {@code serial().pass(inputs).close()}.
      *
      * @param inputs the iterable returning the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> serialCall(@Nullable Iterable<? extends IN> inputs);
+    Channel<IN, OUT> serial(@Nullable Iterable<? extends IN> inputs);
 
     /**
-     * Short for {@code serialInvoke().pass(inputs).result()}.
+     * Short for {@code serial().pass(inputs).close()}.
      *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
+     * @param inputs the channel returning the input data.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> serialCall(@Nullable OutputChannel<? extends IN> inputs);
+    Channel<IN, OUT> serial(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in serial mode.
@@ -273,51 +242,43 @@ public interface Routine<IN, OUT> {
      * @return the invocation channel.
      */
     @NotNull
-    InvocationChannel<IN, OUT> serialInvoke();
+    Channel<IN, OUT> serial();
 
     /**
-     * Short for {@code syncInvoke().result()}.
-     *
-     * @return the output channel.
-     */
-    @NotNull
-    OutputChannel<OUT> syncCall();
-
-    /**
-     * Short for {@code syncInvoke().pass(input).result()}.
+     * Short for {@code sync().pass(input).close()}.
      *
      * @param input the input.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> syncCall(@Nullable IN input);
+    Channel<IN, OUT> sync(@Nullable IN input);
 
     /**
-     * Short for {@code syncInvoke().pass(inputs).result()}.
+     * Short for {@code sync().pass(inputs).close()}.
      *
      * @param inputs the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> syncCall(@Nullable IN... inputs);
+    Channel<IN, OUT> sync(@Nullable IN... inputs);
 
     /**
-     * Short for {@code syncInvoke().pass(inputs).result()}.
+     * Short for {@code sync().pass(inputs).close()}.
      *
      * @param inputs the iterable returning the input data.
-     * @return the output channel.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> syncCall(@Nullable Iterable<? extends IN> inputs);
+    Channel<IN, OUT> sync(@Nullable Iterable<? extends IN> inputs);
 
     /**
-     * Short for {@code syncInvoke().pass(inputs).result()}.
+     * Short for {@code sync().pass(inputs).close()}.
      *
-     * @param inputs the output channel returning the input data.
-     * @return the output channel.
+     * @param inputs the invocation channel returning the input data.
+     * @return the invocation channel.
      */
     @NotNull
-    OutputChannel<OUT> syncCall(@Nullable OutputChannel<? extends IN> inputs);
+    Channel<IN, OUT> sync(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
      * Invokes the execution of this routine in synchronous mode.
@@ -325,5 +286,5 @@ public interface Routine<IN, OUT> {
      * @return the invocation channel.
      */
     @NotNull
-    InvocationChannel<IN, OUT> syncInvoke();
+    Channel<IN, OUT> sync();
 }

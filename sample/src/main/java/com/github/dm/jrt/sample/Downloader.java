@@ -162,7 +162,7 @@ public class Downloader {
                                 .withInputBackoff(seconds(3))
                                 .apply()
                                 .buildRoutine();
-            downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
+            downloads.put(uri, writeFile.async(mReadConnection.async(uri)));
         }
     }
 

@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
@@ -27,53 +27,53 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Class implementing a builder of I/O channel objects.
+ * Class implementing a builder of channel objects.
  * <p>
  * Created by davide-maestroni on 10/25/2014.
  */
-class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
+class DefaultChannelBuilder implements ChannelBuilder, Configurable<ChannelBuilder> {
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      */
-    DefaultIOChannelBuilder() {
+    DefaultChannelBuilder() {
     }
 
     @NotNull
-    public IOChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
+    public ChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA> buildChannel() {
-        return new DefaultIOChannel<DATA>(mConfiguration);
+    public <DATA> Channel<DATA, DATA> buildChannel() {
+        return new DefaultChannel<DATA>(mConfiguration);
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA> of() {
+    public <DATA> Channel<DATA, DATA> of() {
         return this.<DATA>buildChannel().close();
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
+    public <DATA> Channel<DATA, DATA> of(@Nullable final DATA input) {
         return this.<DATA>buildChannel().pass(input).close();
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA> of(@Nullable final DATA... inputs) {
+    public <DATA> Channel<DATA, DATA> of(@Nullable final DATA... inputs) {
         return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA> of(@Nullable final Iterable<DATA> inputs) {
+    public <DATA> Channel<DATA, DATA> of(@Nullable final Iterable<DATA> inputs) {
         return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull
-    public Builder<? extends IOChannelBuilder> channelConfiguration() {
-        return new Builder<IOChannelBuilder>(this, mConfiguration);
+    public Builder<? extends ChannelBuilder> channelConfiguration() {
+        return new Builder<ChannelBuilder>(this, mConfiguration);
     }
 }

@@ -38,9 +38,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -1553,7 +1550,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                             public OutputChannel<String> apply(
                                     final OutputChannel<String> channel) {
 
-                                return JRoutineCore.on(new UpperCase()).asyncCall(channel);
+                                return JRoutineCore.on(new UpperCase()).async(channel);
                             }
                         });
             }
@@ -1576,7 +1573,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                             public OutputChannel<String> apply(
                                     final OutputChannel<String> channel) {
 
-                                return JRoutineCore.on(new UpperCase()).asyncCall(channel);
+                                return JRoutineCore.on(new UpperCase()).async(channel);
                             }
                         });
             }

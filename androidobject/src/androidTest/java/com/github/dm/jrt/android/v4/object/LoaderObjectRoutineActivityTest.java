@@ -30,9 +30,6 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
@@ -371,7 +368,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            routine3.syncCall(new IllegalArgumentException("test")).afterMax(timeout).all();
+            routine3.sync(new IllegalArgumentException("test")).afterMax(timeout).all();
 
             fail();
 
@@ -753,7 +750,7 @@ public class LoaderObjectRoutineActivityTest
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
-        assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
+        assertThat(itf.add10().async('d').all()).containsOnly((int) 'd');
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
@@ -796,7 +793,7 @@ public class LoaderObjectRoutineActivityTest
                       .result()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                 new int[]{'f', 'z'});
-        assertThat(itf.addA14().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA14().async(new char[]{'c', 'z'}).all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA15()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
@@ -810,7 +807,7 @@ public class LoaderObjectRoutineActivityTest
                       .result()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addA18().asyncCall(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
+        assertThat(itf.addA18().async(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addA19()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
@@ -865,7 +862,7 @@ public class LoaderObjectRoutineActivityTest
                       .result()
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                 Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL14().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL14().async(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL15()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
@@ -880,7 +877,7 @@ public class LoaderObjectRoutineActivityTest
                       .result()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addL18().asyncCall(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
+        assertThat(itf.addL18().async(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addL19()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
@@ -911,7 +908,7 @@ public class LoaderObjectRoutineActivityTest
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().hasCompleted();
-        itf.set5().asyncCall(-17).hasCompleted();
+        itf.set5().async(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
         final IOChannel<int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -923,7 +920,7 @@ public class LoaderObjectRoutineActivityTest
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().hasCompleted();
-        itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
+        itf.setA6().async(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -935,7 +932,7 @@ public class LoaderObjectRoutineActivityTest
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().hasCompleted();
-        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
+        itf.setL6().async(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
     public void testProxyRoutine() {

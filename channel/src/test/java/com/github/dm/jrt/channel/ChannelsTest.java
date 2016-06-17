@@ -17,13 +17,10 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.DeadlockException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -80,7 +77,7 @@ public class ChannelsTest {
     @Test
     public void testBlendAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
@@ -92,7 +89,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.blend(channel1, channel2).buildChannels())
+            routine.async(Channels.blend(channel1, channel2).buildChannels())
                    .afterMax(seconds(1))
                    .all();
 
@@ -109,8 +106,8 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                      .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(Channels.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                  .buildChannels()).afterMax(seconds(1)).all();
 
             fail();
 
@@ -502,7 +499,7 @@ public class ChannelsTest {
     @Test
     public void testConcatAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
@@ -514,7 +511,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.concat(channel1, channel2).buildChannels())
+            routine.async(Channels.concat(channel1, channel2).buildChannels())
                    .afterMax(seconds(1))
                    .all();
 
@@ -531,8 +528,8 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                      .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(Channels.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                  .buildChannels()).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1109,7 +1106,7 @@ public class ChannelsTest {
     @Test
     public void testJoin() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1124,7 +1121,7 @@ public class ChannelsTest {
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
@@ -1145,7 +1142,7 @@ public class ChannelsTest {
     @Test
     public void testJoinAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1173,8 +1170,8 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                      .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(Channels.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                  .buildChannels()).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1186,7 +1183,7 @@ public class ChannelsTest {
     @Test
     public void testJoinBackoff() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1255,7 +1252,7 @@ public class ChannelsTest {
     @Test
     public void testJoinPlaceholder() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1264,14 +1261,14 @@ public class ChannelsTest {
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(
-                routine.asyncCall(Channels.join(new Object(), channel1, channel2).buildChannels())
+                routine.async(Channels.join(new Object(), channel1, channel2).buildChannels())
                        .afterMax(seconds(10))
                        .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
+        assertThat(routine.async(
                 Channels.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2))
                         .buildChannels()).afterMax(seconds(10)).all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -1286,7 +1283,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.join(new Object(), channel1, channel2).buildChannels())
+            routine.async(Channels.join(new Object(), channel1, channel2).buildChannels())
                    .afterMax(seconds(10))
                    .all();
 
@@ -1300,7 +1297,7 @@ public class ChannelsTest {
     @Test
     public void testJoinPlaceholderAbort() {
 
-        final IOChannelBuilder builder = JRoutineCore.io();
+        final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1311,7 +1308,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.join((Object) null, channel1, channel2).buildChannels())
+            routine.async(Channels.join((Object) null, channel1, channel2).buildChannels())
                    .afterMax(seconds(1))
                    .all();
 
@@ -1328,7 +1325,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(
+            routine.async(
                     Channels.join(new Object(), Arrays.<OutputChannel<?>>asList(channel1, channel2))
                             .buildChannels()).afterMax(seconds(1)).all();
 
@@ -1386,7 +1383,7 @@ public class ChannelsTest {
     @Test
     public void testMap() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
@@ -1398,7 +1395,7 @@ public class ChannelsTest {
                                                                      .withInputOrder(
                                                                              OrderType.BY_CALL)
                                                                      .apply()
-                                                                     .asyncCall(channel);
+                                                                     .async(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 Channels.select(output, Sort.INTEGER, Sort.STRING).buildChannels();
 
@@ -1421,7 +1418,7 @@ public class ChannelsTest {
     @Test
     public void testMerge() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1473,7 +1470,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
@@ -1506,7 +1503,7 @@ public class ChannelsTest {
     @Test
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder =
+        final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -2115,7 +2112,7 @@ public class ChannelsTest {
         private int mFirstIndex;
 
         @Override
-        public void onInitialize() {
+        public void onRecycle() {
 
             mFirstIndex = NO_INDEX;
         }

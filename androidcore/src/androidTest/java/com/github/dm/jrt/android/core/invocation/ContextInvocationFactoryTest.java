@@ -22,7 +22,6 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -50,10 +49,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     public void testClass() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class)))
-                               .syncCall("TEST")
+                               .sync("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class, true)))
-                               .syncCall("test")
+                               .sync("test")
                                .all()).containsExactly("TEST");
     }
 
@@ -82,7 +81,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         final InvocationFactory<String, String> factory =
                 fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryFrom(factory)))
-                               .syncCall("TEST")
+                               .sync("TEST")
                                .all()).containsExactly("test");
     }
 
@@ -101,10 +100,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     public void testToken() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
-                               .syncCall("TEST")
+                               .sync("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                               .syncCall("test")
+                               .sync("test")
                                .all()).containsExactly("TEST");
     }
 
@@ -131,10 +130,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     public void testWrapper() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
-                               .syncCall("TEST")
+                               .sync("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
-                               .syncCall("test")
+                               .sync("test")
                                .all()).containsExactly("TEST");
     }
 

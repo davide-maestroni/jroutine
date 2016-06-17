@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.android.v11.core;
 
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;

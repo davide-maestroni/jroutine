@@ -36,9 +36,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.ConverterRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -431,7 +429,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         }
 
         @Override
-        public void onInitialize() {
+        public void onRecycle() {
             final Logger logger = mLogger;
             mInputChannel = JRoutineCore.io()
                                         .channelConfiguration()

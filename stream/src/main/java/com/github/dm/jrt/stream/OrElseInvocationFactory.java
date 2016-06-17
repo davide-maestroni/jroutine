@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -75,7 +74,7 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         }
 
         @Override
-        public void onInitialize() {
+        public void onRecycle() {
             mHasOutputs = false;
         }
 

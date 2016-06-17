@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -47,23 +47,19 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
         mInvocation.onAbort(reason);
     }
 
-    public void onDestroy() throws Exception {
-        mInvocation.onDestroy();
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+        mInvocation.onComplete(result);
     }
 
-    public void onInitialize() throws Exception {
-        mInvocation.onInitialize();
+    public void onDiscard() throws Exception {
+        mInvocation.onDiscard();
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-        mInvocation.onResult(result);
-    }
-
-    public void onTerminate() throws Exception {
-        mInvocation.onTerminate();
+    public void onRecycle() throws Exception {
+        mInvocation.onRecycle();
     }
 }

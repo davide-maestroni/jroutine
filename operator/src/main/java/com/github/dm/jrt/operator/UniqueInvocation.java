@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -65,7 +64,7 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onInitialize() {
+    public void onRecycle() {
         mSet.clear();
     }
 

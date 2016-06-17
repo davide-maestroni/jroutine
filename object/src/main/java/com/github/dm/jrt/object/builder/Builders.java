@@ -17,8 +17,6 @@
 package com.github.dm.jrt.object.builder;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -772,9 +770,9 @@ public class Builders {
     private static InvocationChannel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
-        return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
-                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
-                        : (invocationMode == InvocationMode.SERIAL) ? routine.serialInvoke()
+        return (invocationMode == InvocationMode.SYNC) ? routine.sync()
+                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallel()
+                        : (invocationMode == InvocationMode.SERIAL) ? routine.serial()
                                 : routine.asyncInvoke();
     }
 

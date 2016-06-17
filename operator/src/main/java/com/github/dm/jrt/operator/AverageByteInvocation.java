@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -63,24 +64,24 @@ class AverageByteInvocation extends TemplateInvocation<Number, Byte> {
     }
 
     @Override
-    public void onRecycle() {
-        mSum = (byte) 0;
-        mCount = 0;
-    }
-
-    @Override
-    public void onInput(final Number input, @NotNull final ResultChannel<Byte> result) {
-        mSum = addOptimistic(mSum, input).byteValue();
-        ++mCount;
-    }
-
-    @Override
-    public void onResult(@NotNull final ResultChannel<Byte> result) {
+    public void onComplete(@NotNull final Channel<Byte, ?> result) {
         if (mCount == 0) {
             result.pass((byte) 0);
 
         } else {
             result.pass((byte) (mSum.byteValue() / mCount));
         }
+    }
+
+    @Override
+    public void onInput(final Number input, @NotNull final Channel<Byte, ?> result) {
+        mSum = addOptimistic(mSum, input).byteValue();
+        ++mCount;
+    }
+
+    @Override
+    public void onRecycle() {
+        mSum = (byte) 0;
+        mCount = 0;
     }
 }

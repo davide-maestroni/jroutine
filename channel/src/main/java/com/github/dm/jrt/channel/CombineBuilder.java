@@ -17,7 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -33,9 +33,9 @@ import java.util.ArrayList;
  *
  * @param <IN> the input data type.
  */
-class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends IN>>> {
+class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final ArrayList<InputChannel<? extends IN>> mChannels;
+    private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
     private final int mStartIndex;
 
@@ -49,10 +49,10 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
      *                                            null object.
      */
     CombineBuilder(final int startIndex,
-            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-        final ArrayList<InputChannel<? extends IN>> channelList =
-                new ArrayList<InputChannel<? extends IN>>();
-        for (final InputChannel<? extends IN> channel : channels) {
+            @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+        final ArrayList<Channel<? extends IN, ?>> channelList =
+                new ArrayList<Channel<? extends IN, ?>>();
+        for (final Channel<? extends IN, ?> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -72,25 +72,24 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected IOChannel<Selectable<? extends IN>> build(
+    protected Channel<Selectable<? extends IN>, ?> build(
             @NotNull final ChannelConfiguration configuration) {
-        final ArrayList<InputChannel<? extends IN>> channels = mChannels;
-        final ArrayList<IOChannel<? extends IN>> channelList =
-                new ArrayList<IOChannel<? extends IN>>(channels.size());
-        for (final InputChannel<?> channel : channels) {
-            final IOChannel<? extends IN> ioChannel = JRoutineCore.io()
-                                                                  .channelConfiguration()
-                                                                  .with(configuration)
-                                                                  .apply()
-                                                                  .buildChannel();
-            ioChannel.bind(((InputChannel<IN>) channel));
-            channelList.add(ioChannel);
+        final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
+        final ArrayList<Channel<? extends IN, ?>> channelList =
+                new ArrayList<Channel<? extends IN, ?>>(channels.size());
+        for (final Channel<? extends IN, ?> channel : channels) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(configuration)
+                                                              .apply()
+                                                              .buildChannel();
+            outputChannel.bind((Channel<IN, ?>) channel);
+            channelList.add(outputChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>> ioChannel =
+        final Channel<Selectable<? extends IN>, ?> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        ioChannel.bind(new SortingArrayOutputConsumer(mStartIndex, channelList));
-        return ioChannel;
+        return inputChannel.bind(new SortingArrayOutputConsumer(mStartIndex, channelList));
     }
 
     /**
@@ -99,7 +98,7 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
     private static class SortingArrayOutputConsumer<IN>
             implements OutputConsumer<Selectable<? extends IN>> {
 
-        private final ArrayList<IOChannel<? extends IN>> mChannelList;
+        private final ArrayList<Channel<? extends IN, ?>> mChannelList;
 
         private final int mSize;
 
@@ -112,20 +111,20 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
          * @param channels   the list of channels.
          */
         private SortingArrayOutputConsumer(final int startIndex,
-                @NotNull final ArrayList<IOChannel<? extends IN>> channels) {
+                @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
             mStartIndex = startIndex;
             mChannelList = channels;
             mSize = channels.size();
         }
 
         public void onComplete() {
-            for (final IOChannel<? extends IN> channel : mChannelList) {
+            for (final Channel<? extends IN, ?> channel : mChannelList) {
                 channel.close();
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
-            for (final IOChannel<? extends IN> channel : mChannelList) {
+            for (final Channel<? extends IN, ?> channel : mChannelList) {
                 channel.abort(error);
             }
         }
@@ -136,8 +135,8 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
                 return;
             }
 
-            @SuppressWarnings("unchecked") final IOChannel<IN> channel =
-                    (IOChannel<IN>) mChannelList.get(index);
+            @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
+                    (Channel<IN, ?>) mChannelList.get(index);
             if (channel != null) {
                 channel.pass(selectable.data);
             }

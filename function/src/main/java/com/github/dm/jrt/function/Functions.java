@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -122,7 +123,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> consumerCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
         return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
     }
 
@@ -143,7 +144,7 @@ public class Functions {
      */
     @NotNull
     public static <OUT> CommandInvocation<OUT> consumerCommand(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         return new ConsumerCommandInvocation<OUT>(wrap(consumer));
     }
 
@@ -165,7 +166,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> MappingInvocation<IN, OUT> consumerMapping(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         return new ConsumerMappingInvocation<IN, OUT>(wrap(consumer));
     }
 

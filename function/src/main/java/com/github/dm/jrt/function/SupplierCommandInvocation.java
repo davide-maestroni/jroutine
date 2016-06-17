@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -44,7 +45,7 @@ class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
         mSupplier = supplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         result.pass(mSupplier.get());
     }
 }

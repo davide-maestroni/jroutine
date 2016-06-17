@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -36,7 +37,7 @@ import java.util.LinkedList;
  * <pre>
  *     <code>
  *
- *         public void onInput(final IN in, final ResultChannel&lt;ByteBuffer&gt; result) {
+ *         public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
  *
  *             ...
  *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bind(result);
@@ -48,7 +49,7 @@ import java.util.LinkedList;
  * <pre>
  *     <code>
  *
- *         public void onInput(final ByteBuffer buffer, final ResultChannel&lt;OUT&gt; result) {
+ *         public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
  *
  *             ...
  *             final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
@@ -87,9 +88,8 @@ public class ByteChannel {
 
     private final int mDataBufferSize;
 
-    private final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
-            mStreams =
-            new WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>();
+    private final WeakIdentityHashMap<Channel<? super ByteBuffer, ?>, BufferOutputStream> mStreams =
+            new WeakIdentityHashMap<Channel<? super ByteBuffer, ?>, BufferOutputStream>();
 
     /**
      * Constructor.
@@ -200,11 +200,11 @@ public class ByteChannel {
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream bind(@NotNull final InputChannel<? super ByteBuffer> channel) {
+    public BufferOutputStream bind(@NotNull final Channel<? super ByteBuffer, ?> channel) {
         BufferOutputStream stream;
         synchronized (mStreams) {
-            final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
-                    streams = mStreams;
+            final WeakIdentityHashMap<Channel<? super ByteBuffer, ?>, BufferOutputStream> streams =
+                    mStreams;
             stream = streams.get(channel);
             if (stream == null) {
                 stream = new DefaultBufferOutputStream(channel);
@@ -213,20 +213,6 @@ public class ByteChannel {
         }
 
         return stream;
-    }
-
-    /**
-     * Returns the output stream used to write bytes into the specified channel.
-     * <p>
-     * Note that the channel will be automatically closed as soon as the returned output stream is
-     * closed.
-     *
-     * @param channel the I/O channel to which pass the data.
-     * @return the output stream.
-     */
-    @NotNull
-    public BufferOutputStream bind(@NotNull final IOChannel<? super ByteBuffer> channel) {
-        return new IOBufferOutputStream(bind(channel.asInput()), channel);
     }
 
     @NotNull
@@ -387,6 +373,13 @@ public class ByteChannel {
         }
 
         /**
+         * Sets if the underlying channel must be closed when this stream is.
+         *
+         * @param close whether to close the underlying channel.
+         */
+        public abstract void closeChannel(boolean close);
+
+        /**
          * Transfers all the bytes from the specified input stream and close it.
          * <br>
          * Calling this method has the same effect as calling:
@@ -415,6 +408,18 @@ public class ByteChannel {
             } finally {
                 in.close();
             }
+        }
+
+        /**
+         * Sets if the underlying channel must be closed when this stream is.
+         *
+         * @param close whether to close the underlying channel.
+         * @return this stream.
+         */
+        @NotNull
+        public BufferOutputStream withCloseChannel(final boolean close) {
+            closeChannel(close);
+            return this;
         }
 
         /**
@@ -464,63 +469,6 @@ public class ByteChannel {
 
         @Override
         public abstract void close();
-    }
-
-    /**
-     * Implementation of a buffer output stream automatically closing the output I/O channel.
-     */
-    private static class IOBufferOutputStream extends BufferOutputStream {
-
-        private final IOChannel<? super ByteBuffer> mIOChannel;
-
-        private final BufferOutputStream mOutputStream;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped stream.
-         * @param channel the I/O channel.
-         */
-        private IOBufferOutputStream(@NotNull final BufferOutputStream wrapped,
-                @NotNull final IOChannel<? super ByteBuffer> channel) {
-            mOutputStream = wrapped;
-            mIOChannel = channel;
-        }
-
-        @Override
-        public int write(@NotNull final InputStream in) throws IOException {
-            return mOutputStream.write(in);
-        }
-
-        @Override
-        public void write(final int b) throws IOException {
-            mOutputStream.write(b);
-        }
-
-        @Override
-        public void write(@NotNull final byte[] b) throws IOException {
-            mOutputStream.write(b);
-        }
-
-        @Override
-        public void write(@NotNull final byte[] b, final int off, final int len) throws
-                IOException {
-            mOutputStream.write(b, off, len);
-        }
-
-        @Override
-        public void flush() {
-            mOutputStream.flush();
-        }
-
-        @Override
-        public void close() {
-            try {
-                mOutputStream.close();
-            } finally {
-                mIOChannel.close();
-            }
-        }
     }
 
     /**
@@ -1089,11 +1037,13 @@ public class ByteChannel {
      */
     private class DefaultBufferOutputStream extends BufferOutputStream {
 
-        private final InputChannel<? super ByteBuffer> mChannel;
+        private final Channel<? super ByteBuffer, ?> mChannel;
 
         private final Object mMutex = new Object();
 
         private ByteBuffer mBuffer;
+
+        private AtomicBoolean mCloseChannel = new AtomicBoolean(false);
 
         private boolean mIsClosed;
 
@@ -1104,18 +1054,13 @@ public class ByteChannel {
          *
          * @param channel the input channel to which pass the data.
          */
-        private DefaultBufferOutputStream(@NotNull final InputChannel<? super ByteBuffer> channel) {
+        private DefaultBufferOutputStream(@NotNull final Channel<? super ByteBuffer, ?> channel) {
             mChannel = ConstantConditions.notNull("input channel", channel);
         }
 
-        @NotNull
-        private ByteBuffer getBuffer() {
-            final ByteBuffer byteBuffer = mBuffer;
-            if (byteBuffer != null) {
-                return byteBuffer;
-            }
-
-            return (mBuffer = acquire());
+        @Override
+        public void closeChannel(final boolean close) {
+            mCloseChannel.set(close);
         }
 
         @Override
@@ -1184,7 +1129,14 @@ public class ByteChannel {
                 mIsClosed = true;
             }
 
-            flush();
+            try {
+                flush();
+
+            } finally {
+                if (mCloseChannel.get()) {
+                    mChannel.close();
+                }
+            }
         }
 
         @Override
@@ -1294,6 +1246,16 @@ public class ByteChannel {
                 }
 
             } while (written < len);
+        }
+
+        @NotNull
+        private ByteBuffer getBuffer() {
+            final ByteBuffer byteBuffer = mBuffer;
+            if (byteBuffer != null) {
+                return byteBuffer;
+            }
+
+            return (mBuffer = acquire());
         }
     }
 }

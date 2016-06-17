@@ -949,7 +949,7 @@ public class Streams extends Operators {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
-        return Channels.toSelectable(channel, index);
+        return Channels.selectableOutput(channel, index);
     }
 
     /**
@@ -970,7 +970,7 @@ public class Streams extends Operators {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
-        return new BuilderWrapper<Selectable<OUT>>(Channels.toSelectable(channel, index));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.selectableOutput(channel, index));
     }
 
     @NotNull

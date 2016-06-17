@@ -52,7 +52,7 @@ class BindSelectable<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
     @SuppressWarnings("unchecked")
     public OutputChannel<Selectable<OUT>> apply(final OutputChannel<OUT> channel) {
         final OutputChannel<? extends Selectable<OUT>> outputChannel =
-                Channels.toSelectable(channel, mIndex)
+                Channels.selectableOutput(channel, mIndex)
                         .channelConfiguration()
                         .with(mConfiguration)
                         .apply()

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -79,7 +80,7 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) throws Exception {
+                @NotNull final Channel<OUT, ?> result) throws Exception {
             result.pass(mFunction.apply(new ArrayList<IN>(inputs)));
         }
     }

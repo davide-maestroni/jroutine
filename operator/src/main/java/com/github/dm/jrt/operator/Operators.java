@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -63,7 +64,7 @@ public class Operators {
 
                 @SuppressWarnings("unchecked")
                 public void onInput(final Iterable<?> input,
-                        @NotNull final ResultChannel<Object> result) {
+                        @NotNull final Channel<Object, ?> result) {
                     result.pass((Iterable) input);
                 }
             };

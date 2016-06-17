@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -33,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConsumerMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
-    private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
+    private final BiConsumerWrapper<? super IN, ? super Channel<OUT, ?>> mConsumer;
 
     /**
      * Constructor.
@@ -41,12 +42,12 @@ class ConsumerMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
      * @param consumer the consumer instance.
      */
     ConsumerMappingInvocation(
-            @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumerWrapper<? super IN, ? super Channel<OUT, ?>> consumer) {
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         mConsumer.accept(input, result);
     }
 }

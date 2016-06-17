@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -58,17 +59,17 @@ class CountInvocation extends TemplateInvocation<Object, Long> {
     }
 
     @Override
-    public void onRecycle() {
-        mCount = 0;
+    public void onComplete(@NotNull final Channel<Long, ?> result) {
+        result.pass(mCount);
     }
 
     @Override
-    public void onInput(final Object input, @NotNull final ResultChannel<Long> result) {
+    public void onInput(final Object input, @NotNull final Channel<Long, ?> result) {
         ++mCount;
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Long> result) {
-        result.pass(mCount);
+    public void onRecycle() {
+        mCount = 0;
     }
 }

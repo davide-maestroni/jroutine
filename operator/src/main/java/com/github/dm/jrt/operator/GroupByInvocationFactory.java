@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -120,20 +122,12 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
         }
 
         @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<List<DATA>> result) {
-            final ArrayList<DATA> inputs = mInputs;
-            final int size = mSize;
-            if (inputs.size() < size) {
-                inputs.add(input);
-                if (inputs.size() == size) {
-                    result.pass(new ArrayList<DATA>(inputs));
-                    inputs.clear();
-                }
-            }
+        public void onAbort(@NotNull final RoutineException reason) {
+            mInputs.clear();
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
+        public void onComplete(@NotNull final Channel<List<DATA>, ?> result) {
             final ArrayList<DATA> inputs = mInputs;
             final int inputSize = inputs.size();
             if (inputSize > 0) {
@@ -144,12 +138,21 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
                 }
 
                 result.pass(data);
+                inputs.clear();
             }
         }
 
         @Override
-        public void onTerminate() {
-            mInputs.clear();
+        public void onInput(final DATA input, @NotNull final Channel<List<DATA>, ?> result) {
+            final ArrayList<DATA> inputs = mInputs;
+            final int size = mSize;
+            if (inputs.size() < size) {
+                inputs.add(input);
+                if (inputs.size() == size) {
+                    result.pass(new ArrayList<DATA>(inputs));
+                    inputs.clear();
+                }
+            }
         }
     }
 }

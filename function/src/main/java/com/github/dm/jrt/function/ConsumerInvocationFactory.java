@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -46,7 +47,7 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param consumer the consumer instance.
      */
     ConsumerInvocationFactory(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
-            ResultChannel<OUT>> consumer) {
+            Channel<OUT, ?>> consumer) {
         super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
         mInvocation = new ConsumerInvocation<IN, OUT>(consumer);
     }
@@ -65,7 +66,7 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     private static class ConsumerInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
-        private final BiConsumerWrapper<? super List<IN>, ? super ResultChannel<OUT>> mConsumer;
+        private final BiConsumerWrapper<? super List<IN>, ? super Channel<OUT, ?>> mConsumer;
 
         /**
          * Constructor.
@@ -73,13 +74,13 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
          * @param consumer the consumer instance.
          */
         private ConsumerInvocation(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
-                ResultChannel<OUT>> consumer) {
+                Channel<OUT, ?>> consumer) {
             mConsumer = consumer;
         }
 
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) throws Exception {
+                @NotNull final Channel<OUT, ?> result) throws Exception {
             mConsumer.accept(new ArrayList<IN>(inputs), result);
         }
     }

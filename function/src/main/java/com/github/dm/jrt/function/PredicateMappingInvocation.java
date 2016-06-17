@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -44,7 +45,7 @@ class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
         mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<IN, ?> result) throws Exception {
         if (mPredicate.test(input)) {
             result.pass(input);
         }

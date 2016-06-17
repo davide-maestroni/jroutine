@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -74,12 +75,14 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         }
 
         @Override
-        public void onRecycle() {
-            mIsMatch = true;
+        public void onComplete(@NotNull final Channel<Boolean, ?> result) {
+            if (mIsMatch) {
+                result.pass(true);
+            }
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<Boolean> result) throws
+        public void onInput(final IN input, @NotNull final Channel<Boolean, ?> result) throws
                 Exception {
             if (mIsMatch && !mFilterPredicate.test(input)) {
                 mIsMatch = false;
@@ -88,10 +91,8 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Boolean> result) {
-            if (mIsMatch) {
-                result.pass(true);
-            }
+        public void onRecycle() {
+            mIsMatch = true;
         }
     }
 }

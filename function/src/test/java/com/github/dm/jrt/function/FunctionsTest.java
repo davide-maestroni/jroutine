@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -73,9 +74,9 @@ public class FunctionsTest {
     @NotNull
     private static CommandInvocation<String> createCommand() {
 
-        return consumerCommand(new Consumer<ResultChannel<String>>() {
+        return consumerCommand(new Consumer<Channel<String, ?>>() {
 
-            public void accept(final ResultChannel<String> result) {
+            public void accept(final Channel<String, ?> result) {
 
                 result.pass("test");
             }
@@ -104,7 +105,7 @@ public class FunctionsTest {
                 return new MappingInvocation<Object, String>(null) {
 
                     public void onInput(final Object input,
-                            @NotNull final ResultChannel<String> result) {
+                            @NotNull final Channel<String, ?> result) {
 
                         result.pass(input.toString());
                     }
@@ -116,9 +117,9 @@ public class FunctionsTest {
     @NotNull
     private static InvocationFactory<Object, String> createFunction() {
 
-        return consumerCall(new BiConsumer<List<?>, ResultChannel<String>>() {
+        return consumerCall(new BiConsumer<List<?>, Channel<String, ?>>() {
 
-            public void accept(final List<?> objects, final ResultChannel<String> result) {
+            public void accept(final List<?> objects, final Channel<String, ?> result) {
 
                 for (final Object object : objects) {
 
@@ -150,9 +151,9 @@ public class FunctionsTest {
     @NotNull
     private static MappingInvocation<Object, String> createMapping() {
 
-        return consumerMapping(new BiConsumer<Object, ResultChannel<String>>() {
+        return consumerMapping(new BiConsumer<Object, Channel<String, ?>>() {
 
-            public void accept(final Object o, final ResultChannel<String> result) {
+            public void accept(final Object o, final Channel<String, ?> result) {
 
                 result.pass(o.toString());
             }
@@ -500,14 +501,14 @@ public class FunctionsTest {
     public void testCommand() {
 
         final Routine<Void, String> routine = JRoutineCore.on(createCommand()).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testCommand2() {
 
         final Routine<Void, String> routine = JRoutineCore.on(createCommand2()).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -544,7 +545,7 @@ public class FunctionsTest {
     public void testCommandEquals() {
 
         final InvocationFactory<Void, String> factory = createCommand();
-        final ConsumerWrapper<ResultChannel<String>> sink = sink();
+        final ConsumerWrapper<Channel<String, ?>> sink = sink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createCommand());
         assertThat(factory).isNotEqualTo(consumerCommand(sink));
@@ -731,8 +732,7 @@ public class FunctionsTest {
     public void testFactory() {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFactory()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -924,15 +924,14 @@ public class FunctionsTest {
     public void testFunctionFactory() {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFunction()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
     public void testFunctionFactory2() {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFunction2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test1");
     }
 
     @Test
@@ -968,7 +967,7 @@ public class FunctionsTest {
     public void testFunctionFactoryEquals() {
 
         final InvocationFactory<?, String> factory = createFunction();
-        final BiConsumerWrapper<List<?>, ResultChannel<Object>> sink = biSink();
+        final BiConsumerWrapper<List<?>, Channel<Object, ?>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFunction());
         assertThat(factory).isNotEqualTo(consumerCall(sink));
@@ -1042,16 +1041,14 @@ public class FunctionsTest {
     public void testMapping() {
 
         final Routine<Object, String> routine = JRoutineCore.on(createMapping()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
     public void testMapping2() {
 
         final Routine<Object, String> routine = JRoutineCore.on(createMapping2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -1075,7 +1072,7 @@ public class FunctionsTest {
 
         try {
 
-            functionMapping((Function<Object, ResultChannel<Object>>) null);
+            functionMapping((Function<Object, Channel<Object, ?>>) null);
 
             fail();
 
@@ -1088,7 +1085,7 @@ public class FunctionsTest {
     public void testMapping3() {
 
         final Routine<String, String> routine = JRoutineCore.on(createMapping3()).buildRoutine();
-        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("test", "").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -1125,7 +1122,7 @@ public class FunctionsTest {
     public void testMappingEquals() {
 
         final InvocationFactory<Object, String> factory = createMapping();
-        final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
+        final BiConsumerWrapper<Object, Channel<String, ?>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createMapping());
         assertThat(factory).isNotEqualTo(consumerMapping(sink));

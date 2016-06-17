@@ -445,9 +445,13 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
 
-    private void internalAbort(@NotNull final RoutineException abortException) {
+    private void internalAbort(@NotNull final RoutineException abortException,
+            final boolean clearInputs) {
         mInputCount = 0;
-        mInputQueue.clear();
+        if (clearInputs) {
+            mInputQueue.clear();
+        }
+
         mAbortException = abortException;
         mRunner.cancel(mExecution);
     }
@@ -994,7 +998,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
             if (delay.isZero()) {
                 mLogger.dbg(reason, "aborting channel");
-                internalAbort(abortException);
+                internalAbort(abortException, true);
                 mState = new AbortChannelState();
                 mMutex.notifyAll();
                 return mExecution.abort();
@@ -1023,7 +1027,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Nullable
         Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
             mLogger.dbg(reason, "aborting channel after delay");
-            internalAbort(reason);
+            internalAbort(reason, true);
             mState = new AbortChannelState();
             mMutex.notifyAll();
             return mExecution.abort();
@@ -1116,7 +1120,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Nullable
         Execution onConsumerError(@NotNull final RoutineException error) {
             mLogger.dbg(error, "aborting consumer");
-            internalAbort(error);
+            // Cannot clear the input queue since this piece code is not called inside an execution
+            internalAbort(error, false);
             mState = new AbortChannelState();
             return mExecution.abort();
         }
@@ -1163,7 +1168,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Nullable
         Execution onHandlerAbort(@NotNull final RoutineException reason) {
             mLogger.dbg(reason, "aborting result channel");
-            internalAbort(reason);
+            internalAbort(reason, true);
             mState = new AbortChannelState();
             mMutex.notifyAll();
             return mExecution.abort();

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -74,18 +75,18 @@ class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         }
 
         @Override
-        public void onRecycle() {
-            mCurrent = 0;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
             if (mCurrent < mCount) {
                 ++mCurrent;
 
             } else {
                 result.pass(input);
             }
+        }
+
+        @Override
+        public void onRecycle() {
+            mCurrent = 0;
         }
     }
 }

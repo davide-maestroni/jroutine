@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -68,19 +69,7 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
     }
 
     @Override
-    public void onRecycle() {
-        mSum = (byte) 0;
-        mCount = 0;
-    }
-
-    @Override
-    public void onInput(final Number input, @NotNull final ResultChannel<Number> result) {
-        mSum = addOptimistic(mSum, input);
-        ++mCount;
-    }
-
-    @Override
-    public void onResult(@NotNull final ResultChannel<Number> result) {
+    public void onComplete(@NotNull final Channel<Number, ?> result) {
         if (mCount == 0) {
             result.pass(0);
 
@@ -117,5 +106,17 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
 
             result.pass(mean);
         }
+    }
+
+    @Override
+    public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
+        mSum = addOptimistic(mSum, input);
+        ++mCount;
+    }
+
+    @Override
+    public void onRecycle() {
+        mSum = (byte) 0;
+        mCount = 0;
     }
 }

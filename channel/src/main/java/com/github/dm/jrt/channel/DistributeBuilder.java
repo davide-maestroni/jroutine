@@ -17,7 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -35,9 +35,9 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>>> {
+class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, ?>> {
 
-    private final ArrayList<InputChannel<? extends IN>> mChannels;
+    private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
     private final boolean mIsFlush;
 
@@ -54,10 +54,10 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
      *                                            null object.
      */
     DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
-            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
-        final ArrayList<InputChannel<? extends IN>> channelList =
-                new ArrayList<InputChannel<? extends IN>>();
-        for (final InputChannel<? extends IN> channel : channels) {
+            @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+        final ArrayList<Channel<? extends IN, ?>> channelList =
+                new ArrayList<Channel<? extends IN, ?>>();
+        for (final Channel<? extends IN, ?> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -78,23 +78,23 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected IOChannel<List<? extends IN>> build(
+    protected Channel<List<? extends IN>, ?> build(
             @NotNull final ChannelConfiguration configuration) {
-        final ArrayList<InputChannel<? extends IN>> channels = mChannels;
-        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
-        for (final InputChannel<?> channel : channels) {
-            final IOChannel<?> ioChannel = JRoutineCore.io()
-                                                       .channelConfiguration()
-                                                       .with(configuration)
-                                                       .apply()
-                                                       .buildChannel();
-            ioChannel.bind(((InputChannel<Object>) channel));
-            channelList.add(ioChannel);
+        final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
+        final ArrayList<Channel<?, ?>> channelList = new ArrayList<Channel<?, ?>>(channels.size());
+        for (final Channel<? extends IN, ?> channel : channels) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(configuration)
+                                                              .apply()
+                                                              .buildChannel();
+            outputChannel.bind((Channel<IN, ?>) channel);
+            channelList.add(outputChannel);
         }
 
-        final IOChannel<List<? extends IN>> ioChannel =
+        final Channel<List<? extends IN>, ?> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        return ioChannel.bind(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
+        return inputChannel.bind(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
     }
 
     /**
@@ -105,7 +105,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
     private static class DistributeOutputConsumer<IN>
             implements OutputConsumer<List<? extends IN>> {
 
-        private final ArrayList<IOChannel<? extends IN>> mChannels;
+        private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
         private final boolean mIsFlush;
 
@@ -119,27 +119,27 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
          * @param channels    the list of channels.
          */
         private DistributeOutputConsumer(final boolean isFlush, @Nullable final IN placeholder,
-                @NotNull final ArrayList<IOChannel<? extends IN>> channels) {
+                @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
             mIsFlush = isFlush;
             mChannels = channels;
             mPlaceholder = placeholder;
         }
 
         public void onComplete() {
-            for (final IOChannel<? extends IN> channel : mChannels) {
+            for (final Channel<? extends IN, ?> channel : mChannels) {
                 channel.close();
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
-            for (final IOChannel<? extends IN> channel : mChannels) {
+            for (final Channel<? extends IN, ?> channel : mChannels) {
                 channel.abort(error);
             }
         }
 
         public void onOutput(final List<? extends IN> inputs) {
             final int inputSize = inputs.size();
-            final ArrayList<IOChannel<? extends IN>> channels = mChannels;
+            final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
             final int size = channels.size();
             if (inputSize > size) {
                 throw new IllegalArgumentException();
@@ -148,8 +148,8 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
             final IN placeholder = mPlaceholder;
             final boolean isFlush = mIsFlush;
             for (int i = 0; i < size; ++i) {
-                @SuppressWarnings("unchecked") final IOChannel<IN> channel =
-                        (IOChannel<IN>) channels.get(i);
+                @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
+                        (Channel<IN, ?>) channels.get(i);
                 if (i < inputSize) {
                     channel.pass(inputs.get(i));
 

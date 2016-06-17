@@ -1,7 +1,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>>> {
+class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> {
 
-    private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+    private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
     private final boolean mIsFlush;
 
@@ -43,10 +43,10 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
      *                                            null object.
      */
     JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
-            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-        final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>();
-        for (final OutputChannel<? extends OUT> channel : channels) {
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        final ArrayList<Channel<?, ? extends OUT>> channelList =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        for (final Channel<?, ? extends OUT> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -66,10 +66,10 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
 
     @NotNull
     @Override
-    protected OutputChannel<List<? extends OUT>> build(
+    protected Channel<?, List<? extends OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
-        final IOChannel<List<? extends OUT>> ioChannel =
+        final ArrayList<Channel<?, ? extends OUT>> channels = mChannels;
+        final Channel<List<? extends OUT>, List<? extends OUT>> outputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         final Object mutex = new Object();
         final int size = channels.size();
@@ -85,12 +85,12 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         final int limit = configuration.getLimitOrElse(Integer.MAX_VALUE);
         final Backoff backoff = configuration.getBackoffOrElse(null);
         final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
-        for (final OutputChannel<? extends OUT> channel : channels) {
+        for (final Channel<?, ? extends OUT> channel : channels) {
             channel.bind(new JoinOutputConsumer<OUT>(limit, backoff, maxSize, mutex, i++, isFlush,
-                    closed, queues, placeholder, ioChannel));
+                    closed, queues, placeholder, outputChannel));
         }
 
-        return ioChannel;
+        return outputChannel;
     }
 
     /**
@@ -102,7 +102,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
 
         private final Backoff mBackoff;
 
-        private final IOChannel<List<? extends OUT>> mChannel;
+        private final Channel<List<? extends OUT>, List<? extends OUT>> mChannel;
 
         private final boolean[] mClosed;
 
@@ -138,7 +138,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
                 final int maxSize, @NotNull final Object mutex, final int index,
                 final boolean isFlush, @NotNull final boolean[] closed,
                 @NotNull final SimpleQueue<OUT>[] queues, @Nullable final OUT placeholder,
-                @NotNull final IOChannel<List<? extends OUT>> channel) {
+                @NotNull final Channel<List<? extends OUT>, List<? extends OUT>> channel) {
             mLimit = limit;
             mBackoff = backoff;
             mMaxSize = maxSize;
@@ -224,7 +224,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         }
 
         private void flush() {
-            final IOChannel<List<? extends OUT>> channel = mChannel;
+            final Channel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
             final OUT placeholder = mPlaceholder;

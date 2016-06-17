@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -66,13 +68,21 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle() {
-        mIsFirst = true;
+    public void onAbort(@NotNull final RoutineException reason) {
+        mResult = null;
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
-            Exception {
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+        if (!mIsFirst) {
+            result.pass(mResult);
+        }
+
+        mResult = null;
+    }
+
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
         if (mIsFirst) {
             mIsFirst = false;
             mResult = input;
@@ -83,15 +93,8 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<DATA> result) {
-        if (!mIsFirst) {
-            result.pass(mResult);
-        }
-    }
-
-    @Override
-    public void onTerminate() {
-        mResult = null;
+    public void onRecycle() {
+        mIsFirst = true;
     }
 
     /**

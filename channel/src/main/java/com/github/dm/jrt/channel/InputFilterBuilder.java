@@ -17,7 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -32,9 +32,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <IN> the input data type.
  */
-class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> {
+class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>> {
 
-    private final InputChannel<? super IN> mChannel;
+    private final Channel<? super IN, ?> mChannel;
 
     private final int mIndex;
 
@@ -44,19 +44,17 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
      * @param channel the input channel.
      * @param index   the selectable index.
      */
-    InputFilterBuilder(@NotNull final InputChannel<? super IN> channel, final int index) {
+    InputFilterBuilder(@NotNull final Channel<? super IN, ?> channel, final int index) {
         mChannel = ConstantConditions.notNull("input channel", channel);
         mIndex = index;
     }
 
     @NotNull
     @Override
-    protected IOChannel<Selectable<IN>> build(@NotNull final ChannelConfiguration configuration) {
-        final IOChannel<Selectable<IN>> inputChannel =
+    protected Channel<Selectable<IN>, ?> build(@NotNull final ChannelConfiguration configuration) {
+        final Channel<Selectable<IN>, Selectable<IN>> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-        ioChannel.bind(mChannel);
-        return inputChannel.bind(new FilterOutputConsumer<IN>(ioChannel, mIndex));
+        return inputChannel.bind(new FilterOutputConsumer<IN>(mChannel, mIndex));
     }
 
     /**
@@ -66,7 +64,7 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
      */
     private static class FilterOutputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
 
-        private final IOChannel<? super IN> mChannel;
+        private final Channel<? super IN, ?> mChannel;
 
         private final int mIndex;
 
@@ -76,7 +74,7 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
          * @param channel the input channel to feed.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@NotNull final IOChannel<? super IN> channel,
+        private FilterOutputConsumer(@NotNull final Channel<? super IN, ?> channel,
                 final int index) {
             mChannel = channel;
             mIndex = index;

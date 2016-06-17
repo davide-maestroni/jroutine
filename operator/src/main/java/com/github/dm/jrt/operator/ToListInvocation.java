@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -65,23 +67,23 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
     }
 
     @Override
-    public void onRecycle() {
-        mList = new ArrayList<DATA>();
+    public void onAbort(@NotNull final RoutineException reason) {
+        mList = null;
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<List<DATA>> result) {
-        mList.add(input);
-    }
-
-    @Override
-    public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
+    public void onComplete(@NotNull final Channel<List<DATA>, ?> result) {
         result.pass(mList);
         mList = null;
     }
 
     @Override
-    public void onTerminate() {
-        mList = null;
+    public void onInput(final DATA input, @NotNull final Channel<List<DATA>, ?> result) {
+        mList.add(input);
+    }
+
+    @Override
+    public void onRecycle() {
+        mList = new ArrayList<DATA>();
     }
 }

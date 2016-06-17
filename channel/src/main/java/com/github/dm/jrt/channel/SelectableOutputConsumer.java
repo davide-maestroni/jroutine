@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN> {
 
-    private final IOChannel<? super Selectable<OUT>> mChannel;
+    private final Channel<? super Selectable<OUT>, ?> mChannel;
 
     private final int mIndex;
 
@@ -42,9 +43,9 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
      * @param channel the selectable channel.
      * @param index   the selectable index.
      */
-    SelectableOutputConsumer(@NotNull final IOChannel<? super Selectable<OUT>> channel,
+    SelectableOutputConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
             final int index) {
-        mChannel = ConstantConditions.notNull("I/O channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 

@@ -18,7 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -44,15 +44,15 @@ public class ReplayChannelTest {
     @Test
     public void testReplay() {
 
-        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
         assertThat(channel.isOpen()).isTrue();
         ioChannel.pass("test3").close();
@@ -68,13 +68,13 @@ public class ReplayChannelTest {
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testReplayAbort() {
 
-        IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
         ioChannel.abort();
 
@@ -112,8 +112,8 @@ public class ReplayChannelTest {
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testReplayAbortException() {
 
-        IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -166,8 +166,8 @@ public class ReplayChannelTest {
     @Test
     public void testReplayConsumer() {
 
-        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
@@ -193,8 +193,8 @@ public class ReplayChannelTest {
     @Test
     public void testReplayError() {
 
-        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.eventuallyBreak();
         try {
             channel.remove();
@@ -240,7 +240,7 @@ public class ReplayChannelTest {
 
         }
 
-        channel.afterMax(seconds(3));
+        channel.after(seconds(3));
         try {
             channel.remove();
             fail();
@@ -249,7 +249,7 @@ public class ReplayChannelTest {
 
         }
 
-        channel.afterMax(3, TimeUnit.SECONDS);
+        channel.after(3, TimeUnit.SECONDS);
         try {
             channel.remove();
             fail();
@@ -262,8 +262,8 @@ public class ReplayChannelTest {
     @Test
     public void testReplayException() {
 
-        IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
+        Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        Channel<?, Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -314,14 +314,16 @@ public class ReplayChannelTest {
     @Test
     public void testSize() {
 
-        final InvocationChannel<Object, Object> channel =
-                JRoutineCore.on(IdentityInvocation.factoryOf()).asyncInvoke();
-        assertThat(channel.size()).isEqualTo(0);
+        final Channel<Object, Object> channel =
+                JRoutineCore.on(IdentityInvocation.factoryOf()).async();
+        assertThat(channel.inSize()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.size()).isEqualTo(1);
-        final OutputChannel<Object> result = Channels.replay(channel.result()).buildChannels();
-        assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.skipNext(1).size()).isEqualTo(0);
+        assertThat(channel.inSize()).isEqualTo(1);
+        assertThat(channel.outSize()).isEqualTo(0);
+        final Channel<?, Object> result = Channels.replay(channel.close()).buildChannels();
+        assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.inSize()).isEqualTo(0);
+        assertThat(result.outSize()).isEqualTo(1);
+        assertThat(result.skipNext(1).outSize()).isEqualTo(0);
     }
 }

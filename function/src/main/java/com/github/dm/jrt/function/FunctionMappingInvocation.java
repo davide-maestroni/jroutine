@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -45,7 +46,7 @@ class FunctionMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
         mFunction = function;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         result.pass(mFunction.apply(input));
     }
 }

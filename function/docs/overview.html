@@ -54,7 +54,7 @@
                                 return Math.sqrt((double) sum / integers.size());
                         })).buildRoutine();
                 final Double rms =
-                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
+                        meanRoutine.async(squareRoutine.parallel(parseRoutine.parallel(args)))
                                    .afterMax(seconds(3))
                                    .next();
                 System.out.println(rms);

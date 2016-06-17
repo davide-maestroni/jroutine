@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -79,25 +81,25 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
         }
 
         @Override
-        public void onRecycle() {
-            mMap = new HashMap<KEY, IN>();
+        public void onAbort(@NotNull final RoutineException reason) {
+            mMap = null;
         }
 
         @Override
-        public void onInput(final IN input,
-                @NotNull final ResultChannel<Map<KEY, IN>> result) throws Exception {
-            mMap.put(mFunction.apply(input), input);
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<Map<KEY, IN>> result) {
+        public void onComplete(@NotNull final Channel<Map<KEY, IN>, ?> result) {
             result.pass(mMap);
             mMap = null;
         }
 
         @Override
-        public void onTerminate() {
-            mMap = null;
+        public void onInput(final IN input, @NotNull final Channel<Map<KEY, IN>, ?> result) throws
+                Exception {
+            mMap.put(mFunction.apply(input), input);
+        }
+
+        @Override
+        public void onRecycle() {
+            mMap = new HashMap<KEY, IN>();
         }
     }
 }

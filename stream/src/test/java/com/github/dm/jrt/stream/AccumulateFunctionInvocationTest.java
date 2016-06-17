@@ -50,7 +50,7 @@ public class AccumulateFunctionInvocationTest {
 
         final BiFunction<String, String, String> function = createFunction();
         assertThat(JRoutineCore.on(functionFactory(function))
-                               .syncCall("test1", "test2", "test3")
+                               .sync("test1", "test2", "test3")
                                .next()).isEqualTo("test1test2test3");
         assertThat(JRoutineCore.on(functionFactory(new Supplier<String>() {
 
@@ -58,7 +58,7 @@ public class AccumulateFunctionInvocationTest {
 
                 return "test0";
             }
-        }, function)).syncCall("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
+        }, function)).sync("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
     }
 
     @Test

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channels;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -31,9 +31,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindConcat<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+class BindConcat<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
-    private final OutputChannel<? extends OUT> mChannel;
+    private final Channel<?, ? extends OUT> mChannel;
 
     private final ChannelConfiguration mConfiguration;
 
@@ -44,12 +44,12 @@ class BindConcat<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>
      * @param channel       the output channel to concat.
      */
     BindConcat(@NotNull final ChannelConfiguration configuration,
-            @NotNull final OutputChannel<? extends OUT> channel) {
+            @NotNull final Channel<?, ? extends OUT> channel) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mChannel = ConstantConditions.notNull("output channel", channel);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
         return Channels.<OUT>concat(channel, mChannel).channelConfiguration()
                                                       .with(mConfiguration)
                                                       .apply()

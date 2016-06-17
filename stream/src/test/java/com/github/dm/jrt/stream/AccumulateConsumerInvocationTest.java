@@ -54,7 +54,7 @@ public class AccumulateConsumerInvocationTest {
     public void testFactory() {
 
         final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-        assertThat(JRoutineCore.on(consumerFactory(consumer)).syncCall(new ArrayList<String>() {{
+        assertThat(JRoutineCore.on(consumerFactory(consumer)).sync(new ArrayList<String>() {{
             add("test1");
         }}, new ArrayList<String>() {{
             add("test2");
@@ -69,7 +69,7 @@ public class AccumulateConsumerInvocationTest {
                     add("test0");
                 }};
             }
-        }, consumer)).syncCall(new ArrayList<String>() {{
+        }, consumer)).sync(new ArrayList<String>() {{
             add("test1");
         }}, new ArrayList<String>() {{
             add("test2");

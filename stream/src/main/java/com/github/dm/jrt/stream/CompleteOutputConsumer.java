@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -33,7 +34,7 @@ public class CompleteOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     private final Runnable mCompleteAction;
 
-    private final IOChannel<Void> mOutputChannel;
+    private final Channel<?, Void> mOutputChannel;
 
     /**
      * Constructor.
@@ -42,7 +43,7 @@ public class CompleteOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param outputChannel the output channel.
      */
     public CompleteOutputConsumer(@NotNull final Runnable action,
-            @NotNull final IOChannel<Void> outputChannel) {
+            @NotNull final Channel<?, Void> outputChannel) {
         mCompleteAction = ConstantConditions.notNull("runnable instance", action);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }

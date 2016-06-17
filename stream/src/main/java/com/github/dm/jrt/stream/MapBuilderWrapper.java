@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.ChannelsBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
@@ -39,7 +39,7 @@ import java.util.Map.Entry;
 class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>,
         Configurable<ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>> {
 
-    private final ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> mBuilder;
+    private final ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> mBuilder;
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -49,7 +49,7 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
      * @param wrapped the wrapped instance.
      */
     MapBuilderWrapper(
-            @NotNull final ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> wrapped) {
+            @NotNull final ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> wrapped) {
         mBuilder = ConstantConditions.notNull("wrapped instance", wrapped);
     }
 
@@ -63,11 +63,11 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
 
     @NotNull
     public Map<Integer, StreamChannel<OUT, OUT>> buildChannels() {
-        final Map<Integer, OutputChannel<OUT>> channels = mBuilder.buildChannels();
+        final Map<Integer, Channel<?, OUT>> channels = mBuilder.buildChannels();
         final HashMap<Integer, StreamChannel<OUT, OUT>> channelMap =
                 new HashMap<Integer, StreamChannel<OUT, OUT>>(channels.size());
-        for (final Entry<Integer, OutputChannel<OUT>> entry : channels.entrySet()) {
-            channelMap.put(entry.getKey(), Streams.streamOf(entry.getValue()));
+        for (final Entry<Integer, Channel<?, OUT>> entry : channels.entrySet()) {
+            channelMap.put(entry.getKey(), new DefaultStreamChannel<OUT, OUT>(entry.getValue()));
         }
 
         return channelMap;

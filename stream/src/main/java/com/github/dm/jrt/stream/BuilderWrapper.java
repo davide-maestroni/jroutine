@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.ChannelsBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
         Configurable<ChannelsBuilder<StreamChannel<OUT, OUT>>> {
 
-    private final ChannelsBuilder<? extends OutputChannel<? extends OUT>> mBuilder;
+    private final ChannelsBuilder<? extends Channel<?, ? extends OUT>> mBuilder;
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -44,7 +44,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
      *
      * @param wrapped the wrapped instance.
      */
-    BuilderWrapper(@NotNull final ChannelsBuilder<? extends OutputChannel<? extends OUT>> wrapped) {
+    BuilderWrapper(@NotNull final ChannelsBuilder<? extends Channel<?, ? extends OUT>> wrapped) {
         mBuilder = ConstantConditions.notNull("wrapped instance", wrapped);
     }
 
@@ -59,7 +59,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
     @NotNull
     @SuppressWarnings("unchecked")
     public StreamChannel<OUT, OUT> buildChannels() {
-        return (StreamChannel<OUT, OUT>) Streams.streamOf(mBuilder.buildChannels());
+        return new DefaultStreamChannel<OUT, OUT>((Channel<?, OUT>) mBuilder.buildChannels());
     }
 
     @NotNull

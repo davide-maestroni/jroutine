@@ -18,7 +18,7 @@ package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -49,8 +49,8 @@ public class Downloader {
 
     private final HashSet<URI> mDownloaded = new HashSet<URI>();
 
-    private final HashMap<URI, OutputChannel<Boolean>> mDownloads =
-            new HashMap<URI, OutputChannel<Boolean>>();
+    private final HashMap<URI, Channel<?, Boolean>> mDownloads =
+            new HashMap<URI, Channel<?, Boolean>>();
 
     private final Routine<URI, ByteBuffer> mReadConnection;
 
@@ -116,7 +116,7 @@ public class Downloader {
      * @return whether the download was running and has been successfully aborted.
      */
     public boolean abort(final URI uri) {
-        final OutputChannel<Boolean> channel = mDownloads.remove(uri);
+        final Channel<?, Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort();
     }
 
@@ -129,8 +129,8 @@ public class Downloader {
      * elapsed.
      */
     public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
-        final OutputChannel<Boolean> channel = mDownloads.remove(uri);
-        return (channel != null) && channel.abort() && channel.afterMax(timeout).hasCompleted();
+        final Channel<?, Boolean> channel = mDownloads.remove(uri);
+        return (channel != null) && channel.abort() && channel.after(timeout).hasCompleted();
     }
 
     /**
@@ -140,7 +140,7 @@ public class Downloader {
      * @param dstFile the destination file.
      */
     public void download(final URI uri, final File dstFile) {
-        final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
+        final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
         // Check if we are already downloading the same resource
         if (!downloads.containsKey(uri)) {
             // Remove it from the downloaded set
@@ -194,13 +194,13 @@ public class Downloader {
      * @return whether the resource was successfully downloaded.
      */
     public boolean waitDone(final URI uri, final UnitDuration timeout) {
-        final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
-        final OutputChannel<Boolean> channel = downloads.get(uri);
+        final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
+        final Channel<?, Boolean> channel = downloads.get(uri);
         // Check if the output channel is in the map, that is, the resource is currently downloading
         if (channel != null) {
             try {
                 // Wait for the routine to complete
-                if (channel.afterMax(timeout).hasCompleted()) {
+                if (channel.after(timeout).hasCompleted()) {
                     // If completed, remove the resource from the download map
                     downloads.remove(uri);
                     // Read the result and, if successful, add the resource to the downloaded set

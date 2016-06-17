@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindTryFinally<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -49,12 +49,12 @@ class BindTryFinally<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
         mRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-        final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .with(mConfiguration)
-                                                     .apply()
-                                                     .buildChannel();
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
+        final Channel<OUT, OUT> ioChannel = JRoutineCore.io()
+                                                        .channelConfiguration()
+                                                        .with(mConfiguration)
+                                                        .apply()
+                                                        .buildChannel();
         channel.bind(new TryFinallyOutputConsumer<OUT>(mRunnable, ioChannel));
         return ioChannel;
     }

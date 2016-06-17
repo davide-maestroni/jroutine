@@ -17,6 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -44,7 +45,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      *
      * @param channel the wrapped output channel.
      */
-    DefaultStreamChannel(@NotNull final OutputChannel<IN> channel) {
+    DefaultStreamChannel(@NotNull final Channel<?, IN> channel) {
         super(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC), channel);
     }
@@ -58,8 +59,8 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      *                            channel.
      */
     private DefaultStreamChannel(@NotNull final StreamConfiguration streamConfiguration,
-            @NotNull final OutputChannel<IN> sourceChannel,
-            @Nullable final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
+            @NotNull final Channel<?, IN> sourceChannel,
+            @Nullable final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
         super(streamConfiguration, sourceChannel, bindingFunction);
     }
 
@@ -67,8 +68,8 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
     @Override
     protected <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
             @NotNull final StreamConfiguration streamConfiguration,
-            @NotNull final OutputChannel<BEFORE> sourceChannel,
-            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> bindingFunction) {
+            @NotNull final Channel<?, BEFORE> sourceChannel,
+            @NotNull final Function<Channel<?, BEFORE>, Channel<?, AFTER>> bindingFunction) {
         return new DefaultStreamChannel<BEFORE, AFTER>(streamConfiguration, sourceChannel,
                 bindingFunction);
     }

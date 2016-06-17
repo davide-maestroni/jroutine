@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Builder implementation returning a channel combining data from a map of input channels.
@@ -63,8 +64,21 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
     @SuppressWarnings("unchecked")
     protected Channel<Selectable<? extends IN>, ?> build(
             @NotNull final ChannelConfiguration configuration) {
+        final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
+        final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
+                new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
+        for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(configuration)
+                                                              .apply()
+                                                              .buildChannel();
+            outputChannel.bind((Channel<IN, ?>) entry.getValue());
+            inputChannelMap.put(entry.getKey(), outputChannel);
+        }
+
         final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        return inputChannel.bind(new SortingMapOutputConsumer<IN>(mChannelMap));
+        return inputChannel.bind(new SortingMapOutputConsumer<IN>(inputChannelMap));
     }
 }

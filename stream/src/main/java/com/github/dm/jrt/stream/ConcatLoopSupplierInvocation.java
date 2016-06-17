@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.SupplierWrapper;
 
@@ -50,15 +51,15 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
         mOutputSupplier = outputSupplier;
     }
 
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-        result.pass(input);
-    }
-
-    public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
+    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
         final long count = mCount;
         final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }
+    }
+
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+        result.pass(input);
     }
 }

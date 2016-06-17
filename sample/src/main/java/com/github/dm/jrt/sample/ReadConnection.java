@@ -19,6 +19,7 @@ package com.github.dm.jrt.sample;
 import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
         super(null);
     }
 
-    public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
+    public void onInput(final URI uri, @NotNull final Channel<ByteBuffer, ?> result) throws
             IOException {
         final URLConnection connection = uri.toURL().openConnection();
         connection.setConnectTimeout(3000);

@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         &#64;AsyncOut
- *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
+ *         public Channel&lt;?, Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
@@ -97,19 +97,19 @@ public @interface AsyncOut {
         /**
          * Value mode.
          * <br>
-         * The variable is just passed to the output channel.
+         * The variable is just passed to the channel.
          * <p>
          * The annotated method must return a superclass of
-         * {@link com.github.dm.jrt.core.channel.Channel.OutputChannel OutputChannel}.
+         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
          */
         VALUE,
         /**
          * Element mode.
          * <br>
-         * The elements of the result array or iterable are passed one by one to the output channel.
+         * The elements of the result array or iterable are passed one by one to the channel.
          * <p>
          * The annotated method must return a superclass of
-         * {@link com.github.dm.jrt.core.channel.Channel.OutputChannel OutputChannel}.
+         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
          */
         ELEMENT
     }

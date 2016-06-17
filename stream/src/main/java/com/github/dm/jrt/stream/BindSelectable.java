@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindSelectable<OUT> implements Function<OutputChannel<OUT>, OutputChannel<Selectable<OUT>>> {
+class BindSelectable<OUT> implements Function<Channel<?, OUT>, Channel<?, Selectable<OUT>>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -50,13 +50,13 @@ class BindSelectable<OUT> implements Function<OutputChannel<OUT>, OutputChannel<
     }
 
     @SuppressWarnings("unchecked")
-    public OutputChannel<Selectable<OUT>> apply(final OutputChannel<OUT> channel) {
-        final OutputChannel<? extends Selectable<OUT>> outputChannel =
+    public Channel<?, Selectable<OUT>> apply(final Channel<?, OUT> channel) {
+        final Channel<?, ? extends Selectable<OUT>> outputChannel =
                 Channels.selectableOutput(channel, mIndex)
                         .channelConfiguration()
                         .with(mConfiguration)
                         .apply()
                         .buildChannels();
-        return (OutputChannel<Selectable<OUT>>) outputChannel;
+        return (Channel<?, Selectable<OUT>>) outputChannel;
     }
 }

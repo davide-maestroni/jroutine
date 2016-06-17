@@ -480,7 +480,7 @@ public class Channels {
     }
 
     /**
-     * Returns a builder of output channels joining the data coming from the specified ones.
+     * Returns a builder of channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
      * <p>
@@ -686,7 +686,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the map of indexes and output channels.
+     * @param channels the map of indexes and channels.
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
@@ -913,7 +913,7 @@ public class Channels {
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
-     * @return the map of indexes and output channels builder.
+     * @return the map of indexes and channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
      */
     @NotNull
@@ -951,7 +951,7 @@ public class Channels {
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels builder.
+     * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
      */
@@ -988,7 +988,7 @@ public class Channels {
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels builder.
+     * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
      */
@@ -1036,7 +1036,8 @@ public class Channels {
      * <br>
      * Each output will be passed along unchanged.
      * <p>
-     * Note that the builder will successfully create only one channel instance.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channel will be bound as a result of the creation.
      * <p>
      * Given channel {@code A}, the final output will be:
      * <pre>

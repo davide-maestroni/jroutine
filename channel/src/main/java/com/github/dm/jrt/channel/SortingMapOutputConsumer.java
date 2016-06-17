@@ -34,7 +34,7 @@ import java.util.Map;
  */
 class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? extends OUT>> {
 
-    private final HashMap<Integer, Channel<? extends OUT, ?>> mChannels;
+    private final HashMap<Integer, Channel<OUT, ?>> mChannels;
 
     /**
      * Constructor.
@@ -43,9 +43,9 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      * @throws java.lang.NullPointerException if the specified map is null or contains a null
      *                                        object.
      */
-    SortingMapOutputConsumer(@NotNull final Map<Integer, Channel<? extends OUT, ?>> channels) {
-        final HashMap<Integer, Channel<? extends OUT, ?>> channelMap =
-                new HashMap<Integer, Channel<? extends OUT, ?>>(channels);
+    SortingMapOutputConsumer(@NotNull final Map<Integer, Channel<OUT, ?>> channels) {
+        final HashMap<Integer, Channel<OUT, ?>> channelMap =
+                new HashMap<Integer, Channel<OUT, ?>>(channels);
         if (channelMap.containsValue(null)) {
             throw new NullPointerException("the map of I/O channels must not contain null objects");
         }
@@ -54,20 +54,19 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
     }
 
     public void onComplete() {
-        for (final Channel<? extends OUT, ?> channel : mChannels.values()) {
+        for (final Channel<OUT, ?> channel : mChannels.values()) {
             channel.close();
         }
     }
 
     public void onError(@NotNull final RoutineException error) {
-        for (final Channel<? extends OUT, ?> channel : mChannels.values()) {
+        for (final Channel<OUT, ?> channel : mChannels.values()) {
             channel.abort(error);
         }
     }
 
     public void onOutput(final Selectable<? extends OUT> selectable) {
-        @SuppressWarnings("unchecked") final Channel<OUT, ?> channel =
-                (Channel<OUT, ?>) mChannels.get(selectable.index);
+        final Channel<OUT, ?> channel = mChannels.get(selectable.index);
         if (channel != null) {
             channel.pass(selectable.data);
         }

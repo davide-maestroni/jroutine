@@ -17,9 +17,11 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
@@ -64,13 +66,13 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
+    private static class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
         private final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super IN,
                 ? extends OUT>>
                 mFunction;
 
-        private IOChannel<IN> mInputChannel;
+        private Channel<IN, IN> mInputChannel;
 
         private StreamChannel<? super IN, ? extends OUT> mOutputChannel;
 
@@ -86,18 +88,22 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         public void onAbort(@NotNull final RoutineException reason) {
             mInputChannel.abort(reason);
+            mInputChannel = null;
+            mOutputChannel = null;
         }
 
-        public void onDiscard() {
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
+            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
+            }
+
+            mInputChannel.close();
+            mInputChannel = null;
+            mOutputChannel = null;
         }
 
-        public void onRecycle() throws Exception {
-            final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-            mOutputChannel = mFunction.apply(Streams.streamOf(ioChannel));
-            mInputChannel = ioChannel;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
@@ -106,18 +112,10 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
             mInputChannel.pass(input);
         }
 
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
-            mInputChannel.close();
-        }
-
-        public void onTerminate() {
-            mInputChannel = null;
-            mOutputChannel = null;
+        public void onRecycle() throws Exception {
+            final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
+            mOutputChannel = mFunction.apply(new DefaultStreamChannel<IN, IN>(inputChannel));
+            mInputChannel = inputChannel;
         }
     }
 }

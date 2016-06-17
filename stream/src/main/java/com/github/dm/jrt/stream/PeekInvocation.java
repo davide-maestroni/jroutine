@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
@@ -45,8 +46,7 @@ class PeekInvocation<DATA> extends MappingInvocation<DATA, DATA> {
         mPeekConsumer = peekConsumer;
     }
 
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
-            Exception {
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
         mPeekConsumer.accept(input);
         result.pass(input);
     }

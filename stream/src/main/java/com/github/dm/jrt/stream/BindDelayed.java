@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindDelayed<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
+class BindDelayed<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> mBindingFunction;
+    private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
     private final long mDelay;
 
@@ -55,17 +55,17 @@ class BindDelayed<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<
      * @param bindingFunction the binding function.
      */
     BindDelayed(@Nullable final Runner runner, final long delay, @NotNull final TimeUnit timeUnit,
-            @NotNull final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction) {
+            @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
         mRunner = runner;
         mDelay = ConstantConditions.notNegative("delay value", delay);
         mTimeUnit = ConstantConditions.notNull("delay time unit", timeUnit);
         mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) throws Exception {
-        final IOChannel<IN> inputChannel =
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
+        final Channel<IN, IN> inputChannel =
                 JRoutineCore.io().channelConfiguration().withRunner(mRunner).apply().buildChannel();
-        final OutputChannel<OUT> outOutputChannel = mBindingFunction.apply(inputChannel);
+        final Channel<?, OUT> outOutputChannel = mBindingFunction.apply(inputChannel);
         inputChannel.after(mDelay, mTimeUnit).pass(channel).close();
         return outOutputChannel;
     }

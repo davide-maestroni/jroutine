@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindParallelKey<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
+class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -62,12 +62,12 @@ class BindParallelKey<IN, OUT> implements Function<OutputChannel<IN>, OutputChan
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
-        final IOChannel<OUT> outputChannel = JRoutineCore.io()
-                                                         .channelConfiguration()
-                                                         .with(mConfiguration)
-                                                         .apply()
-                                                         .buildChannel();
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                            .channelConfiguration()
+                                                            .with(mConfiguration)
+                                                            .apply()
+                                                            .buildChannel();
         channel.bind(new ParallelKeyOutputConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
                 mInvocationMode));
         return outputChannel;

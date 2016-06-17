@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -34,9 +34,9 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mCatchConsumer;
+    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
-    private final IOChannel<OUT> mOutputChannel;
+    private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
@@ -45,9 +45,9 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param outputChannel the output channel.
      */
     TryCatchOutputConsumer(
-            @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
+            @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer,
-            @NotNull final IOChannel<OUT> outputChannel) {
+            @NotNull final Channel<OUT, ?> outputChannel) {
         mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
@@ -57,7 +57,7 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
     }
 
     public void onError(@NotNull final RoutineException error) {
-        final IOChannel<OUT> channel = mOutputChannel;
+        final Channel<OUT, ?> channel = mOutputChannel;
         try {
             mCatchConsumer.accept(error, channel);
             channel.close();

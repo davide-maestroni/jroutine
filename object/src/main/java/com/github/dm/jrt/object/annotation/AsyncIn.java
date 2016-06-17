@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;AsyncIn(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *         public int sum(&#64;AsyncIn(int.class) Channel&lt;?, Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
@@ -98,10 +98,10 @@ public @interface AsyncIn {
         /**
          * Value mode.
          * <br>
-         * The variable is just read from an output channel.
+         * The variable is just read from a channel.
          * <p>
-         * The annotated parameters must extend an
-         * {@link com.github.dm.jrt.core.channel.Channel.OutputChannel OutputChannel}.
+         * The annotated parameters must extend a
+         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
          */
         VALUE,
         /**
@@ -110,9 +110,9 @@ public @interface AsyncIn {
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method.
          * <p>
-         * The annotated parameter must extend an
-         * {@link com.github.dm.jrt.core.channel.Channel.OutputChannel OutputChannel} and must be
-         * the only parameter accepted by the method.
+         * The annotated parameter must extend a
+         * {@link com.github.dm.jrt.core.channel.Channel Channel} and must be the only parameter
+         * accepted by the method.
          */
         COLLECTION
     }

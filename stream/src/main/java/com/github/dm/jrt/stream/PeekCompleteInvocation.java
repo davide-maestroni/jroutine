@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,12 +44,11 @@ class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
         mPeekAction = peekAction;
     }
 
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
-            Exception {
-        result.pass(input);
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+        mPeekAction.run();
     }
 
-    public void onResult(@NotNull final ResultChannel<DATA> result) {
-        mPeekAction.run();
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+        result.pass(input);
     }
 }

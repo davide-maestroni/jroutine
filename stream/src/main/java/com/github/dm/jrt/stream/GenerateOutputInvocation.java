@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -43,10 +45,10 @@ class GenerateOutputInvocation<OUT> extends GenerateInvocation<Object, OUT> {
         mOutputs = outputs;
     }
 
-    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) {
+        result.pass(mOutputs);
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
-        result.pass(mOutputs);
+    public void onInput(final Object input, @NotNull final Channel<OUT, ?> result) {
     }
 }

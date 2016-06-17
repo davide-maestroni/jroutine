@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -34,7 +35,7 @@ import java.util.Random;
  */
 class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final ArrayList<IOChannel<OUT>> mChannels;
+    private final ArrayList<Channel<OUT, ?>> mChannels;
 
     private final int[] mIndexes;
 
@@ -45,19 +46,19 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
      *
      * @param channels the list of I/O channels.
      */
-    ParallelCountOutputConsumer(@NotNull final List<IOChannel<OUT>> channels) {
-        mChannels = new ArrayList<IOChannel<OUT>>(channels);
+    ParallelCountOutputConsumer(@NotNull final List<? extends Channel<OUT, OUT>> channels) {
+        mChannels = new ArrayList<Channel<OUT, ?>>(channels);
         mIndexes = new int[channels.size()];
     }
 
     public void onComplete() {
-        for (final IOChannel<OUT> channel : mChannels) {
+        for (final Channel<OUT, ?> channel : mChannels) {
             channel.close();
         }
     }
 
     public void onError(@NotNull final RoutineException error) {
-        for (final IOChannel<OUT> channel : mChannels) {
+        for (final Channel<OUT, ?> channel : mChannels) {
             channel.abort(error);
         }
     }
@@ -66,10 +67,10 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
         int count = 0;
         int minSize = Integer.MAX_VALUE;
         final int[] indexes = mIndexes;
-        final ArrayList<IOChannel<OUT>> channels = mChannels;
+        final ArrayList<Channel<OUT, ?>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
-            final int channelSize = channels.get(i).size();
+            final int channelSize = channels.get(i).inSize();
             if (channelSize < minSize) {
                 count = 1;
                 indexes[0] = i;

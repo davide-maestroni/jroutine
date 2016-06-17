@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -46,11 +46,11 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
             mBackoffFunction;
 
-    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBindingFunction;
+    private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
-    private final OutputChannel<IN> mInputChannel;
+    private final Channel<?, IN> mInputChannel;
 
-    private final IOChannel<OUT> mOutputChannel;
+    private final Channel<OUT, ?> mOutputChannel;
 
     private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
 
@@ -67,9 +67,9 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
      * @param bindingFunction the binding function.
      * @param backoffFunction the backoff function.
      */
-    RetryOutputConsumer(@NotNull final OutputChannel<IN> inputChannel,
-            @NotNull final IOChannel<OUT> outputChannel, @NotNull final Runner runner,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
+    RetryOutputConsumer(@NotNull final Channel<?, IN> inputChannel,
+            @NotNull final Channel<OUT, ?> outputChannel, @NotNull final Runner runner,
+            @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
         mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
@@ -84,7 +84,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     }
 
     public void run() {
-        final IOChannel<IN> channel = JRoutineCore.io().buildChannel();
+        final Channel<IN, IN> channel = JRoutineCore.io().buildChannel();
         mInputChannel.bind(new SafeOutputConsumer<IN>(channel));
         try {
             mBindingFunction.apply(channel).bind(this);
@@ -107,14 +107,14 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
      */
     private static class SafeOutputConsumer<IN> implements OutputConsumer<IN> {
 
-        private final IOChannel<IN> mChannel;
+        private final Channel<IN, ?> mChannel;
 
         /**
          * Constructor.
          *
          * @param channel the I/O channel.
          */
-        private SafeOutputConsumer(@NotNull final IOChannel<IN> channel) {
+        private SafeOutputConsumer(@NotNull final Channel<IN, ?> channel) {
             mChannel = channel;
         }
 

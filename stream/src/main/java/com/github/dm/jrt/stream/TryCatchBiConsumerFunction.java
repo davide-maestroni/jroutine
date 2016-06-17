@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class TryCatchBiConsumerFunction<OUT> implements BiConsumer<RoutineException, InputChannel<OUT>> {
+class TryCatchBiConsumerFunction<OUT> implements BiConsumer<RoutineException, Channel<OUT, ?>> {
 
     private final Function<? super RoutineException, ? extends OUT> mCatchFunction;
 
@@ -45,7 +45,7 @@ class TryCatchBiConsumerFunction<OUT> implements BiConsumer<RoutineException, In
         mCatchFunction = ConstantConditions.notNull("function instance", catchFunction);
     }
 
-    public void accept(final RoutineException error, final InputChannel<OUT> channel) throws
+    public void accept(final RoutineException error, final Channel<OUT, ?> channel) throws
             Exception {
         channel.pass(mCatchFunction.apply(error));
     }

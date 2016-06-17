@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChannel<Void>> {
+class BindOutputConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Void>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -50,13 +50,13 @@ class BindOutputConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChan
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
     }
 
-    public OutputChannel<Void> apply(final OutputChannel<OUT> channel) {
-        final IOChannel<Void> ioChannel = JRoutineCore.io()
-                                                      .channelConfiguration()
-                                                      .with(mConfiguration)
-                                                      .apply()
-                                                      .buildChannel();
-        channel.bind(new ConsumingOutputConsumer<OUT>(mOutputConsumer, ioChannel));
-        return ioChannel;
+    public Channel<?, Void> apply(final Channel<?, OUT> channel) {
+        final Channel<Void, Void> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(mConfiguration)
+                                                              .apply()
+                                                              .buildChannel();
+        channel.bind(new ConsumingOutputConsumer<OUT>(mOutputConsumer, outputChannel));
+        return outputChannel;
     }
 }

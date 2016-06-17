@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.SupplierWrapper;
 
@@ -50,14 +51,14 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
         mOutputSupplier = outputSupplier;
     }
 
-    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
-    }
-
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         final long count = mCount;
         final SupplierWrapper<? extends OUT> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }
+    }
+
+    public void onInput(final Object input, @NotNull final Channel<OUT, ?> result) {
     }
 }

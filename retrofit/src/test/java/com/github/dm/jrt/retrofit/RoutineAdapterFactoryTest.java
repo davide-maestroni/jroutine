@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
@@ -270,7 +270,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -298,7 +298,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -326,7 +326,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -354,7 +354,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -381,7 +381,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -408,7 +408,7 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(3))
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -424,11 +424,11 @@ public class RoutineAdapterFactoryTest {
                 final Retrofit retrofit) {
 
             if (returnType instanceof ParameterizedType) {
-                if (((ParameterizedType) returnType).getRawType() == OutputChannel.class) {
+                if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                     return null;
                 }
 
-            } else if (returnType == OutputChannel.class) {
+            } else if (returnType == Channel.class) {
                 return null;
             }
 

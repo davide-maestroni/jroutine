@@ -19,6 +19,7 @@ package com.github.dm.jrt;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -294,7 +295,7 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.on(consumerCall(consumer));
     }
 
@@ -354,7 +355,7 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> onCommandMore(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.on(consumerCommand(consumer));
     }
 
@@ -427,7 +428,7 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onMappingMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.on(consumerMapping(consumer));
     }
 }

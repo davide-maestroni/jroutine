@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -84,18 +85,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
             mOutputSupplier = outputSupplier;
         }
 
-        @Override
-        public void onRecycle() {
-            mHasOutputs = false;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-            mHasOutputs = true;
-            result.pass(input);
-        }
-
-        public void onResult(@NotNull final ResultChannel<DATA> result) throws Exception {
+        public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
             if (!mHasOutputs) {
                 final long count = mCount;
                 final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;
@@ -103,6 +93,17 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
                     result.pass(supplier.get());
                 }
             }
+        }
+
+        @Override
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+            mHasOutputs = true;
+            result.pass(input);
+        }
+
+        @Override
+        public void onRecycle() {
+            mHasOutputs = false;
         }
     }
 }

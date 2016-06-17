@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindCompleteConsumer<OUT> implements Function<OutputChannel<OUT>, OutputChannel<Void>> {
+class BindCompleteConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Void>> {
 
     private final Runnable mCompleteAction;
 
@@ -49,13 +49,13 @@ class BindCompleteConsumer<OUT> implements Function<OutputChannel<OUT>, OutputCh
         mCompleteAction = ConstantConditions.notNull("runnable instance", action);
     }
 
-    public OutputChannel<Void> apply(final OutputChannel<OUT> channel) throws Exception {
-        final IOChannel<Void> ioChannel = JRoutineCore.io()
-                                                      .channelConfiguration()
-                                                      .with(mConfiguration)
-                                                      .apply()
-                                                      .buildChannel();
-        channel.bind(new CompleteOutputConsumer<OUT>(mCompleteAction, ioChannel));
-        return ioChannel;
+    public Channel<?, Void> apply(final Channel<?, OUT> channel) throws Exception {
+        final Channel<Void, Void> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(mConfiguration)
+                                                              .apply()
+                                                              .buildChannel();
+        channel.bind(new CompleteOutputConsumer<OUT>(mCompleteAction, outputChannel));
+        return outputChannel;
     }
 }

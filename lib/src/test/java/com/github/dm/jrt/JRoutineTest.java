@@ -17,7 +17,7 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.AutoProxyRoutineBuilder.BuilderType;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
@@ -80,7 +80,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .apply()
                                                         .method(TestClass.GET);
-        assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
+        assertThat(routine.sync().close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class JRoutineTest {
                         return builder.toString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
+        assertThat(routine.async("test", "1").after(seconds(1)).all()).containsOnly("test1");
     }
 
     @Test
@@ -110,7 +110,7 @@ public class JRoutineTest {
 
             @Override
             protected void onCall(@NotNull final List<? extends Integer> integers,
-                    @NotNull final ResultChannel<Integer> result) {
+                    @NotNull final Channel<Integer, ?> result) {
 
                 int sum = 0;
                 for (final Integer integer : integers) {
@@ -133,16 +133,17 @@ public class JRoutineTest {
                     }
                 })).buildRoutine();
 
-        assertThat(sumRoutine.sync(squareRoutine.syncCall(1, 2, 3, 4))
-                             .afterMax(timeout)
+        assertThat(sumRoutine.sync(squareRoutine.sync(1, 2, 3, 4))
+                             .after(timeout)
                              .all()).containsExactly(30);
-        assertThat(sumRoutine.async(squareRoutine.syncCall(1, 2, 3, 4)).afterMax(timeout).all())
-                .containsExactly(30);
-        assertThat(sumRoutine.async(squareRoutine.asyncCall(1, 2, 3, 4))
-                             .afterMax(timeout)
+        assertThat(sumRoutine.async(squareRoutine.sync(1, 2, 3, 4))
+                             .after(timeout)
                              .all()).containsExactly(30);
-        assertThat(sumRoutine.async(squareRoutine.parallelCall(1, 2, 3, 4))
-                             .afterMax(timeout)
+        assertThat(sumRoutine.async(squareRoutine.async(1, 2, 3, 4))
+                             .after(timeout)
+                             .all()).containsExactly(30);
+        assertThat(sumRoutine.async(squareRoutine.parallel(1, 2, 3, 4))
+                             .after(timeout)
                              .all()).containsExactly(30);
     }
 
@@ -171,7 +172,7 @@ public class JRoutineTest {
     public void testCommandInvocation() {
 
         final Routine<Void, String> routine = JRoutine.on(new GetString()).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -193,24 +194,24 @@ public class JRoutineTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutine.onCommandMore(new Consumer<ResultChannel<String>>() {
+                JRoutine.onCommandMore(new Consumer<Channel<String, ?>>() {
 
-                    public void accept(final ResultChannel<String> result) {
+                    public void accept(final Channel<String, ?> result) {
 
                         result.pass("test", "1");
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutine.onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutine.onCall(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                     public void accept(final List<String> strings,
-                            final ResultChannel<String> result) {
+                            final Channel<String, ?> result) {
 
                         final StringBuilder builder = new StringBuilder();
                         for (final String string : strings) {
@@ -220,22 +221,21 @@ public class JRoutineTest {
                         result.pass(builder.toString());
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
+        assertThat(routine.async("test", "1").after(seconds(1)).all()).containsOnly("test1");
     }
 
     @Test
     public void testConsumerMapping() {
 
         final Routine<Object, String> routine =
-                JRoutine.onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
+                JRoutine.onMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
 
-                    public void accept(final Object o, final ResultChannel<String> result) {
+                    public void accept(final Object o, final Channel<String, ?> result) {
 
                         result.pass(o.toString());
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -248,8 +248,7 @@ public class JRoutineTest {
                 return o.toString();
             }
         }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -257,28 +256,28 @@ public class JRoutineTest {
 
         final Routine<String, String> routine =
                 JRoutine.on((Invocation<String, String>) new ToCase()).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationAndArgs() {
 
         final Routine<String, String> routine = JRoutine.on(new ToCase(), true).buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(1)).all()).containsOnly("TEST");
+        assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
     public void testInvocationClass() {
 
         final Routine<String, String> routine = JRoutine.on(ToCase.class).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationClassAndArgs() {
 
         final Routine<String, String> routine = JRoutine.on(ToCase.class, true).buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(1)).all()).containsOnly("TEST");
+        assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
@@ -286,14 +285,14 @@ public class JRoutineTest {
 
         final Routine<String, String> routine =
                 JRoutine.on((InvocationFactory<String, String>) new ToCase()).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationToken() {
 
         final Routine<String, String> routine = JRoutine.on(tokenOf(ToCase.class)).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -301,14 +300,14 @@ public class JRoutineTest {
 
         final Routine<String, String> routine =
                 JRoutine.on(tokenOf(ToCase.class), true).buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(1)).all()).containsOnly("TEST");
+        assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
     public void testMappingInvocation() {
 
         final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -338,7 +337,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .apply()
                                                         .method(TestClass.GET);
-        assertThat(routine.syncCall().all()).containsExactly(-77L);
+        assertThat(routine.sync().close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -380,7 +379,7 @@ public class JRoutineTest {
                                                         .apply()
                                                         .method(TestClass.class.getMethod(
                                                                 "getLong"));
-        assertThat(routine.syncCall().all()).containsExactly(-77L);
+        assertThat(routine.sync().close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -394,7 +393,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .apply()
                                                         .method("getLong");
-        assertThat(routine.syncCall().all()).containsExactly(-77L);
+        assertThat(routine.sync().close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -428,17 +427,16 @@ public class JRoutineTest {
     @Test
     public void testPendingInputs() {
 
-        final InvocationChannel<Object, Object> channel =
-                JRoutine.on(IdentityInvocation.factoryOf()).asyncInvoke();
+        final Channel<Object, Object> channel = JRoutine.on(IdentityInvocation.factoryOf()).async();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final Channel<Object, Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.result();
+        channel.close();
         assertThat(channel.isOpen()).isFalse();
         ioChannel.close();
         assertThat(channel.isOpen()).isFalse();
@@ -454,7 +452,7 @@ public class JRoutineTest {
                 return s.length() > 1;
             }
         }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("test", "1").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -496,7 +494,7 @@ public class JRoutineTest {
                 return "test";
             }
         }).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -509,14 +507,14 @@ public class JRoutineTest {
                 return new ToCase();
             }
         }).buildRoutine();
-        assertThat(routine.async("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     public interface TestItf {
 
         @OutputTimeout(300)
         @AsyncOut
-        OutputChannel<Integer> getOne();
+        Channel<?, Integer> getOne();
     }
 
     @Proxy(TestClass.class)
@@ -524,11 +522,11 @@ public class JRoutineTest {
 
         @OutputTimeout(300)
         @AsyncOut
-        OutputChannel<Integer> getOne();
+        Channel<?, Integer> getOne();
 
         @OutputTimeout(300)
         @AsyncOut
-        OutputChannel<Integer> getTwo();
+        Channel<?, Integer> getTwo();
     }
 
     public static class GetString extends CommandInvocation<String> {
@@ -541,7 +539,7 @@ public class JRoutineTest {
             super(null);
         }
 
-        public void onResult(@NotNull final ResultChannel<String> result) {
+        public void onComplete(@NotNull final Channel<String, ?> result) {
 
             result.pass("test");
         }
@@ -592,7 +590,7 @@ public class JRoutineTest {
             mIsUpper = isUpper;
         }
 
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
         }

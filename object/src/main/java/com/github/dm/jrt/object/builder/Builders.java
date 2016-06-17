@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -109,7 +109,7 @@ public class Builders {
      */
     public static void callFromInvocation(@NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final Method targetMethod, @NotNull final List<?> objects,
-            @NotNull final ResultChannel<Object> result, @Nullable final InputMode inputMode,
+            @NotNull final Channel<Object, ?> result, @Nullable final InputMode inputMode,
             @Nullable final OutputMode outputMode) throws Exception {
         Reflection.makeAccessible(targetMethod);
         final Object methodResult;
@@ -232,17 +232,17 @@ public class Builders {
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
         if (inputMode == InputMode.VALUE) {
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!Channel.class.isAssignableFrom(parameterType)) {
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.VALUE
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
+                                + " must extends an " + Channel.class.getCanonicalName());
             }
 
         } else { // InputMode.COLLECTION
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!Channel.class.isAssignableFrom(parameterType)) {
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
+                                + " must extends an " + Channel.class.getCanonicalName());
             }
 
             final Class<?> paramClass = asyncInputAnnotation.value();
@@ -316,8 +316,8 @@ public class Builders {
         }
 
         final Class<?> returnType = method.getReturnType();
-        if (!returnType.isAssignableFrom(OutputChannel.class)) {
-            final String channelClassName = OutputChannel.class.getCanonicalName();
+        if (!returnType.isAssignableFrom(Channel.class)) {
+            final String channelClassName = Channel.class.getCanonicalName();
             throw new IllegalArgumentException(
                     "[" + method + "] an async output must be a superclass of " + channelClassName);
         }
@@ -429,8 +429,8 @@ public class Builders {
                     }
 
                     final Class<?> returnType = proxyMethod.getReturnType();
-                    if (!returnType.isAssignableFrom(InvocationChannel.class)
-                            && !returnType.isAssignableFrom(Routine.class)) {
+                    if (!returnType.isAssignableFrom(Channel.class) && !returnType.isAssignableFrom(
+                            Routine.class)) {
                         throw new IllegalArgumentException(
                                 "the proxy method has incompatible return type: " + proxyMethod);
                     }
@@ -506,43 +506,42 @@ public class Builders {
             @Nullable final OutputMode outputMode) {
         final Class<?> returnType = method.getReturnType();
         if (method.isAnnotationPresent(AsyncMethod.class)) {
-            if (returnType.isAssignableFrom(InvocationChannel.class)) {
+            if (returnType.isAssignableFrom(Channel.class)) {
                 return invokeRoutine(routine, invocationMode);
             }
 
             return routine;
         }
 
-        final OutputChannel<Object> outputChannel;
-        final InvocationChannel<Object, Object> invocationChannel =
-                invokeRoutine(routine, invocationMode);
+        final Channel<Object, Object> outputChannel;
+        final Channel<Object, Object> invocationChannel = invokeRoutine(routine, invocationMode);
         if (inputMode == InputMode.VALUE) {
             invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
             for (int i = 0; i < length; ++i) {
                 final Object arg = args[i];
-                if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
-                    invocationChannel.pass((OutputChannel<Object>) arg);
+                if (Channel.class.isAssignableFrom(parameterTypes[i])) {
+                    invocationChannel.pass((Channel<?, Object>) arg);
 
                 } else {
                     invocationChannel.pass(arg);
                 }
             }
 
-            outputChannel = invocationChannel.result();
+            outputChannel = invocationChannel.close();
 
         } else if (inputMode == InputMode.COLLECTION) {
             outputChannel =
-                    invocationChannel.orderByCall().pass((OutputChannel<Object>) args[0]).result();
+                    invocationChannel.orderByCall().pass((Channel<?, Object>) args[0]).close();
 
         } else {
-            outputChannel = invocationChannel.pass(args).result();
+            outputChannel = invocationChannel.pass(args).close();
         }
 
         if (!Void.class.equals(Reflection.boxingClass(returnType))) {
             if (outputMode != null) {
-                if (OutputChannel.class.isAssignableFrom(returnType)) {
+                if (Channel.class.isAssignableFrom(returnType)) {
                     return outputChannel;
                 }
 
@@ -767,13 +766,13 @@ public class Builders {
     }
 
     @NotNull
-    private static InvocationChannel<Object, Object> invokeRoutine(
+    private static Channel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
         return (invocationMode == InvocationMode.SYNC) ? routine.sync()
                 : (invocationMode == InvocationMode.PARALLEL) ? routine.parallel()
                         : (invocationMode == InvocationMode.SERIAL) ? routine.serial()
-                                : routine.asyncInvoke();
+                                : routine.async();
     }
 
     /**

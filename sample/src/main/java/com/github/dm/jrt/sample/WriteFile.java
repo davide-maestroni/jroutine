@@ -18,6 +18,7 @@ package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
@@ -57,20 +58,20 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onRecycle() throws FileNotFoundException {
-        mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
+    public void onComplete(@NotNull final Channel<Boolean, ?> result) throws IOException {
+        closeStream();
+        result.pass(true);
     }
 
     @Override
-    public void onInput(final ByteBuffer buffer,
-            @NotNull final ResultChannel<Boolean> result) throws IOException {
+    public void onInput(final ByteBuffer buffer, @NotNull final Channel<Boolean, ?> result) throws
+            IOException {
         ByteChannel.inputStream(buffer).transferTo(mOutputStream);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Boolean> result) throws IOException {
-        closeStream();
-        result.pass(true);
+    public void onRecycle() throws FileNotFoundException {
+        mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 
     private void closeStream() throws IOException {

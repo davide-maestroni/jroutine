@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.runner.Runners;
@@ -36,12 +36,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
+class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
     private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
             mBackoffFunction;
 
-    private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBindingFunction;
+    private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
     private final ChannelConfiguration mConfiguration;
 
@@ -53,7 +53,7 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
      * @param backoffFunction the backoff function.
      */
     BindRetry(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindingFunction,
+            @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -61,10 +61,10 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
         mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final ChannelConfiguration configuration = mConfiguration;
-        final OutputChannel<IN> inputChannel = Channels.replay(channel).buildChannels();
-        final IOChannel<OUT> outputChannel =
+        final Channel<?, IN> inputChannel = Channels.replay(channel).buildChannels();
+        final Channel<OUT, OUT> outputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         new RetryOutputConsumer<IN, OUT>(inputChannel, outputChannel,
                 configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,

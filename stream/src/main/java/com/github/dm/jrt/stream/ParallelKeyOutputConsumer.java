@@ -17,6 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -38,12 +39,12 @@ import java.util.HashMap;
  */
 class ParallelKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements OutputConsumer<IN> {
 
-    private final HashMap<Object, IOChannel<IN>> mInputChannels =
-            new HashMap<Object, IOChannel<IN>>();
+    private final HashMap<Object, Channel<IN, IN>> mInputChannels =
+            new HashMap<Object, Channel<IN, IN>>();
 
     private final Function<? super IN, ?> mKeyFunction;
 
-    private final IOChannel<OUT> mOutputChannel;
+    private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
@@ -53,7 +54,7 @@ class ParallelKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Out
      * @param routine        the routine instance.
      * @param invocationMode the invocation mode.
      */
-    ParallelKeyOutputConsumer(@NotNull final IOChannel<OUT> outputChannel,
+    ParallelKeyOutputConsumer(@NotNull final Channel<OUT, ?> outputChannel,
             @NotNull final Function<? super IN, ?> keyFunction,
             @NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
@@ -64,7 +65,7 @@ class ParallelKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Out
 
     public void onComplete() {
         mOutputChannel.close();
-        for (final IOChannel<IN> channel : mInputChannels.values()) {
+        for (final Channel<IN, ?> channel : mInputChannels.values()) {
             channel.close();
         }
     }
@@ -74,9 +75,9 @@ class ParallelKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Out
     }
 
     public void onOutput(final IN output) throws Exception {
-        final HashMap<Object, IOChannel<IN>> channels = mInputChannels;
+        final HashMap<Object, Channel<IN, IN>> channels = mInputChannels;
         final Object key = mKeyFunction.apply(output);
-        IOChannel<IN> inputChannel = channels.get(key);
+        Channel<IN, IN> inputChannel = channels.get(key);
         if (inputChannel == null) {
             inputChannel = JRoutineCore.io().buildChannel();
             mOutputChannel.pass(super.apply(inputChannel));

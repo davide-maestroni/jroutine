@@ -36,12 +36,12 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 05/13/2016.
  */
-class SequentialRunner extends SyncRunner {
+class ImmediateRunner extends SyncRunner {
 
     /**
      * Constructor.
      */
-    SequentialRunner() {
+    ImmediateRunner() {
     }
 
     @Override

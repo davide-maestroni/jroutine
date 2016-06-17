@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindMap<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
+class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
     private final InvocationMode mInvocationMode;
 
@@ -51,7 +51,7 @@ class BindMap<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final InvocationMode invocationMode = mInvocationMode;
         if (invocationMode == InvocationMode.ASYNC) {
             return mRoutine.async(channel);

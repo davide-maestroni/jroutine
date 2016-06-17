@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         &#64;AsyncMethod({int.class, int.class})
- *         public InvocationChannel&lt;Integer, Integer&gt; sum();
+ *         public Channel&lt;Integer, Integer&gt; sum();
  *     </code>
  * </pre>
  * <p>

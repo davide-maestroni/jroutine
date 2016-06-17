@@ -21,8 +21,7 @@ import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -70,14 +69,14 @@ public class StreamsTest {
         StreamChannel<String, String> channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(channel2, channel1)
                           .buildChannels()
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                 "test6");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                           .buildChannels()
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                 "test6");
     }
@@ -88,8 +87,8 @@ public class StreamsTest {
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -98,7 +97,7 @@ public class StreamsTest {
         try {
 
             routine.async(Streams.blend(channel1, channel2).buildChannels())
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -114,8 +113,10 @@ public class StreamsTest {
 
         try {
 
-            routine.async(Streams.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                 .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(
+                    Streams.blend(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
+                   .after(seconds(1))
+                   .all();
 
             fail();
 
@@ -140,7 +141,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.blend((OutputChannel<?>[]) null);
+            Streams.blend((Channel<?, ?>[]) null);
 
             fail();
 
@@ -150,7 +151,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.blend(new OutputChannel[]{null});
+            Streams.blend(new Channel[]{null});
 
             fail();
 
@@ -160,7 +161,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.blend(Collections.<OutputChannel<?>>emptyList());
+            Streams.blend(Collections.<Channel<?, ?>>emptyList());
 
             fail();
 
@@ -170,7 +171,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.blend((List<OutputChannel<?>>) null);
+            Streams.blend((List<Channel<?, ?>>) null);
 
             fail();
 
@@ -180,7 +181,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.blend(Collections.<OutputChannel<?>>singletonList(null));
+            Streams.blend(Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -192,12 +193,10 @@ public class StreamsTest {
     @Test
     public void testCombine() {
 
-        final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        final InvocationChannel<Integer, Integer> channel2 =
-                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf())
-                            .asyncInvoke()
-                            .orderByCall();
+        final Channel<String, String> channel1 =
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+        final Channel<Integer, Integer> channel2 =
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).async().orderByCall();
         Streams.combine(channel1, channel2)
                .buildChannels()
                .pass(new Selectable<String>("test1", 0))
@@ -208,18 +207,17 @@ public class StreamsTest {
                .pass(new Selectable<String>("test2", 3))
                .pass(new Selectable<Integer>(2, 4))
                .close();
-        Streams.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+        Streams.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                .buildChannels()
                .pass(new Selectable<String>("test3", 0))
                .pass(new Selectable<Integer>(3, 1))
                .close();
-        Streams.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+        Streams.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                .buildChannels()
                .pass(new Selectable<String>("test4", -5))
                .pass(new Selectable<Integer>(4, -4))
                .close();
-        final HashMap<Integer, InvocationChannel<?, ?>> map =
-                new HashMap<Integer, InvocationChannel<?, ?>>(2);
+        final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);
         Streams.combine(map)
@@ -227,9 +225,9 @@ public class StreamsTest {
                .pass(new Selectable<String>("test5", 31))
                .pass(new Selectable<Integer>(5, 17))
                .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2",
+        assertThat(channel1.close().after(seconds(1)).all()).containsExactly("test1", "test2",
                 "test3", "test4", "test5");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(channel2.close().after(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
     @Test
@@ -239,14 +237,14 @@ public class StreamsTest {
         StreamChannel<String, String> channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(channel2, channel1)
                           .buildChannels()
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                 "test3");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                           .buildChannels()
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                 "test6");
     }
@@ -257,8 +255,8 @@ public class StreamsTest {
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -267,7 +265,7 @@ public class StreamsTest {
         try {
 
             routine.async(Streams.concat(channel1, channel2).buildChannels())
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -283,8 +281,8 @@ public class StreamsTest {
 
         try {
 
-            routine.async(Streams.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                 .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(Streams.concat(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                                 .buildChannels()).after(seconds(1)).all();
 
             fail();
 
@@ -309,7 +307,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.concat((OutputChannel<?>[]) null);
+            Streams.concat((Channel<?, ?>[]) null);
 
             fail();
 
@@ -319,7 +317,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.concat(new OutputChannel[]{null});
+            Streams.concat(new Channel[]{null});
 
             fail();
 
@@ -329,7 +327,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.concat(Collections.<OutputChannel<?>>emptyList());
+            Streams.concat(Collections.<Channel<?, ?>>emptyList());
 
             fail();
 
@@ -339,7 +337,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.concat((List<OutputChannel<?>>) null);
+            Streams.concat((List<Channel<?, ?>>) null);
 
             fail();
 
@@ -349,7 +347,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.concat(Collections.<OutputChannel<?>>singletonList(null));
+            Streams.concat(Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -391,15 +389,15 @@ public class StreamsTest {
     @Test
     public void testDistribute() {
 
-        final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        final InvocationChannel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        final Channel<String, String> channel1 =
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+        final Channel<String, String> channel2 =
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
         Streams.distribute(channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
                .close();
-        Streams.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
+        Streams.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                .buildChannels()
                .pass(Arrays.asList("test2-1", "test2-2"))
                .close();
@@ -407,25 +405,24 @@ public class StreamsTest {
                .buildChannels()
                .pass(Collections.singletonList("test3-1"))
                .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
-                "test2-1", "test3-1");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                "test2-2");
+        assertThat(channel1.close().after(seconds(1)).all()).containsExactly("test1-1", "test2-1",
+                "test3-1");
+        assertThat(channel2.close().after(seconds(1)).all()).containsExactly("test1-2", "test2-2");
     }
 
     @Test
     public void testDistributePlaceholder() {
 
-        final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        final InvocationChannel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        final Channel<String, String> channel1 =
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+        final Channel<String, String> channel2 =
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
         Streams.distribute((Object) null, channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
                .close();
         final String placeholder = "placeholder";
-        Streams.distribute((Object) placeholder, Arrays.<InputChannel<?>>asList(channel1, channel2))
+        Streams.distribute((Object) placeholder, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                .buildChannels()
                .pass(Arrays.asList("test2-1", "test2-2"))
                .close();
@@ -433,10 +430,10 @@ public class StreamsTest {
                .buildChannels()
                .pass(Collections.singletonList("test3-1"))
                .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
-                "test2-1", "test3-1");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                "test2-2", placeholder);
+        assertThat(channel1.close().after(seconds(1)).all()).containsExactly("test1-1", "test2-1",
+                "test3-1");
+        assertThat(channel2.close().after(seconds(1)).all()).containsExactly("test1-2", "test2-2",
+                placeholder);
     }
 
     @Test
@@ -458,16 +455,15 @@ public class StreamsTest {
                     }
                 });
         assertThat(JRoutineCore.on(factory)
-                               .asyncCall("test1", "test2", "test3")
-                               .afterMax(seconds(3))
+                               .async("test1", "test2", "test3")
+                               .after(seconds(3))
                                .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel =
-                    JRoutineCore.on(factory).asyncInvoke();
+            final Channel<String, String> channel = JRoutineCore.on(factory).async();
             channel.abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(3)).next();
+            channel.close().after(seconds(3)).next();
 
             fail();
 
@@ -489,12 +485,12 @@ public class StreamsTest {
                             }
                         });
                     }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                }).async("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
                 "TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = Streams.onStream(
+            final Channel<String, String> channel = Streams.onStream(
                     new Function<StreamChannel<String, String>, StreamChannel<String, String>>() {
 
                         public StreamChannel<String, String> apply(
@@ -508,9 +504,9 @@ public class StreamsTest {
                                 }
                             });
                         }
-                    }).asyncInvoke();
+                    }).async();
             channel.abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(3)).next();
+            channel.close().after(seconds(3)).next();
 
             fail();
 
@@ -576,37 +572,34 @@ public class StreamsTest {
     @SuppressWarnings("unchecked")
     public void testInputSelect() {
 
-        IOChannel<Selectable<String>> channel = JRoutineCore.io().buildChannel();
-        Streams.select(channel.asInput(), 33)
-               .buildChannels()
-               .pass("test1", "test2", "test3")
-               .close();
-        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly(
+        Channel<Selectable<String>, Selectable<String>> channel = JRoutineCore.io().buildChannel();
+        Streams.selectInput(channel, 33).buildChannels().pass("test1", "test2", "test3").close();
+        assertThat(channel.close().after(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
                 new Selectable<String>("test3", 33));
         channel = JRoutineCore.io().buildChannel();
-        Map<Integer, IOChannel<String>> channelMap =
-                Streams.select(channel.asInput(), Arrays.asList(1, 2, 3)).buildChannels();
+        Map<Integer, Channel<String, ?>> channelMap =
+                Streams.selectInput(channel, Arrays.asList(1, 2, 3)).buildChannels();
         channelMap.get(1).pass("test1").close();
         channelMap.get(2).pass("test2").close();
         channelMap.get(3).pass("test3").close();
-        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly(
+        assertThat(channel.close().after(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 1), new Selectable<String>("test2", 2),
                 new Selectable<String>("test3", 3));
         channel = JRoutineCore.io().buildChannel();
-        channelMap = Streams.select(channel.asInput(), 1, 2, 3).buildChannels();
+        channelMap = Streams.selectInput(channel, 1, 2, 3).buildChannels();
         channelMap.get(1).pass("test1").close();
         channelMap.get(2).pass("test2").close();
         channelMap.get(3).pass("test3").close();
-        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly(
+        assertThat(channel.close().after(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 1), new Selectable<String>("test2", 2),
                 new Selectable<String>("test3", 3));
         channel = JRoutineCore.io().buildChannel();
-        channelMap = Streams.select(1, 3, channel.asInput()).buildChannels();
+        channelMap = Streams.selectInput(1, 3, channel).buildChannels();
         channelMap.get(1).pass("test1").close();
         channelMap.get(2).pass("test2").close();
         channelMap.get(3).pass("test3").close();
-        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly(
+        assertThat(channel.close().after(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 1), new Selectable<String>("test2", 2),
                 new Selectable<String>("test3", 3));
     }
@@ -615,13 +608,13 @@ public class StreamsTest {
     @SuppressWarnings("unchecked")
     public void testInputToSelectable() {
 
-        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
-        Streams.toSelectable(channel.asInput(), 33)
+        final Channel<String, String> channel = JRoutineCore.io().buildChannel();
+        Streams.selectableInput(channel, 33)
                .buildChannels()
                .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                        new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
                .close();
-        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly("test1", "test3");
+        assertThat(channel.close().after(seconds(1)).all()).containsExactly("test1", "test3");
     }
 
     @Test
@@ -629,22 +622,22 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Streams.join(channel1, channel2).buildChannels())
-                          .afterMax(seconds(10))
+        assertThat(routine.async(Streams.join(channel1, channel2).buildChannels())
+                          .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(
-                Streams.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels())
-                          .afterMax(seconds(10))
+                Streams.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
+                          .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -655,8 +648,8 @@ public class StreamsTest {
                 .pass("test3")
                 .close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Streams.join(channel1, channel2).buildChannels())
-                          .afterMax(seconds(10))
+        assertThat(routine.async(Streams.join(channel1, channel2).buildChannels())
+                          .after(seconds(10))
                           .all()).containsExactly('s', '2');
     }
 
@@ -665,8 +658,8 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -674,9 +667,7 @@ public class StreamsTest {
 
         try {
 
-            routine.asyncCall(Streams.join(channel1, channel2).buildChannels())
-                   .afterMax(seconds(1))
-                   .all();
+            routine.async(Streams.join(channel1, channel2).buildChannels()).after(seconds(1)).all();
 
             fail();
 
@@ -691,8 +682,10 @@ public class StreamsTest {
 
         try {
 
-            routine.async(Streams.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                 .buildChannels()).afterMax(seconds(1)).all();
+            routine.async(
+                    Streams.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
+                   .after(seconds(1))
+                   .all();
 
             fail();
 
@@ -716,7 +709,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(Collections.<OutputChannel<?>>emptyList());
+            Streams.join(Collections.<Channel<?, ?>>emptyList());
 
             fail();
 
@@ -726,7 +719,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(new OutputChannel[]{null});
+            Streams.join(new Channel[]{null});
 
             fail();
 
@@ -736,7 +729,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(Collections.<OutputChannel<?>>singletonList(null));
+            Streams.join(Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -750,22 +743,22 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(Streams.join(new Object(), channel1, channel2).buildChannels())
-                          .afterMax(seconds(10))
+                          .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(
-                Streams.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                       .buildChannels()).afterMax(seconds(10)).all()).containsExactly('s', '2');
+                Streams.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                       .buildChannels()).after(seconds(10)).all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall()
@@ -779,7 +772,7 @@ public class StreamsTest {
         try {
 
             routine.async(Streams.join(new Object(), channel1, channel2).buildChannels())
-                   .afterMax(seconds(10))
+                   .after(seconds(10))
                    .all();
 
             fail();
@@ -794,8 +787,8 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -804,7 +797,7 @@ public class StreamsTest {
         try {
 
             routine.async(Streams.join((Object) null, channel1, channel2).buildChannels())
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -821,8 +814,8 @@ public class StreamsTest {
         try {
 
             routine.async(
-                    Streams.join(new Object(), Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                           .buildChannels()).afterMax(seconds(1)).all();
+                    Streams.join(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .buildChannels()).after(seconds(1)).all();
 
             fail();
 
@@ -846,7 +839,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(null, Collections.<OutputChannel<?>>emptyList());
+            Streams.join(null, Collections.<Channel<?, ?>>emptyList());
 
             fail();
 
@@ -856,7 +849,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(new Object(), new OutputChannel[]{null});
+            Streams.join(new Object(), new Channel[]{null});
 
             fail();
 
@@ -866,7 +859,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.join(new Object(), Collections.<OutputChannel<?>>singletonList(null));
+            Streams.join(new Object(), Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -880,19 +873,18 @@ public class StreamsTest {
 
         final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
-        final IOChannel<String> channel1 = builder.buildChannel();
-        final IOChannel<Integer> channel2 = builder.buildChannel();
+        final Channel<String, String> channel1 = builder.buildChannel();
+        final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
-        final OutputChannel<? extends Selectable<Object>> channel =
-                Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels();
-        final OutputChannel<Selectable<Object>> output = JRoutineCore.on(new Sort())
-                                                                     .invocationConfiguration()
-                                                                     .withInputOrder(
-                                                                             OrderType.BY_CALL)
-                                                                     .apply()
-                                                                     .async(channel);
-        final Map<Integer, OutputChannel<Object>> channelMap =
-                Channels.select(output, Sort.INTEGER, Sort.STRING).buildChannels();
+        final Channel<?, ? extends Selectable<Object>> channel =
+                Streams.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
+        final Channel<?, Selectable<Object>> output = JRoutineCore.on(new Sort())
+                                                                  .invocationConfiguration()
+                                                                  .withInputOrder(OrderType.BY_CALL)
+                                                                  .apply()
+                                                                  .async(channel);
+        final Map<Integer, Channel<?, Object>> channelMap =
+                Channels.selectOutput(output, Sort.INTEGER, Sort.STRING).buildChannels();
 
         for (int i = 0; i < 4; i++) {
 
@@ -906,11 +898,11 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
                           .asyncMap(null)
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsExactly("0", "1", "2", "3");
         assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
                           .asyncMap(null)
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsExactly(0, 1, 2, 3);
     }
 
@@ -919,49 +911,48 @@ public class StreamsTest {
 
         final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        OutputChannel<? extends Selectable<?>> outputChannel;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
+        Channel<?, ? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.merge(-7, channel1, channel2).buildChannels();
         channel1.pass("test1").close();
         channel2.pass(13).close();
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
+        assertThat(outputChannel.after(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test1", -7), new Selectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Streams.merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                               .buildChannels();
+        outputChannel =
+                Streams.merge(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
         channel2.pass(13).close();
         channel1.pass("test1").close();
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
+        assertThat(outputChannel.after(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test1", 11), new Selectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.merge(channel1, channel2).buildChannels();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
+        assertThat(outputChannel.after(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels();
+                Streams.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
+        assertThat(outputChannel.after(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
+        final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
         outputChannel = Streams.merge(channelMap).buildChannels();
         channel1.pass("test3").close();
         channel2.pass(111).close();
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
+        assertThat(outputChannel.after(seconds(1)).all()).containsOnly(
                 new Selectable<String>("test3", 7), new Selectable<Integer>(111, -3));
     }
 
@@ -971,14 +962,14 @@ public class StreamsTest {
 
         final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
-        final IOChannel<String> channel1 = builder.buildChannel();
-        final IOChannel<String> channel2 = builder.buildChannel();
-        final IOChannel<String> channel3 = builder.buildChannel();
-        final IOChannel<String> channel4 = builder.buildChannel();
+        final Channel<String, String> channel1 = builder.buildChannel();
+        final Channel<String, String> channel2 = builder.buildChannel();
+        final Channel<String, String> channel3 = builder.buildChannel();
+        final Channel<String, String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
                 JRoutineCore.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
-        final OutputChannel<String> outputChannel = routine.asyncCall(
+        final Channel<?, String> outputChannel = routine.async(
                 Streams.merge(Arrays.asList(channel1, channel2, channel3, channel4))
                        .buildChannels());
 
@@ -996,7 +987,7 @@ public class StreamsTest {
         channel3.close();
         channel4.close();
 
-        assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("0", "1", "2", "3");
+        assertThat(outputChannel.after(seconds(10)).all()).containsExactly("0", "1", "2", "3");
     }
 
     @Test
@@ -1004,9 +995,9 @@ public class StreamsTest {
 
         final ChannelBuilder builder =
                 JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        OutputChannel<? extends Selectable<?>> outputChannel;
+        Channel<String, String> channel1;
+        Channel<Integer, Integer> channel2;
+        Channel<?, ? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.merge(-7, channel1, channel2).buildChannels();
@@ -1015,7 +1006,7 @@ public class StreamsTest {
 
         try {
 
-            outputChannel.afterMax(seconds(1)).all();
+            outputChannel.after(seconds(1)).all();
 
             fail();
 
@@ -1025,14 +1016,14 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = Streams.merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                               .buildChannels();
+        outputChannel =
+                Streams.merge(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
         channel2.abort();
         channel1.pass("test1").close();
 
         try {
 
-            outputChannel.afterMax(seconds(1)).all();
+            outputChannel.after(seconds(1)).all();
 
             fail();
 
@@ -1048,7 +1039,7 @@ public class StreamsTest {
 
         try {
 
-            outputChannel.afterMax(seconds(1)).all();
+            outputChannel.after(seconds(1)).all();
 
             fail();
 
@@ -1059,13 +1050,13 @@ public class StreamsTest {
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels();
+                Streams.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
         channel1.pass("test2").close();
         channel2.abort();
 
         try {
 
-            outputChannel.afterMax(seconds(1)).all();
+            outputChannel.after(seconds(1)).all();
 
             fail();
 
@@ -1075,8 +1066,7 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
+        final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
         outputChannel = Streams.merge(channelMap).buildChannels();
@@ -1085,7 +1075,7 @@ public class StreamsTest {
 
         try {
 
-            outputChannel.afterMax(seconds(1)).all();
+            outputChannel.after(seconds(1)).all();
 
             fail();
 
@@ -1099,7 +1089,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(0, Collections.<OutputChannel<Object>>emptyList());
+            Streams.merge(0, Collections.<Channel<?, Object>>emptyList());
 
             fail();
 
@@ -1119,7 +1109,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(Collections.<OutputChannel<Object>>emptyList());
+            Streams.merge(Collections.<Channel<?, Object>>emptyList());
 
             fail();
 
@@ -1129,7 +1119,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(Collections.<Integer, OutputChannel<Object>>emptyMap());
+            Streams.merge(Collections.<Integer, Channel<?, Object>>emptyMap());
 
             fail();
 
@@ -1149,7 +1139,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(new OutputChannel[]{null});
+            Streams.merge(new Channel[]{null});
 
             fail();
 
@@ -1159,7 +1149,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(Collections.<OutputChannel<?>>singletonList(null));
+            Streams.merge(Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -1169,7 +1159,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(0, new OutputChannel[]{null});
+            Streams.merge(0, new Channel[]{null});
 
             fail();
 
@@ -1179,7 +1169,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(0, Collections.<OutputChannel<?>>singletonList(null));
+            Streams.merge(0, Collections.<Channel<?, ?>>singletonList(null));
 
             fail();
 
@@ -1189,7 +1179,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.merge(Collections.<Integer, OutputChannel<?>>singletonMap(1, null));
+            Streams.merge(Collections.<Integer, Channel<?, ?>>singletonMap(1, null));
 
             fail();
 
@@ -1202,11 +1192,11 @@ public class StreamsTest {
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
-        assertThat(Streams.toSelectable(channel.asOutput(), 33)
+        assertThat(Streams.selectableOutput(channel, 33)
                           .buildChannels()
-                          .afterMax(seconds(1))
+                          .after(seconds(1))
                           .all()).containsExactly(new Selectable<String>("test1", 33),
                 new Selectable<String>("test2", 33), new Selectable<String>("test3", 33));
     }
@@ -1214,11 +1204,11 @@ public class StreamsTest {
     @Test
     public void testOutputToSelectableAbort() {
 
-        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
-            Streams.toSelectable(channel.asOutput(), 33).buildChannels().afterMax(seconds(1)).all();
+            Streams.selectableOutput(channel, 33).buildChannels().after(seconds(1)).all();
             fail();
 
         } catch (final AbortException ignored) {
@@ -1238,110 +1228,113 @@ public class StreamsTest {
                                   return (char) (character + 1);
                               }
                           }))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, 2, new BigDecimal(0.7)))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
                 new BigDecimal(0.7).add(new BigDecimal(0.7))));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, -10, BigInteger.valueOf(-2)))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-2), BigInteger.valueOf(-4),
                         BigInteger.valueOf(-6), BigInteger.valueOf(-8), BigInteger.valueOf(-10)));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, BigInteger.valueOf(2), 0.7))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
                 new BigDecimal(0.7).add(new BigDecimal(0.7))));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, -10, -2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
-        assertThat(
-                Streams.streamOf().async().thenGetMore(range(0, 2, 0.7)).afterMax(seconds(3)).all())
+        assertThat(Streams.streamOf().async().thenGetMore(range(0, 2, 0.7)).after(seconds(3)).all())
                 .isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, 2, 0.7f))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0L, -9, -2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, (short) 9, 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range((byte) 0, (short) 9, (byte) 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range((byte) 0, (byte) 10, (byte) 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, new BigDecimal(2)))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0), new BigDecimal(1), new BigDecimal(2)));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, BigInteger.valueOf(-2)))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-1),
                         BigInteger.valueOf(-2)));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0.1, BigInteger.valueOf(2)))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0.1), new BigDecimal(0.1).add(BigDecimal.ONE)));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, -5))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
-        assertThat(Streams.streamOf().async().thenGetMore(range(0, 2.1)).afterMax(seconds(3)).all())
-                .isEqualTo(Arrays.asList(0d, 1d, 2d));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGetMore(range(0, 2.1))
+                          .after(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range(0, 1.9f))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 1f));
-        assertThat(Streams.streamOf().async().thenGetMore(range(0L, -4)).afterMax(seconds(3)).all())
-                .isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(Streams.streamOf()
                           .async()
-                          .thenGetMore(range(0, (short) 4))
-                          .afterMax(seconds(3))
-                          .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
+                          .thenGetMore(range(0L, -4))
+                          .after(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
+        assertThat(
+                Streams.streamOf().async().thenGetMore(range(0, (short) 4)).after(seconds(3)).all())
+                .isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range((byte) 0, (short) 4))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGetMore(range((byte) 0, (byte) 5))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
         assertThat(Streams.streamOf()
@@ -1354,94 +1347,94 @@ public class StreamsTest {
                                   return (char) (character + 1);
                               }
                           }))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, -10, -2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2, 0.7))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2, 0.7f))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0L, -9, -2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, (short) 9, 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (short) 9, (byte) 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (byte) 10, (byte) 2))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, -5))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 2.1))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, 1.9f))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 1f));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0L, -4))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range(0, (short) 4))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (short) 4))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
                           .parallel()
                           .thenGetMore(range((byte) 0, (byte) 5))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
         assertThat(Streams.streamOf()
@@ -1495,7 +1488,7 @@ public class StreamsTest {
     @Test
     public void testRangeEquals() {
 
-        final Consumer<? extends InputChannel<? extends Number>> range1 =
+        final Consumer<? extends Channel<? extends Number, ?>> range1 =
                 Streams.range(BigDecimal.ONE, 10);
         assertThat(range1).isEqualTo(range1);
         assertThat(range1).isNotEqualTo(null);
@@ -1504,7 +1497,7 @@ public class StreamsTest {
         assertThat(range1).isEqualTo(Streams.range(BigDecimal.ONE, 10));
         assertThat(range1.hashCode()).isEqualTo(Streams.range(BigDecimal.ONE, 10).hashCode());
 
-        final Consumer<? extends InputChannel<? extends Number>> range2 =
+        final Consumer<? extends Channel<? extends Number, ?>> range2 =
                 Streams.range(BigInteger.ONE, 10);
         assertThat(range2).isEqualTo(range2);
         assertThat(range2).isNotEqualTo(null);
@@ -1513,7 +1506,7 @@ public class StreamsTest {
         assertThat(range2).isEqualTo(Streams.range(BigInteger.ONE, 10));
         assertThat(range2.hashCode()).isEqualTo(Streams.range(BigInteger.ONE, 10).hashCode());
 
-        final Consumer<? extends InputChannel<? extends Number>> range3 = Streams.range(1, 10);
+        final Consumer<? extends Channel<? extends Number, ?>> range3 = Streams.range(1, 10);
         assertThat(range3).isEqualTo(range3);
         assertThat(range3).isNotEqualTo(null);
         assertThat(range3).isNotEqualTo("test");
@@ -1521,7 +1514,7 @@ public class StreamsTest {
         assertThat(range3).isEqualTo(Streams.range(1, 10));
         assertThat(range3.hashCode()).isEqualTo(Streams.range(1, 10).hashCode());
 
-        final Consumer<? extends InputChannel<? extends Number>> range4 = Streams.range(1, 10, -2);
+        final Consumer<? extends Channel<? extends Number, ?>> range4 = Streams.range(1, 10, -2);
         assertThat(range4).isEqualTo(range4);
         assertThat(range4).isNotEqualTo(null);
         assertThat(range4).isNotEqualTo("test");
@@ -1536,7 +1529,7 @@ public class StreamsTest {
                 return (char) (character + 1);
             }
         };
-        final Consumer<? extends InputChannel<? extends Character>> range5 =
+        final Consumer<? extends Channel<? extends Character, ?>> range5 =
                 Streams.range('a', 'f', function);
         assertThat(range5).isEqualTo(range5);
         assertThat(range5).isNotEqualTo(null);
@@ -1673,13 +1666,13 @@ public class StreamsTest {
     @Test
     public void testReplay() {
 
-        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.replay(ioChannel).buildChannels();
+        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Streams.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
         ioChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
@@ -1689,13 +1682,13 @@ public class StreamsTest {
     @Test
     public void testReplayAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.replay(ioChannel).buildChannels();
+        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Streams.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
         ioChannel.abort();
 
@@ -1722,17 +1715,18 @@ public class StreamsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutineCore.on(new Sort()).buildRoutine();
-        final IOChannel<Selectable<Object>> inputChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        final Channel<Selectable<Object>, Selectable<Object>> inputChannel =
+                JRoutineCore.io().buildChannel();
+        final Channel<?, Selectable<Object>> outputChannel = routine.async(inputChannel);
         final StreamChannel<Object, Object> intChannel =
-                Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+                Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                        .channelConfiguration()
                        .withLogLevel(Level.WARNING)
                        .apply()
                        .buildChannels()
                        .get(Sort.INTEGER);
         final StreamChannel<Object, Object> strChannel =
-                Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
+                Streams.selectOutput(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
                        .channelConfiguration()
                        .withLogLevel(Level.WARNING)
                        .apply()
@@ -1740,16 +1734,16 @@ public class StreamsTest {
                        .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
                 new Selectable<Object>(-11, Sort.INTEGER));
-        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
-        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        assertThat(intChannel.after(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.after(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
                 new Selectable<Object>("test21", Sort.STRING));
-        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
-        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        assertThat(intChannel.after(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.after(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
                 new Selectable<Object>(-11, Sort.INTEGER));
-        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
-        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        assertThat(intChannel.after(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.after(seconds(10)).next()).isEqualTo("test21");
     }
 
     @Test
@@ -1758,9 +1752,10 @@ public class StreamsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutineCore.on(new Sort()).buildRoutine();
-        IOChannel<Selectable<Object>> inputChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
-        Streams.select(Sort.STRING, 2, outputChannel).buildChannels();
+        Channel<Selectable<Object>, Selectable<Object>> inputChannel =
+                JRoutineCore.io().buildChannel();
+        Channel<?, Selectable<Object>> outputChannel = routine.async(inputChannel);
+        Streams.selectOutput(Sort.STRING, 2, outputChannel).buildChannels();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
                             new Selectable<Object>(-11, Sort.INTEGER))
@@ -1768,10 +1763,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+            Streams.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
                    .buildChannels()
                    .get(Sort.STRING)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1782,10 +1777,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+            Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                    .buildChannels()
                    .get(Sort.INTEGER)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1795,8 +1790,8 @@ public class StreamsTest {
         }
 
         inputChannel = JRoutineCore.io().buildChannel();
-        outputChannel = routine.asyncCall(inputChannel);
-        Streams.select(outputChannel, Sort.INTEGER, Sort.STRING).buildChannels();
+        outputChannel = routine.async(inputChannel);
+        Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING).buildChannels();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>(-11, Sort.INTEGER),
                             new Selectable<Object>("test21", Sort.STRING))
@@ -1804,10 +1799,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+            Streams.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
                    .buildChannels()
                    .get(Sort.STRING)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1818,10 +1813,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+            Streams.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
                    .buildChannels()
                    .get(Sort.INTEGER)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1831,8 +1826,9 @@ public class StreamsTest {
         }
 
         inputChannel = JRoutineCore.io().buildChannel();
-        outputChannel = routine.asyncCall(inputChannel);
-        Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER)).buildChannels();
+        outputChannel = routine.async(inputChannel);
+        Streams.selectOutput(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
+               .buildChannels();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
                             new Selectable<Object>(-11, Sort.INTEGER))
@@ -1840,10 +1836,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+            Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                    .buildChannels()
                    .get(Sort.STRING)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1854,10 +1850,10 @@ public class StreamsTest {
 
         try {
 
-            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+            Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                    .buildChannels()
                    .get(Sort.INTEGER)
-                   .afterMax(seconds(1))
+                   .after(seconds(1))
                    .all();
 
             fail();
@@ -1881,7 +1877,7 @@ public class StreamsTest {
                                           return (char) (character + 1);
                                       }
                                   }))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .order(OrderType.BY_CALL)
@@ -1895,7 +1891,7 @@ public class StreamsTest {
                                           return (char) (character + 1);
                                       }
                                   }))
-                          .afterMax(seconds(3))
+                          .after(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .sync()
@@ -1914,7 +1910,7 @@ public class StreamsTest {
     @Test
     public void testSequenceEquals() {
 
-        final Consumer<InputChannel<Integer>> series1 =
+        final Consumer<Channel<Integer, ?>> series1 =
                 Streams.sequence(1, 10, Functions.<Integer, Long>first());
         assertThat(series1).isEqualTo(series1);
         assertThat(series1).isNotEqualTo(null);
@@ -1967,14 +1963,7 @@ public class StreamsTest {
         private int mFirstIndex;
 
         @Override
-        public void onRecycle() {
-
-            mFirstIndex = NO_INDEX;
-        }
-
-        @Override
-        public void onInput(final Selectable<DATA> input,
-                @NotNull final ResultChannel<DATA> result) {
+        public void onInput(final Selectable<DATA> input, @NotNull final Channel<DATA, ?> result) {
 
             if (mFirstIndex == NO_INDEX) {
 
@@ -1985,6 +1974,12 @@ public class StreamsTest {
 
                 result.pass(input.data);
             }
+        }
+
+        @Override
+        public void onRecycle() {
+
+            mFirstIndex = NO_INDEX;
         }
     }
 
@@ -1998,7 +1993,7 @@ public class StreamsTest {
             super(null);
         }
 
-        public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
+        public void onInput(final List<?> objects, @NotNull final Channel<Character, ?> result) {
 
             final String text = (String) objects.get(0);
             final int index = ((Integer) objects.get(1));
@@ -2021,21 +2016,22 @@ public class StreamsTest {
         }
 
         public void onInput(final Selectable<Object> selectable,
-                @NotNull final ResultChannel<Selectable<Object>> result) {
+                @NotNull final Channel<Selectable<Object>, ?> result) {
 
             switch (selectable.index) {
 
                 case INTEGER:
-                    Channels.<Object, Integer>select(result, INTEGER).buildChannels()
-                                                                     .pass(selectable
-                                                                             .<Integer>data())
-                                                                     .close();
+                    Channels.<Object, Integer>selectInput(result, INTEGER).buildChannels()
+                                                                          .pass(selectable
+                                                                                  .<Integer>data())
+                                                                          .close();
                     break;
 
                 case STRING:
-                    Channels.<Object, String>select(result, STRING).buildChannels()
-                                                                   .pass(selectable.<String>data())
-                                                                   .close();
+                    Channels.<Object, String>selectInput(result, STRING).buildChannels()
+                                                                        .pass(selectable
+                                                                                .<String>data())
+                                                                        .close();
                     break;
             }
         }

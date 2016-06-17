@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
 
@@ -34,7 +35,7 @@ class LoopConsumerInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
     private final long mCount;
 
-    private final ConsumerWrapper<? super ResultChannel<OUT>> mOutputsConsumer;
+    private final ConsumerWrapper<? super Channel<OUT, ?>> mOutputsConsumer;
 
     /**
      * Constructor.
@@ -43,21 +44,21 @@ class LoopConsumerInvocation<OUT> extends GenerateInvocation<Object, OUT> {
      * @param outputsConsumer the consumer instance.
      */
     LoopConsumerInvocation(final long count,
-            @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> outputsConsumer) {
+            @NotNull final ConsumerWrapper<? super Channel<OUT, ?>> outputsConsumer) {
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("consumer instance", outputsConsumer)));
         mCount = count;
         mOutputsConsumer = outputsConsumer;
     }
 
-    public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
-    }
-
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         final long count = mCount;
-        final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mOutputsConsumer;
+        final ConsumerWrapper<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {
             consumer.accept(result);
         }
+    }
+
+    public void onInput(final Object input, @NotNull final Channel<OUT, ?> result) {
     }
 }

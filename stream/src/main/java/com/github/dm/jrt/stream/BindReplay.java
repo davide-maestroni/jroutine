@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channels;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BindReplay<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+class BindReplay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -44,7 +44,7 @@ class BindReplay<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
         return Channels.replay(channel)
                        .channelConfiguration()
                        .with(mConfiguration)

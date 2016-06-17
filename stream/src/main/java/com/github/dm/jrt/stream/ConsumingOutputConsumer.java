@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final IOChannel<?> mOutputChannel;
+    private final Channel<?, ?> mOutputChannel;
 
     private final ConsumerWrapper<? super OUT> mOutputConsumer;
 
@@ -43,7 +44,7 @@ class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param outputChannel  the output channel.
      */
     ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
-            @NotNull final IOChannel<?> outputChannel) {
+            @NotNull final Channel<?, ?> outputChannel) {
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
         mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }

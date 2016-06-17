@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -58,16 +58,16 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
         mCount = ConstantConditions.positive("channel count", count);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final int count = mCount;
-        final IOChannel<OUT> outputChannel = JRoutineCore.io()
-                                                         .channelConfiguration()
-                                                         .with(mConfiguration)
-                                                         .apply()
-                                                         .buildChannel();
-        final ArrayList<IOChannel<IN>> channels = new ArrayList<IOChannel<IN>>(count);
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                            .channelConfiguration()
+                                                            .with(mConfiguration)
+                                                            .apply()
+                                                            .buildChannel();
+        final ArrayList<Channel<IN, IN>> channels = new ArrayList<Channel<IN, IN>>(count);
         for (int i = 0; i < count; ++i) {
-            final IOChannel<IN> inputChannel = JRoutineCore.io().buildChannel();
+            final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
             outputChannel.pass(super.apply(inputChannel));
             channels.add(inputChannel);
         }

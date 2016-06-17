@@ -103,7 +103,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
 
         @SuppressWarnings("unchecked") final CallAdapter<OutputChannel<?>> channelAdapter =
                 (CallAdapter<OutputChannel<?>>) delegateFactory.get(
-                        getOutputChannelType(responseType), annotations, retrofit);
+                        getChannelType(responseType), annotations, retrofit);
         if (channelAdapter != null) {
             return new ChannelAdapterInvocationFactory(
                     asArgs(delegateFactory, configuration, invocationMode, responseType,

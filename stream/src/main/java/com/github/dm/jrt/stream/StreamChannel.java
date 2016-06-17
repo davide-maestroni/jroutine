@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -56,8 +56,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.START;
 
 /**
- * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions.
+ * Interface defining a stream channel, that is, a channel concatenating map and reduce functions.
  * <br>
  * Each function in the stream is backed by a routine instance, which may have its own specific
  * configuration and invocation mode.
@@ -76,21 +75,21 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <OUT> the output data type.
  */
 public interface StreamChannel<IN, OUT>
-        extends OutputChannel<OUT>, ConfigurableBuilder<StreamChannel<IN, OUT>> {
+        extends Channel<IN, OUT>, ConfigurableBuilder<StreamChannel<IN, OUT>> {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> afterMax(@NotNull UnitDuration timeout);
+    StreamChannel<IN, OUT> after(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    StreamChannel<IN, OUT> after(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -105,6 +104,14 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> close();
+    // TODO: 17/06/16 unit tests + pass
 
     /**
      * {@inheritDoc}
@@ -140,6 +147,48 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> immediately();
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> orderByCall();
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> orderByDelay();
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> pass(@Nullable IN input);
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    @StreamFlow(START)
+    StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
      * {@inheritDoc}.
@@ -202,7 +251,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> append(@NotNull OutputChannel<? extends OUT> channel);
+    StreamChannel<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
 
     /**
      * Concatenates a stream appending the outputs returned by the specified supplier.
@@ -260,7 +309,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> appendGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+            @NotNull Consumer<? super Channel<OUT, ?>> consumer);
 
     /**
      * Concatenates a stream appending the outputs returned by the specified consumer.
@@ -279,7 +328,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> appendGetMore(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    StreamChannel<IN, OUT> appendGetMore(@NotNull Consumer<? super Channel<OUT, ?>> consumer);
 
     /**
      * Transforms this stream by applying the specified function.
@@ -313,8 +362,8 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> applyTransform(@NotNull Function<? extends Function<? super
-            OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-            OutputChannel<IN>, ? extends OutputChannel<AFTER>>> transformFunction);
+            Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+            Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * Transforms the stream by modifying the flow building function.
@@ -333,8 +382,8 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> applyTransformWith(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
-                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> transformFunction);
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -601,8 +650,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> flatMap(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
-                    mappingFunction);
+            @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
      * Gets the invocation configuration builder related only to the next concatenated routine
@@ -743,7 +791,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> mapAllMore(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> mappingConsumer);
+            @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
      * Concatenates a stream mapping this stream outputs through the specified consumer.
@@ -762,7 +810,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> mapMore(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> mappingConsumer);
+            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
      * Concatenates a consumer handling the outputs completion.
@@ -916,7 +964,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> orElseGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
+            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * Concatenates a stream producing the outputs returned by the specified consumer in case this
@@ -937,7 +985,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> orElseGetMore(
-            @NotNull Consumer<? super ResultChannel<OUT>> outputsConsumer);
+            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
@@ -1485,7 +1533,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGetMore(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * Concatenates a stream generating the outputs returned by the specified consumer.
@@ -1508,7 +1556,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGetMore(
-            @NotNull Consumer<? super ResultChannel<AFTER>> outputsConsumer);
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * Returns a new stream making this one selectable.
@@ -1555,7 +1603,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> tryCatchMore(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> catchConsumer);
+            @NotNull BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer);
 
     /**
      * Concatenates a runnable always called when outputs complete, even if an error occurred.

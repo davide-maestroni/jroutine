@@ -24,6 +24,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -354,7 +355,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
         checkStatic(wrap(consumer), consumer);
         return on(consumerCall(consumer));
     }
@@ -424,7 +425,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <OUT> LoaderRoutineBuilder<Void, OUT> onCommandMore(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         checkStatic(wrap(consumer), consumer);
         return on(consumerCommand(consumer));
     }
@@ -573,7 +574,7 @@ public class LoaderBuilderCompat {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onMappingMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         checkStatic(wrap(consumer), consumer);
         return on(consumerMapping(consumer));
     }

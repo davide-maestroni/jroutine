@@ -160,10 +160,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         if (returnType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) returnType;
             rawType = parameterizedType.getRawType();
-            if (Channel.class == rawType) {
-                responseType = parameterizedType.getActualTypeArguments()[0];
-
-            } else if (StreamChannel.class == rawType) {
+            if ((Channel.class == rawType) || (StreamChannel.class == rawType)) {
                 responseType = parameterizedType.getActualTypeArguments()[1];
             }
 

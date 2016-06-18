@@ -1199,7 +1199,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mBoundChannels.add(channel);
             ++mPendingExecutionCount;
             mLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer();
+            return new DefaultOutputConsumer(); // TODO: 18/06/16 pass channel and remove?
         }
 
         /**

@@ -40,7 +40,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -54,7 +53,6 @@
 
                                   &commat;Override
                                   public void onError(&commat;NotNull final RoutineException error) {
-
                                       final Throwable cause = error.getCause();
                                       Toast.makeText(MainTestActivity.this, (cause != null) ?
                                               cause.getMessage() : "Cannot load image",
@@ -63,7 +61,6 @@
 
                                   &commat;Override
                                   public void onOutput(final Bitmap bitmap) {
-
                                       imageView.setImageBitmap(bitmap);
                                   }
                               });
@@ -72,9 +69,8 @@
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) throws
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
                         Exception {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -107,7 +103,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -121,7 +116,6 @@
 
                                   &commat;Override
                                   public void onError(&commat;NotNull final RoutineException error) {
-
                                       final Throwable cause = error.getCause();
                                       Toast.makeText(MainTestActivity.this, (cause != null) ?
                                               cause.getMessage() : "Cannot load image",
@@ -130,7 +124,6 @@
 
                                   &commat;Override
                                   public void onOutput(final Bitmap bitmap) {
-
                                       imageView.setImageBitmap(bitmap);
                                   }
                               });
@@ -139,9 +132,8 @@
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) throws
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
                         Exception {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -165,7 +157,6 @@
 
                 &commat;Override
                 public void onContext(&commat;NotNull final Context context) {
-
                     super.onContext(context);
                     mRoutine = JRoutineService.with(serviceFrom(context))
                                               .on(TargetInvocationFactory.factoryOf(LoadBitmap.class))
@@ -173,8 +164,7 @@
                 }
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
-
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) {
                     result.pass(mRoutine.asyncCall(uri));
                 }
             }

@@ -46,8 +46,8 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 /**
- * Implementation of a call adapter factory supporting {@code OutputChannel}, {@code StreamChannel}
- * and {@code LoaderStreamChannelCompat} return types.
+ * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamChannel} and
+ * {@code LoaderStreamChannelCompat} return types.
  * <br>
  * If properly configured, the routine invocations will run in a dedicated Android loader.
  * <p>

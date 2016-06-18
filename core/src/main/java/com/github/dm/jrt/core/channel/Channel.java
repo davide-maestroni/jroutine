@@ -417,7 +417,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * Checks if this channel is bound to a consumer or another channel.
      *
      * @return whether the channel is bound.
-     * @see #bind bind(InputChannel)
+     * @see #bind bind(Channel)
      * @see #bind(OutputConsumer)
      */
     boolean isBound();

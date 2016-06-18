@@ -50,8 +50,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre>
  *     <code>
  *
- *         public void onInput(final IN in,
- *                 final ResultChannel&lt;ParcelableByteBuffer&gt; result) {
+ *         public void onInput(final IN in, final Channel&lt;ParcelableByteBuffer, ?&gt; result) {
  *
  *             ...
  *             final BufferOutputStream outputStream =
@@ -65,7 +64,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *     <code>
  *
  *         public void onInput(final ParcelableByteBuffer buffer,
- *                 final ResultChannel&lt;OUT&gt; result) {
+ *         final Channel&lt;OUT, ?&gt; result) {
  *
  *             ...
  *             final BufferInputStream inputStream =

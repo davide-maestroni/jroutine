@@ -44,7 +44,7 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
     /**
      * Constructor.
      *
-     * @param channels the list of I/O channels.
+     * @param channels the list of channels.
      */
     ParallelCountOutputConsumer(@NotNull final List<? extends Channel<OUT, OUT>> channels) {
         mChannels = new ArrayList<Channel<OUT, ?>>(channels);

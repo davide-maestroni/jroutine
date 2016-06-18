@@ -46,7 +46,7 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
      */
     SelectableOutputConsumer(@NotNull final Channel<? super
             ParcelableSelectable<OUT>, ?> channel, final int index) {
-        mChannel = ConstantConditions.notNull("I/O channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 

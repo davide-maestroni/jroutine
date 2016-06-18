@@ -51,7 +51,7 @@ public class JRoutineAndroid extends LoaderStreams {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns a channel builder.
      *
      * @return the channel builder instance.
      */

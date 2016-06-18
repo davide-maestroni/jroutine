@@ -1571,6 +1571,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(int index);
+    // TODO: 18/06/16 selectable(int)
 
     /**
      * Concatenates a function handling invocation exceptions.

@@ -42,7 +42,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -54,7 +53,6 @@
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {
-
                                            final Throwable cause = error.getCause();
                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                    cause.getMessage() : "Cannot load image",
@@ -63,7 +61,6 @@
 
                                        &commat;Override
                                        public void onOutput(final Bitmap bitmap) {
-
                                            imageView.setImageBitmap(bitmap);
                                        }
                                    });
@@ -76,7 +73,7 @@
                 &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                 &commat;AsyncOut
                 &commat;NotNull
-                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
             }
 
             public static class BitmapLoader {
@@ -84,7 +81,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -117,7 +113,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -129,7 +124,6 @@
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {
-
                                            final Throwable cause = error.getCause();
                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                    cause.getMessage() : "Cannot load image",
@@ -138,7 +132,6 @@
 
                                        &commat;Override
                                        public void onOutput(final Bitmap bitmap) {
-
                                            imageView.setImageBitmap(bitmap);
                                        }
                                    });
@@ -151,7 +144,7 @@
                 &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                 &commat;AsyncOut
                 &commat;NotNull
-                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
             }
 
             public static class BitmapLoader {
@@ -159,7 +152,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -181,7 +173,6 @@
                 private final BitmapLoader mLoader;
 
                 public MyContext(&commat;NotNull final Context base) {
-
                     super(base);
                     mLoader = new BitmapLoader();
                 }
@@ -189,7 +180,6 @@
                 &commat;Nullable
                 public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
                         &commat;NotNull final Object... args) {
-
                     if (type == BitmapLoader.class) {
                         return type.cast(mLoader);
                     }
@@ -214,7 +204,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -226,7 +215,6 @@
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {
-
                                            final Throwable cause = error.getCause();
                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                    cause.getMessage() : "Cannot load image",
@@ -235,7 +223,6 @@
 
                                        &commat;Override
                                        public void onOutput(final Bitmap bitmap) {
-
                                            imageView.setImageBitmap(bitmap);
                                        }
                                    });
@@ -248,7 +235,7 @@
                 &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                 &commat;AsyncOut
                 &commat;NotNull
-                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
             }
 
             public static class BitmapLoader {
@@ -256,7 +243,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -278,7 +264,6 @@
                 private final BitmapLoader mLoader;
 
                 public MyContext(&commat;NotNull final Context base) {
-
                     super(base);
                     mLoader = new BitmapLoader();
                 }
@@ -286,7 +271,6 @@
                 &commat;Nullable
                 public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
                         &commat;NotNull final Object... args) {
-
                     if (type == BitmapLoader.class) {
                         return type.cast(mLoader);
                     }

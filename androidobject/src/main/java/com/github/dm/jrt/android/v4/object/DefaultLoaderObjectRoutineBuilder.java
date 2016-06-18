@@ -29,6 +29,7 @@ import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
@@ -143,9 +144,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         final ObjectConfiguration objectConfiguration =
                 Builders.withAnnotations(mObjectConfiguration, targetMethod);
-        final AliasContextInvocationFactory<IN, OUT> factory =
-                new AliasContextInvocationFactory<IN, OUT>(targetMethod, objectConfiguration,
-                        target, name);
+        final MethodAliasInvocationFactory<IN, OUT> factory =
+                new MethodAliasInvocationFactory<IN, OUT>(targetMethod, objectConfiguration, target,
+                        name);
         final InvocationConfiguration invocationConfiguration =
                 Builders.withAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -173,8 +174,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
         final ObjectConfiguration objectConfiguration =
                 Builders.withAnnotations(mObjectConfiguration, method);
-        final MethodContextInvocationFactory<IN, OUT> factory =
-                new MethodContextInvocationFactory<IN, OUT>(method, objectConfiguration, mTarget,
+        final MethodSignatureInvocationFactory<IN, OUT> factory =
+                new MethodSignatureInvocationFactory<IN, OUT>(method, objectConfiguration, mTarget,
                         method);
         final InvocationConfiguration invocationConfiguration =
                 Builders.withAnnotations(mInvocationConfiguration, method);
@@ -219,7 +220,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
+    private static class MethodAliasInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -227,7 +228,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
-        private InvocationChannel<IN, OUT> mChannel;
+        private Channel<IN, OUT> mChannel;
 
         private Object mInstance;
 
@@ -240,7 +241,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target              the invocation target.
          * @param name                the alias name.
          */
-        private AliasContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
+        private MethodAliasInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -250,6 +251,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
+            mChannel = null;
         }
 
         @Override
@@ -280,28 +282,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             mChannel.pass(input);
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-            result.pass(mChannel.result());
-        }
-
-        @Override
-        public void onTerminate() {
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
+            result.pass(mChannel.close());
             mChannel = null;
         }
     }
 
     /**
-     * Factory of {@link AliasContextInvocation}s.
+     * Factory of {@link MethodAliasInvocation}s.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocationFactory<IN, OUT>
+    private static class MethodAliasInvocationFactory<IN, OUT>
             extends ContextInvocationFactory<IN, OUT> {
 
         private final String mName;
@@ -318,7 +316,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target              the invocation target.
          * @param name                the alias name.
          */
-        private AliasContextInvocationFactory(@NotNull final Method targetMethod,
+        private MethodAliasInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
             super(asArgs(targetMethod, objectConfiguration, target, name));
@@ -330,7 +328,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
-            return new AliasContextInvocation<IN, OUT>(mObjectConfiguration, mTarget, mName);
+            return new MethodAliasInvocation<IN, OUT>(mObjectConfiguration, mTarget, mName);
         }
     }
 
@@ -340,7 +338,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
+    private static class MethodSignatureInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -348,7 +346,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
-        private InvocationChannel<IN, OUT> mChannel;
+        private Channel<IN, OUT> mChannel;
 
         private Object mInstance;
 
@@ -361,7 +359,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target              the invocation target.
          * @param method              the method.
          */
-        private MethodContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
+        private MethodSignatureInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
             mObjectConfiguration = objectConfiguration;
             mTarget = target;
@@ -369,8 +367,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
+            result.pass(mChannel.close());
+            mChannel = null;
+        }
+
+        @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
+            mChannel = null;
         }
 
         @Override
@@ -385,18 +390,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             mChannel.pass(input);
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-            result.pass(mChannel.result());
-        }
-
-        @Override
-        public void onTerminate() {
-            mChannel = null;
         }
 
         @Override
@@ -417,12 +412,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     /**
-     * Factory of {@link MethodContextInvocation}s.
+     * Factory of {@link MethodSignatureInvocation}s.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocationFactory<IN, OUT>
+    private static class MethodSignatureInvocationFactory<IN, OUT>
             extends ContextInvocationFactory<IN, OUT> {
 
         private final Method mMethod;
@@ -439,7 +434,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target              the invocation target.
          * @param method              the method.
          */
-        private MethodContextInvocationFactory(@NotNull final Method targetMethod,
+        private MethodSignatureInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
             super(asArgs(targetMethod, objectConfiguration, target, method));
@@ -451,7 +446,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @NotNull
         @Override
         public ContextInvocation<IN, OUT> newInvocation() {
-            return new MethodContextInvocation<IN, OUT>(mObjectConfiguration, mTarget, mMethod);
+            return new MethodSignatureInvocation<IN, OUT>(mObjectConfiguration, mTarget, mMethod);
         }
     }
 
@@ -517,7 +512,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) throws Exception {
+                @NotNull final Channel<Object, ?> result) throws Exception {
             callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }

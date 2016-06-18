@@ -23,10 +23,12 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -270,7 +272,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Alias method invocation.
      */
-    private static class MethodAliasInvocation extends TemplateContextInvocation<Object, Object> {
+    private static class MethodAliasInvocation implements ContextInvocation<Object, Object> {
 
         private final String mAliasName;
 
@@ -278,7 +280,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
-        private InvocationChannel<Object, Object> mChannel;
+        private Channel<Object, Object> mChannel;
 
         @SuppressWarnings("unused")
         private Object mInstance;
@@ -300,8 +302,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
+        public void onAbort(@NotNull final RoutineException reason) {
+            mChannel.abort(reason);
+            mChannel = null;
+        }
+
+        @Override
         public void onContext(@NotNull final Context context) throws Exception {
-            super.onContext(context);
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.on(target)
@@ -312,32 +319,33 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onRecycle() {
-            mChannel = mRoutine.sync();
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
+            result.pass(mChannel.close());
+            mChannel = null;
         }
 
         @Override
-        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
+        public void onDiscard() {
+            mRoutine = null;
+            mInstance = null;
+        }
+
+        @Override
+        public void onInput(final Object input, @NotNull final Channel<Object, ?> result) throws
                 Exception {
             mChannel.pass(input);
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Object> result) {
-            result.pass(mChannel.result());
-        }
-
-        @Override
-        public void onTerminate() {
-            mChannel = null;
+        public void onRecycle() {
+            mChannel = mRoutine.sync();
         }
     }
 
     /**
      * Invocation based on method signature.
      */
-    private static class MethodSignatureInvocation
-            extends TemplateContextInvocation<Object, Object> {
+    private static class MethodSignatureInvocation implements ContextInvocation<Object, Object> {
 
         private final String mMethodName;
 
@@ -347,7 +355,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
-        private InvocationChannel<Object, Object> mChannel;
+        private Channel<Object, Object> mChannel;
 
         @SuppressWarnings("unused")
         private Object mInstance;
@@ -373,15 +381,27 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@NotNull final Context context) throws Exception {
-            super.onContext(context);
-            final InvocationTarget target = mTarget.getInvocationTarget(context);
-            mInstance = target.getTarget();
-            mRoutine = JRoutineObject.on(target)
-                                     .objectConfiguration()
-                                     .withSharedFields(mSharedFields)
-                                     .apply()
-                                     .method(mMethodName, mParameterTypes);
+        public void onAbort(@NotNull final RoutineException reason) {
+            mChannel.abort(reason);
+            mChannel = null;
+        }
+
+        @Override
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
+            result.pass(mChannel.close());
+            mChannel = null;
+        }
+
+        @Override
+        public void onDiscard() {
+            mRoutine = null;
+            mInstance = null;
+        }
+
+        @Override
+        public void onInput(final Object input, @NotNull final Channel<Object, ?> result) throws
+                Exception {
+            mChannel.pass(input);
         }
 
         @Override
@@ -390,19 +410,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
-                Exception {
-            mChannel.pass(input);
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<Object> result) {
-            result.pass(mChannel.result());
-        }
-
-        @Override
-        public void onTerminate() {
-            mChannel = null;
+        public void onContext(@NotNull final Context context) throws Exception {
+            final InvocationTarget target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            mRoutine = JRoutineObject.on(target)
+                                     .objectConfiguration()
+                                     .withSharedFields(mSharedFields)
+                                     .apply()
+                                     .method(mMethodName, mParameterTypes);
         }
     }
 
@@ -464,7 +479,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) throws Exception {
+                @NotNull final Channel<Object, ?> result) throws Exception {
             callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }

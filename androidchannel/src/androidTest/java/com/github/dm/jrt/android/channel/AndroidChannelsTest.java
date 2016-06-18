@@ -622,7 +622,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testInputSelect() {
 
         final IOChannel<ParcelableSelectable<String>> channel = JRoutineCore.io().buildChannel();
-        AndroidChannels.selectParcelable(channel, 33)
+        AndroidChannels.selectParcelableInput(channel, 33)
                        .buildChannels()
                        .pass("test1", "test2", "test3")
                        .close();
@@ -636,7 +636,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testInputSelectAbort() {
 
         final IOChannel<ParcelableSelectable<String>> channel = JRoutineCore.io().buildChannel();
-        AndroidChannels.selectParcelable(channel, 33)
+        AndroidChannels.selectParcelableInput(channel, 33)
                        .buildChannels()
                        .pass("test1", "test2", "test3")
                        .abort();
@@ -657,7 +657,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testInputToSelectable() {
 
         final IOChannel<String> channel = JRoutineCore.io().buildChannel();
-        AndroidChannels.toSelectable(channel.asInput(), 33)
+        AndroidChannels.selectableOutput(channel.asInput(), 33)
                        .buildChannels()
                        .pass(new ParcelableSelectable<String>("test1", 33),
                                new ParcelableSelectable<String>("test2", -33),
@@ -671,7 +671,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testInputToSelectableAbort() {
 
         final IOChannel<String> channel = JRoutineCore.io().buildChannel();
-        AndroidChannels.toSelectable(channel.asInput(), 33).buildChannels().abort();
+        AndroidChannels.selectableOutput(channel.asInput(), 33).buildChannels().abort();
         channel.close();
 
         try {
@@ -1324,7 +1324,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         final IOChannel<String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
-        assertThat(AndroidChannels.toSelectable(channel.asOutput(), 33)
+        assertThat(AndroidChannels.selectableOutput(channel.asOutput(), 33)
                                   .buildChannels()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly(
@@ -1340,7 +1340,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.toSelectable(channel.asOutput(), 33)
+            AndroidChannels.selectableOutput(channel.asOutput(), 33)
                            .buildChannels()
                            .afterMax(seconds(10))
                            .all();
@@ -1420,14 +1420,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
             switch (selectable.index) {
 
                 case INTEGER:
-                    AndroidChannels.<Object, Integer>selectParcelable(result,
+                    AndroidChannels.<Object, Integer>selectParcelableInput(result,
                             INTEGER).buildChannels().pass((Integer) selectable.data).close();
                     break;
 
                 case STRING:
-                    AndroidChannels.<Object, String>selectParcelable(result, STRING).buildChannels()
-                                                                                    .pass((String) selectable.data)
-                                                                                    .close();
+                    AndroidChannels.<Object, String>selectParcelableInput(result, STRING).buildChannels()
+                                                                                         .pass((String) selectable.data)
+                                                                                         .close();
                     break;
             }
         }

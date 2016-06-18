@@ -37,7 +37,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
      *
      * @param isFlush     whether to flush data.
      * @param placeholder the placeholder instance.
-     * @param channels    the input channels to join.
+     * @param channels    the channels to join.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -132,7 +132,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
          * @param closed      the array of booleans indicating whether a queue is closed.
          * @param queues      the array of queues used to store the outputs.
          * @param placeholder the placeholder instance.
-         * @param channel     the I/O channel.
+         * @param channel     the channel.
          */
         private JoinOutputConsumer(final int limit, @Nullable final Backoff backoff,
                 final int maxSize, @NotNull final Object mutex, final int index,

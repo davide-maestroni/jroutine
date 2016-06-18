@@ -64,13 +64,11 @@ import java.util.WeakHashMap;
  *
  *                        &#64;Override
  *                        public void onError(&#64;NotNull final RoutineException error) {
- *
  *                            displayError(error);
  *                        }
  *
  *                        &#64;Override
  *                        public void onOutput(final MyResource resource) {
- *
  *                            displayResource(resource);
  *                        }
  *                    });

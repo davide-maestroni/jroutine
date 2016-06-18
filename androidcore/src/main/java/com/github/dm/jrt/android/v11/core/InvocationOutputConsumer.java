@@ -22,6 +22,7 @@ import android.os.Build.VERSION_CODES;
 
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -189,9 +190,9 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
         }
 
         @Override
-        public boolean passTo(@NotNull final Collection<IOChannel<OUT>> newChannels,
-                @NotNull final Collection<IOChannel<OUT>> oldChannels,
-                @NotNull final Collection<IOChannel<OUT>> abortedChannels) {
+        public boolean passTo(@NotNull final Collection<Channel<OUT, ?>> newChannels,
+                @NotNull final Collection<Channel<OUT, ?>> oldChannels,
+                @NotNull final Collection<Channel<OUT, ?>> abortedChannels) {
             synchronized (mMutex) {
                 final Logger logger = mLogger;
                 final ArrayList<OUT> lastResults = mLastResults;
@@ -204,7 +205,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
                 } else {
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
-                    for (final IOChannel<OUT> newChannel : newChannels) {
+                    for (final Channel<OUT, ?> newChannel : newChannels) {
                         try {
                             newChannel.pass(cachedResults).pass(lastResults);
 
@@ -216,7 +217,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
                         }
                     }
 
-                    for (final IOChannel<OUT> channel : oldChannels) {
+                    for (final Channel<OUT, ?> channel : oldChannels) {
                         try {
                             channel.pass(lastResults);
 

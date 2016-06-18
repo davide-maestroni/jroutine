@@ -19,8 +19,6 @@ package com.github.dm.jrt.android.channel;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,112 +40,115 @@ public class AndroidChannels extends Channels {
     }
 
     /**
-     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * Returns a builder of channels merging the specified channels into a selectable one.
+     * <br>
      * The selectable indexes will start from the specified one.
      * <p>
-     * Note that the builder will successfully create only one output channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#merge(int, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
-            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return new MergeBuilder<OUT>(startIndex, channels);
     }
 
     /**
-     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * Returns a builder of channels merging the specified channels into a selectable one.
+     * <br>
      * The selectable indexes will start from the specified one.
      * <p>
-     * Note that the builder will successfully create only one output channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(int, Channel.OutputChannel...)
+     * @see Channels#merge(int, Channel...)
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+            @NotNull final Channel<?, ?>... channels) {
         return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, Arrays.asList(channels));
     }
 
     /**
-     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * Returns a builder of channels merging the specified channels into a selectable one.
+     * <br>
      * The selectable indexes will be the position in the iterable.
      * <p>
-     * Note that the builder will successfully create only one output channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#merge(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
             ParcelableSelectable<OUT>>> merge(
-            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return merge(0, channels);
     }
 
     /**
-     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * Returns a builder of channels merging the specified channels into a selectable one.
+     * <br>
      * The selectable indexes will be the position in the array.
      * <p>
-     * Note that the builder will successfully create only one output channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(Channel.OutputChannel...)
+     * @see Channels#merge(Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
-            ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
+            ParcelableSelectable<OUT>>> merge(@NotNull final Channel<?, ?>... channels) {
         return merge(0, channels);
     }
 
     /**
      * Returns a builder of channels transforming the input data into selectable ones.
      * <p>
-     * Note that the builder will successfully create several input channel instances, and that the
-     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the builder will successfully create several channel instances.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
-     * @return the I/O channel builder.
-     * @see Channels#select(Channel.InputChannel, int)
+     * @return the channel builder.
+     * @see Channels#selectInput(Channel, int)
      */
     @NotNull
-    public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
-            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>>
+    selectParcelableInput(
+            @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             final int index) {
         return new InputSelectBuilder<DATA, IN>(channel, index);
     }
@@ -157,19 +158,19 @@ public class AndroidChannels extends Channels {
      * <br>
      * Each output will be passed along unchanged.
      * <p>
-     * Note that the builder will successfully create only one output channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel builder.
-     * @see Channels#toSelectable(Channel.OutputChannel, int)
+     * @return the selectable channel builder.
+     * @see Channels#selectableOutput(Channel, int)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
-            ParcelableSelectable<OUT>>> toSelectable(
-            @NotNull final OutputChannel<? extends OUT> channel, final int index) {
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
+            ParcelableSelectable<OUT>>> selectableOutput(
+            @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new SelectableOutputBuilder<OUT>(channel, index);
     }
 }

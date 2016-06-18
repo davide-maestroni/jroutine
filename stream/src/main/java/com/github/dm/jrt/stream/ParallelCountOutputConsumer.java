@@ -64,6 +64,7 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
     }
 
     public void onOutput(final OUT output) {
+        // TODO: 18/06/16 does it work??
         int count = 0;
         int minSize = Integer.MAX_VALUE;
         final int[] indexes = mIndexes;

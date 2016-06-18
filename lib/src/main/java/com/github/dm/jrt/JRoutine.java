@@ -66,7 +66,7 @@ public class JRoutine extends Streams {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns an channel builder.
      *
      * @return the channel builder instance.
      */

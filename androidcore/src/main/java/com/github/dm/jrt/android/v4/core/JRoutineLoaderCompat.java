@@ -64,7 +64,6 @@ import java.util.WeakHashMap;
  *
  *         &#64;Override
  *         protected void onCreate(final Bundle savedInstanceState) {
- *
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *             if (savedInstanceState != null) {
@@ -84,13 +83,11 @@ import java.util.WeakHashMap;
  *
  *                            &#64;Override
  *                            public void onError(&#64;NotNull final RoutineException error) {
- *
  *                                displayError(error);
  *                            }
  *
  *                            &#64;Override
  *                            public void onOutput(final MyResource resource) {
- *
  *                                mResource = resource;
  *                                displayResource(resource);
  *                            }
@@ -100,7 +97,6 @@ import java.util.WeakHashMap;
  *
  *         &#64;Override
  *         protected void onSaveInstanceState(final Bundle outState) {
- *
  *             super.onSaveInstanceState(outState);
  *             outState.putParcelable(RESOURCE_KEY, mResource);
  *         }
@@ -119,7 +115,6 @@ import java.util.WeakHashMap;
  *
  *             &#64;Override
  *             public void onContext(&#64;Nonnull final Context context) {
- *
  *                 super.onContext(context);
  *                 mRoutine = JRoutineService.with(serviceFrom(context))
  *                                           .on(factoryOf(LoadResourceUri.class))
@@ -128,8 +123,7 @@ import java.util.WeakHashMap;
  *
  *             &#64;Override
  *             protected void onCall(final List&lt;? extends URI&gt; uris,
- *                     &#64;Nonnull final ResultChannel&lt;MyResource&gt; result) {
- *
+ *                     &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
  *                 result.pass(mRoutine.async(uris));
  *             }
  *         }

@@ -121,7 +121,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the array of input channels.
+     * @param channels the array of channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
@@ -152,7 +152,7 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the array of input channels.
+     * @param channels   the array of channels.
      * @param <IN>       the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
@@ -189,7 +189,7 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the iterable of input channels.
+     * @param channels   the iterable of channels.
      * @param <IN>       the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
@@ -220,7 +220,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the iterable of input channels.
+     * @param channels the iterable of channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
@@ -250,7 +250,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the map of indexes and input channels.
+     * @param channels the map of indexes and channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
@@ -1023,7 +1023,7 @@ public class Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <IN>    the input data type.
-     * @return the selectable I/O channel builder.
+     * @return the selectable channel builder.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<IN>, ?>> selectableInput(

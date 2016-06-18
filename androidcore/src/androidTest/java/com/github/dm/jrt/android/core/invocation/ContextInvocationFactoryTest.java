@@ -22,6 +22,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -153,7 +154,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
 
         @Override
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) throws
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) throws
                 Exception {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());

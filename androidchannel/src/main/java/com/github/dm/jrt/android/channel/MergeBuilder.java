@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.channel;
 
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Builder implementation merging data from a set of output channels into selectable objects.
+ * Builder implementation merging data from a set of channels into selectable objects.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT>
-        extends AbstractBuilder<OutputChannel<? extends ParcelableSelectable<OUT>>> {
+class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends ParcelableSelectable<OUT>>> {
 
-    private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+    private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
     private final int mStartIndex;
 
@@ -43,16 +42,16 @@ class MergeBuilder<OUT>
      * Constructor.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the input channels to merge.
+     * @param channels   the channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     MergeBuilder(final int startIndex,
-            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-        final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>();
-        for (final OutputChannel<? extends OUT> channel : channels) {
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        final ArrayList<Channel<?, ? extends OUT>> channelList =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        for (final Channel<?, ? extends OUT> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -71,15 +70,15 @@ class MergeBuilder<OUT>
 
     @NotNull
     @Override
-    protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
+    protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel =
+        final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         int i = mStartIndex;
-        for (final OutputChannel<? extends OUT> channel : mChannels) {
-            ioChannel.pass(AndroidChannels.toSelectable(channel, i++).buildChannels());
+        for (final Channel<?, ? extends OUT> channel : mChannels) {
+            outputChannel.pass(AndroidChannels.selectableOutput(channel, i++).buildChannels());
         }
 
-        return ioChannel.close();
+        return outputChannel.close();
     }
 }

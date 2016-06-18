@@ -21,7 +21,7 @@ import android.support.v4.util.SparseArrayCompat;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -36,21 +36,21 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Builder implementation returning a map of output channels returning selectable output data.
+ * Builder implementation returning a map of channels returning selectable output data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChannel<OUT>>> {
+class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<Channel<?, OUT>>> {
 
-    private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
-            SparseArrayCompat<OutputChannel<?>>>>
+    private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
+            SparseArrayCompat<Channel<?, ?>>>>
             sOutputChannels =
-            new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
-                    SparseArrayCompat<OutputChannel<?>>>>();
+            new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
+                    SparseArrayCompat<Channel<?, ?>>>>();
 
-    private final OutputChannel<? extends ParcelableSelectable<? extends OUT>> mChannel;
+    private final Channel<?, ? extends ParcelableSelectable<? extends OUT>> mChannel;
 
     private final HashSet<Integer> mIndexes;
 
@@ -63,7 +63,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
      *                                        null object.
      */
     OutputMapBuilder(
-            @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
+            @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Set<Integer> indexes) {
         mChannel = ConstantConditions.notNull("output channel", channel);
         final HashSet<Integer> indexSet =
@@ -78,45 +78,45 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected SparseArrayCompat<OutputChannel<OUT>> build(
+    protected SparseArrayCompat<Channel<?, OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final HashSet<Integer> indexes = mIndexes;
-        final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
+        final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
         synchronized (sOutputChannels) {
-            final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
-                    SparseArrayCompat<OutputChannel<?>>>>
+            final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
+                    SparseArrayCompat<Channel<?, ?>>>>
                     outputChannels = sOutputChannels;
-            HashMap<SelectInfo, SparseArrayCompat<OutputChannel<?>>> channelMaps =
+            HashMap<SelectInfo, SparseArrayCompat<Channel<?, ?>>> channelMaps =
                     outputChannels.get(channel);
             if (channelMaps == null) {
-                channelMaps = new HashMap<SelectInfo, SparseArrayCompat<OutputChannel<?>>>();
+                channelMaps = new HashMap<SelectInfo, SparseArrayCompat<Channel<?, ?>>>();
                 outputChannels.put(channel, channelMaps);
             }
 
             final int size = indexes.size();
             final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-            final SparseArrayCompat<OutputChannel<OUT>> channelMap =
-                    new SparseArrayCompat<OutputChannel<OUT>>(size);
-            SparseArrayCompat<OutputChannel<?>> channels = channelMaps.get(selectInfo);
+            final SparseArrayCompat<Channel<?, OUT>> channelMap =
+                    new SparseArrayCompat<Channel<?, OUT>>(size);
+            SparseArrayCompat<Channel<?, ?>> channels = channelMaps.get(selectInfo);
             if (channels != null) {
                 final int channelSize = channels.size();
                 for (int i = 0; i < channelSize; ++i) {
-                    channelMap.append(channels.keyAt(i), (OutputChannel<OUT>) channels.valueAt(i));
+                    channelMap.append(channels.keyAt(i), (Channel<?, OUT>) channels.valueAt(i));
                 }
 
             } else {
-                final SparseArrayCompat<IOChannel<OUT>> inputMap =
-                        new SparseArrayCompat<IOChannel<OUT>>(size);
-                channels = new SparseArrayCompat<OutputChannel<?>>(size);
+                final SparseArrayCompat<Channel<OUT, ?>> inputMap =
+                        new SparseArrayCompat<Channel<OUT, ?>>(size);
+                channels = new SparseArrayCompat<Channel<?, ?>>(size);
                 for (final Integer index : indexes) {
-                    final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                                 .channelConfiguration()
-                                                                 .with(configuration)
-                                                                 .apply()
-                                                                 .buildChannel();
-                    inputMap.append(index, ioChannel);
-                    channelMap.append(index, ioChannel);
-                    channels.append(index, ioChannel);
+                    final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                                        .channelConfiguration()
+                                                                        .with(configuration)
+                                                                        .apply()
+                                                                        .buildChannel();
+                    inputMap.append(index, outputChannel);
+                    channelMap.append(index, outputChannel);
+                    channels.append(index, outputChannel);
                 }
 
                 channel.bind(new SortingMapOutputConsumer<OUT>(inputMap));

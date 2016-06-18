@@ -41,11 +41,11 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
     /**
      * Constructor.
      *
-     * @param channel the input channel.
+     * @param channel the channel.
      * @param index   the selectable index.
      */
     InputFilterBuilder(@NotNull final Channel<? super IN, ?> channel, final int index) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 
@@ -73,7 +73,7 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
         /**
          * Constructor.
          *
-         * @param channel the input channel to feed.
+         * @param channel the channel to feed.
          * @param index   the index to filter.
          */
         private FilterOutputConsumer(@NotNull final Channel<? super IN, ?> channel,

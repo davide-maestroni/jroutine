@@ -25,7 +25,7 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectable<
      * Constructor.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the input channels to merge.
+     * @param channels   the channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.

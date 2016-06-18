@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Builder implementation returning a channel combining data from a collection of input channels.
+ * Builder implementation returning a channel combining data from a collection of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -43,7 +43,7 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
      * Constructor.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the input channels to combine.
+     * @param channels   the channels to combine.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -93,7 +93,7 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
     }
 
     /**
-     * Output consumer sorting selectable inputs among a list of input channels.
+     * Output consumer sorting selectable inputs among a list of channels.
      */
     private static class SortingArrayOutputConsumer<IN>
             implements OutputConsumer<Selectable<? extends IN>> {

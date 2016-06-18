@@ -287,7 +287,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Output channel adapter implementation.
+     * Channel adapter implementation.
      */
     private static class ChannelAdapter extends BaseAdapter<Channel> {
 
@@ -344,7 +344,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Parameterized type implementation mimicking an output channel type.
+     * Parameterized type implementation mimicking a channel type.
      */
     private static class ChannelType implements ParameterizedType {
 

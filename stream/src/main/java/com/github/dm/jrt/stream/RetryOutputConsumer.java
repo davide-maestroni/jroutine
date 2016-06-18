@@ -112,7 +112,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
         /**
          * Constructor.
          *
-         * @param channel the I/O channel.
+         * @param channel the channel.
          */
         private SafeOutputConsumer(@NotNull final Channel<IN, ?> channel) {
             mChannel = channel;

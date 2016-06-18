@@ -196,7 +196,7 @@ public class ByteChannel {
     /**
      * Returns the output stream used to write bytes into the specified channel.
      *
-     * @param channel the input channel to which pass the data.
+     * @param channel the channel to which pass the data.
      * @return the output stream.
      */
     @NotNull
@@ -1052,10 +1052,10 @@ public class ByteChannel {
         /**
          * Constructor
          *
-         * @param channel the input channel to which pass the data.
+         * @param channel the channel to which pass the data.
          */
         private DefaultBufferOutputStream(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-            mChannel = ConstantConditions.notNull("input channel", channel);
+            mChannel = ConstantConditions.notNull("channel instance", channel);
         }
 
         @Override

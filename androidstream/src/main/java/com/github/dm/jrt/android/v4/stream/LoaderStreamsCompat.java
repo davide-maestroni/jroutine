@@ -791,13 +791,13 @@ public class LoaderStreamsCompat extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannelsCompat#selectParcelable(Channel.InputChannel, int)
+     * @see SparseChannelsCompat#selectParcelableInput(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
-        return SparseChannelsCompat.selectParcelable(channel, index);
+        return SparseChannelsCompat.selectParcelableInput(channel, index);
     }
 
     /**
@@ -822,7 +822,7 @@ public class LoaderStreamsCompat extends Streams {
             SparseArrayCompat<IOChannel<IN>>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final int... indexes) {
-        return SparseChannelsCompat.selectParcelable(channel, indexes);
+        return SparseChannelsCompat.selectParcelableOutput(channel, indexes);
     }
 
     /**
@@ -840,14 +840,14 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannelsCompat#selectParcelable(Channel.InputChannel, Iterable)
+     * @see SparseChannelsCompat#selectParcelableInput(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
             SparseArrayCompat<IOChannel<IN>>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
-        return SparseChannelsCompat.selectParcelable(channel, indexes);
+        return SparseChannelsCompat.selectParcelableInput(channel, indexes);
     }
 
     /**
@@ -872,7 +872,7 @@ public class LoaderStreamsCompat extends Streams {
             SparseArrayCompat<IOChannel<IN>>> selectParcelable(final int startIndex,
             final int rangeSize,
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
-        return SparseChannelsCompat.selectParcelable(startIndex, rangeSize, channel);
+        return SparseChannelsCompat.selectParcelableOutput(startIndex, rangeSize, channel);
     }
 
     /**
@@ -896,7 +896,7 @@ public class LoaderStreamsCompat extends Streams {
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
         return new MapBuilderWrapper<OUT>(
-                SparseChannelsCompat.selectParcelable(startIndex, rangeSize, channel));
+                SparseChannelsCompat.selectParcelableOutput(startIndex, rangeSize, channel));
     }
 
     /**
@@ -919,7 +919,7 @@ public class LoaderStreamsCompat extends Streams {
             SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
-        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelableOutput(channel, indexes));
     }
 
     /**
@@ -942,7 +942,7 @@ public class LoaderStreamsCompat extends Streams {
             SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
-        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelableInput(channel, indexes));
     }
 
     /**
@@ -1042,7 +1042,7 @@ public class LoaderStreamsCompat extends Streams {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
-        return SparseChannelsCompat.toSelectable(channel, index);
+        return SparseChannelsCompat.selectableOutput(channel, index);
     }
 
     /**
@@ -1064,6 +1064,6 @@ public class LoaderStreamsCompat extends Streams {
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                SparseChannelsCompat.toSelectable(channel, index));
+                SparseChannelsCompat.selectableOutput(channel, index));
     }
 }

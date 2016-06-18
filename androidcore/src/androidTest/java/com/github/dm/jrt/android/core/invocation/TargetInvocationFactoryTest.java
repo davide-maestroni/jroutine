@@ -27,6 +27,7 @@ import com.github.dm.jrt.android.core.DecoratingService.StringInvocation;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.RemoteDecoratingService;
 import com.github.dm.jrt.android.core.TestActivity;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
@@ -86,8 +87,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
                                .on(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
-        routine.purge();
+        assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
+        routine.clear();
     }
 
     public void testInvocationDecoratorAbort2() {
@@ -96,8 +97,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
                                .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
-        routine.purge();
+        assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
+        routine.clear();
     }
 
     public void testInvocationDecoratorLifecycle() {
@@ -106,8 +107,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
                                .on(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
     }
 
     public void testInvocationDecoratorLifecycle2() {
@@ -116,8 +117,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
                                .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
     }
 
     public void testInvocationFactory() {
@@ -126,25 +127,25 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                                                          .on(factoryOf(
                                                                  PassingStringInvocation.class))
                                                          .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(PassingStringInvocation.class, 3))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test",
-                "test", "test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
+                "test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(tokenOf(PassingStringInvocation.class)))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(tokenOf(PassingStringInvocation.class), 3))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test",
-                "test", "test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
+                "test");
+        routine.clear();
     }
 
     public void testInvocationFactory2() {
@@ -153,25 +154,25 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                                                          .on(factoryOf(
                                                                  PassingStringInvocation2.class))
                                                          .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(PassingStringInvocation2.class, 3))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test",
-                "test", "test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
+                "test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(tokenOf(PassingStringInvocation2.class)))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(tokenOf(PassingStringInvocation2.class), 3))
                                  .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test",
-                "test", "test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
+                "test");
+        routine.clear();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -310,8 +311,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .on(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
-        routine.purge();
+        assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
+        routine.clear();
     }
 
     public void testRemoteInvocationDecoratorAbort2() {
@@ -320,8 +321,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
-        routine.purge();
+        assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
+        routine.clear();
     }
 
     public void testRemoteInvocationDecoratorLifecycle() {
@@ -330,8 +331,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .on(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
     }
 
     public void testRemoteInvocationDecoratorLifecycle2() {
@@ -340,8 +341,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.async("test").afterMax(seconds(10)).all()).containsExactly("test");
-        routine.purge();
+        assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
+        routine.clear();
     }
 
     @SuppressWarnings("unused")
@@ -360,7 +361,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
             mCount = count;
         }
 
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) {
 
             for (int i = 0; i < mCount; i++) {
                 result.pass(input);
@@ -383,7 +384,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
             mCount = count;
         }
 
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) {
 
             for (int i = 0; i < mCount; i++) {
                 result.pass(input);

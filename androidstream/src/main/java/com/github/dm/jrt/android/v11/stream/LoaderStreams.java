@@ -786,13 +786,13 @@ public class LoaderStreams extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannels#selectParcelable(Channel.InputChannel, int)
+     * @see SparseChannels#selectParcelableInput(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
-        return SparseChannels.selectParcelable(channel, index);
+        return SparseChannels.selectParcelableInput(channel, index);
     }
 
     /**
@@ -1036,7 +1036,7 @@ public class LoaderStreams extends Streams {
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
-        return SparseChannels.toSelectable(channel, index);
+        return SparseChannels.selectableOutput(channel, index);
     }
 
     /**
@@ -1058,6 +1058,6 @@ public class LoaderStreams extends Streams {
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                SparseChannels.toSelectable(channel, index));
+                SparseChannels.selectableOutput(channel, index));
     }
 }

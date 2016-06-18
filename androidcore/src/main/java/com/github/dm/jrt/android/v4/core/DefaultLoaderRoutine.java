@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoaders;
+import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoaders;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -86,11 +86,11 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
     }
 
     @Override
-    public void purge() {
-        super.purge();
+    public void clear() {
+        super.clear();
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            purgeLoaders(context, mLoaderId, mFactory);
+            clearLoaders(context, mLoaderId, mFactory);
         }
     }
 
@@ -117,15 +117,14 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
     }
 
     @Override
-    public void purge(@Nullable final IN input) {
+    public void clear(@Nullable final IN input) {
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            purgeLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
+            clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
         }
     }
 
-    @Override
-    public void purge(@Nullable final IN... inputs) {
+    public void clear(@Nullable final IN... inputs) {
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<IN> inputList;
@@ -136,12 +135,12 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
                 inputList = Arrays.asList(inputs);
             }
 
-            purgeLoaders(context, mLoaderId, mFactory, inputList);
+            clearLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 
     @Override
-    public void purge(@Nullable final Iterable<? extends IN> inputs) {
+    public void clear(@Nullable final Iterable<? extends IN> inputs) {
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<IN> inputList;
@@ -155,7 +154,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
                 }
             }
 
-            purgeLoaders(context, mLoaderId, mFactory, inputList);
+            clearLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 

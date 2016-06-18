@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder implementation returning a channel distributing data into a set of input channels.
+ * Builder implementation returning a channel distributing data into a set of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -48,7 +48,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, 
      *
      * @param isFlush     whether to flush data.
      * @param placeholder the placeholder instance.
-     * @param channels    the input channels.
+     * @param channels    the channels.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.

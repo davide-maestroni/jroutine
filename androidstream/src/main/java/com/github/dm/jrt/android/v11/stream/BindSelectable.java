@@ -58,7 +58,7 @@ class BindSelectable<OUT> extends DeepEqualObject
     @SuppressWarnings("unchecked")
     public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
         final OutputChannel<? extends ParcelableSelectable<OUT>> outputChannel =
-                SparseChannels.toSelectable(channel, mIndex)
+                SparseChannels.selectableOutput(channel, mIndex)
                               .channelConfiguration()
                               .with(mConfiguration)
                               .apply()

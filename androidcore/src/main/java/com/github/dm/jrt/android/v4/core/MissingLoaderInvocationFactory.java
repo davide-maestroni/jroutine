@@ -20,6 +20,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -71,7 +72,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
             result.abort(new MissingLoaderException(mId));
         }
     }

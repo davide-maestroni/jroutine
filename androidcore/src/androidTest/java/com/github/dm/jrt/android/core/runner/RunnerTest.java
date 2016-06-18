@@ -22,7 +22,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -178,20 +178,22 @@ public class RunnerTest extends AndroidTestCase {
 
         final CommandInvocation<Handler> invocation = new CommandInvocation<Handler>(null) {
 
-            public void onResult(@NotNull final ResultChannel<Handler> result) {
+            @Override
+            public void onComplete(@NotNull final Channel<Handler, ?> result) {
 
                 result.pass(new Handler());
             }
         };
-        final OutputChannel<Handler> channel = JRoutineCore.on(factoryOf(invocation, this, null))
-                                                           .invocationConfiguration()
-                                                           .withRunner(AndroidRunners.handlerRunner(
-                                                                   new HandlerThread("test")))
-                                                           .apply()
-                                                           .asyncCall();
+        final Channel<?, Handler> channel = JRoutineCore.on(factoryOf(invocation, this, null))
+                                                        .invocationConfiguration()
+                                                        .withRunner(AndroidRunners.handlerRunner(
+                                                                new HandlerThread("test")))
+                                                        .apply()
+                                                        .async()
+                                                        .close();
         assertThat(JRoutineCore.on(new HandlerInvocationFactory())
                                .async(channel)
-                               .afterMax(seconds(30))
+                               .after(seconds(30))
                                .next()).isEqualTo(true);
     }
 
@@ -201,21 +203,21 @@ public class RunnerTest extends AndroidTestCase {
                 new TemplateInvocation<Object, Object>() {
 
                     @Override
-                    public void onResult(@NotNull final ResultChannel<Object> result) {
+                    public void onComplete(@NotNull final Channel<Object, ?> result) {
 
                         result.pass(Looper.myLooper()).pass(AndroidRunners.myRunner());
                     }
                 };
-        final OutputChannel<Object> channel = JRoutineCore.on(factoryOf(invocation, this))
-                                                          .invocationConfiguration()
-                                                          .withRunner(AndroidRunners.handlerRunner(
-                                                                  new HandlerThread("test")))
-                                                          .apply()
-                                                          .asyncCall();
-
+        final Channel<?, Object> channel = JRoutineCore.on(factoryOf(invocation, this))
+                                                       .invocationConfiguration()
+                                                       .withRunner(AndroidRunners.handlerRunner(
+                                                               new HandlerThread("test")))
+                                                       .apply()
+                                                       .async()
+                                                       .close();
         assertThat(JRoutineCore.on(new LooperInvocationFactory())
                                .async(channel)
-                               .afterMax(seconds(30))
+                               .after(seconds(30))
                                .next()).isEqualTo(true);
     }
 
@@ -251,7 +253,7 @@ public class RunnerTest extends AndroidTestCase {
             super(null);
         }
 
-        public void onInput(final Handler input, @NotNull final ResultChannel<Object> result) throws
+        public void onInput(final Handler input, @NotNull final Channel<Object, ?> result) throws
                 Exception {
 
             testRunner(new HandlerRunner(input));
@@ -278,7 +280,7 @@ public class RunnerTest extends AndroidTestCase {
 
                 @Override
                 protected void onCall(@NotNull final List<?> objects,
-                        @NotNull final ResultChannel<Object> result) {
+                        @NotNull final Channel<Object, ?> result) {
 
                     try {
 

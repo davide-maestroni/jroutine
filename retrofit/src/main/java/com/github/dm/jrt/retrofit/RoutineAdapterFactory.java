@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
 import retrofit2.CallAdapter;
 
 /**
- * Implementation of a call adapter factory supporting {@code OutputChannel} and
+ * Implementation of a call adapter factory supporting {@code Channel} and
  * {@code StreamChannel} return types.
  * <p>
  * Created by davide-maestroni on 03/26/2016.

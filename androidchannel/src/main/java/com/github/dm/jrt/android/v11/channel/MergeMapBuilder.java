@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +35,9 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 class MergeMapBuilder<OUT>
-        extends AbstractBuilder<OutputChannel<? extends ParcelableSelectable<OUT>>> {
+        extends AbstractBuilder<Channel<?, ? extends ParcelableSelectable<OUT>>> {
 
-    private final SparseArray<? extends OutputChannel<? extends OUT>> mChannelMap;
+    private final SparseArray<? extends Channel<?, ? extends OUT>> mChannelMap;
 
     /**
      * Constructor.
@@ -47,12 +47,13 @@ class MergeMapBuilder<OUT>
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
      */
-    MergeMapBuilder(@NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
+    MergeMapBuilder(
+            @NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final SparseArray<? extends OutputChannel<? extends OUT>> channelMap = channels.clone();
+        final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = channels.clone();
         if (channelMap.indexOfValue(null) >= 0) {
             throw new NullPointerException("the map of channels must not contain null objects");
         }
@@ -62,17 +63,18 @@ class MergeMapBuilder<OUT>
 
     @NotNull
     @Override
-    protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
+    protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final SparseArray<? extends OutputChannel<? extends OUT>> channelMap = mChannelMap;
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel =
+        final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
+        final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
                 JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
-            ioChannel.pass(AndroidChannels.toSelectable(channelMap.valueAt(i), channelMap.keyAt(i))
-                                          .buildChannels());
+            outputChannel.pass(
+                    AndroidChannels.selectableOutput(channelMap.valueAt(i), channelMap.keyAt(i))
+                                   .buildChannels());
         }
 
-        return ioChannel.close();
+        return outputChannel.close();
     }
 }

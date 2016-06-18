@@ -29,7 +29,7 @@ import android.os.RemoteException;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.AbstractRoutine;
-import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -274,7 +274,7 @@ public class InvocationService extends Service {
         }
 
         for (final RoutineState routineState : routineStates) {
-            routineState.mRoutine.purge();
+            routineState.mRoutine.clear();
         }
 
         super.onDestroy();
@@ -404,7 +404,7 @@ public class InvocationService extends Service {
                 routines.put(routineInfo, routineState);
             }
 
-            final InvocationChannel<Object, Object> channel = routineState.invoke();
+            final Channel<Object, Object> channel = routineState.invoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
             routineInvocation.bind(new ServiceOutputConsumer(routineInvocation, message.replyTo));
@@ -585,9 +585,9 @@ public class InvocationService extends Service {
          * @return the invocation channel.
          */
         @NotNull
-        InvocationChannel<Object, Object> invoke() {
+        Channel<Object, Object> invoke() {
             ++mInvocationCount;
-            return mRoutine.asyncInvoke();
+            return mRoutine.async();
         }
 
         /**
@@ -648,11 +648,9 @@ public class InvocationService extends Service {
      */
     private class RoutineInvocation {
 
-        private final InvocationChannel<Object, Object> mChannel;
+        private final Channel<Object, Object> mChannel;
 
         private final String mId;
-
-        private final IOChannel<Object> mIoChannel;
 
         private final RoutineInfo mRoutineInfo;
 
@@ -667,14 +665,12 @@ public class InvocationService extends Service {
          * @param state   the routine state.
          */
         private RoutineInvocation(@NotNull final String id,
-                @NotNull final InvocationChannel<Object, Object> channel,
-                @NotNull final RoutineInfo info, @NotNull final RoutineState state) {
+                @NotNull final Channel<Object, Object> channel, @NotNull final RoutineInfo info,
+                @NotNull final RoutineState state) {
             mId = id;
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
-            final IOChannel<Object> ioChannel = (mIoChannel = JRoutineCore.io().buildChannel());
-            channel.pass(ioChannel);
         }
 
         /**
@@ -683,7 +679,7 @@ public class InvocationService extends Service {
          * @param reason the throwable object identifying the reason of the routine abortion.
          */
         void abort(@Nullable final Throwable reason) {
-            mIoChannel.abort(reason);
+            mChannel.abort(reason);
         }
 
         /**
@@ -694,14 +690,14 @@ public class InvocationService extends Service {
          *                                                       or already bound to a consumer.
          */
         void bind(@NotNull final OutputConsumer<Object> consumer) {
-            mChannel.result().bind(consumer);
+            mChannel.bind(consumer);
         }
 
         /**
          * Closes the channel.
          */
         void close() {
-            mIoChannel.close();
+            mChannel.close();
         }
 
         /**
@@ -712,7 +708,7 @@ public class InvocationService extends Service {
          * @throws java.lang.IllegalStateException               if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
-            mIoChannel.pass(input);
+            mChannel.pass(input);
         }
 
         /**

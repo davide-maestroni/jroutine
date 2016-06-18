@@ -78,7 +78,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             @NotNull final Logger logger) {
         super(context);
         mInvocation = ConstantConditions.notNull("invocation instance", invocation);
-        mFactory = ConstantConditions.notNull("invocation factory", factory);
+        mFactory = ConstantConditions.notNull("context invocation factory", factory);
         mInputs = ConstantConditions.notNull("list of input data", inputs);
         mOrderType = order;
         mLogger = logger.subContextLogger(this);

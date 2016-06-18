@@ -1423,7 +1423,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                     .apply()
                                     .async(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
-                SparseChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING)
+                SparseChannelsCompat.selectParcelableOutput(output, Sort.INTEGER, Sort.STRING)
                                     .buildChannels();
 
         for (int i = 0; i < 4; i++) {
@@ -2156,12 +2156,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             switch (selectable.index) {
 
                 case INTEGER:
-                    SparseChannelsCompat.<Object, Integer>selectParcelable(result,
+                    SparseChannelsCompat.<Object, Integer>selectParcelableOutput(result,
                             INTEGER).buildChannels().pass(selectable.<Integer>data()).close();
                     break;
 
                 case STRING:
-                    SparseChannelsCompat.<Object, String>selectParcelable(result,
+                    SparseChannelsCompat.<Object, String>selectParcelableOutput(result,
                             STRING).buildChannels().pass(selectable.<String>data()).close();
                     break;
             }

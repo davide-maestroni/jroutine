@@ -36,6 +36,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.ConverterRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -205,7 +206,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         private final Logger mLogger;
 
-        private final IOChannel<OUT> mOutputChannel;
+        private final Channel<OUT, OUT> mOutputChannel;
 
         private ServiceConnection mConnection;
 
@@ -216,11 +217,11 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
          *
          * @param looper        the message looper.
          * @param context       the service context.
-         * @param outputChannel the output I/O channel.
+         * @param outputChannel the output channel.
          * @param logger        the logger instance.
          */
         private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceContext context,
-                @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
+                @NotNull final Channel<OUT, OUT> outputChannel, @NotNull final Logger logger) {
             super(looper);
             mContext = context;
             mOutputChannel = outputChannel;
@@ -300,7 +301,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         private final IncomingHandler<OUT> mIncomingHandler;
 
-        private final IOChannel<IN> mInputChannel;
+        private final Channel<IN, IN> mInputChannel;
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -308,7 +309,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         private final Logger mLogger;
 
-        private final IOChannel<OUT> mOutputChannel;
+        private final Channel<OUT, OUT> mOutputChannel;
 
         private final ServiceConfiguration mServiceConfiguration;
 
@@ -322,8 +323,8 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
          * @param invocationConfiguration the invocation configuration.
          * @param serviceConfiguration    the service configuration.
          * @param handler                 the handler managing messages from the service.
-         * @param inputChannel            the input I/O channel.
-         * @param outputChannel           the output I/O channel.
+         * @param inputChannel            the input channel.
+         * @param outputChannel           the output channel.
          * @param logger                  the logger instance.
          */
         private RoutineServiceConnection(@NotNull final String invocationId,
@@ -331,8 +332,8 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration,
                 @NotNull final IncomingHandler<OUT> handler,
-                @NotNull final IOChannel<IN> inputChannel,
-                @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
+                @NotNull final Channel<IN, IN> inputChannel,
+                @NotNull final Channel<OUT, OUT> outputChannel, @NotNull final Logger logger) {
             mInvocationId = invocationId;
             mTargetFactory = target;
             mInvocationConfiguration = invocationConfiguration;
@@ -398,9 +399,9 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
-        private IOChannel<IN> mInputChannel;
+        private Channel<IN, IN> mInputChannel;
 
-        private IOChannel<OUT> mOutputChannel;
+        private Channel<OUT, OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -426,6 +427,30 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mInputChannel.abort(reason);
+            mInputChannel = null;
+            mOutputChannel = null;
+        }
+
+        @Override
+        public void onComplete(@NotNull final Channel<OUT, ?> result) {
+            final Channel<OUT, OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
+            }
+
+            mInputChannel.close();
+            mInputChannel = null;
+            mOutputChannel = null;
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+            final Channel<OUT, OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
+            }
+
+            mInputChannel.pass(input);
         }
 
         @Override
@@ -448,33 +473,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             final IncomingHandler<OUT> handler =
                     new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
             handler.setConnection(bindService(handler));
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-            final IOChannel<OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
-            mInputChannel.pass(input);
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-            final IOChannel<OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
-            mInputChannel.close();
-        }
-
-        @Override
-        public void onTerminate() {
-            mInputChannel.close();
-            mInputChannel = null;
-            mOutputChannel = null;
         }
 
         @NotNull

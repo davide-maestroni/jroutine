@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.v4.channel;
 import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.channel.Selectable;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -33,19 +34,19 @@ import org.jetbrains.annotations.NotNull;
  */
 class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? extends OUT>> {
 
-    private final SparseArrayCompat<IOChannel<OUT>> mChannels;
+    private final SparseArrayCompat<Channel<OUT, ?>> mChannels;
 
     /**
      * Constructor.
      *
-     * @param channels the map of indexes and I/O channels.
+     * @param channels the map of indexes and channels.
      * @throws java.lang.NullPointerException if the specified map is null or contains a null
      *                                        object.
      */
-    SortingMapOutputConsumer(@NotNull final SparseArrayCompat<IOChannel<OUT>> channels) {
-        final SparseArrayCompat<IOChannel<OUT>> channelMap = channels.clone();
+    SortingMapOutputConsumer(@NotNull final SparseArrayCompat<Channel<OUT, ?>> channels) {
+        final SparseArrayCompat<Channel<OUT, ?>> channelMap = channels.clone();
         if (channelMap.indexOfValue(null) >= 0) {
-            throw new NullPointerException("the map of I/O channels must not contain null objects");
+            throw new NullPointerException("the map of channels must not contain null objects");
         }
 
         mChannels = channelMap;
@@ -53,7 +54,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onComplete() {
-        final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
+        final SparseArrayCompat<Channel<OUT, ?>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
             channels.valueAt(i).close();
@@ -62,7 +63,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onError(@NotNull final RoutineException error) {
-        final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
+        final SparseArrayCompat<Channel<OUT, ?>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
             channels.valueAt(i).abort(error);
@@ -71,7 +72,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
 
     @Override
     public void onOutput(final Selectable<? extends OUT> selectable) {
-        final IOChannel<OUT> channel = mChannels.get(selectable.index);
+        final Channel<OUT, ?> channel = mChannels.get(selectable.index);
         if (channel != null) {
             channel.pass(selectable.data);
         }

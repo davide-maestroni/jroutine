@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Builder implementation returning a channel combining data from a map of input channels.
+ * Builder implementation returning a channel combining data from a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *

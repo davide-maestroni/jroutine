@@ -214,7 +214,7 @@ public class Streams extends Operators {
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
-     * @return the selectable I/O channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
@@ -344,7 +344,7 @@ public class Streams extends Operators {
      * @param placeholder the placeholder instance.
      * @param channels    the iterable of channels.
      * @param <IN>        the input data type.
-     * @return the I/O channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.

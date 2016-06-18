@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,33 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
      * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
     @NotNull
-    <OUT> OutputChannel<OUT> buildChannel();
+    <OUT> Channel<?, OUT> buildChannel();
+
+    /**
+     * Makes the builder destroy all the cached invocation instances.
+     */
+    void clear();
+
+    /**
+     * Makes the builder destroy the cached invocation instances with the specified input.
+     *
+     * @param input the input.
+     */
+    void clear(@Nullable Object input);
+
+    /**
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    void clear(@Nullable Object... inputs);
+
+    /**
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    void clear(@Nullable Iterable<?> inputs);
 
     /**
      * Note that the clash resolution types will be ignored.
@@ -54,30 +80,4 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
     @NotNull
     @Override
     Builder<? extends LoaderChannelBuilder> loaderConfiguration();
-
-    /**
-     * Makes the builder destroy all the cached invocation instances.
-     */
-    void purge();
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
-     *
-     * @param input the input.
-     */
-    void purge(@Nullable Object input);
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void purge(@Nullable Object... inputs);
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void purge(@Nullable Iterable<?> inputs);
 }

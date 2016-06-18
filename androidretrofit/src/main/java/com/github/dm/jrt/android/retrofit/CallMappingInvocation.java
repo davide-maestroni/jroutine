@@ -65,7 +65,7 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
             body.writeTo(buffer);
             if (buffer.size() > 0) {
                 final IOChannel<Object> channel =
-                        AndroidChannels.selectParcelable(result, BYTES_INDEX).buildChannels();
+                        AndroidChannels.selectParcelableInput(result, BYTES_INDEX).buildChannels();
                 final BufferOutputStream outputStream =
                         ParcelableByteChannel.byteChannel().bind(channel);
                 try {

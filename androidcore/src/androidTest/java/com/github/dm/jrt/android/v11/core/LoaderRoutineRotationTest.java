@@ -23,7 +23,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -74,7 +74,7 @@ public class LoaderRoutineRotationTest
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.async("test2").afterMax(timeout).next()).isEqualTo("TEST1");
+        assertThat(routine.async("test2").after(timeout).next()).isEqualTo("TEST1");
     }
 
     public void testActivityRotationChannel() throws InterruptedException {
@@ -93,14 +93,14 @@ public class LoaderRoutineRotationTest
                       .loaderConfiguration()
                       .withLoaderId(0)
                       .apply()
-                      .asyncCall("test1", "test2");
+                      .async("test1", "test2");
 
         simulateRotation();
 
-        final OutputChannel<String> channel =
+        final Channel<?, String> channel =
                 JRoutineLoader.with(loaderFrom(getActivity())).onId(0).buildChannel();
 
-        assertThat(channel.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
+        assertThat(channel.after(timeout).all()).containsExactly("TEST1", "TEST2");
     }
 
     public void testActivityRotationInputs() throws InterruptedException {
@@ -122,8 +122,8 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
-        final OutputChannel<String> result1 = routine2.async("test1").afterMax(timeout);
-        final OutputChannel<String> result2 = routine2.async("test2").afterMax(timeout);
+        final Channel<?, String> result1 = routine2.async("test1").after(timeout);
+        final Channel<?, String> result2 = routine2.async("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -149,8 +149,8 @@ public class LoaderRoutineRotationTest
         final Routine<Data, Data> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                            .on(factoryOf(Delay.class))
                                                            .buildRoutine();
-        final OutputChannel<Data> result1 = routine2.async(data1).afterMax(timeout);
-        final OutputChannel<Data> result2 = routine2.async(data1).afterMax(timeout);
+        final Channel<?, Data> result1 = routine2.async(data1).after(timeout);
+        final Channel<?, Data> result2 = routine2.async(data1).after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
@@ -177,7 +177,7 @@ public class LoaderRoutineRotationTest
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.async("test2").afterMax(timeout).next()).isEqualTo("TEST2");
+        assertThat(routine.async("test2").after(timeout).next()).isEqualTo("TEST2");
     }
 
     private void simulateRotation() throws InterruptedException {
@@ -205,7 +205,7 @@ public class LoaderRoutineRotationTest
 
         @Override
         protected void onCall(@NotNull final List<? extends Data> inputs,
-                @NotNull final ResultChannel<Data> result) {
+                @NotNull final Channel<Data, ?> result) {
 
             result.after(UnitDuration.millis(500)).pass(inputs);
         }
@@ -215,7 +215,7 @@ public class LoaderRoutineRotationTest
 
         @Override
         protected void onCall(@NotNull final List<? extends String> inputs,
-                @NotNull final ResultChannel<String> result) {
+                @NotNull final Channel<String, ?> result) {
 
             result.after(UnitDuration.millis(500));
 

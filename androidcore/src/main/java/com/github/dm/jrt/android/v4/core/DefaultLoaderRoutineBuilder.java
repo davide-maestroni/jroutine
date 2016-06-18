@@ -129,22 +129,21 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @Override
-    public void purge(@Nullable final IN input) {
-        buildRoutine().purge(input);
+    public void clear(@Nullable final IN input) {
+        buildRoutine().clear(input);
+    }
+
+    public void clear(@Nullable final IN... inputs) {
+        buildRoutine().clear(inputs);
     }
 
     @Override
-    public void purge(@Nullable final IN... inputs) {
-        buildRoutine().purge(inputs);
+    public void clear(@Nullable final Iterable<? extends IN> inputs) {
+        buildRoutine().clear(inputs);
     }
 
     @Override
-    public void purge(@Nullable final Iterable<? extends IN> inputs) {
-        buildRoutine().purge(inputs);
-    }
-
-    @Override
-    public void purge() {
-        buildRoutine().purge();
+    public void clear() {
+        buildRoutine().clear();
     }
 }

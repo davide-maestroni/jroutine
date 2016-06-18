@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder implementation returning a map of input channels accepting selectable data.
+ * Builder implementation returning a map of channels accepting selectable data.
  * <p>
  * Created by davide-maestroni on 05/03/2016.
  *
@@ -35,7 +35,7 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
      */
     InputMapBuilder(@NotNull final Channel<? super Selectable<DATA>, ?> channel,
             @NotNull final Set<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
         if (indexSet.contains(null)) {

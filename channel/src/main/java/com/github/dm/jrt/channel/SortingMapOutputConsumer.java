@@ -39,7 +39,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
     /**
      * Constructor.
      *
-     * @param channels the map of indexes and I/O channels.
+     * @param channels the map of indexes and channels.
      * @throws java.lang.NullPointerException if the specified map is null or contains a null
      *                                        object.
      */
@@ -47,7 +47,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
         final HashMap<Integer, Channel<OUT, ?>> channelMap =
                 new HashMap<Integer, Channel<OUT, ?>>(channels);
         if (channelMap.containsValue(null)) {
-            throw new NullPointerException("the map of I/O channels must not contain null objects");
+            throw new NullPointerException("the map of channels must not contain null objects");
         }
 
         mChannels = channelMap;

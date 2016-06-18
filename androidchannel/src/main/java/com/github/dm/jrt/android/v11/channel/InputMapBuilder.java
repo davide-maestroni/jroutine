@@ -53,7 +53,7 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<SparseArray
      */
     InputMapBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             @NotNull final HashSet<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
         if (indexSet.contains(null)) {

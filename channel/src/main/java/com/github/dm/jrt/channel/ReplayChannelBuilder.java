@@ -36,10 +36,10 @@ class ReplayChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param channel the channel.
      */
     ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
-        mChannel = ConstantConditions.notNull("output channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull

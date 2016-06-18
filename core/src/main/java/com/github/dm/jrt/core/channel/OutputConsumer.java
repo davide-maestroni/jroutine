@@ -21,9 +21,9 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an output consumer that can be bound to an output channel.
+ * Interface defining an output consumer that can be bound to a channel.
  * <br>
- * The same instance can be safely bound to different output channels.
+ * The same instance can be safely bound to different channels.
  * <p>
  * The typical lifecycle of a consumer object is the following:
  * <pre>

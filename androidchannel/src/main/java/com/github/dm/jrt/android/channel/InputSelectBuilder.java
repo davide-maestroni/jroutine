@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel passing selectable data to an input channel.
+ * Builder implementation returning a channel passing selectable data to an input one.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -46,7 +46,7 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<
      */
     InputSelectBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             final int index) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 

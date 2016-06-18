@@ -1159,7 +1159,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
-     * Default implementation of an output channel iterator.
+     * Default implementation of a channel iterator.
      */
     private class DefaultIterator implements Iterator<OUT> {
 
@@ -1436,7 +1436,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
-     * Default implementation of an output channel iterator.
+     * Default implementation of a channel eventual iterator.
      */
     private class EventualIterator implements Iterator<OUT> {
 
@@ -1859,7 +1859,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         /**
-         * Called when an output channel is passed to the result channel.
+         * Called when a channel is passed to the result channel.
          *
          * @param channel the channel instance.
          * @return the output consumer to bind or null.

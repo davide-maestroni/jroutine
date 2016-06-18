@@ -62,7 +62,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
     ConverterOutputConsumer(@NotNull final Converter<ResponseBody, ?> converter,
             @NotNull final Channel<Object, ?> channel) {
         mConverter = ConstantConditions.notNull("converter instance", converter);
-        mOutputChannel = ConstantConditions.notNull("output I/O channel", channel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @Override

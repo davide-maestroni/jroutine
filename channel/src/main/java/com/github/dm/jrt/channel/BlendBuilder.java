@@ -38,7 +38,7 @@ class BlendBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
     /**
      * Constructor.
      *
-     * @param channels the output channels to blend.
+     * @param channels the channels to blend.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.

@@ -45,7 +45,7 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
     TryFinallyOutputConsumer(@NotNull final Runnable finallyRunnable,
             @NotNull final Channel<OUT, ?> outputChannel) {
         mFinallyRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() {

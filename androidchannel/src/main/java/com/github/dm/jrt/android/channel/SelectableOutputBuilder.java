@@ -45,7 +45,7 @@ class SelectableOutputBuilder<OUT>
      * @param index   the selectable index.
      */
     SelectableOutputBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int index) {
-        mChannel = ConstantConditions.notNull("output channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 

@@ -546,10 +546,10 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     /**
      * Passes the data returned by the specified channel to this one.
      * <p>
-     * Note that the output channel will be bound as a result of the call, thus effectively
+     * Note that the passed channel will be bound as a result of the call, thus effectively
      * preventing any other consumer from getting data from it.
      *
-     * @param channel the output channel.
+     * @param channel the channel.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException               if this channel is already closed.

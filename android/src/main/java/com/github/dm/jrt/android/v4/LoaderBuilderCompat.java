@@ -484,7 +484,7 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a builder of output channels bound to the loader identified by the specified ID.
+     * Returns a builder of channels bound to the loader identified by the specified ID.
      * <br>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a

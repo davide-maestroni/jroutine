@@ -1036,7 +1036,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 new ParcelableSelectable<String>("test2", 2),
                 new ParcelableSelectable<String>("test3", 3));
         channel = JRoutineCore.io().buildChannel();
-        LoaderStreams.selectParcelableInput(channel, 33)
+        LoaderStreams.selectInput(channel, 33)
                      .buildChannels()
                      .pass("test1", "test2", "test3")
                      .close();

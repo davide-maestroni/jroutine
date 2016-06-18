@@ -41,12 +41,12 @@ class BindConcat<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param channel       the output channel to concat.
+     * @param channel       the channel to concat.
      */
     BindConcat(@NotNull final ChannelConfiguration configuration,
             @NotNull final Channel<?, ? extends OUT> channel) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mChannel = ConstantConditions.notNull("output channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     public Channel<?, OUT> apply(final Channel<?, OUT> channel) {

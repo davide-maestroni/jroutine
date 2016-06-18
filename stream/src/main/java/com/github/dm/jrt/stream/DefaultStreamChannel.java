@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 
 /**
- * Default implementation of a stream output channel.
+ * Default implementation of a stream channel.
  * <p>
  * Created by davide-maestroni on 12/23/2015.
  *
@@ -43,7 +43,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param channel the wrapped output channel.
+     * @param channel the wrapped channel.
      */
     DefaultStreamChannel(@NotNull final Channel<?, IN> channel) {
         super(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
@@ -54,7 +54,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
      * Constructor.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      * @param bindingFunction     if null the stream will act as a wrapper of the source output
      *                            channel.
      */

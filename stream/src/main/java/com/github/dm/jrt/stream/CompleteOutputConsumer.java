@@ -45,7 +45,7 @@ public class CompleteOutputConsumer<OUT> implements OutputConsumer<OUT> {
     public CompleteOutputConsumer(@NotNull final Runnable action,
             @NotNull final Channel<?, Void> outputChannel) {
         mCompleteAction = ConstantConditions.notNull("runnable instance", action);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() throws Exception {

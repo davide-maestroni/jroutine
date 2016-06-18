@@ -125,7 +125,7 @@ public class Streams extends Operators {
      * <p>
      * Note that the builder will successfully create several channel instances.
      *
-     * @param channels the array of input channels.
+     * @param channels the array of channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
@@ -147,7 +147,7 @@ public class Streams extends Operators {
      * Note that the builder will successfully create several channel instances.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the array of input channels.
+     * @param channels   the array of channels.
      * @param <IN>       the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
@@ -169,7 +169,7 @@ public class Streams extends Operators {
      * Note that the builder will successfully create several channel instances.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the iterable of input channels.
+     * @param channels   the iterable of channels.
      * @param <IN>       the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
@@ -191,7 +191,7 @@ public class Streams extends Operators {
      * <p>
      * Note that the builder will successfully create several channel instances.
      *
-     * @param channels the iterable of input channels.
+     * @param channels the iterable of channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
@@ -212,7 +212,7 @@ public class Streams extends Operators {
      * <p>
      * Note that the builder will successfully create several channel instances.
      *
-     * @param channels the map of indexes and input channels.
+     * @param channels the map of indexes and channels.
      * @param <IN>     the input data type.
      * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
@@ -406,9 +406,9 @@ public class Streams extends Operators {
      * Returns a builder of stream channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size of the channel list.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
@@ -433,9 +433,9 @@ public class Streams extends Operators {
      * Returns a builder of stream channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size of the channel list.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
@@ -651,7 +651,7 @@ public class Streams extends Operators {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channel the output channel.
+     * @param channel channel instance.
      * @param <OUT>   the output data type.
      * @return the replaying stream channel builder.
      * @see Channels#replay(Channel)
@@ -776,7 +776,7 @@ public class Streams extends Operators {
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -799,7 +799,7 @@ public class Streams extends Operators {
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -938,12 +938,12 @@ public class Streams extends Operators {
     /**
      * Builds and returns a new stream channel generating the specified outputs.
      * <br>
-     * The output channel will be bound as a result of the call.
+     * The specified channel will be bound as a result of the call.
      * <p>
      * Note that the stream will start producing results only when one of the {@link Channel}
      * methods is called.
      *
-     * @param output the output channel returning the output data.
+     * @param output the channel returning the output data.
      * @param <OUT>  the output data type.
      * @return the newly created stream instance.
      */

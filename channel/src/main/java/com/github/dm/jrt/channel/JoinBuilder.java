@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Builder implementation joining data from a set of output channels.
+ * Builder implementation joining data from a set of channels.
  * <p>
  * Created by davide-maestroni on 05/03/2016.
  *

@@ -63,7 +63,7 @@ import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutp
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Default implementation of a loader stream output channel.
+ * Default implementation of a loader stream channel.
  * <p>
  * Created by davide-maestroni on 01/15/2016.
  *
@@ -130,7 +130,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
      * Constructor.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      */
     private DefaultLoaderStreamChannel(@NotNull final LoaderStreamConfiguration streamConfiguration,
             @NotNull final Channel<?, IN> sourceChannel) {
@@ -142,7 +142,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
      * Constructor.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      * @param bindingFunction     if null the stream will act as a wrapper of the source output
      *                            channel.
      */

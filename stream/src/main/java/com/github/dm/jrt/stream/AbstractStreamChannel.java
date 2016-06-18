@@ -66,7 +66,7 @@ import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Abstract implementation of a stream output channel.
+ * Abstract implementation of a stream channel.
  * <p>
  * This class provides a default implementation of all the stream channel features. The inheriting
  * class just needs to create routine and channel instances when required.
@@ -120,7 +120,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * Constructor.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      */
     protected AbstractStreamChannel(@NotNull final StreamConfiguration streamConfiguration,
             @NotNull final Channel<?, IN> sourceChannel) {
@@ -137,7 +137,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * {@link #newChannel(StreamConfiguration, Channel, Function)} method invocation.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      * @param bindingFunction     if null the stream will act as a wrapper of the source output
      *                            channel.
      * @throws java.lang.IllegalStateException if the constructor is invoked outside the
@@ -952,7 +952,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * Note that this method should be never directly called by the implementing class.
      *
      * @param streamConfiguration the stream configuration.
-     * @param sourceChannel       the source output channel.
+     * @param sourceChannel       the source channel.
      * @param bindingFunction     the binding function.
      * @param <BEFORE>            the concatenation input type.
      * @param <AFTER>             the concatenation output type.

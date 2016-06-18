@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Implementation of a factory creating invocations wrapping a stream output channel.
+ * Implementation of a factory creating invocations wrapping a stream channel.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -46,7 +46,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param function the function used to instantiate the stream output channel.
+     * @param function the function used to instantiate the stream channel.
      */
     StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends
             StreamChannel<? super IN, ? extends OUT>> function) {
@@ -61,7 +61,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     }
 
     /**
-     * Implementation of an invocation wrapping a stream output channel.
+     * Implementation of an invocation wrapping a stream channel.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
@@ -79,7 +79,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
         /**
          * Constructor.
          *
-         * @param function the function used to instantiate the stream output channel.
+         * @param function the function used to instantiate the stream channel.
          */
         private StreamInvocation(@NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                 StreamChannel<? super IN, ? extends OUT>> function) {

@@ -46,7 +46,7 @@ class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
     ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
             @NotNull final Channel<?, ?> outputChannel) {
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() {

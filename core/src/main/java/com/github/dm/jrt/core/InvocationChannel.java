@@ -1184,7 +1184,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         /**
-         * Called when an output channel is passed to the invocation.
+         * Called when a channel is passed to the invocation.
          *
          * @param channel the channel instance.
          * @return the output consumer to bind or null.

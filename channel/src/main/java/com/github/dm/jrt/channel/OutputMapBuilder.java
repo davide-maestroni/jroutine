@@ -34,7 +34,7 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Builder implementation returning a map of output channels returning selectable output data.
+ * Builder implementation returning a map of channels returning selectable output data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -62,7 +62,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, Channel<?, OUT>
      */
     OutputMapBuilder(@NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
             @NotNull final Set<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("output channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
         if (indexSet.contains(null)) {

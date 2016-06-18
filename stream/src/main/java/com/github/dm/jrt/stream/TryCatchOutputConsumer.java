@@ -49,7 +49,7 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
                     catchConsumer,
             @NotNull final Channel<OUT, ?> outputChannel) {
         mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() {

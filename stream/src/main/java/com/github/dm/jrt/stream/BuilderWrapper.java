@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation wrapping a builder of output channels.
+ * Builder implementation wrapping a builder of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *

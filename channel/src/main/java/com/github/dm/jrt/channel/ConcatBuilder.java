@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Builder implementation returning a channel concatenating data from a set of output channels.
+ * Builder implementation returning a channel concatenating data from a set of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -39,7 +39,7 @@ class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
     /**
      * Constructor.
      *
-     * @param channels the output channels to concat.
+     * @param channels the channels to concat.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.

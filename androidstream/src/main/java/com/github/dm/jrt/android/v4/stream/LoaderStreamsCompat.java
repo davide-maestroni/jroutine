@@ -281,7 +281,7 @@ public class LoaderStreamsCompat extends Streams {
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
-     * @param function the function providing the stream output channels.
+     * @param function the function providing the stream channel instances.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
@@ -432,9 +432,9 @@ public class LoaderStreamsCompat extends Streams {
      * Returns a builder of loader streams joining the data coming from the specified channels.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size of the channel list.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
@@ -461,9 +461,9 @@ public class LoaderStreamsCompat extends Streams {
      * Returns a builder of loader streams joining the data coming from the specified channels.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size of the channel list.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
@@ -581,7 +581,7 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the map of indexes and output channels.
+     * @param channels the map of indexes and channels.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
@@ -606,7 +606,7 @@ public class LoaderStreamsCompat extends Streams {
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
-     * @param function the function providing the stream output channels.
+     * @param function the function providing the stream channel instances.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the routine builder.
@@ -637,7 +637,7 @@ public class LoaderStreamsCompat extends Streams {
      * one.
      *
      * @param context  the loader context.
-     * @param function the function providing the stream output channels.
+     * @param function the function providing the stream channel instances.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the loader routine builder.
@@ -659,7 +659,7 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channel the output channel.
+     * @param channel the channel instance.
      * @param <OUT>   the output data type.
      * @return the replaying stream channel builder.
      * @see SparseChannelsCompat#replay(Channel)
@@ -871,7 +871,7 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -895,7 +895,7 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -1017,7 +1017,7 @@ public class LoaderStreamsCompat extends Streams {
     /**
      * Builds and returns a new loader stream channel generating the specified outputs.
      * <br>
-     * The output channel will be bound as a result of the call.
+     * The specified channel will be bound as a result of the call.
      * <p>
      * Note that the stream will start producing results only when one of the {@link Channel}
      * methods is called.

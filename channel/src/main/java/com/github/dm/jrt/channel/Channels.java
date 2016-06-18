@@ -60,7 +60,7 @@ public class Channels {
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -87,7 +87,7 @@ public class Channels {
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -281,7 +281,7 @@ public class Channels {
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -310,7 +310,7 @@ public class Channels {
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -468,7 +468,7 @@ public class Channels {
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -497,7 +497,7 @@ public class Channels {
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -512,9 +512,9 @@ public class Channels {
      * Returns a builder of channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size as the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size as the channel list.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
@@ -530,7 +530,7 @@ public class Channels {
      * @param placeholder the placeholder instance.
      * @param channels    the iterable of channels.
      * @param <OUT>       the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -546,9 +546,9 @@ public class Channels {
      * Returns a builder of channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining outputs will be returned by
-     * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size as the channel list.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size as the channel list.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
@@ -564,7 +564,7 @@ public class Channels {
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
-     * @return the output channel builder.
+     * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -594,7 +594,7 @@ public class Channels {
      * @param startIndex the selectable start index.
      * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -625,7 +625,7 @@ public class Channels {
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -659,7 +659,7 @@ public class Channels {
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
@@ -688,7 +688,7 @@ public class Channels {
      *
      * @param channels the map of indexes and channels.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
@@ -717,7 +717,7 @@ public class Channels {
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
@@ -749,7 +749,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channel the output channel.
+     * @param channel the channel.
      * @param <OUT>   the output data type.
      * @return the replaying channel builder.
      */
@@ -948,7 +948,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -985,7 +985,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channel the selectable output channel.
+     * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and channels builder.
@@ -1050,7 +1050,7 @@ public class Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel builder.
+     * @return the selectable channel builder.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>>

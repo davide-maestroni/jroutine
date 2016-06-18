@@ -59,7 +59,7 @@ class ParallelKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Out
             @NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
         super(routine, invocationMode);
-        mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
         mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
     }
 

@@ -59,8 +59,8 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.START;
 
 /**
- * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions, employing Android loaders to run the backing routines.
+ * Interface defining a stream channel, that is, a channel concatenating map and reduce functions,
+ * employing Android loaders to run the backing routines.
  * <br>
  * In fact, each function in the channel is backed by a routine instance, that can have its own
  * specific configuration and invocation mode.

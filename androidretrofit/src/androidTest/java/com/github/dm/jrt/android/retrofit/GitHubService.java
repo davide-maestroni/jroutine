@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.stream.StreamChannel;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public interface GitHubService {
 
     @GET("users/{user}/repos")
     @Headers("Accept: application/json")
-    OutputChannel<List<Repo>> listRepos(@Path("user") String user);
+    Channel<Object, List<Repo>> listRepos(@Path("user") String user);
 
     @GET("users/{user}/repos")
     @Headers("Accept: application/json")

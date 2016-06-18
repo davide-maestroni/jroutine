@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
@@ -50,7 +50,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
             new TemplateContextInvocation<Call<Object>, Object>() {
 
                 public void onInput(final Call<Object> input,
-                        @NotNull final ResultChannel<Object> result) throws IOException {
+                        @NotNull final Channel<Object, ?> result) throws IOException {
                     result.pass(input.execute().body());
                 }
             };
@@ -101,9 +101,9 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
             return sCallInvocationFactory;
         }
 
-        @SuppressWarnings("unchecked") final CallAdapter<OutputChannel<?>> channelAdapter =
-                (CallAdapter<OutputChannel<?>>) delegateFactory.get(
-                        getChannelType(responseType), annotations, retrofit);
+        @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
+                (CallAdapter<Channel<?, ?>>) delegateFactory.get(getChannelType(responseType),
+                        annotations, retrofit);
         if (channelAdapter != null) {
             return new ChannelAdapterInvocationFactory(
                     asArgs(delegateFactory, configuration, invocationMode, responseType,
@@ -140,7 +140,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
         }
 
         @Override
-        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
+        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -178,19 +178,19 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     private static class ChannelAdapterInvocation
             extends TemplateContextInvocation<Call<Object>, Object> {
 
-        private final CallAdapter<OutputChannel<?>> mCallAdapter;
+        private final CallAdapter<Channel<?, ?>> mCallAdapter;
 
         /**
          * Constructor.
          *
          * @param callAdapter the call adapter instance.
          */
-        private ChannelAdapterInvocation(@NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
+        private ChannelAdapterInvocation(@NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
             mCallAdapter = callAdapter;
         }
 
         @Override
-        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
+        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
             result.pass(mCallAdapter.adapt(input));
         }
     }
@@ -210,7 +210,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
          * @param callAdapter the call adapter instance.
          */
         private ChannelAdapterInvocationFactory(@Nullable final Object[] args,
-                @NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
+                @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
             super(args);
             mInvocation = new ChannelAdapterInvocation(callAdapter);
         }

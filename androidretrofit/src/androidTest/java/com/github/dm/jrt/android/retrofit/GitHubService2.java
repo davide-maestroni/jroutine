@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
@@ -32,5 +32,5 @@ public interface GitHubService2 {
 
     @POST("users/{user}/repos")
     @Headers({"Accept: application/json", "Content-type: application/json"})
-    OutputChannel<Repo> createRepo(@Path("user") String user, @Body Repo repo);
+    Channel<Object, Repo> createRepo(@Path("user") String user, @Body Repo repo);
 }

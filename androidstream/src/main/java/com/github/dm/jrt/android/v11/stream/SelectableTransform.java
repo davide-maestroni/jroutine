@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
@@ -33,8 +33,8 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * @param <OUT> the output data type.
  */
 class SelectableTransform<IN, OUT> implements
-        BiFunction<StreamConfiguration, Function<OutputChannel<IN>, OutputChannel<OUT>>,
-                Function<OutputChannel<IN>, OutputChannel<ParcelableSelectable<OUT>>>> {
+        BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
+                Function<Channel<?, IN>, Channel<?, ParcelableSelectable<OUT>>>> {
 
     private final int mIndex;
 
@@ -48,9 +48,9 @@ class SelectableTransform<IN, OUT> implements
     }
 
     @Override
-    public Function<OutputChannel<IN>, OutputChannel<ParcelableSelectable<OUT>>> apply(
+    public Function<Channel<?, IN>, Channel<?, ParcelableSelectable<OUT>>> apply(
             final StreamConfiguration configuration,
-            final Function<OutputChannel<IN>, OutputChannel<OUT>> function) {
+            final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return wrap(function).andThen(
                 new BindSelectable<OUT>(configuration.asChannelConfiguration(), mIndex));
     }

@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4.stream;
 import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.channel.ChannelsBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation wrapping a builder of maps of output channels.
+ * Builder implementation wrapping a builder of maps of channels.
  * <p>
  * Created by davide-maestroni on 02/27/2016.
  *
@@ -38,7 +38,7 @@ class MapBuilderWrapper<OUT>
         implements ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>>,
         Configurable<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>>> {
 
-    private final ChannelsBuilder<? extends SparseArrayCompat<OutputChannel<OUT>>> mBuilder;
+    private final ChannelsBuilder<? extends SparseArrayCompat<Channel<?, OUT>>> mBuilder;
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -48,8 +48,7 @@ class MapBuilderWrapper<OUT>
      * @param wrapped the wrapped instance.
      */
     MapBuilderWrapper(
-            @NotNull final ChannelsBuilder<? extends SparseArrayCompat<OutputChannel<OUT>>>
-                    wrapped) {
+            @NotNull final ChannelsBuilder<? extends SparseArrayCompat<Channel<?, OUT>>> wrapped) {
         mBuilder = ConstantConditions.notNull("wrapped instance", wrapped);
     }
 
@@ -65,7 +64,7 @@ class MapBuilderWrapper<OUT>
     @NotNull
     @Override
     public SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>> buildChannels() {
-        final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.buildChannels();
+        final SparseArrayCompat<Channel<?, OUT>> channels = mBuilder.buildChannels();
         final int size = channels.size();
         final SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>> channelMap =
                 new SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>(size);

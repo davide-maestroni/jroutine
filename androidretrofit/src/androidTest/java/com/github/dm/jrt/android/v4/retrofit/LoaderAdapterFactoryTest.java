@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.retrofit.Repo;
 import com.github.dm.jrt.android.retrofit.ServiceAdapterFactory;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -104,7 +104,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -136,7 +136,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -165,7 +165,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -194,7 +194,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -228,7 +228,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -258,7 +258,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -497,7 +497,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -526,7 +526,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -555,7 +555,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -584,7 +584,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -618,7 +618,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -648,7 +648,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -718,11 +718,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final Retrofit retrofit) {
 
             if (returnType instanceof ParameterizedType) {
-                if (((ParameterizedType) returnType).getRawType() == OutputChannel.class) {
+                if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                     return null;
                 }
 
-            } else if (returnType == OutputChannel.class) {
+            } else if (returnType == Channel.class) {
                 return null;
             }
 

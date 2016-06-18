@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.channel.ChannelsBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation wrapping a builder of output channels.
+ * Builder implementation wrapping a builder of channels.
  * <p>
  * Created by davide-maestroni on 02/27/2016.
  *
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>,
         Configurable<ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>> {
 
-    private final ChannelsBuilder<? extends OutputChannel<? extends OUT>> mBuilder;
+    private final ChannelsBuilder<? extends Channel<?, ? extends OUT>> mBuilder;
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -44,7 +44,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
      *
      * @param wrapped the wrapped instance.
      */
-    BuilderWrapper(@NotNull final ChannelsBuilder<? extends OutputChannel<? extends OUT>> wrapped) {
+    BuilderWrapper(@NotNull final ChannelsBuilder<? extends Channel<?, ? extends OUT>> wrapped) {
         mBuilder = ConstantConditions.notNull("wrapped builder", wrapped);
     }
 
@@ -61,8 +61,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     @Override
     @SuppressWarnings("unchecked")
     public LoaderStreamChannel<OUT, OUT> buildChannels() {
-        return new DefaultLoaderStreamChannel<OUT, OUT>(
-                (OutputChannel<OUT>) mBuilder.buildChannels());
+        return new DefaultLoaderStreamChannel<OUT, OUT>((Channel<?, OUT>) mBuilder.buildChannels());
     }
 
     @NotNull

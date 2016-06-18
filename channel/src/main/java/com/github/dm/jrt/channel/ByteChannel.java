@@ -421,6 +421,7 @@ public class ByteChannel {
             closeChannel(close);
             return this;
         }
+        // TODO: 18/06/16 just BufferOutputStream closeChannel()
 
         /**
          * Writes some bytes into the output stream by reading them from the specified input stream.

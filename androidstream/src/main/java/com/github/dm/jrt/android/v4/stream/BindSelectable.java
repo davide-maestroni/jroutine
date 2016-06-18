@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.stream;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -36,7 +36,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <OUT> the output data type.
  */
 class BindSelectable<OUT> extends DeepEqualObject
-        implements Function<OutputChannel<OUT>, OutputChannel<ParcelableSelectable<OUT>>> {
+        implements Function<Channel<?, OUT>, Channel<?, ParcelableSelectable<OUT>>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -56,13 +56,13 @@ class BindSelectable<OUT> extends DeepEqualObject
 
     @Override
     @SuppressWarnings("unchecked")
-    public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
-        final OutputChannel<? extends ParcelableSelectable<OUT>> outputChannel =
+    public Channel<?, ParcelableSelectable<OUT>> apply(final Channel<?, OUT> channel) {
+        final Channel<?, ? extends ParcelableSelectable<OUT>> outputChannel =
                 SparseChannelsCompat.selectableOutput(channel, mIndex)
                                     .channelConfiguration()
                                     .with(mConfiguration)
                                     .apply()
                                     .buildChannels();
-        return (OutputChannel<ParcelableSelectable<OUT>>) outputChannel;
+        return (Channel<?, ParcelableSelectable<OUT>>) outputChannel;
     }
 }

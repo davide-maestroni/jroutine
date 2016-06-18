@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -46,7 +47,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
 
     private final Converter<ResponseBody, ?> mConverter;
 
-    private final IOChannel<Object> mOutputChannel;
+    private final Channel<Object, ?> mOutputChannel;
 
     private final ByteArrayOutputStream mOutputStream = new ByteArrayOutputStream();
 
@@ -59,7 +60,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
      * @param channel   the output channel.
      */
     ConverterOutputConsumer(@NotNull final Converter<ResponseBody, ?> converter,
-            @NotNull final IOChannel<Object> channel) {
+            @NotNull final Channel<Object, ?> channel) {
         mConverter = ConstantConditions.notNull("converter instance", converter);
         mOutputChannel = ConstantConditions.notNull("output I/O channel", channel);
     }

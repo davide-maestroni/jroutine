@@ -20,6 +20,7 @@ import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +54,7 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
 
     @Override
     public void onInput(final Call<?> input,
-            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws IOException {
+            @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
         final Request request = input.request();
         result.pass(new ParcelableSelectable<Object>(RequestData.of(request), REQUEST_DATA_INDEX));
         final RequestBody body = request.body();
@@ -64,12 +65,12 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
             final Buffer buffer = new Buffer();
             body.writeTo(buffer);
             if (buffer.size() > 0) {
-                final IOChannel<Object> channel =
+                final Channel<Object, ?> channel =
                         AndroidChannels.selectParcelableInput(result, BYTES_INDEX).buildChannels();
                 final BufferOutputStream outputStream =
                         ParcelableByteChannel.byteChannel().bind(channel);
                 try {
-                    outputStream.transferFrom(buffer.inputStream());
+                    outputStream.withCloseChannel(true).transferFrom(buffer.inputStream());
 
                 } finally {
                     outputStream.close();

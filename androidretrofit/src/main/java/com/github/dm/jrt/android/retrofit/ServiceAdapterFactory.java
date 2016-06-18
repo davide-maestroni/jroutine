@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -54,8 +54,8 @@ import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutp
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Implementation of a call adapter factory supporting {@code OutputChannel} and
- * {@code StreamChannel} return types.
+ * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamChannel}
+ * return types.
  * <br>
  * If properly configured, the routine invocations will run in a dedicated Android service.
  * <br>
@@ -160,7 +160,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         if (returnType instanceof ParameterizedType) {
             final ParameterizedType parameterizedType = (ParameterizedType) returnType;
             rawType = parameterizedType.getRawType();
-            if (OutputChannel.class == rawType) {
+            if (Channel.class == rawType) {
                 responseType = parameterizedType.getActualTypeArguments()[0];
 
             } else if (StreamChannel.class == rawType) {
@@ -175,7 +175,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             // Use annotations to configure the routine
             final InvocationConfiguration invocationConfiguration =
                     Builders.withAnnotations(mInvocationConfiguration, annotations);
-            if (OutputChannel.class == rawType) {
+            if (Channel.class == rawType) {
                 return new OutputChannelAdapter(invocationConfiguration,
                         retrofit.responseBodyConverter(responseType, annotations),
                         buildRoutine(invocationConfiguration), responseType);
@@ -338,8 +338,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Bind function used to create the stream channel instances.
      */
-    private static class BindService implements
-            Function<OutputChannel<ParcelableSelectable<Object>>, OutputChannel<Object>> {
+    private static class BindService
+            implements Function<Channel<?, ParcelableSelectable<Object>>, Channel<?, Object>> {
 
         private final ChannelConfiguration mConfiguration;
 
@@ -364,13 +364,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         @Override
-        public OutputChannel<Object> apply(
-                final OutputChannel<ParcelableSelectable<Object>> channel) {
-            final IOChannel<Object> ioChannel = JRoutineCore.io()
-                                                            .channelConfiguration()
-                                                            .with(mConfiguration)
-                                                            .apply()
-                                                            .buildChannel();
+        public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
+            final Channel<Object, Object> ioChannel = JRoutineCore.io()
+                                                                  .channelConfiguration()
+                                                                  .with(mConfiguration)
+                                                                  .apply()
+                                                                  .buildChannel();
             mRoutine.async(channel).bind(new ConverterOutputConsumer(mConverter, ioChannel));
             return ioChannel;
         }
@@ -379,7 +378,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Output channel adapter implementation.
      */
-    private static class OutputChannelAdapter extends BaseAdapter<OutputChannel> {
+    private static class OutputChannelAdapter extends BaseAdapter<Channel> {
 
         private final ChannelConfiguration mChannelConfiguration;
 
@@ -407,7 +406,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         @NotNull
-        private OutputChannel<ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
+        private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
             return JRoutineCore.on(sInvocation)
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
@@ -416,15 +415,15 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         @Override
-        public <OUT> OutputChannel adapt(final Call<OUT> call) {
-            final IOChannel<Object> ioChannel = JRoutineCore.io()
-                                                            .channelConfiguration()
-                                                            .with(mChannelConfiguration)
-                                                            .apply()
-                                                            .buildChannel();
+        public <OUT> Channel adapt(final Call<OUT> call) {
+            final Channel<Object, Object> outputChannel = JRoutineCore.io()
+                                                                      .channelConfiguration()
+                                                                      .with(mChannelConfiguration)
+                                                                      .apply()
+                                                                      .buildChannel();
             getRoutine().async(invokeCall(call))
-                        .bind(new ConverterOutputConsumer(mConverter, ioChannel));
-            return ioChannel;
+                        .bind(new ConverterOutputConsumer(mConverter, outputChannel));
+            return outputChannel;
         }
     }
 
@@ -460,17 +459,17 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> StreamChannel adapt(final Call<OUT> call) {
-            final Function<Function<OutputChannel<Call<OUT>>,
-                    OutputChannel<ParcelableSelectable<Object>>>,
-                    Function<OutputChannel<Call<OUT>>, OutputChannel<Object>>>
+            final Function<Function<Channel<?, Call<OUT>>, Channel<?,
+                    ParcelableSelectable<Object>>>, Function<Channel<?, Call<OUT>>, Channel<?,
+                    Object>>>
                     function =
-                    new Function<Function<OutputChannel<Call<OUT>>,
-                            OutputChannel<ParcelableSelectable<Object>>>,
-                            Function<OutputChannel<Call<OUT>>, OutputChannel<Object>>>() {
+                    new Function<Function<Channel<?, Call<OUT>>, Channel<?,
+                            ParcelableSelectable<Object>>>, Function<Channel<?, Call<OUT>>,
+                            Channel<?, Object>>>() {
 
-                        public Function<OutputChannel<Call<OUT>>, OutputChannel<Object>> apply(
-                                final Function<OutputChannel<Call<OUT>>,
-                                        OutputChannel<ParcelableSelectable<Object>>> function) {
+                        public Function<Channel<?, Call<OUT>>, Channel<?, Object>> apply(
+                                final Function<Channel<?, Call<OUT>>, Channel<?,
+                                        ParcelableSelectable<Object>>> function) {
                             return wrap(function).andThen(
                                     new BindService(mChannelConfiguration, mConverter,
                                             getRoutine()));

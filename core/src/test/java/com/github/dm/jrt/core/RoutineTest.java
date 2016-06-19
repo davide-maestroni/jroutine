@@ -549,7 +549,7 @@ public class RoutineTest {
                     }
 
                     @Override
-                    public void onRecycle() {
+                    public void onRestart() {
                         mChannel = sumRoutine.async();
                     }
 
@@ -1124,7 +1124,7 @@ public class RoutineTest {
                 new TemplateInvocation<String, String>() {
 
                     @Override
-                    public void onRecycle() {
+                    public void onRestart() {
                         throw new NullPointerException("test1");
                     }
                 };
@@ -3248,7 +3248,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             sActive = true;
         }
 

@@ -173,15 +173,15 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> after(@NotNull final UnitDuration timeout) {
-        return (LoaderStreamChannel<IN, OUT>) super.after(timeout);
+    public LoaderStreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannel<IN, OUT>) super.after(delay);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> after(final long timeout,
+    public LoaderStreamChannel<IN, OUT> after(final long delay,
             @NotNull final TimeUnit timeUnit) {
-        return (LoaderStreamChannel<IN, OUT>) super.after(timeout, timeUnit);
+        return (LoaderStreamChannel<IN, OUT>) super.after(delay, timeUnit);
     }
 
     @NotNull
@@ -331,32 +331,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> applyFlatTransform(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> transformFunction) {
-        return (LoaderStreamChannel<BEFORE, AFTER>) super.applyFlatTransform(transformFunction);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> applyTransform(
-            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction) {
-        return (LoaderStreamChannel<IN, AFTER>) super.applyTransform(transformFunction);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<IN, AFTER> applyTransformWith(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
-        return (LoaderStreamChannel<IN, AFTER>) super.applyTransformWith(transformFunction);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<IN, OUT> async() {
         return (LoaderStreamChannel<IN, OUT>) super.async();
     }
@@ -463,6 +437,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatLift(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> transformFunction) {
+        return (LoaderStreamChannel<BEFORE, AFTER>) super.flatLift(transformFunction);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -489,6 +471,24 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, OUT> invocationMode(
             @NotNull final InvocationMode invocationMode) {
         return (LoaderStreamChannel<IN, OUT>) super.invocationMode(invocationMode);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> lift(
+            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, AFTER>>> transformFunction) {
+        return (LoaderStreamChannel<IN, AFTER>) super.lift(transformFunction);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<IN, AFTER> liftConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
+        return (LoaderStreamChannel<IN, AFTER>) super.liftConfig(transformFunction);
     }
 
     @NotNull
@@ -775,7 +775,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> selectable(
             final int index) {
-        return applyTransformWith(new SelectableTransform<IN, OUT>(index));
+        return liftConfig(new SelectableTransform<IN, OUT>(index));
     }
 
     @NotNull

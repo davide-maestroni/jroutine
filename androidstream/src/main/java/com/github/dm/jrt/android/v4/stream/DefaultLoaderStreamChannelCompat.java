@@ -181,15 +181,15 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> after(@NotNull final UnitDuration timeout) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.after(timeout);
+    public LoaderStreamChannelCompat<IN, OUT> after(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.after(delay);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> after(final long timeout,
+    public LoaderStreamChannelCompat<IN, OUT> after(final long delay,
             @NotNull final TimeUnit timeUnit) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.after(timeout, timeUnit);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.after(delay, timeUnit);
     }
 
     @NotNull
@@ -345,34 +345,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> transformFunction) {
-        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.applyFlatTransform(
-                transformFunction);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
-            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction) {
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransform(transformFunction);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
-        checkStatic(wrap(transformFunction), transformFunction);
-        return (LoaderStreamChannelCompat<IN, AFTER>) super.applyTransformWith(transformFunction);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<IN, OUT> async() {
         return (LoaderStreamChannelCompat<IN, OUT>) super.async();
     }
@@ -480,6 +452,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> flatLift(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> transformFunction) {
+        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.flatLift(transformFunction);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -506,6 +486,25 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public LoaderStreamChannelCompat<IN, OUT> invocationMode(
             @NotNull final InvocationMode invocationMode) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.invocationMode(invocationMode);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> lift(
+            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, AFTER>>> transformFunction) {
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.lift(transformFunction);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> liftConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
+        checkStatic(wrap(transformFunction), transformFunction);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.liftConfig(transformFunction);
     }
 
     @NotNull
@@ -796,7 +795,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> selectable(
             final int index) {
-        return applyTransformWith(new SelectableTransform<IN, OUT>(index));
+        return liftConfig(new SelectableTransform<IN, OUT>(index));
     }
 
     @NotNull

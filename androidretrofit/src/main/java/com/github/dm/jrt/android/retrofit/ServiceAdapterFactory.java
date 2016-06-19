@@ -477,7 +477,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                           .with(mInvocationConfiguration)
                           .apply()
                           .map(sInvocation)
-                          .applyTransform(function);
+                          .lift(function);
         }
     }
 }

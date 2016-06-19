@@ -420,7 +420,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public boolean isEmpty() {
-        return outputCount() == 0;
+        return (outputCount() == 0);
     }
 
     public boolean isOpen() {

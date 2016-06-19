@@ -511,7 +511,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
      * @see #orderByDelay()
      */
     @NotNull
@@ -531,7 +530,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
      * @see #orderByCall()
      */
     @NotNull

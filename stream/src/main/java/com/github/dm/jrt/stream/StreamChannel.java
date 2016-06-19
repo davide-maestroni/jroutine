@@ -82,14 +82,14 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> after(@NotNull UnitDuration timeout);
+    StreamChannel<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> after(long timeout, @NotNull TimeUnit timeUnit);
+    StreamChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -109,9 +109,8 @@ public interface StreamChannel<IN, OUT>
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> close();
-    // TODO: 17/06/16 unit tests + pass
+    // TODO: 17/06/16 unit tests + pass + ReplayChannel
 
     /**
      * {@inheritDoc}
@@ -152,42 +151,36 @@ public interface StreamChannel<IN, OUT>
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> orderByCall();
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    @StreamFlow(START)
     StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
@@ -329,61 +322,6 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> appendGetMore(@NotNull Consumer<? super Channel<OUT, ?>> consumer);
-
-    /**
-     * Transforms this stream by applying the specified function.
-     * <br>
-     * This method provides a convenient way to apply a set of configurations and concatenations
-     * without breaking the fluent chain.
-     *
-     * @param transformFunction the transformation function.
-     * @param <BEFORE>          the concatenation input type.
-     * @param <AFTER>           the concatenation output type.
-     * @return the transformed stream.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> applyFlatTransform(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> transformFunction);
-
-    /**
-     * Transforms the stream by modifying the flow building function.
-     * <br>
-     * The returned function will be employed when the flow of input data is initiated (see
-     * {@link TransformationType#START}).
-     *
-     * @param transformFunction the function modifying the flow one.
-     * @param <AFTER>           the concatenation output type.
-     * @return the new stream instance.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> applyTransform(@NotNull Function<? extends Function<? super
-            Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-            Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
-
-    /**
-     * Transforms the stream by modifying the flow building function.
-     * <br>
-     * The current configuration of the stream will be passed as the first parameter.
-     * <br>
-     * The returned function will be employed when the flow of input data is initiated (see
-     * {@link TransformationType#START}).
-     *
-     * @param transformFunction the bi-function modifying the flow one.
-     * @param <AFTER>           the concatenation output type.
-     * @return the new stream instance.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> applyTransformWith(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -636,6 +574,24 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
+     * Transforms this stream by applying the specified function.
+     * <br>
+     * This method provides a convenient way to apply a set of configurations and concatenations
+     * without breaking the fluent chain.
+     *
+     * @param transformFunction the transformation function.
+     * @param <BEFORE>          the concatenation input type.
+     * @param <AFTER>           the concatenation output type.
+     * @return the transformed stream.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> transformFunction);
+
+    /**
      * Concatenates a stream mapping this stream outputs by applying the specified function to each
      * one of them.
      * <p>
@@ -703,6 +659,43 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(CONFIG)
     StreamChannel<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+
+    /**
+     * Transforms the stream by modifying the flow building function.
+     * <br>
+     * The returned function will be employed when the flow of input data is initiated (see
+     * {@link TransformationType#START}).
+     *
+     * @param transformFunction the function modifying the flow one.
+     * @param <AFTER>           the concatenation output type.
+     * @return the new stream instance.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> lift(@NotNull Function<? extends Function<? super
+            Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+            Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
+
+    /**
+     * Transforms the stream by modifying the flow building function.
+     * <br>
+     * The current configuration of the stream will be passed as the first parameter.
+     * <br>
+     * The returned function will be employed when the flow of input data is initiated (see
+     * {@link TransformationType#START}).
+     *
+     * @param transformFunction the bi-function modifying the flow one.
+     * @param <AFTER>           the concatenation output type.
+     * @return the new stream instance.
+     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamChannel<IN, AFTER> liftConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * Concatenates a stream limiting the maximum number of outputs to the specified count.

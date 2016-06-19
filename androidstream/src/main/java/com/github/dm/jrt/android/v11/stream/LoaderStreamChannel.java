@@ -84,7 +84,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> after(@NotNull UnitDuration timeout);
+    LoaderStreamChannel<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -92,7 +92,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> after(long timeout, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -281,44 +281,6 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Note that this instance will be passed as input parameter to the specified function, and
-     * a {@code LoaderStreamChannel} is expected as result.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> applyFlatTransform(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> transformFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> applyTransform(
-            @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that a {@link LoaderStreamConfiguration} instance will be passed as input parameter to
-     * the specified function.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannel<IN, AFTER> applyTransformWith(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
-
-    /**
-     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -450,6 +412,19 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannel} is expected as result.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> transformFunction);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -484,6 +459,31 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(CONFIG)
     LoaderStreamChannel<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> lift(
+            @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, AFTER>>> transformFunction);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfiguration} instance will be passed as input parameter to
+     * the specified function.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannel<IN, AFTER> liftConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * {@inheritDoc}

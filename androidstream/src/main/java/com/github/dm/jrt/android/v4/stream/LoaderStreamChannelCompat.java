@@ -84,7 +84,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> after(@NotNull UnitDuration timeout);
+    LoaderStreamChannelCompat<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -92,7 +92,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> after(long timeout, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -283,44 +283,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Note that this instance will be passed as input parameter to the specified function, and
-     * a {@code LoaderStreamChannelCompat} is expected as result.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyFlatTransform(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> transformFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransform(
-            @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that a {@link LoaderStreamConfigurationCompat} instance will be passed as input
-     * parameter to the specified function.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> applyTransformWith(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
-
-    /**
-     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -453,6 +415,19 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannelCompat} is expected as result.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> transformFunction);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -487,6 +462,31 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @Override
     @StreamFlow(CONFIG)
     LoaderStreamChannelCompat<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> lift(
+            @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, AFTER>>> transformFunction);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfigurationCompat} instance will be passed as input
+     * parameter to the specified function.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> liftConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
 
     /**
      * {@inheritDoc}

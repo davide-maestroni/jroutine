@@ -2060,7 +2060,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreams.streamOf("test1")
                                 .with(loaderFrom(getActivity()))
-                                .applyFlatTransform(
+                                .flatLift(
                                         new Function<StreamChannel<String, String>,
                                                 StreamChannel<String, String>>() {
 
@@ -2074,7 +2074,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .all()).containsExactly("test1", "test2");
         assertThat(LoaderStreams.streamOf("test1")
                                 .with(loaderFrom(getActivity()))
-                                .applyFlatTransform(
+                                .flatLift(
                                         new Function<StreamChannel<String, String>,
                                                 LoaderStreamChannel<String, String>>() {
 
@@ -3597,12 +3597,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreams.streamOf("test")
                                 .with(loaderFrom(getActivity()))
-                                .applyTransformWith(transformBiFunction())
+                                .liftConfig(transformBiFunction())
                                 .after(seconds(10))
                                 .next()).isEqualTo("TEST");
         assertThat(LoaderStreams.streamOf("test")
                                 .with(loaderFrom(getActivity()))
-                                .applyTransform(transformFunction())
+                                .lift(transformFunction())
                                 .after(seconds(10))
                                 .next()).isEqualTo("TEST");
     }

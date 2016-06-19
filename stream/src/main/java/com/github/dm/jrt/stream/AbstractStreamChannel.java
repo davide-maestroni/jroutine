@@ -208,11 +208,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     public boolean isEmpty() {
-        return bindChannel().isEmpty();
+        return (inputCount() == 0) && (outputCount() == 0);
     }
 
     public boolean isOpen() {
-        return bindChannel().isOpen();
+        bindChannel();
+        return mSourceChannel.isOpen();
     }
 
     @NotNull
@@ -233,14 +234,14 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> after(@NotNull final UnitDuration timeout) {
-        bindChannel().after(timeout);
+    public StreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
+        bindChannel().after(delay);
         return this;
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> after(final long timeout, @NotNull final TimeUnit timeUnit) {
-        bindChannel().after(timeout, timeUnit);
+    public StreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        bindChannel().after(delay, timeUnit);
         return this;
     }
 
@@ -258,7 +259,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> close() {
-        bindChannel().close();
         return this;
     }
 
@@ -294,13 +294,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> orderByCall() {
-        bindChannel().orderByCall();
         return this;
     }
 
     @NotNull
     public StreamChannel<IN, OUT> orderByDelay() {
-        bindChannel().orderByDelay();
         return this;
     }
 
@@ -372,52 +370,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public StreamChannel<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         return appendGetMore(1, consumer);
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> applyFlatTransform(
-            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> transformFunction) {
-        try {
-            return ConstantConditions.notNull("transformed stream", transformFunction.apply(this));
-
-        } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
-        }
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <AFTER> StreamChannel<IN, AFTER> applyTransform(
-            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction) {
-        try {
-            return newChannel(ConstantConditions.notNull("binding function",
-                    ((Function<Function<Channel<?, IN>, Channel<?, OUT>>, Function<Channel<?,
-                            IN>, Channel<?, AFTER>>>) transformFunction)
-                            .apply(getBindingFunction())));
-
-        } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
-        }
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <AFTER> StreamChannel<IN, AFTER> applyTransformWith(
-            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
-        try {
-            return newChannel(ConstantConditions.notNull("binding function",
-                    ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
-                            Function<Channel<?, IN>, Channel<?, AFTER>>>) transformFunction)
-                            .apply(mStreamConfiguration, getBindingFunction())));
-
-        } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
-        }
     }
 
     @NotNull
@@ -524,6 +476,18 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> flatLift(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> transformFunction) {
+        try {
+            return ConstantConditions.notNull("transformed stream", transformFunction.apply(this));
+
+        } catch (final Exception e) {
+            throw StreamException.wrapIfNeeded(e);
+        }
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -546,6 +510,40 @@ public abstract class AbstractStreamChannel<IN, OUT>
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return newChannel(newConfiguration(streamConfiguration.getStreamConfiguration(),
                 streamConfiguration.getCurrentConfiguration(), invocationMode));
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamChannel<IN, AFTER> lift(
+            @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
+                    Channel<?, AFTER>>> transformFunction) {
+        try {
+            return newChannel(ConstantConditions.notNull("binding function",
+                    ((Function<Function<Channel<?, IN>, Channel<?, OUT>>, Function<Channel<?,
+                            IN>, Channel<?, AFTER>>>) transformFunction)
+                            .apply(getBindingFunction())));
+
+        } catch (final Exception e) {
+            throw StreamException.wrapIfNeeded(e);
+        }
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamChannel<IN, AFTER> liftConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
+        try {
+            return newChannel(ConstantConditions.notNull("binding function",
+                    ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
+                            Function<Channel<?, IN>, Channel<?, AFTER>>>) transformFunction)
+                            .apply(mStreamConfiguration, getBindingFunction())));
+
+        } catch (final Exception e) {
+            throw StreamException.wrapIfNeeded(e);
+        }
     }
 
     @NotNull

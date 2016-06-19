@@ -1075,7 +1075,7 @@ public class StreamChannelTest {
     public void testFlatTransform() {
 
         assertThat(Streams.streamOf("test1")
-                          .applyFlatTransform(
+                          .flatLift(
                                   new Function<StreamChannel<String, String>,
                                           StreamChannel<String, String>>() {
 
@@ -1089,7 +1089,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("test1", "test2");
         try {
             Streams.streamOf()
-                   .applyFlatTransform(
+                   .flatLift(
                            new Function<StreamChannel<Object, Object>, StreamChannel<Object,
                                    Object>>() {
 
@@ -1403,7 +1403,8 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(factory).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").sequential().map(factory).all()).containsExactly(
+        assertThat(
+                Streams.streamOf("test1", "test2").sequential().map(factory).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -1550,13 +1551,14 @@ public class StreamChannelTest {
                 return s.toUpperCase();
             }
         }).all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").sequential().map(new Function<String, String>() {
+        assertThat(
+                Streams.streamOf("test1", "test2").sequential().map(new Function<String, String>() {
 
-            public String apply(final String s) {
+                    public String apply(final String s) {
 
-                return s.toUpperCase();
-            }
-        }).all()).containsExactly("TEST1", "TEST2");
+                        return s.toUpperCase();
+                    }
+                }).all()).containsExactly("TEST1", "TEST2");
     }
 
     @Test
@@ -1624,7 +1626,8 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(routine).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").sequential().map(routine).all()).containsExactly(
+        assertThat(
+                Streams.streamOf("test1", "test2").sequential().map(routine).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -1644,7 +1647,8 @@ public class StreamChannelTest {
                           .all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(builder).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").sequential().map(builder).all()).containsExactly(
+        assertThat(
+                Streams.streamOf("test1", "test2").sequential().map(builder).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -2582,8 +2586,11 @@ public class StreamChannelTest {
                           .then((String) null)
                           .after(seconds(1))
                           .all()).containsOnly((String) null);
-        assertThat(Streams.streamOf("test1").sequential().then((String[]) null).after(seconds(1)).all())
-                .isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .sequential()
+                          .then((String[]) null)
+                          .after(seconds(1))
+                          .all()).isEmpty();
         assertThat(Streams.streamOf("test1").sequential().then().after(seconds(1)).all()).isEmpty();
         assertThat(Streams.streamOf("test1")
                           .sequential()
@@ -2795,7 +2802,7 @@ public class StreamChannelTest {
     public void testTransform() {
 
         assertThat(Streams.streamOf("test")
-                          .applyTransformWith(
+                          .liftConfig(
                                   new BiFunction<StreamConfiguration, Function<Channel<?,
                                           String>, Channel<?, String>>, Function<Channel<?,
                                           String>, Channel<?, String>>>() {
@@ -2830,32 +2837,30 @@ public class StreamChannelTest {
                           .after(seconds(3))
                           .next()).isEqualTo("TEST");
         assertThat(Streams.streamOf("test")
-                          .applyTransform(
-                                  new Function<Function<Channel<?, String>, Channel<?, String>>,
-                                          Function<Channel<?, String>, Channel<?, String>>>() {
+                          .lift(new Function<Function<Channel<?, String>, Channel<?, String>>,
+                                  Function<Channel<?, String>, Channel<?, String>>>() {
 
-                                      public Function<Channel<?, String>, Channel<?, String>> apply(
-                                              final Function<Channel<?, String>, Channel<?,
-                                                      String>> function) {
+                              public Function<Channel<?, String>, Channel<?, String>> apply(
+                                      final Function<Channel<?, String>, Channel<?, String>>
+                                              function) {
 
-                                          return wrap(function).andThen(
-                                                  new Function<Channel<?, String>, Channel<?,
-                                                          String>>() {
+                                  return wrap(function).andThen(
+                                          new Function<Channel<?, String>, Channel<?, String>>() {
 
-                                                      public Channel<?, String> apply(
-                                                              final Channel<?, String> channel) {
+                                              public Channel<?, String> apply(
+                                                      final Channel<?, String> channel) {
 
-                                                          return JRoutineCore.on(new UpperCase())
-                                                                             .async(channel);
-                                                      }
-                                                  });
-                                      }
-                                  })
+                                                  return JRoutineCore.on(new UpperCase())
+                                                                     .async(channel);
+                                              }
+                                          });
+                              }
+                          })
                           .after(seconds(3))
                           .next()).isEqualTo("TEST");
         try {
             Streams.streamOf()
-                   .applyTransformWith(
+                   .liftConfig(
                            new BiFunction<StreamConfiguration, Function<Channel<?, Object>,
                                    Channel<?, Object>>, Function<Channel<?, Object>, Channel<?,
                                    Object>>>() {
@@ -2876,17 +2881,15 @@ public class StreamChannelTest {
 
         try {
             Streams.streamOf()
-                   .applyTransform(
-                           new Function<Function<Channel<?, Object>, Channel<?, Object>>,
-                                   Function<Channel<?, Object>, Channel<?, Object>>>() {
+                   .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>,
+                           Function<Channel<?, Object>, Channel<?, Object>>>() {
 
-                               public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                       final Function<Channel<?, Object>, Channel<?, Object>>
-                                               function) {
+                       public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                               final Function<Channel<?, Object>, Channel<?, Object>> function) {
 
-                                   throw new NullPointerException();
-                               }
-                           });
+                           throw new NullPointerException();
+                       }
+                   });
             fail();
 
         } catch (final StreamException e) {
@@ -2895,25 +2898,23 @@ public class StreamChannelTest {
 
         final StreamChannel<Object, Object> stream = //
                 Streams.streamOf()
-                       .applyTransform(
-                               new Function<Function<Channel<?, Object>, Channel<?, Object>>,
-                                       Function<Channel<?, Object>, Channel<?, Object>>>() {
+                       .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>,
+                               Function<Channel<?, Object>, Channel<?, Object>>>() {
 
-                                   public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                           final Function<Channel<?, Object>, Channel<?, Object>>
-                                                   function) {
+                           public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                                   final Function<Channel<?, Object>, Channel<?, Object>>
+                                           function) {
 
-                                       return new Function<Channel<?, Object>, Channel<?,
-                                               Object>>() {
+                               return new Function<Channel<?, Object>, Channel<?, Object>>() {
 
-                                           public Channel<?, Object> apply(
-                                                   final Channel<?, Object> objects) {
+                                   public Channel<?, Object> apply(
+                                           final Channel<?, Object> objects) {
 
-                                               throw new NullPointerException();
-                                           }
-                                       };
+                                       throw new NullPointerException();
                                    }
-                               });
+                               };
+                           }
+                       });
         try {
             stream.bind();
             fail();

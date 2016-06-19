@@ -535,11 +535,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             return false;
         }
 
-        @Override
-        void orderBy(@NotNull final OrderType orderType) {
-            throw exception();
-        }
-
         @Nullable
         @Override
         OutputConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
@@ -621,11 +616,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Override
         Execution pass(@NotNull final UnitDuration delay,
                 @Nullable final Iterable<? extends IN> inputs) {
-            throw exception();
-        }
-
-        @Override
-        void orderBy(@NotNull final OrderType orderType) {
             throw exception();
         }
 

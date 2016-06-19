@@ -739,7 +739,7 @@ public class Channels {
      * instance to be bound twice.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
-     * ones will be bound as a result of the creation.
+     * one will be bound as a result of the creation.
      * <p>
      * Given channels {@code A}, the final output will be:
      * <pre>

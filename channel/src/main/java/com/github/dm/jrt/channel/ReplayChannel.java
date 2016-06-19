@@ -116,7 +116,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public <IN extends Channel<? super OUT, ?>> IN bind(@NotNull final IN channel) {
+    public <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull final CHANNEL channel) {
         synchronized (mMutex) {
             final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
             if (channels.containsKey(channel)) {
@@ -172,7 +172,6 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
 
     @NotNull
     public Channel<OUT, OUT> close() {
-        mOutputChannel.close();
         return this;
     }
 
@@ -237,7 +236,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     }
 
     public boolean isEmpty() {
-        if (mChannel.isEmpty()) {
+        if (mChannel.isEmpty() && mOutputChannel.isEmpty()) {
             synchronized (mMutex) {
                 return mCached.isEmpty();
             }

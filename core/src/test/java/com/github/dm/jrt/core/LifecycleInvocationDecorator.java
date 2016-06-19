@@ -89,13 +89,13 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     }
 
     @Override
-    public void onRecycle() throws Exception {
+    public void onRestart() throws Exception {
         if (!TO_START_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
 
         mState = State.START;
-        super.onRecycle();
+        super.onRestart();
     }
 
     private enum State {

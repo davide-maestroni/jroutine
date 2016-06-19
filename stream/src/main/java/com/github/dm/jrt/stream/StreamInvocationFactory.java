@@ -112,7 +112,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
             mInputChannel.pass(input);
         }
 
-        public void onRecycle() throws Exception {
+        public void onRestart() throws Exception {
             final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
             mOutputChannel = mFunction.apply(new DefaultStreamChannel<IN, IN>(inputChannel));
             mInputChannel = inputChannel;

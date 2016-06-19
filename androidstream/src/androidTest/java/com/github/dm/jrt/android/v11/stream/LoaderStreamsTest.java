@@ -2220,7 +2220,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
 
             mFirstIndex = NO_INDEX;
         }

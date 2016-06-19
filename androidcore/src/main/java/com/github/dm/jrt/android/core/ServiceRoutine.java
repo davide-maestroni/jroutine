@@ -454,7 +454,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             final Logger logger = mLogger;
             mInputChannel = JRoutineCore.io()
                                         .channelConfiguration()

@@ -335,7 +335,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             mHasInputs = false;
         }
     }
@@ -375,7 +375,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             mHasInputs = false;
         }
     }

@@ -2089,7 +2089,7 @@ public class ChannelsTest {
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
 
             mFirstIndex = NO_INDEX;
         }

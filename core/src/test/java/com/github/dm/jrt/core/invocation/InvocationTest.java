@@ -44,7 +44,7 @@ public class InvocationTest {
             public void onComplete(@NotNull final Channel<Object, ?> result) throws Exception {
             }
         };
-        invocation.onRecycle();
+        invocation.onRestart();
         invocation.onInput(null, null);
         invocation.onComplete(null);
         invocation.onAbort(null);

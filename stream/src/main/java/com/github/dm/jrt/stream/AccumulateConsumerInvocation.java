@@ -134,7 +134,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mIsFirst = true;
     }
 

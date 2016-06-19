@@ -102,7 +102,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             mHasOutputs = false;
         }
     }

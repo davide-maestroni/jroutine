@@ -71,7 +71,7 @@ class SumByteInvocation extends TemplateInvocation<Number, Byte> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = 0;
     }
 }

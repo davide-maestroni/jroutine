@@ -154,7 +154,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 if (mInvocation == null) {
                     mInvocation = invocation;
                     logger.dbg("initializing invocation: %s", invocation);
-                    invocation.onRecycle();
+                    invocation.onRestart();
                     mIsInitialized = true;
                 }
 
@@ -262,7 +262,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                             if (mInvocation == null) {
                                 mInvocation = invocation;
                                 logger.dbg("initializing invocation: %s", invocation);
-                                invocation.onRecycle();
+                                invocation.onRestart();
                                 mIsInitialized = true;
                             }
 

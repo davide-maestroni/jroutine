@@ -78,7 +78,7 @@ class AverageBigInvocation extends TemplateInvocation<Number, BigDecimal> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = BigDecimal.ZERO;
         mCount = 0;
     }

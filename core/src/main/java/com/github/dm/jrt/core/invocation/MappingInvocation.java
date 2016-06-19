@@ -59,6 +59,6 @@ public abstract class MappingInvocation<IN, OUT> extends InvocationFactory<IN, O
     public final void onDiscard() {
     }
 
-    public final void onRecycle() {
+    public final void onRestart() {
     }
 }

@@ -28,13 +28,13 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *                           |    ---------(if exception is thrown)---------
+ *                           |    -----(*)----------------------------------
  *                           |   |                                          |
  *          -------------    |   |    -----------------------------------   |
  *         |             |   |   |   |                                   |  |
- *         |             V   V   V   V                                   |  |
+ *         |             V   V   |   V                                   |  |
  *         |           -----------------                                 |  |
- *         |           |  onRecycle()  |                                 |  |
+ *         |           |  onRestart()  |                                 |  |
  *         |           -----------------                                 |  |
  *         |             |     |     |                                   |  |
  *         |   ----------      |     |                                   |  |
@@ -49,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
  *         |  |                |             |       |     |     |       |  |
  *         |  |                |             |       V     V     V       |  |
  *         |   ----------      |             |     -----------------     |  |
- *         |             |     |             |     |   onAbort()   |-----   |
+ *         |             |     |            (*)    |   onAbort()   |-----   |
  *         |             V     V             |     -----------------        |
  *         |           -----------------     |             |                |
  *          -----------|  onComplete() |-----              |                |
@@ -64,6 +64,7 @@ import org.jetbrains.annotations.NotNull;
  *                     |  onDiscard()  |
  *                     -----------------
  *
+ *      (*) only when an exception escapes the method
  *     </code>
  * </pre>
  * The routine invocation interface is designed so to allow recycling of instantiated objects.
@@ -72,10 +73,10 @@ import org.jetbrains.annotations.NotNull;
  * in case no input is expected, the {@code onComplete()} method will be called soon after the
  * initialization.
  * <p>
- * Note also that {@code onAbort()} might be called at any time after {@code onRecycle()} in case
+ * Note also that {@code onAbort()} might be called at any time after {@code onRestart()} in case
  * the invocation is aborted.
  * <p>
- * The {@code onRecycle()} method is meant to allow the reset operations needed to prepare the
+ * The {@code onRestart()} method is meant to allow the reset operations needed to prepare the
  * invocation object to be reused. When the method does not complete successfully, the invocation
  * object is discarded.
  * <br>
@@ -158,5 +159,5 @@ public interface Invocation<IN, OUT> {
      *
      * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onRecycle() throws Exception;
+    void onRestart() throws Exception;
 }

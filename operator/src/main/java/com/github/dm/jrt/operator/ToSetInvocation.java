@@ -83,7 +83,7 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSet = new HashSet<DATA>();
     }
 }

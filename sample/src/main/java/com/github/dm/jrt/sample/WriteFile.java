@@ -70,7 +70,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onRecycle() throws FileNotFoundException {
+    public void onRestart() throws FileNotFoundException {
         mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 

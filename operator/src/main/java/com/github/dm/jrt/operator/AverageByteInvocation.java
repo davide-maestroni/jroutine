@@ -80,7 +80,7 @@ class AverageByteInvocation extends TemplateInvocation<Number, Byte> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = (byte) 0;
         mCount = 0;
     }

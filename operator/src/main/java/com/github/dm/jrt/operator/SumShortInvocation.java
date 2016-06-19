@@ -71,7 +71,7 @@ class SumShortInvocation extends TemplateInvocation<Number, Short> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = 0;
     }
 }

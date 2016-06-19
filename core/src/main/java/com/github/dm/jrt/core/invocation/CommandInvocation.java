@@ -59,6 +59,6 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
     public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
     }
 
-    public final void onRecycle() {
+    public final void onRestart() {
     }
 }

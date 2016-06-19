@@ -83,7 +83,7 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mList = new ArrayList<DATA>();
     }
 }

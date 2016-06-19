@@ -93,7 +93,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mIsFirst = true;
     }
 

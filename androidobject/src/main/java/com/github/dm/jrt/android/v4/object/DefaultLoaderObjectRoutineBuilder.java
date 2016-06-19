@@ -277,7 +277,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             mChannel = mRoutine.sync();
         }
 
@@ -385,7 +385,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
             mChannel = mRoutine.sync();
         }
 

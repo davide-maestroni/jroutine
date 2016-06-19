@@ -83,7 +83,7 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSet.clear();
     }
 }

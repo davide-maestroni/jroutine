@@ -55,6 +55,6 @@ abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
     public final void onDiscard() {
     }
 
-    public final void onRecycle() {
+    public final void onRestart() {
     }
 }

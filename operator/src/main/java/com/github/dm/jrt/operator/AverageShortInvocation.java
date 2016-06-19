@@ -80,7 +80,7 @@ class AverageShortInvocation extends TemplateInvocation<Number, Short> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = (byte) 0;
         mCount = 0;
     }

@@ -80,7 +80,7 @@ class AverageFloatInvocation extends TemplateInvocation<Number, Float> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = (byte) 0;
         mCount = 0;
     }

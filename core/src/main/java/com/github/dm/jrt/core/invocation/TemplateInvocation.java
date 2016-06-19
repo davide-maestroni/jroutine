@@ -45,6 +45,6 @@ public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT>
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     }
 
-    public void onRecycle() throws Exception {
+    public void onRestart() throws Exception {
     }
 }

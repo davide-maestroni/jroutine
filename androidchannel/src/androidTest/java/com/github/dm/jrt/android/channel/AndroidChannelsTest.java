@@ -1361,7 +1361,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         @Override
-        public void onRecycle() {
+        public void onRestart() {
 
             mFirstIndex = NO_INDEX;
         }

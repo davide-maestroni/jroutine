@@ -71,7 +71,7 @@ class SumDoubleInvocation extends TemplateInvocation<Number, Double> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = 0;
     }
 }

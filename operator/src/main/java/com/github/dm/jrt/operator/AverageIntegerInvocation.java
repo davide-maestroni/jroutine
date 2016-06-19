@@ -80,7 +80,7 @@ class AverageIntegerInvocation extends TemplateInvocation<Number, Integer> {
     }
 
     @Override
-    public void onRecycle() {
+    public void onRestart() {
         mSum = (byte) 0;
         mCount = 0;
     }

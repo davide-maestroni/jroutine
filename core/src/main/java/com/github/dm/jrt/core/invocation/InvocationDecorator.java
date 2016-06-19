@@ -59,7 +59,7 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
         mInvocation.onInput(input, result);
     }
 
-    public void onRecycle() throws Exception {
-        mInvocation.onRecycle();
+    public void onRestart() throws Exception {
+        mInvocation.onRestart();
     }
 }

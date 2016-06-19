@@ -67,7 +67,7 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     }
 
     @Override
-    public final void onRecycle() throws Exception {
+    public final void onRestart() throws Exception {
         final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
         mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
     }

@@ -61,7 +61,7 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
     }
 
     @Override
-    public final void onRecycle() throws Exception {
+    public final void onRestart() throws Exception {
         final ArrayList<IN> inputs = mInputs;
         if (inputs != null) {
             inputs.clear();

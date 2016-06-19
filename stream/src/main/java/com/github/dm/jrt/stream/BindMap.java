@@ -63,6 +63,6 @@ class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
             return mRoutine.sync(channel);
         }
 
-        return mRoutine.serial(channel);
+        return mRoutine.sequential(channel);
     }
 }

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -63,8 +64,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     private static final Runner sSyncRunner = Runners.syncRunner();
 
-    private final ArrayList<Channel<?, ? extends IN>> mBoundChannels =
-            new ArrayList<Channel<?, ? extends IN>>();
+    private final LinkedHashSet<Channel<?, ? extends IN>> mBoundChannels =
+            new LinkedHashSet<Channel<?, ? extends IN>>();
 
     private final InvocationExecution<IN, OUT> mExecution;
 
@@ -445,13 +446,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
 
-    private void internalAbort(@NotNull final RoutineException abortException,
-            final boolean clearInputs) {
+    private void internalAbort(@NotNull final RoutineException abortException) {
         mInputCount = 0;
-        if (clearInputs) {
-            mInputQueue.clear();
-        }
-
         mAbortException = abortException;
         mRunner.cancel(mExecution);
     }
@@ -499,6 +495,13 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         @Nullable
         @Override
+        Execution onConsumerComplete(@NotNull final Channel<?, ? extends IN> channel,
+                @NotNull final NestedQueue<IN> queue) {
+            throw consumerException();
+        }
+
+        @Nullable
+        @Override
         Execution onConsumerOutput(final IN input, @NotNull final NestedQueue<IN> queue,
                 final long delay, @NotNull final TimeUnit timeUnit,
                 @NotNull final OrderType orderType) {
@@ -510,12 +513,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         Execution onHandlerAbort(@NotNull final RoutineException reason) {
             mLogger.wrn(reason, "avoiding aborting result channel since invocation is aborted");
             return null;
-        }
-
-        @Nullable
-        @Override
-        Execution onConsumerComplete(@NotNull final NestedQueue<IN> queue) {
-            throw consumerException();
         }
 
         @NotNull
@@ -688,6 +685,21 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         @Nullable
         @Override
+        Execution onConsumerComplete(@NotNull final Channel<?, ? extends IN> channel,
+                @NotNull final NestedQueue<IN> queue) {
+            throw exception();
+        }
+
+        @Nullable
+        @Override
+        Execution onConsumerError(@NotNull final Channel<?, ? extends IN> channel,
+                @NotNull final RoutineException error) {
+            mLogger.wrn(error, "avoiding aborting consumer since channel is closed");
+            return null;
+        }
+
+        @Nullable
+        @Override
         Execution onConsumerOutput(final IN input, @NotNull final NestedQueue<IN> queue,
                 final long delay, @NotNull final TimeUnit timeUnit,
                 @NotNull final OrderType orderType) {
@@ -735,19 +747,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mLogger.dbg(reason, "aborting result channel");
             return new AbortResultExecution(reason);
         }
-
-        @Nullable
-        @Override
-        Execution onConsumerComplete(@NotNull final NestedQueue<IN> queue) {
-            throw exception();
-        }
-
-        @Nullable
-        @Override
-        Execution onConsumerError(@NotNull final RoutineException error) {
-            mLogger.wrn(error, "avoiding aborting consumer since channel is closed");
-            return null;
-        }
     }
 
     /**
@@ -779,10 +778,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             final Throwable abortException;
             final List<Channel<?, ? extends IN>> channels;
             synchronized (mMutex) {
+                mInputQueue.clear();
                 abortException = mAbortException;
-                mLogger.dbg(abortException, "aborting bound channels [%d]", mBoundChannels.size());
-                channels = new ArrayList<Channel<?, ? extends IN>>(mBoundChannels);
-                mBoundChannels.clear();
+                final LinkedHashSet<Channel<?, ? extends IN>> boundChannels = mBoundChannels;
+                mLogger.dbg(abortException, "aborting bound channels [%d]", boundChannels.size());
+                channels = new ArrayList<Channel<?, ? extends IN>>(boundChannels);
+                boundChannels.clear();
             }
 
             for (final Channel<?, ? extends IN> channel : channels) {
@@ -827,6 +828,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      */
     private class DefaultOutputConsumer implements OutputConsumer<IN> {
 
+        private final Channel<?, ? extends IN> mChannel;
+
         private final long mDelay;
 
         private final TimeUnit mDelayUnit;
@@ -837,19 +840,22 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         /**
          * Constructor.
+         *
+         * @param channel the bound channel.
          */
-        private DefaultOutputConsumer() {
+        private DefaultOutputConsumer(@NotNull final Channel<?, ? extends IN> channel) {
             final UnitDuration delay = mInputDelay.get();
             mDelay = delay.value;
             mDelayUnit = delay.unit;
             final OrderType order = (mOrderType = mInputOrder.get());
             mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
+            mChannel = channel;
         }
 
         public void onComplete() {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerComplete(mQueue);
+                execution = mState.onConsumerComplete(mChannel, mQueue);
             }
 
             if (execution != null) {
@@ -860,7 +866,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void onError(@NotNull final RoutineException error) {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerError(error);
+                execution = mState.onConsumerError(mChannel, error);
             }
 
             if (execution != null) {
@@ -998,7 +1004,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
             if (delay.isZero()) {
                 mLogger.dbg(reason, "aborting channel");
-                internalAbort(abortException, true);
+                internalAbort(abortException);
                 mState = new AbortChannelState();
                 mMutex.notifyAll();
                 return mExecution.abort();
@@ -1027,7 +1033,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Nullable
         Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
             mLogger.dbg(reason, "aborting channel after delay");
-            internalAbort(reason, true);
+            internalAbort(reason);
             mState = new AbortChannelState();
             mMutex.notifyAll();
             return mExecution.abort();
@@ -1093,12 +1099,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         /**
          * Called when the feeding consumer completes.
          *
-         * @param queue the input queue.
+         * @param channel the bound channel.
+         * @param queue   the input queue.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerComplete(@NotNull final NestedQueue<IN> queue) {
+        Execution onConsumerComplete(@NotNull final Channel<?, ? extends IN> channel,
+                @NotNull final NestedQueue<IN> queue) {
             mLogger.dbg("closing consumer");
+            mBoundChannels.remove(channel);
             queue.close();
             if (!mIsPendingExecution && !mIsConsuming) {
                 mIsPendingExecution = true;
@@ -1114,14 +1123,16 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         /**
          * Called when the feeding consumer receives an error.
          *
-         * @param error the error.
+         * @param channel the bound channel.
+         * @param error   the error.
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerError(@NotNull final RoutineException error) {
+        Execution onConsumerError(@NotNull final Channel<?, ? extends IN> channel,
+                @NotNull final RoutineException error) {
             mLogger.dbg(error, "aborting consumer");
-            // Cannot clear the input queue since this piece code is not called inside an execution
-            internalAbort(error, false);
+            mBoundChannels.remove(channel);
+            internalAbort(error);
             mState = new AbortChannelState();
             return mExecution.abort();
         }
@@ -1168,7 +1179,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Nullable
         Execution onHandlerAbort(@NotNull final RoutineException reason) {
             mLogger.dbg(reason, "aborting result channel");
-            internalAbort(reason, true);
+            internalAbort(reason);
             mState = new AbortChannelState();
             mMutex.notifyAll();
             return mExecution.abort();
@@ -1196,10 +1207,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return null;
             }
 
-            mBoundChannels.add(channel);
-            ++mPendingExecutionCount;
+            if (mBoundChannels.add(channel)) {
+                ++mPendingExecutionCount;
+            }
+
             mLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer(); // TODO: 18/06/16 pass channel and remove?
+            return new DefaultOutputConsumer(channel);
         }
 
         /**

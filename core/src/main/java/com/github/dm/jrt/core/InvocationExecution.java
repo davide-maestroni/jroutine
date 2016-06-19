@@ -171,7 +171,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     mIsTerminated = true;
                     manager.recycle(invocation);
 
-                } catch (final Throwable ignored) {
+                } catch (final Throwable t) {
+                    mLogger.wrn("Discarding invocation since it failed to be recycled", t);
                     manager.discard(invocation);
 
                 } finally {

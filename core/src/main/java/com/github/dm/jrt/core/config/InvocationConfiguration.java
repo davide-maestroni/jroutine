@@ -50,7 +50,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * the maximum age the lower priority invocation will have, before getting precedence over the
  * higher priority one.</li>
  * <li>The core number of invocation instances to be retained in order to be re-used when needed.
- * When an invocation completes without being destroyed, the instance is retained for future
+ * When an invocation completes without being discarded, the instance is retained for future
  * executions.</li>
  * <li>The maximum number of invocation instances running at the same time. When the limit is
  * exceeded, the new invocation execution is delayed until one instance becomes available.</li>

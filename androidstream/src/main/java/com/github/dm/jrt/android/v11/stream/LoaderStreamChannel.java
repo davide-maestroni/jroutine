@@ -811,7 +811,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> serial();
+    LoaderStreamChannel<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}

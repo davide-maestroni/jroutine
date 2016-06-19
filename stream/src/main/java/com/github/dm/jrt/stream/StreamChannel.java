@@ -667,7 +667,7 @@ public interface StreamChannel<IN, OUT>
      * the next routine invocation.
      * <p>
      * Note that the runner will be employed with asynchronous and parallel invocation modes, while
-     * the synchronous and serial modes will behave as before.
+     * the synchronous and sequential modes will behave as before.
      *
      * @return the new stream instance.
      * @see #async()
@@ -1360,14 +1360,15 @@ public interface StreamChannel<IN, OUT>
                     backoffFunction);
 
     /**
-     * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
+     * Makes the stream sequential, that is, the concatenated routines will be invoked in sequential
+     * mode.
      *
      * @return the new stream instance.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> serial();
+    StreamChannel<IN, OUT> sequential();
 
     /**
      * Concatenates a stream skipping the specified number of outputs.

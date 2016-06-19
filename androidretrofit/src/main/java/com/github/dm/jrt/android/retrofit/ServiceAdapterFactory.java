@@ -145,7 +145,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         final ServiceContext serviceContext = mServiceContext;
         if ((serviceContext == null) || (invocationMode == InvocationMode.SYNC) || (invocationMode
-                == InvocationMode.SERIAL)) {
+                == InvocationMode.SEQUENTIAL)) {
             return RoutineAdapterFactory.builder()
                                         .invocationMode(invocationMode)
                                         .invocationConfiguration()

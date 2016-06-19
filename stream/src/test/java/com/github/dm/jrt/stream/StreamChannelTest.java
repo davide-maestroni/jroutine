@@ -864,7 +864,7 @@ public class StreamChannelTest {
                           .filter(Functions.isNotNull())
                           .all()).containsExactly("test");
         assertThat(Streams.streamOf(null, "test")
-                          .serial()
+                          .sequential()
                           .filter(Functions.isNotNull())
                           .after(seconds(3))
                           .all()).containsExactly("test");
@@ -906,7 +906,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().filter(null);
+            Streams.streamOf().sequential().filter(null);
 
             fail();
 
@@ -957,7 +957,7 @@ public class StreamChannelTest {
                           .after(seconds(3))
                           .all()).containsOnly("test1", "test2");
         assertThat(Streams.streamOf("test1", null, "test2", null)
-                          .serial()
+                          .sequential()
                           .flatMap(new Function<String, Channel<?, String>>() {
 
                               public Channel<?, String> apply(final String s) {
@@ -1007,7 +1007,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().flatMap(null);
+            Streams.streamOf().sequential().flatMap(null);
 
             fail();
 
@@ -1163,7 +1163,7 @@ public class StreamChannelTest {
                           .after(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
-                          .invocationMode(InvocationMode.SERIAL)
+                          .invocationMode(InvocationMode.SEQUENTIAL)
                           .asyncMap(null)
                           .after(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
@@ -1360,7 +1360,7 @@ public class StreamChannelTest {
                           })
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .serial()
+                          .sequential()
                           .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
                               public void accept(final String s, final Channel<String, ?> result) {
@@ -1403,7 +1403,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(factory).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").serial().map(factory).all()).containsExactly(
+        assertThat(Streams.streamOf("test1", "test2").sequential().map(factory).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -1443,7 +1443,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((InvocationFactory<Object, Object>) null);
+            Streams.streamOf().sequential().map((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1471,7 +1471,7 @@ public class StreamChannelTest {
                           .map(new UpperCase())
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .serial()
+                          .sequential()
                           .map(new UpperCase())
                           .all()).containsExactly("TEST1", "TEST2");
     }
@@ -1512,7 +1512,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((MappingInvocation<Object, Object>) null);
+            Streams.streamOf().sequential().map((MappingInvocation<Object, Object>) null);
 
             fail();
 
@@ -1550,7 +1550,7 @@ public class StreamChannelTest {
                 return s.toUpperCase();
             }
         }).all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").serial().map(new Function<String, String>() {
+        assertThat(Streams.streamOf("test1", "test2").sequential().map(new Function<String, String>() {
 
             public String apply(final String s) {
 
@@ -1595,7 +1595,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((Function<Object, Object>) null);
+            Streams.streamOf().sequential().map((Function<Object, Object>) null);
 
             fail();
 
@@ -1624,7 +1624,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(routine).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").serial().map(routine).all()).containsExactly(
+        assertThat(Streams.streamOf("test1", "test2").sequential().map(routine).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -1644,7 +1644,7 @@ public class StreamChannelTest {
                           .all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2").sync().map(builder).all()).containsExactly(
                 "TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").serial().map(builder).all()).containsExactly(
+        assertThat(Streams.streamOf("test1", "test2").sequential().map(builder).all()).containsExactly(
                 "TEST1", "TEST2");
     }
 
@@ -1677,7 +1677,7 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().serial().map((RoutineBuilder<Object, Object>) null);
+            Streams.streamOf().sequential().map((RoutineBuilder<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1714,7 +1714,7 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().serial().map((Routine<Object, Object>) null);
+            Streams.streamOf().sequential().map((Routine<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2578,35 +2578,35 @@ public class StreamChannelTest {
                           .after(seconds(1))
                           .all()).containsOnly("TEST2");
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then((String) null)
                           .after(seconds(1))
                           .all()).containsOnly((String) null);
-        assertThat(Streams.streamOf("test1").serial().then((String[]) null).after(seconds(1)).all())
+        assertThat(Streams.streamOf("test1").sequential().then((String[]) null).after(seconds(1)).all())
                 .isEmpty();
-        assertThat(Streams.streamOf("test1").serial().then().after(seconds(1)).all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sequential().then().after(seconds(1)).all()).isEmpty();
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then((List<String>) null)
                           .after(seconds(1))
                           .all()).isEmpty();
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then(Collections.<String>emptyList())
                           .after(seconds(1))
                           .all()).isEmpty();
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then("TEST2")
                           .after(seconds(1))
                           .all()).containsOnly("TEST2");
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then("TEST2", "TEST2")
                           .after(seconds(1))
                           .all()).containsOnly("TEST2", "TEST2");
         assertThat(Streams.streamOf("test1")
-                          .serial()
+                          .sequential()
                           .then(Collections.singletonList("TEST2"))
                           .after(seconds(1))
                           .all()).containsOnly("TEST2");

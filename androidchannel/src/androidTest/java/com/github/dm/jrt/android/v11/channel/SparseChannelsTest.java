@@ -646,8 +646,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-                         .close();
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = SparseChannels.selectParcelableOutput(channel,
                 Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
         channel.abort();
@@ -675,8 +674,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                                 new ParcelableSelectable<Object>("test21", Sort.STRING))
-                         .close();
+                                 new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap = SparseChannels.selectParcelableOutput(channel, Sort.INTEGER, Sort.STRING)
                                    .buildChannels();
         channel.abort();
@@ -704,8 +702,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-                         .close();
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = SparseChannels.selectParcelableOutput(Math.min(Sort.INTEGER, Sort.STRING), 2,
                 channel).buildChannels();
         channel.abort();

@@ -82,9 +82,9 @@ import org.jetbrains.annotations.Nullable;
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
  * <p>
- * <b>Serial invocation</b><br>
- * The serial invocation behaves exactly in the same way as the parallel one, that is, a new
- * invocation is issued for each input, with the exception that the routine is synchronously
+ * <b>Sequential invocation</b><br>
+ * The sequential invocation mode behaves exactly in the same way as the parallel one, that is, a
+ * new invocation is issued for each input, with the exception that the routine is synchronously
  * invoked, thus effectively serializing the data processing.
  * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
@@ -198,7 +198,7 @@ public interface Routine<IN, OUT> {
     Channel<IN, OUT> parallel();
 
     /**
-     * Short for {@code serial().pass(input).close()}.
+     * Short for {@code sequential().pass(input).close()}.
      * <p>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
@@ -207,42 +207,42 @@ public interface Routine<IN, OUT> {
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> serial(@Nullable IN input);
+    Channel<IN, OUT> sequential(@Nullable IN input);
 
     /**
-     * Short for {@code serial().pass(inputs).close()}.
+     * Short for {@code sequential().pass(inputs).close()}.
      *
      * @param inputs the input data.
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> serial(@Nullable IN... inputs);
+    Channel<IN, OUT> sequential(@Nullable IN... inputs);
 
     /**
-     * Short for {@code serial().pass(inputs).close()}.
+     * Short for {@code sequential().pass(inputs).close()}.
      *
      * @param inputs the iterable returning the input data.
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> serial(@Nullable Iterable<? extends IN> inputs);
+    Channel<IN, OUT> sequential(@Nullable Iterable<? extends IN> inputs);
 
     /**
-     * Short for {@code serial().pass(inputs).close()}.
+     * Short for {@code sequential().pass(inputs).close()}.
      *
      * @param inputs the channel returning the input data.
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> serial(@Nullable Channel<?, ? extends IN> inputs);
+    Channel<IN, OUT> sequential(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
-     * Invokes the execution of this routine in serial mode.
+     * Invokes the execution of this routine in sequential mode.
      *
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> serial();
+    Channel<IN, OUT> sequential();
 
     /**
      * Short for {@code sync().pass(input).close()}.

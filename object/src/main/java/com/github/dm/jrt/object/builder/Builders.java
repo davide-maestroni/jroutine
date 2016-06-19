@@ -285,7 +285,7 @@ public class Builders {
 
         final InvocationMode invocationMode = invokeAnnotation.value();
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (method.getParameterTypes().length > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (method.getParameterTypes().length > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + method);
@@ -458,7 +458,7 @@ public class Builders {
                 }
 
                 if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                        == InvocationMode.SERIAL)) && (targetParameterTypes.length > 1)) {
+                        == InvocationMode.SEQUENTIAL)) && (targetParameterTypes.length > 1)) {
                     throw new IllegalArgumentException(
                             "methods annotated with invocation mode " + invocationMode
                                     + " must have no input parameters: " + proxyMethod);
@@ -771,7 +771,7 @@ public class Builders {
             @Nullable final InvocationMode invocationMode) {
         return (invocationMode == InvocationMode.SYNC) ? routine.sync()
                 : (invocationMode == InvocationMode.PARALLEL) ? routine.parallel()
-                        : (invocationMode == InvocationMode.SERIAL) ? routine.serial()
+                        : (invocationMode == InvocationMode.SEQUENTIAL) ? routine.sequential()
                                 : routine.async();
     }
 

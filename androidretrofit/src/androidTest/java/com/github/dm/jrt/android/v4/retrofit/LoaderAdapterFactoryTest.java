@@ -173,7 +173,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.builder()
                                                   .with(context)
-                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -369,7 +369,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.builder()
                                                   .with(context)
-                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
                                                   .apply()
@@ -563,7 +563,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.builder()
                                                   .with(context)
-                                                  .invocationMode(InvocationMode.SERIAL)
+                                                  .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

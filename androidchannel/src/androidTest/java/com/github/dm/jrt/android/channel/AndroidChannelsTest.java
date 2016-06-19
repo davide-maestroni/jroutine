@@ -1163,8 +1163,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-                         .close();
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = AndroidChannels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                                     .buildChannels();
         channel.abort();
@@ -1192,8 +1191,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                                 new ParcelableSelectable<Object>("test21", Sort.STRING))
-                         .close();
+                                 new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap =
                 AndroidChannels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannels();
         channel.abort();
@@ -1221,8 +1219,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.async()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-                         .close();
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = AndroidChannels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                                     .buildChannels();
         channel.abort();

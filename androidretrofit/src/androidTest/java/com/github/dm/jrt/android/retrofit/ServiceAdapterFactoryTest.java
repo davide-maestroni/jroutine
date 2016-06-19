@@ -160,7 +160,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(context)
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .apply()
@@ -276,7 +276,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(context)
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .apply()
@@ -400,7 +400,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
                                              .with(context)
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

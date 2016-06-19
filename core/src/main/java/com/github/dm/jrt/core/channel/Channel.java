@@ -69,7 +69,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     boolean abort(@Nullable Throwable reason);
 
     /**
-     * Tells the channel to delay the next operation of the specified time duration.
+     * Tells the channel to delay the following operations of the specified time duration.
      * <br>
      * In case of read operations the value will represent the maximum allowed time before the
      * operation completes.
@@ -88,7 +88,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     Channel<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
-     * Tells the channel to delay the next operation of the specified time duration.
+     * Tells the channel to delay the following operations of the specified time duration.
      * <br>
      * In case of read operations the value will represent the maximum allowed time before the
      * operation completes.
@@ -405,6 +405,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      */
     @NotNull
     Channel<IN, OUT> immediately();
+    // TODO: 19/06/16 rename?
 
     /**
      * Returns the number of input data stored in the channel.

@@ -120,7 +120,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
         } catch (final Throwable t) {
             InvocationInterruptedException.throwIfInterrupt(t);
-            mLogger.wrn(t, "ignoring exception while destroying invocation instance");
+            mLogger.wrn(t, "ignoring exception while discarding invocation instance");
         }
 
         mLogger.dbg("resetting result");

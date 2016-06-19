@@ -808,7 +808,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsOnly("test1", "test2");
         assertThat(LoaderStreamsCompat.streamOf("test1", null, "test2", null)
                                       .with(loaderFrom(activity))
-                                      .serial()
+                                      .sequential()
                                       .flatMap(new Function<String, Channel<?, String>>() {
 
                                           public Channel<?, String> apply(final String s) {
@@ -989,7 +989,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
                                       .order(OrderType.BY_CALL)
-                                      .serial()
+                                      .sequential()
                                       .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
                                           public void accept(final String s,
@@ -1043,7 +1043,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
                                       .order(OrderType.BY_CALL)
-                                      .serial()
+                                      .sequential()
                                       .map(new Function<String, String>() {
 
                                           public String apply(final String s) {
@@ -1429,7 +1429,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
-                                      .serial()
+                                      .sequential()
                                       .thenGetMore(3, new Consumer<Channel<String, ?>>() {
 
                                           public void accept(
@@ -1442,7 +1442,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
-                                      .serial()
+                                      .sequential()
                                       .thenGet(3, new Supplier<String>() {
 
                                           public String get() {
@@ -1916,7 +1916,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test");
         assertThat(LoaderStreamsCompat.streamOf(null, "test")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .filter(Functions.isNotNull())
                                       .after(seconds(10))
                                       .all()).containsExactly("test");
@@ -1950,7 +1950,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf().serial().filter(null);
+            LoaderStreamsCompat.streamOf().sequential().filter(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1991,7 +1991,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).serial().flatMap(null);
+            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sequential().flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2087,7 +2087,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test1", "test2", "test3");
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(getActivity()))
-                                      .invocationMode(InvocationMode.SERIAL)
+                                      .invocationMode(InvocationMode.SEQUENTIAL)
                                       .asyncMap(null)
                                       .after(seconds(10))
                                       .all()).containsExactly("test1", "test2", "test3");
@@ -2218,7 +2218,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
                                       .order(OrderType.BY_CALL)
-                                      .serial()
+                                      .sequential()
                                       .map(factory)
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2253,7 +2253,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf("test").serial().map(factory);
+            LoaderStreamsCompat.streamOf("test").sequential().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
@@ -2300,7 +2300,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .map((ContextInvocationFactory<Object, Object>) null);
             fail();
 
@@ -2333,7 +2333,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
                                       .order(OrderType.BY_CALL)
-                                      .serial()
+                                      .sequential()
                                       .map(factory)
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2378,7 +2378,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .map((InvocationFactory<Object, Object>) null);
             fail();
 
@@ -2410,7 +2410,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
                                       .order(OrderType.BY_CALL)
-                                      .serial()
+                                      .sequential()
                                       .map(new UpperCase())
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2455,7 +2455,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .map((MappingInvocation<Object, Object>) null);
             fail();
 
@@ -2508,7 +2508,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .map((Function<Object, Object>) null);
             fail();
 
@@ -2543,7 +2543,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .map(routine)
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2571,7 +2571,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .map(builder)
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2593,7 +2593,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .map(loaderBuilder)
                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
-                                      .serial()
+                                      .sequential()
                                       .map(loaderBuilder)
                                       .after(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
@@ -2638,7 +2638,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .map((Routine<Object, Object>) null);
             fail();
 
@@ -3146,49 +3146,49 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsOnly("TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then((String) null)
                                       .after(seconds(10))
                                       .all()).containsOnly((String) null);
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then((String[]) null)
                                       .after(seconds(10))
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then()
                                       .after(seconds(10))
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then((List<String>) null)
                                       .after(seconds(10))
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then(Collections.<String>emptyList())
                                       .after(seconds(10))
                                       .all()).isEmpty();
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then("TEST2")
                                       .after(seconds(10))
                                       .all()).containsOnly("TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then("TEST2", "TEST2")
                                       .after(seconds(10))
                                       .all()).containsOnly("TEST2", "TEST2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .serial()
+                                      .sequential()
                                       .then(Collections.singletonList("TEST2"))
                                       .after(seconds(10))
                                       .all()).containsOnly("TEST2");
@@ -3254,7 +3254,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .thenGet(-1, Functions.constant(null));
             fail();
 
@@ -3265,7 +3265,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .thenGet(-1, Functions.constant(null));
             fail();
 
@@ -3276,7 +3276,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .thenGetMore(-1, Functions.sink());
             fail();
 
@@ -3386,7 +3386,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .thenGet(3, null);
             fail();
 
@@ -3397,7 +3397,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
-                               .serial()
+                               .sequential()
                                .thenGetMore(3, null);
             fail();
 

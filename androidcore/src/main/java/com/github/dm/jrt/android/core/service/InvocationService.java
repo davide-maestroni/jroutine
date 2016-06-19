@@ -516,7 +516,7 @@ public class InvocationService extends Service {
                     }
 
                 } catch (final Throwable ignored) {
-                    logger.err(ignored, "error while destroying invocation");
+                    logger.err(ignored, "error while discarding invocation");
                 }
 
                 try {
@@ -577,6 +577,13 @@ public class InvocationService extends Service {
          */
         private RoutineState(@NotNull final ContextRoutine routine) {
             mRoutine = routine;
+        }
+
+        /**
+         * Clear the routine invocation cache.
+         */
+        void clear() {
+            mRoutine.clear();
         }
 
         /**
@@ -717,7 +724,9 @@ public class InvocationService extends Service {
         void recycle() {
             synchronized (mMutex) {
                 mInvocations.remove(mId);
-                if (mRoutineState.releaseInvocation() <= 0) {
+                final RoutineState routineState = mRoutineState;
+                if (routineState.releaseInvocation() <= 0) {
+                    routineState.clear();
                     mRoutines.remove(mRoutineInfo);
                 }
             }

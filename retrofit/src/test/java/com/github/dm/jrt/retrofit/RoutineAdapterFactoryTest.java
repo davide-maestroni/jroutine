@@ -149,7 +149,7 @@ public class RoutineAdapterFactoryTest {
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .apply()
@@ -333,7 +333,7 @@ public class RoutineAdapterFactoryTest {
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

@@ -58,8 +58,8 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    public Channel<IN, OUT> serial() {
-        return buildRoutine().serial();
+    public Channel<IN, OUT> sequential() {
+        return buildRoutine().sequential();
     }
 
     @NotNull

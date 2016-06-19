@@ -800,8 +800,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> serial() {
-        return invocationMode(InvocationMode.SERIAL);
+    public StreamChannel<IN, OUT> sequential() {
+        return invocationMode(InvocationMode.SEQUENTIAL);
     }
 
     @NotNull

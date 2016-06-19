@@ -80,7 +80,7 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
         return (invocationMode == InvocationMode.ASYNC) ? mRoutine.async(channel)
                 : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallel(channel)
                         : (invocationMode == InvocationMode.SYNC) ? mRoutine.sync(channel)
-                                : mRoutine.serial(channel);
+                                : mRoutine.sequential(channel);
     }
 
     /**

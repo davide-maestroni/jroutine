@@ -820,7 +820,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> serial();
+    LoaderStreamChannelCompat<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}

@@ -47,26 +47,26 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
     <OUT> Channel<?, OUT> buildChannel();
 
     /**
-     * Makes the builder destroy all the cached invocation instances.
+     * Makes the builder discard all the cached invocation instances.
      */
     void clear();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
+     * Makes the builder discard the cached invocation instances with the specified input.
      *
      * @param input the input.
      */
     void clear(@Nullable Object input);
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Makes the builder discard the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
     void clear(@Nullable Object... inputs);
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Makes the builder discard the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */

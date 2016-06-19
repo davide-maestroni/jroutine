@@ -44,9 +44,9 @@ public enum InvocationMode {
      */
     PARALLEL,
     /**
-     * Serial mode.
+     * Sequential mode.
      *
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
-    SERIAL
+    SEQUENTIAL
 }

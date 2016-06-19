@@ -773,8 +773,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> serial() {
-        return (LoaderStreamChannel<IN, OUT>) super.serial();
+    public LoaderStreamChannel<IN, OUT> sequential() {
+        return (LoaderStreamChannel<IN, OUT>) super.sequential();
     }
 
     @NotNull

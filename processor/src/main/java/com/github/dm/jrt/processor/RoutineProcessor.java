@@ -946,7 +946,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
         final InvocationMode invocationMode = annotation.value();
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (methodElement.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1829,7 +1829,7 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (targetMethod.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
@@ -1887,7 +1887,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 buildInputParams(annotationElement, element, targetElement, methodElement));
         method = method.replace("${invokeMethod}", (invocationMode == InvocationMode.SYNC) ? "sync"
                 : (invocationMode == InvocationMode.PARALLEL) ? "parallel"
-                        : (invocationMode == InvocationMode.SERIAL) ? "serial" : "async");
+                        : (invocationMode == InvocationMode.SEQUENTIAL) ? "sequential" : "async");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader =

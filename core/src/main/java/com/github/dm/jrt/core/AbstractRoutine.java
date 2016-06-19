@@ -142,8 +142,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     @NotNull
-    public Channel<IN, OUT> serial() {
-        mLogger.dbg("invoking routine: %s", InvocationMode.SERIAL);
+    public Channel<IN, OUT> sequential() {
+        mLogger.dbg("invoking routine: %s", InvocationMode.SEQUENTIAL);
         return getElementRoutine().sync();
     }
 
@@ -245,7 +245,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         protected Invocation<IN, OUT> convertInvocation(
                                 @NotNull final Invocation<IN, OUT> invocation,
                                 @NotNull final InvocationType type) throws Exception {
-                            // No need to destroy the old one
+                            // No need to discard the old one
                             return newInvocation(type);
                         }
 
@@ -255,7 +255,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                                 @NotNull final InvocationType type) {
                             return (type == InvocationType.ASYNC) ? new ParallelInvocation<IN, OUT>(
                                     AbstractRoutine.this)
-                                    : new SerialInvocation<IN, OUT>(AbstractRoutine.this);
+                                    : new SequentialInvocation<IN, OUT>(AbstractRoutine.this);
                         }
                     };
         }
@@ -341,12 +341,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     /**
-     * Implementation of an invocation handling serial mode.
+     * Implementation of an invocation handling sequential mode.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class SerialInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+    private static class SequentialInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
         private final Routine<IN, OUT> mRoutine;
 
@@ -355,9 +355,9 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         /**
          * Constructor.
          *
-         * @param routine the routine to invoke in serial mode.
+         * @param routine the routine to invoke in sequential mode.
          */
-        private SerialInvocation(@NotNull final Routine<IN, OUT> routine) {
+        private SequentialInvocation(@NotNull final Routine<IN, OUT> routine) {
             mRoutine = routine;
         }
 
@@ -481,7 +481,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
                     } catch (final Throwable t) {
                         InvocationInterruptedException.throwIfInterrupt(t);
-                        logger.wrn(t, "ignoring exception while destroying invocation instance");
+                        logger.wrn(t, "ignoring exception while discarding invocation instance");
                     }
                 }
 

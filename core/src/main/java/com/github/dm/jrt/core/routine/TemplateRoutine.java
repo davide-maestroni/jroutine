@@ -78,23 +78,23 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> serial(@Nullable final IN input) {
-        return serial().pass(input).close();
+    public Channel<IN, OUT> sequential(@Nullable final IN input) {
+        return sequential().pass(input).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> serial(@Nullable final IN... inputs) {
-        return serial().pass(inputs).close();
+    public Channel<IN, OUT> sequential(@Nullable final IN... inputs) {
+        return sequential().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> serial(@Nullable final Iterable<? extends IN> inputs) {
-        return serial().pass(inputs).close();
+    public Channel<IN, OUT> sequential(@Nullable final Iterable<? extends IN> inputs) {
+        return sequential().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> serial(@Nullable final Channel<?, ? extends IN> inputs) {
-        return serial().pass(inputs).close();
+    public Channel<IN, OUT> sequential(@Nullable final Channel<?, ? extends IN> inputs) {
+        return sequential().pass(inputs).close();
     }
 
     @NotNull

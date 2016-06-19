@@ -1728,8 +1728,7 @@ public class ChannelsTest {
         channel = routine.async()
                          .after(millis(100))
                          .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                                 new Selectable<Object>("test21", Sort.STRING))
-                         .close();
+                                 new Selectable<Object>("test21", Sort.STRING));
         channelMap = Channels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannels();
         channel.abort();
 
@@ -1756,8 +1755,7 @@ public class ChannelsTest {
         channel = routine.async()
                          .after(millis(100))
                          .pass(new Selectable<Object>("test21", Sort.STRING),
-                                 new Selectable<Object>(-11, Sort.INTEGER))
-                         .close();
+                                 new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                              .buildChannels();
         channel.abort();

@@ -318,15 +318,15 @@ public class RoutineTest {
         assertThat(routine.parallel("test1").after(timeout).all()).containsOnly("test1");
         assertThat(routine.parallel("test1", "test2").after(timeout).all()).containsOnly("test1",
                 "test2");
-        assertThat(routine.serial().close().after(timeout).all()).isEmpty();
-        assertThat(
-                routine.serial(Arrays.asList("test1", "test2")).after(timeout).all()).containsOnly(
-                "test1", "test2");
-        assertThat(
-                routine.serial(routine.sync("test1", "test2")).after(timeout).all()).containsOnly(
-                "test1", "test2");
-        assertThat(routine.serial("test1").after(timeout).all()).containsOnly("test1");
-        assertThat(routine.serial("test1", "test2").after(timeout).all()).containsOnly("test1",
+        assertThat(routine.sequential().close().after(timeout).all()).isEmpty();
+        assertThat(routine.sequential(Arrays.asList("test1", "test2"))
+                          .after(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.sequential(routine.sync("test1", "test2"))
+                          .after(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.sequential("test1").after(timeout).all()).containsOnly("test1");
+        assertThat(routine.sequential("test1", "test2").after(timeout).all()).containsOnly("test1",
                 "test2");
 
         assertThat(routine.sync().pass().close().all()).isEmpty();
@@ -378,20 +378,24 @@ public class RoutineTest {
                           .close()
                           .after(timeout)
                           .all()).containsOnly("test1", "test2");
-        assertThat(routine.serial().pass().close().after(timeout).all()).isEmpty();
-        assertThat(
-                routine.serial().pass(Arrays.asList("test1", "test2")).close().after(timeout).all())
-                .containsOnly("test1", "test2");
-        assertThat(routine.serial()
+        assertThat(routine.sequential().pass().close().after(timeout).all()).isEmpty();
+        assertThat(routine.sequential()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .close()
+                          .after(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.sequential()
                           .pass(routine.sync("test1", "test2"))
                           .close()
                           .after(timeout)
                           .all()).containsOnly("test1", "test2");
-        assertThat(routine.serial().pass("test1").close().after(timeout).all()).containsOnly(
+        assertThat(routine.sequential().pass("test1").close().after(timeout).all()).containsOnly(
                 "test1");
-        assertThat(
-                routine.serial().pass("test1", "test2").close().after(timeout).all()).containsOnly(
-                "test1", "test2");
+        assertThat(routine.sequential()
+                          .pass("test1", "test2")
+                          .close()
+                          .after(timeout)
+                          .all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -417,7 +421,7 @@ public class RoutineTest {
         assertThat(sumRoutine.sync(squareRoutine.sync(1, 2, 3, 4))
                              .after(timeout)
                              .all()).containsExactly(30);
-        assertThat(sumRoutine.sync(squareRoutine.serial(1, 2, 3, 4))
+        assertThat(sumRoutine.sync(squareRoutine.sequential(1, 2, 3, 4))
                              .after(timeout)
                              .all()).containsExactly(30);
         assertThat(sumRoutine.async(squareRoutine.sync(1, 2, 3, 4))
@@ -429,7 +433,7 @@ public class RoutineTest {
         assertThat(sumRoutine.async(squareRoutine.parallel(1, 2, 3, 4))
                              .after(timeout)
                              .all()).containsExactly(30);
-        assertThat(sumRoutine.async(squareRoutine.serial(1, 2, 3, 4))
+        assertThat(sumRoutine.async(squareRoutine.sequential(1, 2, 3, 4))
                              .after(timeout)
                              .all()).containsExactly(30);
     }
@@ -868,7 +872,7 @@ public class RoutineTest {
         routine5.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
         final Routine<String, String> routine6 =
-                JRoutineCore.on(RoutineInvocation.factoryFrom(routine3, InvocationMode.SERIAL))
+                JRoutineCore.on(RoutineInvocation.factoryFrom(routine3, InvocationMode.SEQUENTIAL))
                             .buildRoutine();
         assertThat(routine6.async("test5").after(timeout).all()).containsExactly("test5");
         routine6.clear();
@@ -889,8 +893,8 @@ public class RoutineTest {
                 "2", "3", "4", "5");
         assertThat(routine1.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine1.serial("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
+        assertThat(routine1.sequential("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
         final Routine<String, String> routine3 =
@@ -914,8 +918,8 @@ public class RoutineTest {
                 "2", "3", "4", "5");
         assertThat(routine5.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine5.serial("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
+        assertThat(routine5.sequential("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
         routine5.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
@@ -928,8 +932,8 @@ public class RoutineTest {
                 "2", "3", "4", "5");
         assertThat(routine6.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine6.serial("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
+        assertThat(routine6.sequential("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
         routine6.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
     }
@@ -1382,7 +1386,7 @@ public class RoutineTest {
                                                         .withMaxInstances(1)
                                                         .apply()
                                                         .buildRoutine();
-        routine.async().close();
+        routine.sync().pass((Void) null);
         try {
             routine.async().close().after(seconds(1)).next();
             fail();
@@ -2531,7 +2535,7 @@ public class RoutineTest {
         }
 
         try {
-            routine.serial(input).after(timeout).all();
+            routine.sequential(input).after(timeout).all();
             fail();
 
         } catch (final InvocationException e) {
@@ -2539,7 +2543,7 @@ public class RoutineTest {
         }
 
         try {
-            for (final String s : routine.serial(input).after(timeout)) {
+            for (final String s : routine.sequential(input).after(timeout)) {
                 assertThat(s).isNotEmpty();
             }
 
@@ -2607,7 +2611,7 @@ public class RoutineTest {
         }
 
         try {
-            routine.serial().pass(input).close().after(timeout).all();
+            routine.sequential().pass(input).close().after(timeout).all();
             fail();
 
         } catch (final InvocationException e) {
@@ -2615,7 +2619,7 @@ public class RoutineTest {
         }
 
         try {
-            for (final String s : routine.serial().pass(input).close().after(timeout)) {
+            for (final String s : routine.sequential().pass(input).close().after(timeout)) {
                 assertThat(s).isNotEmpty();
             }
 
@@ -3162,10 +3166,7 @@ public class RoutineTest {
 
         @Override
         public void onDiscard() {
-            synchronized (sInstanceCount) {
-                sInstanceCount.decrementAndGet();
-                sInstanceCount.notifyAll();
-            }
+            sInstanceCount.decrementAndGet();
         }
     }
 

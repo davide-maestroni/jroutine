@@ -142,17 +142,18 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     private void execute(@NotNull final Invocation<IN, OUT> invocation) {
+        final Logger logger = mLogger;
         final InputIterator<IN> inputIterator = mInputIterator;
         final InvocationManager<IN, OUT> manager = mInvocationManager;
         final ResultChannel<OUT> resultChannel = mResultChannel;
         try {
             inputIterator.onConsumeStart();
-            mLogger.dbg("running execution");
+            logger.dbg("running execution");
             final boolean isComplete;
             try {
                 if (mInvocation == null) {
                     mInvocation = invocation;
-                    mLogger.dbg("initializing invocation: %s", invocation);
+                    logger.dbg("initializing invocation: %s", invocation);
                     invocation.onRecycle();
                     mIsInitialized = true;
                 }
@@ -172,7 +173,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     manager.recycle(invocation);
 
                 } catch (final Throwable t) {
-                    mLogger.wrn("Discarding invocation since it failed to be recycled", t);
+                    logger.wrn(t, "Discarding invocation since it failed to be recycled");
                     manager.discard(invocation);
 
                 } finally {
@@ -248,18 +249,19 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
             synchronized (mMutex) {
                 mIsWaitingAbortInvocation = false;
+                final Logger logger = mLogger;
                 final InputIterator<IN> inputIterator = mInputIterator;
                 final InvocationManager<IN, OUT> manager = mInvocationManager;
                 final ResultChannel<OUT> resultChannel = mResultChannel;
                 resultChannel.enterInvocation();
                 try {
                     final RoutineException exception = inputIterator.getAbortException();
-                    mLogger.dbg(exception, "aborting invocation");
+                    logger.dbg(exception, "aborting invocation");
                     try {
                         if (!mIsTerminated) {
                             if (mInvocation == null) {
                                 mInvocation = invocation;
-                                mLogger.dbg("initializing invocation: %s", invocation);
+                                logger.dbg("initializing invocation: %s", invocation);
                                 invocation.onRecycle();
                                 mIsInitialized = true;
                             }

@@ -1360,6 +1360,20 @@ public interface StreamChannel<IN, OUT>
                     backoffFunction);
 
     /**
+     * Returns a new stream making this one selectable.
+     * <br>
+     * Each output will be passed along unchanged.
+     * <p>
+     * Note that this stream will be bound as a result of the call.
+     *
+     * @param index the stream index.
+     * @return the selectable stream.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamChannel<IN, ? extends Selectable<OUT>> selectable(int index);
+
+    /**
      * Makes the stream sequential, that is, the concatenated routines will be invoked in sequential
      * mode.
      *
@@ -1558,21 +1572,6 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(REDUCE)
     <AFTER> StreamChannel<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * Returns a new stream making this one selectable.
-     * <br>
-     * Each output will be passed along unchanged.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param index the stream index.
-     * @return the selectable stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(int index);
-    // TODO: 18/06/16 selectable(int)
 
     /**
      * Concatenates a function handling invocation exceptions.

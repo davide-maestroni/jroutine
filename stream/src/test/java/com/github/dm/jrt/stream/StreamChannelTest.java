@@ -2012,7 +2012,7 @@ public class StreamChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(
-                Streams.streamOf(channel).toSelectable(33).after(seconds(1)).all()).containsExactly(
+                Streams.streamOf(channel).selectable(33).after(seconds(1)).all()).containsExactly(
                 new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
                 new Selectable<String>("test3", 33));
     }
@@ -2024,7 +2024,7 @@ public class StreamChannelTest {
         channel.pass("test1", "test2", "test3").abort();
 
         try {
-            Streams.streamOf(channel).toSelectable(33).after(seconds(1)).all();
+            Streams.streamOf(channel).selectable(33).after(seconds(1)).all();
             fail();
 
         } catch (final AbortException ignored) {

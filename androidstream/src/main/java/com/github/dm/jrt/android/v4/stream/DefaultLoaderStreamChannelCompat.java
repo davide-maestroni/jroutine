@@ -794,6 +794,13 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> selectable(
+            final int index) {
+        return applyTransformWith(new SelectableTransform<IN, OUT>(index));
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> sequential() {
         return (LoaderStreamChannelCompat<IN, OUT>) super.sequential();
     }
@@ -867,13 +874,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetMore(outputsConsumer);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(
-            final int index) {
-        return applyTransformWith(new SelectableTransform<IN, OUT>(index));
     }
 
     @NotNull

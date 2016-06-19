@@ -742,20 +742,9 @@ public class ByteChannel {
             mStream = new DefaultBufferInputStream(this);
         }
 
-        /**
-         * Returns the size in number of bytes of this buffer.
-         *
-         * @return the buffer size.
-         */
-        public int getSize() {
-            synchronized (mMutex) {
-                return mSize;
-            }
-        }
-
         @Override
         public int hashCode() {
-            final int size = getSize();
+            final int size = size();
             final byte[] buffer = mBuffer;
             int result = size;
             for (int i = 0; i < size; ++i) {
@@ -776,8 +765,8 @@ public class ByteChannel {
             }
 
             final ByteBuffer that = (ByteBuffer) o;
-            final int size = getSize();
-            if (size != that.getSize()) {
+            final int size = size();
+            if (size != that.size()) {
                 return false;
             }
 
@@ -790,6 +779,17 @@ public class ByteChannel {
             }
 
             return true;
+        }
+
+        /**
+         * Returns the size in number of bytes of this buffer.
+         *
+         * @return the buffer size.
+         */
+        public int size() {
+            synchronized (mMutex) {
+                return mSize;
+            }
         }
 
         private void changeState(@NotNull final BufferState expected,
@@ -886,7 +886,7 @@ public class ByteChannel {
         public int read(@NotNull final OutputStream out) throws IOException {
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -908,7 +908,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -932,7 +932,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -948,7 +948,7 @@ public class ByteChannel {
         @Override
         public long skip(final long n) {
             synchronized (mMutex) {
-                final long skipped = Math.min(mBuffer.getSize() - mOffset, n);
+                final long skipped = Math.min(mBuffer.size() - mOffset, n);
                 if (skipped > 0) {
                     mOffset += skipped;
                 }
@@ -960,7 +960,7 @@ public class ByteChannel {
         @Override
         public int available() {
             synchronized (mMutex) {
-                return Math.max(0, mBuffer.getSize() - mOffset);
+                return Math.max(0, mBuffer.size() - mOffset);
             }
         }
 
@@ -988,7 +988,7 @@ public class ByteChannel {
         public int read() {
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 if (mOffset >= size) {
                     return -1;
                 }

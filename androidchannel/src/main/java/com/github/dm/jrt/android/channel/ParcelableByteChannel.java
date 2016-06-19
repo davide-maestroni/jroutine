@@ -338,9 +338,9 @@ public class ParcelableByteChannel {
          *
          * @return the buffer size.
          */
-        public int getSize() {
+        public int size() {
             final ByteBuffer buffer = mBuffer;
-            return (buffer != null) ? buffer.getSize() : 0;
+            return (buffer != null) ? buffer.size() : 0;
         }
 
         @Nullable

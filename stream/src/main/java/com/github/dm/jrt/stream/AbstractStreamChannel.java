@@ -800,6 +800,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, ? extends Selectable<OUT>> selectable(final int index) {
+        return newChannel(getBindingFunction().andThen(
+                new BindSelectable<OUT>(mStreamConfiguration.asChannelConfiguration(), index)));
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> sequential() {
         return invocationMode(InvocationMode.SEQUENTIAL);
     }
@@ -878,12 +884,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
         return thenGetMore(1, outputsConsumer);
-    }
-
-    @NotNull
-    public StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(final int index) {
-        return newChannel(getBindingFunction().andThen(
-                new BindSelectable<OUT>(mStreamConfiguration.asChannelConfiguration(), index)));
     }
 
     @NotNull

@@ -213,6 +213,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
                             throw e;
 
                         } catch (final Throwable t) {
+                            logger.wrn(t, "aborted channel");
                             abortedChannels.add(newChannel);
                         }
                     }
@@ -225,6 +226,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
                             throw e;
 
                         } catch (final Throwable t) {
+                            logger.wrn(t, "aborted channel");
                             abortedChannels.add(channel);
                         }
                     }

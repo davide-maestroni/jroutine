@@ -2833,7 +2833,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         channel.pass("test1", "test2", "test3").close();
         assertThat(LoaderStreams.streamOf(channel)
                                 .with(loaderFrom(getActivity()))
-                                .toSelectable(33)
+                                .selectable(33)
                                 .after(seconds(10))
                                 .all()).containsExactly(
                 new ParcelableSelectable<String>("test1", 33),
@@ -2852,7 +2852,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         try {
             LoaderStreams.streamOf(channel)
                          .with(loaderFrom(getActivity()))
-                         .toSelectable(33)
+                         .selectable(33)
                          .after(seconds(10))
                          .all();
             fail();

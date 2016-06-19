@@ -810,6 +810,14 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> selectable(int index);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     @StreamFlow(CONFIG)
     LoaderStreamChannel<IN, OUT> sequential();
 
@@ -897,14 +905,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @StreamFlow(REDUCE)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
 
     /**
      * {@inheritDoc}

@@ -462,6 +462,17 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(CONFIG)
+    LoaderStreamChannelCompat<IN, OUT> immediate();
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -802,17 +813,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     LoaderStreamChannelCompat<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}

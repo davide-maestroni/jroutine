@@ -362,13 +362,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
-            final Channel<Object, Object> ioChannel = JRoutineCore.io()
-                                                                  .channelConfiguration()
-                                                                  .with(mConfiguration)
-                                                                  .apply()
-                                                                  .buildChannel();
-            mRoutine.async(channel).bind(new ConverterOutputConsumer(mConverter, ioChannel));
-            return ioChannel;
+            final Channel<Object, Object> outputChannel = JRoutineCore.io()
+                                                                      .channelConfiguration()
+                                                                      .with(mConfiguration)
+                                                                      .apply()
+                                                                      .buildChannel();
+            mRoutine.async(channel).bind(new ConverterOutputConsumer(mConverter, outputChannel));
+            return outputChannel;
         }
     }
 

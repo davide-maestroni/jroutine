@@ -1581,10 +1581,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
         final LoaderStreamChannel<Object, Object> streamChannel =
-                LoaderStreams.streamOf(ioChannel).with(loaderFrom(getActivity()));
-        ioChannel.abort(new IllegalArgumentException());
+                LoaderStreams.streamOf(channel).with(loaderFrom(getActivity()));
+        channel.abort(new IllegalArgumentException());
         try {
             streamChannel.after(seconds(10)).throwError();
 
@@ -2967,16 +2967,16 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
         final Channel<?, Object> channel =
-                LoaderStreams.streamOf(ioChannel).with(loaderFrom(getActivity())).replay();
-        ioChannel.pass("test1", "test2");
+                LoaderStreams.streamOf(inputChannel).with(loaderFrom(getActivity())).replay();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.pass("test3").close();
+        inputChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
         assertThat(output1.all()).containsExactly("test2", "test3");
     }
@@ -2987,16 +2987,16 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
         final Channel<?, Object> channel =
-                LoaderStreams.streamOf(ioChannel).with(loaderFrom(getActivity())).replay();
-        ioChannel.pass("test1", "test2");
+                LoaderStreams.streamOf(inputChannel).with(loaderFrom(getActivity())).replay();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.abort();
+        inputChannel.abort();
         try {
             output1.all();
             fail();
@@ -3067,7 +3067,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         assertThat(LoaderStreams.streamOf()
-                                .sequential()
+                                .immediate()
                                 .thenGetMore(range(1, 1000))
                                 .streamInvocationConfiguration()
                                 .withInputMaxSize(1)
@@ -3088,13 +3088,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                               .on(IdentityContextInvocation
                                                                       .factoryOf())
                                                               .async();
-        assertThat(channel.inSize()).isEqualTo(0);
+        assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.inSize()).isEqualTo(1);
+        assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<?, Object> result = LoaderStreams.streamOf(channel.close());
         assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
-        assertThat(result.outSize()).isEqualTo(1);
-        assertThat(result.skipNext(1).outSize()).isEqualTo(0);
+        assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 
     public void testSkip() {

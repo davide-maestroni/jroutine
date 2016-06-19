@@ -184,9 +184,10 @@ public class ServiceCallInvocation extends
 
         final Channel<Object, ?> channel =
                 AndroidChannels.selectParcelableInput(result, BYTES_INDEX).buildChannels();
-        final BufferOutputStream outputStream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream outputStream =
+                ParcelableByteChannel.byteChannel().bindDeep(channel);
         try {
-            outputStream.withCloseChannel(true).transferFrom(responseBody.byteStream());
+            outputStream.transferFrom(responseBody.byteStream());
 
         } finally {
             outputStream.close();

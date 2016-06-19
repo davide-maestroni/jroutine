@@ -409,8 +409,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return after(zero());
     }
 
-    public int inSize() {
-        return outSize();
+    public int inputCount() {
+        return outputCount();
     }
 
     public boolean isBound() {
@@ -420,7 +420,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public boolean isEmpty() {
-        return outSize() == 0;
+        return outputCount() == 0;
     }
 
     public boolean isOpen() {
@@ -474,7 +474,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return this;
     }
 
-    public int outSize() {
+    public int outputCount() {
         synchronized (mMutex) {
             return mOutputCount;
         }

@@ -45,8 +45,7 @@ public class ByteChannelTest {
     public void testAvailable() throws IOException {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel().bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -116,8 +115,7 @@ public class ByteChannelTest {
     public void testConcatAvailable() throws IOException {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel(8).bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel(8).bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -150,8 +148,7 @@ public class ByteChannelTest {
     public void testConcatMark() throws IOException {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel(4).bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel(4).bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -430,8 +427,7 @@ public class ByteChannelTest {
     public void testMark() throws IOException {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel().bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -456,8 +452,7 @@ public class ByteChannelTest {
     public void testOutputClose() {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel().bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         stream.close();
         assertThat(channel.eventuallyBreak().all()).isEmpty();
         final byte[] b = new byte[16];
@@ -770,8 +765,7 @@ public class ByteChannelTest {
     public void testSkip() throws IOException {
 
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream =
-                ByteChannel.byteChannel().bind(channel).withCloseChannel(true);
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -810,15 +804,6 @@ public class ByteChannelTest {
         assertThat(ByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
         assertThat(b).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6,
                 (byte) 7, (byte) 8, (byte) 9, (byte) 10);
-    }
-
-    @Test
-    public void testStreamCache() {
-
-        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final ByteChannel byteChannel = ByteChannel.byteChannel();
-        final BufferOutputStream stream = byteChannel.bind(channel);
-        assertThat(byteChannel.bind(channel)).isSameAs(stream);
     }
 
     @Test

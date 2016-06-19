@@ -71,7 +71,7 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
         final ArrayList<Channel<OUT, ?>> channels = mChannels;
         final int size = channels.size();
         for (int i = 0; i < size; ++i) {
-            final int channelSize = channels.get(i).inSize();
+            final int channelSize = channels.get(i).inputCount();
             if (channelSize < minSize) {
                 count = 1;
                 indexes[0] = i;

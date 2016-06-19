@@ -57,16 +57,16 @@ public class ChannelsTest {
     @Test
     public void testBlend() {
 
-        Channel<String, String> ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
-        Channel<String, String> ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
-        assertThat(Channels.blend(ioChannel2, ioChannel1)
+        Channel<String, String> channel1 = JRoutineCore.io().of("test1", "test2", "test3");
+        Channel<String, String> channel2 = JRoutineCore.io().of("test4", "test5", "test6");
+        assertThat(Channels.blend(channel2, channel1)
                            .buildChannels()
                            .after(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                 "test6");
-        ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
-        ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
-        assertThat(Channels.blend(Arrays.<Channel<?, ?>>asList(ioChannel1, ioChannel2))
+        channel1 = JRoutineCore.io().of("test1", "test2", "test3");
+        channel2 = JRoutineCore.io().of("test4", "test5", "test6");
+        assertThat(Channels.blend(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                            .buildChannels()
                            .after(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
@@ -458,16 +458,16 @@ public class ChannelsTest {
     @Test
     public void testConcat() {
 
-        Channel<String, String> ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
-        Channel<String, String> ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
-        assertThat(Channels.concat(ioChannel2, ioChannel1)
+        Channel<String, String> channel1 = JRoutineCore.io().of("test1", "test2", "test3");
+        Channel<String, String> channel2 = JRoutineCore.io().of("test4", "test5", "test6");
+        assertThat(Channels.concat(channel2, channel1)
                            .buildChannels()
                            .after(seconds(1))
                            .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                 "test3");
-        ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
-        ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
-        assertThat(Channels.concat(Arrays.<Channel<?, ?>>asList(ioChannel1, ioChannel2))
+        channel1 = JRoutineCore.io().of("test1", "test2", "test3");
+        channel2 = JRoutineCore.io().of("test4", "test5", "test6");
+        assertThat(Channels.concat(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                            .buildChannels()
                            .after(seconds(1))
                            .all()).containsExactly("test1", "test2", "test3", "test4", "test5",

@@ -653,6 +653,31 @@ public interface StreamChannel<IN, OUT>
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
+     * Short for
+     * {@code async().streamInvocationConfiguration().withRunner(immediateRunner).apply()}.
+     * <br>
+     * This method is useful to set the stream runner so that each input is immediately passed
+     * through the whole chain as soon as it is fed to the stream.
+     * <p>
+     * On the contrary of the default synchronous runner, the set one makes so that each routine
+     * in the chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data are accumulated before actually being processed by
+     * the next routine invocation.
+     * <p>
+     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
+     * the synchronous and serial modes will behave as before.
+     *
+     * @return the new stream instance.
+     * @see #async()
+     * @see #parallel()
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    StreamChannel<IN, OUT> immediate();
+
+    /**
      * Gets the invocation configuration builder related only to the next concatenated routine
      * instance. Any further addition to the chain will retain only the stream configuration.
      * <br>
@@ -1333,31 +1358,6 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
-
-    /**
-     * Short for
-     * {@code async().streamInvocationConfiguration().withRunner(sequentialRunner).apply()}.
-     * <br>
-     * This method is useful to set the stream runner so that each input is sequentially passed
-     * through the whole chain as soon as it is fed to the stream.
-     * <p>
-     * On the contrary of the default synchronous runner, the set one makes so that each routine
-     * in the chain is be passed any input as soon as it is produced by the previous one. Such
-     * behavior decreases memory demands at the expense of a deeper stack of calls. In fact, the
-     * default synchronous runner breaks up routine calls so to perform them in a loop. The main
-     * drawback of the latter approach is that all input data are accumulated before actually being
-     * processed by the next routine invocation.
-     * <p>
-     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
-     * the synchronous and serial modes will behave as before.
-     *
-     * @return the new stream instance.
-     * @see #async()
-     * @see #parallel()
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> sequential();
 
     /**
      * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.

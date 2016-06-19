@@ -68,9 +68,9 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
                 final Channel<Object, ?> channel =
                         AndroidChannels.selectParcelableInput(result, BYTES_INDEX).buildChannels();
                 final BufferOutputStream outputStream =
-                        ParcelableByteChannel.byteChannel().bind(channel);
+                        ParcelableByteChannel.byteChannel().bindDeep(channel);
                 try {
-                    outputStream.withCloseChannel(true).transferFrom(buffer.inputStream());
+                    outputStream.transferFrom(buffer.inputStream());
 
                 } finally {
                     outputStream.close();

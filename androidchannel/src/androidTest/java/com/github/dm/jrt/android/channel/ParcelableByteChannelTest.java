@@ -62,7 +62,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -140,7 +140,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel(8).bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel(8).bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -181,7 +181,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel(4).bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel(4).bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -474,7 +474,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -502,7 +502,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bindDeep(channel);
         stream.close();
         final Channel<?, ParcelableByteBuffer> result =
                 channel.close().after(3, TimeUnit.SECONDS).eventuallyBreak();
@@ -847,7 +847,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -889,17 +889,6 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         assertThat(ParcelableByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
         assertThat(b).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6,
                 (byte) 7, (byte) 8, (byte) 9, (byte) 10);
-    }
-
-    public void testStreamCache() {
-
-        final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-                JRoutineService.with(serviceFrom(getActivity()))
-                               .on(factoryOf(PassingInvocation.class))
-                               .async();
-        final ParcelableByteChannel byteChannel = ParcelableByteChannel.byteChannel();
-        final BufferOutputStream stream = byteChannel.bind(channel);
-        assertThat(byteChannel.bind(channel)).isSameAs(stream);
     }
 
     public void testTransferFrom() throws IOException {

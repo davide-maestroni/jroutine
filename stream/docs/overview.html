@@ -43,7 +43,7 @@
                                           .parallel()
                                           .map(Integer::parseInt)
                                           .map(integer -&gt; integer * integer)
-                                          .sequential()
+                                          .immediate()
                                           .map(averageFloat())
                                           .map(Math::sqrt)
                                           .afterMax(seconds(1))

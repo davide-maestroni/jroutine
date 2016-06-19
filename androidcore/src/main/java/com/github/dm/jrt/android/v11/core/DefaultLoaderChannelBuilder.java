@@ -90,9 +90,9 @@ class DefaultLoaderChannelBuilder
         final LoaderContext context = mContext;
         final Object component = context.getComponent();
         if (component == null) {
-            final Channel<OUT, OUT> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.abort(new MissingLoaderException(loaderId));
-            return ioChannel.close();
+            final Channel<OUT, OUT> channel = JRoutineCore.io().buildChannel();
+            channel.abort(new MissingLoaderException(loaderId));
+            return channel.close();
         }
 
         final MissingLoaderInvocationFactory<OUT> factory =

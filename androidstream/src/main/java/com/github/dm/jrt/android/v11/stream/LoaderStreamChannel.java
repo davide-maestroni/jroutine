@@ -459,6 +459,17 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(CONFIG)
+    LoaderStreamChannel<IN, OUT> immediate();
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -793,17 +804,6 @@ public interface LoaderStreamChannel<IN, OUT>
     LoaderStreamChannel<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}

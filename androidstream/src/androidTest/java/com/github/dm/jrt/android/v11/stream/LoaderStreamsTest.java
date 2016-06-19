@@ -1862,30 +1862,30 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testReplay() {
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = LoaderStreams.replay(ioChannel).buildChannels();
-        ioChannel.pass("test1", "test2");
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = LoaderStreams.replay(inputChannel).buildChannels();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.pass("test3").close();
+        inputChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
         assertThat(output1.all()).containsExactly("test2", "test3");
     }
 
     public void testReplayAbort() {
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = LoaderStreams.replay(ioChannel).buildChannels();
-        ioChannel.pass("test1", "test2");
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = LoaderStreams.replay(inputChannel).buildChannels();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.abort();
+        inputChannel.abort();
 
         try {
             output1.all();

@@ -945,7 +945,7 @@ public class RoutineTest {
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
         final Channel<Object, Object> result = channel.close();
-        assertThat(result.outSize()).isZero();
+        assertThat(result.outputCount()).isZero();
         assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
         assertThat(result.isEmpty()).isFalse();
@@ -1652,12 +1652,12 @@ public class RoutineTest {
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        channel.pass(ioChannel);
+        final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+        channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        ioChannel.close();
+        outputChannel.close();
         assertThat(channel.isOpen()).isFalse();
     }
 
@@ -1670,8 +1670,8 @@ public class RoutineTest {
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        channel.pass(ioChannel);
+        final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+        channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.immediately().abort();
         assertThat(channel.isOpen()).isFalse();
@@ -1971,13 +1971,13 @@ public class RoutineTest {
     public void testSize() {
         final Channel<Object, Object> channel =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).async();
-        assertThat(channel.inSize()).isEqualTo(0);
+        assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.inSize()).isEqualTo(1);
+        assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<Object, Object> result = channel.close();
         assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
-        assertThat(result.outSize()).isEqualTo(1);
-        assertThat(result.skipNext(1).outSize()).isEqualTo(0);
+        assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 
     @Test

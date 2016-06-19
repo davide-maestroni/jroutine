@@ -198,9 +198,9 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return bindChannel().next();
     }
 
-    public int inSize() {
+    public int inputCount() {
         bindChannel();
-        return mSourceChannel.inSize();
+        return mSourceChannel.inputCount();
     }
 
     public boolean isBound() {
@@ -224,8 +224,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return bindChannel().nextOrElse(output);
     }
 
-    public int outSize() {
-        return bindChannel().outSize();
+    public int outputCount() {
+        return bindChannel().outputCount();
     }
 
     public void throwError() {
@@ -531,6 +531,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> immediate() {
+        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
+    }
+
+    @NotNull
     public Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration() {
         return new Builder<StreamChannel<IN, OUT>>(this,
                 mStreamConfiguration.getCurrentConfiguration());
@@ -792,11 +797,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
                     backoffFunction) {
         return newChannel(new BindRetry<IN, OUT>(mStreamConfiguration.asChannelConfiguration(),
                 getBindingFunction(), backoffFunction));
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> sequential() {
-        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
     }
 
     @NotNull

@@ -54,12 +54,12 @@ class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
     }
 
     public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
-        final Channel<OUT, OUT> ioChannel = JRoutineCore.io()
-                                                        .channelConfiguration()
-                                                        .with(mConfiguration)
-                                                        .apply()
-                                                        .buildChannel();
-        channel.bind(new TryCatchOutputConsumer<OUT>(mCatchConsumer, ioChannel));
-        return ioChannel;
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                            .channelConfiguration()
+                                                            .with(mConfiguration)
+                                                            .apply()
+                                                            .buildChannel();
+        channel.bind(new TryCatchOutputConsumer<OUT>(mCatchConsumer, outputChannel));
+        return outputChannel;
     }
 }

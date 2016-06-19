@@ -98,9 +98,9 @@ public class StreamChannelTest {
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testAbort() {
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        final StreamChannel<Object, Object> streamChannel = Streams.streamOf(ioChannel);
-        ioChannel.abort(new IllegalArgumentException());
+        final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
+        final StreamChannel<Object, Object> streamChannel = Streams.streamOf(channel);
+        channel.abort(new IllegalArgumentException());
         try {
             streamChannel.after(seconds(3)).throwError();
 
@@ -2207,15 +2207,15 @@ public class StreamChannelTest {
     @Test
     public void testReplay() {
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = Streams.streamOf(ioChannel).replay();
-        ioChannel.pass("test1", "test2");
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Streams.streamOf(inputChannel).replay();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.pass("test3").close();
+        inputChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
         assertThat(output1.all()).containsExactly("test2", "test3");
     }
@@ -2223,15 +2223,15 @@ public class StreamChannelTest {
     @Test
     public void testReplayAbort() {
 
-        final Channel<Object, Object> ioChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = Streams.streamOf(ioChannel).replay();
-        ioChannel.pass("test1", "test2");
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, Object> channel = Streams.streamOf(inputChannel).replay();
+        inputChannel.pass("test1", "test2");
         final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        ioChannel.abort();
+        inputChannel.abort();
 
         try {
             output1.all();
@@ -2294,7 +2294,7 @@ public class StreamChannelTest {
     public void testSequential() {
 
         assertThat(Streams.streamOf()
-                          .sequential()
+                          .immediate()
                           .thenGetMore(range(1, 1000))
                           .streamInvocationConfiguration()
                           .withInputMaxSize(1)
@@ -2316,13 +2316,13 @@ public class StreamChannelTest {
 
         final Channel<Object, Object> channel =
                 JRoutineCore.on(IdentityInvocation.factoryOf()).async();
-        assertThat(channel.inSize()).isEqualTo(0);
+        assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.inSize()).isEqualTo(1);
+        assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<?, Object> result = Streams.streamOf(channel.close());
         assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
-        assertThat(result.outSize()).isEqualTo(1);
-        assertThat(result.skipNext(1).outSize()).isEqualTo(0);
+        assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 
     @Test

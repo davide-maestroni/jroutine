@@ -411,7 +411,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return the input data size.
      */
-    int inSize();
+    int inputCount();
 
     /**
      * Checks if this channel is bound to a consumer or another channel.
@@ -541,7 +541,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return the output data size.
      */
-    int outSize();
+    int outputCount();
 
     /**
      * Passes the data returned by the specified channel to this one.

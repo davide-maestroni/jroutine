@@ -489,6 +489,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> immediate() {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.immediate();
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     invocationConfiguration() {
         return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(
@@ -784,12 +790,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.retry(backoffFunction);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> sequential() {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.sequential();
     }
 
     @NotNull

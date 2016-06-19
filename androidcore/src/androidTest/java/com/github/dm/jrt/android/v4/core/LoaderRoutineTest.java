@@ -1646,13 +1646,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .on(IdentityContextInvocation
                                                                             .factoryOf())
                                                                     .async();
-        assertThat(channel.inSize()).isEqualTo(0);
+        assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.inSize()).isEqualTo(1);
+        assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<?, Object> result = channel.close();
         assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
-        assertThat(result.outSize()).isEqualTo(1);
-        assertThat(result.skipNext(1).outSize()).isEqualTo(0);
+        assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 
     private static class Abort extends CallContextInvocation<Data, Data> {

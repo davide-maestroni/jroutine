@@ -117,7 +117,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public <IN extends Channel<? super DATA, ?>> IN bind(@NotNull final IN channel) {
+    public <CHANNEL extends Channel<? super DATA, ?>> CHANNEL bind(@NotNull final CHANNEL channel) {
         return mChannel.bind(channel);
     }
 
@@ -157,8 +157,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<DATA, DATA> eventuallyThrow() {
-        mChannel.eventuallyThrow();
+    public Channel<DATA, DATA> eventuallyFail() {
+        mChannel.eventuallyFail();
         return this;
     }
 

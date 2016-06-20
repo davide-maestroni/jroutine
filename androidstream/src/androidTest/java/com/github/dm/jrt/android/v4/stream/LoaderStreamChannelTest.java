@@ -1720,7 +1720,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                 JRoutineCore.io().<String>buildChannel().after(1000, TimeUnit.SECONDS)
                                                         .pass("test"));
         try {
-            channel.eventuallyThrow().next();
+            channel.eventuallyFail().next();
             fail();
 
         } catch (final TimeoutException ignored) {

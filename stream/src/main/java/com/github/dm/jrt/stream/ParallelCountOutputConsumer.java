@@ -22,8 +22,9 @@ import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 /**
@@ -35,54 +36,54 @@ import java.util.Random;
  */
 class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    private final ArrayList<Channel<OUT, ?>> mChannels;
+    private final HashMap<Channel<OUT, ?>, Channel<?, ?>> mChannels;
 
-    private final int[] mIndexes;
+    private final Channel<OUT, ?>[] mInputs;
 
     private final Random mRandom = new Random();
 
     /**
      * Constructor.
      *
-     * @param channels the list of channels.
+     * @param channels the map of input and invocation channels.
      */
-    ParallelCountOutputConsumer(@NotNull final List<? extends Channel<OUT, OUT>> channels) {
-        mChannels = new ArrayList<Channel<OUT, ?>>(channels);
-        mIndexes = new int[channels.size()];
+    @SuppressWarnings("unchecked")
+    ParallelCountOutputConsumer(
+            @NotNull final Map<? extends Channel<OUT, ?>, ? extends Channel<?, ?>> channels) {
+        mChannels = new HashMap<Channel<OUT, ?>, Channel<?, ?>>(channels);
+        mInputs = new Channel[channels.size()];
     }
 
     public void onComplete() {
-        for (final Channel<OUT, ?> channel : mChannels) {
+        for (final Channel<OUT, ?> channel : mChannels.keySet()) {
             channel.close();
         }
     }
 
     public void onError(@NotNull final RoutineException error) {
-        for (final Channel<OUT, ?> channel : mChannels) {
+        for (final Channel<OUT, ?> channel : mChannels.keySet()) {
             channel.abort(error);
         }
     }
 
     public void onOutput(final OUT output) {
-        // TODO: 18/06/16 does it work??
         int count = 0;
         int minSize = Integer.MAX_VALUE;
-        final int[] indexes = mIndexes;
-        final ArrayList<Channel<OUT, ?>> channels = mChannels;
-        final int size = channels.size();
-        for (int i = 0; i < size; ++i) {
-            final int channelSize = channels.get(i).inputCount();
+        final Channel<OUT, ?>[] inputs = mInputs;
+        final HashMap<Channel<OUT, ?>, Channel<?, ?>> channels = mChannels;
+        for (final Entry<Channel<OUT, ?>, Channel<?, ?>> entry : channels.entrySet()) {
+            final int channelSize = entry.getValue().inputCount();
             if (channelSize < minSize) {
                 count = 1;
-                indexes[0] = i;
+                inputs[0] = entry.getKey();
                 minSize = channelSize;
 
             } else if (channelSize == minSize) {
-                indexes[count++] = i;
+                inputs[count++] = entry.getKey();
             }
         }
 
         final int i = (count == 1) ? 0 : Math.round((count - 1) * mRandom.nextFloat());
-        channels.get(indexes[i]).pass(output);
+        inputs[i].pass(output);
     }
 }

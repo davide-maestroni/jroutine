@@ -1444,7 +1444,7 @@ public class RoutineTest {
                         .after(millis(300))
                         .pass("test2")
                         .close()
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(millis(100))
                         .next(2);
             fail();
@@ -1490,7 +1490,7 @@ public class RoutineTest {
         try {
             JRoutineCore.on(factoryOf(DelayedInvocation.class, millis(300)))
                         .async("test1")
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(millis(100))
                         .nextOrElse("test2");
             fail();
@@ -2023,7 +2023,7 @@ public class RoutineTest {
         try {
             JRoutineCore.on(IdentityInvocation.factoryOf())
                         .async("test1")
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(seconds(1))
                         .skipNext(2);
             fail();
@@ -2124,7 +2124,7 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .invocationConfiguration()
-                            .withOutputTimeoutAction(TimeoutActionType.THROW)
+                            .withOutputTimeoutAction(TimeoutActionType.FAIL)
                             .apply()
                             .buildRoutine();
         final Channel<String, String> channel3 = routine3.async("test1");

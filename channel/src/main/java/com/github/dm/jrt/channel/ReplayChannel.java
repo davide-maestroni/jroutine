@@ -199,8 +199,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> eventuallyThrow() {
-        mOutputChannel.eventuallyThrow();
+    public Channel<OUT, OUT> eventuallyFail() {
+        mOutputChannel.eventuallyFail();
         return this;
     }
 

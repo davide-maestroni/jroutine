@@ -44,8 +44,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -64,8 +64,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     private static final Runner sSyncRunner = Runners.syncRunner();
 
-    private final LinkedHashSet<Channel<?, ? extends IN>> mBoundChannels =
-            new LinkedHashSet<Channel<?, ? extends IN>>();
+    private final IdentityHashMap<Channel<?, ? extends IN>, Void> mBoundChannels =
+            new IdentityHashMap<Channel<?, ? extends IN>, Void>();
 
     private final InvocationExecution<IN, OUT> mExecution;
 
@@ -255,8 +255,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> eventuallyThrow() {
-        mResultChanel.eventuallyThrow();
+    public Channel<IN, OUT> eventuallyFail() {
+        mResultChanel.eventuallyFail();
         return this;
     }
 
@@ -341,7 +341,16 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         if ((consumer != null) && (channel != null)) {
-            channel.bind(consumer);
+            try {
+                channel.bind(consumer);
+
+            } catch (final IllegalStateException e) {
+                synchronized (mMutex) {
+                    mState.onBindFailure();
+                }
+
+                throw e;
+            }
         }
 
         return this;
@@ -770,9 +779,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             synchronized (mMutex) {
                 mInputQueue.clear();
                 abortException = mAbortException;
-                final LinkedHashSet<Channel<?, ? extends IN>> boundChannels = mBoundChannels;
+                final IdentityHashMap<Channel<?, ? extends IN>, Void> boundChannels =
+                        mBoundChannels;
                 mLogger.dbg(abortException, "aborting bound channels [%d]", boundChannels.size());
-                channels = new ArrayList<Channel<?, ? extends IN>>(boundChannels);
+                channels = new ArrayList<Channel<?, ? extends IN>>(boundChannels.keySet());
                 boundChannels.clear();
             }
 
@@ -980,6 +990,13 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * Invocation channel internal state (using "state" design pattern).
      */
     private class InputChannelState implements InputIterator<IN> {
+
+        /**
+         * Called when the binding of channel fails.
+         */
+        public void onBindFailure() {
+            --mPendingExecutionCount;
+        }
 
         /**
          * Called when the invocation is aborted.
@@ -1197,10 +1214,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return null;
             }
 
-            if (mBoundChannels.add(channel)) {
-                ++mPendingExecutionCount;
-            }
-
+            ++mPendingExecutionCount;
+            mBoundChannels.put(channel, null);
             mLogger.dbg("passing channel: %s", channel);
             return new DefaultOutputConsumer(channel);
         }

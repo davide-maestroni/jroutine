@@ -362,7 +362,7 @@ public class StreamChannelTest {
                 JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"));
 
         try {
-            channel.eventuallyThrow().next();
+            channel.eventuallyFail().next();
             fail();
 
         } catch (final TimeoutException ignored) {

@@ -247,7 +247,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .on(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
-                               .withOutputTimeoutAction(TimeoutActionType.THROW)
+                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                .apply()
                                .async("test3");
 

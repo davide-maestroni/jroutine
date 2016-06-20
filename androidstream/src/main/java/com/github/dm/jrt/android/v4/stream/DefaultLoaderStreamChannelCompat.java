@@ -232,8 +232,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> eventuallyThrow() {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyThrow();
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyFail() {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyFail();
     }
 
     @NotNull

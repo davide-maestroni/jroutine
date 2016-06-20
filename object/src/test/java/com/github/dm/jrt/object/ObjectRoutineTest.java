@@ -1575,7 +1575,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(testTimeout))
                           .invocationConfiguration()
-                          .withOutputTimeoutAction(TimeoutActionType.THROW)
+                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .apply()
                           .method("test")
                           .async()
@@ -1601,7 +1601,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(testTimeout))
                           .invocationConfiguration()
-                          .withOutputTimeoutAction(TimeoutActionType.THROW)
+                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .apply()
                           .method("getInt")
                           .async()
@@ -1627,7 +1627,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(testTimeout))
                           .invocationConfiguration()
-                          .withOutputTimeoutAction(TimeoutActionType.THROW)
+                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .apply()
                           .method(TestTimeout.class.getMethod("getInt"))
                           .async()
@@ -1651,7 +1651,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(testTimeout))
                           .invocationConfiguration()
-                          .withOutputTimeoutAction(TimeoutActionType.THROW)
+                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .apply()
                           .buildProxy(TestTimeoutItf.class)
                           .getInt();

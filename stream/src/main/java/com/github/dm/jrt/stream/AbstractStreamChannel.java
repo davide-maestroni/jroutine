@@ -281,8 +281,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> eventuallyThrow() {
-        bindChannel().eventuallyThrow();
+    public StreamChannel<IN, OUT> eventuallyFail() {
+        bindChannel().eventuallyFail();
         return this;
     }
 

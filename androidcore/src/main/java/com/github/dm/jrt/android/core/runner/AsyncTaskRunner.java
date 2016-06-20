@@ -29,8 +29,6 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -49,11 +47,10 @@ class AsyncTaskRunner extends AsyncRunner {
 
     private final Executor mExecutor;
 
+    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
     private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
             new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
-
-    private final Map<Thread, Void> mThreads =
-            Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
 
     /**
      * Constructor.
@@ -81,13 +78,14 @@ class AsyncTaskRunner extends AsyncRunner {
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-        return mThreads.containsKey(thread);
+        final Boolean isManaged = mIsManaged.get();
+        return (isManaged != null) && isManaged;
     }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-        final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
+        final ExecutionTask task = new ExecutionTask(execution, mExecutor);
         synchronized (mTasks) {
             final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks = mTasks;
             WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
@@ -106,26 +104,22 @@ class AsyncTaskRunner extends AsyncRunner {
     /**
      * Implementation of an async task whose execution starts in a runnable.
      */
-    private static class ExecutionTask extends AsyncTask<Void, Void, Void> implements Execution {
+    private class ExecutionTask extends AsyncTask<Void, Void, Void> implements Execution {
 
         private final Execution mExecution;
 
         private final Executor mExecutor;
-
-        private final Map<Thread, Void> mThreads;
 
         /**
          * Constructor.
          *
          * @param execution the execution instance.
          * @param executor  the executor.
-         * @param threads   the map of runner threads.
          */
-        private ExecutionTask(@NotNull final Execution execution, @Nullable final Executor executor,
-                @NotNull final Map<Thread, Void> threads) {
+        private ExecutionTask(@NotNull final Execution execution,
+                @Nullable final Executor executor) {
             mExecution = execution;
             mExecutor = executor;
-            mThreads = threads;
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)
@@ -142,9 +136,9 @@ class AsyncTaskRunner extends AsyncRunner {
 
         @Override
         protected Void doInBackground(@NotNull final Void... voids) {
-            final Thread currentThread = Thread.currentThread();
-            if (currentThread != Looper.getMainLooper().getThread()) {
-                mThreads.put(currentThread, null);
+            final Looper looper = Looper.myLooper();
+            if (looper != Looper.getMainLooper()) {
+                mIsManaged.set(true);
             }
 
             mExecution.run();

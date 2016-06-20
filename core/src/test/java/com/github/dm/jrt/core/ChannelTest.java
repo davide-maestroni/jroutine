@@ -98,7 +98,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyAbort().eventuallyThrow();
+        channel.eventuallyAbort().eventuallyFail();
         try {
             channel.allInto(new ArrayList<String>());
             fail();
@@ -115,7 +115,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow().after(millis(10));
+        channel.eventuallyFail().after(millis(10));
         try {
             channel.allInto(new ArrayList<String>());
             fail();
@@ -131,7 +131,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow();
+        channel.eventuallyFail();
         try {
             channel.all();
             fail();
@@ -147,7 +147,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow().after(millis(10));
+        channel.eventuallyFail().after(millis(10));
         try {
             channel.all();
             fail();
@@ -243,7 +243,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow();
+        channel.eventuallyFail();
         try {
             channel.iterator().hasNext();
             fail();
@@ -259,7 +259,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow().after(millis(10));
+        channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().hasNext();
             fail();
@@ -290,7 +290,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow();
+        channel.eventuallyFail();
         try {
             channel.iterator().next();
             fail();
@@ -306,7 +306,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow().after(millis(10));
+        channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().next();
             fail();
@@ -361,7 +361,7 @@ public class ChannelTest {
             JRoutineCore.io()
                         .buildChannel()
                         .pass("test1")
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(seconds(1))
                         .next(2);
             fail();
@@ -408,7 +408,7 @@ public class ChannelTest {
         try {
             JRoutineCore.io()
                         .buildChannel()
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(millis(100))
                         .nextOrElse("test2");
             fail();
@@ -422,7 +422,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow();
+        channel.eventuallyFail();
         try {
             channel.next();
             fail();
@@ -438,7 +438,7 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.after(seconds(3)).pass("test").close();
         assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
-        channel.eventuallyThrow().after(millis(10));
+        channel.eventuallyFail().after(millis(10));
         try {
             channel.next();
             fail();
@@ -546,7 +546,7 @@ public class ChannelTest {
                                                              .channelConfiguration()
                                                              .withOutputTimeout(millis(10))
                                                              .withOutputTimeoutAction(
-                                                                     TimeoutActionType.THROW)
+                                                                     TimeoutActionType.FAIL)
                                                              .apply()
                                                              .buildChannel();
         try {
@@ -676,7 +676,7 @@ public class ChannelTest {
                         .buildChannel()
                         .pass("test1")
                         .close()
-                        .eventuallyThrow()
+                        .eventuallyFail()
                         .after(seconds(1))
                         .skipNext(2);
             fail();

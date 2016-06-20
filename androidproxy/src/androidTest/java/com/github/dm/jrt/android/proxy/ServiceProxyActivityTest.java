@@ -595,7 +595,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
             JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                 .on(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
-                                .withOutputTimeoutAction(TimeoutActionType.THROW)
+                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt();

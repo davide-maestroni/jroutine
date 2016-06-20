@@ -222,8 +222,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> eventuallyThrow() {
-        return (LoaderStreamChannel<IN, OUT>) super.eventuallyThrow();
+    public LoaderStreamChannel<IN, OUT> eventuallyFail() {
+        return (LoaderStreamChannel<IN, OUT>) super.eventuallyFail();
     }
 
     @NotNull

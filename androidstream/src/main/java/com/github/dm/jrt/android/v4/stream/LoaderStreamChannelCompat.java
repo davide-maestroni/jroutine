@@ -148,7 +148,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> eventuallyThrow();
+    LoaderStreamChannelCompat<IN, OUT> eventuallyFail();
 
     /**
      * {@inheritDoc}

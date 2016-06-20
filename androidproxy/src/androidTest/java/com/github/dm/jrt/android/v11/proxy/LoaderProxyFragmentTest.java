@@ -661,7 +661,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
             JRoutineLoaderProxy.with(loaderFrom(fragment))
                                .on(instanceOf(TestTimeout.class))
                                .invocationConfiguration()
-                               .withOutputTimeoutAction(TimeoutActionType.THROW)
+                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                .apply()
                                .buildProxy(TestTimeoutItf.class)
                                .getInt();

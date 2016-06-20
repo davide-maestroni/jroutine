@@ -222,7 +222,7 @@ public class ReplayChannelTest {
 
         }
 
-        channel.eventuallyThrow();
+        channel.eventuallyFail();
         try {
             channel.remove();
             fail();

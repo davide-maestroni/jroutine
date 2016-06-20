@@ -154,7 +154,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY));
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
         mTimeoutActionType = new LocalValue<TimeoutActionType>(
-                configuration.getOutputTimeoutActionOrElse(TimeoutActionType.THROW));
+                configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
         mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
         mOutputBackoff = configuration.getOutputBackoffOrElse(Backoffs.zeroDelay());
         mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
@@ -246,7 +246,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public <IN extends Channel<? super OUT, ?>> IN bind(@NotNull final IN channel) {
+    public <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull final CHANNEL channel) {
         channel.pass(this);
         return channel;
     }
@@ -309,8 +309,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> eventuallyThrow() {
-        mTimeoutActionType.set(TimeoutActionType.THROW);
+    public Channel<OUT, OUT> eventuallyFail() {
+        mTimeoutActionType.set(TimeoutActionType.FAIL);
         mTimeoutException.set(null);
         return this;
     }
@@ -583,7 +583,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             } catch (final NoSuchElementException ignored) {
                 mLogger.wrn("skipping output timeout: [%d %s] => [%s]", timeout, timeoutUnit,
                         timeoutAction);
-                if (timeoutAction == TimeoutActionType.THROW) {
+                if (timeoutAction == TimeoutActionType.FAIL) {
                     throw new OutputTimeoutException(
                             "timeout while waiting for outputs [" + timeout + " " + timeoutUnit
                                     + "]");
@@ -863,7 +863,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             } else if (timeout == 0) {
                 logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit, timeoutAction);
-                if (timeoutAction == TimeoutActionType.THROW) {
+                if (timeoutAction == TimeoutActionType.FAIL) {
                     throw new OutputTimeoutException(
                             "timeout while waiting to know if more outputs are coming [" + timeout
                                     + " " + timeUnit + "]");
@@ -900,7 +900,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (isTimeout) {
                     logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == TimeoutActionType.THROW) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
                                         + timeout + " " + timeUnit + "]");
@@ -974,7 +974,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (outputQueue.isEmpty()) {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == TimeoutActionType.THROW) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");
@@ -1010,7 +1010,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (isTimeout) {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == TimeoutActionType.THROW) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");

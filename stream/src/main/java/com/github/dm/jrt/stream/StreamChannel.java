@@ -138,7 +138,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyThrow();
+    StreamChannel<IN, OUT> eventuallyFail();
 
     /**
      * {@inheritDoc}

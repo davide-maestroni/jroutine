@@ -256,7 +256,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .invocationConfiguration()
                                                           .withOutputTimeout(millis(10))
                                                           .withOutputTimeoutAction(
-                                                                  TimeoutActionType.THROW)
+                                                                  TimeoutActionType.FAIL)
                                                           .apply()
                                                           .async("test3");
 

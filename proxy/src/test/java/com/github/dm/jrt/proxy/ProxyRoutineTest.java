@@ -611,7 +611,7 @@ public class ProxyRoutineTest {
 
             JRoutineProxy.on(instance(testTimeout))
                          .invocationConfiguration()
-                         .withOutputTimeoutAction(TimeoutActionType.THROW)
+                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
                          .apply()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();

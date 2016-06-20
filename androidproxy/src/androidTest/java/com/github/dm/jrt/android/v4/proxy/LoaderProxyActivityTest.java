@@ -578,7 +578,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
             JRoutineLoaderProxyCompat.with(loaderFrom(getActivity()))
                                      .on(instanceOf(TestTimeout.class))
                                      .invocationConfiguration()
-                                     .withOutputTimeoutAction(TimeoutActionType.THROW)
+                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                      .apply()
                                      .buildProxy(TestTimeoutItf.class)
                                      .getInt();

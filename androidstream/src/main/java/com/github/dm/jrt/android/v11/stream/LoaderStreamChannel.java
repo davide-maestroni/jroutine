@@ -148,7 +148,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> eventuallyThrow();
+    LoaderStreamChannel<IN, OUT> eventuallyFail();
 
     /**
      * {@inheritDoc}

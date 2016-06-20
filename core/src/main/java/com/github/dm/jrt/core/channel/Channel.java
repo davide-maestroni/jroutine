@@ -130,7 +130,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     List<OUT> all();
@@ -158,7 +158,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Channel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
@@ -217,7 +217,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Iterator<OUT> eventualIterator();
@@ -239,7 +239,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Channel<IN, OUT> eventuallyAbort();
@@ -262,7 +262,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Channel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
@@ -284,7 +284,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Channel<IN, OUT> eventuallyBreak();
@@ -308,7 +308,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyBreak()
      */
     @NotNull
-    Channel<IN, OUT> eventuallyThrow();
+    Channel<IN, OUT> eventuallyFail();
 
     /**
      * Gets the invocation error or abort exception, if the invocation is aborted, waiting at the
@@ -359,7 +359,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     boolean hasNext();
 
@@ -389,7 +389,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     OUT next();
 
@@ -461,7 +461,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     List<OUT> next(int count);
@@ -496,7 +496,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     OUT nextOrElse(OUT output);
 
@@ -612,7 +612,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyBreak()
-     * @see #eventuallyThrow()
+     * @see #eventuallyFail()
      */
     @NotNull
     Channel<IN, OUT> skipNext(int count);

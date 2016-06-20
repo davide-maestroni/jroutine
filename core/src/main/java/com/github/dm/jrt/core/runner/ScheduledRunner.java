@@ -22,8 +22,6 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -42,10 +40,9 @@ class ScheduledRunner extends AsyncRunner {
     private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
             new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
 
-    private final ScheduledExecutorService mService;
+    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
 
-    private final Map<Thread, Void> mThreads =
-            Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
+    private final ScheduledExecutorService mService;
 
     /**
      * Constructor.
@@ -95,7 +92,8 @@ class ScheduledRunner extends AsyncRunner {
 
     @Override
     public boolean isManagedThread(@NotNull final Thread thread) {
-        return mThreads.containsKey(thread);
+        final Boolean isManaged = mIsManaged.get();
+        return (isManaged != null) && isManaged;
     }
 
     @Override
@@ -121,7 +119,7 @@ class ScheduledRunner extends AsyncRunner {
      */
     private class ExecutionWrapper implements Runnable {
 
-        private final Thread mCurrentThread;
+        private final long mCurrentThreadId;
 
         private final Execution mExecution;
 
@@ -132,13 +130,13 @@ class ScheduledRunner extends AsyncRunner {
          */
         private ExecutionWrapper(@NotNull final Execution wrapped) {
             mExecution = wrapped;
-            mCurrentThread = Thread.currentThread();
+            mCurrentThreadId = Thread.currentThread().getId();
         }
 
         public void run() {
             final Thread currentThread = Thread.currentThread();
-            if (currentThread != mCurrentThread) {
-                mThreads.put(currentThread, null);
+            if (currentThread.getId() != mCurrentThreadId) {
+                mIsManaged.set(true);
             }
 
             mExecution.run();

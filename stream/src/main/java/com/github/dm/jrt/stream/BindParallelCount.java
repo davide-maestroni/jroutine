@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Parallel by count binding function.
@@ -65,11 +65,13 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
                                                             .with(mConfiguration)
                                                             .apply()
                                                             .buildChannel();
-        final ArrayList<Channel<IN, IN>> channels = new ArrayList<Channel<IN, IN>>(count);
+        final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
+                new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);
         for (int i = 0; i < count; ++i) {
             final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
-            outputChannel.pass(super.apply(inputChannel));
-            channels.add(inputChannel);
+            final Channel<?, OUT> invocationChannel = super.apply(inputChannel);
+            outputChannel.pass(invocationChannel);
+            channels.put(inputChannel, invocationChannel);
         }
 
         channel.bind(new ParallelCountOutputConsumer<IN>(channels));

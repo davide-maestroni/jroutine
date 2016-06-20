@@ -344,9 +344,9 @@ public class ChannelConfigurationTest {
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputTimeoutAction(TimeoutActionType.BREAK).apply());
         assertThat(configuration.builderFrom()
-                                .withOutputTimeoutAction(TimeoutActionType.THROW)
+                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()).isNotEqualTo(
-                builder().withOutputTimeoutAction(TimeoutActionType.THROW).apply());
+                builder().withOutputTimeoutAction(TimeoutActionType.FAIL).apply());
     }
 
     @Test

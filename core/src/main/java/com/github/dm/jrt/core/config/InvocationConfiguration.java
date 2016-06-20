@@ -54,30 +54,32 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * executions.</li>
  * <li>The maximum number of invocation instances running at the same time. When the limit is
  * exceeded, the new invocation execution is delayed until one instance becomes available.</li>
- * <li>The order in which data are dispatched through the input channel. The order of input data is
- * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
- * they are passed to the channels, at the cost of a slightly increase in memory usage and
+ * <li>The order in which data are dispatched through the invocation channel. The order of input
+ * data is not guaranteed. Nevertheless, it is possible to force data to be delivered in the same
+ * order as they are passed to the channels, at the cost of a slightly increase in memory usage and
  * computation.</li>
- * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
- * order to avoid excessive memory consumption. In case the maximum number is exceeded when passing
- * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
+ * <li>The core number of input data buffered in the invocation channel. The channel buffer can be
+ * limited in order to avoid excessive memory consumption. In case the maximum number is exceeded
+ * when passing an input, the call will block until enough data are consumed or the specified delay
+ * elapses.</li>
  * <li>The backoff policy to be applied to the calling thread when the buffered input data exceed
- * the channel core limit.</li>
- * <li>The maximum number of input data buffered in the channel. When the number of data exceeds it,
- * a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.</li>
- * <li>The order in which data are dispatched through the output channel. The order of input data is
+ * the invocation channel core limit.</li>
+ * <li>The maximum number of input data buffered in the invocation channel. When the number of data
+ * exceeds it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be
+ * thrown.</li>
+ * <li>The order in which data are dispatched through the result channel. The order of input data is
  * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
  * they are passed to the channels, at the cost of a slightly increase in memory usage and
  * computation.</li>
- * <li>The core number of output data buffered in the channel. The channel buffer can be limited in
- * order to avoid excessive memory consumption. In case the maximum number is exceeded when passing
- * an output, the call will block until enough data are consumed or the specified delay elapses.
- * </li>
+ * <li>The core number of output data buffered in the result channel. The channel buffer can be
+ * limited in order to avoid excessive memory consumption. In case the maximum number is exceeded
+ * when passing an output, the call will block until enough data are consumed or the specified delay
+ * elapses.</li>
  * <li>The backoff policy to be applied to the calling thread when the buffered output data exceed
- * the channel core limit.</li>
- * <li>The maximum number of output data buffered in the channel. When the number of data exceeds
- * it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.
- * </li>
+ * the result channel core limit.</li>
+ * <li>The maximum number of output data buffered in the result channel. When the number of data
+ * exceeds it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be
+ * thrown.</li>
  * <li>The maximum timeout while waiting for a new output to be available before performing the
  * specified action.</li>
  * <li>The action to be taken when no output becomes available before the timeout elapses.</li>
@@ -449,12 +451,12 @@ public final class InvocationConfiguration extends DeepEqualObject {
     public enum TimeoutActionType {
 
         /**
-         * Throw exception.
+         * Fail with exception.
          * <br>
          * If no result is available after the specified timeout, the called method will throw an
          * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
          */
-        THROW,
+        FAIL,
         /**
          * Break execution.
          * <br>
@@ -678,8 +680,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the backoff policy to apply while waiting for the input channel to have room for
-         * additional data.
+         * Sets the backoff policy to apply while waiting for the invocation channel to have room
+         * for additional data.
          * <p>
          * Note that the backoff instance will be likely called from different threads, so, it's
          * responsibility of the implementing class to ensure that consistent delays are returned
@@ -699,8 +701,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the constant delay to apply while waiting for the input channel to have room for
-         * additional data.
+         * Sets the constant delay to apply while waiting for the invocation channel to have room
+         * for additional data.
          * <p>
          * This configuration option should be used on conjunction with the input limit, or it might
          * have no effect on the invocation execution.
@@ -717,8 +719,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the constant delay to apply while waiting for the input channel to have room for
-         * additional data.
+         * Sets the constant delay to apply while waiting for the invocation channel to have room
+         * for additional data.
          * <p>
          * This configuration option should be used on conjunction with the input limit, or it might
          * have no effect on the invocation execution.
@@ -733,9 +735,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the limit of data that the input channel can retain before starting to slow down the
-         * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
-         * up to the specific implementation to choose a default one.
+         * Sets the limit of data that the invocation channel can retain before starting to slow
+         * down the feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means
+         * that it is up to the specific implementation to choose a default one.
          * <p>
          * This configuration option is used to slow down the process feeding the routine invocation
          * when its execution time increases. Note, however, that it is not allowed to block the
@@ -757,7 +759,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the maximum number of data that the input channel can retain before they are
+         * Sets the maximum number of data that the invocation channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
          * <br>
@@ -779,8 +781,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the order in which input data are collected from the input channel. A null value
-         * means that it is up to the specific implementation to choose a default one.
+         * Sets the order in which input data are collected from the invocation channel. A null
+         * value means that it is up to the specific implementation to choose a default one.
          * <p>
          * Note that this is just the initial configuration of the invocation, since the channel
          * order can be dynamically changed through the dedicated methods.
@@ -896,7 +898,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the limit of data that the output channel can retain before starting to slow down
+         * Sets the limit of data that the result channel can retain before starting to slow down
          * the feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it
          * is up to the specific implementation to choose a default one.
          * <p>
@@ -958,7 +960,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result.
+         * Sets the timeout for an invocation to produce a readable result.
          * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
@@ -975,8 +977,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the specific implementation to choose a default one.
+         * Sets the timeout for an invocation to produce a readable result. A null value means that
+         * it is up to the specific implementation to choose a default one.
          * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
@@ -992,8 +994,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
-         * output channel. A null value means that it is up to the specific implementation to choose
-         * a default one.
+         * invocation channel. A null value means that it is up to the specific implementation to
+         * choose a default one.
          * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout action can be dynamically changed through the dedicated methods.

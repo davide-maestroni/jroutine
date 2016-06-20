@@ -356,6 +356,7 @@ public class PriorityRunner {
                 super.run(delayedExecution, delay, timeUnit);
             }
 
+            // TODO: 20/06/16 does not work
             localExecutions.remove(priorityExecution);
         }
 

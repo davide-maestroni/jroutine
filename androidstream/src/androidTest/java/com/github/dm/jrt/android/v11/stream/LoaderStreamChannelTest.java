@@ -3582,7 +3582,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreams.streamOf().with(loaderFrom(getActivity())).sequential().thenGetMore(3, null);
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .sequential()
+                         .thenGetMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {

@@ -47,8 +47,7 @@ class MergeMapBuilder<OUT>
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
      */
-    MergeMapBuilder(
-            @NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
+    MergeMapBuilder(@NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }

@@ -179,8 +179,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> after(final long delay,
-            @NotNull final TimeUnit timeUnit) {
+    public LoaderStreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
         return (LoaderStreamChannel<IN, OUT>) super.after(delay, timeUnit);
     }
 

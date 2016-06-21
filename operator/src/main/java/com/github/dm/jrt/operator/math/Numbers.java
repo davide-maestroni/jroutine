@@ -125,7 +125,7 @@ public class Numbers {
      * @param n1 the first number.
      * @param n2 the second number.
      * @return the sum.
-     * @throws IllegalArgumentException if one of the two instance is of an unsupported
+     * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
      *                                            type.
      */
     @NotNull
@@ -212,7 +212,7 @@ public class Numbers {
      *
      * @param n the number to convert.
      * @return the {@code BigDecimal} instance.
-     * @throws IllegalArgumentException if the number instance is of an unsupported type.
+     * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
      */
     @NotNull
     public static BigDecimal toBigDecimalSafe(@NotNull final Number n) {

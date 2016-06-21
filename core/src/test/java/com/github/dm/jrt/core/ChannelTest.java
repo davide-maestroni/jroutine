@@ -67,8 +67,7 @@ public class ChannelTest {
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
 
-        assertThat(channel.getError().getCause()).isExactlyInstanceOf(
-                IllegalStateException.class);
+        assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -186,19 +185,19 @@ public class ChannelTest {
     public void testAsynchronousInput2() {
         final UnitDuration timeout = seconds(1);
         final Channel<String, String> channel1 = JRoutineCore.io()
-                                                               .channelConfiguration()
-                                                               .withOrder(OrderType.BY_CALL)
-                                                               .apply()
-                                                               .buildChannel();
+                                                             .channelConfiguration()
+                                                             .withOrder(OrderType.BY_CALL)
+                                                             .apply()
+                                                             .buildChannel();
         new Thread() {
 
             @Override
             public void run() {
                 channel1.after(1, TimeUnit.MILLISECONDS)
-                          .after(millis(200))
-                          .pass("test1", "test2")
-                          .pass(Collections.singleton("test3"))
-                          .close();
+                        .after(millis(200))
+                        .pass("test1", "test2")
+                        .pass(Collections.singleton("test3"))
+                        .close();
             }
         }.start();
         final Channel<String, String> outputChannel1 =

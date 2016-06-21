@@ -120,14 +120,6 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
                 mLoaderConfiguration);
     }
 
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-    loaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
-    }
-
     @Override
     public void clear(@Nullable final IN input) {
         buildRoutine().clear(input);
@@ -145,5 +137,13 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     @Override
     public void clear() {
         buildRoutine().clear();
+    }
+
+    @NotNull
+    @Override
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
+    loaderConfiguration() {
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
     }
 }

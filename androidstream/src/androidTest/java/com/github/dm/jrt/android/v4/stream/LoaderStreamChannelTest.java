@@ -1991,7 +1991,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sequential().flatMap(null);
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .sequential()
+                               .flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {

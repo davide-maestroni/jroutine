@@ -47,8 +47,8 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
     private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
             SparseArray<Channel<?, ?>>>>
             sOutputChannels =
-            new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
-                    SparseArray<Channel<?, ?>>>>();
+            new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?,
+                    ?>>>>();
 
     private final Channel<?, ? extends ParcelableSelectable<? extends OUT>> mChannel;
 
@@ -83,8 +83,8 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
         final HashSet<Integer> indexes = mIndexes;
         final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
         synchronized (sOutputChannels) {
-            final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
-                    SparseArray<Channel<?, ?>>>>
+            final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?,
+                    ?>>>>
                     outputChannels = sOutputChannels;
             HashMap<SelectInfo, SparseArray<Channel<?, ?>>> channelMaps =
                     outputChannels.get(channel);
@@ -95,8 +95,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
 
             final int size = indexes.size();
             final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-            final SparseArray<Channel<?, OUT>> channelMap =
-                    new SparseArray<Channel<?, OUT>>(size);
+            final SparseArray<Channel<?, OUT>> channelMap = new SparseArray<Channel<?, OUT>>(size);
             SparseArray<Channel<?, ?>> channels = channelMaps.get(selectInfo);
             if (channels != null) {
                 final int channelSize = channels.size();

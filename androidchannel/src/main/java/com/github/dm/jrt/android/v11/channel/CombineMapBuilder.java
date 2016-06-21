@@ -45,8 +45,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
      */
-    CombineMapBuilder(
-            @NotNull final SparseArray<? extends Channel<? extends IN, ?>> channels) {
+    CombineMapBuilder(@NotNull final SparseArray<? extends Channel<? extends IN, ?>> channels) {
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
@@ -66,8 +65,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
             @NotNull final ChannelConfiguration configuration) {
         final SparseArray<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
         final int size = channelMap.size();
-        final SparseArray<Channel<IN, ?>> inputChannelMap =
-                new SparseArray<Channel<IN, ?>>(size);
+        final SparseArray<Channel<IN, ?>> inputChannelMap = new SparseArray<Channel<IN, ?>>(size);
         for (int i = 0; i < size; ++i) {
             final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
             outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));

@@ -45,6 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -80,6 +81,18 @@ public interface StreamChannel<IN, OUT>
     /**
      * {@inheritDoc}
      */
+    @StreamFlow(START)
+    boolean abort();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean abort(@Nullable Throwable reason);
+
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> after(@NotNull UnitDuration delay);
@@ -96,7 +109,21 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(START)
+    List<OUT> all();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
     StreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull CHANNEL channel);
 
     /**
      * {@inheritDoc}
@@ -110,7 +137,13 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     StreamChannel<IN, OUT> close();
-    // TODO: 17/06/16 unit tests + pass + ReplayChannel
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    Iterator<OUT> eventualIterator();
 
     /**
      * {@inheritDoc}
@@ -143,9 +176,72 @@ public interface StreamChannel<IN, OUT>
     /**
      * {@inheritDoc}
      */
+    @Nullable
+    @StreamFlow(START)
+    RoutineException getError();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean hasCompleted();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean hasNext();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    OUT next();
+
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> immediately();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    int inputCount();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean isBound();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean isEmpty();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    boolean isOpen();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamFlow(START)
+    List<OUT> next(int count);
+    // TODO: 17/06/16 unit tests + pass + size + ReplayChannel
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    OUT nextOrElse(OUT output);
 
     /**
      * {@inheritDoc}.
@@ -158,6 +254,12 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     StreamChannel<IN, OUT> orderByDelay();
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    int outputCount();
 
     /**
      * {@inheritDoc}.
@@ -184,11 +286,23 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    int size();
+
+    /**
      * {@inheritDoc}.
      */
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> skipNext(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    void throwError();
 
     /**
      * Returns a stream appending the specified output to this stream ones.
@@ -659,6 +773,12 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(CONFIG)
     StreamChannel<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+
+    /**
+     * {@inheritDoc}
+     */
+    @StreamFlow(START)
+    Iterator<OUT> iterator();
 
     /**
      * Transforms the stream by modifying the flow building function.

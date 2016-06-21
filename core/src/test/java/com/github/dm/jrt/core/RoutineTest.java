@@ -1983,6 +1983,7 @@ public class RoutineTest {
         final Channel<Object, Object> result = channel.close();
         assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 

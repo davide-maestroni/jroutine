@@ -590,6 +590,13 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     Channel<IN, OUT> pass(@Nullable IN... inputs);
 
     /**
+     * Returns the total number of data stored in the channel.
+     *
+     * @return the data size.
+     */
+    int size();
+
+    /**
      * Skips the first {@code count} available results by waiting at the maximum for the set delay.
      * <p>
      * Note that this method invocation will block the calling thread until {@code count} new

@@ -246,7 +246,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     }
 
     public boolean isOpen() {
-        return mChannel.isOpen();
+        return false;
     }
 
     @NotNull
@@ -290,6 +290,18 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     @NotNull
     public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
         throw new IllegalStateException("cannot pass data to a replay channel");
+    }
+
+    public int size() {
+        final int outputSize = mOutputChannel.size();
+        final int size = mChannel.size() + outputSize;
+        if (outputSize == 0) {
+            synchronized (mMutex) {
+                return size + mCached.size();
+            }
+        }
+
+        return size;
     }
 
     @NotNull

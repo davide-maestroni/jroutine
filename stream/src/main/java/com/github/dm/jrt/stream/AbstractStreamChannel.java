@@ -167,8 +167,26 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
+        bindChannel().after(delay);
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        bindChannel().after(delay, timeUnit);
+        return this;
+    }
+
+    @NotNull
     public List<OUT> all() {
         return bindChannel().all();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
+        bindChannel().allInto(results);
+        return this;
     }
 
     @NotNull
@@ -177,8 +195,43 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+        bindChannel().bind(consumer);
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> close() {
+        return this;
+    }
+
+    @NotNull
     public Iterator<OUT> eventualIterator() {
         return bindChannel().eventualIterator();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> eventuallyAbort() {
+        bindChannel().eventuallyAbort();
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
+        bindChannel().eventuallyAbort(reason);
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> eventuallyBreak() {
+        bindChannel().eventuallyBreak();
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> eventuallyFail() {
+        bindChannel().eventuallyFail();
+        return this;
     }
 
     @Nullable
@@ -196,6 +249,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     public OUT next() {
         return bindChannel().next();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> immediately() {
+        bindChannel().immediately();
+        return this;
     }
 
     public int inputCount() {
@@ -225,73 +284,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return bindChannel().nextOrElse(output);
     }
 
-    public int outputCount() {
-        return bindChannel().outputCount();
-    }
-
-    public void throwError() {
-        bindChannel().throwError();
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
-        bindChannel().after(delay);
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        bindChannel().after(delay, timeUnit);
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
-        bindChannel().allInto(results);
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
-        bindChannel().bind(consumer);
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> close() {
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> eventuallyAbort() {
-        bindChannel().eventuallyAbort();
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        bindChannel().eventuallyAbort(reason);
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> eventuallyBreak() {
-        bindChannel().eventuallyBreak();
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> eventuallyFail() {
-        bindChannel().eventuallyFail();
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> immediately() {
-        bindChannel().immediately();
-        return this;
-    }
-
     @NotNull
     public StreamChannel<IN, OUT> orderByCall() {
         return this;
@@ -300,6 +292,10 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> orderByDelay() {
         return this;
+    }
+
+    public int outputCount() {
+        return bindChannel().outputCount();
     }
 
     @NotNull
@@ -322,10 +318,18 @@ public abstract class AbstractStreamChannel<IN, OUT>
         throw new IllegalStateException("cannot pass data to a stream channel");
     }
 
+    public int size() {
+        return bindChannel().size();
+    }
+
     @NotNull
     public StreamChannel<IN, OUT> skipNext(final int count) {
         bindChannel().skipNext(count);
         return this;
+    }
+
+    public void throwError() {
+        bindChannel().throwError();
     }
 
     @NotNull
@@ -510,6 +514,10 @@ public abstract class AbstractStreamChannel<IN, OUT>
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return newChannel(newConfiguration(streamConfiguration.getStreamConfiguration(),
                 streamConfiguration.getCurrentConfiguration(), invocationMode));
+    }
+
+    public Iterator<OUT> iterator() {
+        return bindChannel().iterator();
     }
 
     @NotNull
@@ -904,10 +912,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return newChannel(getBindingFunction().andThen(
                 new BindTryFinally<OUT>(mStreamConfiguration.asChannelConfiguration(),
                         ConstantConditions.notNull("runnable instance", action))));
-    }
-
-    public Iterator<OUT> iterator() {
-        return bindChannel().iterator();
     }
 
     public void remove() {

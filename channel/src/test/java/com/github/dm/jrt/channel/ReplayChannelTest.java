@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
@@ -42,6 +43,39 @@ import static org.junit.Assert.fail;
 public class ReplayChannelTest {
 
     @Test
+    public void testInvalidCalls() {
+        final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<?, String> channel = Channels.replay(inputChannel).buildChannels();
+        try {
+            channel.orderByCall().pass("test");
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.orderByDelay().pass("test", "test");
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.pass((Iterable<?>) Collections.singleton("test"));
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.pass((Channel<?, ?>) JRoutineCore.io().buildChannel());
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+    }
+
+    @Test
     public void testReplay() {
 
         final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
@@ -54,7 +88,9 @@ public class ReplayChannelTest {
         assertThat(output1.next()).isEqualTo("test1");
         final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
         channel.bind(output2).close();
-        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.isOpen()).isFalse();
+        channel.close();
+        assertThat(channel.isOpen()).isFalse();
         inputChannel.pass("test3").close();
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.hasCompleted()).isTrue();
@@ -181,7 +217,7 @@ public class ReplayChannelTest {
             }
         };
         channel.bind(consumer);
-        assertThat(channel.isOpen()).isTrue();
+        assertThat(channel.isOpen()).isFalse();
         inputChannel.pass("test3").close();
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.hasCompleted()).isTrue();
@@ -324,6 +360,7 @@ public class ReplayChannelTest {
         assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
         assertThat(result.inputCount()).isEqualTo(0);
         assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 }

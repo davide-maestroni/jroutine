@@ -421,6 +421,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         return this;
     }
 
+    public int size() {
+        return inputCount() + outputCount();
+    }
+
     @NotNull
     public Channel<IN, OUT> skipNext(final int count) {
         mResultChanel.skipNext(count);

@@ -250,6 +250,10 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
         return this;
     }
 
+    public int size() {
+        return mChannel.size();
+    }
+
     @NotNull
     public Channel<DATA, DATA> skipNext(final int count) {
         mChannel.skipNext(count);

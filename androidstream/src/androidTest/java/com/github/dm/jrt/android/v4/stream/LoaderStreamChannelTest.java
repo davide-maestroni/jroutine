@@ -2914,6 +2914,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         final Channel<?, Object> result = LoaderStreamsCompat.streamOf(channel.close());
         assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 

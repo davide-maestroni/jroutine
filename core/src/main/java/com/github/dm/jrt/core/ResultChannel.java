@@ -566,6 +566,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return this;
     }
 
+    public int size() {
+        return outputCount();
+    }
+
     @NotNull
     public Channel<OUT, OUT> skipNext(final int count) {
         if (count > 0) {

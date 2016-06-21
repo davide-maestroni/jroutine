@@ -612,6 +612,7 @@ public class ChannelTest {
         assertThat(channel.after(seconds(1)).hasCompleted()).isTrue();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(1);
+        assertThat(channel.size()).isEqualTo(1);
         assertThat(channel.skipNext(1).outputCount()).isEqualTo(0);
 
         final Channel<Object, Object> channel1 = JRoutineCore.io().buildChannel();
@@ -624,6 +625,7 @@ public class ChannelTest {
         assertThat(channel1.after(seconds(1)).hasCompleted()).isTrue();
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);
+        assertThat(channel1.size()).isEqualTo(1);
         assertThat(channel1.skipNext(1).outputCount()).isEqualTo(0);
     }
 

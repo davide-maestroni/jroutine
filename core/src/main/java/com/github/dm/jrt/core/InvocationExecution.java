@@ -113,6 +113,25 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         }
     }
 
+    /**
+     * Forces the recycling of the invocation.
+     */
+    public void recycle() {
+        synchronized (mMutex) {
+            final Invocation<IN, OUT> invocation = mInvocation;
+            if ((invocation != null) && !mIsTerminated) {
+                mIsTerminated = true;
+                if (mIsInitialized) {
+                    mInvocationManager.recycle(invocation);
+
+                } else {
+                    // Initialization failed, so just discard the invocation
+                    mInvocationManager.discard(invocation);
+                }
+            }
+        }
+    }
+
     public void run() {
         final Invocation<IN, OUT> invocation;
         synchronized (mMutex) {
@@ -183,7 +202,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             }
 
         } catch (final Throwable t) {
-            resultChannel.abortImmediately(t);
+            if (!resultChannel.abortImmediately(t)) {
+                // Needed if the result channel is explicitly closed by the invocation
+                recycle();
+            }
         }
     }
 
@@ -273,6 +295,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                             } else {
                                 // Initialization failed, so just discard the invocation
+                                mIsTerminated = true;
                                 manager.discard(invocation);
                             }
                         }
@@ -280,7 +303,11 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                         resultChannel.close(exception);
 
                     } catch (final Throwable t) {
-                        manager.discard(invocation);
+                        if (!mIsTerminated) {
+                            mIsTerminated = true;
+                            manager.discard(invocation);
+                        }
+
                         resultChannel.close(t);
                     }
 

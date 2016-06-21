@@ -624,7 +624,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param reason the reason of the abortion.
      * @see com.github.dm.jrt.core.channel.Channel#abort(Throwable) Channel.abort(Throwable)
      */
-    void abortImmediately(@Nullable final Throwable reason) {
+    boolean abortImmediately(@Nullable final Throwable reason) {
         RoutineException abortException = InvocationException.wrapIfNeeded(reason);
         synchronized (mMutex) {
             abortException = mState.abortInvocation(abortException, zero());
@@ -632,7 +632,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         if (abortException != null) {
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
+            return true;
         }
+
+        return false;
     }
 
     /**

@@ -905,9 +905,11 @@ public class RoutineTest {
         channel = routine3.async().pass("1");
         channel.abort();
         assertThat(channel.after(timeout).hasCompleted()).isTrue();
+        assertThat(TestDiscard.getInstanceCount()).isZero();
         channel = routine3.parallel().pass("1");
         channel.abort();
         assertThat(channel.after(timeout).hasCompleted()).isTrue();
+        routine3.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =

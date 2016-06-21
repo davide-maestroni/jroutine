@@ -151,6 +151,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                     runExecution(execution, delay, timeUnit);
 
                 } else {
+                    // Make sure the invocation is properly recycled
+                    mExecution.recycle();
                     mResultChanel.close(reason);
                 }
             }
@@ -284,7 +286,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     public int inputCount() {
         synchronized (mMutex) {
-            return mInputCount;
+            return mState.inputCount();
         }
     }
 
@@ -456,7 +458,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     private void internalAbort(@NotNull final RoutineException abortException) {
-        mInputCount = 0;
         mAbortException = abortException;
         mRunner.cancel(mExecution);
     }
@@ -501,6 +502,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * The invocation execution has been aborted.
      */
     private class AbortChannelState extends CompleteChannelState {
+
+        @Override
+        public int inputCount() {
+            return 0;
+        }
 
         @Nullable
         @Override
@@ -596,18 +602,18 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      */
     private class ClosedChannelState extends InputChannelState {
 
+        @NotNull
+        private IllegalStateException exception() {
+            mLogger.err("invalid call on closed channel");
+            return new IllegalStateException("the input channel is closed");
+        }
+
         @Nullable
         @Override
         Execution abortInvocation(@NotNull final UnitDuration delay,
                 @Nullable final Throwable reason) {
             mLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
-        }
-
-        @NotNull
-        private IllegalStateException exception() {
-            mLogger.err("invalid call on closed channel");
-            return new IllegalStateException("the input channel is closed");
         }
 
         @Nullable
@@ -777,6 +783,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             final Throwable abortException;
             final List<Channel<?, ? extends IN>> channels;
             synchronized (mMutex) {
+                mInputCount = 0;
                 mInputQueue.clear();
                 abortException = mAbortException;
                 final IdentityHashMap<Channel<?, ? extends IN>, Void> boundChannels =
@@ -990,6 +997,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * Invocation channel internal state (using "state" design pattern).
      */
     private class InputChannelState implements InputIterator<IN> {
+
+        /**
+         * Returns the number of inputs still to be processed.
+         *
+         * @return the input count.
+         */
+        public int inputCount() {
+            return mInputCount;
+        }
 
         /**
          * Called when the binding of channel fails.

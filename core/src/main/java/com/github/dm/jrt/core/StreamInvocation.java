@@ -57,7 +57,7 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     }
 
     @Override
-    public void onDiscard() {
+    public void onDiscard() throws Exception {
     }
 
     @Override

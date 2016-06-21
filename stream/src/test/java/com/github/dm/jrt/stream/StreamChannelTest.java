@@ -347,7 +347,19 @@ public class StreamChannelTest {
         assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
         assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
 
-        final Iterator<String> iterator = Streams.streamOf("test1", "test2", "test3").iterator();
+        Iterator<String> iterator = Streams.streamOf("test1", "test2", "test3").iterator();
+        assertThat(iterator.hasNext()).isTrue();
+        assertThat(iterator.next()).isEqualTo("test1");
+
+        try {
+            iterator.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+        }
+
+        iterator = Streams.streamOf("test1", "test2", "test3").eventualIterator();
         assertThat(iterator.hasNext()).isTrue();
         assertThat(iterator.next()).isEqualTo("test1");
 
@@ -844,6 +856,26 @@ public class StreamChannelTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    @Test
+    public void testErrors() {
+        final StreamChannel<String, String> stream = Streams.streamOf("test");
+        stream.map(IdentityInvocation.<String>factoryOf());
+        try {
+            stream.replay();
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+
+        try {
+            stream.close();
+            fail();
+
+        } catch (final IllegalStateException ignored) {
         }
     }
 

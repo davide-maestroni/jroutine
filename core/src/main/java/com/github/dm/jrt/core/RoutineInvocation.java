@@ -68,7 +68,7 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
-    public void onDiscard() {
+    public void onDiscard() throws Exception {
         super.onDiscard();
         mRoutine.clear();
     }

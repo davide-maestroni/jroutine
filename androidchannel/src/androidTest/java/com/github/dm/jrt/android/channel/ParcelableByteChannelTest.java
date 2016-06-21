@@ -432,10 +432,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(PassingInvocation.class))
                                .async();
-        final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bind(channel);
+        final BufferOutputStream stream = ParcelableByteChannel.byteChannel(16, 16).bind(channel);
         stream.write(31);
         stream.flush();
         final ParcelableByteBuffer buffer = channel.close().after(seconds(10)).next();
+        assertThat(buffer.size()).isEqualTo(1);
         final BufferInputStream inputStream = ParcelableByteChannel.inputStream(buffer);
         inputStream.close();
         final byte[] b = new byte[16];

@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.core.StreamContextInvocation;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -98,6 +99,17 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
+    public void testTemplateInvocation() {
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(ContextTest.class)))
+                               .sync()
+                               .close()
+                               .getError()).isNull();
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(StreamContextTest.class)))
+                               .sync()
+                               .close()
+                               .getError()).isNull();
+    }
+
     public void testToken() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
@@ -172,6 +184,24 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         public CaseWrapper(final boolean isUpper) {
 
             super(new Case(isUpper));
+        }
+    }
+
+    public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+
+        @Override
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
+            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
+        }
+    }
+
+    public static class StreamContextTest extends StreamContextInvocation<Object, Object> {
+
+        @NotNull
+        @Override
+        protected Channel<?, Object> onChannel(@NotNull final Channel<?, Object> channel) {
+            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
+            return channel;
         }
     }
 }

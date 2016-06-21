@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,8 +29,11 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.UnitDuration.days;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +45,112 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 10/26/2014.
  */
 public class ReplayChannelTest {
+
+    @Test
+    public void testChannel() {
+
+        Channel<?, String> channel = Channels.replay(JRoutineCore.io().of("test")).buildChannels();
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.abort()).isFalse();
+        assertThat(channel.abort(null)).isFalse();
+        assertThat(channel.close().isOpen()).isFalse();
+        assertThat(channel.isEmpty()).isFalse();
+        assertThat(channel.hasCompleted()).isTrue();
+        assertThat(channel.isBound()).isFalse();
+        final ArrayList<String> results = new ArrayList<String>();
+        assertThat(channel.after(1, TimeUnit.SECONDS).hasNext()).isTrue();
+        channel.immediately().allInto(results);
+        assertThat(results).containsExactly("test");
+        channel = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels();
+
+        try {
+            channel.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+        }
+
+        assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
+        assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
+        assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
+
+        Iterator<String> iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
+                                            .buildChannels()
+                                            .iterator();
+        assertThat(iterator.hasNext()).isTrue();
+        assertThat(iterator.next()).isEqualTo("test1");
+
+        try {
+            iterator.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+        }
+
+        iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
+                           .buildChannels()
+                           .eventualIterator();
+        assertThat(iterator.hasNext()).isTrue();
+        assertThat(iterator.next()).isEqualTo("test1");
+
+        try {
+            iterator.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+        }
+
+        channel = Channels.replay(
+                JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"))
+                          .buildChannels();
+
+        try {
+            channel.eventuallyFail().next();
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+
+        try {
+            channel.eventuallyBreak().next();
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+        }
+
+        try {
+            channel.eventuallyAbort().next();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+            channel.eventuallyAbort(new IllegalArgumentException()).next();
+            fail();
+
+        } catch (final AbortException e) {
+            assertThat(e.getCause()).isNull();
+        }
+
+        channel = Channels.replay(
+                JRoutineCore.io().<String>buildChannel().after(seconds(1)).pass("test"))
+                          .buildChannels();
+
+        try {
+            channel.eventuallyAbort(new IllegalArgumentException()).next();
+            fail();
+
+        } catch (final AbortException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+    }
 
     @Test
     @SuppressWarnings("unchecked")

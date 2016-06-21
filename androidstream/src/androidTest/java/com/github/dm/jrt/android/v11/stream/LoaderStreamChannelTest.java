@@ -41,6 +41,7 @@ import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -1682,9 +1683,22 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
         assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
         assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
-        final Iterator<String> iterator = LoaderStreams.streamOf("test1", "test2", "test3")
-                                                       .with(loaderFrom(getActivity()))
-                                                       .iterator();
+        Iterator<String> iterator = LoaderStreams.streamOf("test1", "test2", "test3")
+                                                 .with(loaderFrom(getActivity()))
+                                                 .iterator();
+        assertThat(iterator.hasNext()).isTrue();
+        assertThat(iterator.next()).isEqualTo("test1");
+        try {
+            iterator.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+        }
+
+        iterator = LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(getActivity()))
+                                .eventualIterator();
         assertThat(iterator.hasNext()).isTrue();
         assertThat(iterator.next()).isEqualTo("test1");
         try {
@@ -1902,6 +1916,29 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    public void testErrors() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final LoaderStreamChannel<String, String> stream =
+                LoaderStreams.streamOf("test").with(loaderFrom(getActivity()));
+        stream.map(IdentityInvocation.<String>factoryOf());
+        try {
+            stream.replay();
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            stream.close();
+            fail();
+
+        } catch (final IllegalStateException ignored) {
         }
     }
 

@@ -25,10 +25,11 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.DeadlockException;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
@@ -1035,7 +1036,7 @@ public class RoutineTest {
         final Logger logger = Logger.newLogger(null, null, this);
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
             fail();
@@ -1045,7 +1046,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
                     logger);
@@ -1064,7 +1065,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
                     new TestInputIterator(), channel, null);
@@ -1234,8 +1235,8 @@ public class RoutineTest {
                                .withInputBackoff(zero())
                                .apply()
                                .async()
-                               .orderByDelay()
-                               .orderByCall()
+                               .sortedByDelay()
+                               .sortedByCall()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1251,7 +1252,7 @@ public class RoutineTest {
                                .withInputBackoff(millis(1000))
                                .apply()
                                .async()
-                               .orderByCall()
+                               .sortedByCall()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1267,7 +1268,7 @@ public class RoutineTest {
                                .withInputBackoff(millis(1000))
                                .apply()
                                .async()
-                               .orderByCall()
+                               .sortedByCall()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1283,7 +1284,7 @@ public class RoutineTest {
                                .withInputBackoff(millis(1000))
                                .apply()
                                .async()
-                               .orderByCall()
+                               .sortedByCall()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1301,7 +1302,7 @@ public class RoutineTest {
                                .withInputBackoff(millis(1000))
                                .apply()
                                .async()
-                               .orderByCall()
+                               .sortedByCall()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1357,7 +1358,7 @@ public class RoutineTest {
                         .withInputBackoff(millis(1000))
                         .apply()
                         .async()
-                        .orderByCall()
+                        .sortedByCall()
                         .after(millis(100))
                         .pass("test1")
                         .immediately()
@@ -1688,7 +1689,7 @@ public class RoutineTest {
     public void testResultChannelError() {
         final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
         try {
-            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
+            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(), null,
                     Runners.sharedRunner(), logger);
             fail();
 
@@ -1696,7 +1697,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), null, logger);
             fail();
 
@@ -1704,7 +1705,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), null);
             fail();
 
@@ -1712,7 +1713,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
             fail();
 
@@ -1720,7 +1721,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
             fail();
 
@@ -1729,7 +1730,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.sharedRunner(), logger);
             channel.after(-1, TimeUnit.MILLISECONDS);
             fail();
@@ -2643,20 +2644,20 @@ public class RoutineTest {
         }
 
         public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-            result.orderByCall().orderByDelay();
+            result.sortedByCall().sortedByDelay();
             assertThat(result.isOpen()).isTrue();
             assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
             assertThat(result.abort()).isFalse();
             assertThat(result.isOpen()).isFalse();
             try {
-                result.orderByCall();
+                result.sortedByCall();
                 fail();
 
             } catch (final InvocationException ignored) {
             }
 
             try {
-                result.orderByDelay();
+                result.sortedByDelay();
                 fail();
 
             } catch (final InvocationException ignored) {
@@ -3287,16 +3288,20 @@ public class RoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
+        public boolean isExecutionThread() {
+            return false;
+        }
+
+        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
             mExecutions.add(execution);
         }
 
         private void run(int count) {
-            final Iterator<Execution> iterator = mExecutions.iterator();
-            while (iterator.hasNext() && (count-- > 0)) {
-                final Execution execution = iterator.next();
-                iterator.remove();
+            final ArrayList<Execution> executions = mExecutions;
+            while (!executions.isEmpty() && (count-- > 0)) {
+                final Execution execution = executions.remove(0);
                 execution.run();
             }
         }

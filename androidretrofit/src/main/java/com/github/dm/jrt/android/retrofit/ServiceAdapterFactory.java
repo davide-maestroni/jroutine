@@ -50,7 +50,6 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -398,7 +397,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = builderFromOutputChannel(configuration).apply();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
             mConverter = converter;
         }
 
@@ -450,7 +449,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = builderFromOutputChannel(configuration).apply();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
             mConverter = converter;
         }
 

@@ -29,8 +29,6 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-
 /**
  * Default implementation of a stream channel.
  * <p>
@@ -141,7 +139,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        builderFromOutputChannel(asInvocationConfiguration()).apply();
+                        asInvocationConfiguration().outputConfigurationBuilder().apply();
             }
 
             return mChannelConfiguration;

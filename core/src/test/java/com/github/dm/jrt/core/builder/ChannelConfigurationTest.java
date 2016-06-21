@@ -18,9 +18,8 @@ package com.github.dm.jrt.core.builder;
 
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -33,9 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInputChannel;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInvocation;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -218,94 +214,6 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    public void testFromInputChannelConfiguration() {
-
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .withInputOrder(OrderType.BY_CALL)
-                       .withInputLimit(10)
-                       .withInputBackoff(millis(33))
-                       .withInputMaxSize(100)
-                       .apply();
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withLimit(10)
-                                                            .withBackoff(millis(33))
-                                                            .withMaxSize(100)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        assertThat(builderFromInputChannel(invocationConfiguration).apply()).isEqualTo(
-                configuration);
-    }
-
-    @Test
-    public void testFromInvocationConfiguration() {
-
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .withInputOrder(OrderType.BY_CALL)
-                       .withInputLimit(10)
-                       .withInputBackoff(millis(33))
-                       .withInputMaxSize(100)
-                       .apply();
-        final ChannelConfiguration configuration = builder().withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        assertThat(builderFromInvocation(invocationConfiguration).apply()).isEqualTo(configuration);
-    }
-
-    @Test
-    public void testFromOutputChannelConfiguration() {
-
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .withOutputOrder(OrderType.BY_CALL)
-                       .withOutputLimit(10)
-                       .withOutputBackoff(millis(33))
-                       .withOutputMaxSize(100)
-                       .apply();
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withLimit(10)
-                                                            .withBackoff(millis(33))
-                                                            .withMaxSize(100)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        assertThat(builderFromOutputChannel(invocationConfiguration).apply()).isEqualTo(
-                configuration);
-    }
-
-    @Test
     public void testLogEquals() {
 
         final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
@@ -376,94 +284,5 @@ public class ChannelConfigurationTest {
         assertThat(
                 configuration.builderFrom().withRunner(Runners.syncRunner()).apply()).isNotEqualTo(
                 builder().withRunner(Runners.syncRunner()).apply());
-    }
-
-    @Test
-    public void testToInputChannelConfiguration() {
-
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withLimit(10)
-                                                            .withBackoff(millis(33))
-                                                            .withMaxSize(100)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .withInputOrder(OrderType.BY_CALL)
-                       .withInputLimit(10)
-                       .withInputBackoff(millis(33))
-                       .withInputMaxSize(100)
-                       .apply();
-        assertThat(configuration.toInputChannelConfiguration().apply()).isEqualTo(
-                invocationConfiguration);
-    }
-
-    @Test
-    public void testToInvocationConfiguration() {
-
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withLimit(10)
-                                                            .withBackoff(millis(33))
-                                                            .withMaxSize(100)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .apply();
-        assertThat(configuration.toInvocationConfiguration().apply()).isEqualTo(
-                invocationConfiguration);
-    }
-
-    @Test
-    public void testToOutputChannelConfiguration() {
-
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withLimit(10)
-                                                            .withBackoff(millis(33))
-                                                            .withMaxSize(100)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withOutputTimeout(millis(100))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .withLog(Logs.nullLog())
-                                                            .withLogLevel(Level.SILENT)
-                                                            .apply();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
-                builder.withRunner(Runners.syncRunner())
-                       .withOutputTimeout(millis(100))
-                       .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .withLog(Logs.nullLog())
-                       .withLogLevel(Level.SILENT)
-                       .withOutputOrder(OrderType.BY_CALL)
-                       .withOutputLimit(10)
-                       .withOutputBackoff(millis(33))
-                       .withOutputMaxSize(100)
-                       .apply();
-        assertThat(configuration.toOutputChannelConfiguration().apply()).isEqualTo(
-                invocationConfiguration);
     }
 }

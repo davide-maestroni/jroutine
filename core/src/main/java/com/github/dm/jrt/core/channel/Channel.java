@@ -501,41 +501,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     OUT nextOrElse(OUT output);
 
     /**
-     * Tells the channel to sort the passed input data based on the order of the calls to the pass
-     * methods.
-     * <p>
-     * By default no particular order is applied.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #orderByDelay()
-     */
-    @NotNull
-    Channel<IN, OUT> orderByCall();
-
-    /**
-     * Tells the channel to not sort the passed input data.
-     * <p>
-     * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
-     * are passed to the channel, while the others will be delivered as soon as the dedicated runner
-     * handles the specific execution.
-     * <p>
-     * This is the default behavior.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #orderByCall()
-     */
-    @NotNull
-    Channel<IN, OUT> orderByDelay();
-
-    /**
      * Returns the number of output data stored in the channel.
      *
      * @return the output data size.
@@ -623,6 +588,41 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      */
     @NotNull
     Channel<IN, OUT> skipNext(int count);
+
+    /**
+     * Tells the channel to sort the passed input data based on the order of the calls to the pass
+     * methods.
+     * <p>
+     * By default no particular order is applied.
+     * <p>
+     * Note that the implementing class should ensure that calls of this method from different
+     * threads will not interfere with each others.
+     *
+     * @return this channel.
+     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+     * @see #sortedByDelay()
+     */
+    @NotNull
+    Channel<IN, OUT> sortedByCall();
+
+    /**
+     * Tells the channel to not sort the passed input data.
+     * <p>
+     * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
+     * are passed to the channel, while the others will be delivered as soon as the dedicated runner
+     * handles the specific execution.
+     * <p>
+     * This is the default behavior.
+     * <p>
+     * Note that the implementing class should ensure that calls of this method from different
+     * threads will not interfere with each others.
+     *
+     * @return this channel.
+     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+     * @see #sortedByCall()
+     */
+    @NotNull
+    Channel<IN, OUT> sortedByDelay();
 
     /**
      * Throws the invocation error or abort exception, if the invocation is aborted, waiting at the

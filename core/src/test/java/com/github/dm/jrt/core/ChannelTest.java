@@ -19,8 +19,8 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.DeadlockException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -481,7 +481,7 @@ public class ChannelTest {
         channel1.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel1.after(timeout).all()).containsOnly(23, -77L);
         final Channel<Object, Object> channel2 = JRoutineCore.io().buildChannel();
-        channel2.orderByDelay().orderByCall();
+        channel2.sortedByDelay().sortedByCall();
         channel2.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel2.after(timeout).all()).containsExactly(23, -77L);
     }

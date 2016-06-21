@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -53,15 +52,6 @@ public class PriorityRunner {
 
     private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
             new PriorityExecutionComparator();
-
-    private static final ThreadLocal<HashSet<PriorityExecution>> sLocalExecutions =
-            new ThreadLocal<HashSet<PriorityExecution>>() {
-
-                @Override
-                protected HashSet<PriorityExecution> initialValue() {
-                    return new HashSet<PriorityExecution>();
-                }
-            };
 
     private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunners =
             new WeakIdentityHashMap<Runner, PriorityRunner>();
@@ -185,15 +175,10 @@ public class PriorityRunner {
             final PriorityExecution execution = mExecution;
             mDelayedExecutions.remove(execution);
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
-            if (sLocalExecutions.get().contains(execution)) {
-                execution.run();
-
-            } else {
-                queue.put(execution);
-                final PriorityExecution priorityExecution = queue.poll();
-                if (priorityExecution != null) {
-                    priorityExecution.run();
-                }
+            queue.put(execution);
+            final PriorityExecution priorityExecution = queue.poll();
+            if (priorityExecution != null) {
+                priorityExecution.run();
             }
         }
     }
@@ -217,15 +202,9 @@ public class PriorityRunner {
         public void run() {
             final PriorityExecution execution = mExecution;
             mImmediateExecutions.remove(execution);
-            final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
-            if (sLocalExecutions.get().contains(execution) && queue.remove(execution)) {
-                execution.run();
-
-            } else {
-                final PriorityExecution priorityExecution = queue.poll();
-                if (priorityExecution != null) {
-                    priorityExecution.run();
-                }
+            final PriorityExecution priorityExecution = mQueue.poll();
+            if (priorityExecution != null) {
+                priorityExecution.run();
             }
         }
     }
@@ -327,37 +306,39 @@ public class PriorityRunner {
         @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-            final PriorityExecution priorityExecution =
-                    new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
-            synchronized (mExecutions) {
-                final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
-                        executions = mExecutions;
-                WeakHashMap<PriorityExecution, Void> priorityExecutions = executions.get(execution);
-                if (priorityExecutions == null) {
-                    priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
-                    executions.put(execution, priorityExecutions);
-                }
-
-                priorityExecutions.put(priorityExecution, null);
-            }
-
-            final HashSet<PriorityExecution> localExecutions = sLocalExecutions.get();
-            localExecutions.add(priorityExecution);
-            if (delay == 0) {
-                final ImmediateExecution immediateExecution =
-                        new ImmediateExecution(priorityExecution);
-                mImmediateExecutions.put(priorityExecution, immediateExecution);
-                mQueue.put(priorityExecution);
-                super.run(immediateExecution, 0, timeUnit);
+            if (isExecutionThread()) {
+                super.run(execution, delay, timeUnit);
 
             } else {
-                final DelayedExecution delayedExecution = new DelayedExecution(priorityExecution);
-                mDelayedExecutions.put(priorityExecution, delayedExecution);
-                super.run(delayedExecution, delay, timeUnit);
-            }
+                final PriorityExecution priorityExecution =
+                        new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
+                synchronized (mExecutions) {
+                    final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
+                            executions = mExecutions;
+                    WeakHashMap<PriorityExecution, Void> priorityExecutions =
+                            executions.get(execution);
+                    if (priorityExecutions == null) {
+                        priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
+                        executions.put(execution, priorityExecutions);
+                    }
 
-            // TODO: 20/06/16 does not work
-            localExecutions.remove(priorityExecution);
+                    priorityExecutions.put(priorityExecution, null);
+                }
+
+                if (delay == 0) {
+                    final ImmediateExecution immediateExecution =
+                            new ImmediateExecution(priorityExecution);
+                    mImmediateExecutions.put(priorityExecution, immediateExecution);
+                    mQueue.put(priorityExecution);
+                    super.run(immediateExecution, 0, timeUnit);
+
+                } else {
+                    final DelayedExecution delayedExecution =
+                            new DelayedExecution(priorityExecution);
+                    mDelayedExecutions.put(priorityExecution, delayedExecution);
+                    super.run(delayedExecution, delay, timeUnit);
+                }
+            }
         }
 
         @NotNull

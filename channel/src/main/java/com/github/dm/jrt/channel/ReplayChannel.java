@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.UnitDuration;
 
@@ -258,16 +258,6 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
         return mOutputChannel.nextOrElse(output);
     }
 
-    @NotNull
-    public Channel<OUT, OUT> orderByCall() {
-        return this;
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> orderByDelay() {
-        return this;
-    }
-
     public int outputCount() {
         return mOutputChannel.outputCount();
     }
@@ -307,6 +297,16 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     @NotNull
     public Channel<OUT, OUT> skipNext(final int count) {
         mOutputChannel.skipNext(count);
+        return this;
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> sortedByCall() {
+        return this;
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> sortedByDelay() {
         return this;
     }
 

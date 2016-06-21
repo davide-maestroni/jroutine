@@ -38,7 +38,7 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -1659,9 +1659,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         StreamChannel<String, String> channel =
                 LoaderStreams.streamOf("test").with(loaderFrom(getActivity()));
+        assertThat(channel.isOpen()).isFalse();
         assertThat(channel.abort()).isFalse();
         assertThat(channel.abort(null)).isFalse();
-        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.close().isOpen()).isFalse();
         assertThat(channel.isEmpty()).isFalse();
         assertThat(channel.hasCompleted()).isTrue();
         assertThat(channel.isBound()).isFalse();
@@ -2088,6 +2089,37 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         })
                                 .after(seconds(10))
                                 .all()).containsExactly("test1", "test2");
+    }
+
+    public void testInvalidCalls() {
+        final LoaderStreamChannel<String, String> channel = LoaderStreams.streamOf();
+        try {
+            channel.sortedByCall().pass("test");
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.sortedByDelay().pass("test", "test");
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.pass(Collections.singleton("test"));
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.pass(JRoutineCore.io().<String>buildChannel());
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
     }
 
     public void testInvocationDeadlock() {

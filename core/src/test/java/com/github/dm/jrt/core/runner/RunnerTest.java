@@ -136,8 +136,8 @@ public class RunnerTest {
         final TestRunner testRunner = new TestRunner();
         final Runner runner = Runners.priorityRunner(testRunner).getRunner(0);
         assertThat(runner.isExecutionThread()).isFalse();
-        testRunner.setExecutionThread(Thread.currentThread());
-        assertThat(runner.isExecutionThread()).isTrue();
+        testRunner.setExecutionThread(new Thread());
+        assertThat(runner.isExecutionThread()).isFalse();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         assertThat(execution.isRun()).isFalse();
         testRunner.getLastExecution().run();

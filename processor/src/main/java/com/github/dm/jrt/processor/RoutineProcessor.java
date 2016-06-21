@@ -17,8 +17,8 @@
 package com.github.dm.jrt.processor;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -321,7 +321,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, @Nullable final InputMode inputMode) {
         return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION))
-                ? ".orderByCall()" : "";
+                ? ".sortedByCall()" : "";
     }
 
     /**

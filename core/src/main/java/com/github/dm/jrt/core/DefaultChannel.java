@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
@@ -61,9 +60,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
      * @param configuration the channel configuration.
      */
     DefaultChannel(@NotNull final ChannelConfiguration configuration) {
-        final InvocationConfiguration invocationConfiguration =
-                configuration.toOutputChannelConfiguration().apply();
-        final Logger logger = invocationConfiguration.newLogger(this);
+        final Logger logger = configuration.newLogger(this);
         final Runner wrapped = configuration.getRunnerOrElse(Runners.sharedRunner());
         ChannelRunner channelRunner;
         synchronized (sRunners) {
@@ -78,8 +75,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final ResultChannel<DATA> channel =
-                new ResultChannel<DATA>(invocationConfiguration, abortHandler, channelRunner,
-                        logger);
+                new ResultChannel<DATA>(configuration, abortHandler, channelRunner, logger);
         abortHandler.setChannel(channel);
         mChannel = channel;
         logger.dbg("building channel with configuration: %s", configuration);
@@ -210,18 +206,6 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
         return mChannel.nextOrElse(output);
     }
 
-    @NotNull
-    public Channel<DATA, DATA> orderByCall() {
-        mChannel.orderByCall();
-        return this;
-    }
-
-    @NotNull
-    public Channel<DATA, DATA> orderByDelay() {
-        mChannel.orderByDelay();
-        return this;
-    }
-
     public int outputCount() {
         return mChannel.outputCount();
     }
@@ -257,6 +241,18 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     @NotNull
     public Channel<DATA, DATA> skipNext(final int count) {
         mChannel.skipNext(count);
+        return this;
+    }
+
+    @NotNull
+    public Channel<DATA, DATA> sortedByCall() {
+        mChannel.sortedByCall();
+        return this;
+    }
+
+    @NotNull
+    public Channel<DATA, DATA> sortedByDelay() {
+        mChannel.sortedByDelay();
         return this;
     }
 

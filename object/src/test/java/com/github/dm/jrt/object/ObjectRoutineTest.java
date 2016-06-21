@@ -19,10 +19,10 @@ package com.github.dm.jrt.object;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -230,34 +230,22 @@ public class ObjectRoutineTest {
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
         assertThat(withAnnotations(InvocationConfiguration.defaultConfiguration(),
-                AnnotationItf.class.getMethod("toString"))).isEqualTo(builder().withCoreInstances(3)
-                                                                               .withInputOrder(
-                                                                                       OrderType
-                                                                                               .BY_DELAY)
-                                                                               .withInputLimit(71)
-                                                                               .withInputBackoff(
-                                                                                       7777,
-                                                                                       TimeUnit.MICROSECONDS)
-                                                                               .withInputMaxSize(33)
-                                                                               .withLogLevel(
-                                                                                       Level.WARNING)
-                                                                               .withMaxInstances(17)
-                                                                               .withOutputOrder(
-                                                                                       OrderType
-                                                                                               .BY_CALL)
-                                                                               .withOutputLimit(31)
-                                                                               .withOutputBackoff(
-                                                                                       3333,
-                                                                                       TimeUnit.NANOSECONDS)
-                                                                               .withOutputMaxSize(
-                                                                                       77)
-                                                                               .withPriority(41)
-                                                                               .withOutputTimeout(
-                                                                                       1111,
-                                                                                       TimeUnit.MICROSECONDS)
-                                                                               .withOutputTimeoutAction(
-                                                                                       TimeoutActionType.ABORT)
-                                                                               .apply());
+                AnnotationItf.class.getMethod("toString"))).isEqualTo(//
+                builder().withCoreInstances(3)
+                         .withInputOrder(OrderType.BY_DELAY)
+                         .withInputLimit(71)
+                         .withInputBackoff(7777, TimeUnit.MICROSECONDS)
+                         .withInputMaxSize(33)
+                         .withLogLevel(Level.WARNING)
+                         .withMaxInstances(17)
+                         .withOutputOrder(OrderType.BY_CALL)
+                         .withOutputLimit(31)
+                         .withOutputBackoff(3333, TimeUnit.NANOSECONDS)
+                         .withOutputMaxSize(77)
+                         .withPriority(41)
+                         .withOutputTimeout(1111, TimeUnit.MICROSECONDS)
+                         .withOutputTimeoutAction(TimeoutActionType.ABORT)
+                         .apply());
     }
 
     @Test
@@ -2556,20 +2544,20 @@ public class ObjectRoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
+        public boolean isExecutionThread() {
+            return false;
+        }
+
+        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             mExecutions.add(execution);
         }
 
         private void run(int count) {
-
-            final Iterator<Execution> iterator = mExecutions.iterator();
-
-            while (iterator.hasNext() && (count-- > 0)) {
-
-                final Execution execution = iterator.next();
-                iterator.remove();
+            final ArrayList<Execution> executions = mExecutions;
+            while (!executions.isEmpty() && (count-- > 0)) {
+                final Execution execution = executions.remove(0);
                 execution.run();
             }
         }

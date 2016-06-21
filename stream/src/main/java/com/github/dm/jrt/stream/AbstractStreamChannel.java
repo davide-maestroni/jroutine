@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -202,6 +202,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> close() {
+        bindChannel().close();
         return this;
     }
 
@@ -271,8 +272,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     public boolean isOpen() {
-        bindChannel();
-        return mSourceChannel.isOpen();
+        return bindChannel().isOpen();
     }
 
     @NotNull
@@ -282,16 +282,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     public OUT nextOrElse(final OUT output) {
         return bindChannel().nextOrElse(output);
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> orderByCall() {
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> orderByDelay() {
-        return this;
     }
 
     public int outputCount() {
@@ -325,6 +315,16 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> skipNext(final int count) {
         bindChannel().skipNext(count);
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> sortedByCall() {
+        return this;
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> sortedByDelay() {
         return this;
     }
 

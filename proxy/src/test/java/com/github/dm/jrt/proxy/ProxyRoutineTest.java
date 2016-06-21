@@ -19,9 +19,9 @@ package com.github.dm.jrt.proxy;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -1296,20 +1296,20 @@ public class ProxyRoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
+        public boolean isExecutionThread() {
+            return false;
+        }
+
+        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-
             mExecutions.add(execution);
         }
 
         private void run(int count) {
-
-            final Iterator<Execution> iterator = mExecutions.iterator();
-
-            while (iterator.hasNext() && (count-- > 0)) {
-
-                final Execution execution = iterator.next();
-                iterator.remove();
+            final ArrayList<Execution> executions = mExecutions;
+            while (!executions.isEmpty() && (count-- > 0)) {
+                final Execution execution = executions.remove(0);
                 execution.run();
             }
         }

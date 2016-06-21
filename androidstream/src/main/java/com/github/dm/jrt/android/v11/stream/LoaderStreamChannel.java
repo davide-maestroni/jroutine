@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -164,22 +164,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> orderByCall();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> orderByDelay();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
     LoaderStreamChannel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
 
     /**
@@ -213,6 +197,22 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(START)
     LoaderStreamChannel<IN, OUT> skipNext(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> sortedByCall();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannel<IN, OUT> sortedByDelay();
 
     /**
      * {@inheritDoc}

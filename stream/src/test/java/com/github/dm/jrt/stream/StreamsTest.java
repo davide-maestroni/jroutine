@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -91,8 +91,8 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().abort();
 
         try {
 
@@ -108,8 +108,8 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().abort();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
@@ -194,9 +194,9 @@ public class StreamsTest {
     public void testCombine() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<Integer, Integer> channel2 =
-                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Streams.combine(channel1, channel2)
                .buildChannels()
                .pass(new Selectable<String>("test1", 0))
@@ -259,8 +259,8 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().abort();
 
         try {
 
@@ -276,8 +276,8 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().abort();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
@@ -390,9 +390,9 @@ public class StreamsTest {
     public void testDistribute() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         Streams.distribute(channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
@@ -414,9 +414,9 @@ public class StreamsTest {
     public void testDistributePlaceholder() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         Streams.distribute((Object) null, channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
@@ -626,28 +626,28 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(Streams.join(channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(
                 Streams.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall()
+        channel1.sortedByCall()
                 .after(millis(100))
                 .pass("testtest")
                 .pass("test2")
                 .pass("test3")
                 .close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(Streams.join(channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
@@ -662,8 +662,8 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().abort();
 
         try {
 
@@ -677,8 +677,8 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().abort();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
@@ -747,27 +747,27 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(Streams.join(new Object(), channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.async(
                 Streams.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                        .buildChannels()).after(seconds(10)).all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall()
+        channel1.sortedByCall()
                 .after(millis(100))
                 .pass("testtest")
                 .pass("test2")
                 .pass("test3")
                 .close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 
@@ -791,8 +791,8 @@ public class StreamsTest {
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
+        channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.sortedByCall().abort();
 
         try {
 
@@ -808,8 +808,8 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        channel1.sortedByCall().abort();
+        channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
 
         try {
 

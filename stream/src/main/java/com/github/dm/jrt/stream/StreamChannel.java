@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -235,25 +235,12 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     List<OUT> next(int count);
-    // TODO: 17/06/16 unit tests + pass + size + ReplayChannel
 
     /**
      * {@inheritDoc}
      */
     @StreamFlow(START)
     OUT nextOrElse(OUT output);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> orderByCall();
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> orderByDelay();
 
     /**
      * {@inheritDoc}
@@ -297,6 +284,18 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> skipNext(int count);
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    StreamChannel<IN, OUT> sortedByCall();
+
+    /**
+     * {@inheritDoc}.
+     */
+    @NotNull
+    StreamChannel<IN, OUT> sortedByDelay();
 
     /**
      * {@inheritDoc}

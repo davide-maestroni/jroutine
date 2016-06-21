@@ -23,7 +23,7 @@
             final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
             mutex.acquire();
             try {
-                result.orderByCall();
+                result.sortedByCall();
                 for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
                     result.pass(element);
                 }

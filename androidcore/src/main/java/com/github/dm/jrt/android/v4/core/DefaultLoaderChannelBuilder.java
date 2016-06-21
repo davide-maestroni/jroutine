@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoader;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
 import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
@@ -100,7 +101,7 @@ class DefaultLoaderChannelBuilder
         final DefaultLoaderRoutineBuilder<Void, OUT> builder =
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         final InvocationConfiguration invocationConfiguration =
-                mChannelConfiguration.toOutputChannelConfiguration().apply();
+                builderFromOutput(mChannelConfiguration).apply();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOrElse(null);

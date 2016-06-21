@@ -35,7 +35,7 @@ import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.log.Logger;

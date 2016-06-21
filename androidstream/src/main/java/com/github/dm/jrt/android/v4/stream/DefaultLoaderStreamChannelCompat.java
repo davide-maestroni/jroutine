@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -59,7 +59,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -244,18 +243,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> orderByCall() {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.orderByCall();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> orderByDelay() {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.orderByDelay();
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<IN, OUT> pass(
             @Nullable final Channel<?, ? extends IN> channel) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.pass(channel);
@@ -283,6 +270,18 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> skipNext(final int count) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.skipNext(count);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> sortedByCall() {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sortedByCall();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> sortedByDelay() {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sortedByDelay();
     }
 
     @NotNull
@@ -1178,7 +1177,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        builderFromOutputChannel(asInvocationConfiguration()).apply();
+                        asInvocationConfiguration().outputConfigurationBuilder().apply();
             }
 
             return mChannelConfiguration;

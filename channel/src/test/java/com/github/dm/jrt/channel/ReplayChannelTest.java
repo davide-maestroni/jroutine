@@ -43,32 +43,34 @@ import static org.junit.Assert.fail;
 public class ReplayChannelTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testInvalidCalls() {
         final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, String> channel = Channels.replay(inputChannel).buildChannels();
+        final Channel<Object, String> channel =
+                (Channel<Object, String>) Channels.replay(inputChannel).buildChannels();
         try {
-            channel.orderByCall().pass("test");
+            channel.sortedByCall().pass("test");
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            channel.orderByDelay().pass("test", "test");
+            channel.sortedByDelay().pass("test", "test");
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            channel.pass((Iterable<?>) Collections.singleton("test"));
+            channel.pass(Collections.singleton("test"));
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            channel.pass((Channel<?, ?>) JRoutineCore.io().buildChannel());
+            channel.pass(JRoutineCore.io().buildChannel());
             fail();
 
         } catch (final IllegalStateException ignored) {

@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.config;
 
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -209,6 +211,60 @@ public final class InvocationConfiguration extends DeepEqualObject {
             @Nullable final InvocationConfiguration initialConfiguration) {
         return (initialConfiguration == null) ? builder()
                 : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
+    }
+
+    /**
+     * Returns an invocation configuration builder initialized with the specified input
+     * configuration.
+     *
+     * @param initialConfiguration the initial configuration.
+     * @return the builder.
+     */
+    @NotNull
+    public static Builder<InvocationConfiguration> builderFromInput(
+            @Nullable final ChannelConfiguration initialConfiguration) {
+        final Builder<InvocationConfiguration> builder = builder();
+        if (initialConfiguration != null) {
+            builder.withRunner(initialConfiguration.getRunnerOrElse(null))
+                   .withInputBackoff(initialConfiguration.getBackoffOrElse(null))
+                   .withInputLimit(initialConfiguration.getLimitOrElse(DEFAULT))
+                   .withInputMaxSize(initialConfiguration.getMaxSizeOrElse(DEFAULT))
+                   .withInputOrder(initialConfiguration.getOrderTypeOrElse(null))
+                   .withLog(initialConfiguration.getLogOrElse(null))
+                   .withLogLevel(initialConfiguration.getLogLevelOrElse(null))
+                   .withOutputTimeout(initialConfiguration.getOutputTimeoutOrElse(null))
+                   .withOutputTimeoutAction(
+                           initialConfiguration.getOutputTimeoutActionOrElse(null));
+        }
+
+        return builder;
+    }
+
+    /**
+     * Returns an invocation configuration builder initialized with the specified output
+     * configuration.
+     *
+     * @param initialConfiguration the initial configuration.
+     * @return the builder.
+     */
+    @NotNull
+    public static Builder<InvocationConfiguration> builderFromOutput(
+            @Nullable final ChannelConfiguration initialConfiguration) {
+        final Builder<InvocationConfiguration> builder = builder();
+        if (initialConfiguration != null) {
+            builder.withRunner(initialConfiguration.getRunnerOrElse(null))
+                   .withOutputBackoff(initialConfiguration.getBackoffOrElse(null))
+                   .withOutputLimit(initialConfiguration.getLimitOrElse(DEFAULT))
+                   .withOutputMaxSize(initialConfiguration.getMaxSizeOrElse(DEFAULT))
+                   .withOutputOrder(initialConfiguration.getOrderTypeOrElse(null))
+                   .withLog(initialConfiguration.getLogOrElse(null))
+                   .withLogLevel(initialConfiguration.getLogLevelOrElse(null))
+                   .withOutputTimeout(initialConfiguration.getOutputTimeoutOrElse(null))
+                   .withOutputTimeoutAction(
+                           initialConfiguration.getOutputTimeoutActionOrElse(null));
+        }
+
+        return builder;
     }
 
     /**
@@ -415,6 +471,26 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Returns a channel configuration builder initialized with output related options converted
+     * from this configuration ones.
+     *
+     * @return the builder.
+     */
+    @NotNull
+    public ChannelConfiguration.Builder<ChannelConfiguration> inputConfigurationBuilder() {
+        return ChannelConfiguration.builder()
+                                   .withRunner(getRunnerOrElse(null))
+                                   .withBackoff(getInputBackoffOrElse(null))
+                                   .withLimit(getInputLimitOrElse(ChannelConfiguration.DEFAULT))
+                                   .withMaxSize(getInputMaxSizeOrElse(ChannelConfiguration.DEFAULT))
+                                   .withOrder(getInputOrderTypeOrElse(null))
+                                   .withLog(getLogOrElse(null))
+                                   .withLogLevel(getLogLevelOrElse(null))
+                                   .withOutputTimeout(getOutputTimeoutOrElse(null))
+                                   .withOutputTimeoutAction(getOutputTimeoutActionOrElse(null));
+    }
+
+    /**
      * Creates a new logger based on this configuration.
      *
      * @param context the context.
@@ -426,51 +502,24 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Enumeration defining how data are ordered inside a channel.
+     * Returns a channel configuration builder initialized with input related options converted from
+     * this configuration ones.
+     *
+     * @return the builder.
      */
-    public enum OrderType {
-
-        /**
-         * Order by call.
-         * <br>
-         * Data are passed to the invocation or the output consumer in the same order as they are
-         * passed to the channel, independently from the specific delay.
-         */
-        BY_CALL,
-        /**
-         * Order by delay.
-         * <br>
-         * Data are passed to the invocation or the output consumer based on their delay.
-         */
-        BY_DELAY
-    }
-
-    /**
-     * Enumeration indicating the type of action to be taken on output channel timeout.
-     */
-    public enum TimeoutActionType {
-
-        /**
-         * Fail with exception.
-         * <br>
-         * If no result is available after the specified timeout, the called method will throw an
-         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
-         */
-        FAIL,
-        /**
-         * Break execution.
-         * <br>
-         * If no result is available after the specified timeout, the called method will stop its
-         * execution and exit immediately.
-         */
-        BREAK,
-        /**
-         * Abort invocation.
-         * <br>
-         * If no result is available after the specified timeout, the invocation will be aborted and
-         * the method will immediately exit.
-         */
-        ABORT
+    @NotNull
+    public ChannelConfiguration.Builder<ChannelConfiguration> outputConfigurationBuilder() {
+        return ChannelConfiguration.builder()
+                                   .withRunner(getRunnerOrElse(null))
+                                   .withBackoff(getOutputBackoffOrElse(null))
+                                   .withLimit(getOutputLimitOrElse(ChannelConfiguration.DEFAULT))
+                                   .withMaxSize(
+                                           getOutputMaxSizeOrElse(ChannelConfiguration.DEFAULT))
+                                   .withOrder(getOutputOrderTypeOrElse(null))
+                                   .withLog(getLogOrElse(null))
+                                   .withLogLevel(getLogLevelOrElse(null))
+                                   .withOutputTimeout(getOutputTimeoutOrElse(null))
+                                   .withOutputTimeoutAction(getOutputTimeoutActionOrElse(null));
     }
 
     /**

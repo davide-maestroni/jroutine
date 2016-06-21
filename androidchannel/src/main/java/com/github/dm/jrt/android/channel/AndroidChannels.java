@@ -46,6 +46,8 @@ public class AndroidChannels extends Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param channels   the iterable of channels.
@@ -70,6 +72,8 @@ public class AndroidChannels extends Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -95,6 +99,8 @@ public class AndroidChannels extends Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -118,6 +124,8 @@ public class AndroidChannels extends Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -159,7 +167,9 @@ public class AndroidChannels extends Channels {
      * Each output will be passed along unchanged.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
-     * ones will be bound as a result of the creation.
+     * one will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.

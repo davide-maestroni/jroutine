@@ -49,7 +49,10 @@ public class SparseChannels extends AndroidChannels {
      * <br>
      * The selectable indexes will be the keys of the specified map.
      * <p>
-     * Note that the builder will successfully create only one channel instance.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the map of indexes and channels.
      * @param <IN>     the input data type.
@@ -72,6 +75,8 @@ public class SparseChannels extends AndroidChannels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the map of indexes and channels.
      * @param <OUT>    the output data type.
@@ -177,6 +182,8 @@ public class SparseChannels extends AndroidChannels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -207,6 +214,8 @@ public class SparseChannels extends AndroidChannels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param channel the selectable channel.
      * @param indexes the list of indexes.
@@ -235,6 +244,8 @@ public class SparseChannels extends AndroidChannels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.

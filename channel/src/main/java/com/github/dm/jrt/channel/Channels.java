@@ -49,6 +49,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -76,6 +78,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -270,6 +274,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -299,6 +305,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -457,6 +465,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -486,6 +496,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -518,6 +530,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -552,6 +566,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -582,6 +598,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -613,6 +631,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -648,6 +668,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -677,6 +699,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -706,6 +730,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -740,6 +766,8 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * one will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channels {@code A}, the final output will be:
      * <pre>
@@ -897,6 +925,8 @@ public class Channels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -936,6 +966,8 @@ public class Channels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -973,6 +1005,8 @@ public class Channels {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      * <p>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -1036,8 +1070,10 @@ public class Channels {
      * <br>
      * Each output will be passed along unchanged.
      * <p>
-     * Note that the builder will successfully create only one stream channel instance, and that the
-     * passed channel will be bound as a result of the creation.
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * one will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      * <p>
      * Given channel {@code A}, the final output will be:
      * <pre>

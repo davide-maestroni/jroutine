@@ -2133,12 +2133,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             switch (selectable.index) {
 
                 case INTEGER:
-                    SparseChannelsCompat.<Object, Integer>selectParcelableInput(result,
+                    LoaderStreamsCompat.<Object, Integer>selectParcelableInput(result,
                             INTEGER).buildChannels().pass(selectable.<Integer>data()).close();
                     break;
 
                 case STRING:
-                    SparseChannelsCompat.<Object, String>selectParcelableInput(result,
+                    LoaderStreamsCompat.<Object, String>selectParcelableInput(result,
                             STRING).buildChannels().pass(selectable.<String>data()).close();
                     break;
             }

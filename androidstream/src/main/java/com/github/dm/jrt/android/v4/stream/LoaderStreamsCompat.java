@@ -63,6 +63,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
@@ -83,6 +85,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -234,6 +238,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
@@ -256,6 +262,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -389,6 +397,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
@@ -412,6 +422,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -438,6 +450,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the iterable of channels.
@@ -467,6 +481,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -490,6 +506,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param channels   the iterable of channels.
@@ -514,6 +532,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -537,6 +557,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -558,6 +580,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -580,6 +604,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channels the map of indexes and channels.
      * @param <OUT>    the output data type.
@@ -657,7 +683,9 @@ public class LoaderStreamsCompat extends Streams {
      * consumer, thus effectively supporting binding of several output consumers.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * passed channel will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channel the channel instance.
      * @param <OUT>   the output data type.
@@ -846,6 +874,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -870,6 +900,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param channel the selectable channel.
      * @param indexes the list of indexes.
@@ -894,6 +926,8 @@ public class LoaderStreamsCompat extends Streams {
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -937,7 +971,9 @@ public class LoaderStreamsCompat extends Streams {
      * Each output will be passed along unchanged.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
-     * passed channels will be bound as a result of the creation.
+     * passed channel will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.

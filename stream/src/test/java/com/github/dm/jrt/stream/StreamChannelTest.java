@@ -488,6 +488,17 @@ public class StreamChannelTest {
                           })
                           .after(seconds(3))
                           .next()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.<String>streamOf()
+                          .sync()
+                          .collectInto(new Supplier<List<String>>() {
+
+                              public List<String> get() {
+
+                                  return new ArrayList<String>();
+                              }
+                          })
+                          .after(seconds(3))
+                          .next()).isEmpty();
     }
 
     @Test
@@ -575,6 +586,47 @@ public class StreamChannelTest {
                           })
                           .after(seconds(3))
                           .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>streamOf()
+                          .sync()
+                          .collect(new Supplier<StringBuilder>() {
+
+                              public StringBuilder get() {
+
+                                  return new StringBuilder();
+                              }
+                          }, new BiConsumer<StringBuilder, String>() {
+
+                              public void accept(final StringBuilder b, final String s) {
+
+                                  b.append(s);
+                              }
+                          })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .after(seconds(3))
+                          .all()).containsExactly("");
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .collect(new Supplier<List<Object>>() {
+
+                              public List<Object> get() {
+
+                                  return new ArrayList<Object>();
+                              }
+                          }, new BiConsumer<List<Object>, Object>() {
+
+                              public void accept(final List<Object> l, final Object o) {
+
+                                  l.add(o);
+                              }
+                          })
+                          .after(seconds(3))
+                          .next()).isEmpty();
     }
 
     @Test

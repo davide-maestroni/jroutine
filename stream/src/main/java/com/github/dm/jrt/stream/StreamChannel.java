@@ -933,6 +933,7 @@ public interface StreamChannel<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
+     * @param action the action to perform.
      * @return the new stream instance.
      */
     @NotNull

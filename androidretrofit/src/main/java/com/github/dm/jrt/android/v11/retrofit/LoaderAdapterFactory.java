@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.v11.retrofit;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.builder.AndroidBuilders;
@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamChannel;
 import com.github.dm.jrt.android.v11.stream.LoaderStreams;
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -175,7 +175,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      * @see AndroidBuilders#withAnnotations(LoaderConfiguration, Annotation...)
      */
     public static class Builder
-            implements ConfigurableBuilder<Builder>, LoaderConfigurableBuilder<Builder>,
+            implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder>,
             InvocationConfiguration.Configurable<Builder>,
             LoaderConfiguration.Configurable<Builder> {
 

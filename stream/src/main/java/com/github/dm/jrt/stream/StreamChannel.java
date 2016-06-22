@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
@@ -76,7 +76,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <OUT> the output data type.
  */
 public interface StreamChannel<IN, OUT>
-        extends Channel<IN, OUT>, ConfigurableBuilder<StreamChannel<IN, OUT>> {
+        extends Channel<IN, OUT>, InvocationConfigurable<StreamChannel<IN, OUT>> {
 
     /**
      * {@inheritDoc}

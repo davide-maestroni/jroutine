@@ -21,21 +21,20 @@ import com.github.dm.jrt.object.config.ObjectConfiguration.Builder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of object routines.
+ * Interface defining an object that can be configured through an object configuration.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the builder type.
  */
-public interface ObjectConfigurableBuilder<TYPE> {
+public interface ObjectConfigurable<TYPE> {
 
     /**
-     * Gets the object configuration builder related to the routine builder instance.
+     * Gets the object configuration builder related to the instance.
      * <br>
-     * The configuration options not supported by the routine builder implementation might be
-     * ignored.
+     * The configuration options not supported by the specific implementation might be ignored.
      * <p>
-     * Note that the configuration builder will be initialized with the current configuration.
+     * Note that the configuration builder must be initialized with the current configuration.
      *
      * @return the object configuration builder.
      */

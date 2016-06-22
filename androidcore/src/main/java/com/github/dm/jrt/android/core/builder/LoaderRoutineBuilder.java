@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public interface LoaderRoutineBuilder<IN, OUT>
-        extends RoutineBuilder<IN, OUT>, LoaderConfigurableBuilder<LoaderRoutineBuilder<IN, OUT>>,
+        extends RoutineBuilder<IN, OUT>, LoaderConfigurable<LoaderRoutineBuilder<IN, OUT>>,
         LoaderRoutine<IN, OUT> {
 
     /**

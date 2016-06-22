@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
-import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
+import com.github.dm.jrt.core.builder.ChannelConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
-public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderChannelBuilder>,
-        LoaderConfigurableBuilder<LoaderChannelBuilder> {
+public interface LoaderChannelBuilder extends ChannelConfigurable<LoaderChannelBuilder>,
+        LoaderConfigurable<LoaderChannelBuilder> {
 
     /**
      * Builds and returns a channel bound to the routine invocation.

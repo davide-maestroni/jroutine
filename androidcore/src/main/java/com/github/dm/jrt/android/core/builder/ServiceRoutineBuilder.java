@@ -39,8 +39,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface ServiceRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>,
-        ServiceConfigurableBuilder<ServiceRoutineBuilder<IN, OUT>> {
+public interface ServiceRoutineBuilder<IN, OUT>
+        extends RoutineBuilder<IN, OUT>, ServiceConfigurable<ServiceRoutineBuilder<IN, OUT>> {
 
     /**
      * {@inheritDoc}

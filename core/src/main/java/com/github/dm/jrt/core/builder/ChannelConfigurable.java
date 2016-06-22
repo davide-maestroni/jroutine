@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of routines backed by loaders.
+ * Interface defining an object that can be configured through a channel configuration.
  * <p>
- * Created by davide-maestroni on 05/01/2015.
+ * Created by davide-maestroni on 08/18/2015.
  *
  * @param <TYPE> the builder type.
  */
-public interface LoaderConfigurableBuilder<TYPE> {
+public interface ChannelConfigurable<TYPE> {
 
     /**
-     * Gets the loader configuration builder related to the routine builder instance.
+     * Gets the channel configuration builder related to the instance.
      * <br>
-     * The configuration options not supported by the routine builder implementation might be
-     * ignored.
+     * The configuration options not supported by the specific implementation might be ignored.
      * <p>
-     * Note that the configuration builder will be initialized with the current configuration.
+     * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the loader configuration builder.
+     * @return the channel configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> loaderConfiguration();
+    Builder<? extends TYPE> channelConfiguration();
 }

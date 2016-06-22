@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of service routines.
+ * Interface defining an object that can be configured through an invocation configuration.
  * <p>
- * Created by davide-maestroni on 05/01/2015.
+ * Created by davide-maestroni on 03/06/2015.
  *
- * @param <TYPE> the builder type.
+ * @param <TYPE> the object type.
  */
-public interface ServiceConfigurableBuilder<TYPE> {
+public interface InvocationConfigurable<TYPE> {
 
     /**
-     * Gets the service configuration builder related to the routine builder instance.
+     * Gets the invocation configuration builder related to the instance.
      * <br>
-     * The configuration options not supported by the routine builder implementation might be
-     * ignored.
+     * The configuration options not supported by the specific implementation might be ignored.
      * <p>
-     * Note that the configuration builder will be initialized with the current configuration.
+     * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the service configuration builder.
+     * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> serviceConfiguration();
+    Builder<? extends TYPE> invocationConfiguration();
 }

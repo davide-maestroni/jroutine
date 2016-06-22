@@ -25,14 +25,14 @@ import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Selectable transform function.
+ * Selectable lift function.
  * <p>
  * Created by davide-maestroni on 05/08/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableTransform<IN, OUT> implements
+class SelectableLift<IN, OUT> implements
         BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
                 Function<Channel<?, IN>, Channel<?, ParcelableSelectable<OUT>>>> {
 
@@ -43,7 +43,7 @@ class SelectableTransform<IN, OUT> implements
      *
      * @param index the selectable index.
      */
-    SelectableTransform(final int index) {
+    SelectableLift(final int index) {
         mIndex = index;
     }
 

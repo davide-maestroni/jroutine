@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.builder;
+package com.github.dm.jrt.android.core.builder;
 
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of routines.
+ * Interface defining an object that can be configured through a loader configuration.
  * <p>
- * Created by davide-maestroni on 03/06/2015.
+ * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the builder type.
  */
-public interface ConfigurableBuilder<TYPE> {
+public interface LoaderConfigurable<TYPE> {
 
     /**
-     * Gets the invocation configuration builder related to the routine builder instance.
+     * Gets the loader configuration builder related to the instance.
      * <br>
-     * The configuration options not supported by the routine builder implementation might be
-     * ignored.
+     * The configuration options not supported by the specific implementation might be ignored.
      * <p>
-     * Note that the configuration builder will be initialized with the current configuration.
+     * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the invocation configuration builder.
+     * @return the loader configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> invocationConfiguration();
+    Builder<? extends TYPE> loaderConfiguration();
 }

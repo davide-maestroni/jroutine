@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
-import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -209,8 +209,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      */
-    public static class Builder implements ServiceConfigurableBuilder<Builder>,
-            InvocationConfiguration.Configurable<Builder>,
+    public static class Builder
+            implements ServiceConfigurable<Builder>, InvocationConfiguration.Configurable<Builder>,
             ServiceConfiguration.Configurable<Builder> {
 
         private InvocationConfiguration mInvocationConfiguration =

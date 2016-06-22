@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
@@ -76,7 +76,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <OUT> the output data type.
  */
 public interface LoaderStreamChannel<IN, OUT>
-        extends StreamChannel<IN, OUT>, LoaderConfigurableBuilder<LoaderStreamChannel<IN, OUT>> {
+        extends StreamChannel<IN, OUT>, LoaderConfigurable<LoaderStreamChannel<IN, OUT>> {
 
     /**
      * {@inheritDoc}

@@ -767,7 +767,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> selectable(
             final int index) {
-        return liftConfig(new SelectableTransform<IN, OUT>(index));
+        return liftConfig(new SelectableLift<IN, OUT>(index));
     }
 
     @NotNull

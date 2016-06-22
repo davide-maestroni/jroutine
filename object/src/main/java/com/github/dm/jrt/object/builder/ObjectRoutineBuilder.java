@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -29,8 +29,8 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
-        ObjectConfigurableBuilder<ObjectRoutineBuilder> {
+public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRoutineBuilder>,
+        ObjectConfigurable<ObjectRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

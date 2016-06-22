@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.builder;
+package com.github.dm.jrt.android.core.builder;
 
-import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of channels.
+ * Interface defining an object that can be configured through a service configuration.
  * <p>
- * Created by davide-maestroni on 08/18/2015.
+ * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the builder type.
  */
-public interface ChannelConfigurableBuilder<TYPE> {
+public interface ServiceConfigurable<TYPE> {
 
     /**
-     * Gets the channel configuration builder related to the channel builder instance.
+     * Gets the service configuration builder related to the instance.
+     * <br>
+     * The configuration options not supported by the specific implementation might be ignored.
      * <p>
-     * Note that the configuration builder will be initialized with the current configuration.
+     * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the channel configuration builder.
+     * @return the service configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> channelConfiguration();
+    Builder<? extends TYPE> serviceConfiguration();
 }

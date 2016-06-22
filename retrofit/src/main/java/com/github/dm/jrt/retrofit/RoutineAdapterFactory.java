@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -85,7 +85,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      */
-    public static class Builder implements ConfigurableBuilder<Builder>, Configurable<Builder> {
+    public static class Builder implements InvocationConfigurable<Builder>, Configurable<Builder> {
 
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface ChannelBuilder extends ChannelConfigurableBuilder<ChannelBuilder> {
+public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
 
     /**
      * Builds and returns a channel instance.

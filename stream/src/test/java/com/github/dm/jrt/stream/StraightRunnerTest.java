@@ -29,13 +29,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Created by davide-maestroni on 06/11/2016.
  */
-public class ImmediateRunnerTest {
+public class StraightRunnerTest {
 
     @Test
     public void testRun() {
 
         final TestExecution testExecution = new TestExecution();
-        final ImmediateRunner runner = new ImmediateRunner();
+        final StraightRunner runner = new StraightRunner();
         runner.run(testExecution, 0, TimeUnit.MILLISECONDS);
         assertThat(testExecution.mIsRun).isTrue();
         testExecution.mIsRun = false;

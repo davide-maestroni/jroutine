@@ -151,11 +151,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         mHandler = ConstantConditions.notNull("abort handler", handler);
         mRunner = ConstantConditions.notNull("runner instance", runner);
         mResultOrder =
-                new LocalValue<OrderType>(configuration.getOrderTypeOrElse(
-                        ChannelConfiguration.OrderType.BY_DELAY));
+                new LocalValue<OrderType>(configuration.getOrderTypeOrElse(OrderType.BY_DELAY));
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
         mTimeoutActionType = new LocalValue<TimeoutActionType>(
-                configuration.getOutputTimeoutActionOrElse(ChannelConfiguration.TimeoutActionType.FAIL));
+                configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
         mOutputLimit = configuration.getLimitOrElse(Integer.MAX_VALUE);
         mOutputBackoff = configuration.getBackoffOrElse(Backoffs.zeroDelay());
         mMaxOutput = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
@@ -297,21 +296,21 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @NotNull
     public Channel<OUT, OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        mTimeoutActionType.set(ChannelConfiguration.TimeoutActionType.ABORT);
+        mTimeoutActionType.set(TimeoutActionType.ABORT);
         mTimeoutException.set(reason);
         return this;
     }
 
     @NotNull
     public Channel<OUT, OUT> eventuallyBreak() {
-        mTimeoutActionType.set(ChannelConfiguration.TimeoutActionType.BREAK);
+        mTimeoutActionType.set(TimeoutActionType.BREAK);
         mTimeoutException.set(null);
         return this;
     }
 
     @NotNull
     public Channel<OUT, OUT> eventuallyFail() {
-        mTimeoutActionType.set(ChannelConfiguration.TimeoutActionType.FAIL);
+        mTimeoutActionType.set(TimeoutActionType.FAIL);
         mTimeoutException.set(null);
         return this;
     }
@@ -570,12 +569,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             } catch (final NoSuchElementException ignored) {
                 mLogger.wrn("skipping output timeout: [%d %s] => [%s]", timeout, timeoutUnit,
                         timeoutAction);
-                if (timeoutAction == ChannelConfiguration.TimeoutActionType.FAIL) {
+                if (timeoutAction == TimeoutActionType.FAIL) {
                     throw new OutputTimeoutException(
                             "timeout while waiting for outputs [" + timeout + " " + timeoutUnit
                                     + "]");
 
-                } else if (timeoutAction == ChannelConfiguration.TimeoutActionType.ABORT) {
+                } else if (timeoutAction == TimeoutActionType.ABORT) {
                     final RoutineException abortException =
                             AbortException.wrapIfNeeded(timeoutException);
                     abortImmediately(abortException);
@@ -590,7 +589,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> sortedByCall() {
         synchronized (mMutex) {
-            mState.orderBy(ChannelConfiguration.OrderType.BY_CALL);
+            mState.orderBy(OrderType.BY_CALL);
         }
 
         return this;
@@ -599,7 +598,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> sortedByDelay() {
         synchronized (mMutex) {
-            mState.orderBy(ChannelConfiguration.OrderType.BY_DELAY);
+            mState.orderBy(OrderType.BY_DELAY);
         }
 
         return this;
@@ -871,13 +870,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             } else if (timeout == 0) {
                 logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit, timeoutAction);
-                if (timeoutAction == ChannelConfiguration.TimeoutActionType.FAIL) {
+                if (timeoutAction == TimeoutActionType.FAIL) {
                     throw new OutputTimeoutException(
                             "timeout while waiting to know if more outputs are coming [" + timeout
                                     + " " + timeUnit + "]");
 
                 } else {
-                    isAbort = (timeoutAction == ChannelConfiguration.TimeoutActionType.ABORT);
+                    isAbort = (timeoutAction == TimeoutActionType.ABORT);
                 }
 
             } else {
@@ -908,13 +907,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (isTimeout) {
                     logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == ChannelConfiguration.TimeoutActionType.FAIL) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
                                         + timeout + " " + timeUnit + "]");
 
                     } else {
-                        isAbort = (timeoutAction == ChannelConfiguration.TimeoutActionType.ABORT);
+                        isAbort = (timeoutAction == TimeoutActionType.ABORT);
                     }
                 }
             }
@@ -982,13 +981,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (outputQueue.isEmpty()) {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == ChannelConfiguration.TimeoutActionType.FAIL) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");
                     }
 
-                    isAbort = (timeoutAction == ChannelConfiguration.TimeoutActionType.ABORT);
+                    isAbort = (timeoutAction == TimeoutActionType.ABORT);
                 }
 
             } else {
@@ -1018,13 +1017,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 if (isTimeout) {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
-                    if (timeoutAction == ChannelConfiguration.TimeoutActionType.FAIL) {
+                    if (timeoutAction == TimeoutActionType.FAIL) {
                         throw new OutputTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + " " + timeUnit
                                         + "]");
                     }
 
-                    isAbort = (timeoutAction == ChannelConfiguration.TimeoutActionType.ABORT);
+                    isAbort = (timeoutAction == TimeoutActionType.ABORT);
                 }
             }
 
@@ -1231,7 +1230,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mDelay = delay.value;
             mDelayUnit = delay.unit;
             final OrderType order = (mOrderType = mResultOrder.get());
-            mQueue = (order == ChannelConfiguration.OrderType.BY_CALL) ? mOutputQueue.addNested() : mOutputQueue;
+            mQueue = (order == OrderType.BY_CALL) ? mOutputQueue.addNested() : mOutputQueue;
         }
 
         public void onComplete() {
@@ -1854,7 +1853,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             ++mPendingOutputCount;
             return new DelayedOutputExecution(
-                    (orderType != ChannelConfiguration.OrderType.BY_DELAY) ? queue.addNested() : queue, output);
+                    (orderType != OrderType.BY_DELAY) ? queue.addNested() : queue, output);
         }
 
         /**
@@ -1916,7 +1915,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
                             : mOutputQueue, list);
         }
 
@@ -1939,7 +1938,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             ++mPendingOutputCount;
             return new DelayedOutputExecution(
-                    (mResultOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
                             : mOutputQueue, output);
         }
 
@@ -1970,7 +1969,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mOutputQueue.addNested()
+                    (mResultOrder.get() != OrderType.BY_DELAY) ? mOutputQueue.addNested()
                             : mOutputQueue, list);
         }
 

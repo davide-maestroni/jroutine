@@ -1706,8 +1706,8 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
         assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
         Iterator<String> iterator = LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                                             .with(loaderFrom(getActivity()))
-                                                             .iterator();
+                                                       .with(loaderFrom(getActivity()))
+                                                       .iterator();
         assertThat(iterator.hasNext()).isTrue();
         assertThat(iterator.next()).isEqualTo("test1");
         try {
@@ -2956,20 +2956,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testSequential() {
-
-        assertThat(LoaderStreamsCompat.streamOf()
-                                      .immediate()
-                                      .thenGetMore(range(1, 1000))
-                                      .streamInvocationConfiguration()
-                                      .withInputMaxSize(1)
-                                      .withOutputMaxSize(1)
-                                      .apply()
-                                      .map(sqrt())
-                                      .map(LoaderStreamsCompat.<Double>averageDouble())
-                                      .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
     public void testSize() {
 
         final Channel<Object, Object> channel = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
@@ -3068,6 +3054,20 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .parallelBy(Functions.<String>identity(), loaderBuilder)
                                       .after(seconds(3))
                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
+    }
+
+    public void testStraight() {
+
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .straight()
+                                      .thenGetMore(range(1, 1000))
+                                      .streamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .apply()
+                                      .map(sqrt())
+                                      .map(LoaderStreamsCompat.<Double>averageDouble())
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     public void testThen() {

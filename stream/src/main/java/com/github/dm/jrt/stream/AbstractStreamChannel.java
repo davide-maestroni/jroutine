@@ -21,10 +21,10 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -89,7 +89,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     private static final LocalFence sNewChannelFence = new LocalFence();
 
-    private static final ImmediateRunner sSequentialRunner = new ImmediateRunner();
+    private static final StraightRunner sSequentialRunner = new StraightRunner();
 
     private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
@@ -499,11 +499,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> immediate() {
-        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
-    }
-
-    @NotNull
     public Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration() {
         return new Builder<StreamChannel<IN, OUT>>(this,
                 mStreamConfiguration.getCurrentConfiguration());
@@ -819,6 +814,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> skip(final int count) {
         return map(Operators.<OUT>skip(count));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> straight() {
+        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
     }
 
     @NotNull

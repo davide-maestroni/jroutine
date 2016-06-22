@@ -30,8 +30,8 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -452,12 +452,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> immediate() {
-        return (LoaderStreamChannel<IN, OUT>) super.immediate();
-    }
-
-    @NotNull
-    @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamChannel<IN, OUT>>
     invocationConfiguration() {
         return new InvocationConfiguration.Builder<LoaderStreamChannel<IN, OUT>>(
@@ -786,6 +780,12 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public LoaderStreamChannel<IN, OUT> skip(final int count) {
         return (LoaderStreamChannel<IN, OUT>) super.skip(count);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> straight() {
+        return (LoaderStreamChannel<IN, OUT>) super.straight();
     }
 
     @NotNull

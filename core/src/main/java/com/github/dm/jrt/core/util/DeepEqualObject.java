@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
+import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
+
 /**
  * Base abstract class providing a default implementation of {@code equals()}, {@code hashCode()}
  * and {@code toString()} based on the list of objects passed as the constructor arguments.
@@ -38,7 +40,7 @@ public abstract class DeepEqualObject {
      * @param args the constructor arguments.
      */
     protected DeepEqualObject(@Nullable final Object[] args) {
-        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+        mArgs = cloneArgs(args);
     }
 
     /**

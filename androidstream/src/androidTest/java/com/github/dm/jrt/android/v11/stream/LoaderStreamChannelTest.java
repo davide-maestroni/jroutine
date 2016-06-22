@@ -3129,24 +3129,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testSequential() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        assertThat(LoaderStreams.streamOf()
-                                .immediate()
-                                .thenGetMore(range(1, 1000))
-                                .streamInvocationConfiguration()
-                                .withInputMaxSize(1)
-                                .withOutputMaxSize(1)
-                                .apply()
-                                .map(sqrt())
-                                .map(LoaderStreams.<Double>averageDouble())
-                                .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
     public void testSize() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -3256,6 +3238,24 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .parallelBy(Functions.<String>identity(), loaderBuilder)
                                 .after(seconds(3))
                                 .all()).containsOnly("TEST1", "TEST2", "TEST3");
+    }
+
+    public void testStraight() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(LoaderStreams.streamOf()
+                                .straight()
+                                .thenGetMore(range(1, 1000))
+                                .streamInvocationConfiguration()
+                                .withInputMaxSize(1)
+                                .withOutputMaxSize(1)
+                                .apply()
+                                .map(sqrt())
+                                .map(LoaderStreams.<Double>averageDouble())
+                                .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     public void testThen() {

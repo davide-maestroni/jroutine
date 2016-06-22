@@ -22,9 +22,9 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -720,31 +720,6 @@ public interface StreamChannel<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> StreamChannel<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * Short for
-     * {@code async().streamInvocationConfiguration().withRunner(immediateRunner).apply()}.
-     * <br>
-     * This method is useful to set the stream runner so that each input is immediately passed
-     * through the whole chain as soon as it is fed to the stream.
-     * <p>
-     * On the contrary of the default synchronous runner, the set one makes so that each routine
-     * in the chain is passed any input as soon as it is produced by the previous one. Such behavior
-     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
-     * the latter approach is that all input data are accumulated before actually being processed by
-     * the next routine invocation.
-     * <p>
-     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
-     * the synchronous and sequential modes will behave as before.
-     *
-     * @return the new stream instance.
-     * @see #async()
-     * @see #parallel()
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> immediate();
 
     /**
      * Gets the invocation configuration builder related only to the next concatenated routine
@@ -1510,6 +1485,31 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> skip(int count);
+
+    /**
+     * Short for
+     * {@code async().streamInvocationConfiguration().withRunner(straightRunner).apply()}.
+     * <br>
+     * This method is useful to set the stream runner so that each input is immediately passed
+     * through the whole chain as soon as it is fed to the stream.
+     * <p>
+     * On the contrary of the default synchronous runner, the set one makes so that each routine
+     * in the chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data are accumulated before actually being processed by
+     * the next routine invocation.
+     * <p>
+     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
+     * the synchronous and sequential modes will behave as before.
+     *
+     * @return the new stream instance.
+     * @see #async()
+     * @see #parallel()
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    StreamChannel<IN, OUT> straight();
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

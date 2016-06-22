@@ -22,9 +22,8 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -120,7 +119,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
         mInputOrder = new LocalValue<OrderType>(
-                configuration.getInputOrderTypeOrElse(ChannelConfiguration.OrderType.BY_DELAY));
+                configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY));
         mInputLimit = configuration.getInputLimitOrElse(Integer.MAX_VALUE);
         mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.zeroDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
@@ -418,7 +417,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     @NotNull
     public Channel<IN, OUT> sortedByCall() {
         synchronized (mMutex) {
-            mState.orderBy(ChannelConfiguration.OrderType.BY_CALL);
+            mState.orderBy(OrderType.BY_CALL);
         }
 
         return this;
@@ -427,7 +426,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     @NotNull
     public Channel<IN, OUT> sortedByDelay() {
         synchronized (mMutex) {
-            mState.orderBy(ChannelConfiguration.OrderType.BY_DELAY);
+            mState.orderBy(OrderType.BY_DELAY);
         }
 
         return this;
@@ -861,7 +860,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mDelay = delay.value;
             mDelayUnit = delay.unit;
             final OrderType order = (mOrderType = mInputOrder.get());
-            mQueue = (order == ChannelConfiguration.OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
+            mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
             mChannel = channel;
         }
 
@@ -1196,7 +1195,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (orderType != ChannelConfiguration.OrderType.BY_DELAY) ? queue.addNested() : queue, input);
+                    (orderType != OrderType.BY_DELAY) ? queue.addNested() : queue, input);
         }
 
         /**
@@ -1279,7 +1278,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
                             : mInputQueue, list);
         }
 
@@ -1308,7 +1307,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (mInputOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
                             : mInputQueue, input);
         }
 
@@ -1345,7 +1344,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder.get() != ChannelConfiguration.OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
                             : mInputQueue, list);
         }
 

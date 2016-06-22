@@ -26,8 +26,8 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -434,17 +434,6 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Note that the runner configuration will be ignored if the stream is configured to run in
-     * an Android {@code Loader}.
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> immediate();
-
-    /**
-     * {@inheritDoc}
      */
     @NotNull
     @Override
@@ -828,6 +817,17 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> skip(int count);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the runner configuration will be ignored if the stream is configured to run in
+     * an Android {@code Loader}.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(CONFIG)
+    LoaderStreamChannel<IN, OUT> straight();
 
     /**
      * {@inheritDoc}

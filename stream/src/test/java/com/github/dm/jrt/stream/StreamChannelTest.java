@@ -488,17 +488,13 @@ public class StreamChannelTest {
                           })
                           .after(seconds(3))
                           .next()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.<String>streamOf()
-                          .sync()
-                          .collectInto(new Supplier<List<String>>() {
+        assertThat(Streams.<String>streamOf().sync().collectInto(new Supplier<List<String>>() {
 
-                              public List<String> get() {
+            public List<String> get() {
 
-                                  return new ArrayList<String>();
-                              }
-                          })
-                          .after(seconds(3))
-                          .next()).isEmpty();
+                return new ArrayList<String>();
+            }
+        }).after(seconds(3)).next()).isEmpty();
     }
 
     @Test
@@ -586,47 +582,38 @@ public class StreamChannelTest {
                           })
                           .after(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>streamOf()
-                          .sync()
-                          .collect(new Supplier<StringBuilder>() {
+        assertThat(Streams.<String>streamOf().sync().collect(new Supplier<StringBuilder>() {
 
-                              public StringBuilder get() {
+            public StringBuilder get() {
 
-                                  return new StringBuilder();
-                              }
-                          }, new BiConsumer<StringBuilder, String>() {
+                return new StringBuilder();
+            }
+        }, new BiConsumer<StringBuilder, String>() {
 
-                              public void accept(final StringBuilder b, final String s) {
+            public void accept(final StringBuilder b, final String s) {
 
-                                  b.append(s);
-                              }
-                          })
-                          .map(new Function<StringBuilder, String>() {
+                b.append(s);
+            }
+        }).map(new Function<StringBuilder, String>() {
 
-                              public String apply(final StringBuilder builder) {
+            public String apply(final StringBuilder builder) {
 
-                                  return builder.toString();
-                              }
-                          })
-                          .after(seconds(3))
-                          .all()).containsExactly("");
-        assertThat(Streams.streamOf()
-                          .sync()
-                          .collect(new Supplier<List<Object>>() {
+                return builder.toString();
+            }
+        }).after(seconds(3)).all()).containsExactly("");
+        assertThat(Streams.streamOf().sync().collect(new Supplier<List<Object>>() {
 
-                              public List<Object> get() {
+            public List<Object> get() {
 
-                                  return new ArrayList<Object>();
-                              }
-                          }, new BiConsumer<List<Object>, Object>() {
+                return new ArrayList<Object>();
+            }
+        }, new BiConsumer<List<Object>, Object>() {
 
-                              public void accept(final List<Object> l, final Object o) {
+            public void accept(final List<Object> l, final Object o) {
 
-                                  l.add(o);
-                              }
-                          })
-                          .after(seconds(3))
-                          .next()).isEmpty();
+                l.add(o);
+            }
+        }).after(seconds(3)).next()).isEmpty();
     }
 
     @Test
@@ -921,7 +908,6 @@ public class StreamChannelTest {
 
         } catch (final IllegalStateException ignored) {
         }
-
 
         try {
             stream.close();
@@ -2412,27 +2398,6 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testSequential() {
-
-        assertThat(Streams.streamOf()
-                          .immediate()
-                          .thenGetMore(range(1, 1000))
-                          .streamInvocationConfiguration()
-                          .withInputMaxSize(1)
-                          .withOutputMaxSize(1)
-                          .apply()
-                          .map(new Function<Number, Double>() {
-
-                              public Double apply(final Number number) {
-
-                                  return Math.sqrt(number.doubleValue());
-                              }
-                          })
-                          .map(Streams.averageDouble())
-                          .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
-    @Test
     public void testSize() {
 
         final Channel<Object, Object> channel =
@@ -2513,6 +2478,27 @@ public class StreamChannelTest {
                                   JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
                           .after(seconds(3))
                           .all()).containsOnly(1, 2, 3);
+    }
+
+    @Test
+    public void testStraight() {
+
+        assertThat(Streams.streamOf()
+                          .straight()
+                          .thenGetMore(range(1, 1000))
+                          .streamInvocationConfiguration()
+                          .withInputMaxSize(1)
+                          .withOutputMaxSize(1)
+                          .apply()
+                          .map(new Function<Number, Double>() {
+
+                              public Double apply(final Number number) {
+
+                                  return Math.sqrt(number.doubleValue());
+                              }
+                          })
+                          .map(Streams.averageDouble())
+                          .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test

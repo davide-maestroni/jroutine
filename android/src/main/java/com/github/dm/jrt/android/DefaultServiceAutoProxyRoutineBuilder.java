@@ -181,8 +181,8 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
     @NotNull
     private ServiceObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineServiceObject.with(mContext)
-                                    .on(mTarget)
+        return JRoutineServiceObject.on(mContext)
+                                    .with(mTarget)
                                     .invocationConfiguration()
                                     .with(mInvocationConfiguration)
                                     .apply()
@@ -196,8 +196,8 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
     @NotNull
     private ServiceProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineServiceProxy.with(mContext)
-                                   .on(mTarget)
+        return JRoutineServiceProxy.on(mContext)
+                                   .with(mTarget)
                                    .invocationConfiguration()
                                    .with(mInvocationConfiguration)
                                    .apply()

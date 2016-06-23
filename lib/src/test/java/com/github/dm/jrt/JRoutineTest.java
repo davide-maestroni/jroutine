@@ -69,7 +69,7 @@ public class JRoutineTest {
 
         final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(instance(test))
+        final Routine<Object, Object> routine = JRoutine.with(instance(test))
                                                         .invocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
@@ -87,7 +87,7 @@ public class JRoutineTest {
     public void testCallFunction() {
 
         final Routine<String, String> routine =
-                JRoutine.onCall(new Function<List<String>, String>() {
+                JRoutine.withCall(new Function<List<String>, String>() {
 
                     public String apply(final List<String> strings) {
 
@@ -122,9 +122,9 @@ public class JRoutineTest {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                JRoutine.on(factoryOf(execSum, this)).buildRoutine();
+                JRoutine.with(factoryOf(execSum, this)).buildRoutine();
         final Routine<Integer, Integer> squareRoutine =
-                JRoutine.on(functionMapping(new Function<Integer, Integer>() {
+                JRoutine.with(functionMapping(new Function<Integer, Integer>() {
 
                     public Integer apply(final Integer integer) {
 
@@ -150,7 +150,7 @@ public class JRoutineTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutine.on(classOfType(TestClass.class))
+        final TestStatic testStatic = JRoutine.with(classOfType(TestClass.class))
                                               .invocationConfiguration()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
@@ -171,7 +171,7 @@ public class JRoutineTest {
     @Test
     public void testCommandInvocation() {
 
-        final Routine<Void, String> routine = JRoutine.on(new GetString()).buildRoutine();
+        final Routine<Void, String> routine = JRoutine.with(new GetString()).buildRoutine();
         assertThat(routine.async().close().after(seconds(1)).all()).containsOnly("test");
     }
 
@@ -194,7 +194,7 @@ public class JRoutineTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutine.onCommandMore(new Consumer<Channel<String, ?>>() {
+                JRoutine.withCommandMore(new Consumer<Channel<String, ?>>() {
 
                     public void accept(final Channel<String, ?> result) {
 
@@ -208,7 +208,7 @@ public class JRoutineTest {
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutine.onCall(new BiConsumer<List<String>, Channel<String, ?>>() {
+                JRoutine.withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                     public void accept(final List<String> strings,
                             final Channel<String, ?> result) {
@@ -228,7 +228,7 @@ public class JRoutineTest {
     public void testConsumerMapping() {
 
         final Routine<Object, String> routine =
-                JRoutine.onMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
+                JRoutine.withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
 
                     public void accept(final Object o, final Channel<String, ?> result) {
 
@@ -241,7 +241,7 @@ public class JRoutineTest {
     @Test
     public void testFunctionMapping() {
 
-        final Routine<Object, String> routine = JRoutine.onMapping(new Function<Object, String>() {
+        final Routine<Object, String> routine = JRoutine.withMapping(new Function<Object, String>() {
 
             public String apply(final Object o) {
 
@@ -255,28 +255,28 @@ public class JRoutineTest {
     public void testInvocation() {
 
         final Routine<String, String> routine =
-                JRoutine.on((Invocation<String, String>) new ToCase()).buildRoutine();
+                JRoutine.with((Invocation<String, String>) new ToCase()).buildRoutine();
         assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationAndArgs() {
 
-        final Routine<String, String> routine = JRoutine.on(new ToCase(), true).buildRoutine();
+        final Routine<String, String> routine = JRoutine.with(new ToCase(), true).buildRoutine();
         assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
     public void testInvocationClass() {
 
-        final Routine<String, String> routine = JRoutine.on(ToCase.class).buildRoutine();
+        final Routine<String, String> routine = JRoutine.with(ToCase.class).buildRoutine();
         assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationClassAndArgs() {
 
-        final Routine<String, String> routine = JRoutine.on(ToCase.class, true).buildRoutine();
+        final Routine<String, String> routine = JRoutine.with(ToCase.class, true).buildRoutine();
         assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
@@ -284,14 +284,14 @@ public class JRoutineTest {
     public void testInvocationFactory() {
 
         final Routine<String, String> routine =
-                JRoutine.on((InvocationFactory<String, String>) new ToCase()).buildRoutine();
+                JRoutine.with((InvocationFactory<String, String>) new ToCase()).buildRoutine();
         assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationToken() {
 
-        final Routine<String, String> routine = JRoutine.on(tokenOf(ToCase.class)).buildRoutine();
+        final Routine<String, String> routine = JRoutine.with(tokenOf(ToCase.class)).buildRoutine();
         assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
@@ -299,14 +299,14 @@ public class JRoutineTest {
     public void testInvocationTokenAndArgs() {
 
         final Routine<String, String> routine =
-                JRoutine.on(tokenOf(ToCase.class), true).buildRoutine();
+                JRoutine.with(tokenOf(ToCase.class), true).buildRoutine();
         assertThat(routine.async("test").after(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
     public void testMappingInvocation() {
 
-        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
+        final Routine<String, String> routine = JRoutine.with(new ToCase()).buildRoutine();
         assertThat(routine.async("TEST").after(seconds(1)).all()).containsOnly("test");
     }
 
@@ -314,7 +314,7 @@ public class JRoutineTest {
     public void testObjectStaticMethod() {
 
         final TestClass test = new TestClass();
-        final TestStatic testStatic = JRoutine.on(instance(test))
+        final TestStatic testStatic = JRoutine.with(instance(test))
                                               .withType(BuilderType.OBJECT)
                                               .invocationConfiguration()
                                               .withRunner(Runners.poolRunner())
@@ -330,7 +330,7 @@ public class JRoutineTest {
     public void testObjectWrapAlias() {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(test)
+        final Routine<Object, Object> routine = JRoutine.with(test)
                                                         .invocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
@@ -344,7 +344,7 @@ public class JRoutineTest {
     public void testObjectWrapGeneratedProxy() {
 
         final TestClass test = new TestClass();
-        final TestStatic proxy = JRoutine.on(test)
+        final TestStatic proxy = JRoutine.with(test)
                                          .withType(BuilderType.PROXY)
                                          .invocationConfiguration()
                                          .withRunner(Runners.poolRunner())
@@ -359,7 +359,7 @@ public class JRoutineTest {
     public void testObjectWrapGeneratedProxyToken() {
 
         final TestClass test = new TestClass();
-        final TestStatic proxy = JRoutine.on(test)
+        final TestStatic proxy = JRoutine.with(test)
                                          .invocationConfiguration()
                                          .withRunner(Runners.poolRunner())
                                          .withLogLevel(Level.DEBUG)
@@ -373,7 +373,7 @@ public class JRoutineTest {
     public void testObjectWrapMethod() throws NoSuchMethodException {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(test)
+        final Routine<Object, Object> routine = JRoutine.with(test)
                                                         .objectConfiguration()
                                                         .withSharedFields()
                                                         .apply()
@@ -386,7 +386,7 @@ public class JRoutineTest {
     public void testObjectWrapMethodName() {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(test)
+        final Routine<Object, Object> routine = JRoutine.with(test)
                                                         .invocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
@@ -400,7 +400,7 @@ public class JRoutineTest {
     public void testObjectWrapProxy() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutine.on(test)
+        final TestItf proxy = JRoutine.with(test)
                                       .invocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
@@ -414,7 +414,7 @@ public class JRoutineTest {
     public void testObjectWrapProxyToken() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutine.on(test)
+        final TestItf proxy = JRoutine.with(test)
                                       .invocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
@@ -427,7 +427,7 @@ public class JRoutineTest {
     @Test
     public void testPendingInputs() {
 
-        final Channel<Object, Object> channel = JRoutine.on(IdentityInvocation.factoryOf()).async();
+        final Channel<Object, Object> channel = JRoutine.with(IdentityInvocation.factoryOf()).async();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
@@ -445,7 +445,7 @@ public class JRoutineTest {
     @Test
     public void testPredicateFilter() {
 
-        final Routine<String, String> routine = JRoutine.onFilter(new Predicate<String>() {
+        final Routine<String, String> routine = JRoutine.withFilter(new Predicate<String>() {
 
             public boolean test(final String s) {
 
@@ -459,7 +459,7 @@ public class JRoutineTest {
     public void testProxyConfiguration() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutine.on(test)
+        final TestItf proxy = JRoutine.with(test)
                                       .invocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
@@ -476,7 +476,7 @@ public class JRoutineTest {
     public void testProxyError() {
 
         try {
-            JRoutine.on(TestItf.class);
+            JRoutine.with(TestItf.class);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -487,7 +487,7 @@ public class JRoutineTest {
     @Test
     public void testSupplierCommand() {
 
-        final Routine<Void, String> routine = JRoutine.onCommand(new Supplier<String>() {
+        final Routine<Void, String> routine = JRoutine.withCommand(new Supplier<String>() {
 
             public String get() {
 
@@ -500,7 +500,7 @@ public class JRoutineTest {
     @Test
     public void testSupplierFactory() {
 
-        final Routine<String, String> routine = JRoutine.onFactory(new Supplier<ToCase>() {
+        final Routine<String, String> routine = JRoutine.withFactory(new Supplier<ToCase>() {
 
             public ToCase get() {
 

@@ -79,7 +79,7 @@ public class ProxyRoutineTest {
 
         final Pass pass = new Pass();
         final TestRunner runner = new TestRunner();
-        final PriorityPass priorityPass = JRoutineProxy.on(instance(pass))
+        final PriorityPass priorityPass = JRoutineProxy.with(instance(pass))
                                                        .invocationConfiguration()
                                                        .withRunner(runner)
                                                        .apply()
@@ -104,7 +104,7 @@ public class ProxyRoutineTest {
     public void testAnnotationGenerics() {
 
         final Size size = new Size();
-        final SizeItf proxy = JRoutineObject.on(instance(size)).buildProxy(SizeItf.class);
+        final SizeItf proxy = JRoutineObject.with(instance(size)).buildProxy(SizeItf.class);
         assertThat(proxy.getSize(Arrays.asList("test1", "test2", "test3")).after(seconds(3)).next())
                 .isEqualTo(3);
         assertThat(proxy.getSize()
@@ -117,7 +117,7 @@ public class ProxyRoutineTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutineProxy.on(classOfType(TestClass.class))
+        final TestStatic testStatic = JRoutineProxy.with(classOfType(TestClass.class))
                                                    .invocationConfiguration()
                                                    .withRunner(Runners.poolRunner())
                                                    .withLogLevel(Level.DEBUG)
@@ -157,7 +157,7 @@ public class ProxyRoutineTest {
     public void testGenericProxyCache() {
 
         final TestList<String> testList = new TestList<String>();
-        final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(testList))
+        final ProxyRoutineBuilder builder = JRoutineProxy.with(instance(testList))
                                                          .invocationConfiguration()
                                                          .withRunner(Runners.syncRunner())
                                                          .apply();
@@ -186,7 +186,7 @@ public class ProxyRoutineTest {
 
         final TestClass test = new TestClass();
         final ClassToken<TestInterfaceProxy> token = tokenOf(TestInterfaceProxy.class);
-        final TestInterfaceProxy testProxy = JRoutineProxy.on(instance(test)).buildProxy(token);
+        final TestInterfaceProxy testProxy = JRoutineProxy.with(instance(test)).buildProxy(token);
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
     }
@@ -199,7 +199,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(test)).buildProxy((Class<?>) null);
+            JRoutineProxy.with(instance(test)).buildProxy((Class<?>) null);
 
             fail();
 
@@ -209,7 +209,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(test)).buildProxy((ClassToken<?>) null);
+            JRoutineProxy.with(instance(test)).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -222,7 +222,7 @@ public class ProxyRoutineTest {
     public void testObjectStaticMethod() {
 
         final TestClass test = new TestClass();
-        final TestStatic testStatic = JRoutineProxy.on(instance(test))
+        final TestStatic testStatic = JRoutineProxy.with(instance(test))
                                                    .invocationConfiguration()
                                                    .withRunner(Runners.poolRunner())
                                                    .withLogLevel(Level.DEBUG)
@@ -240,7 +240,7 @@ public class ProxyRoutineTest {
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
-        final TestProxy testProxy = JRoutineProxy.on(instance(test))
+        final TestProxy testProxy = JRoutineProxy.with(instance(test))
                                                  .invocationConfiguration()
                                                  .withRunner(runner)
                                                  .withLogLevel(Level.DEBUG)
@@ -271,7 +271,7 @@ public class ProxyRoutineTest {
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
         final ProxyObjectBuilder<TestProxy> builder =
-                com.github.dm.jrt.proxy.Proxy_Test.on(instance(test));
+                com.github.dm.jrt.proxy.Proxy_Test.with(instance(test));
         final TestProxy testProxy =
                 builder.invocationConfiguration().with(configuration).apply().buildProxy();
 
@@ -288,7 +288,7 @@ public class ProxyRoutineTest {
 
         assertThat(testProxy.getString(JRoutineCore.io().of(3))).isEqualTo("3");
 
-        assertThat(JRoutineProxy.on(instance(test))
+        assertThat(JRoutineProxy.with(instance(test))
                                 .invocationConfiguration()
                                 .with(configuration)
                                 .apply()
@@ -303,13 +303,13 @@ public class ProxyRoutineTest {
         final TestClass test = new TestClass();
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
-        final TestProxy testProxy = JRoutineProxy.on(instance(test))
+        final TestProxy testProxy = JRoutineProxy.with(instance(test))
                                                  .invocationConfiguration()
                                                  .with(configuration)
                                                  .apply()
                                                  .buildProxy(tokenOf(TestProxy.class));
 
-        assertThat(JRoutineProxy.on(instance(test))
+        assertThat(JRoutineProxy.with(instance(test))
                                 .invocationConfiguration()
                                 .with(configuration)
                                 .apply()
@@ -323,7 +323,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(test)).buildProxy(TestClass.class);
+            JRoutineProxy.with(instance(test)).buildProxy(TestClass.class);
 
             fail();
 
@@ -333,7 +333,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(test)).buildProxy(tokenOf(TestClass.class));
+            JRoutineProxy.with(instance(test)).buildProxy(tokenOf(TestClass.class));
 
             fail();
 
@@ -346,7 +346,7 @@ public class ProxyRoutineTest {
     public void testSharedFields() {
 
         final TestClass2 test = new TestClass2();
-        final ProxyRoutineBuilder builder = JRoutineProxy.on(instance(test))
+        final ProxyRoutineBuilder builder = JRoutineProxy.with(instance(test))
                                                          .invocationConfiguration()
                                                          .withOutputTimeout(seconds(2))
                                                          .apply();
@@ -383,7 +383,7 @@ public class ProxyRoutineTest {
     public void testTemplates() {
 
         final Impl impl = new Impl();
-        final Itf itf = JRoutineProxy.on(instance(impl))
+        final Itf itf = JRoutineProxy.with(instance(impl))
                                      .invocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .apply()
@@ -599,7 +599,7 @@ public class ProxyRoutineTest {
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
         final TestTimeout testTimeout = new TestTimeout();
-        assertThat(JRoutineProxy.on(instance(testTimeout))
+        assertThat(JRoutineProxy.with(instance(testTimeout))
                                 .invocationConfiguration()
                                 .withOutputTimeout(seconds(1))
                                 .apply()
@@ -608,7 +608,7 @@ public class ProxyRoutineTest {
 
         try {
 
-            JRoutineProxy.on(instance(testTimeout))
+            JRoutineProxy.with(instance(testTimeout))
                          .invocationConfiguration()
                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                          .apply()

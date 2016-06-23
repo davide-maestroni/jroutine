@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Routine&lt;Input, Result&gt; routine =
- *                 JRoutineCore.on(myFactory)
+ *                 JRoutineCore.with(myFactory)
  *                             .invocationConfiguration()
  *                             .withLogLevel(Level.WARNING)
  *                             .apply()
@@ -94,7 +94,7 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutineCore.on(IdentityInvocation.&lt;Result&gt;factoryOf())
+ *                  JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
  *                              .buildRoutine();
  *         final Channel&lt;Result, Result&gt; channel = routine.async();
  *
@@ -145,7 +145,7 @@ public class JRoutineCore {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final InvocationFactory<IN, OUT> factory) {
         return new DefaultRoutineBuilder<IN, OUT>(factory);
     }

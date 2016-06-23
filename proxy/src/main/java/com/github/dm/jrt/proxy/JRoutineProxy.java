@@ -62,7 +62,7 @@ public class JRoutineProxy {
      *                                            interface.
      */
     @NotNull
-    public static ProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static ProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
         return new DefaultProxyRoutineBuilder(target);
     }
 }

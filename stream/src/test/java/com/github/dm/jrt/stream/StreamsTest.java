@@ -86,7 +86,7 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -194,9 +194,9 @@ public class StreamsTest {
     public void testCombine() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<Integer, Integer> channel2 =
-                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Streams.combine(channel1, channel2)
                .buildChannels()
                .pass(new Selectable<String>("test1", 0))
@@ -254,7 +254,7 @@ public class StreamsTest {
 
         final ChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -390,9 +390,9 @@ public class StreamsTest {
     public void testDistribute() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         Streams.distribute(channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
@@ -414,9 +414,9 @@ public class StreamsTest {
     public void testDistributePlaceholder() {
 
         final Channel<String, String> channel1 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         final Channel<String, String> channel2 =
-                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
         Streams.distribute((Object) null, channel1, channel2)
                .buildChannels()
                .pass(Arrays.asList("test1-1", "test1-2"))
@@ -454,14 +454,14 @@ public class StreamsTest {
                         });
                     }
                 });
-        assertThat(JRoutineCore.on(factory)
+        assertThat(JRoutineCore.with(factory)
                                .async("test1", "test2", "test3")
                                .after(seconds(3))
                                .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final Channel<String, String> channel = JRoutineCore.on(factory).async();
+            final Channel<String, String> channel = JRoutineCore.with(factory).async();
             channel.abort(new IllegalArgumentException());
             channel.close().after(seconds(3)).next();
 
@@ -471,7 +471,7 @@ public class StreamsTest {
 
         }
 
-        assertThat(Streams.onStream(
+        assertThat(Streams.withStream(
                 new Function<StreamChannel<String, String>, StreamChannel<String, String>>() {
 
                     public StreamChannel<String, String> apply(
@@ -490,7 +490,7 @@ public class StreamsTest {
 
         try {
 
-            final Channel<String, String> channel = Streams.onStream(
+            final Channel<String, String> channel = Streams.withStream(
                     new Function<StreamChannel<String, String>, StreamChannel<String, String>>() {
 
                         public StreamChannel<String, String> apply(
@@ -559,7 +559,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.onStream(null);
+            Streams.withStream(null);
 
             fail();
 
@@ -621,7 +621,7 @@ public class StreamsTest {
     public void testJoin() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutineCore.with(new CharAt()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -657,7 +657,7 @@ public class StreamsTest {
     public void testJoinAbort() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutineCore.with(new CharAt()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -742,7 +742,7 @@ public class StreamsTest {
     public void testJoinPlaceholder() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutineCore.with(new CharAt()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -786,7 +786,7 @@ public class StreamsTest {
     public void testJoinPlaceholderAbort() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutineCore.with(new CharAt()).buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = builder.buildChannel();
@@ -878,7 +878,7 @@ public class StreamsTest {
 
         final Channel<?, ? extends Selectable<Object>> channel =
                 Streams.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
-        final Channel<?, Selectable<Object>> output = JRoutineCore.on(new Sort())
+        final Channel<?, Selectable<Object>> output = JRoutineCore.with(new Sort())
                                                                   .invocationConfiguration()
                                                                   .withInputOrder(OrderType.BY_CALL)
                                                                   .apply()
@@ -968,7 +968,7 @@ public class StreamsTest {
         final Channel<String, String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
-                JRoutineCore.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
+                JRoutineCore.with(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
         final Channel<?, String> outputChannel = routine.async(
                 Streams.merge(Arrays.asList(channel1, channel2, channel3, channel4))
                        .buildChannels());
@@ -1714,7 +1714,7 @@ public class StreamsTest {
     public void testSelectMap() {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
-                JRoutineCore.on(new Sort()).buildRoutine();
+                JRoutineCore.with(new Sort()).buildRoutine();
         final Channel<Selectable<Object>, Selectable<Object>> inputChannel =
                 JRoutineCore.io().buildChannel();
         final Channel<?, Selectable<Object>> outputChannel = routine.async(inputChannel);
@@ -1751,7 +1751,7 @@ public class StreamsTest {
     public void testSelectMapAbort() {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
-                JRoutineCore.on(new Sort()).buildRoutine();
+                JRoutineCore.with(new Sort()).buildRoutine();
         Channel<Selectable<Object>, Selectable<Object>> inputChannel =
                 JRoutineCore.io().buildChannel();
         Channel<?, Selectable<Object>> outputChannel = routine.async(inputChannel);

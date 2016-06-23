@@ -37,14 +37,14 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.on(functionMapping(Integer::parseInt)).buildRoutine();
+                        JRoutineCore.with(functionMapping(Integer::parseInt)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.on(functionMapping(integer -> {
+                        JRoutineCore.with(functionMapping(integer -> {
                                 final int input = integer;
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(functionCall(integers -> {
+                        JRoutineCore.with(functionCall(integers -> {
                                 int sum = 0;
                                 for (final Integer integer : integers) {
                                     sum += integer;

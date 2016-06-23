@@ -300,7 +300,7 @@ public class LoaderStreamsCompat extends Streams {
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> contextFactory(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
-        return factoryFrom(onStream(function), wrap(function).hashCode(), InvocationMode.SYNC);
+        return factoryFrom(withStream(function), wrap(function).hashCode(), InvocationMode.SYNC);
     }
 
     /**
@@ -640,7 +640,7 @@ public class LoaderStreamsCompat extends Streams {
      *                                            static scope.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
         if (!wrap(function).hasStaticScope()) {
@@ -649,7 +649,7 @@ public class LoaderStreamsCompat extends Streams {
                                                                                      .getName());
         }
 
-        return Streams.onStream(function);
+        return Streams.withStream(function);
     }
 
     /**
@@ -671,11 +671,11 @@ public class LoaderStreamsCompat extends Streams {
      *                                            static scope.
      */
     @NotNull
-    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStreamWith(
+    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> withStreamOn(
             @NotNull final LoaderContextCompat context,
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
-        return JRoutineLoaderCompat.with(context).on(contextFactory(function));
+        return JRoutineLoaderCompat.on(context).with(contextFactory(function));
     }
 
     /**

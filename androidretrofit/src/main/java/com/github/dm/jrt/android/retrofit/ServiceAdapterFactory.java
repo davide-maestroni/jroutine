@@ -189,8 +189,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @NotNull
     private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
             @NotNull final InvocationConfiguration invocationConfiguration) {
-        return JRoutineService.with(ConstantConditions.notNull("service context", mServiceContext))
-                              .on(factoryOf(ServiceCallInvocation.class))
+        return JRoutineService.on(ConstantConditions.notNull("service context", mServiceContext))
+                              .with(factoryOf(ServiceCallInvocation.class))
                               .invocationConfiguration()
                               .with(invocationConfiguration)
                               .apply()
@@ -286,7 +286,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
          * @return this builder.
          */
         @NotNull
-        public Builder with(@Nullable final ServiceContext context) {
+        public Builder on(@Nullable final ServiceContext context) {
             mServiceContext = context;
             return this;
         }
@@ -403,7 +403,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @NotNull
         private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
-            return JRoutineCore.on(sInvocation)
+            return JRoutineCore.with(sInvocation)
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
                                .apply()

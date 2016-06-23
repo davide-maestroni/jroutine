@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         final LoaderAdapterFactoryCompat adapterFactory =
-                LoaderAdapterFactoryCompat.with(loaderFrom(this));
+                LoaderAdapterFactoryCompat.on(loaderFrom(this));
         final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(GsonConverterFactory.create())

@@ -140,7 +140,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                 Builders.withAnnotations(configuration, annotations);
         final MappingInvocation<Call<Object>, Object> factory =
                 getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-        return JRoutineCore.on(factory)
+        return JRoutineCore.with(factory)
                            .invocationConfiguration()
                            .with(invocationConfiguration)
                            .apply()

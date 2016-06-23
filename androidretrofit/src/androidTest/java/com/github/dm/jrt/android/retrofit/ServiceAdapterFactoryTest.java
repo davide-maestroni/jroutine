@@ -73,7 +73,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .apply()
@@ -101,7 +101,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -130,7 +130,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -159,7 +159,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -210,7 +210,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .apply()
@@ -231,7 +231,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -253,7 +253,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -275,7 +275,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -338,7 +338,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .serviceConfiguration()
                                              .withLogClass(NullLog.class)
@@ -370,7 +370,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -399,7 +399,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.builder()
-                                             .with(context)
+                                             .on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

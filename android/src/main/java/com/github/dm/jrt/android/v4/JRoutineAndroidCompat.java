@@ -67,8 +67,8 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity) {
-        return with(loaderFrom(activity));
+    public static LoaderBuilderCompat oni(@NotNull final FragmentActivity activity) {
+        return oni(loaderFrom(activity));
     }
 
     /**
@@ -79,9 +79,9 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity,
+    public static LoaderBuilderCompat oni(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
-        return with(loaderFrom(activity, context));
+        return oni(loaderFrom(activity, context));
     }
 
     /**
@@ -91,8 +91,8 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context) {
-        return with(serviceFrom(context));
+    public static ServiceBuilder oni(@NotNull final Context context) {
+        return oni(serviceFrom(context));
     }
 
     /**
@@ -103,9 +103,9 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context,
+    public static ServiceBuilder oni(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
-        return with(serviceFrom(context, serviceClass));
+        return oni(serviceFrom(context, serviceClass));
     }
 
     /**
@@ -116,9 +116,9 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context,
+    public static ServiceBuilder oni(@NotNull final Context context,
             @NotNull final Intent service) {
-        return with(serviceFrom(context, service));
+        return oni(serviceFrom(context, service));
     }
 
     /**
@@ -128,8 +128,8 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilderCompat with(@NotNull final Fragment fragment) {
-        return with(loaderFrom(fragment));
+    public static LoaderBuilderCompat oni(@NotNull final Fragment fragment) {
+        return oni(loaderFrom(fragment));
     }
 
     /**
@@ -140,9 +140,9 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilderCompat with(@NotNull final Fragment fragment,
+    public static LoaderBuilderCompat oni(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-        return with(loaderFrom(fragment, context));
+        return oni(loaderFrom(fragment, context));
     }
 
     /**
@@ -152,7 +152,7 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderBuilderCompat oni(@NotNull final LoaderContextCompat context) {
         return new LoaderBuilderCompat(context);
     }
 
@@ -163,7 +163,7 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder oni(@NotNull final ServiceContext context) {
         return new ServiceBuilder(context) {};
     }
 }

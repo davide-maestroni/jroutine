@@ -37,16 +37,16 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.on(functionMapping(Integer::parseInt)).buildRoutine();
+                        JRoutineCore.with(functionMapping(Integer::parseInt)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.on(functionMapping(integer -> {
+                        JRoutineCore.with(functionMapping(integer -> {
                                 final int input = integer;
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(Operators.&lt;Integer&gt;averageDouble())).buildRoutine();
+                        JRoutineCore.with(Operators.&lt;Integer&gt;averageDouble())).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
-                        JRoutineCore.on(functionMapping(Math::sqrt)).buildRoutine();
+                        JRoutineCore.with(functionMapping(Math::sqrt)).buildRoutine();
                 final Double rms = parseRoutine.parallel(args)
                                                .bind(squareRoutine.parallel())
                                                .close()

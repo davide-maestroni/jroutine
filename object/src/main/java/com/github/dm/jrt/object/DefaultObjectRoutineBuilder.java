@@ -184,7 +184,7 @@ class DefaultObjectRoutineBuilder
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(objectConfiguration, target, method, inputMode,
                                 outputMode);
-                routine = JRoutineCore.on(factory)
+                routine = JRoutineCore.with(factory)
                                       .invocationConfiguration()
                                       .with(invocationConfiguration)
                                       .apply()

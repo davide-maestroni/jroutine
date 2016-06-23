@@ -59,7 +59,7 @@ public class JRoutineServiceProxy {
      * @return the context builder.
      */
     @NotNull
-    public static ServiceProxyBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceProxyBuilder on(@NotNull final ServiceContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<ServiceContext, ServiceProxyBuilder> builders = sBuilders;
             ServiceProxyBuilder builder = builders.get(context);
@@ -104,7 +104,7 @@ public class JRoutineServiceProxy {
          * @return the routine builder instance.
          */
         @NotNull
-        public ServiceProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public ServiceProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultServiceProxyRoutineBuilder(mContext, target);
         }
     }

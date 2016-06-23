@@ -45,8 +45,8 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                JRoutineLoaderProxy.with(loaderFrom(this))
-                                   .on(instanceOf(BitmapLoader.class))
+                JRoutineLoaderProxy.on(loaderFrom(this))
+                                   .with(instanceOf(BitmapLoader.class))
                                    .buildProxy(BitmapLoaderItf.class)
                                    .loadFromUri(URI.create(IMAGE_URI))
                                    .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
@@ -116,8 +116,8 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                JRoutineLoaderProxy.with(loaderFrom(this, new MyContext(this)))
-                                   .on(instanceOf(BitmapLoader.class))
+                JRoutineLoaderProxy.on(loaderFrom(this, new MyContext(this)))
+                                   .with(instanceOf(BitmapLoader.class))
                                    .buildProxy(BitmapLoaderItf.class)
                                    .loadFromUri(URI.create(IMAGE_URI))
                                    .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
@@ -207,8 +207,8 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                LoaderProxy_MainActivity_BitmapLoaderItf.with(loaderFrom(this, new MyContext(this)))
-                                   .on(instanceOf(BitmapLoader.class))
+                LoaderProxy_MainActivity_BitmapLoaderItf.on(loaderFrom(this, new MyContext(this)))
+                                   .with(instanceOf(BitmapLoader.class))
                                    .buildProxy()
                                    .loadFromUri(URI.create(IMAGE_URI))
                                    .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {

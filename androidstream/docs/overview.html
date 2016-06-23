@@ -75,7 +75,7 @@
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 LoaderStreams.streamOf(IMAGE_URI)
-                             .with(loaderFrom(this))
+                             .on(loaderFrom(this))
                              .factoryId(11)
                              .map(loadUri())
                              .onError(showToast(this))

@@ -50,10 +50,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testClass() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                                .sync("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class, true)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
                                .sync("test")
                                .all()).containsExactly("TEST");
     }
@@ -82,7 +82,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
         final InvocationFactory<String, String> factory =
                 fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryFrom(factory)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
                                .sync("TEST")
                                .all()).containsExactly("test");
     }
@@ -100,11 +100,11 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     public void testTemplateInvocation() {
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(ContextTest.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                                .sync()
                                .close()
                                .getError()).isNull();
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(StreamContextTest.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(StreamContextTest.class)))
                                .sync()
                                .close()
                                .getError()).isNull();
@@ -112,10 +112,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testToken() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                                .sync("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
                                .sync("test")
                                .all()).containsExactly("TEST");
     }
@@ -142,10 +142,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testWrapper() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                                .sync("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
                                .sync("test")
                                .all()).containsExactly("TEST");
     }

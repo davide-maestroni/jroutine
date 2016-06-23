@@ -54,14 +54,14 @@ public class AccumulateConsumerInvocationTest {
     public void testFactory() {
 
         final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-        assertThat(JRoutineCore.on(consumerFactory(consumer)).sync(new ArrayList<String>() {{
+        assertThat(JRoutineCore.with(consumerFactory(consumer)).sync(new ArrayList<String>() {{
             add("test1");
         }}, new ArrayList<String>() {{
             add("test2");
         }}, new ArrayList<String>() {{
             add("test3");
         }}).next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
-        assertThat(JRoutineCore.on(consumerFactory(new Supplier<List<String>>() {
+        assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
 
             public List<String> get() {
 

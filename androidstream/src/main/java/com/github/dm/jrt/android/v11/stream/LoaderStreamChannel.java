@@ -1148,7 +1148,7 @@ public interface LoaderStreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> with(@Nullable LoaderContext context);
+    LoaderStreamChannel<IN, OUT> on(@Nullable LoaderContext context);
 
     /**
      * Interface defining a loader stream configuration.

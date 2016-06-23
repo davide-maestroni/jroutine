@@ -74,8 +74,8 @@ import java.util.WeakHashMap;
  *
  *             } else {
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutineLoader.with(loaderFrom(this))
- *                                       .on(factoryOf(LoadResource.class))
+ *                         JRoutineLoader.on(loaderFrom(this))
+ *                                       .with(factoryOf(LoadResource.class))
  *                                       .buildRoutine();
  *                 routine.async(RESOURCE_URI)
  *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -116,8 +116,8 @@ import java.util.WeakHashMap;
  *             &#64;Override
  *             public void onContext(&#64;Nonnull final Context context) {
  *                 super.onContext(context);
- *                 mRoutine = JRoutineService.with(serviceFrom(context))
- *                                           .on(factoryOf(LoadResourceUri.class))
+ *                 mRoutine = JRoutineService.on(serviceFrom(context))
+ *                                           .with(factoryOf(LoadResourceUri.class))
  *                                           .buildRoutine();
  *             }
  *
@@ -154,7 +154,7 @@ public class JRoutineLoader {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderBuilder on(@NotNull final LoaderContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContext, LoaderBuilder> builders = sBuilders;
             LoaderBuilder builder = builders.get(context);
@@ -205,7 +205,7 @@ public class JRoutineLoader {
          *                                            a static scope.
          */
         @NotNull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }
@@ -226,7 +226,7 @@ public class JRoutineLoader {
          * @return the channel builder instance.
          */
         @NotNull
-        public LoaderChannelBuilder onId(final int loaderId) {
+        public LoaderChannelBuilder withId(final int loaderId) {
             return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
                                                             .withLoaderId(loaderId)
                                                             .apply();

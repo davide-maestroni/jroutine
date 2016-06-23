@@ -44,7 +44,7 @@
 
             public static void main(final String[] args) {
 
-                final ObjectRoutineBuilder builder = JRoutineObject.on(classOfType(Main.class))
+                final ObjectRoutineBuilder builder = JRoutineObject.with(classOfType(Main.class))
                                                                    .objectConfiguration()
                                                                    .withSharedFields()
                                                                    .apply()
@@ -97,7 +97,7 @@
 
             public static void main(final String[] args) {
                 final Main main = new Main();
-                final AsyncMain proxy = JRoutineObject.on(instance(main))
+                final AsyncMain proxy = JRoutineObject.with(instance(main))
                                                       .objectConfiguration()
                                                       .withSharedFields()
                                                       .apply()

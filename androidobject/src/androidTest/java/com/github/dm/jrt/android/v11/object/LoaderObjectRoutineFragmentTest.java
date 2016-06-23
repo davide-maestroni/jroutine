@@ -101,8 +101,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                                    .on(instanceOf(TestClass.class))
+        final Routine<Object, Object> routine = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                                    .with(instanceOf(TestClass.class))
                                                                     .invocationConfiguration()
                                                                     .withRunner(
                                                                             Runners.poolRunner())
@@ -128,8 +128,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment))
-                                       .on(instanceOf(TestArgs.class, 17))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
+                                       .with(instanceOf(TestArgs.class, 17))
                                        .method("getId")
                                        .async()
                                        .close()
@@ -148,8 +148,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final SumItf sumAsync = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                    .on(instanceOf(Sum.class))
+        final SumItf sumAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                    .with(instanceOf(Sum.class))
                                                     .invocationConfiguration()
                                                     .withOutputTimeout(timeout)
                                                     .apply()
@@ -186,8 +186,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final CountItf countAsync = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                        .on(instanceOf(Count.class))
+        final CountItf countAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                        .with(instanceOf(Count.class))
                                                         .invocationConfiguration()
                                                         .withOutputTimeout(timeout)
                                                         .apply()
@@ -268,8 +268,8 @@ public class LoaderObjectRoutineFragmentTest
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .apply();
-        JRoutineLoaderObject.with(loaderFrom(fragment))
-                            .on(instanceOf(TestClass.class))
+        JRoutineLoaderObject.on(loaderFrom(fragment))
+                            .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
@@ -279,8 +279,8 @@ public class LoaderObjectRoutineFragmentTest
                             .method(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
-        JRoutineLoaderObject.with(loaderFrom(fragment))
-                            .on(instanceOf(Square.class))
+        JRoutineLoaderObject.on(loaderFrom(fragment))
+                            .with(instanceOf(Square.class))
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
@@ -303,8 +303,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment =
                 (TestFragment) activity.getFragmentManager().findFragmentById(R.id.test_fragment);
         final StringContext contextWrapper = new StringContext(activity);
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment, contextWrapper))
-                                       .on(instanceOf(String.class))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment, contextWrapper))
+                                       .with(instanceOf(String.class))
                                        .method("toString")
                                        .async()
                                        .close()
@@ -325,8 +325,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(DuplicateAnnotation.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(DuplicateAnnotation.class))
                                 .method(DuplicateAnnotation.GET);
 
             fail();
@@ -347,8 +347,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine3 = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                                     .on(instanceOf(
+        final Routine<Object, Object> routine3 = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                                     .with(instanceOf(
                                                                              TestClass.class))
                                                                      .method(TestClass.THROW);
 
@@ -379,7 +379,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoader.with(null).on(factoryOf(TestInvocation.class));
+            JRoutineLoader.on(null).with(factoryOf(TestInvocation.class));
 
             fail();
 
@@ -389,7 +389,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoader.with(loaderFrom(fragment)).on((ContextInvocationFactory<?, ?>) null);
+            JRoutineLoader.on(loaderFrom(fragment)).with((ContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -399,7 +399,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(null).on(classOfType(TestInvocation.class));
+            JRoutineLoaderObject.on(null).with(classOfType(TestInvocation.class));
 
             fail();
 
@@ -409,8 +409,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(null)
-                                .on(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
+            JRoutineLoaderObject.on(null)
+                                .with(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
 
             fail();
 
@@ -420,7 +420,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment)).on(classOfType((Class<?>) null));
+            JRoutineLoaderObject.on(loaderFrom(fragment)).with(classOfType((Class<?>) null));
 
             fail();
 
@@ -430,8 +430,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(null, Reflection.NO_ARGS));
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(null, Reflection.NO_ARGS));
 
             fail();
 
@@ -441,7 +441,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(null);
+            JRoutineLoaderObject.on(null);
 
             fail();
 
@@ -463,8 +463,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .buildProxy(TestClass.class);
 
             fail();
@@ -475,8 +475,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
@@ -499,8 +499,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(1, new int[0]);
 
@@ -512,8 +512,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(new String[0]);
 
@@ -525,8 +525,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(new int[0]);
 
@@ -538,8 +538,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(Collections.<Integer>emptyList());
 
@@ -553,8 +553,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(channel);
 
@@ -566,8 +566,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute(1, channel);
 
@@ -579,8 +579,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Sum.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Sum.class))
                                 .buildProxy(SumError.class)
                                 .compute("test", channel);
 
@@ -604,8 +604,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
                                 .apply()
@@ -620,8 +620,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
                                 .apply()
@@ -636,8 +636,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
                                 .apply()
@@ -664,8 +664,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Count.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Count.class))
                                 .buildProxy(CountError.class)
                                 .count(3);
 
@@ -677,8 +677,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Count.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Count.class))
                                 .buildProxy(CountError.class)
                                 .count1(3);
 
@@ -690,8 +690,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Count.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Count.class))
                                 .buildProxy(CountError.class)
                                 .countList(3);
 
@@ -703,8 +703,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(Count.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(Count.class))
                                 .buildProxy(CountError.class)
                                 .countList1(3);
 
@@ -726,8 +726,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine2 = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                                     .on(instanceOf(
+        final Routine<Object, Object> routine2 = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                                     .with(instanceOf(
                                                                              TestClass.class))
                                                                      .invocationConfiguration()
                                                                      .withRunner(
@@ -756,8 +756,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine1 = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                                     .on(instanceOf(
+        final Routine<Object, Object> routine1 = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                                     .with(instanceOf(
                                                                              TestClass.class))
                                                                      .invocationConfiguration()
                                                                      .withRunner(
@@ -781,8 +781,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .method("test");
 
             fail();
@@ -805,8 +805,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .method("test");
 
             fail();
@@ -830,7 +830,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment)).on(null);
+            JRoutineLoaderObject.on(loaderFrom(fragment)).with(null);
 
             fail();
 
@@ -840,7 +840,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment)).on(instanceOf(null));
+            JRoutineLoaderObject.on(loaderFrom(fragment)).with(instanceOf(null));
 
             fail();
 
@@ -863,8 +863,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .buildProxy((Class<?>) null);
 
             fail();
@@ -875,8 +875,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestClass.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestClass.class))
                                 .buildProxy((ClassToken<?>) null);
 
             fail();
@@ -897,8 +897,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Itf itf = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                            .on(instanceOf(Impl.class))
+        final Itf itf = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                            .with(instanceOf(Impl.class))
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
                                             .apply()
@@ -1121,8 +1121,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final SquareItf squareAsync = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                          .on(instanceOf(Square.class))
+        final SquareItf squareAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                          .with(instanceOf(Square.class))
                                                           .buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
@@ -1147,8 +1147,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderObjectRoutineBuilder builder = JRoutineLoaderObject.with(loaderFrom(fragment))
-                                                                       .on(instanceOf(
+        final LoaderObjectRoutineBuilder builder = JRoutineLoaderObject.on(loaderFrom(fragment))
+                                                                       .with(instanceOf(
                                                                                TestClass2.class))
                                                                        .invocationConfiguration()
                                                                        .withOutputTimeout(
@@ -1194,8 +1194,8 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment))
-                                       .on(instanceOf(TestTimeout.class))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
+                                       .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
                                        .apply()
@@ -1209,8 +1209,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestTimeout.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()
@@ -1228,8 +1228,8 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment))
-                                       .on(instanceOf(TestTimeout.class))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
+                                       .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
                                        .apply()
@@ -1243,8 +1243,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestTimeout.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()
@@ -1262,8 +1262,8 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment))
-                                       .on(instanceOf(TestTimeout.class))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
+                                       .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
                                        .apply()
@@ -1277,8 +1277,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestTimeout.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()
@@ -1296,8 +1296,8 @@ public class LoaderObjectRoutineFragmentTest
 
         }
 
-        assertThat(JRoutineLoaderObject.with(loaderFrom(fragment))
-                                       .on(instanceOf(TestTimeout.class))
+        assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
+                                       .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
                                        .apply()
@@ -1309,8 +1309,8 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with(loaderFrom(fragment))
-                                .on(instanceOf(TestTimeout.class))
+            JRoutineLoaderObject.on(loaderFrom(fragment))
+                                .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .apply()

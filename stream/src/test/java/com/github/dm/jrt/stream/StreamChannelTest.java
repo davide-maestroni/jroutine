@@ -1091,7 +1091,7 @@ public class StreamChannelTest {
     public void testFlatMapRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionMapping(new Function<Object, String>() {
+                JRoutineCore.with(functionMapping(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -1712,7 +1712,7 @@ public class StreamChannelTest {
     @Test
     public void testMapRoutine() {
 
-        final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
+        final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
                                                             .apply()
@@ -1737,7 +1737,7 @@ public class StreamChannelTest {
     @Test
     public void testMapRoutineBuilder() {
 
-        final RoutineBuilder<String, String> builder = JRoutineCore.on(new UpperCase());
+        final RoutineBuilder<String, String> builder = JRoutineCore.with(new UpperCase());
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
                           .map(builder)
@@ -2401,7 +2401,7 @@ public class StreamChannelTest {
     public void testSize() {
 
         final Channel<Object, Object> channel =
-                JRoutineCore.on(IdentityInvocation.factoryOf()).async();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).async();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
@@ -2469,13 +2469,13 @@ public class StreamChannelTest {
                           .all()).containsOnly(1L, 4L, 9L);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
-                          .parallel(2, JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
+                          .parallel(2, JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()))
                           .after(seconds(3))
                           .all()).containsOnly(1, 2, 3);
         assertThat(Streams.streamOf()
                           .thenGetMore(range(1, 3))
                           .parallelBy(Functions.<Integer>identity(),
-                                  JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()))
+                                  JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()))
                           .after(seconds(3))
                           .all()).containsOnly(1, 2, 3);
     }
@@ -2932,7 +2932,7 @@ public class StreamChannelTest {
                                                       public Channel<?, String> apply(
                                                               final Channel<?, String> channel) {
 
-                                                          return JRoutineCore.on(new UpperCase())
+                                                          return JRoutineCore.with(new UpperCase())
                                                                              .async(channel);
                                                       }
                                                   });
@@ -2954,7 +2954,7 @@ public class StreamChannelTest {
                                               public Channel<?, String> apply(
                                                       final Channel<?, String> channel) {
 
-                                                  return JRoutineCore.on(new UpperCase())
+                                                  return JRoutineCore.with(new UpperCase())
                                                                      .async(channel);
                                               }
                                           });

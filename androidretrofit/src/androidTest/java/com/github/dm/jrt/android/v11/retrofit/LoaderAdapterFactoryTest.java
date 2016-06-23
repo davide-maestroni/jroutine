@@ -84,7 +84,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context);
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -111,7 +111,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .loaderConfiguration()
                                             .withResultStaleTime(seconds(3))
@@ -143,7 +143,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory =  //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -172,7 +172,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory =  //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -206,7 +206,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                 : ServiceAdapterFactory.defaultFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -236,7 +236,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -282,7 +282,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
                                             .apply()
@@ -310,7 +310,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
@@ -339,7 +339,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
@@ -368,7 +368,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
@@ -402,7 +402,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                 : ServiceAdapterFactory.defaultFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
@@ -432,7 +432,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
@@ -476,7 +476,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context);
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -503,7 +503,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -532,7 +532,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -561,7 +561,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -595,7 +595,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                 : ServiceAdapterFactory.defaultFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -625,7 +625,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.builder()
-                                            .with(context)
+                                            .on(context)
                                             .delegateFactory(factory)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

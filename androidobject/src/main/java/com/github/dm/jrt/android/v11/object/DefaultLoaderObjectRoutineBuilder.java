@@ -151,7 +151,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.withAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(mLoaderConfiguration, targetMethod);
-        final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.with(mContext).on(factory);
+        final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.on(mContext).with(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .apply()
@@ -180,7 +180,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.withAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(mLoaderConfiguration, method);
-        final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.with(mContext).on(factory);
+        final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.on(mContext).with(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .apply()
@@ -261,7 +261,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.on(target)
+            mRoutine = JRoutineObject.with(target)
                                      .objectConfiguration()
                                      .with(mObjectConfiguration)
                                      .apply()
@@ -401,7 +401,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.on(target)
+            mRoutine = JRoutineObject.with(target)
                                      .objectConfiguration()
                                      .with(mObjectConfiguration)
                                      .apply()
@@ -607,7 +607,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     new ProxyInvocationFactory(targetMethod, objectConfiguration, target, inputMode,
                             outputMode);
             final LoaderRoutineBuilder<Object, Object> builder =
-                    JRoutineLoader.with(mContext).on(factory);
+                    JRoutineLoader.on(mContext).with(factory);
             final LoaderRoutine<Object, Object> routine = builder.invocationConfiguration()
                                                                  .with(invocationConfiguration)
                                                                  .apply()

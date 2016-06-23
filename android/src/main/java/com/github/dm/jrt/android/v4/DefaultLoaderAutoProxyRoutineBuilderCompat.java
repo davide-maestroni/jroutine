@@ -181,8 +181,8 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
 
     @NotNull
     private LoaderObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineLoaderObjectCompat.with(mContext)
-                                         .on(mTarget)
+        return JRoutineLoaderObjectCompat.on(mContext)
+                                         .with(mTarget)
                                          .invocationConfiguration()
                                          .with(mInvocationConfiguration)
                                          .apply()
@@ -196,8 +196,8 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
 
     @NotNull
     private LoaderProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineLoaderProxyCompat.with(mContext)
-                                        .on(mTarget)
+        return JRoutineLoaderProxyCompat.on(mContext)
+                                        .with(mTarget)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
                                         .apply()

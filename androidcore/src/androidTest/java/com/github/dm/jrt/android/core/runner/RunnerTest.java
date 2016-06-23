@@ -184,14 +184,14 @@ public class RunnerTest extends AndroidTestCase {
                 result.pass(new Handler());
             }
         };
-        final Channel<?, Handler> channel = JRoutineCore.on(factoryOf(invocation, this, null))
+        final Channel<?, Handler> channel = JRoutineCore.with(factoryOf(invocation, this, null))
                                                         .invocationConfiguration()
                                                         .withRunner(AndroidRunners.handlerRunner(
                                                                 new HandlerThread("test")))
                                                         .apply()
                                                         .async()
                                                         .close();
-        assertThat(JRoutineCore.on(new HandlerInvocationFactory())
+        assertThat(JRoutineCore.with(new HandlerInvocationFactory())
                                .async(channel)
                                .after(seconds(30))
                                .next()).isEqualTo(true);
@@ -208,14 +208,14 @@ public class RunnerTest extends AndroidTestCase {
                         result.pass(Looper.myLooper()).pass(AndroidRunners.myRunner());
                     }
                 };
-        final Channel<?, Object> channel = JRoutineCore.on(factoryOf(invocation, this))
+        final Channel<?, Object> channel = JRoutineCore.with(factoryOf(invocation, this))
                                                        .invocationConfiguration()
                                                        .withRunner(AndroidRunners.handlerRunner(
                                                                new HandlerThread("test")))
                                                        .apply()
                                                        .async()
                                                        .close();
-        assertThat(JRoutineCore.on(new LooperInvocationFactory())
+        assertThat(JRoutineCore.with(new LooperInvocationFactory())
                                .async(channel)
                                .after(seconds(30))
                                .next()).isEqualTo(true);

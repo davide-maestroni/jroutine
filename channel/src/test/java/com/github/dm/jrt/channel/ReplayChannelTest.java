@@ -463,7 +463,7 @@ public class ReplayChannelTest {
     public void testSize() {
 
         final Channel<Object, Object> channel =
-                JRoutineCore.on(IdentityInvocation.factoryOf()).async();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).async();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);

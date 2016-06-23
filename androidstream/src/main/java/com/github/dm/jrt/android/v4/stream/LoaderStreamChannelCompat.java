@@ -1160,7 +1160,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
      */
     @NotNull
     @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> with(@Nullable LoaderContextCompat context);
+    LoaderStreamChannelCompat<IN, OUT> on(@Nullable LoaderContextCompat context);
 
     /**
      * Interface defining a loader stream configuration.

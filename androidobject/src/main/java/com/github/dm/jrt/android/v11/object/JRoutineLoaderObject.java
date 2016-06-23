@@ -95,7 +95,7 @@ public class JRoutineLoaderObject {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderObjectBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderObjectBuilder on(@NotNull final LoaderContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContext, LoaderObjectBuilder> builders = sBuilders;
             LoaderObjectBuilder builder = builders.get(context);
@@ -144,7 +144,7 @@ public class JRoutineLoaderObject {
          * @return the routine builder instance.
          */
         @NotNull
-        public LoaderObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public LoaderObjectRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }
     }

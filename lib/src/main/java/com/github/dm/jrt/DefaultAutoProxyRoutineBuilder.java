@@ -151,7 +151,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     private ObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineObject.on(mTarget)
+        return JRoutineObject.with(mTarget)
                              .invocationConfiguration()
                              .with(mInvocationConfiguration)
                              .apply()
@@ -162,7 +162,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     private ProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineProxy.on(mTarget)
+        return JRoutineProxy.with(mTarget)
                             .invocationConfiguration()
                             .with(mInvocationConfiguration)
                             .apply()

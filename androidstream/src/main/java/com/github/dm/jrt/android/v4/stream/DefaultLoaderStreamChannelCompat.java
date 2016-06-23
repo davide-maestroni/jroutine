@@ -942,7 +942,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                 (LoaderStreamConfigurationCompat) streamConfiguration;
         final LoaderContextCompat loaderContext = loaderStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
-            return JRoutineCore.on(factory)
+            return JRoutineCore.with(factory)
                                .invocationConfiguration()
                                .with(loaderStreamConfiguration.asInvocationConfiguration())
                                .apply()
@@ -950,10 +950,10 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
 
         final ContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
-                factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
+                factoryFrom(JRoutineCore.with(factory).buildRoutine(), factory.hashCode(),
                         InvocationMode.SYNC);
-        return JRoutineLoaderCompat.with(loaderContext)
-                                   .on(invocationFactory)
+        return JRoutineLoaderCompat.on(loaderContext)
+                                   .with(invocationFactory)
                                    .invocationConfiguration()
                                    .with(loaderStreamConfiguration.asInvocationConfiguration())
                                    .apply()
@@ -999,7 +999,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             throw new IllegalStateException("the loader context is null");
         }
 
-        return map(JRoutineLoaderCompat.with(loaderContext).on(factory));
+        return map(JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
@@ -1020,7 +1020,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
 
         checkStatic("factory", factory);
-        return parallel(count, JRoutineLoaderCompat.with(loaderContext).on(factory));
+        return parallel(count, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
@@ -1043,7 +1043,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return parallelBy(keyFunction, JRoutineLoaderCompat.with(loaderContext).on(factory));
+        return parallelBy(keyFunction, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
@@ -1078,7 +1078,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> with(@Nullable final LoaderContextCompat context) {
+    public LoaderStreamChannelCompat<IN, OUT> on(@Nullable final LoaderContextCompat context) {
         return (LoaderStreamChannelCompat<IN, OUT>) newChannel(newConfiguration(context));
     }
 

@@ -100,7 +100,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
      * @return the factory instance.
      */
     @NotNull
-    public static LoaderAdapterFactoryCompat with(@Nullable final LoaderContextCompat context) {
+    public static LoaderAdapterFactoryCompat on(@Nullable final LoaderContextCompat context) {
         return (context == null) ? sFactory : new LoaderAdapterFactoryCompat(context, null,
                 InvocationConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
@@ -122,8 +122,8 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
                     AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
             final ContextInvocationFactory<Call<Object>, Object> factory =
                     getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-            return JRoutineLoaderCompat.with(loaderContext)
-                                       .on(factory)
+            return JRoutineLoaderCompat.on(loaderContext)
+                                       .with(factory)
                                        .invocationConfiguration()
                                        .with(invocationConfiguration)
                                        .apply()
@@ -268,7 +268,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
          * @return this builder.
          */
         @NotNull
-        public Builder with(@Nullable final LoaderContextCompat context) {
+        public Builder on(@Nullable final LoaderContextCompat context) {
             mLoaderContext = context;
             return this;
         }
@@ -307,10 +307,10 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
             final LoaderStreamChannelCompat<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                stream = LoaderStreamsCompat.streamOf(comparableCall).with(mContext).async();
+                stream = LoaderStreamsCompat.streamOf(comparableCall).on(mContext).async();
 
             } else {
-                stream = LoaderStreamsCompat.streamOf(comparableCall).with(mContext).sync();
+                stream = LoaderStreamsCompat.streamOf(comparableCall).on(mContext).sync();
             }
 
             return stream.map(getRoutine()).invocationMode(invocationMode);

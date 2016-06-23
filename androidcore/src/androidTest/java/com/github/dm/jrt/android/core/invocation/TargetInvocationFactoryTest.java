@@ -84,8 +84,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorAbort() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
         assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
         routine.clear();
@@ -94,8 +94,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorAbort2() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation2.class))
+                JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
         routine.clear();
@@ -104,8 +104,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorLifecycle() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
@@ -114,8 +114,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorLifecycle2() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation2.class))
+                JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
@@ -123,25 +123,25 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
     public void testInvocationFactory() {
 
-        Routine<String, String> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                         .on(factoryOf(
+        Routine<String, String> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                         .with(factoryOf(
                                                                  PassingStringInvocation.class))
                                                          .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(PassingStringInvocation.class, 3))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(PassingStringInvocation.class, 3))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
                 "test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(tokenOf(PassingStringInvocation.class)))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(tokenOf(PassingStringInvocation.class)))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(tokenOf(PassingStringInvocation.class), 3))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(tokenOf(PassingStringInvocation.class), 3))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
                 "test");
@@ -150,25 +150,25 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
     public void testInvocationFactory2() {
 
-        Routine<String, String> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                         .on(factoryOf(
+        Routine<String, String> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                         .with(factoryOf(
                                                                  PassingStringInvocation2.class))
                                                          .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(PassingStringInvocation2.class, 3))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(PassingStringInvocation2.class, 3))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
                 "test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(tokenOf(PassingStringInvocation2.class)))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(tokenOf(PassingStringInvocation2.class)))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
-        routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryOf(tokenOf(PassingStringInvocation2.class), 3))
+        routine = JRoutineService.on(serviceFrom(getActivity()))
+                                 .with(factoryOf(tokenOf(PassingStringInvocation2.class), 3))
                                  .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test", "test",
                 "test");
@@ -308,8 +308,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testRemoteInvocationDecoratorAbort() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
         assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
         routine.clear();
@@ -318,8 +318,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testRemoteInvocationDecoratorAbort2() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation2.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.async().after(millis(100)).pass("test").close().abort()).isTrue();
         routine.clear();
@@ -328,8 +328,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testRemoteInvocationDecoratorLifecycle() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();
@@ -338,8 +338,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testRemoteInvocationDecoratorLifecycle2() {
 
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryOf(PassingStringInvocation2.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.async("test").after(seconds(10)).all()).containsExactly("test");
         routine.clear();

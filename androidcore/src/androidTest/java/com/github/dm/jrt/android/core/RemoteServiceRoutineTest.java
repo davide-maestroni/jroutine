@@ -75,8 +75,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final UnitDuration timeout = seconds(10);
         final Data data = new Data();
         final Channel<?, Data> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(Delay.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(Delay.class))
                                .serviceConfiguration()
                                .withRunnerClass(MainRunner.class)
                                .apply()
@@ -96,8 +96,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(factoryOf(Abort.class))
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(factoryOf(Abort.class))
                            .async()
                            .close()
                            .after(timeout)
@@ -120,7 +120,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(context).on(factoryOf(classToken));
+            JRoutineService.on(context).with(factoryOf(classToken));
 
             fail();
 
@@ -130,8 +130,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(null);
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(null);
 
             fail();
 
@@ -141,8 +141,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(factoryOf((ClassToken<StringPassingInvocation>) null));
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(factoryOf((ClassToken<StringPassingInvocation>) null));
 
             fail();
 
@@ -188,8 +188,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(new PassingWrapper<String>());
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
@@ -205,8 +205,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testExecutionTimeout() {
 
         final Channel<?, String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.BREAK)
@@ -219,8 +219,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testExecutionTimeout2() {
 
         final Channel<?, String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.ABORT)
@@ -243,8 +243,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testExecutionTimeout3() {
 
         final Channel<?, String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
@@ -270,8 +270,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringPassingInvocation.class);
         final Routine<String, String> routine1 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
@@ -293,8 +293,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final UnitDuration timeout = seconds(10);
         final ClassToken<StringCallInvocation> token = tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(token))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(token))
                                .invocationConfiguration()
                                .withOutputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
@@ -317,8 +317,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine3 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withOutputOrder(OrderType.BY_CALL)
@@ -338,8 +338,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine4 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
@@ -359,8 +359,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<Void, String> targetFactory =
                 factoryOf(TextCommandInvocation.class);
         final Routine<Void, String> routine4 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
@@ -378,8 +378,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final UnitDuration timeout = seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
-        assertThat(JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                                  .on(factoryOf(MyParcelableInvocation.class))
+        assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                  .with(factoryOf(MyParcelableInvocation.class))
                                   .async(p)
                                   .after(timeout)
                                   .next()).isEqualTo(p);
@@ -389,8 +389,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final UnitDuration timeout = seconds(10);
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                               .on(factoryOf(StringPassingInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                               .with(factoryOf(StringPassingInvocation.class))
                                .buildRoutine();
         assertThat(routine.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
@@ -403,8 +403,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testSize() {
 
         final Channel<String, String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                               .on(factoryOf(StringPassingInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                               .with(factoryOf(StringPassingInvocation.class))
                                .async();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
@@ -418,8 +418,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testTransform() {
 
-        assertThat(JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                                  .on(factoryOf(TestTransform.class))
+        assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                                  .with(factoryOf(TestTransform.class))
                                   .async("test1", "test2", "test3")
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST1", "TEST2", "TEST3");
@@ -636,7 +636,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         @Override
         protected Channel<?, String> onChannel(@NotNull final Channel<?, String> channel) {
 
-            return JRoutineCore.on(new UpperCaseInvocation()).async(channel);
+            return JRoutineCore.with(new UpperCaseInvocation()).async(channel);
         }
     }
 

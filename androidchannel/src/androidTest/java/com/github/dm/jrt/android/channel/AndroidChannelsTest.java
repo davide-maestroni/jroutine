@@ -61,12 +61,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testCombine() {
 
-        final Channel<String, String> channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
-        final Channel<Integer, Integer> channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                  .on(factoryOf(
+        final Channel<Integer, Integer> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
                                                                           PassingInteger.class))
                                                                   .async()
                                                                   .sortedByCall();
@@ -107,12 +107,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingInteger.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingInteger.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.combine(channel1, channel2).buildChannels().abort();
@@ -137,12 +137,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingInteger.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingInteger.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.combine(3, channel1, channel2).buildChannels().abort();
@@ -167,12 +167,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingInteger.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingInteger.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
@@ -199,12 +199,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingInteger.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingInteger.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
@@ -231,12 +231,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingInteger.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingInteger.class))
                                   .async()
                                   .sortedByCall();
         final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
@@ -334,12 +334,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testDistribute() {
 
-        final Channel<String, String> channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
-        final Channel<String, String> channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute(channel1, channel2)
@@ -363,12 +363,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         Channel<String, String> channel1;
         Channel<String, String> channel2;
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.distribute(channel1, channel2).buildChannels().abort();
@@ -393,12 +393,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2))
@@ -428,8 +428,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testDistributeError() {
 
-        final Channel<String, String> channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute(channel1)
@@ -470,12 +470,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testDistributePlaceholder() {
 
-        final Channel<String, String> channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
-        final Channel<String, String> channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute((Object) null, channel1, channel2)
@@ -502,12 +502,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         Channel<String, String> channel1;
         Channel<String, String> channel2;
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.distribute((Object) null, channel1, channel2).buildChannels().abort();
@@ -532,12 +532,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         }
 
-        channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
-        channel2 = JRoutineService.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(PassingString.class))
+        channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                  .with(factoryOf(PassingString.class))
                                   .async()
                                   .sortedByCall();
         AndroidChannels.distribute(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
@@ -567,8 +567,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testDistributePlaceholderError() {
 
-        final Channel<String, String> channel1 = JRoutineService.with(serviceFrom(getActivity()))
-                                                                .on(factoryOf(PassingString.class))
+        final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute((Object) null, channel1)
@@ -679,8 +679,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testJoin() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                                   .on(factoryOf(CharAt.class))
+        final Routine<List<?>, Character> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                                   .with(factoryOf(CharAt.class))
                                                                    .buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
@@ -716,8 +716,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testJoinAbort() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                                   .on(factoryOf(CharAt.class))
+        final Routine<List<?>, Character> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                                   .with(factoryOf(CharAt.class))
                                                                    .buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
@@ -781,8 +781,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testJoinPlaceholder() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                                   .on(factoryOf(CharAt.class))
+        final Routine<List<?>, Character> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                                   .with(factoryOf(CharAt.class))
                                                                    .buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
@@ -828,8 +828,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testJoinPlaceholderAbort() {
 
         final ChannelBuilder builder = JRoutineCore.io();
-        final Routine<List<?>, Character> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                                   .on(factoryOf(CharAt.class))
+        final Routine<List<?>, Character> routine = JRoutineService.on(serviceFrom(getActivity()))
+                                                                   .with(factoryOf(CharAt.class))
                                                                    .buildRoutine();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
@@ -903,8 +903,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                 AndroidChannels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                .buildChannels();
         final Channel<?, ParcelableSelectable<Object>> output =
-                JRoutineService.with(serviceFrom(getActivity()))
-                               .on(factoryOf(Sort.class))
+                JRoutineService.on(serviceFrom(getActivity()))
+                               .with(factoryOf(Sort.class))
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .apply()
@@ -982,7 +982,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final Channel<String, String> channel4 = builder.buildChannel();
 
         final Routine<ParcelableSelectable<String>, String> routine =
-                JRoutineCore.on(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
+                JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                             .buildRoutine();
         final Channel<?, String> outputChannel = routine.async(
                 AndroidChannels.merge(Arrays.asList(channel1, channel2, channel3, channel4))
@@ -1126,8 +1126,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testOutputMap() {
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineService.with(serviceFrom(getActivity()))
-                               .on(factoryOf(Sort.class))
+                JRoutineService.on(serviceFrom(getActivity()))
+                               .with(factoryOf(Sort.class))
                                .buildRoutine();
         Map<Integer, Channel<?, Object>> channelMap;
         Channel<?, ParcelableSelectable<Object>> channel;
@@ -1155,8 +1155,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testOutputMapAbort() {
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineService.with(serviceFrom(getActivity()))
-                               .on(factoryOf(Sort.class))
+                JRoutineService.on(serviceFrom(getActivity()))
+                               .with(factoryOf(Sort.class))
                                .buildRoutine();
         Map<Integer, Channel<?, Object>> channelMap;
         Channel<?, ParcelableSelectable<Object>> channel;
@@ -1248,8 +1248,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testOutputMapCache() {
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineService.with(serviceFrom(getActivity()))
-                               .on(factoryOf(Sort.class))
+                JRoutineService.on(serviceFrom(getActivity()))
+                               .with(factoryOf(Sort.class))
                                .buildRoutine();
         final Channel<?, ParcelableSelectable<Object>> channel = routine.async();
         final Map<Integer, Channel<?, Object>> channelMap =
@@ -1263,8 +1263,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.selectOutput(0, 0, JRoutineService.with(serviceFrom(getActivity()))
-                                                              .on(factoryOf(Sort.class))
+            AndroidChannels.selectOutput(0, 0, JRoutineService.on(serviceFrom(getActivity()))
+                                                              .with(factoryOf(Sort.class))
                                                               .async());
 
             fail();

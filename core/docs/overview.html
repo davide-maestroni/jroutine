@@ -35,11 +35,11 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.on(factoryOf(Parse.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(Parse.class)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.on(factoryOf(Square.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(Square.class)).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(factoryOf(SquareRootMean.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.async(squareRoutine.parallel(parseRoutine.parallel(args)))
                                    .after(seconds(3))
@@ -113,10 +113,10 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final Routine&lt;String, Integer&gt; parseRoutine = JRoutineCore.on(new Parse()).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.on(new Square()).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine = JRoutineCore.with(new Parse()).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.with(new Square()).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(new SquareRootMeanFactory()).buildRoutine();
+                        JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
                         meanRoutine.async(squareRoutine.parallel(parseRoutine.parallel(args)))
                                    .after(seconds(3))

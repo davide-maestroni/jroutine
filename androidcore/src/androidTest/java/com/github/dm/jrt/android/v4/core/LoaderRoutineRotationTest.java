@@ -60,8 +60,8 @@ public class LoaderRoutineRotationTest
         }
 
         final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                                                    .on(factoryOf(
+        final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                    .with(factoryOf(
                                                                             ToUpperCase.class))
                                                                     .loaderConfiguration()
                                                                     .withLoaderId(0)
@@ -87,8 +87,8 @@ public class LoaderRoutineRotationTest
         }
 
         final UnitDuration timeout = UnitDuration.seconds(10);
-        JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                            .on(factoryOf(ToUpperCase.class))
+        JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                            .with(factoryOf(ToUpperCase.class))
                             .invocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
                             .apply()
@@ -100,7 +100,7 @@ public class LoaderRoutineRotationTest
         simulateRotation();
 
         final Channel<?, String> channel =
-                JRoutineLoaderCompat.with(loaderFrom(getActivity())).onId(0).buildChannel();
+                JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).buildChannel();
 
         assertThat(channel.after(timeout).all()).containsExactly("TEST1", "TEST2");
     }
@@ -114,8 +114,8 @@ public class LoaderRoutineRotationTest
 
         final UnitDuration timeout = UnitDuration.seconds(10);
         final Routine<String, String> routine1 =
-                JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(factoryOf(ToUpperCase.class))
+                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                    .with(factoryOf(ToUpperCase.class))
                                     .buildRoutine();
         routine1.async("test1");
         routine1.async("test2");
@@ -123,8 +123,8 @@ public class LoaderRoutineRotationTest
         simulateRotation();
 
         final Routine<String, String> routine2 =
-                JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(factoryOf(ToUpperCase.class))
+                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                    .with(factoryOf(ToUpperCase.class))
                                     .buildRoutine();
         final Channel<?, String> result1 = routine2.async("test1").after(timeout);
         final Channel<?, String> result2 = routine2.async("test2").after(timeout);
@@ -142,16 +142,16 @@ public class LoaderRoutineRotationTest
 
         final UnitDuration timeout = UnitDuration.seconds(10);
         final Data data1 = new Data();
-        final Routine<Data, Data> routine1 = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                                                 .on(factoryOf(Delay.class))
+        final Routine<Data, Data> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                 .with(factoryOf(Delay.class))
                                                                  .buildRoutine();
         routine1.async(data1);
         routine1.async(data1);
 
         simulateRotation();
 
-        final Routine<Data, Data> routine2 = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                                                 .on(factoryOf(Delay.class))
+        final Routine<Data, Data> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                 .with(factoryOf(Delay.class))
                                                                  .buildRoutine();
         final Channel<?, Data> result1 = routine2.async(data1).after(timeout);
         final Channel<?, Data> result2 = routine2.async(data1).after(timeout);
@@ -168,8 +168,8 @@ public class LoaderRoutineRotationTest
         }
 
         final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                                                    .on(factoryOf(
+        final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                    .with(factoryOf(
                                                                             ToUpperCase.class))
                                                                     .loaderConfiguration()
                                                                     .withLoaderId(0)

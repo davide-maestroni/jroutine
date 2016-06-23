@@ -601,10 +601,10 @@ public class Streams extends Operators {
      * @return the routine builder.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
                     super IN, ? extends OUT>> function) {
-        return JRoutineCore.on(asFactory(function));
+        return JRoutineCore.with(asFactory(function));
     }
 
     /**

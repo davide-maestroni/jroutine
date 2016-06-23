@@ -86,7 +86,7 @@ public class JRoutineServiceObject {
      * @return the context builder.
      */
     @NotNull
-    public static ServiceObjectBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceObjectBuilder on(@NotNull final ServiceContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<ServiceContext, ServiceObjectBuilder> builders = sBuilders;
             ServiceObjectBuilder builder = builders.get(context);
@@ -131,7 +131,7 @@ public class JRoutineServiceObject {
          * @return the routine builder instance.
          */
         @NotNull
-        public ServiceObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public ServiceObjectRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultServiceObjectRoutineBuilder(mContext, target);
         }
     }

@@ -448,7 +448,7 @@ public interface StreamChannel<IN, OUT>
     StreamChannel<IN, OUT> async();
 
     /**
-     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).apply()}.
+     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).applied()}.
      * <br>
      * This method is useful to easily set the stream runner.
      * <p>
@@ -479,7 +479,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(backoff).apply()}.
+     * .withInputBackoff(backoff).applied()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
@@ -500,7 +500,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(delay, timeUnit).apply()}.
+     * .withInputBackoff(delay, timeUnit).applied()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -524,7 +524,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(delay).apply()}.
+     * .withInputBackoff(delay).applied()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -1101,7 +1101,7 @@ public interface StreamChannel<IN, OUT>
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
-     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
+     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
      * <br>
      * This method is useful to easily make the stream ordered or not.
      * <p>
@@ -1127,7 +1127,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for
-     * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).apply()}.
+     * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).applied()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
@@ -1489,7 +1489,7 @@ public interface StreamChannel<IN, OUT>
 
     /**
      * Short for
-     * {@code async().streamInvocationConfiguration().withRunner(straightRunner).apply()}.
+     * {@code async().streamInvocationConfiguration().withRunner(straightRunner).applied()}.
      * <br>
      * This method is useful to set the stream runner so that each input is immediately passed
      * through the whole chain as soon as it is fed to the stream.

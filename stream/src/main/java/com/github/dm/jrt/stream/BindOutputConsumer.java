@@ -54,7 +54,7 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Vo
         final Channel<Void, Void> outputChannel = JRoutineCore.io()
                                                               .channelConfiguration()
                                                               .with(mConfiguration)
-                                                              .apply()
+                                                              .applied()
                                                               .buildChannel();
         channel.bind(new ConsumingOutputConsumer<OUT>(mOutputConsumer, outputChannel));
         return outputChannel;

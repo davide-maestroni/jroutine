@@ -365,7 +365,7 @@ public class StreamsTest {
                           .channelConfiguration()
                           .withOrder(OrderType.BY_CALL)
                           .withOutputTimeout(seconds(1))
-                          .apply()
+                          .applied()
                           .buildChannels()
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                 "test3");
@@ -871,7 +871,7 @@ public class StreamsTest {
     public void testMap() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -880,7 +880,7 @@ public class StreamsTest {
         final Channel<?, Selectable<Object>> output = JRoutineCore.with(new Sort())
                                                                   .invocationConfiguration()
                                                                   .withInputOrder(OrderType.BY_CALL)
-                                                                  .apply()
+                                                                  .applied()
                                                                   .async(channel);
         final Map<Integer, Channel<?, Object>> channelMap =
                 Channels.selectOutput(output, Sort.INTEGER, Sort.STRING).buildChannels();
@@ -909,7 +909,7 @@ public class StreamsTest {
     public void testMerge() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends Selectable<?>> outputChannel;
@@ -960,7 +960,7 @@ public class StreamsTest {
     public void testMerge4() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<String, String> channel2 = builder.buildChannel();
         final Channel<String, String> channel3 = builder.buildChannel();
@@ -993,7 +993,7 @@ public class StreamsTest {
     public void testMergeAbort() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).apply();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends Selectable<?>> outputChannel;
@@ -1721,14 +1721,14 @@ public class StreamsTest {
                 Streams.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                        .channelConfiguration()
                        .withLogLevel(Level.WARNING)
-                       .apply()
+                       .applied()
                        .buildChannels()
                        .get(Sort.INTEGER);
         final StreamChannel<Object, Object> strChannel =
                 Streams.selectOutput(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
                        .channelConfiguration()
                        .withLogLevel(Level.WARNING)
-                       .apply()
+                       .applied()
                        .buildChannels()
                        .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),

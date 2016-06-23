@@ -149,7 +149,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                         .invocationMode(invocationMode)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
-                                        .apply()
+                                        .applied()
                                         .buildFactory()
                                         .get(returnType, annotations, retrofit);
         }
@@ -193,10 +193,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                               .with(factoryOf(ServiceCallInvocation.class))
                               .invocationConfiguration()
                               .with(invocationConfiguration)
-                              .apply()
+                              .applied()
                               .serviceConfiguration()
                               .with(mServiceConfiguration)
-                              .apply()
+                              .applied()
                               .buildRoutine();
     }
 
@@ -364,7 +364,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             final Channel<Object, Object> outputChannel = JRoutineCore.io()
                                                                       .channelConfiguration()
                                                                       .with(mConfiguration)
-                                                                      .apply()
+                                                                      .applied()
                                                                       .buildChannel();
             mRoutine.async(channel).bind(new ConverterOutputConsumer(mConverter, outputChannel));
             return outputChannel;
@@ -397,7 +397,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().applied();
             mConverter = converter;
         }
 
@@ -406,7 +406,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return JRoutineCore.with(sInvocation)
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
-                               .apply()
+                               .applied()
                                .async(call);
         }
 
@@ -415,7 +415,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             final Channel<Object, Object> outputChannel = JRoutineCore.io()
                                                                       .channelConfiguration()
                                                                       .with(mChannelConfiguration)
-                                                                      .apply()
+                                                                      .applied()
                                                                       .buildChannel();
             getRoutine().async(invokeCall(call))
                         .bind(new ConverterOutputConsumer(mConverter, outputChannel));
@@ -449,7 +449,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().applied();
             mConverter = converter;
         }
 
@@ -474,7 +474,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return Streams.streamOf(call)
                           .invocationConfiguration()
                           .with(mInvocationConfiguration)
-                          .apply()
+                          .applied()
                           .map(sInvocation)
                           .lift(function);
         }

@@ -93,7 +93,7 @@ class InputMapBuilder<DATA, IN extends DATA>
                     AndroidChannels.<DATA, IN>selectParcelableInput(channel,
                             index).channelConfiguration()
                                   .with(configuration)
-                                  .apply()
+                                  .applied()
                                   .buildChannels();
             channelMap.put(index, inputChannel);
         }

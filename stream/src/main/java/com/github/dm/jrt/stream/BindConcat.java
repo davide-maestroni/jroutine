@@ -52,7 +52,7 @@ class BindConcat<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
     public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
         return Channels.<OUT>concat(channel, mChannel).channelConfiguration()
                                                       .with(mConfiguration)
-                                                      .apply()
+                                                      .applied()
                                                       .buildChannels();
     }
 }

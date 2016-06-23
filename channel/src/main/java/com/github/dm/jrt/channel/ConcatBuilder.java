@@ -70,7 +70,7 @@ class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
                                                             .channelConfiguration()
                                                             .with(configuration)
                                                             .withOrder(OrderType.BY_CALL)
-                                                            .apply()
+                                                            .applied()
                                                             .buildChannel();
         for (final Channel<?, ? extends OUT> channel : mChannels) {
             channel.bind(outputChannel);

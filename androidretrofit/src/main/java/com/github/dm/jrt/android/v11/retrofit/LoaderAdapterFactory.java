@@ -125,10 +125,10 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
                                  .with(factory)
                                  .invocationConfiguration()
                                  .with(invocationConfiguration)
-                                 .apply()
+                                 .applied()
                                  .loaderConfiguration()
                                  .with(loaderConfiguration)
-                                 .apply()
+                                 .applied()
                                  .buildRoutine();
         }
 

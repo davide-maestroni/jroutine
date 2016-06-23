@@ -1219,7 +1219,7 @@ public class StreamChannelTest {
             Streams.streamOf("test")
                    .invocationConfiguration()
                    .withRunner(runner1)
-                   .apply()
+                   .applied()
                    .map(new Function<String, Object>() {
 
                        public Object apply(final String s) {
@@ -1227,11 +1227,11 @@ public class StreamChannelTest {
                            return Streams.streamOf(s)
                                          .invocationConfiguration()
                                          .withRunner(runner1)
-                                         .apply()
+                                         .applied()
                                          .map(Functions.identity())
                                          .invocationConfiguration()
                                          .withRunner(runner2)
-                                         .apply()
+                                         .applied()
                                          .map(Functions.identity())
                                          .after(minutes(3))
                                          .next();
@@ -1715,7 +1715,7 @@ public class StreamChannelTest {
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .apply()
+                                                            .applied()
                                                             .buildRoutine();
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
@@ -1842,7 +1842,7 @@ public class StreamChannelTest {
                               .withInputBackoff(seconds(3))
                               .withOutputLimit(2)
                               .withOutputBackoff(seconds(3))
-                              .apply()
+                              .applied()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -1893,7 +1893,7 @@ public class StreamChannelTest {
                               .withRunner(getSingleThreadRunner())
                               .withOutputLimit(2)
                               .withOutputBackoff(seconds(3))
-                              .apply()
+                              .applied()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -1942,7 +1942,7 @@ public class StreamChannelTest {
                               .withRunner(getSingleThreadRunner())
                               .withInputLimit(2)
                               .withInputBackoff(seconds(3))
-                              .apply()
+                              .applied()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -2489,7 +2489,7 @@ public class StreamChannelTest {
                           .streamInvocationConfiguration()
                           .withInputMaxSize(1)
                           .withOutputMaxSize(1)
-                          .apply()
+                          .applied()
                           .map(new Function<Number, Double>() {
 
                               public Double apply(final Number number) {

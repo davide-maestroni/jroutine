@@ -48,7 +48,7 @@ class BindReplay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
         return Channels.replay(channel)
                        .channelConfiguration()
                        .with(mConfiguration)
-                       .apply()
+                       .applied()
                        .buildChannels();
     }
 }

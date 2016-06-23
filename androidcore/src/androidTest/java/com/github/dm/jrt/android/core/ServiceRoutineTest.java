@@ -78,7 +78,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                         .with(factoryOf(Delay.class))
                                                         .serviceConfiguration()
                                                         .withRunnerClass(MainRunner.class)
-                                                        .apply()
+                                                        .applied()
                                                         .async(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
@@ -202,10 +202,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                .invocationConfiguration()
                                                                .withInputOrder(OrderType.BY_DELAY)
                                                                .withLogLevel(Level.DEBUG)
-                                                               .apply()
+                                                               .applied()
                                                                .serviceConfiguration()
                                                                .withLogClass(AndroidLog.class)
-                                                               .apply()
+                                                               .applied()
                                                                .buildRoutine();
         assertThat(routine.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
@@ -219,7 +219,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeout(millis(10))
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.BREAK)
-                                                          .apply()
+                                                          .applied()
                                                           .async("test1");
         assertThat(channel.all()).isEmpty();
         assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
@@ -233,7 +233,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeout(millis(10))
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.ABORT)
-                                                          .apply()
+                                                          .applied()
                                                           .async("test2");
 
         try {
@@ -257,7 +257,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeout(millis(10))
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.FAIL)
-                                                          .apply()
+                                                          .applied()
                                                           .async("test3");
 
         try {
@@ -283,10 +283,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .invocationConfiguration()
                                                                 .withInputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
-                                                                .apply()
+                                                                .applied()
                                                                 .serviceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
-                                                                .apply()
+                                                                .applied()
                                                                 .buildRoutine();
         assertThat(routine1.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
@@ -305,10 +305,10 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .invocationConfiguration()
                                                                 .withOutputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
-                                                                .apply()
+                                                                .applied()
                                                                 .serviceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
-                                                                .apply()
+                                                                .applied()
                                                                 .buildRoutine();
         assertThat(routine2.sync("1", "2", "3", "4", "5").after(timeout).all()).containsExactly("1",
                 "2", "3", "4", "5");
@@ -328,7 +328,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .invocationConfiguration()
                                                                 .withInputOrder(OrderType.BY_CALL)
                                                                 .withOutputOrder(OrderType.BY_CALL)
-                                                                .apply()
+                                                                .applied()
                                                                 .buildRoutine();
         assertThat(routine3.sync("1", "2", "3", "4", "5").after(timeout).all()).containsExactly("1",
                 "2", "3", "4", "5");
@@ -348,7 +348,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .invocationConfiguration()
                                                                 .withCoreInstances(0)
                                                                 .withMaxInstances(2)
-                                                                .apply()
+                                                                .applied()
                                                                 .buildRoutine();
         assertThat(routine4.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
@@ -368,7 +368,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                               .invocationConfiguration()
                                                               .withCoreInstances(0)
                                                               .withMaxInstances(2)
-                                                              .apply()
+                                                              .applied()
                                                               .buildRoutine();
         assertThat(routine4.sync().close().after(timeout).all()).containsOnly("test1", "test2",
                 "test3");

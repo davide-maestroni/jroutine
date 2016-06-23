@@ -48,6 +48,6 @@
                                                   .invocationConfiguration()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
-                                                  .apply()
+                                                  .applied()
                                                   .buildRoutine();
     }

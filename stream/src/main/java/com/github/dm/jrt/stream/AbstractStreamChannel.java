@@ -383,7 +383,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> async(@Nullable final Runner runner) {
-        return async().streamInvocationConfiguration().withRunner(runner).apply();
+        return async().streamInvocationConfiguration().withRunner(runner).applied();
     }
 
     @NotNull
@@ -397,7 +397,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(limit)
                                         .withInputBackoff(backoff)
-                                        .apply();
+                                        .applied();
     }
 
     @NotNull
@@ -406,7 +406,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(limit)
                                         .withInputBackoff(delay, timeUnit)
-                                        .apply();
+                                        .applied();
     }
 
     @NotNull
@@ -415,7 +415,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(limit)
                                         .withInputBackoff(delay)
-                                        .apply();
+                                        .applied();
     }
 
     @NotNull
@@ -679,7 +679,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> order(@Nullable final OrderType orderType) {
-        return streamInvocationConfiguration().withOutputOrder(orderType).apply();
+        return streamInvocationConfiguration().withOutputOrder(orderType).applied();
     }
 
     @NotNull
@@ -689,7 +689,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> parallel(final int maxInvocations) {
-        return parallel().invocationConfiguration().withMaxInstances(maxInvocations).apply();
+        return parallel().invocationConfiguration().withMaxInstances(maxInvocations).applied();
     }
 
     @NotNull
@@ -818,7 +818,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> straight() {
-        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).apply();
+        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).applied();
     }
 
     @NotNull
@@ -1047,7 +1047,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return builder.invocationConfiguration()
                       .with(null)
                       .with(mStreamConfiguration.asInvocationConfiguration())
-                      .apply()
+                      .applied()
                       .buildRoutine();
     }
 

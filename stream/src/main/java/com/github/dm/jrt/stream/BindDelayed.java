@@ -63,8 +63,11 @@ class BindDelayed<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> 
     }
 
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
-        final Channel<IN, IN> inputChannel =
-                JRoutineCore.io().channelConfiguration().withRunner(mRunner).apply().buildChannel();
+        final Channel<IN, IN> inputChannel = JRoutineCore.io()
+                                                         .channelConfiguration()
+                                                         .withRunner(mRunner)
+                                                         .applied()
+                                                         .buildChannel();
         final Channel<?, OUT> outOutputChannel = mBindingFunction.apply(inputChannel);
         inputChannel.after(mDelay, mTimeUnit).pass(channel).close();
         return outOutputChannel;

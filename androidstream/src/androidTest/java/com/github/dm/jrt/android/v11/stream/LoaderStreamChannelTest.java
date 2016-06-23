@@ -806,7 +806,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                          .on(loaderFrom(activity))
                          .invocationConfiguration()
                          .withRunner(runner1)
-                         .apply()
+                         .applied()
                          .map(new Function<String, Object>() {
 
                              public Object apply(final String s) {
@@ -815,11 +815,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                      .on(loaderFrom(activity))
                                                      .invocationConfiguration()
                                                      .withRunner(runner1)
-                                                     .apply()
+                                                     .applied()
                                                      .map(Functions.identity())
                                                      .invocationConfiguration()
                                                      .withRunner(runner2)
-                                                     .apply()
+                                                     .applied()
                                                      .map(Functions.identity())
                                                      .after(minutes(3))
                                                      .next();
@@ -2698,7 +2698,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .apply()
+                                                            .applied()
                                                             .buildRoutine();
         assertThat(LoaderStreams.streamOf("test1", "test2")
                                 .on(loaderFrom(getActivity()))
@@ -3249,7 +3249,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .streamInvocationConfiguration()
                                 .withInputMaxSize(1)
                                 .withOutputMaxSize(1)
-                                .apply()
+                                .applied()
                                 .map(sqrt())
                                 .map(LoaderStreams.<Double>averageDouble())
                                 .next()).isCloseTo(21, Offset.offset(0.1));

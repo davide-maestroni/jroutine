@@ -138,7 +138,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return (mInputCount <= inputLimit) || (mAbortException != null);
             }
         };
-        mResultChanel = new ResultChannel<OUT>(configuration.outputConfigurationBuilder().apply(),
+        mResultChanel = new ResultChannel<OUT>(configuration.outputConfigurationBuilder().applied(),
                 new AbortHandler() {
 
                     public void onAbort(@NotNull final RoutineException reason, final long delay,

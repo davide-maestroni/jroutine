@@ -98,7 +98,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
         return JRoutineCore.with(factory)
                            .invocationConfiguration()
                            .with(streamConfiguration.asInvocationConfiguration())
-                           .apply()
+                           .applied()
                            .buildRoutine();
     }
 
@@ -139,7 +139,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().apply();
+                        asInvocationConfiguration().outputConfigurationBuilder().applied();
             }
 
             return mChannelConfiguration;
@@ -149,7 +149,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
         public InvocationConfiguration asInvocationConfiguration() {
             if (mInvocationConfiguration == null) {
                 mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mConfiguration).apply();
+                        mStreamConfiguration.builderFrom().with(mConfiguration).applied();
             }
 
             return mInvocationConfiguration;

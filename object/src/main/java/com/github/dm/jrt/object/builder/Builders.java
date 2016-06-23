@@ -596,7 +596,7 @@ public class Builders {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.apply();
+            return builder.applied();
         }
 
         for (final Annotation annotation : annotations) {
@@ -648,7 +648,7 @@ public class Builders {
             }
         }
 
-        return builder.apply();
+        return builder.applied();
     }
 
     /**
@@ -694,7 +694,7 @@ public class Builders {
         final ObjectConfiguration.Builder<ObjectConfiguration> builder =
                 ObjectConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.apply();
+            return builder.applied();
         }
 
         for (final Annotation annotation : annotations) {
@@ -704,7 +704,7 @@ public class Builders {
             }
         }
 
-        return builder.apply();
+        return builder.applied();
     }
 
     /**

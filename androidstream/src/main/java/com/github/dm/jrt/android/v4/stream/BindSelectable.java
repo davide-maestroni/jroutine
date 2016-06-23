@@ -61,7 +61,7 @@ class BindSelectable<OUT> extends DeepEqualObject
                 SparseChannelsCompat.selectableOutput(channel, mIndex)
                                     .channelConfiguration()
                                     .with(mConfiguration)
-                                    .apply()
+                                    .applied()
                                     .buildChannels();
         return (Channel<?, ParcelableSelectable<OUT>>) outputChannel;
     }

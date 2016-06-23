@@ -154,10 +154,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.on(mContext).with(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
-                      .apply()
+                      .applied()
                       .buildRoutine();
     }
 
@@ -183,10 +183,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.on(mContext).with(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
-                      .apply()
+                      .applied()
                       .buildRoutine();
     }
 
@@ -264,7 +264,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mRoutine = JRoutineObject.with(target)
                                      .objectConfiguration()
                                      .with(mObjectConfiguration)
-                                     .apply()
+                                     .applied()
                                      .method(mAliasName);
         }
 
@@ -404,7 +404,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mRoutine = JRoutineObject.with(target)
                                      .objectConfiguration()
                                      .with(mObjectConfiguration)
-                                     .apply()
+                                     .applied()
                                      .method(mMethod);
         }
     }
@@ -610,10 +610,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     JRoutineLoader.on(mContext).with(factory);
             final LoaderRoutine<Object, Object> routine = builder.invocationConfiguration()
                                                                  .with(invocationConfiguration)
-                                                                 .apply()
+                                                                 .applied()
                                                                  .loaderConfiguration()
                                                                  .with(loaderConfiguration)
-                                                                 .apply()
+                                                                 .applied()
                                                                  .buildRoutine();
             return Builders.invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

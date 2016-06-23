@@ -115,7 +115,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .invocationMode(InvocationMode.PARALLEL)
                                                   .loaderConfiguration()
                                                   .withResultStaleTime(seconds(3))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -285,7 +285,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .on(context)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -314,7 +314,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .invocationMode(InvocationMode.PARALLEL)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -343,7 +343,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .invocationMode(InvocationMode.SYNC)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -372,7 +372,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -406,7 +406,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .delegateFactory(factory)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -436,7 +436,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                   .delegateFactory(factory)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
-                                                  .apply()
+                                                  .applied()
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

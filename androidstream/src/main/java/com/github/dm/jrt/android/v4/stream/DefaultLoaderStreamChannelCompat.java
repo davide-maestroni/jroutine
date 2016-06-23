@@ -945,7 +945,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             return JRoutineCore.with(factory)
                                .invocationConfiguration()
                                .with(loaderStreamConfiguration.asInvocationConfiguration())
-                               .apply()
+                               .applied()
                                .buildRoutine();
         }
 
@@ -956,10 +956,10 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                                    .with(invocationFactory)
                                    .invocationConfiguration()
                                    .with(loaderStreamConfiguration.asInvocationConfiguration())
-                                   .apply()
+                                   .applied()
                                    .loaderConfiguration()
                                    .with(loaderStreamConfiguration.asLoaderConfiguration())
-                                   .apply()
+                                   .applied()
                                    .buildRoutine();
     }
 
@@ -967,13 +967,13 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> cache(
             @Nullable final CacheStrategyType strategyType) {
-        return loaderConfiguration().withCacheStrategy(strategyType).apply();
+        return loaderConfiguration().withCacheStrategy(strategyType).applied();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> factoryId(final int factoryId) {
-        return loaderConfiguration().withFactoryId(factoryId).apply();
+        return loaderConfiguration().withFactoryId(factoryId).applied();
     }
 
     @NotNull
@@ -987,7 +987,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> loaderId(final int loaderId) {
-        return loaderConfiguration().withLoaderId(loaderId).apply();
+        return loaderConfiguration().withLoaderId(loaderId).applied();
     }
 
     @NotNull
@@ -1064,14 +1064,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> staleAfter(@Nullable final UnitDuration staleTime) {
-        return loaderConfiguration().withResultStaleTime(staleTime).apply();
+        return loaderConfiguration().withResultStaleTime(staleTime).applied();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
-        return loaderConfiguration().withResultStaleTime(time, timeUnit).apply();
+        return loaderConfiguration().withResultStaleTime(time, timeUnit).applied();
     }
 
     @NotNull
@@ -1089,11 +1089,11 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         return builder.invocationConfiguration()
                       .with(null)
                       .with(streamConfiguration.asInvocationConfiguration())
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
                       .with(null)
                       .with(streamConfiguration.asLoaderConfiguration())
-                      .apply()
+                      .applied()
                       .buildRoutine();
     }
 
@@ -1177,7 +1177,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().apply();
+                        asInvocationConfiguration().outputConfigurationBuilder().applied();
             }
 
             return mChannelConfiguration;
@@ -1187,7 +1187,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         public InvocationConfiguration asInvocationConfiguration() {
             if (mInvocationConfiguration == null) {
                 mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).apply();
+                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).applied();
             }
 
             return mInvocationConfiguration;
@@ -1217,7 +1217,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             if (mLoaderConfiguration == null) {
                 mLoaderConfiguration = mStreamLoaderConfiguration.builderFrom()
                                                                  .with(mCurrentLoaderConfiguration)
-                                                                 .apply();
+                                                                 .applied();
             }
 
             return mLoaderConfiguration;

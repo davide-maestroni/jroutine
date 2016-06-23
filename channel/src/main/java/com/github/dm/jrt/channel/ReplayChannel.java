@@ -367,7 +367,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
                            .channelConfiguration()
                            .with(mConfiguration)
                            .withOrder(OrderType.BY_CALL)
-                           .apply()
+                           .applied()
                            .buildChannel();
     }
 }

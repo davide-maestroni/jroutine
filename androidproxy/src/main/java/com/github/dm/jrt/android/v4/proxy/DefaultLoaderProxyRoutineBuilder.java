@@ -108,13 +108,13 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
-                      .apply()
+                      .applied()
                       .objectConfiguration()
                       .with(mObjectConfiguration)
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
                       .with(mLoaderConfiguration)
-                      .apply()
+                      .applied()
                       .buildProxy();
     }
 

@@ -69,7 +69,7 @@ public class AndroidBuilders {
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 LoaderConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.apply();
+            return builder.applied();
         }
 
         for (final Annotation annotation : annotations) {
@@ -95,7 +95,7 @@ public class AndroidBuilders {
             }
         }
 
-        return builder.apply();
+        return builder.applied();
     }
 
     /**

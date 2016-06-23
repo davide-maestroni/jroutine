@@ -53,7 +53,7 @@ class BindCompleteConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, 
         final Channel<Void, Void> outputChannel = JRoutineCore.io()
                                                               .channelConfiguration()
                                                               .with(mConfiguration)
-                                                              .apply()
+                                                              .applied()
                                                               .buildChannel();
         channel.bind(new CompleteOutputConsumer<OUT>(mCompleteAction, outputChannel));
         return outputChannel;

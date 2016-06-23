@@ -101,7 +101,7 @@ class DefaultLoaderChannelBuilder
         final DefaultLoaderRoutineBuilder<Void, OUT> builder =
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         final InvocationConfiguration invocationConfiguration =
-                builderFromOutput(mChannelConfiguration).apply();
+                builderFromOutput(mChannelConfiguration).applied();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOrElse(null);
@@ -123,13 +123,13 @@ class DefaultLoaderChannelBuilder
 
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(infinity())
-                      .apply()
+                      .applied()
                       .async()
                       .close();
     }

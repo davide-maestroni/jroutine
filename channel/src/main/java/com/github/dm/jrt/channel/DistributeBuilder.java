@@ -86,14 +86,17 @@ class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, 
             final Channel<IN, IN> outputChannel = JRoutineCore.io()
                                                               .channelConfiguration()
                                                               .with(configuration)
-                                                              .apply()
+                                                              .applied()
                                                               .buildChannel();
             outputChannel.bind((Channel<IN, ?>) channel);
             channelList.add(outputChannel);
         }
 
-        final Channel<List<? extends IN>, ?> inputChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
+        final Channel<List<? extends IN>, ?> inputChannel = JRoutineCore.io()
+                                                                        .channelConfiguration()
+                                                                        .with(configuration)
+                                                                        .applied()
+                                                                        .buildChannel();
         return inputChannel.bind(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
     }
 

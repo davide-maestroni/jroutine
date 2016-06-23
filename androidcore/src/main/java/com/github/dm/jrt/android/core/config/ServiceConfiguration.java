@@ -251,7 +251,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE apply() {
+        public TYPE applied() {
             return mConfigurable.apply(buildConfiguration());
         }
 

@@ -55,7 +55,7 @@ class BindSelectable<OUT> implements Function<Channel<?, OUT>, Channel<?, Select
                 Channels.selectableOutput(channel, mIndex)
                         .channelConfiguration()
                         .with(mConfiguration)
-                        .apply()
+                        .applied()
                         .buildChannels();
         return (Channel<?, Selectable<OUT>>) outputChannel;
     }

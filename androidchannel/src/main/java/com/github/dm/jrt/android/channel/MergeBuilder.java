@@ -73,7 +73,11 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends ParcelableS
     protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
+                JRoutineCore.io()
+                            .channelConfiguration()
+                            .with(configuration)
+                            .applied()
+                            .buildChannel();
         int i = mStartIndex;
         for (final Channel<?, ? extends OUT> channel : mChannels) {
             outputChannel.pass(AndroidChannels.selectableOutput(channel, i++).buildChannels());

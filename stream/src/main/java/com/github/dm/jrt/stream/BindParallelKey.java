@@ -66,7 +66,7 @@ class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OU
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
-                                                            .apply()
+                                                            .applied()
                                                             .buildChannel();
         channel.bind(new ParallelKeyOutputConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
                 mInvocationMode));

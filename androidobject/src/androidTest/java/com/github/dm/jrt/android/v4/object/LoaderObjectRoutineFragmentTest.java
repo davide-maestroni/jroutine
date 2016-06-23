@@ -95,18 +95,20 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine =
-                JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
-                                          .with(instanceOf(TestClass.class))
-                                          .invocationConfiguration()
-                                          .withRunner(Runners.poolRunner())
-                                          .withMaxInstances(1)
-                                          .withCoreInstances(1)
-                                          .withOutputTimeoutAction(TimeoutActionType.BREAK)
-                                          .withLogLevel(Level.DEBUG)
-                                          .withLog(new NullLog())
-                                          .apply()
-                                          .method(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
+                                                                          .with(instanceOf(
+                                                                                  TestClass.class))
+                                                                          .invocationConfiguration()
+                                                                          .withRunner(
+                                                                                  Runners.poolRunner())
+                                                                          .withMaxInstances(1)
+                                                                          .withCoreInstances(1)
+                                                                          .withOutputTimeoutAction(
+                                                                                  TimeoutActionType.BREAK)
+                                                                          .withLogLevel(Level.DEBUG)
+                                                                          .withLog(new NullLog())
+                                                                          .apply()
+                                                                          .method(TestClass.GET);
 
         assertThat(routine.sync().close().after(timeout).all()).containsExactly(-77L);
     }
@@ -300,10 +302,10 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine3 =
-                JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
-                                          .with(instanceOf(TestClass.class))
-                                          .method(TestClass.THROW);
+        final Routine<Object, Object> routine3 = JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
+                                                                           .with(instanceOf(
+                                                                                   TestClass.class))
+                                                                           .method(TestClass.THROW);
 
         try {
 
@@ -650,17 +652,20 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine2 =
-                JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
-                                          .with(instanceOf(TestClass.class))
-                                          .invocationConfiguration()
-                                          .withRunner(Runners.poolRunner())
-                                          .withMaxInstances(1)
-                                          .apply()
-                                          .objectConfiguration()
-                                          .withSharedFields("test")
-                                          .apply()
-                                          .method(TestClass.class.getMethod("getLong"));
+        final Routine<Object, Object> routine2 = JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
+                                                                           .with(instanceOf(
+                                                                                   TestClass.class))
+                                                                           .invocationConfiguration()
+                                                                           .withRunner(
+                                                                                   Runners.poolRunner())
+                                                                           .withMaxInstances(1)
+                                                                           .apply()
+                                                                           .objectConfiguration()
+                                                                           .withSharedFields("test")
+                                                                           .apply()
+                                                                           .method(TestClass
+                                                                                   .class.getMethod(
+                                                                                   "getLong"));
 
         assertThat(routine2.sync().close().after(timeout).all()).containsExactly(-77L);
     }
@@ -671,13 +676,14 @@ public class LoaderObjectRoutineFragmentTest
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final Routine<Object, Object> routine1 =
-                JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
-                                          .with(instanceOf(TestClass.class))
-                                          .invocationConfiguration()
-                                          .withRunner(Runners.poolRunner())
-                                          .apply()
-                                          .method("getLong");
+        final Routine<Object, Object> routine1 = JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
+                                                                           .with(instanceOf(
+                                                                                   TestClass.class))
+                                                                           .invocationConfiguration()
+                                                                           .withRunner(
+                                                                                   Runners.poolRunner())
+                                                                           .apply()
+                                                                           .method("getLong");
 
         assertThat(routine1.sync().close().after(timeout).all()).containsExactly(-77L);
     }

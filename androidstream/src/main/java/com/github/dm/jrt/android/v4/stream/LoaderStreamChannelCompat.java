@@ -1028,6 +1028,21 @@ public interface LoaderStreamChannelCompat<IN, OUT>
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
+     * Sets the stream loader context.
+     * <br>
+     * The context will be used by all the concatenated routines until changed.
+     * <br>
+     * If null it will cause the next routines to employ the configured runner instead of an Android
+     * loader.
+     *
+     * @param context the loader context.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    LoaderStreamChannelCompat<IN, OUT> on(@Nullable LoaderContextCompat context);
+
+    /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
      * different routine invocation.
      * <br>
@@ -1146,21 +1161,6 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamLoaderConfiguration();
-
-    /**
-     * Sets the stream loader context.
-     * <br>
-     * The context will be used by all the concatenated routines until changed.
-     * <br>
-     * If null it will cause the next routines to employ the configured runner instead of an Android
-     * loader.
-     *
-     * @param context the loader context.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> on(@Nullable LoaderContextCompat context);
 
     /**
      * Interface defining a loader stream configuration.

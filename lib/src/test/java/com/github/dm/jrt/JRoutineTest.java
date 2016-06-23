@@ -241,13 +241,14 @@ public class JRoutineTest {
     @Test
     public void testFunctionMapping() {
 
-        final Routine<Object, String> routine = JRoutine.withMapping(new Function<Object, String>() {
+        final Routine<Object, String> routine =
+                JRoutine.withMapping(new Function<Object, String>() {
 
-            public String apply(final Object o) {
+                    public String apply(final Object o) {
 
-                return o.toString();
-            }
-        }).buildRoutine();
+                        return o.toString();
+                    }
+                }).buildRoutine();
         assertThat(routine.async("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
@@ -427,7 +428,8 @@ public class JRoutineTest {
     @Test
     public void testPendingInputs() {
 
-        final Channel<Object, Object> channel = JRoutine.with(IdentityInvocation.factoryOf()).async();
+        final Channel<Object, Object> channel =
+                JRoutine.with(IdentityInvocation.factoryOf()).async();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();

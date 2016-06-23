@@ -81,47 +81,43 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testAliasMethod() throws NoSuchMethodException {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                                     .with(instanceOf(
-                                                                             TestClass.class))
-                                                                     .invocationConfiguration()
-                                                                     .withRunner(
-                                                                             Runners.poolRunner())
-                                                                     .withMaxInstances(1)
-                                                                     .withCoreInstances(1)
-                                                                     .withOutputTimeoutAction(
-                                                                             TimeoutActionType
-                                                                                     .BREAK)
-                                                                     .withLogLevel(Level.DEBUG)
-                                                                     .withLog(new NullLog())
-                                                                     .apply()
-                                                                     .method(TestClass.GET);
+        final Routine<Object, Object> routine =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestClass.class))
+                                     .invocationConfiguration()
+                                     .withRunner(Runners.poolRunner())
+                                     .withMaxInstances(1)
+                                     .withCoreInstances(1)
+                                     .withOutputTimeoutAction(TimeoutActionType.BREAK)
+                                     .withLogLevel(Level.DEBUG)
+                                     .withLog(new NullLog())
+                                     .apply()
+                                     .method(TestClass.GET);
         assertThat(routine.sync().close().after(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
 
-        assertThat(JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                        .with(instanceOf(TestArgs.class, 17))
-                                        .method("getId")
-                                        .async()
-                                        .close()
-                                        .after(seconds(10))
-                                        .next()).isEqualTo(17);
+        assertThat(
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestArgs.class, 17))
+                                     .method("getId")
+                                     .async()
+                                     .close()
+                                     .after(seconds(10))
+                                     .next()).isEqualTo(17);
     }
 
     public void testAsyncInputProxyRoutine() {
 
         final UnitDuration timeout = seconds(10);
-        final SumItf sumAsync = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                     .with(instanceOf(Sum.class))
-                                                     .invocationConfiguration()
-                                                     .withOutputTimeout(timeout)
-                                                     .apply()
-                                                     .buildProxy(ClassToken.tokenOf(SumItf.class));
+        final SumItf sumAsync =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(Sum.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(timeout)
+                                     .apply()
+                                     .buildProxy(ClassToken.tokenOf(SumItf.class));
         final Channel<Integer, Integer> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass(7).close();
         assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
@@ -146,13 +142,13 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testAsyncOutputProxyRoutine() {
 
         final UnitDuration timeout = seconds(10);
-        final CountItf countAsync = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                         .with(instanceOf(Count.class))
-                                                         .invocationConfiguration()
-                                                         .withOutputTimeout(timeout)
-                                                         .apply()
-                                                         .buildProxy(CountItf.class);
+        final CountItf countAsync =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(Count.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(timeout)
+                                     .apply()
+                                     .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
         assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
@@ -218,11 +214,10 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testException() throws NoSuchMethodException {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine3 = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                                      .with(instanceOf(
-                                                                              TestClass.class))
-                                                                      .method(TestClass.THROW);
+        final Routine<Object, Object> routine3 =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestClass.class))
+                                     .method(TestClass.THROW);
 
         try {
 
@@ -469,21 +464,17 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testMethod() throws NoSuchMethodException {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine2 = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                                      .with(instanceOf(
-                                                                              TestClass.class))
-                                                                      .invocationConfiguration()
-                                                                      .withRunner(
-                                                                              Runners.poolRunner())
-                                                                      .withMaxInstances(1)
-                                                                      .apply()
-                                                                      .objectConfiguration()
-                                                                      .withSharedFields("test")
-                                                                      .apply()
-                                                                      .method(TestClass.class
-                                                                              .getMethod(
-                                                                              "getLong" + ""));
+        final Routine<Object, Object> routine2 =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestClass.class))
+                                     .invocationConfiguration()
+                                     .withRunner(Runners.poolRunner())
+                                     .withMaxInstances(1)
+                                     .apply()
+                                     .objectConfiguration()
+                                     .withSharedFields("test")
+                                     .apply()
+                                     .method(TestClass.class.getMethod("getLong" + ""));
 
         assertThat(routine2.sync().close().after(timeout).all()).containsExactly(-77L);
     }
@@ -491,15 +482,13 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testMethodBySignature() throws NoSuchMethodException {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine1 = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                                      .with(instanceOf(
-                                                                              TestClass.class))
-                                                                      .invocationConfiguration()
-                                                                      .withRunner(
-                                                                              Runners.poolRunner())
-                                                                      .apply()
-                                                                      .method("getLong");
+        final Routine<Object, Object> routine1 =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestClass.class))
+                                     .invocationConfiguration()
+                                     .withRunner(Runners.poolRunner())
+                                     .apply()
+                                     .method("getLong");
 
         assertThat(routine1.sync().close().after(timeout).all()).containsExactly(-77L);
     }
@@ -591,13 +580,13 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     @SuppressWarnings("unchecked")
     public void testProxyAnnotations() {
 
-        final Itf itf = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                             .with(instanceOf(Impl.class))
-                                             .invocationConfiguration()
-                                             .withOutputTimeout(infinity())
-                                             .apply()
-                                             .buildProxy(Itf.class);
+        final Itf itf =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(Impl.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(infinity())
+                                     .apply()
+                                     .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
         final Channel<Character, Character> channel1 = JRoutineCore.io().buildChannel();
@@ -809,10 +798,10 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public void testProxyRoutine() {
 
         final UnitDuration timeout = seconds(10);
-        final SquareItf squareAsync = JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                                           .with(instanceOf(Square.class))
-                                                           .buildProxy(SquareItf.class);
+        final SquareItf squareAsync =
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(Square.class))
+                                     .buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
 
@@ -869,16 +858,16 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
-        assertThat(JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                        .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
-                                        .withOutputTimeout(seconds(10))
-                                        .apply()
-                                        .method("test")
-                                        .async()
-                                        .close()
-                                        .next()).isEqualTo(31);
+        assertThat(
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestTimeout.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(seconds(10))
+                                     .apply()
+                                     .method("test")
+                                     .async()
+                                     .close()
+                                     .next()).isEqualTo(31);
 
         try {
 
@@ -898,16 +887,16 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
         }
 
-        assertThat(JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                        .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
-                                        .withOutputTimeout(seconds(10))
-                                        .apply()
-                                        .method("getInt")
-                                        .async()
-                                        .close()
-                                        .next()).isEqualTo(31);
+        assertThat(
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestTimeout.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(seconds(10))
+                                     .apply()
+                                     .method("getInt")
+                                     .async()
+                                     .close()
+                                     .next()).isEqualTo(31);
 
         try {
 
@@ -927,16 +916,16 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
         }
 
-        assertThat(JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                        .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
-                                        .withOutputTimeout(seconds(10))
-                                        .apply()
-                                        .method(TestTimeout.class.getMethod("getInt"))
-                                        .async()
-                                        .close()
-                                        .next()).isEqualTo(31);
+        assertThat(
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestTimeout.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(seconds(10))
+                                     .apply()
+                                     .method(TestTimeout.class.getMethod("getInt"))
+                                     .async()
+                                     .close()
+                                     .next()).isEqualTo(31);
 
         try {
 
@@ -956,14 +945,14 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
         }
 
-        assertThat(JRoutineServiceObject.on(
-                serviceFrom(getActivity(), RemoteInvocationService.class))
-                                        .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
-                                        .withOutputTimeout(seconds(10))
-                                        .apply()
-                                        .buildProxy(TestTimeoutItf.class)
-                                        .getInt()).isEqualTo(31);
+        assertThat(
+                JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                     .with(instanceOf(TestTimeout.class))
+                                     .invocationConfiguration()
+                                     .withOutputTimeout(seconds(10))
+                                     .apply()
+                                     .buildProxy(TestTimeoutItf.class)
+                                     .getInt()).isEqualTo(31);
 
         try {
 

@@ -113,19 +113,19 @@ public class LoaderRoutineRotationTest
         }
 
         final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(factoryOf(ToUpperCase.class))
-                                    .buildRoutine();
+        final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(factoryOf(
+                                                                             ToUpperCase.class))
+                                                                     .buildRoutine();
         routine1.async("test1");
         routine1.async("test2");
 
         simulateRotation();
 
-        final Routine<String, String> routine2 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(factoryOf(ToUpperCase.class))
-                                    .buildRoutine();
+        final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(factoryOf(
+                                                                             ToUpperCase.class))
+                                                                     .buildRoutine();
         final Channel<?, String> result1 = routine2.async("test1").after(timeout);
         final Channel<?, String> result2 = routine2.async("test2").after(timeout);
 

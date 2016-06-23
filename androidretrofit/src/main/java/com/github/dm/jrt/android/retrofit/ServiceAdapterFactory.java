@@ -273,12 +273,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return this;
         }
 
-        @NotNull
-        @Override
-        public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
-            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
-        }
-
         /**
          * Sets the factory service context.
          *
@@ -289,6 +283,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         public Builder on(@Nullable final ServiceContext context) {
             mServiceContext = context;
             return this;
+        }
+
+        @NotNull
+        @Override
+        public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
+            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
         }
     }
 

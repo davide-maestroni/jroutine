@@ -163,24 +163,18 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderContextCompat context = loaderFrom(getActivity());
         StreamChannel<String, String> channel1 =
-                LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                   .on(context)
-                                   .asyncMap(null);
+                LoaderStreamsCompat.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
         StreamChannel<String, String> channel2 =
-                LoaderStreamsCompat.streamOf("test4", "test5", "test6")
-                                   .on(context)
-                                   .asyncMap(null);
+                LoaderStreamsCompat.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(LoaderStreamsCompat.blend(channel2, channel1)
                                       .buildChannels()
                                       .after(seconds(10))
                                       .all()).containsOnly("test1", "test2", "test3", "test4",
                 "test5", "test6");
-        channel1 = LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                      .on(context)
-                                      .asyncMap(null);
-        channel2 = LoaderStreamsCompat.streamOf("test4", "test5", "test6")
-                                      .on(context)
-                                      .asyncMap(null);
+        channel1 =
+                LoaderStreamsCompat.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
+        channel2 =
+                LoaderStreamsCompat.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(LoaderStreamsCompat.blend(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                                       .buildChannels()
                                       .after(seconds(10))
@@ -323,11 +317,10 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testCombine() {
 
-        final Channel<String, String> channel1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .async()
-                                    .sortedByCall();
+        final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .async()
+                                                                     .sortedByCall();
         final Channel<Integer, Integer> channel2 =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(IdentityContextInvocation.<Integer>factoryOf())
@@ -379,24 +372,18 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final LoaderContextCompat context = loaderFrom(getActivity());
         StreamChannel<String, String> channel1 =
-                LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                   .on(context)
-                                   .asyncMap(null);
+                LoaderStreamsCompat.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
         StreamChannel<String, String> channel2 =
-                LoaderStreamsCompat.streamOf("test4", "test5", "test6")
-                                   .on(context)
-                                   .asyncMap(null);
+                LoaderStreamsCompat.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(LoaderStreamsCompat.concat(channel2, channel1)
                                       .buildChannels()
                                       .after(seconds(10))
                                       .all()).containsExactly("test4", "test5", "test6", "test1",
                 "test2", "test3");
-        channel1 = LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                      .on(context)
-                                      .asyncMap(null);
-        channel2 = LoaderStreamsCompat.streamOf("test4", "test5", "test6")
-                                      .on(context)
-                                      .asyncMap(null);
+        channel1 =
+                LoaderStreamsCompat.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
+        channel2 =
+                LoaderStreamsCompat.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(
                 LoaderStreamsCompat.concat(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                                    .buildChannels()
@@ -545,16 +532,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testDistribute() {
 
-        final Channel<String, String> channel1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .async()
-                                    .sortedByCall();
-        final Channel<String, String> channel2 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .async()
-                                    .sortedByCall();
+        final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .async()
+                                                                     .sortedByCall();
+        final Channel<String, String> channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .async()
+                                                                     .sortedByCall();
         LoaderStreamsCompat.distribute(channel1, channel2)
                            .buildChannels()
                            .pass(Arrays.asList("test1-1", "test1-2"))
@@ -574,16 +559,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
     public void testDistributePlaceholder() {
 
-        final Channel<String, String> channel1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .async()
-                                    .sortedByCall();
-        final Channel<String, String> channel2 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .async()
-                                    .sortedByCall();
+        final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .async()
+                                                                     .sortedByCall();
+        final Channel<String, String> channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .async()
+                                                                     .sortedByCall();
         LoaderStreamsCompat.distribute((Object) null, channel1, channel2)
                            .buildChannels()
                            .pass(Arrays.asList("test1-1", "test1-2"))
@@ -719,11 +702,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testFactoryId() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        LoaderStreamsCompat.streamOf("test1")
-                           .on(context)
-                           .factoryId(11)
-                           .async()
-                           .map(toUpperCase());
+        LoaderStreamsCompat.streamOf("test1").on(context).factoryId(11).async().map(toUpperCase());
 
         try {
             JRoutineLoaderCompat.on(context).withId(11).buildChannel().after(seconds(10)).next();

@@ -115,9 +115,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                                .sync("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                               .sync("test")
-                               .all()).containsExactly("TEST");
+        assertThat(
+                JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
+                            .sync("test")
+                            .all()).containsExactly("TEST");
     }
 
     @SuppressWarnings("ConstantConditions")

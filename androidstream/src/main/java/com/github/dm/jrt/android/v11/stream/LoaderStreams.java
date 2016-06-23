@@ -618,62 +618,6 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function, to process input data.
-     * <br>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * scope.
-     * <br>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param function the function providing the stream channel instances.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder.
-     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-     *                                            static scope.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
-            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
-                    StreamChannel<? super IN, ? extends OUT>> function) {
-        if (!wrap(function).hasStaticScope()) {
-            throw new IllegalArgumentException(
-                    "the function instance does not have a static scope: " + function.getClass()
-                                                                                     .getName());
-        }
-
-        return Streams.withStream(function);
-    }
-
-    /**
-     * Returns a loader routine builder, whose invocation instances employ the streams provided by
-     * the specified function, to process input data.
-     * <br>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * scope.
-     * <br>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param context  the loader context.
-     * @param function the function providing the stream channel instances.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the loader routine builder.
-     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-     *                                            static scope.
-     */
-    @NotNull
-    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> withStreamOn(
-            @NotNull final LoaderContext context,
-            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
-                    StreamChannel<? super IN, ? extends OUT>> function) {
-        return JRoutineLoader.on(context).with(contextFactory(function));
-    }
-
-    /**
      * Returns a builder of streams repeating the output data to any newly bound channel or
      * consumer, thus effectively supporting binding of several output consumers.
      * <p>
@@ -1059,5 +1003,61 @@ public class LoaderStreams extends Streams {
             @Nullable final Channel<?, OUT> output) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
         return new DefaultLoaderStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
+    }
+
+    /**
+     * Returns a routine builder, whose invocation instances employ the streams provided by the
+     * specified function, to process input data.
+     * <br>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * scope.
+     * <br>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream channel instances.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
+        if (!wrap(function).hasStaticScope()) {
+            throw new IllegalArgumentException(
+                    "the function instance does not have a static scope: " + function.getClass()
+                                                                                     .getName());
+        }
+
+        return Streams.withStream(function);
+    }
+
+    /**
+     * Returns a loader routine builder, whose invocation instances employ the streams provided by
+     * the specified function, to process input data.
+     * <br>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * scope.
+     * <br>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param context  the loader context.
+     * @param function the function providing the stream channel instances.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the loader routine builder.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> withStreamOn(
+            @NotNull final LoaderContext context,
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
+        return JRoutineLoader.on(context).with(contextFactory(function));
     }
 }

@@ -121,7 +121,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(loaderFrom(fragment))
-                                                                     .with(instanceOf(TestList.class))
+                                                                     .with(instanceOf(
+                                                                             TestList.class))
                                                                      .invocationConfiguration()
                                                                      .withOutputTimeout(seconds(10))
                                                                      .apply();

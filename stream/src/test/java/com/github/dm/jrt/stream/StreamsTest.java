@@ -454,10 +454,9 @@ public class StreamsTest {
                         });
                     }
                 });
-        assertThat(JRoutineCore.with(factory)
-                               .async("test1", "test2", "test3")
-                               .after(seconds(3))
-                               .all()).containsExactly("TEST1", "TEST2", "TEST3");
+        assertThat(
+                JRoutineCore.with(factory).async("test1", "test2", "test3").after(seconds(3)).all())
+                .containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 

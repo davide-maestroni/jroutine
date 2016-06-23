@@ -428,14 +428,15 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testActivityDelegation() {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.factoryOf())
-                                    .buildRoutine();
-        final Routine<Object, Object> routine2 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(factoryFrom(routine1, TEST_ROUTINE_ID, InvocationMode.SYNC))
-                                    .buildRoutine();
+        final Routine<Object, Object> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation
+                                                                             .factoryOf())
+                                                                     .buildRoutine();
+        final Routine<Object, Object> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(factoryFrom(routine1,
+                                                                             TEST_ROUTINE_ID,
+                                                                             InvocationMode.SYNC))
+                                                                     .buildRoutine();
 
         assertThat(routine2.async("test1").after(timeout).all()).containsExactly("test1");
 
@@ -963,19 +964,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderRoutine<String, String> routine =
-                JRoutineLoaderCompat.on(loaderFrom(fragment))
-                                    .with(factoryOf(PurgeContextInvocation.class))
-                                    .invocationConfiguration()
-                                    .withInputOrder(OrderType.BY_CALL)
-                                    .withOutputOrder(OrderType.BY_CALL)
-                                    .withOutputTimeout(seconds(10))
-                                    .apply()
-                                    .loaderConfiguration()
-                                    .withLoaderId(0)
-                                    .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .apply()
-                                    .buildRoutine();
+        final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
+                                                                          .with(factoryOf(
+                                                                                  PurgeContextInvocation.class))
+                                                                          .invocationConfiguration()
+                                                                          .withInputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputTimeout(
+                                                                                  seconds(10))
+                                                                          .apply()
+                                                                          .loaderConfiguration()
+                                                                          .withLoaderId(0)
+                                                                          .withCacheStrategy(
+                                                                                  CacheStrategyType.CACHE)
+                                                                          .apply()
+                                                                          .buildRoutine();
         final Channel<?, String> channel4 = routine.async("test");
         assertThat(channel4.next()).isEqualTo("test");
         assertThat(channel4.hasCompleted());
@@ -998,19 +1003,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderRoutine<String, String> routine =
-                JRoutineLoaderCompat.on(loaderFrom(fragment))
-                                    .with(factoryOf(PurgeContextInvocation.class))
-                                    .invocationConfiguration()
-                                    .withInputOrder(OrderType.BY_CALL)
-                                    .withOutputOrder(OrderType.BY_CALL)
-                                    .withOutputTimeout(seconds(10))
-                                    .apply()
-                                    .loaderConfiguration()
-                                    .withLoaderId(0)
-                                    .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .apply()
-                                    .buildRoutine();
+        final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
+                                                                          .with(factoryOf(
+                                                                                  PurgeContextInvocation.class))
+                                                                          .invocationConfiguration()
+                                                                          .withInputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputTimeout(
+                                                                                  seconds(10))
+                                                                          .apply()
+                                                                          .loaderConfiguration()
+                                                                          .withLoaderId(0)
+                                                                          .withCacheStrategy(
+                                                                                  CacheStrategyType.CACHE)
+                                                                          .apply()
+                                                                          .buildRoutine();
         final Channel<?, String> channel5 = routine.async("test");
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.hasCompleted());
@@ -1163,7 +1172,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutineLoaderCompat.on(loaderFrom(fragment))
-                                                                     .with(IdentityContextInvocation.factoryOf())
+                                                                     .with(IdentityContextInvocation
+                                                                             .factoryOf())
                                                                      .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoaderCompat.on(loaderFrom(fragment))
                                                                      .with(factoryFrom(routine1,
@@ -1386,19 +1396,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderRoutine<String, String> routine =
-                JRoutineLoaderCompat.on(loaderFrom(fragment))
-                                    .with(factoryOf(PurgeContextInvocation.class))
-                                    .invocationConfiguration()
-                                    .withInputOrder(OrderType.BY_CALL)
-                                    .withOutputOrder(OrderType.BY_CALL)
-                                    .withOutputTimeout(seconds(10))
-                                    .apply()
-                                    .loaderConfiguration()
-                                    .withLoaderId(0)
-                                    .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .apply()
-                                    .buildRoutine();
+        final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
+                                                                          .with(factoryOf(
+                                                                                  PurgeContextInvocation.class))
+                                                                          .invocationConfiguration()
+                                                                          .withInputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputTimeout(
+                                                                                  seconds(10))
+                                                                          .apply()
+                                                                          .loaderConfiguration()
+                                                                          .withLoaderId(0)
+                                                                          .withCacheStrategy(
+                                                                                  CacheStrategyType.CACHE)
+                                                                          .apply()
+                                                                          .buildRoutine();
         final Channel<?, String> channel = routine.async("test");
         assertThat(channel.next()).isEqualTo("test");
         assertThat(channel.hasCompleted());
@@ -1411,19 +1425,23 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        final LoaderRoutine<String, String> routine =
-                JRoutineLoaderCompat.on(loaderFrom(fragment))
-                                    .with(factoryOf(PurgeContextInvocation.class))
-                                    .invocationConfiguration()
-                                    .withInputOrder(OrderType.BY_CALL)
-                                    .withOutputOrder(OrderType.BY_CALL)
-                                    .withOutputTimeout(seconds(10))
-                                    .apply()
-                                    .loaderConfiguration()
-                                    .withLoaderId(0)
-                                    .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .apply()
-                                    .buildRoutine();
+        final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
+                                                                          .with(factoryOf(
+                                                                                  PurgeContextInvocation.class))
+                                                                          .invocationConfiguration()
+                                                                          .withInputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputOrder(
+                                                                                  OrderType.BY_CALL)
+                                                                          .withOutputTimeout(
+                                                                                  seconds(10))
+                                                                          .apply()
+                                                                          .loaderConfiguration()
+                                                                          .withLoaderId(0)
+                                                                          .withCacheStrategy(
+                                                                                  CacheStrategyType.CACHE)
+                                                                          .apply()
+                                                                          .buildRoutine();
         final Channel<?, String> channel1 = routine.async("test");
         assertThat(channel1.next()).isEqualTo("test");
         assertThat(channel1.hasCompleted());
@@ -1463,14 +1481,15 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testInvocations() {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<String, String> routine1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(IdentityContextInvocation.<String>factoryOf())
-                                    .invocationConfiguration()
-                                    .withLog(AndroidLogs.androidLog())
-                                    .withLogLevel(Level.WARNING)
-                                    .apply()
-                                    .buildRoutine();
+        final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(IdentityContextInvocation.<String>factoryOf())
+                                                                     .invocationConfiguration()
+                                                                     .withLog(
+                                                                             AndroidLogs
+                                                                                     .androidLog())
+                                                                     .withLogLevel(Level.WARNING)
+                                                                     .apply()
+                                                                     .buildRoutine();
         assertThat(routine1.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
         assertThat(routine1.async("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
@@ -1480,14 +1499,15 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final ClassToken<StringCallInvocation> token2 =
                 ClassToken.tokenOf(StringCallInvocation.class);
-        final Routine<String, String> routine2 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(factoryOf(token2))
-                                    .invocationConfiguration()
-                                    .withLog(AndroidLogs.androidLog())
-                                    .withLogLevel(Level.WARNING)
-                                    .apply()
-                                    .buildRoutine();
+        final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(factoryOf(token2))
+                                                                     .invocationConfiguration()
+                                                                     .withLog(
+                                                                             AndroidLogs
+                                                                                     .androidLog())
+                                                                     .withLogLevel(Level.WARNING)
+                                                                     .apply()
+                                                                     .buildRoutine();
         assertThat(routine2.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
         assertThat(routine2.async("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
@@ -1643,8 +1663,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testSize() {
 
         final Channel<Object, Object> channel = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                    .with(IdentityContextInvocation
-                                                                            .factoryOf())
+                                                                    .with(IdentityContextInvocation.factoryOf())
                                                                     .async();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");

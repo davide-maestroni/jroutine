@@ -589,25 +589,6 @@ public class Streams extends Operators {
     }
 
     /**
-     * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function to process input data.
-     * <br>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param function the function providing the stream channels.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
-            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
-                    super IN, ? extends OUT>> function) {
-        return JRoutineCore.with(asFactory(function));
-    }
-
-    /**
      * Returns a consumer generating the specified range of data.
      * <br>
      * The generated data will start from the specified first one up to and including the specified
@@ -987,6 +968,25 @@ public class Streams extends Operators {
     public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final Channel<?, OUT> output) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
         return new DefaultStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
+    }
+
+    /**
+     * Returns a routine builder, whose invocation instances employ the streams provided by the
+     * specified function to process input data.
+     * <br>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
+                    super IN, ? extends OUT>> function) {
+        return JRoutineCore.with(asFactory(function));
     }
 
     @NotNull

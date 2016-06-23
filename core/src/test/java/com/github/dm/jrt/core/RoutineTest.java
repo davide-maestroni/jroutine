@@ -659,13 +659,13 @@ public class RoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        final Channel<String, String> channel1 =
-                JRoutineCore.with(factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
-                            .invocationConfiguration()
-                            .withInputOrder(OrderType.BY_CALL)
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .apply()
-                            .async();
+        final Channel<String, String> channel1 = JRoutineCore.with(
+                factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
+                                                             .invocationConfiguration()
+                                                             .withInputOrder(OrderType.BY_CALL)
+                                                             .withOutputOrder(OrderType.BY_CALL)
+                                                             .apply()
+                                                             .async();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel1.after(millis(10).nanosTime()).pass("test2");
         channel1.after(millis(10).microsTime()).pass(Arrays.asList("test3", "test4"));
@@ -872,9 +872,8 @@ public class RoutineTest {
         assertThat(routine5.async("test5").after(timeout).all()).containsExactly("test5");
         routine5.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
-        final Routine<String, String> routine6 =
-                JRoutineCore.with(RoutineInvocation.factoryFrom(routine3, InvocationMode.SEQUENTIAL))
-                            .buildRoutine();
+        final Routine<String, String> routine6 = JRoutineCore.with(
+                RoutineInvocation.factoryFrom(routine3, InvocationMode.SEQUENTIAL)).buildRoutine();
         assertThat(routine6.async("test5").after(timeout).all()).containsExactly("test5");
         routine6.clear();
         assertThat(TestDiscard.getInstanceCount()).isZero();
@@ -1645,9 +1644,10 @@ public class RoutineTest {
                         result.immediately().pass(s).after(seconds(2)).abort();
                     }
                 };
-        assertThat(
-                JRoutineCore.with(factoryOf(invocation, this)).async("test").after(millis(500)).all())
-                .containsExactly("test");
+        assertThat(JRoutineCore.with(factoryOf(invocation, this))
+                               .async("test")
+                               .after(millis(500))
+                               .all()).containsExactly("test");
     }
 
     @Test

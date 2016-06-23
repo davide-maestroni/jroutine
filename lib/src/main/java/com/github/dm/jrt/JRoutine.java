@@ -281,7 +281,8 @@ public class JRoutine extends Streams {
      */
     @NotNull
     public static AutoProxyRoutineBuilder with(@NotNull final Object object) {
-        return (object instanceof Class) ? withClassOfType((Class<?>) object) : withInstance(object);
+        return (object instanceof Class) ? withClassOfType((Class<?>) object)
+                : withInstance(object);
     }
 
     /**

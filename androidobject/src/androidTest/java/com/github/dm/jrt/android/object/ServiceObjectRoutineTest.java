@@ -81,18 +81,21 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     public void testAliasMethod() throws NoSuchMethodException {
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine =
-                JRoutineServiceObject.on(serviceFrom(getActivity()))
-                                     .with(instanceOf(TestClass.class))
-                                     .invocationConfiguration()
-                                     .withRunner(Runners.poolRunner())
-                                     .withMaxInstances(1)
-                                     .withCoreInstances(1)
-                                     .withOutputTimeoutAction(TimeoutActionType.BREAK)
-                                     .withLogLevel(Level.DEBUG)
-                                     .withLog(new NullLog())
-                                     .apply()
-                                     .method(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutineServiceObject.on(serviceFrom(getActivity()))
+                                                                     .with(instanceOf(
+                                                                             TestClass.class))
+                                                                     .invocationConfiguration()
+                                                                     .withRunner(
+                                                                             Runners.poolRunner())
+                                                                     .withMaxInstances(1)
+                                                                     .withCoreInstances(1)
+                                                                     .withOutputTimeoutAction(
+                                                                             TimeoutActionType
+                                                                                     .BREAK)
+                                                                     .withLogLevel(Level.DEBUG)
+                                                                     .withLog(new NullLog())
+                                                                     .apply()
+                                                                     .method(TestClass.GET);
         assertThat(routine.sync().close().after(timeout).all()).containsExactly(-77L);
     }
 

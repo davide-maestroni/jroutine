@@ -1845,10 +1845,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .sync()
-                               .collect(null, null);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).sync().collect(null, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1888,10 +1885,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         final Consumer<Object> consumer = null;
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .sync()
-                               .onOutput(consumer);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).sync().onOutput(consumer);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1899,10 +1893,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .async()
-                               .onOutput(consumer);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).async().onOutput(consumer);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2025,10 +2016,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .sequential()
-                               .flatMap(null);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).sequential().flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2847,10 +2835,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testReduceSeedNullPointerError() {
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .async()
-                               .reduce(null, null);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).async().reduce(null, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2858,10 +2843,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .sync()
-                               .reduce(null, null);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).sync().reduce(null, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2959,8 +2941,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testSize() {
 
         final Channel<Object, Object> channel = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                    .with(IdentityContextInvocation
-                                                                            .factoryOf())
+                                                                    .with(IdentityContextInvocation.factoryOf())
                                                                     .async();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
@@ -3404,10 +3385,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf()
-                               .on(loaderFrom(getActivity()))
-                               .async()
-                               .thenGetMore(null);
+            LoaderStreamsCompat.streamOf().on(loaderFrom(getActivity())).async().thenGetMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {

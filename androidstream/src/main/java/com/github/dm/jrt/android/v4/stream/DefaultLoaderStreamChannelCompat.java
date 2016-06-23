@@ -1011,6 +1011,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> on(@Nullable final LoaderContextCompat context) {
+        return (LoaderStreamChannelCompat<IN, OUT>) newChannel(newConfiguration(context));
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallel(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
@@ -1074,12 +1080,6 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     streamLoaderConfiguration() {
         return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(
                 mStreamConfigurable, mStreamConfiguration.getStreamLoaderConfiguration());
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> on(@Nullable final LoaderContextCompat context) {
-        return (LoaderStreamChannelCompat<IN, OUT>) newChannel(newConfiguration(context));
     }
 
     @NotNull

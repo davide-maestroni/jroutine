@@ -1026,16 +1026,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     private static void testOnComplete(final Activity activity) {
         final AtomicBoolean isComplete = new AtomicBoolean(false);
-        assertThat(LoaderStreams.streamOf("test")
-                                .on(loaderFrom(activity))
-                                .onComplete(new Runnable() {
+        assertThat(
+                LoaderStreams.streamOf("test").on(loaderFrom(activity)).onComplete(new Runnable() {
 
-                                    public void run() {
-                                        isComplete.set(true);
-                                    }
-                                })
-                                .after(seconds(3))
-                                .all()).isEmpty();
+                    public void run() {
+                        isComplete.set(true);
+                    }
+                }).after(seconds(3)).all()).isEmpty();
         assertThat(isComplete.get()).isTrue();
         isComplete.set(false);
         assertThat(LoaderStreams.streamOf("test")
@@ -3283,9 +3280,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .sync()
                                 .then((String[]) null)
                                 .all()).isEmpty();
-        assertThat(
-                LoaderStreams.streamOf("test1").on(loaderFrom(getActivity())).sync().then().all())
-                .isEmpty();
+        assertThat(LoaderStreams.streamOf("test1")
+                                .on(loaderFrom(getActivity()))
+                                .sync()
+                                .then()
+                                .all()).isEmpty();
         assertThat(LoaderStreams.streamOf("test1")
                                 .on(loaderFrom(getActivity()))
                                 .sync()
@@ -3632,10 +3631,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreams.streamOf()
-                         .on(loaderFrom(getActivity()))
-                         .parallel()
-                         .thenGetMore(3, null);
+            LoaderStreams.streamOf().on(loaderFrom(getActivity())).parallel().thenGetMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {

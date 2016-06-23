@@ -263,8 +263,8 @@ public class LoaderBuilder {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(@NotNull final Invocation<IN, OUT> invocation,
-            @Nullable final Object... args) {
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
+            @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
         return with(tokenOf(invocation), args);
     }
 

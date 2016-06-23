@@ -468,10 +468,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            SparseChannels.selectParcelableInput(0, 0,
-                    JRoutineLoader.on(loaderFrom(getActivity()))
-                                  .with(factoryOf(Sort.class))
-                                  .async());
+            SparseChannels.selectParcelableInput(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
+                                                                     .with(factoryOf(Sort.class))
+                                                                     .async());
 
             fail();
 
@@ -756,10 +755,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            SparseChannels.selectParcelableOutput(0, 0,
-                    JRoutineLoader.on(loaderFrom(getActivity()))
-                                  .with(factoryOf(Sort.class))
-                                  .async());
+            SparseChannels.selectParcelableOutput(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
+                                                                      .with(factoryOf(Sort.class))
+                                                                      .async());
 
             fail();
 

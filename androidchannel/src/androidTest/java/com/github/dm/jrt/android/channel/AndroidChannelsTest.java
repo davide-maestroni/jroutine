@@ -62,7 +62,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testCombine() {
 
         final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         final Channel<Integer, Integer> channel2 = JRoutineService.on(serviceFrom(getActivity()))
@@ -335,11 +336,13 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testDistribute() {
 
         final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute(channel1, channel2)
@@ -429,7 +432,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testDistributeError() {
 
         final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute(channel1)
@@ -471,11 +475,13 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testDistributePlaceholder() {
 
         final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute((Object) null, channel1, channel2)
@@ -568,7 +574,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testDistributePlaceholderError() {
 
         final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                                .with(factoryOf(PassingString.class))
+                                                                .with(factoryOf(
+                                                                        PassingString.class))
                                                                 .async()
                                                                 .sortedByCall();
         AndroidChannels.distribute((Object) null, channel1)

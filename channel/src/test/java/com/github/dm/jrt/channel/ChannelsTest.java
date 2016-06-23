@@ -226,7 +226,8 @@ public class ChannelsTest {
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
-        channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+        channel2 =
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Channels.combine(channel1, channel2).buildChannels().abort();
 
         try {
@@ -250,7 +251,8 @@ public class ChannelsTest {
         }
 
         channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
-        channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+        channel2 =
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Channels.combine(3, channel1, channel2).buildChannels().abort();
 
         try {
@@ -274,7 +276,8 @@ public class ChannelsTest {
         }
 
         channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
-        channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+        channel2 =
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Channels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels().abort();
 
         try {
@@ -298,7 +301,8 @@ public class ChannelsTest {
         }
 
         channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
-        channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+        channel2 =
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         Channels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                 .buildChannels()
                 .abort();
@@ -324,7 +328,8 @@ public class ChannelsTest {
         }
 
         channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async().sortedByCall();
-        channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
+        channel2 =
+                JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).async().sortedByCall();
         final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);

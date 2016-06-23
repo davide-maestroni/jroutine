@@ -294,7 +294,8 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutineObject.with(instance(new DuplicateAnnotation())).method(DuplicateAnnotation.GET);
+            JRoutineObject.with(instance(new DuplicateAnnotation()))
+                          .method(DuplicateAnnotation.GET);
 
             fail();
 

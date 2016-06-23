@@ -95,9 +95,10 @@ public class OperatorsTest {
                                .close()
                                .after(seconds(3))
                                .next()).isEqualTo(0);
-        assertThat(
-                JRoutineCore.with(Operators.average()).async(1L, 2L, 3L, 4L).after(seconds(3)).next())
-                .isEqualTo(2L);
+        assertThat(JRoutineCore.with(Operators.average())
+                               .async(1L, 2L, 3L, 4L)
+                               .after(seconds(3))
+                               .next()).isEqualTo(2L);
         assertThat(JRoutineCore.with(Operators.average())
                                .async(1, 2, 3, 4)
                                .after(seconds(3))
@@ -114,9 +115,10 @@ public class OperatorsTest {
                                .async(1.0, 2.0, 3.0, 4.0)
                                .after(seconds(3))
                                .next()).isEqualTo(2.5);
-        assertThat(
-                JRoutineCore.with(Operators.average()).async(1f, 2f, 3f, 4f).after(seconds(3)).next())
-                .isEqualTo(2.5f);
+        assertThat(JRoutineCore.with(Operators.average())
+                               .async(1f, 2f, 3f, 4f)
+                               .after(seconds(3))
+                               .next()).isEqualTo(2.5f);
         assertThat(JRoutineCore.with(Operators.average())
                                .async(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                        BigInteger.valueOf(3), BigInteger.valueOf(4))
@@ -144,18 +146,17 @@ public class OperatorsTest {
 
     @Test
     public void testAverageByte() {
-        assertThat(JRoutineCore.with(Operators.averageByte())
-                               .async()
-                               .close()
-                               .after(seconds(3))
-                               .next()).isEqualTo((byte) 0);
+        assertThat(
+                JRoutineCore.with(Operators.averageByte()).async().close().after(seconds(3)).next())
+                .isEqualTo((byte) 0);
         assertThat(JRoutineCore.with(Operators.averageByte())
                                .async(1L, 2L, 3L, 4L)
                                .after(seconds(3))
                                .next()).isEqualTo((byte) 2);
-        assertThat(
-                JRoutineCore.with(Operators.averageByte()).async(1, 2, 3, 4).after(seconds(3)).next())
-                .isEqualTo((byte) 2);
+        assertThat(JRoutineCore.with(Operators.averageByte())
+                               .async(1, 2, 3, 4)
+                               .after(seconds(3))
+                               .next()).isEqualTo((byte) 2);
         assertThat(JRoutineCore.with(Operators.averageByte())
                                .async((short) 1, (short) 2, (short) 3, (short) 4)
                                .after(seconds(3))
@@ -186,9 +187,11 @@ public class OperatorsTest {
 
     @Test
     public void testAverageDouble() {
-        assertThat(
-                JRoutineCore.with(Operators.averageDouble()).async().close().after(seconds(3)).next())
-                .isEqualTo(0d);
+        assertThat(JRoutineCore.with(Operators.averageDouble())
+                               .async()
+                               .close()
+                               .after(seconds(3))
+                               .next()).isEqualTo(0d);
         assertThat(JRoutineCore.with(Operators.averageDouble())
                                .async(1L, 2L, 3L, 4L)
                                .after(seconds(3))
@@ -313,18 +316,17 @@ public class OperatorsTest {
 
     @Test
     public void testAverageLong() {
-        assertThat(JRoutineCore.with(Operators.averageLong())
-                               .async()
-                               .close()
-                               .after(seconds(3))
-                               .next()).isEqualTo(0L);
+        assertThat(
+                JRoutineCore.with(Operators.averageLong()).async().close().after(seconds(3)).next())
+                .isEqualTo(0L);
         assertThat(JRoutineCore.with(Operators.averageLong())
                                .async(1L, 2L, 3L, 4L)
                                .after(seconds(3))
                                .next()).isEqualTo(2L);
-        assertThat(
-                JRoutineCore.with(Operators.averageLong()).async(1, 2, 3, 4).after(seconds(3)).next())
-                .isEqualTo(2L);
+        assertThat(JRoutineCore.with(Operators.averageLong())
+                               .async(1, 2, 3, 4)
+                               .after(seconds(3))
+                               .next()).isEqualTo(2L);
         assertThat(JRoutineCore.with(Operators.averageLong())
                                .async((short) 1, (short) 2, (short) 3, (short) 4)
                                .after(seconds(3))
@@ -544,10 +546,8 @@ public class OperatorsTest {
 
     @Test
     public void testIdentity() {
-        assertThat(JRoutineCore.with(Operators.identity())
-                               .async(1, "test")
-                               .after(seconds(3))
-                               .all()).containsExactly(1, "test");
+        assertThat(JRoutineCore.with(Operators.identity()).async(1, "test").after(seconds(3)).all())
+                .containsExactly(1, "test");
     }
 
     @Test
@@ -620,8 +620,11 @@ public class OperatorsTest {
                                .async("Z TEST", "test")
                                .after(seconds(3))
                                .next()).isEqualTo("Z TEST");
-        assertThat(
-                JRoutineCore.with(Operators.max()).async().close().after(seconds(3)).all()).isEmpty();
+        assertThat(JRoutineCore.with(Operators.max())
+                               .async()
+                               .close()
+                               .after(seconds(3))
+                               .all()).isEmpty();
         assertThat(JRoutineCore.with(Operators.maxBy(String.CASE_INSENSITIVE_ORDER))
                                .async()
                                .close()
@@ -648,8 +651,11 @@ public class OperatorsTest {
                                .async("Z TEST", "test")
                                .after(seconds(3))
                                .next()).isEqualTo("test");
-        assertThat(
-                JRoutineCore.with(Operators.min()).async().close().after(seconds(3)).all()).isEmpty();
+        assertThat(JRoutineCore.with(Operators.min())
+                               .async()
+                               .close()
+                               .after(seconds(3))
+                               .all()).isEmpty();
         assertThat(JRoutineCore.with(Operators.minBy(String.CASE_INSENSITIVE_ORDER))
                                .async()
                                .close()
@@ -667,10 +673,9 @@ public class OperatorsTest {
 
     @Test
     public void testNone() {
-        assertThat(JRoutineCore.with(Operators.none())
-                               .async("test1", null, 3)
-                               .after(seconds(3))
-                               .all()).isEmpty();
+        assertThat(
+                JRoutineCore.with(Operators.none()).async("test1", null, 3).after(seconds(3)).all())
+                .isEmpty();
         assertThat(JRoutineCore.with(Operators.none())
                                .async()
                                .close()
@@ -766,11 +771,9 @@ public class OperatorsTest {
                                .async("test", "test1", ref)
                                .after(seconds(3))
                                .all()).containsExactly("test", "test1");
-        assertThat(JRoutineCore.with(Operators.isNotSameAs(0))
-                               .async()
-                               .close()
-                               .after(seconds(3))
-                               .all()).isEmpty();
+        assertThat(
+                JRoutineCore.with(Operators.isNotSameAs(0)).async().close().after(seconds(3)).all())
+                .isEmpty();
         assertThat(Operators.isNotSameAs(ref)).isNotSameAs(Operators.isEqualTo(ref));
         assertThat(Operators.isNotSameAs(null)).isNotSameAs(Operators.isEqualTo(null));
     }
@@ -794,11 +797,8 @@ public class OperatorsTest {
                                .async("test", "test1", ref)
                                .after(seconds(3))
                                .all()).containsExactly(ref);
-        assertThat(JRoutineCore.with(Operators.isSameAs(0))
-                               .async()
-                               .close()
-                               .after(seconds(3))
-                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(Operators.isSameAs(0)).async().close().after(seconds(3)).all())
+                .isEmpty();
         assertThat(Operators.isSameAs(ref)).isEqualTo(Operators.isSameAs(ref));
         assertThat(Operators.isSameAs(null)).isEqualTo(Operators.isSameAs(null));
     }
@@ -871,10 +871,8 @@ public class OperatorsTest {
 
     @Test
     public void testSumBig() {
-        assertThat(JRoutineCore.with(Operators.sumBig())
-                               .async(1, 2, 3, 4)
-                               .after(seconds(3))
-                               .next()).isEqualTo(new BigDecimal(10));
+        assertThat(JRoutineCore.with(Operators.sumBig()).async(1, 2, 3, 4).after(seconds(3)).next())
+                .isEqualTo(new BigDecimal(10));
     }
 
     @Test
@@ -897,27 +895,28 @@ public class OperatorsTest {
                                .close()
                                .after(seconds(3))
                                .next()).isEqualTo(0d);
-        assertThat(JRoutineCore.with(Operators.sumDouble())
-                               .async(1, 2, 3, 4)
-                               .after(seconds(3))
-                               .next()).isEqualTo(10d);
+        assertThat(
+                JRoutineCore.with(Operators.sumDouble()).async(1, 2, 3, 4).after(seconds(3)).next())
+                .isEqualTo(10d);
     }
 
     @Test
     public void testSumFloat() {
+        assertThat(JRoutineCore.with(Operators.sumFloat()).async().close().after(seconds(3)).next())
+                .isEqualTo(0f);
         assertThat(JRoutineCore.with(Operators.sumFloat())
-                               .async()
-                               .close()
+                               .async(1, 2, 3, 4)
                                .after(seconds(3))
-                               .next()).isEqualTo(0f);
-        assertThat(JRoutineCore.with(Operators.sumFloat()).async(1, 2, 3, 4).after(seconds(3)).next())
-                .isEqualTo(10f);
+                               .next()).isEqualTo(10f);
     }
 
     @Test
     public void testSumInteger() {
-        assertThat(JRoutineCore.with(Operators.sumInteger()).async().close().after(seconds(3)).next())
-                .isEqualTo(0);
+        assertThat(JRoutineCore.with(Operators.sumInteger())
+                               .async()
+                               .close()
+                               .after(seconds(3))
+                               .next()).isEqualTo(0);
         assertThat(JRoutineCore.with(Operators.sumInteger())
                                .async(1, 2, 3, 4)
                                .after(seconds(3))
@@ -939,13 +938,12 @@ public class OperatorsTest {
 
     @Test
     public void testSumShort() {
+        assertThat(JRoutineCore.with(Operators.sumShort()).async().close().after(seconds(3)).next())
+                .isEqualTo((short) 0);
         assertThat(JRoutineCore.with(Operators.sumShort())
-                               .async()
-                               .close()
+                               .async(1, 2, 3, 4)
                                .after(seconds(3))
-                               .next()).isEqualTo((short) 0);
-        assertThat(JRoutineCore.with(Operators.sumShort()).async(1, 2, 3, 4).after(seconds(3)).next())
-                .isEqualTo((short) 10);
+                               .next()).isEqualTo((short) 10);
     }
 
     @Test
@@ -983,13 +981,14 @@ public class OperatorsTest {
 
     @Test
     public void testToSet() {
-        assertThat(JRoutineCore.with(Operators.toSet())
-                               .async("test", "test")
-                               .after(seconds(3))
-                               .next()).isEqualTo(Collections.singleton("test"));
         assertThat(
-                JRoutineCore.with(Operators.toSet()).async("test1", "test2").after(seconds(3)).next())
-                .isEqualTo(new HashSet<String>(Arrays.asList("test1", "test2")));
+                JRoutineCore.with(Operators.toSet()).async("test", "test").after(seconds(3)).next())
+                .isEqualTo(Collections.singleton("test"));
+        assertThat(JRoutineCore.with(Operators.toSet())
+                               .async("test1", "test2")
+                               .after(seconds(3))
+                               .next()).isEqualTo(
+                new HashSet<String>(Arrays.asList("test1", "test2")));
     }
 
     @Test
@@ -1004,12 +1003,12 @@ public class OperatorsTest {
 
     @Test
     public void testUnique() {
-        assertThat(JRoutineCore.with(Operators.unique())
-                               .async("test", "test")
-                               .after(seconds(3))
-                               .all()).containsExactly("test");
         assertThat(
-                JRoutineCore.with(Operators.unique()).async("test1", "test2").after(seconds(3)).all())
-                .containsExactly("test1", "test2");
+                JRoutineCore.with(Operators.unique()).async("test", "test").after(seconds(3)).all())
+                .containsExactly("test");
+        assertThat(JRoutineCore.with(Operators.unique())
+                               .async("test1", "test2")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2");
     }
 }

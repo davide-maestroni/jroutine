@@ -180,7 +180,8 @@ public class LoaderObjectRoutineActivityTest
 
         final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine = JRoutineLoaderObject.on(loaderFrom(getActivity()))
-                                                                    .with(instanceOf(TestClass.class))
+                                                                    .with(instanceOf(
+                                                                            TestClass.class))
                                                                     .invocationConfiguration()
                                                                     .withRunner(
                                                                             Runners.poolRunner())
@@ -414,10 +415,10 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine3 =
-                JRoutineLoaderObject.on(loaderFrom(getActivity()))
-                                    .with(instanceOf(TestClass.class))
-                                    .method(TestClass.THROW);
+        final Routine<Object, Object> routine3 = JRoutineLoaderObject.on(loaderFrom(getActivity()))
+                                                                     .with(instanceOf(
+                                                                             TestClass.class))
+                                                                     .method(TestClass.THROW);
 
         try {
 
@@ -689,17 +690,20 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine2 =
-                JRoutineLoaderObject.on(loaderFrom(getActivity()))
-                                    .with(instanceOf(TestClass.class))
-                                    .invocationConfiguration()
-                                    .withRunner(Runners.poolRunner())
-                                    .withMaxInstances(1)
-                                    .apply()
-                                    .objectConfiguration()
-                                    .withSharedFields("test")
-                                    .apply()
-                                    .method(TestClass.class.getMethod("getLong"));
+        final Routine<Object, Object> routine2 = JRoutineLoaderObject.on(loaderFrom(getActivity()))
+                                                                     .with(instanceOf(
+                                                                             TestClass.class))
+                                                                     .invocationConfiguration()
+                                                                     .withRunner(
+                                                                             Runners.poolRunner())
+                                                                     .withMaxInstances(1)
+                                                                     .apply()
+                                                                     .objectConfiguration()
+                                                                     .withSharedFields("test")
+                                                                     .apply()
+                                                                     .method(TestClass.class
+                                                                             .getMethod(
+                                                                             "getLong"));
 
         assertThat(routine2.sync().close().after(timeout).all()).containsExactly(-77L);
 
@@ -713,13 +717,14 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final UnitDuration timeout = seconds(10);
-        final Routine<Object, Object> routine1 =
-                JRoutineLoaderObject.on(loaderFrom(getActivity()))
-                                    .with(instanceOf(TestClass.class))
-                                    .invocationConfiguration()
-                                    .withRunner(Runners.poolRunner())
-                                    .apply()
-                                    .method("getLong");
+        final Routine<Object, Object> routine1 = JRoutineLoaderObject.on(loaderFrom(getActivity()))
+                                                                     .with(instanceOf(
+                                                                             TestClass.class))
+                                                                     .invocationConfiguration()
+                                                                     .withRunner(
+                                                                             Runners.poolRunner())
+                                                                     .apply()
+                                                                     .method("getLong");
 
         assertThat(routine1.sync().close().after(timeout).all()).containsExactly(-77L);
     }

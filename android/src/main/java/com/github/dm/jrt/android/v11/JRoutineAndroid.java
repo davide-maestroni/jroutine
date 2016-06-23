@@ -67,8 +67,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder oni(@NotNull final Activity activity) {
-        return oni(loaderFrom(activity));
+    public static LoaderBuilder on(@NotNull final Activity activity) {
+        return on(loaderFrom(activity));
     }
 
     /**
@@ -79,9 +79,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder oni(@NotNull final Activity activity,
+    public static LoaderBuilder on(@NotNull final Activity activity,
             @NotNull final Context context) {
-        return oni(loaderFrom(activity, context));
+        return on(loaderFrom(activity, context));
     }
 
     /**
@@ -91,8 +91,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder oni(@NotNull final Context context) {
-        return oni(serviceFrom(context));
+    public static ServiceBuilder on(@NotNull final Context context) {
+        return on(serviceFrom(context));
     }
 
     /**
@@ -103,9 +103,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder oni(@NotNull final Context context,
+    public static ServiceBuilder on(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
-        return oni(serviceFrom(context, serviceClass));
+        return on(serviceFrom(context, serviceClass));
     }
 
     /**
@@ -116,9 +116,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder oni(@NotNull final Context context,
-            @NotNull final Intent service) {
-        return oni(serviceFrom(context, service));
+    public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
+        return on(serviceFrom(context, service));
     }
 
     /**
@@ -128,8 +127,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder oni(@NotNull final Fragment fragment) {
-        return oni(loaderFrom(fragment));
+    public static LoaderBuilder on(@NotNull final Fragment fragment) {
+        return on(loaderFrom(fragment));
     }
 
     /**
@@ -140,9 +139,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder oni(@NotNull final Fragment fragment,
+    public static LoaderBuilder on(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-        return oni(loaderFrom(fragment, context));
+        return on(loaderFrom(fragment, context));
     }
 
     /**
@@ -152,7 +151,7 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder oni(@NotNull final LoaderContext context) {
+    public static LoaderBuilder on(@NotNull final LoaderContext context) {
         return new LoaderBuilder(context);
     }
 
@@ -163,7 +162,7 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder oni(@NotNull final ServiceContext context) {
+    public static ServiceBuilder on(@NotNull final ServiceContext context) {
         return new ServiceBuilder(context) {};
     }
 }

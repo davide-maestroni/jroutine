@@ -73,11 +73,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     public void testCombine() {
 
-        final Channel<String, String> channel1 =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                    .with(factoryOf(PassingString.class))
-                                    .async()
-                                    .sortedByCall();
+        final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                     .with(factoryOf(
+                                                                             PassingString.class))
+                                                                     .async()
+                                                                     .sortedByCall();
         final Channel<Integer, Integer> channel2 =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(factoryOf(PassingInteger.class))

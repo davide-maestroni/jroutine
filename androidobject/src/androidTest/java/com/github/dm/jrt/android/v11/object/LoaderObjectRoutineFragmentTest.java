@@ -102,7 +102,8 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine = JRoutineLoaderObject.on(loaderFrom(fragment))
-                                                                    .with(instanceOf(TestClass.class))
+                                                                    .with(instanceOf(
+                                                                            TestClass.class))
                                                                     .invocationConfiguration()
                                                                     .withRunner(
                                                                             Runners.poolRunner())

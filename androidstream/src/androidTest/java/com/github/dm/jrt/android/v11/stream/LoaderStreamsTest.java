@@ -1439,12 +1439,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        LoaderStreams.streamOf("test1")
-                     .on(context)
-                     .loaderId(11)
-                     .async()
-                     .map(toUpperCase())
-                     .bind();
+        LoaderStreams.streamOf("test1").on(context).loaderId(11).async().map(toUpperCase()).bind();
         assertThat(JRoutineLoader.on(context)
                                  .withId(11)
                                  .buildChannel()

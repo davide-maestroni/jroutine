@@ -370,7 +370,7 @@ public class RunnerTest {
         runner.set(Runners.zeroDelayRunner(new RunnerDecorator(Runners.syncRunner()) {
 
             @Override
-            public boolean isManagedThread(@NotNull final Thread thread) {
+            public boolean isManagedThread() {
 
                 return true;
             }
@@ -621,7 +621,7 @@ public class RunnerTest {
 
         private Execution mLastExecution;
 
-        private Thread mThread;
+        private long mThreadId;
 
         @Override
         public void cancel(@NotNull final Execution execution) {
@@ -630,9 +630,9 @@ public class RunnerTest {
         }
 
         @Override
-        public boolean isManagedThread(@NotNull final Thread thread) {
+        public boolean isManagedThread() {
 
-            return (thread == mThread);
+            return (Thread.currentThread().getId() == mThreadId);
         }
 
         @Override
@@ -654,7 +654,7 @@ public class RunnerTest {
 
         private void setExecutionThread(final Thread thread) {
 
-            mThread = thread;
+            mThreadId = thread.getId();
         }
     }
 }

@@ -33,6 +33,6 @@ public abstract class AsyncRunner extends Runner {
 
     @Override
     public boolean isExecutionThread() {
-        return isManagedThread(Thread.currentThread());
+        return isManagedThread();
     }
 }

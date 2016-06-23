@@ -51,8 +51,8 @@ public class RunnerDecorator extends Runner {
     }
 
     @Override
-    public boolean isManagedThread(@NotNull final Thread thread) {
-        return mRunner.isManagedThread(thread);
+    public boolean isManagedThread() {
+        return mRunner.isManagedThread();
     }
 
     @Override

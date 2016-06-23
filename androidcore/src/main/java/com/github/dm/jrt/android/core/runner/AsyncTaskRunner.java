@@ -77,7 +77,7 @@ class AsyncTaskRunner extends AsyncRunner {
     }
 
     @Override
-    public boolean isManagedThread(@NotNull final Thread thread) {
+    public boolean isManagedThread() {
         final Boolean isManaged = mIsManaged.get();
         return (isManaged != null) && isManaged;
     }

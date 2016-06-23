@@ -91,7 +91,7 @@ class ZeroDelayRunner extends RunnerDecorator {
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-        if ((delay == 0) && isManagedThread(Thread.currentThread())) {
+        if ((delay == 0) && isManagedThread()) {
             ExecutionDecorator decorator;
             synchronized (mExecutions) {
                 final WeakIdentityHashMap<Execution, ExecutionDecorator> executions = mExecutions;

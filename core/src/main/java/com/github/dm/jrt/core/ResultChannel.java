@@ -712,7 +712,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                             + "consumer");
         }
 
-        if (Runner.isManagedThread()) {
+        if (Runner.isCurrentThreadManaged()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on a runner thread: " + Thread.currentThread()
                             + "\nTry binding the output channel to another channel or an output "

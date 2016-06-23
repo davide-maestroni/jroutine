@@ -43,16 +43,6 @@ public abstract class DeepEqualObject {
         mArgs = cloneArgs(args);
     }
 
-    /**
-     * Constructor.
-     * <p>
-     * Forces the inheriting classes to explicitly pass the arguments.
-     */
-    @SuppressWarnings("unused")
-    private DeepEqualObject() {
-        this(null);
-    }
-
     @Override
     public int hashCode() {
         return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);

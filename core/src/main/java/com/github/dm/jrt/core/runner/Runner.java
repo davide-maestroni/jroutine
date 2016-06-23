@@ -71,10 +71,9 @@ public abstract class Runner {
      *
      * @return whether the calling thread is managed by a runner.
      */
-    public static boolean isManagedThread() {
-        final Thread thread = Thread.currentThread();
+    public static boolean isCurrentThreadManaged() {
         for (final Runner runner : sRunners.prune().keySet()) {
-            if ((runner != null) && runner.isManagedThread(thread)) {
+            if ((runner != null) && runner.isManagedThread()) {
                 return true;
             }
         }
@@ -119,10 +118,9 @@ public abstract class Runner {
      * <br>
      * A synchronous runner implementation will always return false.
      *
-     * @param thread the thread.
      * @return whether the thread is managed by the runner.
      */
-    public abstract boolean isManagedThread(@NotNull Thread thread);
+    public abstract boolean isManagedThread();
 
     /**
      * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the

@@ -41,7 +41,7 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
-                        meanRoutine.async(squareRoutine.parallel(parseRoutine.parallel(args)))
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .after(seconds(3))
                                    .next();
                 // Or:
@@ -118,7 +118,7 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
-                        meanRoutine.async(squareRoutine.parallel(parseRoutine.parallel(args)))
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .after(seconds(3))
                                    .next();
                 // Or:

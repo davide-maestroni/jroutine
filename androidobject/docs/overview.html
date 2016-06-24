@@ -50,14 +50,13 @@
                                     .with(instanceOf(BitmapLoader.class))
                                     .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                                    .apply()
+                                    .applied()
                                     .method(LOAD_BITMAP)
                                     .asyncCall(URI.create(IMAGE_URI))
                                     .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
-
                                             final Throwable cause = error.getCause();
                                             Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                     cause.getMessage() : "Cannot load image",
@@ -66,7 +65,6 @@
 
                                         &commat;Override
                                         public void onOutput(final Bitmap bitmap) {
-
                                             imageView.setImageBitmap(bitmap);
                                         }
                                     });
@@ -77,7 +75,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -122,7 +119,6 @@
 
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
-
                                             final Throwable cause = error.getCause();
                                             Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                     cause.getMessage() : "Cannot load image",
@@ -131,7 +127,6 @@
 
                                         &commat;Override
                                         public void onOutput(final Bitmap bitmap) {
-
                                             imageView.setImageBitmap(bitmap);
                                         }
                                     });
@@ -151,7 +146,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -196,7 +190,6 @@
 
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
-
                                             final Throwable cause = error.getCause();
                                             Toast.makeText(MainTestActivity.this, (cause != null) ?
                                                     cause.getMessage() : "Cannot load image",
@@ -205,7 +198,6 @@
 
                                         &commat;Override
                                         public void onOutput(final Bitmap bitmap) {
-
                                             imageView.setImageBitmap(bitmap);
                                         }
                                     });
@@ -225,7 +217,6 @@
                 &commat;Alias(LOAD_BITMAP)
                 &commat;NotNull
                 public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
-
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -247,7 +238,6 @@
                 private final BitmapLoader mLoader;
 
                 public MyContext(&commat;NotNull final Context base) {
-
                     super(base);
                     mLoader = new BitmapLoader();
                 }
@@ -255,7 +245,6 @@
                 &commat;Nullable
                 public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
                         &commat;NotNull final Object... args) {
-
                     if (type == BitmapLoader.class) {
                         return type.cast(mLoader);
                     }

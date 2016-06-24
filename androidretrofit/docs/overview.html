@@ -107,14 +107,12 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-            
                 return repo -> {
                     adapter.add(repo);
                 };
             }
             
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
@@ -124,7 +122,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -163,7 +160,6 @@
 
                 &commat;Override
                 public String toString() {
-
                     return name;
                 }
             }
@@ -181,14 +177,12 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-            
                 return repo -> {
                     adapter.add(repo);
                 };
             }
             
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
@@ -198,7 +192,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -237,7 +230,6 @@
 
                 &commat;Override
                 public String toString() {
-
                     return name;
                 }
             }

@@ -47,12 +47,12 @@
                         JRoutineCore.with(Operators.&lt;Integer&gt;averageDouble())).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
                         JRoutineCore.with(functionMapping(Math::sqrt)).buildRoutine();
-                final Double rms = parseRoutine.parallel(args)
-                                               .bind(squareRoutine.parallel())
+                final Double rms = parseRoutine.parallelCall(args)
+                                               .bind(squareRoutine.parallelCall())
                                                .close()
-                                               .bind(meanRoutine.async())
+                                               .bind(meanRoutine.asyncCall())
                                                .close()
-                                               .bind(sqrtRoutine.sync())
+                                               .bind(sqrtRoutine.syncCall())
                                                .close()
                                                .afterMax(seconds(3))
                                                .next();

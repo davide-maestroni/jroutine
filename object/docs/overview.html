@@ -47,15 +47,15 @@
                 final ObjectRoutineBuilder builder = JRoutineObject.with(classOfType(Main.class))
                                                                    .objectConfiguration()
                                                                    .withSharedFields()
-                                                                   .apply()
+                                                                   .applied()
                                                                    .invocationConfiguration()
                                                                    .withReadTimeout(seconds(3))
-                                                                   .apply();
+                                                                   .applied();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
-                final Double rms = meanRoutine.async(
-                        squareRoutine.parallel(parseRoutine.parallel(args)).all()).next();
+                final Double rms = meanRoutine.asyncCall(
+                        squareRoutine.parallelCall(parseRoutine.parallelCall(args)).all()).next();
                 System.out.println(rms);
                 System.exit(0);
             }
@@ -100,10 +100,10 @@
                 final AsyncMain proxy = JRoutineObject.with(instance(main))
                                                       .objectConfiguration()
                                                       .withSharedFields()
-                                                      .apply()
+                                                      .applied()
                                                       .invocationConfiguration()
                                                       .withReadTimeout(seconds(3))
-                                                      .apply()
+                                                      .applied()
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);

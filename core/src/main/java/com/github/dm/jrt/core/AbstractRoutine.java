@@ -130,25 +130,25 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     @NotNull
-    public Channel<IN, OUT> async() {
+    public Channel<IN, OUT> asyncCall() {
         mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
         return invoke(InvocationType.ASYNC);
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel() {
+    public Channel<IN, OUT> parallelCall() {
         mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
-        return getElementRoutine().async();
+        return getElementRoutine().asyncCall();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential() {
+    public Channel<IN, OUT> sequentialCall() {
         mLogger.dbg("invoking routine: %s", InvocationMode.SEQUENTIAL);
-        return getElementRoutine().sync();
+        return getElementRoutine().syncCall();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync() {
+    public Channel<IN, OUT> syncCall() {
         mLogger.dbg("invoking routine: %s", InvocationMode.SYNC);
         return invoke(InvocationType.SYNC);
     }
@@ -324,14 +324,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.async().close());
+                result.pass(mRoutine.asyncCall().close());
             }
         }
 
         @Override
         public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             mHasInputs = true;
-            result.pass(mRoutine.async(input));
+            result.pass(mRoutine.asyncCall(input));
         }
 
         @Override
@@ -364,14 +364,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.sync().close());
+                result.pass(mRoutine.syncCall().close());
             }
         }
 
         @Override
         public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             mHasInputs = true;
-            result.pass(mRoutine.sync(input));
+            result.pass(mRoutine.syncCall(input));
         }
 
         @Override

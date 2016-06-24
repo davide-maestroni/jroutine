@@ -72,11 +72,11 @@ public class LoaderRoutineRotationTest
                                                                             UnitDuration.minutes(1))
                                                                     .applied()
                                                                     .buildRoutine();
-        routine.async("test1");
+        routine.asyncCall("test1");
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.async("test2").after(timeout).next()).isEqualTo("TEST1");
+        assertThat(routine.asyncCall("test2").after(timeout).next()).isEqualTo("TEST1");
     }
 
     public void testActivityRotationChannel() throws InterruptedException {
@@ -95,7 +95,7 @@ public class LoaderRoutineRotationTest
                             .loaderConfiguration()
                             .withLoaderId(0)
                             .applied()
-                            .async("test1", "test2");
+                            .asyncCall("test1", "test2");
 
         simulateRotation();
 
@@ -117,8 +117,8 @@ public class LoaderRoutineRotationTest
                                                                      .with(factoryOf(
                                                                              ToUpperCase.class))
                                                                      .buildRoutine();
-        routine1.async("test1");
-        routine1.async("test2");
+        routine1.asyncCall("test1");
+        routine1.asyncCall("test2");
 
         simulateRotation();
 
@@ -126,8 +126,8 @@ public class LoaderRoutineRotationTest
                                                                      .with(factoryOf(
                                                                              ToUpperCase.class))
                                                                      .buildRoutine();
-        final Channel<?, String> result1 = routine2.async("test1").after(timeout);
-        final Channel<?, String> result2 = routine2.async("test2").after(timeout);
+        final Channel<?, String> result1 = routine2.asyncCall("test1").after(timeout);
+        final Channel<?, String> result2 = routine2.asyncCall("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -145,16 +145,16 @@ public class LoaderRoutineRotationTest
         final Routine<Data, Data> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(factoryOf(Delay.class))
                                                                  .buildRoutine();
-        routine1.async(data1);
-        routine1.async(data1);
+        routine1.asyncCall(data1);
+        routine1.asyncCall(data1);
 
         simulateRotation();
 
         final Routine<Data, Data> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(factoryOf(Delay.class))
                                                                  .buildRoutine();
-        final Channel<?, Data> result1 = routine2.async(data1).after(timeout);
-        final Channel<?, Data> result2 = routine2.async(data1).after(timeout);
+        final Channel<?, Data> result1 = routine2.asyncCall(data1).after(timeout);
+        final Channel<?, Data> result2 = routine2.asyncCall(data1).after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
@@ -179,11 +179,11 @@ public class LoaderRoutineRotationTest
                                                                     .withResultStaleTime(zero())
                                                                     .applied()
                                                                     .buildRoutine();
-        routine.async("test1");
+        routine.asyncCall("test1");
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.async("test2").after(timeout).next()).isEqualTo("TEST2");
+        assertThat(routine.asyncCall("test2").after(timeout).next()).isEqualTo("TEST2");
     }
 
     @TargetApi(VERSION_CODES.HONEYCOMB)

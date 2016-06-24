@@ -79,7 +79,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                         .serviceConfiguration()
                                                         .withRunnerClass(MainRunner.class)
                                                         .applied()
-                                                        .async(data);
+                                                        .asyncCall(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
@@ -97,7 +97,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
             JRoutineService.on(serviceFrom(getActivity()))
                            .with(factoryOf(Abort.class))
-                           .async()
+                           .asyncCall()
                            .close()
                            .after(timeout)
                            .next();
@@ -207,7 +207,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                .withLogClass(AndroidLog.class)
                                                                .applied()
                                                                .buildRoutine();
-        assertThat(routine.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+        assertThat(routine.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
     }
 
@@ -220,7 +220,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.BREAK)
                                                           .applied()
-                                                          .async("test1");
+                                                          .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
         assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
     }
@@ -234,7 +234,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.ABORT)
                                                           .applied()
-                                                          .async("test2");
+                                                          .asyncCall("test2");
 
         try {
 
@@ -258,7 +258,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withOutputTimeoutAction(
                                                                   TimeoutActionType.FAIL)
                                                           .applied()
-                                                          .async("test3");
+                                                          .asyncCall("test3");
 
         try {
 
@@ -288,11 +288,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withLogClass(AndroidLog.class)
                                                                 .applied()
                                                                 .buildRoutine();
-        assertThat(routine1.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
-        assertThat(routine1.async("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
-        assertThat(routine1.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+        assertThat(routine1.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(routine1.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(
+                routine1.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
@@ -310,11 +311,13 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withLogClass(AndroidLog.class)
                                                                 .applied()
                                                                 .buildRoutine();
-        assertThat(routine2.sync("1", "2", "3", "4", "5").after(timeout).all()).containsExactly("1",
-                "2", "3", "4", "5");
-        assertThat(routine2.async("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+        assertThat(routine2.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine2.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+        assertThat(
+                routine2.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+                "1", "2", "3", "4", "5");
+        assertThat(
+                routine2.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
@@ -330,12 +333,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withOutputOrder(OrderType.BY_CALL)
                                                                 .applied()
                                                                 .buildRoutine();
-        assertThat(routine3.sync("1", "2", "3", "4", "5").after(timeout).all()).containsExactly("1",
-                "2", "3", "4", "5");
-        assertThat(routine3.async("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+        assertThat(routine3.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine3.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+        assertThat(
+                routine3.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
+        assertThat(routine3.parallelCall("1", "2", "3", "4", "5")
+                           .after(timeout)
+                           .all()).containsExactly("1", "2", "3", "4", "5");
     }
 
     public void testInvocations4() throws InterruptedException {
@@ -350,11 +355,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withMaxInstances(2)
                                                                 .applied()
                                                                 .buildRoutine();
-        assertThat(routine4.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
-        assertThat(routine4.async("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
-        assertThat(routine4.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+        assertThat(routine4.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(routine4.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(
+                routine4.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
@@ -370,12 +376,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                               .withMaxInstances(2)
                                                               .applied()
                                                               .buildRoutine();
-        assertThat(routine4.sync().close().after(timeout).all()).containsOnly("test1", "test2",
+        assertThat(routine4.syncCall().close().after(timeout).all()).containsOnly("test1", "test2",
                 "test3");
-        assertThat(routine4.async().close().after(timeout).all()).containsOnly("test1", "test2",
+        assertThat(routine4.asyncCall().close().after(timeout).all()).containsOnly("test1", "test2",
                 "test3");
-        assertThat(routine4.parallel().close().after(timeout).all()).containsOnly("test1", "test2",
-                "test3");
+        assertThat(routine4.parallelCall().close().after(timeout).all()).containsOnly("test1",
+                "test2", "test3");
     }
 
     public void testParcelable() {
@@ -384,7 +390,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final MyParcelable p = new MyParcelable(33, -17);
         assertThat(JRoutineService.on(serviceFrom(getActivity()))
                                   .with(factoryOf(MyParcelableInvocation.class))
-                                  .async(p)
+                                  .asyncCall(p)
                                   .after(timeout)
                                   .next()).isEqualTo(p);
     }
@@ -396,12 +402,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 JRoutineService.on(serviceFrom(getActivity(), TestService.class))
                                .with(factoryOf(StringPassingInvocation.class))
                                .buildRoutine();
-        assertThat(routine.sync("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+        assertThat(routine.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
                 "2", "3", "4", "5");
-        assertThat(routine.async("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
-        assertThat(routine.parallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
-                "2", "3", "4", "5");
+        assertThat(routine.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(routine.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
     }
 
     public void testSize() {
@@ -410,7 +416,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                .with(factoryOf(
                                                                        StringPassingInvocation
                                                                                .class))
-                                                               .async();
+                                                               .asyncCall();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
@@ -425,7 +431,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         assertThat(JRoutineService.on(serviceFrom(getActivity()))
                                   .with(factoryOf(TestTransform.class))
-                                  .async("test1", "test2", "test3")
+                                  .asyncCall("test1", "test2", "test3")
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST1", "TEST2", "TEST3");
     }
@@ -641,7 +647,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         @Override
         protected Channel<?, String> onChannel(@NotNull final Channel<?, String> channel) {
 
-            return JRoutineCore.with(new UpperCaseInvocation()).async(channel);
+            return JRoutineCore.with(new UpperCaseInvocation()).asyncCall(channel);
         }
     }
 

@@ -36,10 +36,10 @@ public class ConverterRoutineTest {
     @Test
     public void testConversion() {
         final TestRoutine routine = new TestRoutine();
-        routine.async().close();
+        routine.asyncCall().close();
         assertThat(AsyncInvocation.sCount).isEqualTo(1);
         assertThat(SyncInvocation.sCount).isEqualTo(0);
-        routine.sync().close();
+        routine.syncCall().close();
         assertThat(AsyncInvocation.sCount).isEqualTo(1);
         assertThat(SyncInvocation.sCount).isEqualTo(1);
     }

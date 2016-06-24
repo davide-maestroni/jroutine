@@ -49,16 +49,16 @@ public class AccumulateFunctionInvocationTest {
     public void testFactory() {
 
         final BiFunction<String, String, String> function = createFunction();
-        assertThat(
-                JRoutineCore.with(functionFactory(function)).sync("test1", "test2", "test3").next())
-                .isEqualTo("test1test2test3");
+        assertThat(JRoutineCore.with(functionFactory(function))
+                               .syncCall("test1", "test2", "test3")
+                               .next()).isEqualTo("test1test2test3");
         assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
 
             public String get() {
 
                 return "test0";
             }
-        }, function)).sync("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
+        }, function)).syncCall("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
     }
 
     @Test

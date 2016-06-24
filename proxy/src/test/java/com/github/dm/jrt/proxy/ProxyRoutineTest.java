@@ -406,8 +406,8 @@ public class ProxyRoutineTest {
         assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
-        assertThat(itf.add10().async('d').all()).containsOnly((int) 'd');
-        assertThat(itf.add11().parallel('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+        assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
+        assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final Channel<char[], char[]> channel5 = JRoutineCore.io().buildChannel();
@@ -449,10 +449,11 @@ public class ProxyRoutineTest {
                       .close()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                 new int[]{'f', 'z'});
-        assertThat(itf.addA14().async(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA14().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA15()
-                      .parallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
+                              new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                 new int[]{'f', 'z'});
         assertThat(itf.addA16().pass(new char[]{'c', 'z'}).close().all()).containsExactly((int) 'c',
@@ -462,10 +463,11 @@ public class ProxyRoutineTest {
                       .close()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addA18().async(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
+        assertThat(itf.addA18().asyncCall(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addA19()
-                      .parallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
+                              new char[]{'f', 'z'})
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
@@ -522,10 +524,10 @@ public class ProxyRoutineTest {
                       .close()
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                 Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL14().async(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL14().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL15()
-                      .parallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                      .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                               Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                 Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
@@ -537,29 +539,29 @@ public class ProxyRoutineTest {
                       .close()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addL18().async(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
+        assertThat(itf.addL18().asyncCall(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addL19()
-                      .parallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                      .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                               Arrays.asList('f', 'z'))
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().close().all()).containsExactly(31);
-        assertThat(itf.get4().async().close().all()).containsExactly(31);
+        assertThat(itf.get4().asyncCall().close().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA3().async().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA3().asyncCall().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getA5().async().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getA5().asyncCall().close().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL3().async().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL3().asyncCall().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getL5().async().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getL5().asyncCall().close().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
         final Channel<Integer, Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
@@ -568,7 +570,7 @@ public class ProxyRoutineTest {
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).close().hasCompleted();
-        itf.set5().async(-17).hasCompleted();
+        itf.set5().asyncCall(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
         final Channel<int[], int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -580,7 +582,7 @@ public class ProxyRoutineTest {
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).close().hasCompleted();
-        itf.setA6().async(new int[]{1, 2, 3}).hasCompleted();
+        itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
         final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -592,7 +594,7 @@ public class ProxyRoutineTest {
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).close().hasCompleted();
-        itf.setL6().async(Arrays.asList(1, 2, 3)).hasCompleted();
+        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
     @Test

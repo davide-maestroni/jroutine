@@ -54,8 +54,8 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Channel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
- *         channel.pass(routine1.async().close())
- *                .pass(routine2.async().close())
+ *         channel.pass(routine1.asyncCall().close())
+ *                .pass(routine2.asyncCall().close())
  *                .close();
  *                .after(seconds(20))
  *                .allInto(results);
@@ -65,8 +65,8 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Void, Result&gt; output1 = routine1.async().close();
- *         final Channel&lt;Void, Result&gt; output2 = routine2.async().close();
+ *         final Channel&lt;Void, Result&gt; output1 = routine1.asyncCall().close();
+ *         final Channel&lt;Void, Result&gt; output2 = routine2.asyncCall().close();
  *         output1.after(seconds(20)).allInto(results);
  *         output2.after(seconds(20)).allInto(results);
  *     </code>
@@ -78,14 +78,14 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine2.async(routine1.async().close()).after(seconds(20).all();
+ *         routine2.asyncCall(routine1.asyncCall().close()).after(seconds(20).all();
  *     </code>
  * </pre>
  * Or, in an equivalent way:
  * <pre>
  *     <code>
  *
- *         routine1.async().close().bind(routine2.async()).close().after(seconds(20).all();
+ *         routine1.asyncCall().close().bind(routine2.asyncCall()).close().after(seconds(20).all();
  *     </code>
  * </pre>
  * <p>
@@ -96,7 +96,7 @@ import org.jetbrains.annotations.NotNull;
  *         final Routine&lt;Result, Result&gt; routine =
  *                  JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
  *                              .buildRoutine();
- *         final Channel&lt;Result, Result&gt; channel = routine.async();
+ *         final Channel&lt;Result, Result&gt; channel = routine.asyncCall();
  *
  *         new Thread() {
  *

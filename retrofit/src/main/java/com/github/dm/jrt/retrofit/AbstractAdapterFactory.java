@@ -312,10 +312,10 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             final Routine<Call<?>, ?> routine = getRoutine();
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                return routine.async(call);
+                return routine.asyncCall(call);
             }
 
-            return routine.sync(call);
+            return routine.syncCall(call);
         }
     }
 

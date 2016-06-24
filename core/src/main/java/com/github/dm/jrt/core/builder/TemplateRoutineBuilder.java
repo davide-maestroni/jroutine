@@ -48,23 +48,23 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    public Channel<IN, OUT> async() {
-        return buildRoutine().async();
+    public Channel<IN, OUT> asyncCall() {
+        return buildRoutine().asyncCall();
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel() {
-        return buildRoutine().parallel();
+    public Channel<IN, OUT> parallelCall() {
+        return buildRoutine().parallelCall();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential() {
-        return buildRoutine().sequential();
+    public Channel<IN, OUT> sequentialCall() {
+        return buildRoutine().sequentialCall();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync() {
-        return buildRoutine().sync();
+    public Channel<IN, OUT> syncCall() {
+        return buildRoutine().syncCall();
     }
 
     @NotNull

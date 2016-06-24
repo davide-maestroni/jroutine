@@ -130,7 +130,7 @@ class DefaultLoaderChannelBuilder
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(infinity())
                       .applied()
-                      .async()
+                      .asyncCall()
                       .close();
     }
 

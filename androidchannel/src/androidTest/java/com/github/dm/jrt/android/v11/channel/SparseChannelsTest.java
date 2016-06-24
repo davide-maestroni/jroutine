@@ -81,12 +81,12 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         final Channel<String, String> channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                .with(factoryOf(PassingString.class))
-                                                               .async()
+                                                               .asyncCall()
                                                                .sortedByCall();
         final Channel<Integer, Integer> channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                  .with(factoryOf(
                                                                          PassingInteger.class))
-                                                                 .async()
+                                                                 .asyncCall()
                                                                  .sortedByCall();
         SparseChannels.combine(channel1, channel2)
                       .buildChannels()
@@ -132,11 +132,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         Channel<Integer, Integer> channel2;
         channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingString.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingInteger.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         SparseChannels.combine(channel1, channel2).buildChannels().abort();
 
@@ -162,11 +162,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingString.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingInteger.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         SparseChannels.combine(3, channel1, channel2).buildChannels().abort();
 
@@ -192,11 +192,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingString.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingInteger.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                       .buildChannels()
@@ -224,11 +224,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingString.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingInteger.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                       .buildChannels()
@@ -256,11 +256,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingString.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(PassingInteger.class))
-                                 .async()
+                                 .asyncCall()
                                  .sortedByCall();
         final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
         map.put(31, channel1);
@@ -377,19 +377,19 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .buildRoutine();
         SparseArray<Channel<Object, ?>> channelMap;
         Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(channel,
                 Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(channel, Sort.INTEGER, Sort.STRING)
                                    .buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(Math.min(Sort.INTEGER, Sort.STRING), 2,
                 channel).buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
@@ -410,7 +410,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .buildRoutine();
         SparseArray<Channel<Object, ?>> channelMap;
         Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(channel,
                 Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
@@ -426,7 +426,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(channel, Sort.INTEGER, Sort.STRING)
                                    .buildChannels();
         channelMap.get(Sort.INTEGER).abort();
@@ -442,7 +442,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = SparseChannels.selectParcelableInput(Math.min(Sort.INTEGER, Sort.STRING), 2,
                 channel).buildChannels();
         channelMap.get(Sort.INTEGER).abort();
@@ -470,7 +470,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
             SparseChannels.selectParcelableInput(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
                                                                      .with(factoryOf(Sort.class))
-                                                                     .async());
+                                                                     .asyncCall());
 
             fail();
 
@@ -500,7 +500,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .invocationConfiguration()
                               .withInputOrder(OrderType.BY_CALL)
                               .applied()
-                              .async(channel);
+                              .asyncCall(channel);
         final SparseArray<Channel<?, Object>> channelMap =
                 SparseChannels.selectParcelableOutput(output, Sort.INTEGER, Sort.STRING)
                               .buildChannels();
@@ -608,19 +608,19 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .buildRoutine();
         SparseArray<Channel<?, Object>> channelMap;
         Channel<?, ParcelableSelectable<Object>> channel;
-        channel = routine.async(new ParcelableSelectable<Object>("test21", Sort.STRING),
+        channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = SparseChannels.selectParcelableOutput(channel,
                 Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
         assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
-        channel = routine.async(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+        channel = routine.asyncCall(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                 new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap = SparseChannels.selectParcelableOutput(channel, Sort.INTEGER, Sort.STRING)
                                    .buildChannels();
         assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
-        channel = routine.async(new ParcelableSelectable<Object>("test21", Sort.STRING),
+        channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = SparseChannels.selectParcelableOutput(Math.min(Sort.INTEGER, Sort.STRING), 2,
                 channel).buildChannels();
@@ -642,7 +642,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                               .buildRoutine();
         SparseArray<Channel<?, Object>> channelMap;
         Channel<?, ParcelableSelectable<Object>> channel;
-        channel = routine.async()
+        channel = routine.asyncCall()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
                                  new ParcelableSelectable<Object>(-11, Sort.INTEGER));
@@ -670,7 +670,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        channel = routine.async()
+        channel = routine.asyncCall()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                                  new ParcelableSelectable<Object>("test21", Sort.STRING));
@@ -698,7 +698,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        channel = routine.async()
+        channel = routine.asyncCall()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
                                  new ParcelableSelectable<Object>(-11, Sort.INTEGER));
@@ -737,7 +737,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                 JRoutineLoader.on(loaderFrom(getActivity()))
                               .with(factoryOf(Sort.class))
                               .buildRoutine();
-        final Channel<?, ParcelableSelectable<Object>> channel = routine.async();
+        final Channel<?, ParcelableSelectable<Object>> channel = routine.asyncCall();
         final SparseArray<Channel<?, Object>> channelMap =
                 SparseChannels.selectParcelableOutput(channel,
                         Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
@@ -757,7 +757,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
             SparseChannels.selectParcelableOutput(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
                                                                       .with(factoryOf(Sort.class))
-                                                                      .async());
+                                                                      .asyncCall());
 
             fail();
 

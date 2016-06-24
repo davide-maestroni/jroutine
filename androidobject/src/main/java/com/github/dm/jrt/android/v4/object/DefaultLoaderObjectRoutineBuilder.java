@@ -278,7 +278,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.sync();
+            mChannel = mRoutine.syncCall();
         }
 
         @Override
@@ -386,7 +386,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.sync();
+            mChannel = mRoutine.syncCall();
         }
 
         @Override

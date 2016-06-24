@@ -77,10 +77,10 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
     @Override
     protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
         final InvocationMode invocationMode = mInvocationMode;
-        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.async(channel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallel(channel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.sync(channel)
-                                : mRoutine.sequential(channel);
+        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
+                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
+                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
+                                : mRoutine.sequentialCall(channel);
     }
 
     /**

@@ -182,7 +182,7 @@ public class LoaderObjectRoutineActivityTest
                                           .applied()
                                           .method(TestClass.GET);
 
-        assertThat(routine.sync().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.syncCall().close().after(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
@@ -190,7 +190,7 @@ public class LoaderObjectRoutineActivityTest
         assertThat(JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                              .with(instanceOf(TestArgs.class, 17))
                                              .method("getId")
-                                             .async()
+                                             .asyncCall()
                                              .close()
                                              .after(seconds(10))
                                              .next()).isEqualTo(17);
@@ -339,7 +339,7 @@ public class LoaderObjectRoutineActivityTest
         assertThat(JRoutineLoaderObjectCompat.on(loaderFrom(activity, contextWrapper))
                                              .with(instanceOf(String.class))
                                              .method("toString")
-                                             .async()
+                                             .asyncCall()
                                              .close()
                                              .after(seconds(10))
                                              .next()).isEqualTo("test1");
@@ -370,7 +370,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            routine3.sync(new IllegalArgumentException("test")).after(timeout).all();
+            routine3.syncCall(new IllegalArgumentException("test")).after(timeout).all();
 
             fail();
 
@@ -625,7 +625,7 @@ public class LoaderObjectRoutineActivityTest
                                           .applied()
                                           .method(TestClass.class.getMethod("getLong"));
 
-        assertThat(routine2.sync().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.syncCall().close().after(timeout).all()).containsExactly(-77L);
 
     }
 
@@ -640,7 +640,7 @@ public class LoaderObjectRoutineActivityTest
                                           .applied()
                                           .method("getLong");
 
-        assertThat(routine1.sync().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.syncCall().close().after(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -752,8 +752,8 @@ public class LoaderObjectRoutineActivityTest
         assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
-        assertThat(itf.add10().async('d').all()).containsOnly((int) 'd');
-        assertThat(itf.add11().parallel('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
+        assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
+        assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                 (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final Channel<char[], char[]> channel5 = JRoutineCore.io().buildChannel();
@@ -795,10 +795,11 @@ public class LoaderObjectRoutineActivityTest
                       .close()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                 new int[]{'f', 'z'});
-        assertThat(itf.addA14().async(new char[]{'c', 'z'}).all()).containsOnly(
+        assertThat(itf.addA14().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA15()
-                      .parallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
+                              new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                 new int[]{'f', 'z'});
         assertThat(itf.addA16().pass(new char[]{'c', 'z'}).close().all()).containsExactly((int) 'c',
@@ -808,10 +809,11 @@ public class LoaderObjectRoutineActivityTest
                       .close()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addA18().async(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
+        assertThat(itf.addA18().asyncCall(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addA19()
-                      .parallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
+                              new char[]{'f', 'z'})
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
@@ -868,10 +870,10 @@ public class LoaderObjectRoutineActivityTest
                       .close()
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                 Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
-        assertThat(itf.addL14().async(Arrays.asList('c', 'z')).all()).containsOnly(
+        assertThat(itf.addL14().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL15()
-                      .parallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                      .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                               Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                 Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
@@ -883,29 +885,29 @@ public class LoaderObjectRoutineActivityTest
                       .close()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
-        assertThat(itf.addL18().async(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
+        assertThat(itf.addL18().asyncCall(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
                 (int) 'z');
         assertThat(itf.addL19()
-                      .parallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                      .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
                               Arrays.asList('f', 'z'))
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
                 (int) 'z');
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().close().all()).containsExactly(31);
-        assertThat(itf.get4().async().close().all()).containsExactly(31);
+        assertThat(itf.get4().asyncCall().close().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA3().async().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA3().asyncCall().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getA5().async().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getA5().asyncCall().close().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL3().async().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL3().asyncCall().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getL5().async().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getL5().asyncCall().close().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
         final Channel<Integer, Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
@@ -914,7 +916,7 @@ public class LoaderObjectRoutineActivityTest
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).close().hasCompleted();
-        itf.set5().async(-17).hasCompleted();
+        itf.set5().asyncCall(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
         final Channel<int[], int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -926,7 +928,7 @@ public class LoaderObjectRoutineActivityTest
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).close().hasCompleted();
-        itf.setA6().async(new int[]{1, 2, 3}).hasCompleted();
+        itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
         final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -938,7 +940,7 @@ public class LoaderObjectRoutineActivityTest
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).close().hasCompleted();
-        itf.setL6().async(Arrays.asList(1, 2, 3)).hasCompleted();
+        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
     public void testProxyRoutine() {
@@ -975,13 +977,13 @@ public class LoaderObjectRoutineActivityTest
                                            .withSharedFields("1")
                                            .applied()
                                            .method("getOne")
-                                           .async()
+                                           .asyncCall()
                                            .close();
         Channel<?, Object> getTwo = builder.objectConfiguration()
                                            .withSharedFields("2")
                                            .applied()
                                            .method("getTwo")
-                                           .async()
+                                           .asyncCall()
                                            .close();
 
         assertThat(getOne.hasCompleted()).isTrue();
@@ -990,8 +992,8 @@ public class LoaderObjectRoutineActivityTest
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").async().close();
-        getTwo = builder.method("getTwo").async().close();
+        getOne = builder.method("getOne").asyncCall().close();
+        getTwo = builder.method("getTwo").asyncCall().close();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1009,7 +1011,7 @@ public class LoaderObjectRoutineActivityTest
                                              .withLoaderId(0)
                                              .applied()
                                              .method("test")
-                                             .async()
+                                             .asyncCall()
                                              .close()
                                              .next()).isEqualTo(31);
 
@@ -1024,7 +1026,7 @@ public class LoaderObjectRoutineActivityTest
                                       .withLoaderId(1)
                                       .applied()
                                       .method("test")
-                                      .async()
+                                      .asyncCall()
                                       .close()
                                       .next();
 
@@ -1043,7 +1045,7 @@ public class LoaderObjectRoutineActivityTest
                                              .withLoaderId(2)
                                              .applied()
                                              .method("getInt")
-                                             .async()
+                                             .asyncCall()
                                              .close()
                                              .next()).isEqualTo(31);
 
@@ -1058,7 +1060,7 @@ public class LoaderObjectRoutineActivityTest
                                       .withLoaderId(3)
                                       .applied()
                                       .method("getInt")
-                                      .async()
+                                      .asyncCall()
                                       .close()
                                       .next();
 
@@ -1077,7 +1079,7 @@ public class LoaderObjectRoutineActivityTest
                                              .withLoaderId(4)
                                              .applied()
                                              .method(TestTimeout.class.getMethod("getInt"))
-                                             .async()
+                                             .asyncCall()
                                              .close()
                                              .next()).isEqualTo(31);
 
@@ -1092,7 +1094,7 @@ public class LoaderObjectRoutineActivityTest
                                       .withLoaderId(5)
                                       .applied()
                                       .method(TestTimeout.class.getMethod("getInt"))
-                                      .async()
+                                      .asyncCall()
                                       .close()
                                       .next();
 

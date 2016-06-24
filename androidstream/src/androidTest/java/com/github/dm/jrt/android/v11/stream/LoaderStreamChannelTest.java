@@ -1543,7 +1543,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
                             public Channel<?, String> apply(final Channel<?, String> channel) {
 
-                                return JRoutineCore.with(new UpperCase()).async(channel);
+                                return JRoutineCore.with(new UpperCase()).asyncCall(channel);
                             }
                         });
             }
@@ -1565,7 +1565,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
                             public Channel<?, String> apply(final Channel<?, String> channel) {
 
-                                return JRoutineCore.with(new UpperCase()).async(channel);
+                                return JRoutineCore.with(new UpperCase()).asyncCall(channel);
                             }
                         });
             }
@@ -3135,7 +3135,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         final Channel<Object, Object> channel = JRoutineLoader.on(loaderFrom(getActivity()))
                                                               .with(IdentityContextInvocation
                                                                       .factoryOf())
-                                                              .async();
+                                                              .asyncCall();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);

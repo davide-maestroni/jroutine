@@ -2401,7 +2401,7 @@ public class StreamChannelTest {
     public void testSize() {
 
         final Channel<Object, Object> channel =
-                JRoutineCore.with(IdentityInvocation.factoryOf()).async();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).asyncCall();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
@@ -2933,7 +2933,7 @@ public class StreamChannelTest {
                                                               final Channel<?, String> channel) {
 
                                                           return JRoutineCore.with(new UpperCase())
-                                                                             .async(channel);
+                                                                             .asyncCall(channel);
                                                       }
                                                   });
                                       }
@@ -2955,7 +2955,7 @@ public class StreamChannelTest {
                                                       final Channel<?, String> channel) {
 
                                                   return JRoutineCore.with(new UpperCase())
-                                                                     .async(channel);
+                                                                     .asyncCall(channel);
                                               }
                                           });
                               }

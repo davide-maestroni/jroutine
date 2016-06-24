@@ -769,10 +769,10 @@ public class Builders {
     private static Channel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
-        return (invocationMode == InvocationMode.SYNC) ? routine.sync()
-                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallel()
-                        : (invocationMode == InvocationMode.SEQUENTIAL) ? routine.sequential()
-                                : routine.async();
+        return (invocationMode == InvocationMode.SYNC) ? routine.syncCall()
+                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelCall()
+                        : (invocationMode == InvocationMode.SEQUENTIAL) ? routine.sequentialCall()
+                                : routine.asyncCall();
     }
 
     /**

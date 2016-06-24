@@ -594,7 +594,7 @@ public class InvocationService extends Service {
         @NotNull
         Channel<Object, Object> invoke() {
             ++mInvocationCount;
-            return mRoutine.async();
+            return mRoutine.asyncCall();
         }
 
         /**

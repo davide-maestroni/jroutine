@@ -54,15 +54,15 @@ class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
     public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final InvocationMode invocationMode = mInvocationMode;
         if (invocationMode == InvocationMode.ASYNC) {
-            return mRoutine.async(channel);
+            return mRoutine.asyncCall(channel);
 
         } else if (invocationMode == InvocationMode.PARALLEL) {
-            return mRoutine.parallel(channel);
+            return mRoutine.parallelCall(channel);
 
         } else if (invocationMode == InvocationMode.SYNC) {
-            return mRoutine.sync(channel);
+            return mRoutine.syncCall(channel);
         }
 
-        return mRoutine.sequential(channel);
+        return mRoutine.sequentialCall(channel);
     }
 }

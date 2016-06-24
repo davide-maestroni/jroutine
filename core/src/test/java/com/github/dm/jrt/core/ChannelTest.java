@@ -176,7 +176,7 @@ public class ChannelTest {
             }
         }.start();
         final Channel<String, String> outputChannel =
-                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async(channel);
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).asyncCall(channel);
         assertThat(outputChannel.after(timeout).next()).isEqualTo("test");
         assertThat(outputChannel.hasCompleted()).isTrue();
     }
@@ -201,7 +201,7 @@ public class ChannelTest {
             }
         }.start();
         final Channel<String, String> outputChannel1 =
-                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async(channel1);
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).asyncCall(channel1);
         assertThat(outputChannel1.after(timeout).all()).containsExactly("test1", "test2", "test3");
     }
 
@@ -500,7 +500,7 @@ public class ChannelTest {
         final long startTime = System.currentTimeMillis();
         final Channel<String, String> outputChannel =
                 JRoutineCore.with(IdentityInvocation.<String>factoryOf())
-                            .async(channel)
+                            .asyncCall(channel)
                             .eventuallyBreak();
         assertThat(outputChannel.after(millis(500)).all()).containsExactly("test");
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
@@ -594,14 +594,14 @@ public class ChannelTest {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         new WeakThread(channel).start();
         final Channel<String, String> outputChannel =
-                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).async(channel);
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).asyncCall(channel);
         assertThat(outputChannel.after(timeout).next()).isEqualTo("test");
     }
 
     @Test
     public void testSize() {
         final Channel<Object, Object> channel =
-                JRoutineCore.with(IdentityInvocation.factoryOf()).async();
+                JRoutineCore.with(IdentityInvocation.factoryOf()).asyncCall();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");

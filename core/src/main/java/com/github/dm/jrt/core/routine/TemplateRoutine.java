@@ -35,85 +35,85 @@ import org.jetbrains.annotations.Nullable;
 public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     @NotNull
-    public Channel<IN, OUT> async(@Nullable final IN input) {
-        return async().pass(input).close();
+    public Channel<IN, OUT> asyncCall(@Nullable final IN input) {
+        return asyncCall().pass(input).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> async(@Nullable final IN... inputs) {
-        return async().pass(inputs).close();
+    public Channel<IN, OUT> asyncCall(@Nullable final IN... inputs) {
+        return asyncCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> async(@Nullable final Iterable<? extends IN> inputs) {
-        return async().pass(inputs).close();
+    public Channel<IN, OUT> asyncCall(@Nullable final Iterable<? extends IN> inputs) {
+        return asyncCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> async(@Nullable final Channel<?, ? extends IN> inputs) {
-        return async().pass(inputs).close();
+    public Channel<IN, OUT> asyncCall(@Nullable final Channel<?, ? extends IN> inputs) {
+        return asyncCall().pass(inputs).close();
     }
 
     public void clear() {
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel(@Nullable final IN input) {
-        return parallel().pass(input).close();
+    public Channel<IN, OUT> parallelCall(@Nullable final IN input) {
+        return parallelCall().pass(input).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel(@Nullable final IN... inputs) {
-        return parallel().pass(inputs).close();
+    public Channel<IN, OUT> parallelCall(@Nullable final IN... inputs) {
+        return parallelCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel(@Nullable final Iterable<? extends IN> inputs) {
-        return parallel().pass(inputs).close();
+    public Channel<IN, OUT> parallelCall(@Nullable final Iterable<? extends IN> inputs) {
+        return parallelCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> parallel(@Nullable final Channel<?, ? extends IN> inputs) {
-        return parallel().pass(inputs).close();
+    public Channel<IN, OUT> parallelCall(@Nullable final Channel<?, ? extends IN> inputs) {
+        return parallelCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential(@Nullable final IN input) {
-        return sequential().pass(input).close();
+    public Channel<IN, OUT> sequentialCall(@Nullable final IN input) {
+        return sequentialCall().pass(input).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential(@Nullable final IN... inputs) {
-        return sequential().pass(inputs).close();
+    public Channel<IN, OUT> sequentialCall(@Nullable final IN... inputs) {
+        return sequentialCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential(@Nullable final Iterable<? extends IN> inputs) {
-        return sequential().pass(inputs).close();
+    public Channel<IN, OUT> sequentialCall(@Nullable final Iterable<? extends IN> inputs) {
+        return sequentialCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sequential(@Nullable final Channel<?, ? extends IN> inputs) {
-        return sequential().pass(inputs).close();
+    public Channel<IN, OUT> sequentialCall(@Nullable final Channel<?, ? extends IN> inputs) {
+        return sequentialCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync(@Nullable final IN input) {
-        return sync().pass(input).close();
+    public Channel<IN, OUT> syncCall(@Nullable final IN input) {
+        return syncCall().pass(input).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync(@Nullable final IN... inputs) {
-        return sync().pass(inputs).close();
+    public Channel<IN, OUT> syncCall(@Nullable final IN... inputs) {
+        return syncCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync(@Nullable final Iterable<? extends IN> inputs) {
-        return sync().pass(inputs).close();
+    public Channel<IN, OUT> syncCall(@Nullable final Iterable<? extends IN> inputs) {
+        return syncCall().pass(inputs).close();
     }
 
     @NotNull
-    public Channel<IN, OUT> sync(@Nullable final Channel<?, ? extends IN> inputs) {
-        return sync().pass(inputs).close();
+    public Channel<IN, OUT> syncCall(@Nullable final Channel<?, ? extends IN> inputs) {
+        return syncCall().pass(inputs).close();
     }
 }

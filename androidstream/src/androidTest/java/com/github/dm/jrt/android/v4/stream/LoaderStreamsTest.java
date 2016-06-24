@@ -198,7 +198,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(LoaderStreamsCompat.blend(channel1, channel2).buildChannels())
+            routine.asyncCall(LoaderStreamsCompat.blend(channel1, channel2).buildChannels())
                    .after(seconds(10))
                    .all();
 
@@ -215,7 +215,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(
+            routine.asyncCall(
                     LoaderStreamsCompat.blend(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                        .buildChannels()).after(seconds(10)).all();
 
@@ -319,12 +319,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(IdentityContextInvocation.<String>factoryOf())
-                                                                     .async()
+                                                                     .asyncCall()
                                                                      .sortedByCall();
         final Channel<Integer, Integer> channel2 =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(IdentityContextInvocation.<Integer>factoryOf())
-                                    .async()
+                                    .asyncCall()
                                     .sortedByCall();
         LoaderStreamsCompat.combine(channel1, channel2)
                            .buildChannels()
@@ -408,7 +408,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(LoaderStreamsCompat.concat(channel1, channel2).buildChannels())
+            routine.asyncCall(LoaderStreamsCompat.concat(channel1, channel2).buildChannels())
                    .after(seconds(10))
                    .all();
 
@@ -425,7 +425,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(
+            routine.asyncCall(
                     LoaderStreamsCompat.concat(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                        .buildChannels()).after(seconds(10)).all();
 
@@ -534,11 +534,11 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(IdentityContextInvocation.<String>factoryOf())
-                                                                     .async()
+                                                                     .asyncCall()
                                                                      .sortedByCall();
         final Channel<String, String> channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(IdentityContextInvocation.<String>factoryOf())
-                                                                     .async()
+                                                                     .asyncCall()
                                                                      .sortedByCall();
         LoaderStreamsCompat.distribute(channel1, channel2)
                            .buildChannels()
@@ -561,11 +561,11 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(IdentityContextInvocation.<String>factoryOf())
-                                                                     .async()
+                                                                     .asyncCall()
                                                                      .sortedByCall();
         final Channel<String, String> channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(IdentityContextInvocation.<String>factoryOf())
-                                                                     .async()
+                                                                     .asyncCall()
                                                                      .sortedByCall();
         LoaderStreamsCompat.distribute((Object) null, channel1, channel2)
                            .buildChannels()
@@ -590,14 +590,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testFactory() {
 
         assertThat(LoaderStreamsCompat.withStream(toUpperCaseChannel())
-                                      .async("test1", "test2", "test3")
+                                      .asyncCall("test1", "test2", "test3")
                                       .after(seconds(3))
                                       .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
             final Channel<String, String> channel =
-                    LoaderStreamsCompat.withStream(toUpperCaseChannel()).async();
+                    LoaderStreamsCompat.withStream(toUpperCaseChannel()).asyncCall();
             channel.abort(new IllegalArgumentException());
             channel.close().after(seconds(3)).next();
 
@@ -611,14 +611,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 LoaderStreamsCompat.contextFactory(toUpperCaseChannel());
         assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                        .with(factory)
-                                       .async("test1", "test2", "test3")
+                                       .asyncCall("test1", "test2", "test3")
                                        .after(seconds(3))
                                        .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
             final Channel<String, String> channel =
-                    JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factory).async();
+                    JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factory).asyncCall();
             channel.abort(new IllegalArgumentException());
             channel.close().after(seconds(3)).next();
 
@@ -629,7 +629,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         assertThat(LoaderStreamsCompat.withStreamOn(loaderFrom(getActivity()), toUpperCaseChannel())
-                                      .async("test1", "test2", "test3")
+                                      .asyncCall("test1", "test2", "test3")
                                       .after(seconds(3))
                                       .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
@@ -637,7 +637,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
             final Channel<String, String> channel =
                     LoaderStreamsCompat.withStreamOn(loaderFrom(getActivity()),
-                            toUpperCaseChannel()).async();
+                            toUpperCaseChannel()).asyncCall();
             channel.abort(new IllegalArgumentException());
             channel.close().after(seconds(3)).next();
 
@@ -901,19 +901,19 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                     .buildRoutine();
         SparseArrayCompat<Channel<Object, ?>> channelMap;
         Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = LoaderStreamsCompat.selectParcelableInput(channel,
                 Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap = LoaderStreamsCompat.selectParcelableInput(channel, Sort.INTEGER, Sort.STRING)
                                         .buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.async();
+        channel = routine.asyncCall();
         channelMap =
                 LoaderStreamsCompat.selectParcelableInput(Math.min(Sort.INTEGER, Sort.STRING), 2,
                         channel).buildChannels();
@@ -1000,14 +1000,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.async(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
+        assertThat(routine.asyncCall(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.async(
+        assertThat(routine.asyncCall(
                 LoaderStreamsCompat.join(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                    .buildChannels()).after(seconds(10)).all()).containsExactly('s',
                 '2');
@@ -1020,7 +1020,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 .pass("test3")
                 .close();
         channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.async(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
+        assertThat(routine.asyncCall(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
     }
@@ -1040,7 +1040,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
+            routine.asyncCall(LoaderStreamsCompat.join(channel1, channel2).buildChannels())
                    .after(seconds(10))
                    .all();
 
@@ -1057,8 +1057,9 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(LoaderStreamsCompat.join(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                                             .buildChannels()).after(seconds(10)).all();
+            routine.asyncCall(
+                    LoaderStreamsCompat.join(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                                       .buildChannels()).after(seconds(10)).all();
 
             fail();
 
@@ -1122,7 +1123,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.async(
+        assertThat(routine.asyncCall(
                 LoaderStreamsCompat.join(new Object(), channel1, channel2).buildChannels())
                           .after(seconds(10))
                           .all()).containsExactly('s', '2');
@@ -1130,7 +1131,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         channel2 = builder.buildChannel();
         channel1.sortedByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.sortedByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.async(
+        assertThat(routine.asyncCall(
                 LoaderStreamsCompat.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                    .buildChannels()).after(seconds(10)).all()).containsExactly('s',
                 '2');
@@ -1146,7 +1147,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(
+            routine.asyncCall(
                     LoaderStreamsCompat.join(new Object(), channel1, channel2).buildChannels())
                    .after(seconds(10))
                    .all();
@@ -1173,7 +1174,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(
+            routine.asyncCall(
                     LoaderStreamsCompat.join((Object) null, channel1, channel2).buildChannels())
                    .after(seconds(10))
                    .all();
@@ -1191,7 +1192,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            routine.async(LoaderStreamsCompat.join(new Object(),
+            routine.asyncCall(LoaderStreamsCompat.join(new Object(),
                     Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
                    .after(seconds(10))
                    .all();
@@ -1381,7 +1382,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                     .invocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
                                     .applied()
-                                    .async(channel);
+                                    .asyncCall(channel);
         final SparseArrayCompat<Channel<?, Object>> channelMap =
                 SparseChannelsCompat.selectParcelableOutput(output, Sort.INTEGER, Sort.STRING)
                                     .buildChannels();
@@ -1478,7 +1479,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(factoryOf(new ClassToken<Amb<String>>() {}))
                                     .buildRoutine();
-        final Channel<?, String> outputChannel = routine.async(
+        final Channel<?, String> outputChannel = routine.asyncCall(
                 LoaderStreamsCompat.merge(Arrays.asList(channel1, channel2, channel3, channel4))
                                    .buildChannels());
 
@@ -1778,7 +1779,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutineCore.with(new Sort()).buildRoutine();
         final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> inputChannel =
                 JRoutineCore.io().buildChannel();
-        final Channel<?, ParcelableSelectable<Object>> outputChannel = routine.async(inputChannel);
+        final Channel<?, ParcelableSelectable<Object>> outputChannel =
+                routine.asyncCall(inputChannel);
         final StreamChannel<Object, Object> intChannel =
                 LoaderStreamsCompat.selectParcelableOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                                    .channelConfiguration()
@@ -1815,7 +1817,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutineCore.with(new Sort()).buildRoutine();
         Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> inputChannel =
                 JRoutineCore.io().buildChannel();
-        Channel<?, ParcelableSelectable<Object>> outputChannel = routine.async(inputChannel);
+        Channel<?, ParcelableSelectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         LoaderStreamsCompat.selectParcelableOutput(Sort.STRING, 2, outputChannel).buildChannels();
         inputChannel.after(millis(100))
                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
@@ -1851,7 +1853,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         inputChannel = JRoutineCore.io().buildChannel();
-        outputChannel = routine.async(inputChannel);
+        outputChannel = routine.asyncCall(inputChannel);
         LoaderStreamsCompat.selectParcelableOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                            .buildChannels();
         inputChannel.after(millis(100))
@@ -1888,7 +1890,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         inputChannel = JRoutineCore.io().buildChannel();
-        outputChannel = routine.async(inputChannel);
+        outputChannel = routine.asyncCall(inputChannel);
         LoaderStreamsCompat.selectParcelableOutput(outputChannel,
                 Arrays.asList(Sort.STRING, Sort.INTEGER)).buildChannels();
         inputChannel.after(millis(100))

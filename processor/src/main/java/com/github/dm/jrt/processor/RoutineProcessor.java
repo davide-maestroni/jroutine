@@ -1885,9 +1885,11 @@ public class RoutineProcessor extends AbstractProcessor {
                         inputMode));
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
-        method = method.replace("${invokeMethod}", (invocationMode == InvocationMode.SYNC) ? "sync"
-                : (invocationMode == InvocationMode.PARALLEL) ? "parallel"
-                        : (invocationMode == InvocationMode.SEQUENTIAL) ? "sequential" : "async");
+        method = method.replace("${invokeMethod}",
+                (invocationMode == InvocationMode.SYNC) ? "syncCall"
+                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelCall"
+                                : (invocationMode == InvocationMode.SEQUENTIAL) ? "sequentialCall"
+                                        : "asyncCall");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader =

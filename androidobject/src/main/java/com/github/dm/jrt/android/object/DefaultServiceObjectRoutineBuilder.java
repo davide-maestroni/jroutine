@@ -338,7 +338,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.sync();
+            mChannel = mRoutine.syncCall();
         }
     }
 
@@ -406,7 +406,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.sync();
+            mChannel = mRoutine.syncCall();
         }
 
         @Override

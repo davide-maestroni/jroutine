@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         final MyClass myInstance = new MyClass();
- *         JRoutineObject.with(instance(myInstance)).method(MyClass.METHOD_NAME).async();
+ *         JRoutineObject.with(instance(myInstance)).method(MyClass.METHOD_NAME).asyncCall();
  *     </code>
  * </pre>
  * <p>

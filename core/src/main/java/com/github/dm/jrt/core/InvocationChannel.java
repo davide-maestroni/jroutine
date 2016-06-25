@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
-import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -214,7 +214,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public Channel<IN, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
         mResultChanel.bind(consumer);
         return this;
     }
@@ -320,7 +320,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @NotNull
     public Channel<IN, OUT> pass(@Nullable final Channel<?, ? extends IN> channel) {
-        final OutputConsumer<IN> consumer;
+        final ChannelConsumer<IN> consumer;
         synchronized (mMutex) {
             consumer = mState.pass(channel);
         }
@@ -557,7 +557,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         @Nullable
         @Override
-        OutputConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
+        ChannelConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
             throw exception();
         }
 
@@ -646,7 +646,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         @Nullable
         @Override
-        OutputConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
+        ChannelConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
             throw exception();
         }
 
@@ -760,6 +760,75 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     /**
+     * Default implementation of an channel consumer pushing the data into the input queue.
+     */
+    private class DefaultChannelConsumer implements ChannelConsumer<IN> {
+
+        private final Channel<?, ? extends IN> mChannel;
+
+        private final long mDelay;
+
+        private final TimeUnit mDelayUnit;
+
+        private final OrderType mOrderType;
+
+        private final NestedQueue<IN> mQueue;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the bound channel.
+         */
+        private DefaultChannelConsumer(@NotNull final Channel<?, ? extends IN> channel) {
+            final UnitDuration delay = mInputDelay.get();
+            mDelay = delay.value;
+            mDelayUnit = delay.unit;
+            final OrderType order = (mOrderType = mInputOrder.get());
+            mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
+            mChannel = channel;
+        }
+
+        public void onComplete() {
+            final Execution execution;
+            synchronized (mMutex) {
+                execution = mState.onConsumerComplete(mChannel, mQueue);
+            }
+
+            if (execution != null) {
+                runExecution(execution, 0, TimeUnit.MILLISECONDS);
+            }
+        }
+
+        public void onError(@NotNull final RoutineException error) {
+            final Execution execution;
+            synchronized (mMutex) {
+                execution = mState.onConsumerError(mChannel, error);
+            }
+
+            if (execution != null) {
+                runExecution(execution, mDelay, mDelayUnit);
+            }
+        }
+
+        public void onOutput(final IN output) {
+            final Execution execution;
+            synchronized (mMutex) {
+                execution = mState.onConsumerOutput(output, mQueue, mDelay, mDelayUnit, mOrderType);
+            }
+
+            if (execution != null) {
+                runExecution(execution, mDelay, mDelayUnit);
+            }
+
+            synchronized (mMutex) {
+                if (!mHasInputs.isTrue()) {
+                    waitInputs();
+                }
+            }
+        }
+    }
+
+    /**
      * Default implementation of an input iterator.
      */
     private class DefaultInputIterator implements InputIterator<IN> {
@@ -831,75 +900,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void onInvocationComplete() {
             synchronized (mMutex) {
                 mState.onInvocationComplete();
-            }
-        }
-    }
-
-    /**
-     * Default implementation of an output consumer pushing the data into the input queue.
-     */
-    private class DefaultOutputConsumer implements OutputConsumer<IN> {
-
-        private final Channel<?, ? extends IN> mChannel;
-
-        private final long mDelay;
-
-        private final TimeUnit mDelayUnit;
-
-        private final OrderType mOrderType;
-
-        private final NestedQueue<IN> mQueue;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the bound channel.
-         */
-        private DefaultOutputConsumer(@NotNull final Channel<?, ? extends IN> channel) {
-            final UnitDuration delay = mInputDelay.get();
-            mDelay = delay.value;
-            mDelayUnit = delay.unit;
-            final OrderType order = (mOrderType = mInputOrder.get());
-            mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
-            mChannel = channel;
-        }
-
-        public void onComplete() {
-            final Execution execution;
-            synchronized (mMutex) {
-                execution = mState.onConsumerComplete(mChannel, mQueue);
-            }
-
-            if (execution != null) {
-                runExecution(execution, 0, TimeUnit.MILLISECONDS);
-            }
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            final Execution execution;
-            synchronized (mMutex) {
-                execution = mState.onConsumerError(mChannel, error);
-            }
-
-            if (execution != null) {
-                runExecution(execution, mDelay, mDelayUnit);
-            }
-        }
-
-        public void onOutput(final IN output) {
-            final Execution execution;
-            synchronized (mMutex) {
-                execution = mState.onConsumerOutput(output, mQueue, mDelay, mDelayUnit, mOrderType);
-            }
-
-            if (execution != null) {
-                runExecution(execution, mDelay, mDelayUnit);
-            }
-
-            synchronized (mMutex) {
-                if (!mHasInputs.isTrue()) {
-                    waitInputs();
-                }
             }
         }
     }
@@ -1226,10 +1226,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
          * Called when a channel is passed to the invocation.
          *
          * @param channel the channel instance.
-         * @return the output consumer to bind or null.
+         * @return the channel consumer to bind or null.
          */
         @Nullable
-        OutputConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
+        ChannelConsumer<IN> pass(@Nullable final Channel<?, ? extends IN> channel) {
             if (channel == null) {
                 mLogger.wrn("passing null channel");
                 return null;
@@ -1238,7 +1238,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             ++mPendingExecutionCount;
             mBoundChannels.put(channel, null);
             mLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer(channel);
+            return new DefaultChannelConsumer(channel);
         }
 
         /**

@@ -61,6 +61,6 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<
         final Channel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> outputChannel =
                 JRoutineCore.io().buildChannel();
         outputChannel.bind(mChannel);
-        return inputChannel.bind(new SelectableOutputConsumer<DATA, IN>(outputChannel, mIndex));
+        return inputChannel.bind(new SelectableChannelConsumer<DATA, IN>(outputChannel, mIndex));
     }
 }

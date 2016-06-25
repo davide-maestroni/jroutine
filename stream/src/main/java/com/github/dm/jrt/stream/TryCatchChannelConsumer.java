@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -26,13 +26,13 @@ import com.github.dm.jrt.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/catch output consumer implementation.
+ * Try/catch channel consumer implementation.
  * <p>
  * Created by davide-maestroni on 04/19/2016.
  *
  * @param <OUT> the output data type.
  */
-class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
+class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
@@ -44,7 +44,7 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param catchConsumer the consumer instance.
      * @param outputChannel the output channel.
      */
-    TryCatchOutputConsumer(
+    TryCatchChannelConsumer(
             @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer,
             @NotNull final Channel<OUT, ?> outputChannel) {

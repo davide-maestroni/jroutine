@@ -69,7 +69,7 @@ class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
                                                             .with(configuration)
                                                             .applied()
                                                             .buildChannel();
-        new RetryOutputConsumer<IN, OUT>(inputChannel, outputChannel,
+        new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
                 configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
                 mBackoffFunction).run();
         return outputChannel;

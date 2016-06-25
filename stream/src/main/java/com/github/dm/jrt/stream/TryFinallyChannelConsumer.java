@@ -17,20 +17,20 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/finally output consumer implementation.
+ * Try/finally channel consumer implementation.
  * <p>
  * Created by davide-maestroni on 04/21/2016.
  *
  * @param <OUT> the output data type.
  */
-class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
+class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private final Runnable mFinallyRunnable;
 
@@ -42,7 +42,7 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param finallyRunnable the runnable instance.
      * @param outputChannel   the output channel.
      */
-    TryFinallyOutputConsumer(@NotNull final Runnable finallyRunnable,
+    TryFinallyChannelConsumer(@NotNull final Runnable finallyRunnable,
             @NotNull final Channel<OUT, ?> outputChannel) {
         mFinallyRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);

@@ -367,7 +367,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                                                       .applied()
                                                                       .buildChannel();
             mRoutine.asyncCall(channel)
-                    .bind(new ConverterOutputConsumer(mConverter, outputChannel));
+                    .bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;
         }
     }
@@ -419,7 +419,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                                                       .applied()
                                                                       .buildChannel();
             getRoutine().asyncCall(invokeCall(call))
-                        .bind(new ConverterOutputConsumer(mConverter, outputChannel));
+                        .bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;
         }
     }

@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -251,7 +251,7 @@ public class StreamChannelTest {
     public void testBind() throws InterruptedException {
 
         final Semaphore semaphore = new Semaphore(0);
-        Streams.streamOf("test").bind(new TemplateOutputConsumer<String>() {
+        Streams.streamOf("test").bind(new TemplateChannelConsumer<String>() {
 
             @Override
             public void onOutput(final String s) throws Exception {
@@ -268,7 +268,7 @@ public class StreamChannelTest {
         }).bind();
         assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
         Streams.streamOf("test")
-               .bindAfter(10, TimeUnit.MILLISECONDS, new TemplateOutputConsumer<String>() {
+               .bindAfter(10, TimeUnit.MILLISECONDS, new TemplateChannelConsumer<String>() {
 
                    @Override
                    public void onOutput(final String s) throws Exception {
@@ -284,7 +284,7 @@ public class StreamChannelTest {
             }
         }).bindAfter(10, TimeUnit.MILLISECONDS);
         assertThat(semaphore.tryAcquire(3, TimeUnit.SECONDS)).isTrue();
-        Streams.streamOf("test").bindAfter(millis(10), new TemplateOutputConsumer<String>() {
+        Streams.streamOf("test").bindAfter(millis(10), new TemplateChannelConsumer<String>() {
 
             @Override
             public void onOutput(final String s) throws Exception {

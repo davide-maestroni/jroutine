@@ -192,7 +192,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @throws java.lang.IllegalStateException if this channel is already bound.
      */
     @NotNull
-    Channel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+    Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
 
     /**
      * Closes this channel and completes the invocation.
@@ -419,7 +419,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return whether the channel is bound.
      * @see #bind bind(Channel)
-     * @see #bind(OutputConsumer)
+     * @see #bind(ChannelConsumer)
      */
     boolean isBound();
 

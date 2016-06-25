@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an output consumer that can be bound to a channel.
+ * Interface defining a consumer that can be bound to a channel.
  * <br>
  * The same instance can be safely bound to different channels.
  * <p>
@@ -50,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public interface OutputConsumer<OUT> {
+public interface ChannelConsumer<OUT> {
 
     /**
      * Called when the channel closes after the invocation completes its execution.
@@ -68,7 +68,7 @@ public interface OutputConsumer<OUT> {
     void onError(@NotNull RoutineException error) throws Exception;
 
     /**
-     * Called when an output is passed to the channel.
+     * Called when an output is produced by the channel.
      *
      * @param output the output.
      * @throws java.lang.Exception if an unexpected error occurs.

@@ -55,7 +55,7 @@ class BindCompleteConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, 
                                                               .with(mConfiguration)
                                                               .applied()
                                                               .buildChannel();
-        channel.bind(new CompleteOutputConsumer<OUT>(mCompleteAction, outputChannel));
+        channel.bind(new CompleteChannelConsumer<OUT>(mCompleteAction, outputChannel));
         return outputChannel;
     }
 }

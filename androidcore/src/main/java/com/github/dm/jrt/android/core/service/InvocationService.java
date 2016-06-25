@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -407,7 +407,7 @@ public class InvocationService extends Service {
             final Channel<Object, Object> channel = routineState.invoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
-            routineInvocation.bind(new ServiceOutputConsumer(routineInvocation, message.replyTo));
+            routineInvocation.bind(new ServiceChannelConsumer(routineInvocation, message.replyTo));
             invocations.put(invocationId, routineInvocation);
         }
     }
@@ -608,9 +608,9 @@ public class InvocationService extends Service {
     }
 
     /**
-     * Output consumer sending messages to the routine.
+     * Channel consumer sending messages to the routine.
      */
-    private static class ServiceOutputConsumer implements OutputConsumer<Object> {
+    private static class ServiceChannelConsumer implements ChannelConsumer<Object> {
 
         private final RoutineInvocation mInvocation;
 
@@ -622,7 +622,7 @@ public class InvocationService extends Service {
          * @param invocation the routine invocation.
          * @param messenger  the output messenger.
          */
-        private ServiceOutputConsumer(@NotNull final RoutineInvocation invocation,
+        private ServiceChannelConsumer(@NotNull final RoutineInvocation invocation,
                 @NotNull final Messenger messenger) {
             mInvocation = invocation;
             mOutMessenger = ConstantConditions.notNull("output messenger", messenger);
@@ -696,7 +696,7 @@ public class InvocationService extends Service {
          * @throws java.lang.IllegalStateException               if the channel is already closed
          *                                                       or already bound to a consumer.
          */
-        void bind(@NotNull final OutputConsumer<Object> consumer) {
+        void bind(@NotNull final ChannelConsumer<Object> consumer) {
             mChannel.bind(consumer);
         }
 

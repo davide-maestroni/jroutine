@@ -14,50 +14,50 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer passing outputs to a consumer instance.
+ * Channel consumer transforming data into selectable ones.
  * <p>
- * Created by davide-maestroni on 05/14/2016.
+ * Created by davide-maestroni on 02/26/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ConsumingOutputConsumer<OUT> implements OutputConsumer<OUT> {
+class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-    private final Channel<?, ?> mOutputChannel;
+    private final Channel<? super Selectable<OUT>, ?> mChannel;
 
-    private final ConsumerWrapper<? super OUT> mOutputConsumer;
+    private final int mIndex;
 
     /**
      * Constructor.
      *
-     * @param outputConsumer the consumer instance.
-     * @param outputChannel  the output channel.
+     * @param channel the selectable channel.
+     * @param index   the selectable index.
      */
-    ConsumingOutputConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
-            @NotNull final Channel<?, ?> outputChannel) {
-        mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
-        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+    SelectableChannelConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
+            final int index) {
+        mChannel = ConstantConditions.notNull("channel instance", channel);
+        mIndex = index;
     }
 
     public void onComplete() {
-        mOutputChannel.close();
+        mChannel.close();
     }
 
     public void onError(@NotNull final RoutineException error) {
-        mOutputChannel.abort(error);
+        mChannel.abort(error);
     }
 
-    public void onOutput(final OUT output) throws Exception {
-        mOutputConsumer.accept(output);
+    public void onOutput(final IN input) {
+        mChannel.pass(new Selectable<OUT>(input, mIndex));
     }
 }

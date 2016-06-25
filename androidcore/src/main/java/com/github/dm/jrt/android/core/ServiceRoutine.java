@@ -37,7 +37,7 @@ import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.ConverterRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -144,11 +144,11 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
     }
 
     /**
-     * Output consumer sending messages to the service.
+     * Channel consumer sending messages to the service.
      *
      * @param <IN> the input data type.
      */
-    private static class ConnectionOutputConsumer<IN> implements OutputConsumer<IN> {
+    private static class ConnectionChannelConsumer<IN> implements ChannelConsumer<IN> {
 
         private final Messenger mInMessenger;
 
@@ -163,7 +163,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
          * @param inMessenger  the messenger receiving data from the service.
          * @param outMessenger the messenger sending data to the service.
          */
-        private ConnectionOutputConsumer(@NotNull final String invocationId,
+        private ConnectionChannelConsumer(@NotNull final String invocationId,
                 @NotNull final Messenger inMessenger, @NotNull final Messenger outMessenger) {
             mInvocationId = invocationId;
             mInMessenger = inMessenger;
@@ -365,7 +365,7 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             try {
                 outMessenger.send(message);
                 mInputChannel.bind(
-                        new ConnectionOutputConsumer<IN>(invocationId, inMessenger, outMessenger));
+                        new ConnectionChannelConsumer<IN>(invocationId, inMessenger, outMessenger));
 
             } catch (final RemoteException e) {
                 logger.err(e, "error while sending service invocation message");

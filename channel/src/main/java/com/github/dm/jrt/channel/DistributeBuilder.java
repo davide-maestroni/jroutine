@@ -18,7 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -97,16 +97,17 @@ class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, 
                                                                         .with(configuration)
                                                                         .applied()
                                                                         .buildChannel();
-        return inputChannel.bind(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
+        return inputChannel.bind(
+                new DistributeChannelConsumer(mIsFlush, mPlaceholder, channelList));
     }
 
     /**
-     * Output consumer distributing list of data among a list of channels.
+     * Channel consumer distributing list of data among a list of channels.
      *
      * @param <IN> the input data type.
      */
-    private static class DistributeOutputConsumer<IN>
-            implements OutputConsumer<List<? extends IN>> {
+    private static class DistributeChannelConsumer<IN>
+            implements ChannelConsumer<List<? extends IN>> {
 
         private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
@@ -121,7 +122,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, 
          * @param placeholder the placeholder instance.
          * @param channels    the list of channels.
          */
-        private DistributeOutputConsumer(final boolean isFlush, @Nullable final IN placeholder,
+        private DistributeChannelConsumer(final boolean isFlush, @Nullable final IN placeholder,
                 @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
             mIsFlush = isFlush;
             mChannels = channels;

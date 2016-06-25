@@ -293,14 +293,14 @@ public final class ChannelConfiguration extends DeepEqualObject {
         /**
          * Order by call.
          * <br>
-         * Data are passed to the invocation or the output consumer in the same order as they are
+         * Data are passed to the invocation or the channel consumer in the same order as they are
          * passed to the channel, independently from the specific delay.
          */
         BY_CALL,
         /**
          * Order by delay.
          * <br>
-         * Data are passed to the invocation or the output consumer based on their delay.
+         * Data are passed to the invocation or the channel consumer based on their delay.
          */
         BY_DELAY
     }
@@ -532,7 +532,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * <p>
          * This configuration option is useful when the data coming from the invocation execution
          * are meant to be explicitly read through this channel. The execution will slow down until
-         * enough data are consumed. Note, however, that binding the channel to an output consumer
+         * enough data are consumed. Note, however, that binding the channel to a channel consumer
          * will make the option ineffective.
          *
          * @param limit the limit.

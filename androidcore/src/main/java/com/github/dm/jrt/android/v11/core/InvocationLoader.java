@@ -134,8 +134,8 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     @Override
     public InvocationResult<OUT> loadInBackground() {
         final Logger logger = mLogger;
-        final InvocationOutputConsumer<OUT> consumer =
-                new InvocationOutputConsumer<OUT>(this, logger);
+        final InvocationChannelConsumer<OUT> consumer =
+                new InvocationChannelConsumer<OUT>(this, logger);
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
         JRoutineCore.with(fromFactory(getContext(), factory))

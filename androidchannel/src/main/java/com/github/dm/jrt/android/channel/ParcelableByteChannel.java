@@ -25,7 +25,7 @@ import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -220,7 +220,7 @@ public class ParcelableByteChannel {
     public BufferOutputStream bind(
             @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
         final Channel<ByteBuffer, ByteBuffer> outputChannel = JRoutineCore.io().buildChannel();
-        outputChannel.bind(new BufferOutputConsumer(channel));
+        outputChannel.bind(new BufferChannelConsumer(channel));
         return mByteChannel.bind(outputChannel);
     }
 
@@ -236,7 +236,7 @@ public class ParcelableByteChannel {
     public BufferOutputStream bindDeep(
             @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
         final Channel<ByteBuffer, ByteBuffer> outputChannel = JRoutineCore.io().buildChannel();
-        outputChannel.bind(new BufferOutputConsumer(channel));
+        outputChannel.bind(new BufferChannelConsumer(channel));
         return mByteChannel.bindDeep(outputChannel);
     }
 
@@ -350,9 +350,9 @@ public class ParcelableByteChannel {
     }
 
     /**
-     * Output consumer transforming byte buffers into parcelable buffers.
+     * Channel consumer transforming byte buffers into parcelable buffers.
      */
-    private static class BufferOutputConsumer implements OutputConsumer<ByteBuffer> {
+    private static class BufferChannelConsumer implements ChannelConsumer<ByteBuffer> {
 
         private final Channel<? super ParcelableByteBuffer, ?> mChannel;
 
@@ -361,7 +361,7 @@ public class ParcelableByteChannel {
          *
          * @param channel the channel to which to pass the data.
          */
-        private BufferOutputConsumer(
+        private BufferChannelConsumer(
                 @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
             mChannel = ConstantConditions.notNull("channel instance", channel);
         }

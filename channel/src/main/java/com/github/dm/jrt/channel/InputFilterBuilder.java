@@ -18,7 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -59,15 +59,15 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
                                                                                  .buildChannel();
         final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
         outputChannel.bind(mChannel);
-        return inputChannel.bind(new FilterOutputConsumer<IN>(outputChannel, mIndex));
+        return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mIndex));
     }
 
     /**
-     * Output consumer filtering selectable data.
+     * Channel consumer filtering selectable data.
      *
      * @param <IN> the input data type.
      */
-    private static class FilterOutputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
+    private static class FilterChannelConsumer<IN> implements ChannelConsumer<Selectable<IN>> {
 
         private final Channel<? super IN, ?> mChannel;
 
@@ -79,7 +79,7 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
          * @param channel the channel to feed.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@NotNull final Channel<? super IN, ?> channel,
+        private FilterChannelConsumer(@NotNull final Channel<? super IN, ?> channel,
                 final int index) {
             mChannel = channel;
             mIndex = index;

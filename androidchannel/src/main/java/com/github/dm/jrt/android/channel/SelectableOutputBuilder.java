@@ -59,7 +59,7 @@ class SelectableOutputBuilder<OUT>
                             .with(configuration)
                             .applied()
                             .buildChannel();
-        mChannel.bind(new SelectableOutputConsumer<OUT, OUT>(outputChannel, mIndex));
+        mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
         return outputChannel;
     }
 }

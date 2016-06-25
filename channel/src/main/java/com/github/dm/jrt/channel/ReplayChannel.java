@@ -18,7 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Channel caching the output data and passing them to newly bound consumer, thus effectively
- * supporting binding of several output consumers.
+ * supporting binding of several channel consumers.
  * <p>
  * The {@link #isBound()} method will always return false and the bound methods will never fail.
  * <br>
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
+class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
     private final ArrayList<OUT> mCached = new ArrayList<OUT>();
 
@@ -58,8 +58,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
 
     private final ChannelConfiguration mConfiguration;
 
-    private final IdentityHashMap<OutputConsumer<? super OUT>, Channel<OUT, OUT>> mConsumers =
-            new IdentityHashMap<OutputConsumer<? super OUT>, Channel<OUT, OUT>>();
+    private final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> mConsumers =
+            new IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>>();
 
     private final Object mMutex = new Object();
 
@@ -81,7 +81,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
                 : ChannelConfiguration.defaultConfiguration();
         mOutputChannel = createOutputChannel();
         mChannel = channel;
-        channel.bind((OutputConsumer<? super OUT>) this);
+        channel.bind((ChannelConsumer<? super OUT>) this);
     }
 
     public boolean abort() {
@@ -131,7 +131,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
         final boolean isComplete;
         final RoutineException abortException;
         final Channel<OUT, OUT> outputChannel;
@@ -139,7 +139,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, OutputConsumer<OUT> {
         final Channel<OUT, OUT> newChannel;
         final ArrayList<OUT> cachedOutputs;
         synchronized (mMutex) {
-            final IdentityHashMap<OutputConsumer<? super OUT>, Channel<OUT, OUT>> consumers =
+            final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> consumers =
                     mConsumers;
             if (consumers.containsKey(consumer)) {
                 return this;

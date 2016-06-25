@@ -19,7 +19,7 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -245,7 +245,7 @@ public class ReplayChannelTest {
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
         inputChannel.pass("test").close();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onOutput(final Object output) throws Exception {
@@ -262,7 +262,7 @@ public class ReplayChannelTest {
 
         Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
         Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onError(@NotNull final RoutineException error) throws Exception {
@@ -274,7 +274,7 @@ public class ReplayChannelTest {
         assertThat(channel.getError().getCause()).isNull();
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onError(@NotNull final RoutineException error) throws Exception {
@@ -288,7 +288,7 @@ public class ReplayChannelTest {
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
         inputChannel.abort();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onError(@NotNull final RoutineException error) throws Exception {
@@ -300,7 +300,7 @@ public class ReplayChannelTest {
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
         inputChannel.abort();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onError(@NotNull final RoutineException error) throws Exception {
@@ -320,7 +320,7 @@ public class ReplayChannelTest {
         assertThat(channel.isEmpty()).isTrue();
         inputChannel.pass("test1", "test2");
         final ArrayList<Object> outputs = new ArrayList<Object>();
-        final TemplateOutputConsumer<Object> consumer = new TemplateOutputConsumer<Object>() {
+        final TemplateChannelConsumer<Object> consumer = new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onOutput(final Object output) throws Exception {
@@ -412,7 +412,7 @@ public class ReplayChannelTest {
 
         Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
         Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onComplete() throws Exception {
@@ -423,7 +423,7 @@ public class ReplayChannelTest {
         inputChannel.pass("test").close().throwError();
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onComplete() throws Exception {
@@ -436,7 +436,7 @@ public class ReplayChannelTest {
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
         inputChannel.pass("test").close();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onComplete() throws Exception {
@@ -448,7 +448,7 @@ public class ReplayChannelTest {
         inputChannel = JRoutineCore.io().buildChannel();
         channel = Channels.replay(inputChannel).buildChannels();
         inputChannel.pass("test").close();
-        channel.bind(new TemplateOutputConsumer<Object>() {
+        channel.bind(new TemplateChannelConsumer<Object>() {
 
             @Override
             public void onComplete() throws Exception {

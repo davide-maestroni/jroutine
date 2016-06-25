@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -108,7 +108,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+    LoaderStreamChannel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
@@ -356,7 +356,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(START)
     LoaderStreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay,
-            @NotNull OutputConsumer<OUT> consumer);
+            @NotNull ChannelConsumer<OUT> consumer);
 
     /**
      * {@inheritDoc}
@@ -373,7 +373,7 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(START)
     LoaderStreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit,
-            @NotNull OutputConsumer<OUT> consumer);
+            @NotNull ChannelConsumer<OUT> consumer);
 
     /**
      * {@inheritDoc}

@@ -68,7 +68,7 @@ class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OU
                                                             .with(mConfiguration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new ParallelKeyOutputConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
+        channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
                 mInvocationMode));
         return outputChannel;
     }

@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Empty abstract implementation of an output consumer.
+ * Empty abstract implementation of a channel consumer.
  * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p>
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public abstract class TemplateOutputConsumer<OUT> implements OutputConsumer<OUT> {
+public abstract class TemplateChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     public void onComplete() throws Exception {
     }

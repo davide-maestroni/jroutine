@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.android.channel;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer transforming data into selectable ones.
+ * Channel consumer transforming data into selectable ones.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN> {
+class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-    private final Channel<? super Selectable<OUT>, ?> mChannel;
+    private final Channel<? super
+            ParcelableSelectable<OUT>, ?> mChannel;
 
     private final int mIndex;
 
@@ -43,21 +44,24 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
      * @param channel the selectable channel.
      * @param index   the selectable index.
      */
-    SelectableOutputConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
-            final int index) {
+    SelectableChannelConsumer(@NotNull final Channel<? super
+            ParcelableSelectable<OUT>, ?> channel, final int index) {
         mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 
+    @Override
     public void onComplete() {
         mChannel.close();
     }
 
+    @Override
     public void onError(@NotNull final RoutineException error) {
         mChannel.abort(error);
     }
 
+    @Override
     public void onOutput(final IN input) {
-        mChannel.pass(new Selectable<OUT>(input, mIndex));
+        mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
     }
 }

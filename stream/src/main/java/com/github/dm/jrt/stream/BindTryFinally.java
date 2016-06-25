@@ -55,7 +55,7 @@ class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> 
                                                             .with(mConfiguration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new TryFinallyOutputConsumer<OUT>(mRunnable, outputChannel));
+        channel.bind(new TryFinallyChannelConsumer<OUT>(mRunnable, outputChannel));
         return outputChannel;
     }
 }

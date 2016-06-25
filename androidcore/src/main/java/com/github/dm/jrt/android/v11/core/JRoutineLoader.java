@@ -78,7 +78,7 @@ import java.util.WeakHashMap;
  *                                       .with(factoryOf(LoadResource.class))
  *                                       .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
- *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *                        .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                            &#64;Override
  *                            public void onError(&#64;NotNull final RoutineException error) {

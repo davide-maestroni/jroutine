@@ -2,7 +2,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -89,7 +89,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         final Backoff backoff = configuration.getBackoffOrElse(null);
         final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
         for (final Channel<?, ? extends OUT> channel : channels) {
-            channel.bind(new JoinOutputConsumer<OUT>(limit, backoff, maxSize, mutex, i++, isFlush,
+            channel.bind(new JoinChannelConsumer<OUT>(limit, backoff, maxSize, mutex, i++, isFlush,
                     closed, queues, placeholder, outputChannel));
         }
 
@@ -97,11 +97,11 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
     }
 
     /**
-     * Output consumer joining the data coming from several channels.
+     * Channel consumer joining the data coming from several channels.
      *
      * @param <OUT> the output data type.
      */
-    private static class JoinOutputConsumer<OUT> implements OutputConsumer<OUT> {
+    private static class JoinChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
         private final Backoff mBackoff;
 
@@ -137,7 +137,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
          * @param placeholder the placeholder instance.
          * @param channel     the channel.
          */
-        private JoinOutputConsumer(final int limit, @Nullable final Backoff backoff,
+        private JoinChannelConsumer(final int limit, @Nullable final Backoff backoff,
                 final int maxSize, @NotNull final Object mutex, final int index,
                 final boolean isFlush, @NotNull final boolean[] closed,
                 @NotNull final SimpleQueue<OUT>[] queues, @Nullable final OUT placeholder,

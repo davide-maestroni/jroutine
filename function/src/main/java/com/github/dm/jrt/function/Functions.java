@@ -384,34 +384,35 @@ public class Functions {
     }
 
     /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
+     * Returns a channel consumer builder employing the specified consumer function to handle the
      * invocation completion.
      *
      * @param consumer the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
-        return new OutputConsumerBuilder<Object>(consumer, Functions.<RoutineException>sink(),
+    public static ChannelConsumerBuilder<Object> onComplete(
+            @NotNull final Consumer<Void> consumer) {
+        return new ChannelConsumerBuilder<Object>(consumer, Functions.<RoutineException>sink(),
                 Functions.sink());
     }
 
     /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
+     * Returns a channel consumer builder employing the specified consumer function to handle the
      * invocation errors.
      *
      * @param consumer the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public static OutputConsumerBuilder<Object> onError(
+    public static ChannelConsumerBuilder<Object> onError(
             @NotNull final Consumer<RoutineException> consumer) {
-        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), consumer,
+        return new ChannelConsumerBuilder<Object>(Functions.<Void>sink(), consumer,
                 Functions.sink());
     }
 
     /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
+     * Returns a channel consumer builder employing the specified consumer function to handle the
      * invocation outputs.
      *
      * @param consumer the consumer function.
@@ -419,8 +420,9 @@ public class Functions {
      * @return the builder instance.
      */
     @NotNull
-    public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
-        return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
+    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+            @NotNull final Consumer<OUT> consumer) {
+        return new ChannelConsumerBuilder<OUT>(Functions.<Void>sink(),
                 Functions.<RoutineException>sink(), consumer);
     }
 

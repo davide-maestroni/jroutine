@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +28,13 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 /**
- * Parallel by count output consumer.
+ * Parallel by count channel consumer.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
  * @param <OUT> the output data type.
  */
-class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
+class ParallelCountChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private final HashMap<Channel<OUT, ?>, Channel<?, ?>> mChannels;
 
@@ -48,7 +48,7 @@ class ParallelCountOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param channels the map of input and invocation channels.
      */
     @SuppressWarnings("unchecked")
-    ParallelCountOutputConsumer(
+    ParallelCountChannelConsumer(
             @NotNull final Map<? extends Channel<OUT, ?>, ? extends Channel<?, ?>> channels) {
         mChannels = new HashMap<Channel<OUT, ?>, Channel<?, ?>>(channels);
         mInputs = new Channel[channels.size()];

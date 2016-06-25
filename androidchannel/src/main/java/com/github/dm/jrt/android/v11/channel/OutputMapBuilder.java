@@ -118,7 +118,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
                     channels.append(index, outputChannel);
                 }
 
-                channel.bind(new SortingMapOutputConsumer<OUT>(inputMap));
+                channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
                 channelMaps.put(selectInfo, channels);
             }
 

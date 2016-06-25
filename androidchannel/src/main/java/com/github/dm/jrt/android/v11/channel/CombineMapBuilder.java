@@ -78,7 +78,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
                             .with(configuration)
                             .applied()
                             .buildChannel();
-        inputChannel.bind(new SortingMapOutputConsumer<IN>(inputChannelMap));
+        inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
         return inputChannel;
     }
 }

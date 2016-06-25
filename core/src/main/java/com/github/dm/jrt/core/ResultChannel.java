@@ -18,8 +18,8 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -73,8 +73,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             "cannot wait while no invocation instance is available"
                     + "\nTry increasing the max number of instances";
 
-    private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sConsumerMutexes =
-            new WeakIdentityHashMap<OutputConsumer<?>, Object>();
+    private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
+            new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
 
     private static final LocalFence sInvocationFence = new LocalFence();
 
@@ -114,6 +114,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private RoutineException mAbortException;
 
+    private ChannelConsumer<? super OUT> mChannelConsumer;
+
     private Object mConsumerMutex;
 
     private volatile FlushExecution mFlushExecution;
@@ -123,8 +125,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     private boolean mIsWaitingExecution;
 
     private boolean mIsWaitingInvocation;
-
-    private OutputConsumer<? super OUT> mOutputConsumer;
 
     private int mOutputCount;
 
@@ -178,9 +178,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    private static Object getMutex(@NotNull final OutputConsumer<?> consumer) {
+    private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
         synchronized (sConsumerMutexes) {
-            final WeakIdentityHashMap<OutputConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
+            final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes =
+                    sConsumerMutexes;
             Object mutex = consumerMutexes.get(consumer);
             if (mutex == null) {
                 mutex = new Object();
@@ -252,12 +253,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
         final boolean forceClose;
         synchronized (mMutex) {
             verifyBound();
             forceClose = mState.isDone();
-            mOutputConsumer = ConstantConditions.notNull("output consumer", consumer);
+            mChannelConsumer = ConstantConditions.notNull("channel consumer", consumer);
         }
 
         runFlush(forceClose);
@@ -415,7 +416,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     public boolean isBound() {
         synchronized (mMutex) {
-            return (mOutputConsumer != null);
+            return (mChannelConsumer != null);
         }
     }
 
@@ -464,7 +465,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @NotNull
     public Channel<OUT, OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
-        final OutputConsumer<OUT> consumer;
+        final ChannelConsumer<OUT> consumer;
         synchronized (mMutex) {
             consumer = mState.pass(channel);
         }
@@ -732,7 +733,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     private void closeConsumer(@NotNull final OutputChannelState state,
-            @NotNull final OutputConsumer<? super OUT> consumer) {
+            @NotNull final ChannelConsumer<? super OUT> consumer) {
         state.closeConsumer(consumer);
         synchronized (mMutex) {
             final OutputChannelState currentState = mState;
@@ -765,12 +766,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         synchronized (consumerMutex) {
             final OutputChannelState state;
             final ArrayList<Object> outputs = new ArrayList<Object>();
-            final OutputConsumer<? super OUT> consumer;
+            final ChannelConsumer<? super OUT> consumer;
             final boolean isFinal;
             synchronized (mMutex) {
                 state = mState;
                 isFinal = state.isReadyToComplete();
-                consumer = mOutputConsumer;
+                consumer = mChannelConsumer;
                 mOutputQueue.transferTo(outputs);
                 mOutputCount = 0;
                 mMutex.notifyAll();
@@ -795,7 +796,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                         break;
 
                     } else {
-                        logger.dbg("output consumer (%s): %s", consumer, output);
+                        logger.dbg("channel consumer (%s): %s", consumer, output);
                         consumer.onOutput((OUT) output);
                     }
                 }
@@ -822,7 +823,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     private Object getConsumerMutex() {
-        final OutputConsumer<? super OUT> consumer = mOutputConsumer;
+        final ChannelConsumer<? super OUT> consumer = mChannelConsumer;
         if (consumer == null) {
             return null;
         }
@@ -1085,7 +1086,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     private void verifyBound() {
-        if (mOutputConsumer != null) {
+        if (mChannelConsumer != null) {
             mLogger.err("invalid call on bound channel");
             throw new IllegalStateException("the channel is already bound");
         }
@@ -1128,7 +1129,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         RoutineException abortConsumer(@NotNull final Throwable reason) {
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
-            mLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
+            mLogger.wrn(reason, "aborting on consumer exception (%s)", mChannelConsumer);
             internalAbort(abortException);
             return abortException;
         }
@@ -1139,7 +1140,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         @Override
-        void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
+        void closeConsumer(@NotNull final ChannelConsumer<? super OUT> consumer) {
         }
     }
 
@@ -1166,51 +1167,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
-     * Default implementation of a channel iterator.
+     * Default implementation of an channel consumer pushing the data into the output queue.
      */
-    private class DefaultIterator implements Iterator<OUT> {
-
-        private final TimeoutActionType mAction;
-
-        private final Throwable mException;
-
-        private final long mTimeout;
-
-        private final TimeUnit mTimeoutUnit;
-
-        /**
-         * Constructor.
-         *
-         * @param timeout   the output timeout.
-         * @param timeUnit  the output timeout unit.
-         * @param action    the timeout action.
-         * @param exception the timeout exception.
-         */
-        private DefaultIterator(final long timeout, @NotNull final TimeUnit timeUnit,
-                @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
-            mTimeout = timeout;
-            mTimeoutUnit = timeUnit;
-            mAction = action;
-            mException = exception;
-        }
-
-        public boolean hasNext() {
-            return isNextAvailable(mTimeout, mTimeoutUnit, mAction, mException);
-        }
-
-        public OUT next() {
-            return readNext(mTimeout, mTimeoutUnit, mAction, mException);
-        }
-
-        public void remove() {
-            ConstantConditions.unsupported();
-        }
-    }
-
-    /**
-     * Default implementation of an output consumer pushing the data into the output queue.
-     */
-    private class DefaultOutputConsumer implements OutputConsumer<OUT> {
+    private class DefaultChannelConsumer implements ChannelConsumer<OUT> {
 
         private final long mDelay;
 
@@ -1225,7 +1184,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         /**
          * Constructor.
          */
-        private DefaultOutputConsumer() {
+        private DefaultChannelConsumer() {
             final UnitDuration delay = getDelay();
             mDelay = delay.value;
             mDelayUnit = delay.unit;
@@ -1276,6 +1235,48 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     waitOutputs();
                 }
             }
+        }
+    }
+
+    /**
+     * Default implementation of a channel iterator.
+     */
+    private class DefaultIterator implements Iterator<OUT> {
+
+        private final TimeoutActionType mAction;
+
+        private final Throwable mException;
+
+        private final long mTimeout;
+
+        private final TimeUnit mTimeoutUnit;
+
+        /**
+         * Constructor.
+         *
+         * @param timeout   the output timeout.
+         * @param timeUnit  the output timeout unit.
+         * @param action    the timeout action.
+         * @param exception the timeout exception.
+         */
+        private DefaultIterator(final long timeout, @NotNull final TimeUnit timeUnit,
+                @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
+            mTimeout = timeout;
+            mTimeoutUnit = timeUnit;
+            mAction = action;
+            mException = exception;
+        }
+
+        public boolean hasNext() {
+            return isNextAvailable(mTimeout, mTimeoutUnit, mAction, mException);
+        }
+
+        public OUT next() {
+            return readNext(mTimeout, mTimeoutUnit, mAction, mException);
+        }
+
+        public void remove() {
+            ConstantConditions.unsupported();
         }
     }
 
@@ -1548,7 +1549,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         @Nullable
         @Override
-        OutputConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
+        ChannelConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
             throw abortException();
         }
 
@@ -1671,7 +1672,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Nullable
         RoutineException abortConsumer(@NotNull final Throwable reason) {
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
-            mLogger.wrn(reason, "aborting on consumer exception (%s)", mOutputConsumer);
+            mLogger.wrn(reason, "aborting on consumer exception (%s)", mChannelConsumer);
             internalAbort(abortException);
             return abortException;
         }
@@ -1700,7 +1701,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
          *
          * @param consumer the consumer instance.
          */
-        void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
+        void closeConsumer(@NotNull final ChannelConsumer<? super OUT> consumer) {
             final Logger logger = mLogger;
             try {
                 logger.dbg("closing consumer (%s)", consumer);
@@ -1869,10 +1870,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
          * Called when a channel is passed to the result channel.
          *
          * @param channel the channel instance.
-         * @return the output consumer to bind or null.
+         * @return the channel consumer to bind or null.
          */
         @Nullable
-        OutputConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
+        ChannelConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
             if (channel == null) {
                 mLogger.wrn("passing null channel");
                 return null;
@@ -1881,7 +1882,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mBoundChannels.add(channel);
             ++mPendingOutputCount;
             mLogger.dbg("passing channel: %s", channel);
-            return new DefaultOutputConsumer();
+            return new DefaultChannelConsumer();
         }
 
         /**
@@ -2050,7 +2051,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         @Nullable
         @Override
-        OutputConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
+        ChannelConsumer<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
             throw exception();
         }
 

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.core;
+package com.github.dm.jrt.android.v4.core;
 
-import android.annotation.TargetApi;
-import android.content.Loader;
-import android.os.Build.VERSION_CODES;
+import android.support.v4.content.Loader;
 
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
@@ -45,8 +43,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-@TargetApi(VERSION_CODES.HONEYCOMB)
-class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
+class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private static final Runner sMainRunner = AndroidRunners.mainRunner();
 
@@ -72,7 +69,7 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param loader the loader instance.
      * @param logger the logger instance.
      */
-    InvocationOutputConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
+    InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
         ConstantConditions.notNull("loader instance", loader);
         mDeliverResult = new Execution() {
@@ -213,7 +210,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
                             throw e;
 
                         } catch (final Throwable t) {
-                            logger.wrn(t, "aborted channel");
                             abortedChannels.add(newChannel);
                         }
                     }
@@ -226,7 +222,6 @@ class InvocationOutputConsumer<OUT> implements OutputConsumer<OUT> {
                             throw e;
 
                         } catch (final Throwable t) {
-                            logger.wrn(t, "aborted channel");
                             abortedChannels.add(channel);
                         }
                     }

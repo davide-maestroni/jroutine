@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
@@ -304,7 +304,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         final Semaphore semaphore = new Semaphore(0);
         LoaderStreams.streamOf("test")
                      .on(loaderFrom(activity))
-                     .bind(new TemplateOutputConsumer<String>() {
+                     .bind(new TemplateChannelConsumer<String>() {
 
                          @Override
                          public void onOutput(final String s) throws Exception {
@@ -322,7 +322,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
         LoaderStreams.streamOf("test")
                      .on(loaderFrom(activity))
-                     .bindAfter(10, TimeUnit.MILLISECONDS, new TemplateOutputConsumer<String>() {
+                     .bindAfter(10, TimeUnit.MILLISECONDS, new TemplateChannelConsumer<String>() {
 
                          @Override
                          public void onOutput(final String s) throws Exception {
@@ -340,7 +340,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
         LoaderStreams.streamOf("test")
                      .on(loaderFrom(activity))
-                     .bindAfter(millis(10), new TemplateOutputConsumer<String>() {
+                     .bindAfter(millis(10), new TemplateChannelConsumer<String>() {
 
                          @Override
                          public void onOutput(final String s) throws Exception {

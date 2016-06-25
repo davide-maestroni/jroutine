@@ -17,7 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,13 +26,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Output consumer sorting the output data among a map of channels.
+ * Channel consumer sorting the output data among a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? extends OUT>> {
+class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? extends OUT>> {
 
     private final HashMap<Integer, Channel<OUT, ?>> mChannels;
 
@@ -43,7 +43,7 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      * @throws java.lang.NullPointerException if the specified map is null or contains a null
      *                                        object.
      */
-    SortingMapOutputConsumer(@NotNull final Map<Integer, Channel<OUT, ?>> channels) {
+    SortingMapChannelConsumer(@NotNull final Map<Integer, Channel<OUT, ?>> channels) {
         final HashMap<Integer, Channel<OUT, ?>> channelMap =
                 new HashMap<Integer, Channel<OUT, ?>>(channels);
         if (channelMap.containsValue(null)) {

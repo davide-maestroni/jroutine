@@ -14,54 +14,50 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.channel;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer transforming data into selectable ones.
+ * Channel consumer passing outputs to a consumer instance.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 05/14/2016.
  *
- * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN> {
+class ConsumingChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final Channel<? super
-            ParcelableSelectable<OUT>, ?> mChannel;
+    private final Channel<?, ?> mOutputChannel;
 
-    private final int mIndex;
+    private final ConsumerWrapper<? super OUT> mOutputConsumer;
 
     /**
      * Constructor.
      *
-     * @param channel the selectable channel.
-     * @param index   the selectable index.
+     * @param outputConsumer the consumer instance.
+     * @param outputChannel  the output channel.
      */
-    SelectableOutputConsumer(@NotNull final Channel<? super
-            ParcelableSelectable<OUT>, ?> channel, final int index) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        mIndex = index;
+    ConsumingChannelConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
+            @NotNull final Channel<?, ?> outputChannel) {
+        mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
-    @Override
     public void onComplete() {
-        mChannel.close();
+        mOutputChannel.close();
     }
 
-    @Override
     public void onError(@NotNull final RoutineException error) {
-        mChannel.abort(error);
+        mOutputChannel.abort(error);
     }
 
-    @Override
-    public void onOutput(final IN input) {
-        mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
+    public void onOutput(final OUT output) throws Exception {
+        mOutputConsumer.accept(output);
     }
 }

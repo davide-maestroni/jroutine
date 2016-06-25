@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.runner.Execution;
@@ -34,14 +34,14 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Retry output consumer.
+ * Retry channel consumer.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
+class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
     private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
             mBackoffFunction;
@@ -67,7 +67,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
      * @param bindingFunction the binding function.
      * @param backoffFunction the backoff function.
      */
-    RetryOutputConsumer(@NotNull final Channel<?, IN> inputChannel,
+    RetryChannelConsumer(@NotNull final Channel<?, IN> inputChannel,
             @NotNull final Channel<OUT, ?> outputChannel, @NotNull final Runner runner,
             @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
@@ -85,7 +85,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
     public void run() {
         final Channel<IN, IN> channel = JRoutineCore.io().buildChannel();
-        mInputChannel.bind(new SafeOutputConsumer<IN>(channel));
+        mInputChannel.bind(new SafeChannelConsumer<IN>(channel));
         try {
             mBindingFunction.apply(channel).bind(this);
 
@@ -101,11 +101,11 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     }
 
     /**
-     * Output consumer implementation avoiding the upstream propagation of errors.
+     * Channel consumer implementation avoiding the upstream propagation of errors.
      *
      * @param <IN> the input data type.
      */
-    private static class SafeOutputConsumer<IN> implements OutputConsumer<IN> {
+    private static class SafeChannelConsumer<IN> implements ChannelConsumer<IN> {
 
         private final Channel<IN, ?> mChannel;
 
@@ -114,7 +114,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
          *
          * @param channel the channel.
          */
-        private SafeOutputConsumer(@NotNull final Channel<IN, ?> channel) {
+        private SafeChannelConsumer(@NotNull final Channel<IN, ?> channel) {
             mChannel = channel;
         }
 

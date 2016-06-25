@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -130,7 +130,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(START)
-    StreamChannel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+    StreamChannel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}.
@@ -573,7 +573,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> bindAfter(@NotNull UnitDuration delay,
-            @NotNull OutputConsumer<OUT> consumer);
+            @NotNull ChannelConsumer<OUT> consumer);
 
     /**
      * Initiates the flow of this stream after the specified delay.
@@ -597,7 +597,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(START)
     StreamChannel<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit,
-            @NotNull OutputConsumer<OUT> consumer);
+            @NotNull ChannelConsumer<OUT> consumer);
 
     /**
      * Concatenates a stream accumulating data through the specified consumer.

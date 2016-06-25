@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -38,12 +38,12 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_IND
 import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_INDEX;
 
 /**
- * Output consumer implementation converting the request response body into and instance of the
+ * Channel consumer implementation converting the request response body into and instance of the
  * output type.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
-class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Object>> {
+class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<Object>> {
 
     private final Converter<ResponseBody, ?> mConverter;
 
@@ -59,7 +59,7 @@ class ConverterOutputConsumer implements OutputConsumer<ParcelableSelectable<Obj
      * @param converter the body converter.
      * @param channel   the output channel.
      */
-    ConverterOutputConsumer(@NotNull final Converter<ResponseBody, ?> converter,
+    ConverterChannelConsumer(@NotNull final Converter<ResponseBody, ?> converter,
             @NotNull final Channel<Object, ?> channel) {
         mConverter = ConstantConditions.notNull("converter instance", converter);
         mOutputChannel = ConstantConditions.notNull("channel instance", channel);

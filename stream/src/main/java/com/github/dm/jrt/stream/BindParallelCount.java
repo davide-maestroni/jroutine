@@ -74,7 +74,7 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
             channels.put(inputChannel, invocationChannel);
         }
 
-        channel.bind(new ParallelCountOutputConsumer<IN>(channels));
+        channel.bind(new ParallelCountChannelConsumer<IN>(channels));
         return outputChannel.close();
     }
 }

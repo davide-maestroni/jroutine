@@ -18,7 +18,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.log.Logger;
@@ -118,7 +118,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<DATA, DATA> bind(@NotNull final OutputConsumer<? super DATA> consumer) {
+    public Channel<DATA, DATA> bind(@NotNull final ChannelConsumer<? super DATA> consumer) {
         mChannel.bind(consumer);
         return this;
     }

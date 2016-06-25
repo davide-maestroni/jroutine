@@ -17,20 +17,20 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer performing a specific action on completion.
+ * Channel consumer performing a specific action on completion.
  * <p>
  * Created by davide-maestroni on 06/15/2016.
  *
  * @param <OUT> the output data type.
  */
-public class CompleteOutputConsumer<OUT> implements OutputConsumer<OUT> {
+public class CompleteChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private final Runnable mCompleteAction;
 
@@ -42,7 +42,7 @@ public class CompleteOutputConsumer<OUT> implements OutputConsumer<OUT> {
      * @param action        the runnable instance.
      * @param outputChannel the output channel.
      */
-    public CompleteOutputConsumer(@NotNull final Runnable action,
+    public CompleteChannelConsumer(@NotNull final Runnable action,
             @NotNull final Channel<?, Void> outputChannel) {
         mCompleteAction = ConstantConditions.notNull("runnable instance", action);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);

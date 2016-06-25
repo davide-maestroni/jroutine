@@ -18,7 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -92,14 +92,14 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
                                                                               .with(configuration)
                                                                               .applied()
                                                                               .buildChannel();
-        return inputChannel.bind(new SortingArrayOutputConsumer(mStartIndex, channelList));
+        return inputChannel.bind(new SortingArrayChannelConsumer(mStartIndex, channelList));
     }
 
     /**
-     * Output consumer sorting selectable inputs among a list of channels.
+     * Channel consumer sorting selectable inputs among a list of channels.
      */
-    private static class SortingArrayOutputConsumer<IN>
-            implements OutputConsumer<Selectable<? extends IN>> {
+    private static class SortingArrayChannelConsumer<IN>
+            implements ChannelConsumer<Selectable<? extends IN>> {
 
         private final ArrayList<Channel<? extends IN, ?>> mChannelList;
 
@@ -113,7 +113,7 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
          * @param startIndex the selectable start index.
          * @param channels   the list of channels.
          */
-        private SortingArrayOutputConsumer(final int startIndex,
+        private SortingArrayChannelConsumer(final int startIndex,
                 @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
             mStartIndex = startIndex;
             mChannelList = channels;

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,13 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.function.ConsumerWrapper.wrap;
 
 /**
- * Utility class used to build output consumer based on consumer functions.
+ * Utility class used to build channel consumers based on consumer functions.
  * <p>
  * Created by davide-maestroni on 09/21/2015.
  *
  * @param <OUT> the output data type.
  */
-public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
+public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
 
     private final ConsumerWrapper<Void> mOnComplete;
 
@@ -45,7 +45,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @param onError    the error consumer.
      * @param onOutput   the output consumer.
      */
-    OutputConsumerBuilder(@NotNull final Consumer<Void> onComplete,
+    ChannelConsumerBuilder(@NotNull final Consumer<Void> onComplete,
             @NotNull final Consumer<RoutineException> onError,
             @NotNull final Consumer<OUT> onOutput) {
         mOnOutput = wrap(onOutput);
@@ -66,39 +66,39 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     }
 
     /**
-     * Returns a new output consumer builder employing also the specified consumer function to
+     * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation completion.
      *
      * @param consumer the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenComplete(@NotNull final Consumer<Void> consumer) {
-        return new OutputConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
+    public ChannelConsumerBuilder<OUT> thenComplete(@NotNull final Consumer<Void> consumer) {
+        return new ChannelConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
     }
 
     /**
-     * Returns a new output consumer builder employing also the specified consumer function to
+     * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation errors.
      *
      * @param consumer the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenError(
+    public ChannelConsumerBuilder<OUT> thenError(
             @NotNull final Consumer<? super RoutineException> consumer) {
-        return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
+        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
     }
 
     /**
-     * Returns a new output consumer builder employing also the specified consumer function to
+     * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation outputs.
      *
      * @param consumer the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> consumer) {
-        return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
+    public ChannelConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> consumer) {
+        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
     }
 }

@@ -60,6 +60,7 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<
         final Channel<Selectable<DATA>, Selectable<DATA>> selectableChannel =
                 JRoutineCore.io().buildChannel();
         selectableChannel.bind(mChannel);
-        return inputChannel.bind(new SelectableOutputConsumer<DATA, IN>(selectableChannel, mIndex));
+        return inputChannel.bind(
+                new SelectableChannelConsumer<DATA, IN>(selectableChannel, mIndex));
     }
 }

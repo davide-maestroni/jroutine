@@ -20,11 +20,11 @@ import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
-import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
@@ -268,7 +268,7 @@ public class RoutineTest {
     @Test
     public void testBind() {
 
-        final TestOutputConsumer consumer = new TestOutputConsumer();
+        final TestChannelConsumer consumer = new TestChannelConsumer();
         final Channel<Object, Object> channel1 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                              .asyncCall()
                                                              .after(seconds(1))
@@ -1091,8 +1091,8 @@ public class RoutineTest {
 
     @Test
     public void testErrorConsumerOnComplete() {
-        final TemplateOutputConsumer<String> exceptionConsumer =
-                new TemplateOutputConsumer<String>() {
+        final TemplateChannelConsumer<String> exceptionConsumer =
+                new TemplateChannelConsumer<String>() {
 
                     @Override
                     public void onComplete() {
@@ -1104,8 +1104,8 @@ public class RoutineTest {
 
     @Test
     public void testErrorConsumerOnOutput() {
-        final TemplateOutputConsumer<String> exceptionConsumer =
-                new TemplateOutputConsumer<String>() {
+        final TemplateChannelConsumer<String> exceptionConsumer =
+                new TemplateChannelConsumer<String>() {
 
                     @Override
                     public void onOutput(final String output) {
@@ -1794,7 +1794,7 @@ public class RoutineTest {
         }
 
         try {
-            channel.bind((OutputConsumer<String>) null);
+            channel.bind((ChannelConsumer<String>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1807,7 +1807,7 @@ public class RoutineTest {
         } catch (final NullPointerException ignored) {
         }
 
-        final TemplateOutputConsumer<String> consumer = new TemplateOutputConsumer<String>() {};
+        final TemplateChannelConsumer<String> consumer = new TemplateChannelConsumer<String>() {};
         try {
             channel.bind(consumer).bind(consumer);
             fail();
@@ -2487,7 +2487,7 @@ public class RoutineTest {
         }
     }
 
-    private void testConsumer(final OutputConsumer<String> consumer) {
+    private void testConsumer(final ChannelConsumer<String> consumer) {
         final UnitDuration timeout = seconds(1);
         final String input = "test";
         final Routine<String, String> routine =
@@ -3186,6 +3186,27 @@ public class RoutineTest {
         }
     }
 
+    private static class TestChannelConsumer extends TemplateChannelConsumer<Object> {
+
+        private boolean mIsOutput;
+
+        private Object mOutput;
+
+        public Object getOutput() {
+            return mOutput;
+        }
+
+        public boolean isOutput() {
+            return mIsOutput;
+        }
+
+        @Override
+        public void onOutput(final Object o) {
+            mIsOutput = true;
+            mOutput = o;
+        }
+    }
+
     private static class TestDiscard extends TemplateInvocation<String, String> {
 
         private static final AtomicInteger sInstanceCount = new AtomicInteger();
@@ -3294,27 +3315,6 @@ public class RoutineTest {
         @Override
         public void onComplete(@NotNull final Channel<String, ?> result) {
             sActive = false;
-        }
-    }
-
-    private static class TestOutputConsumer extends TemplateOutputConsumer<Object> {
-
-        private boolean mIsOutput;
-
-        private Object mOutput;
-
-        public Object getOutput() {
-            return mOutput;
-        }
-
-        public boolean isOutput() {
-            return mIsOutput;
-        }
-
-        @Override
-        public void onOutput(final Object o) {
-            mIsOutput = true;
-            mOutput = o;
         }
     }
 

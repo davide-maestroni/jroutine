@@ -653,7 +653,7 @@ public class Streams extends Operators {
 
     /**
      * Returns a builder of streams repeating the output data to any newly bound channel or
-     * consumer, thus effectively supporting binding of several output consumers.
+     * consumer, thus effectively supporting binding of several channel consumers.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channel will be bound as a result of the creation.

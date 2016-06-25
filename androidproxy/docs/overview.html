@@ -49,7 +49,7 @@
                                    .with(instanceOf(BitmapLoader.class))
                                    .buildProxy(BitmapLoaderItf.class)
                                    .loadFromUri(URI.create(IMAGE_URI))
-                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {
@@ -120,7 +120,7 @@
                                    .with(instanceOf(BitmapLoader.class))
                                    .buildProxy(BitmapLoaderItf.class)
                                    .loadFromUri(URI.create(IMAGE_URI))
-                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {
@@ -211,7 +211,7 @@
                                    .with(instanceOf(BitmapLoader.class))
                                    .buildProxy()
                                    .loadFromUri(URI.create(IMAGE_URI))
-                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                        &commat;Override
                                        public void onError(&commat;NotNull final RoutineException error) {

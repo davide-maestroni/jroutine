@@ -26,7 +26,7 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Output consumer binding function.
+ * Channel consumer binding function.
  * <p>
  * Created by davide-maestroni on 05/14/2016.
  *
@@ -56,7 +56,7 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Vo
                                                               .with(mConfiguration)
                                                               .applied()
                                                               .buildChannel();
-        channel.bind(new ConsumingOutputConsumer<OUT>(mOutputConsumer, outputChannel));
+        channel.bind(new ConsumingChannelConsumer<OUT>(mOutputConsumer, outputChannel));
         return outputChannel;
     }
 }

@@ -59,7 +59,7 @@ class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
                                                             .with(mConfiguration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new TryCatchOutputConsumer<OUT>(mCatchConsumer, outputChannel));
+        channel.bind(new TryCatchChannelConsumer<OUT>(mCatchConsumer, outputChannel));
         return outputChannel;
     }
 }

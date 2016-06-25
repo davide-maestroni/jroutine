@@ -28,7 +28,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -201,7 +201,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> bind(
-            @NotNull final OutputConsumer<? super OUT> consumer) {
+            @NotNull final ChannelConsumer<? super OUT> consumer) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.bind(consumer);
     }
 
@@ -396,7 +396,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> bindAfter(@NotNull final UnitDuration delay,
-            @NotNull final OutputConsumer<OUT> consumer) {
+            @NotNull final ChannelConsumer<OUT> consumer) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay, consumer);
     }
 
@@ -410,7 +410,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> bindAfter(final long delay,
-            @NotNull final TimeUnit timeUnit, @NotNull final OutputConsumer<OUT> consumer) {
+            @NotNull final TimeUnit timeUnit, @NotNull final ChannelConsumer<OUT> consumer) {
         return (LoaderStreamChannelCompat<IN, OUT>) super.bindAfter(delay, timeUnit, consumer);
     }
 

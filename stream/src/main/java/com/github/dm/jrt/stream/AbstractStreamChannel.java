@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
@@ -195,7 +195,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public StreamChannel<IN, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
         bindChannel().bind(consumer);
         return this;
     }
@@ -431,7 +431,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> bindAfter(@NotNull final UnitDuration delay,
-            @NotNull final OutputConsumer<OUT> consumer) {
+            @NotNull final ChannelConsumer<OUT> consumer) {
         return bindAfter(delay.value, delay.unit, consumer);
     }
 
@@ -445,7 +445,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> bindAfter(final long delay, @NotNull final TimeUnit timeUnit,
-            @NotNull final OutputConsumer<OUT> consumer) {
+            @NotNull final ChannelConsumer<OUT> consumer) {
         final Runner runner =
                 mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null);
         return newChannel(

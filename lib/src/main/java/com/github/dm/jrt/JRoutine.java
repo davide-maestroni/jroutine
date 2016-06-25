@@ -32,7 +32,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,7 @@ import static com.github.dm.jrt.object.InvocationTarget.instance;
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutine extends Streams {
+public class JRoutine extends StreamChannels {
 
     /**
      * Avoid explicit instantiation.

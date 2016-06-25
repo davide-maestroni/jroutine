@@ -15,7 +15,7 @@
  */
 
 /**
- * Streams implementation classes with support for Android compatibility library.
+ * Stream implementation classes with support for Android compatibility library.
  * <p>
  * Created by davide-maestroni on 01/04/2016.
  */

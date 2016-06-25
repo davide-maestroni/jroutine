@@ -15,7 +15,7 @@
  */
 
 /**
- * Streams implementation classes specific to the Android platform.
+ * Stream implementation classes specific to the Android platform.
  * <p>
  * Created by davide-maestroni on 01/04/2016.
  */

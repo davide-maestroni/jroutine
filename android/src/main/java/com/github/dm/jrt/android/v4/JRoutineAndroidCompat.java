@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.stream.LoaderStreamsCompat;
+import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelsCompat;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -41,7 +41,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public class JRoutineAndroidCompat extends LoaderStreamsCompat {
+public class JRoutineAndroidCompat extends LoaderStreamChannelsCompat {
 
     /**
      * Avoid explicit instantiation.

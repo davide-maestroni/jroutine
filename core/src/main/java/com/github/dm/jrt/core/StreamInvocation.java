@@ -48,12 +48,16 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     @Override
     public final void onAbort(@NotNull final RoutineException reason) {
         mInputChannel.abort(reason);
+        mInputChannel = null;
+        mOutputChannel = null;
     }
 
     @Override
     public final void onComplete(@NotNull final Channel<OUT, ?> result) {
         bind(result);
         mInputChannel.close();
+        mInputChannel = null;
+        mOutputChannel = null;
     }
 
     @Override

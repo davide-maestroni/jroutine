@@ -50,12 +50,12 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * <p>
  * Created by davide-maestroni on 11/26/2015.
  */
-public class Streams extends Operators {
+public class StreamChannels extends Operators {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Streams() {
+    protected StreamChannels() {
         ConstantConditions.avoid();
     }
 

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.junit.Test;
 
@@ -231,7 +231,7 @@ public class ProviderAdapterFactoryTest {
                 public <R> Object adapt(final Call<R> call) {
 
                     final List<Object> result = Collections.emptyList();
-                    return Streams.<List<Object>>streamOf(result);
+                    return StreamChannels.<List<Object>>streamOf(result);
                 }
             };
         }

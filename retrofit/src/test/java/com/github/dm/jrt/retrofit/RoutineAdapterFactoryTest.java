@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.junit.Test;
 
@@ -259,7 +259,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -287,7 +287,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -315,7 +315,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -343,7 +343,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -370,7 +370,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -397,7 +397,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {

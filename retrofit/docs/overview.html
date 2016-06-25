@@ -42,7 +42,7 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(Streams.&lt;Repo&gt;unfold())
+                       .map(StreamChannels.&lt;Repo&gt;unfold())
                        .onOutput(System.out::println)
                        .afterMax(seconds(3))
                        .hasCompleted();

@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -93,7 +93,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -125,7 +125,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -154,7 +154,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -183,7 +183,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -217,7 +217,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -247,7 +247,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -486,7 +486,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -515,7 +515,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -544,7 +544,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -573,7 +573,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -607,7 +607,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -637,7 +637,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {

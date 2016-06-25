@@ -39,15 +39,15 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final Double rms = Streams.streamOf(args)
-                                          .parallel()
-                                          .map(Integer::parseInt)
-                                          .map(integer -&gt; integer * integer)
-                                          .straight()
-                                          .map(averageFloat())
-                                          .map(Math::sqrt)
-                                          .afterMax(seconds(1))
-                                          .next();
+                final Double rms = StreamChannels.streamOf(args)
+                                                 .parallel()
+                                                 .map(Integer::parseInt)
+                                                 .map(integer -&gt; integer * integer)
+                                                 .straight()
+                                                 .map(averageFloat())
+                                                 .map(Math::sqrt)
+                                                 .afterMax(seconds(1))
+                                                 .next();
                 System.out.println(rms);
                 System.exit(0);
             }

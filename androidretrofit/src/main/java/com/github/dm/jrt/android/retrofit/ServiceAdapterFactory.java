@@ -33,7 +33,7 @@ import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -472,12 +472,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                             getRoutine()));
                         }
                     };
-            return Streams.streamOf(call)
-                          .invocationConfiguration()
-                          .with(mInvocationConfiguration)
-                          .applied()
-                          .map(sInvocation)
-                          .lift(function);
+            return StreamChannels.streamOf(call)
+                                 .invocationConfiguration()
+                                 .with(mInvocationConfiguration)
+                                 .applied()
+                                 .map(sInvocation)
+                                 .lift(function);
         }
     }
 }

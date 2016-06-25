@@ -16,12 +16,10 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.StreamInvocation;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
@@ -57,7 +55,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     @NotNull
     @Override
     public Invocation<IN, OUT> newInvocation() {
-        return new StreamInvocation<IN, OUT>(mFunction);
+        return new FunctionStreamInvocation<IN, OUT>(mFunction);
     }
 
     /**
@@ -66,56 +64,29 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+    private static class FunctionStreamInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
 
         private final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super IN,
                 ? extends OUT>>
                 mFunction;
-
-        private Channel<IN, IN> mInputChannel;
-
-        private StreamChannel<? super IN, ? extends OUT> mOutputChannel;
 
         /**
          * Constructor.
          *
          * @param function the function used to instantiate the stream channel.
          */
-        private StreamInvocation(@NotNull final Function<? super StreamChannel<IN, IN>, ? extends
-                StreamChannel<? super IN, ? extends OUT>> function) {
+        private FunctionStreamInvocation(
+                @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                        StreamChannel<? super IN, ? extends OUT>> function) {
             mFunction = function;
         }
 
-        public void onAbort(@NotNull final RoutineException reason) {
-            mInputChannel.abort(reason);
-            mInputChannel = null;
-            mOutputChannel = null;
-        }
-
-        public void onComplete(@NotNull final Channel<OUT, ?> result) {
-            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
-            mInputChannel.close();
-            mInputChannel = null;
-            mOutputChannel = null;
-        }
-
-        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
-            mInputChannel.pass(input);
-        }
-
-        public void onRestart() throws Exception {
-            final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
-            mOutputChannel = mFunction.apply(new DefaultStreamChannel<IN, IN>(inputChannel));
-            mInputChannel = inputChannel;
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) throws
+                Exception {
+            return (Channel<?, OUT>) mFunction.apply(new DefaultStreamChannel<IN, IN>(channel));
         }
     }
 }

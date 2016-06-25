@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.stream;
+package com.github.dm.jrt.android.v4.stream;
 
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.v11.channel.SparseChannels;
-import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -33,7 +33,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,16 +45,16 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Utility class acting as a factory of stream channels.
+ * Utility class acting as a factory of stream output channels.
  * <p>
- * Created by davide-maestroni on 01/02/2016.
+ * Created by davide-maestroni on 01/04/2016.
  */
-public class LoaderStreams extends Streams {
+public class LoaderStreamChannelsCompat extends StreamChannels {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected LoaderStreams() {
+    protected LoaderStreamChannelsCompat() {
         ConstantConditions.avoid();
     }
 
@@ -72,12 +72,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#blend(Iterable)
+     * @see SparseChannelsCompat#blend(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> blend(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<OUT>(SparseChannels.blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.blend(channels));
     }
 
     /**
@@ -94,12 +94,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#blend(Channel...)
+     * @see SparseChannelsCompat#blend(Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> blend(
             @NotNull final Channel<?, ?>... channels) {
-        return new BuilderWrapper<OUT>(SparseChannels.<OUT>blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.<OUT>blend(channels));
     }
 
     /**
@@ -115,12 +115,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(Channel...)
+     * @see SparseChannelsCompat#combine(Channel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
             @NotNull final Channel<?, ?>... channels) {
-        return SparseChannels.combine(channels);
+        return SparseChannelsCompat.combine(channels);
     }
 
     /**
@@ -137,12 +137,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#combine(int, Channel...)
+     * @see SparseChannelsCompat#combine(int, Channel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
             final int startIndex, @NotNull final Channel<?, ?>... channels) {
-        return SparseChannels.combine(startIndex, channels);
+        return SparseChannelsCompat.combine(startIndex, channels);
     }
 
     /**
@@ -159,13 +159,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(int, Iterable)
+     * @see SparseChannelsCompat#combine(int, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
             final int startIndex,
             @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.combine(startIndex, channels);
+        return SparseChannelsCompat.combine(startIndex, channels);
     }
 
     /**
@@ -181,12 +181,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(Iterable)
+     * @see SparseChannelsCompat#combine(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
             @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.combine(channels);
+        return SparseChannelsCompat.combine(channels);
     }
 
     /**
@@ -202,12 +202,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
-     * @see SparseChannels#combine(Map)
+     * @see SparseChannelsCompat#combine(Map)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
             @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.combine(channels);
+        return SparseChannelsCompat.combine(channels);
     }
 
     /**
@@ -223,12 +223,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
-     * @see SparseChannels#combine(Map)
+     * @see SparseChannelsCompat#combine(Map)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
-            @NotNull final SparseArray<? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.combine(channels);
+            @NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
+        return SparseChannelsCompat.combine(channels);
     }
 
     /**
@@ -247,12 +247,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#concat(Iterable)
+     * @see SparseChannelsCompat#concat(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> concat(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<OUT>(SparseChannels.concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.concat(channels));
     }
 
     /**
@@ -271,12 +271,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#concat(Channel...)
+     * @see SparseChannelsCompat#concat(Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> concat(
             @NotNull final Channel<?, ?>... channels) {
-        return new BuilderWrapper<OUT>(SparseChannels.<OUT>concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.<OUT>concat(channels));
     }
 
     /**
@@ -315,12 +315,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#distribute(Channel...)
+     * @see SparseChannelsCompat#distribute(Channel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @NotNull final Channel<?, ?>... channels) {
-        return SparseChannels.distribute(channels);
+        return SparseChannelsCompat.distribute(channels);
     }
 
     /**
@@ -335,12 +335,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#distribute(Iterable)
+     * @see SparseChannelsCompat#distribute(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.distribute(channels);
+        return SparseChannelsCompat.distribute(channels);
     }
 
     /**
@@ -358,12 +358,12 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#distribute(Object, Channel...)
+     * @see SparseChannelsCompat#distribute(Object, Channel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @Nullable final IN placeholder, @NotNull final Channel<?, ?>... channels) {
-        return SparseChannels.distribute(placeholder, channels);
+        return SparseChannelsCompat.distribute(placeholder, channels);
     }
 
     /**
@@ -381,13 +381,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#distribute(Object, Iterable)
+     * @see SparseChannelsCompat#distribute(Object, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @Nullable final IN placeholder,
             @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-        return SparseChannels.distribute(placeholder, channels);
+        return SparseChannelsCompat.distribute(placeholder, channels);
     }
 
     /**
@@ -406,13 +406,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#join(Iterable)
+     * @see SparseChannelsCompat#join(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
-            extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>,
+            List<? extends OUT>>> join(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannelsCompat.join(channels));
     }
 
     /**
@@ -431,12 +431,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#join(Channel...)
+     * @see SparseChannelsCompat#join(Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
-            extends OUT>>> join(@NotNull final Channel<?, ?>... channels) {
-        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.<OUT>join(channels));
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>,
+            List<? extends OUT>>> join(
+            @NotNull final Channel<?, ?>... channels) {
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannelsCompat.<OUT>join(channels));
     }
 
     /**
@@ -459,13 +460,15 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#join(Object, Iterable)
+     * @see SparseChannelsCompat#join(Object, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
-            extends OUT>>> join(@Nullable final OUT placeholder,
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>,
+            List<? extends OUT>>> join(
+            @Nullable final OUT placeholder,
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(
+                SparseChannelsCompat.join(placeholder, channels));
     }
 
     /**
@@ -488,13 +491,14 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#join(Object, Channel...)
+     * @see SparseChannelsCompat#join(Object, Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
-            extends OUT>>> join(@Nullable final OUT placeholder,
-            @NotNull final Channel<?, ?>... channels) {
-        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>,
+            List<? extends OUT>>> join(
+            @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
+        return new BuilderWrapper<List<? extends OUT>>(
+                SparseChannelsCompat.join(placeholder, channels));
     }
 
     /**
@@ -512,15 +516,15 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#merge(int, Iterable)
+     * @see SparseChannelsCompat#merge(int, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             final int startIndex,
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                SparseChannels.merge(startIndex, channels));
+                SparseChannelsCompat.merge(startIndex, channels));
     }
 
     /**
@@ -538,14 +542,14 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#merge(int, Channel...)
+     * @see SparseChannelsCompat#merge(int, Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             final int startIndex, @NotNull final Channel<?, ?>... channels) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                SparseChannels.<OUT>merge(startIndex, channels));
+                SparseChannelsCompat.<OUT>merge(startIndex, channels));
     }
 
     /**
@@ -562,13 +566,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see SparseChannels#merge(Iterable)
+     * @see SparseChannelsCompat#merge(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannelsCompat.merge(channels));
     }
 
     /**
@@ -585,13 +589,14 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#merge(Channel...)
+     * @see SparseChannelsCompat#merge(Channel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final Channel<?, ?>... channels) {
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.<OUT>merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                SparseChannelsCompat.<OUT>merge(channels));
     }
 
     /**
@@ -608,13 +613,13 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
-     * @see SparseChannels#merge(SparseArray)
+     * @see SparseChannelsCompat#merge(SparseArrayCompat)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
-            @NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
+            @NotNull final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channels) {
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannelsCompat.merge(channels));
     }
 
     /**
@@ -629,12 +634,12 @@ public class LoaderStreams extends Streams {
      * @param channel the channel instance.
      * @param <OUT>   the output data type.
      * @return the replaying stream channel builder.
-     * @see SparseChannels#replay(Channel)
+     * @see SparseChannelsCompat#replay(Channel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> replay(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> replay(
             @NotNull final Channel<?, OUT> channel) {
-        return new BuilderWrapper<OUT>(SparseChannels.replay(channel));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.replay(channel));
     }
 
     /**
@@ -647,12 +652,12 @@ public class LoaderStreams extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the channel builder.
-     * @see SparseChannels#selectInput(Channel, int)
+     * @see SparseChannelsCompat#selectInput(Channel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>> selectInput(
             @NotNull final Channel<? super Selectable<DATA>, ?> channel, final int index) {
-        return SparseChannels.selectInput(channel, index);
+        return SparseChannelsCompat.selectInput(channel, index);
     }
 
     /**
@@ -667,14 +672,14 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#selectInput(Channel, Iterable)
+     * @see SparseChannelsCompat#selectInput(Channel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
     selectInput(
             @NotNull final Channel<? super Selectable<DATA>, ?> channel,
             @NotNull final Iterable<Integer> indexes) {
-        return SparseChannels.selectInput(channel, indexes);
+        return SparseChannelsCompat.selectInput(channel, indexes);
     }
 
     /**
@@ -689,14 +694,14 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#selectInput(Channel, int...)
+     * @see SparseChannelsCompat#selectInput(Channel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
     selectInput(
             @NotNull final Channel<? super Selectable<DATA>, ?> channel,
             @NotNull final int... indexes) {
-        return SparseChannels.selectInput(channel, indexes);
+        return SparseChannelsCompat.selectInput(channel, indexes);
     }
 
     /**
@@ -711,14 +716,14 @@ public class LoaderStreams extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannels#selectInput(int, int, Channel)
+     * @see SparseChannelsCompat#selectInput(int, int, Channel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
     selectInput(
             final int startIndex, final int rangeSize,
             @NotNull final Channel<? super Selectable<DATA>, ?> channel) {
-        return SparseChannels.selectInput(startIndex, rangeSize, channel);
+        return SparseChannelsCompat.selectInput(startIndex, rangeSize, channel);
     }
 
     /**
@@ -731,14 +736,14 @@ public class LoaderStreams extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the channel builder.
-     * @see SparseChannels#selectParcelableInput(Channel, int)
+     * @see SparseChannelsCompat#selectParcelableInput(Channel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>>
     selectParcelableInput(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             final int index) {
-        return SparseChannels.selectParcelableInput(channel, index);
+        return SparseChannelsCompat.selectParcelableInput(channel, index);
     }
 
     /**
@@ -753,14 +758,14 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#selectParcelableInput(Channel, int...)
+     * @see SparseChannelsCompat#selectParcelableInput(Channel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArray<Channel<IN, ?>>> selectParcelableInput(
+            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             @NotNull final int... indexes) {
-        return SparseChannels.selectParcelableInput(channel, indexes);
+        return SparseChannelsCompat.selectParcelableInput(channel, indexes);
     }
 
     /**
@@ -775,14 +780,14 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#selectParcelableInput(Channel, Iterable)
+     * @see SparseChannelsCompat#selectParcelableInput(Channel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArray<Channel<IN, ?>>> selectParcelableInput(
+            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             @NotNull final Iterable<Integer> indexes) {
-        return SparseChannels.selectParcelableInput(channel, indexes);
+        return SparseChannelsCompat.selectParcelableInput(channel, indexes);
     }
 
     /**
@@ -797,14 +802,14 @@ public class LoaderStreams extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannels#selectParcelableInput(int, int, Channel)
+     * @see SparseChannelsCompat#selectParcelableInput(int, int, Channel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArray<Channel<IN, ?>>> selectParcelableInput(final int startIndex,
+            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(final int startIndex,
             final int rangeSize,
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel) {
-        return SparseChannels.selectParcelableInput(startIndex, rangeSize, channel);
+        return SparseChannelsCompat.selectParcelableInput(startIndex, rangeSize, channel);
     }
 
     /**
@@ -822,15 +827,15 @@ public class LoaderStreams extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see SparseChannels#selectParcelableOutput(int, int, Channel)
+     * @see SparseChannelsCompat#selectParcelableOutput(int, int, Channel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
-            SparseArray<LoaderStreamChannel<OUT, OUT>>> selectParcelableOutput(final int startIndex,
-            final int rangeSize,
+            SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> selectParcelableOutput(
+            final int startIndex, final int rangeSize,
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel) {
         return new MapBuilderWrapper<OUT>(
-                SparseChannels.selectParcelableOutput(startIndex, rangeSize, channel));
+                SparseChannelsCompat.selectParcelableOutput(startIndex, rangeSize, channel));
     }
 
     /**
@@ -848,14 +853,15 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#selectParcelableOutput(Channel, int...)
+     * @see SparseChannelsCompat#selectParcelableOutput(Channel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
-            SparseArray<LoaderStreamChannel<OUT, OUT>>> selectParcelableOutput(
+            SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> selectParcelableOutput(
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
-        return new MapBuilderWrapper<OUT>(SparseChannels.selectParcelableOutput(channel, indexes));
+        return new MapBuilderWrapper<OUT>(
+                SparseChannelsCompat.selectParcelableOutput(channel, indexes));
     }
 
     /**
@@ -873,14 +879,15 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#selectParcelableOutput(Channel, Iterable)
+     * @see SparseChannelsCompat#selectParcelableOutput(Channel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
-            SparseArray<LoaderStreamChannel<OUT, OUT>>> selectParcelableOutput(
+            SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> selectParcelableOutput(
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
-        return new MapBuilderWrapper<OUT>(SparseChannels.selectParcelableOutput(channel, indexes));
+        return new MapBuilderWrapper<OUT>(
+                SparseChannelsCompat.selectParcelableOutput(channel, indexes));
     }
 
     /**
@@ -894,12 +901,12 @@ public class LoaderStreams extends Streams {
      * @param index   the channel index.
      * @param <IN>    the input data type.
      * @return the selectable channel builder.
-     * @see SparseChannels#selectableInput(Channel, int)
+     * @see SparseChannelsCompat#selectableInput(Channel, int)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<Selectable<IN>, ?>> selectableInput(
             @NotNull final Channel<? super IN, ?> channel, final int index) {
-        return SparseChannels.selectableInput(channel, index);
+        return SparseChannelsCompat.selectableInput(channel, index);
     }
 
     /**
@@ -916,14 +923,14 @@ public class LoaderStreams extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see SparseChannels#selectableOutput(Channel, int)
+     * @see SparseChannelsCompat#selectableOutput(Channel, int)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> selectableOutput(
             @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                SparseChannels.selectableOutput(channel, index));
+                SparseChannelsCompat.selectableOutput(channel, index));
     }
 
     /**
@@ -936,7 +943,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf() {
+    public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf() {
         return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
@@ -951,7 +958,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
+    public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf(
             @Nullable final Iterable<OUT> outputs) {
         return streamOf(JRoutineCore.io().of(outputs));
     }
@@ -967,7 +974,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
+    public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf(@Nullable final OUT output) {
         return streamOf(JRoutineCore.io().of(output));
     }
 
@@ -982,7 +989,8 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
+    public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf(
+            @Nullable final OUT... outputs) {
         return streamOf(JRoutineCore.io().of(outputs));
     }
 
@@ -999,10 +1007,10 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
+    public static <OUT> LoaderStreamChannelCompat<OUT, OUT> streamOf(
             @Nullable final Channel<?, OUT> output) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
-        return new DefaultLoaderStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
+        return new DefaultLoaderStreamChannelCompat<OUT, OUT>(outputChannel.pass(output).close());
     }
 
     /**
@@ -1032,7 +1040,7 @@ public class LoaderStreams extends Streams {
                                                                                      .getName());
         }
 
-        return Streams.withStream(function);
+        return StreamChannels.withStream(function);
     }
 
     /**
@@ -1055,9 +1063,9 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> withStreamOn(
-            @NotNull final LoaderContext context,
+            @NotNull final LoaderContextCompat context,
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
-        return JRoutineLoader.on(context).with(contextFactory(function));
+        return JRoutineLoaderCompat.on(context).with(contextFactory(function));
     }
 }

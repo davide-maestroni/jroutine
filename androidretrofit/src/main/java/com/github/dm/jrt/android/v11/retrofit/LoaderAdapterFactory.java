@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamChannel;
-import com.github.dm.jrt.android.v11.stream.LoaderStreams;
+import com.github.dm.jrt.android.v11.stream.LoaderStreamChannels;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -306,10 +306,10 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             final LoaderStreamChannel<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                stream = LoaderStreams.streamOf(comparableCall).on(mContext).async();
+                stream = LoaderStreamChannels.streamOf(comparableCall).on(mContext).async();
 
             } else {
-                stream = LoaderStreams.streamOf(comparableCall).on(mContext).sync();
+                stream = LoaderStreamChannels.streamOf(comparableCall).on(mContext).sync();
             }
 
             return stream.map(getRoutine()).invocationMode(invocationMode);

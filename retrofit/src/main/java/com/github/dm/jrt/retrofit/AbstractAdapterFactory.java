@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -398,10 +398,10 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             final StreamChannel<Call<OUT>, Call<OUT>> stream;
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
                     == InvocationMode.PARALLEL)) {
-                stream = Streams.streamOf(call).async();
+                stream = StreamChannels.streamOf(call).async();
 
             } else {
-                stream = Streams.streamOf(call).sync();
+                stream = StreamChannels.streamOf(call).sync();
             }
 
             return stream.map(getRoutine()).invocationMode(invocationMode);

@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.StreamChannels;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.Nullable;
@@ -320,7 +320,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -352,7 +352,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -381,7 +381,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -410,7 +410,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
+                                  .map(StreamChannels.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {

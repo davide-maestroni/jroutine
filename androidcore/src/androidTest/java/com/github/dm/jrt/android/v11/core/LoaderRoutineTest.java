@@ -651,7 +651,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .withLoaderId(0)
                                                               .withInputClashResolution(
                                                                       ClashResolutionType
-                                                                              .ABORT_THAT)
+                                                                              .ABORT_OTHER)
                                                               .applied()
                                                               .buildRoutine();
         final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
@@ -684,7 +684,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .withLoaderId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType
-                                                                              .ABORT_THAT)
+                                                                              .ABORT_OTHER)
                                                               .applied()
                                                               .buildRoutine();
         final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
@@ -1515,7 +1515,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .withLoaderId(0)
                                                               .withInputClashResolution(
                                                                       ClashResolutionType
-                                                                              .ABORT_THAT)
+                                                                              .ABORT_OTHER)
                                                               .applied()
                                                               .buildRoutine();
         final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
@@ -1551,7 +1551,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .withLoaderId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType
-                                                                              .ABORT_THAT)
+                                                                              .ABORT_OTHER)
                                                               .applied()
                                                               .buildRoutine();
         final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);

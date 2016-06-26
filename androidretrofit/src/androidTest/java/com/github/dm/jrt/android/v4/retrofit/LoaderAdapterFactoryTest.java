@@ -33,7 +33,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.stream.StreamChannels;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -71,7 +71,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
 
     private static void testLoaderStreamChannelAdapter(
-            @Nullable final LoaderContextCompat context) throws IOException {
+            @NotNull final LoaderContextCompat context) throws IOException {
 
         final MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(BODY));
@@ -84,7 +84,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         try {
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.on(context);
+                        LoaderAdapterFactoryCompat.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -110,8 +110,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.PARALLEL)
                                                   .loaderConfiguration()
                                                   .withResultStaleTime(seconds(3))
@@ -142,8 +141,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SYNC)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -171,8 +169,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -199,14 +196,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
                                 serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                                        TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -235,8 +229,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -267,7 +260,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testOutputChannelAdapter(@Nullable final LoaderContextCompat context) throws
+    private static void testOutputChannelAdapter(@NotNull final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -281,8 +274,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         try {
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
                                                   .applied()
@@ -309,8 +301,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.PARALLEL)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
@@ -338,8 +329,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SYNC)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
@@ -367,8 +357,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
@@ -395,14 +384,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
                                 serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                                        TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
@@ -431,8 +417,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .invocationConfiguration()
                                                   .withOutputTimeout(seconds(10))
@@ -463,7 +448,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testStreamChannelAdapter(@Nullable final LoaderContextCompat context) throws
+    private static void testStreamChannelAdapter(@NotNull final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -477,7 +462,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         try {
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.on(context);
+                        LoaderAdapterFactoryCompat.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -503,8 +488,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.PARALLEL)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -532,8 +516,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SYNC)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -561,8 +544,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .invocationMode(InvocationMode.SEQUENTIAL)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -589,14 +571,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
                                 serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                                        TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -625,8 +604,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.builder()
-                                                  .on(context)
+                        LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
                                                   .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -670,11 +648,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         testLoaderStreamChannelAdapter(loaderFrom(fragment));
     }
 
-    public void testLoaderStreamChannelAdapterNullContext() throws IOException {
-
-        testLoaderStreamChannelAdapter(null);
-    }
-
     public void testOutputChannelAdapter() throws IOException {
 
         testOutputChannelAdapter(loaderFrom(getActivity()));
@@ -688,11 +661,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         testOutputChannelAdapter(loaderFrom(fragment));
     }
 
-    public void testOutputChannelAdapterNullContext() throws IOException {
-
-        testOutputChannelAdapter(null);
-    }
-
     public void testStreamChannelAdapter() throws IOException {
 
         testStreamChannelAdapter(loaderFrom(getActivity()));
@@ -704,11 +672,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         testStreamChannelAdapter(loaderFrom(fragment));
-    }
-
-    public void testStreamChannelAdapterNullContext() throws IOException {
-
-        testStreamChannelAdapter(null);
     }
 
     private static class BodyAdapterFactory extends CallAdapter.Factory {

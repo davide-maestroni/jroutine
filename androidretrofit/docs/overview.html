@@ -61,7 +61,7 @@
                 }
 
                 final LoaderAdapterFactory adapterFactory = 
-                        LoaderAdapterFactory.defaultFactory(loaderFrom(this));
+                        LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")
@@ -131,7 +131,7 @@
                 }
 
                 final LoaderAdapterFactoryCompat adapterFactory = 
-                        LoaderAdapterFactoryCompat.defaultFactory(loaderFrom(this));
+                        LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")
@@ -201,7 +201,7 @@
                 }
 
                 final ServiceAdapterFactory adapterFactory = 
-                        ServiceAdapterFactory.defaultFactory(serviceFrom(this, MyRetrofitService.class));
+                        ServiceAdapterFactory.on(serviceFrom(this, MyRetrofitService.class)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")

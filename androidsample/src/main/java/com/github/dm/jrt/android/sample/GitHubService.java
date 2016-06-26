@@ -38,7 +38,7 @@ public interface GitHubService {
     @GET("users/{user}/repos")
     Channel<Object, List<Repo>> listRepos(@Path("user") String user);
 
-    @InputClashResolution(ClashResolutionType.ABORT_THAT)
+    @InputClashResolution(ClashResolutionType.ABORT_OTHER)
     @GET("users/{user}/repos")
     Channel<Object, List<Repo>> refreshRepos(@Path("user") String user);
 }

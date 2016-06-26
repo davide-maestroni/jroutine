@@ -55,10 +55,6 @@ import retrofit2.Retrofit;
  */
 public class LoaderAdapterFactory extends ContextAdapterFactory {
 
-    private static final LoaderAdapterFactory sFactory =
-            new LoaderAdapterFactory(null, null, InvocationConfiguration.defaultConfiguration(),
-                    LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
-
     private final LoaderConfiguration mLoaderConfiguration;
 
     private final LoaderContext mLoaderContext;
@@ -72,7 +68,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      * @param loaderConfiguration     the service configuration.
      * @param invocationMode          the invocation mode.
      */
-    private LoaderAdapterFactory(@Nullable final LoaderContext context,
+    private LoaderAdapterFactory(@NotNull final LoaderContext context,
             @Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
@@ -85,24 +81,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     /**
      * Returns an adapter factory builder.
      *
+     * @param context the loader context.
      * @return the builder instance.
      */
     @NotNull
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Returns the a factory instance with default configuration.
-     *
-     * @param context the loader context.
-     * @return the factory instance.
-     */
-    @NotNull
-    public static LoaderAdapterFactory on(@Nullable final LoaderContext context) {
-        return (context == null) ? sFactory : new LoaderAdapterFactory(context, null,
-                InvocationConfiguration.defaultConfiguration(),
-                LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+    public static Builder on(@NotNull final LoaderContext context) {
+        return new Builder(context);
     }
 
     @NotNull
@@ -112,28 +96,22 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-        final LoaderContext loaderContext = mLoaderContext;
-        if (loaderContext != null) {
-            // Use annotations to configure the routine
-            final InvocationConfiguration invocationConfiguration =
-                    Builders.withAnnotations(configuration, annotations);
-            final LoaderConfiguration loaderConfiguration =
-                    AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
-            final ContextInvocationFactory<Call<Object>, Object> factory =
-                    getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-            return JRoutineLoader.on(loaderContext)
-                                 .with(factory)
-                                 .invocationConfiguration()
-                                 .with(invocationConfiguration)
-                                 .applied()
-                                 .loaderConfiguration()
-                                 .with(loaderConfiguration)
-                                 .applied()
-                                 .buildRoutine();
-        }
-
-        return super.buildRoutine(configuration, invocationMode, returnRawType, responseType,
-                annotations, retrofit);
+        // Use annotations to configure the routine
+        final InvocationConfiguration invocationConfiguration =
+                Builders.withAnnotations(configuration, annotations);
+        final LoaderConfiguration loaderConfiguration =
+                AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
+        final ContextInvocationFactory<Call<Object>, Object> factory =
+                getFactory(configuration, invocationMode, responseType, annotations, retrofit);
+        return JRoutineLoader.on(mLoaderContext)
+                             .with(factory)
+                             .invocationConfiguration()
+                             .with(invocationConfiguration)
+                             .applied()
+                             .loaderConfiguration()
+                             .with(loaderConfiguration)
+                             .applied()
+                             .buildRoutine();
     }
 
     @Nullable
@@ -179,6 +157,8 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             InvocationConfiguration.Configurable<Builder>,
             LoaderConfiguration.Configurable<Builder> {
 
+        private final LoaderContext mLoaderContext;
+
         private CallAdapter.Factory mDelegateFactory;
 
         private InvocationConfiguration mInvocationConfiguration =
@@ -189,12 +169,13 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         private LoaderConfiguration mLoaderConfiguration =
                 LoaderConfiguration.defaultConfiguration();
 
-        private LoaderContext mLoaderContext;
-
         /**
          * Constructor.
+         *
+         * @param context the loader context.
          */
-        private Builder() {
+        private Builder(@NotNull final LoaderContext context) {
+            mLoaderContext = ConstantConditions.notNull("loader context", context);
         }
 
         @NotNull
@@ -258,18 +239,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @Override
         public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
             return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
-        }
-
-        /**
-         * Sets the factory loader context.
-         *
-         * @param context the loader context.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder on(@Nullable final LoaderContext context) {
-            mLoaderContext = context;
-            return this;
         }
     }
 

@@ -67,10 +67,6 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 public class ServiceAdapterFactory extends CallAdapter.Factory {
 
-    private static final ServiceAdapterFactory sFactory =
-            new ServiceAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
-                    ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
-
     private static final CallMappingInvocation sInvocation = new CallMappingInvocation();
 
     private final InvocationConfiguration mInvocationConfiguration;
@@ -89,7 +85,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @param serviceConfiguration    the service configuration.
      * @param invocationMode          the invocation mode.
      */
-    private ServiceAdapterFactory(@Nullable final ServiceContext context,
+    private ServiceAdapterFactory(@NotNull final ServiceContext context,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration,
             @NotNull final InvocationMode invocationMode) {
@@ -102,34 +98,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Returns an adapter factory builder.
      *
+     * @param context the service context.
      * @return the builder instance.
      */
     @NotNull
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Returns the default factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public static ServiceAdapterFactory defaultFactory() {
-        return sFactory;
-    }
-
-    /**
-     * Returns the a factory instance with default configuration.
-     *
-     * @param context the service context.
-     * @return the factory instance.
-     */
-    @NotNull
-    public static ServiceAdapterFactory defaultFactory(@Nullable final ServiceContext context) {
-        return (context == null) ? defaultFactory()
-                : new ServiceAdapterFactory(context, InvocationConfiguration.defaultConfiguration(),
-                        ServiceConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+    public static Builder on(@NotNull final ServiceContext context) {
+        return new Builder(context);
     }
 
     @Override
@@ -142,8 +116,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             }
         }
 
-        final ServiceContext serviceContext = mServiceContext;
-        if ((serviceContext == null) || (invocationMode == InvocationMode.SYNC) || (invocationMode
+        if ((invocationMode == InvocationMode.SYNC) || (invocationMode
                 == InvocationMode.SEQUENTIAL)) {
             return RoutineAdapterFactory.builder()
                                         .invocationMode(invocationMode)
@@ -213,6 +186,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             implements ServiceConfigurable<Builder>, InvocationConfiguration.Configurable<Builder>,
             ServiceConfiguration.Configurable<Builder> {
 
+        private final ServiceContext mServiceContext;
+
         private InvocationConfiguration mInvocationConfiguration =
                 InvocationConfiguration.defaultConfiguration();
 
@@ -221,12 +196,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         private ServiceConfiguration mServiceConfiguration =
                 ServiceConfiguration.defaultConfiguration();
 
-        private ServiceContext mServiceContext;
-
         /**
          * Constructor.
+         *
+         * @param context the loader context.
          */
-        private Builder() {
+        private Builder(@NotNull final ServiceContext context) {
+            mServiceContext = ConstantConditions.notNull("service context", context);
         }
 
         @NotNull
@@ -270,18 +246,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
-            return this;
-        }
-
-        /**
-         * Sets the factory service context.
-         *
-         * @param context the service context.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder on(@Nullable final ServiceContext context) {
-            mServiceContext = context;
             return this;
         }
 

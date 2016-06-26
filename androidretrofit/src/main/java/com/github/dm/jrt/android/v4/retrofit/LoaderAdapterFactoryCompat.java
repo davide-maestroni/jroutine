@@ -55,11 +55,6 @@ import retrofit2.Retrofit;
  */
 public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
-    private static final LoaderAdapterFactoryCompat sFactory =
-            new LoaderAdapterFactoryCompat(null, null,
-                    InvocationConfiguration.defaultConfiguration(),
-                    LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
-
     private final LoaderConfiguration mLoaderConfiguration;
 
     private final LoaderContextCompat mLoaderContext;
@@ -73,7 +68,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
      * @param loaderConfiguration     the service configuration.
      * @param invocationMode          the invocation mode.
      */
-    private LoaderAdapterFactoryCompat(@Nullable final LoaderContextCompat context,
+    private LoaderAdapterFactoryCompat(@NotNull final LoaderContextCompat context,
             @Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
@@ -86,24 +81,12 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     /**
      * Returns an adapter factory builder.
      *
+     * @param context the loader context.
      * @return the builder instance.
      */
     @NotNull
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Returns the a factory instance with default configuration.
-     *
-     * @param context the loader context.
-     * @return the factory instance.
-     */
-    @NotNull
-    public static LoaderAdapterFactoryCompat on(@Nullable final LoaderContextCompat context) {
-        return (context == null) ? sFactory : new LoaderAdapterFactoryCompat(context, null,
-                InvocationConfiguration.defaultConfiguration(),
-                LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+    public static Builder on(@NotNull final LoaderContextCompat context) {
+        return new Builder(context);
     }
 
     @NotNull
@@ -113,28 +96,22 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-        final LoaderContextCompat loaderContext = mLoaderContext;
-        if (loaderContext != null) {
-            // Use annotations to configure the routine
-            final InvocationConfiguration invocationConfiguration =
-                    Builders.withAnnotations(configuration, annotations);
-            final LoaderConfiguration loaderConfiguration =
-                    AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
-            final ContextInvocationFactory<Call<Object>, Object> factory =
-                    getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-            return JRoutineLoaderCompat.on(loaderContext)
-                                       .with(factory)
-                                       .invocationConfiguration()
-                                       .with(invocationConfiguration)
-                                       .applied()
-                                       .loaderConfiguration()
-                                       .with(loaderConfiguration)
-                                       .applied()
-                                       .buildRoutine();
-        }
-
-        return super.buildRoutine(configuration, invocationMode, returnRawType, responseType,
-                annotations, retrofit);
+        // Use annotations to configure the routine
+        final InvocationConfiguration invocationConfiguration =
+                Builders.withAnnotations(configuration, annotations);
+        final LoaderConfiguration loaderConfiguration =
+                AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
+        final ContextInvocationFactory<Call<Object>, Object> factory =
+                getFactory(configuration, invocationMode, responseType, annotations, retrofit);
+        return JRoutineLoaderCompat.on(mLoaderContext)
+                                   .with(factory)
+                                   .invocationConfiguration()
+                                   .with(invocationConfiguration)
+                                   .applied()
+                                   .loaderConfiguration()
+                                   .with(loaderConfiguration)
+                                   .applied()
+                                   .buildRoutine();
     }
 
     @Nullable
@@ -180,6 +157,8 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
             InvocationConfiguration.Configurable<Builder>,
             LoaderConfiguration.Configurable<Builder> {
 
+        private final LoaderContextCompat mLoaderContext;
+
         private CallAdapter.Factory mDelegateFactory;
 
         private InvocationConfiguration mInvocationConfiguration =
@@ -190,12 +169,13 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         private LoaderConfiguration mLoaderConfiguration =
                 LoaderConfiguration.defaultConfiguration();
 
-        private LoaderContextCompat mLoaderContext;
-
         /**
          * Constructor.
+         *
+         * @param context the loader context.
          */
-        private Builder() {
+        private Builder(@NotNull final LoaderContextCompat context) {
+            mLoaderContext = ConstantConditions.notNull("loader context", context);
         }
 
         @NotNull
@@ -259,18 +239,6 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         @Override
         public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
             return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
-        }
-
-        /**
-         * Sets the factory loader context.
-         *
-         * @param context the loader context.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder on(@Nullable final LoaderContextCompat context) {
-            mLoaderContext = context;
-            return this;
         }
     }
 

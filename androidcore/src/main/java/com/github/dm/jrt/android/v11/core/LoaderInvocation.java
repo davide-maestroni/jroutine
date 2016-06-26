@@ -112,7 +112,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
         mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mClashResolutionType =
-                configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_THAT);
+                configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_OTHER);
         mInputClashResolutionType =
                 configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
@@ -508,7 +508,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_BOTH;
 
-        } else if (resolution == ClashResolutionType.ABORT_THAT) {
+        } else if (resolution == ClashResolutionType.ABORT_OTHER) {
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_THAT;
 

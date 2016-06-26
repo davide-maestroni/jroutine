@@ -261,7 +261,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
         /**
          * The clash is resolved by aborting the running invocation.
          */
-        ABORT_THAT,
+        ABORT_OTHER,
         /**
          * The clash is resolved by aborting the invocation with an
          * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException

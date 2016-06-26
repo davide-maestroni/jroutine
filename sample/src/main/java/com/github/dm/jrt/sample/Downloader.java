@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.Backoffs.linearDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
@@ -150,7 +151,7 @@ public class Downloader {
             // the one writing the next chunk of bytes to the local file
             // In such way we can abort the download between two chunks, while they are passed to
             // the specific routine
-            // That's why we store the routine output channel in an internal map
+            // That's why we store the routine channel in an internal map
             final Routine<ByteBuffer, Boolean> writeFile =
                     JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
                                 .invocationConfiguration()
@@ -159,7 +160,7 @@ public class Downloader {
                                 // for available space becomes allowed
                                 .withRunner(sWriteRunner)
                                 .withInputLimit(32)
-                                .withInputBackoff(seconds(3))
+                                .withInputBackoff(linearDelay(seconds(3)))
                                 .applied()
                                 .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
@@ -187,7 +188,7 @@ public class Downloader {
     }
 
     /**
-     * Waits for the specified time for the resource to complete the downloading.
+     * Waits at maximum the specified time for the resource to complete the downloading.
      *
      * @param uri     the URI of the resource.
      * @param timeout the time to wait for the download to complete.
@@ -196,21 +197,17 @@ public class Downloader {
     public boolean waitDone(final URI uri, final UnitDuration timeout) {
         final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
         final Channel<?, Boolean> channel = downloads.get(uri);
-        // Check if the output channel is in the map, that is, the resource is currently downloading
-        if (channel != null) {
+        // Check if the output channel is in the map, that is, the resource is currently
+        // downloading, wait for the routine to complete
+        if ((channel != null) && channel.after(timeout).hasCompleted()) {
+            // If complete, remove the resource from the download map
+            downloads.remove(uri);
+            // Read the result and, if successful, add the resource to the downloaded set
             try {
-                // Wait for the routine to complete
-                if (channel.after(timeout).hasCompleted()) {
-                    // If completed, remove the resource from the download map
-                    downloads.remove(uri);
-                    // Read the result and, if successful, add the resource to the downloaded set
-                    return channel.next() && mDownloaded.add(uri);
-                }
+                return channel.next() && mDownloaded.add(uri);
 
             } catch (final InvocationException ignored) {
                 // Something went wrong or the routine has been aborted
-                // Just remove the resource from the download map
-                downloads.remove(uri);
             }
         }
 

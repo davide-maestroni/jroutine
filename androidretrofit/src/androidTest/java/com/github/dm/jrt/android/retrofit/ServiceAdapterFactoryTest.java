@@ -29,7 +29,7 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.stream.StreamChannels;
 import com.google.gson.Gson;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,7 +60,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         super(TestActivity.class);
     }
 
-    private static void testOutputChannelAdapter(@Nullable final ServiceContext context) throws
+    private static void testOutputChannelAdapter(@NotNull final ServiceContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -72,8 +72,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         try {
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .applied()
@@ -100,8 +99,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -129,8 +127,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -158,8 +155,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -190,7 +186,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static void testPostAdapter(@Nullable final ServiceContext context) throws IOException {
+    private static void testPostAdapter(@NotNull final ServiceContext context) throws IOException {
 
         final Repo repo = new Repo();
         repo.setName("Test Repo");
@@ -209,8 +205,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         try {
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .applied()
@@ -230,8 +225,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -252,8 +246,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -274,8 +267,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
@@ -299,7 +291,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static void testStreamChannelAdapter(@Nullable final ServiceContext context) throws
+    private static void testStreamChannelAdapter(@NotNull final ServiceContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -311,7 +303,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         try {
             {
                 final ServiceAdapterFactory adapterFactory =
-                        ServiceAdapterFactory.defaultFactory(context);
+                        ServiceAdapterFactory.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -337,8 +329,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .serviceConfiguration()
                                              .withLogClass(NullLog.class)
@@ -369,8 +360,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SYNC)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -398,8 +388,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
             {
                 final ServiceAdapterFactory adapterFactory = //
-                        ServiceAdapterFactory.builder()
-                                             .on(context)
+                        ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -435,11 +424,6 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         testOutputChannelAdapter(serviceFrom(getActivity(), TestService.class));
     }
 
-    public void testOutputChannelAdapterNullContext() throws IOException {
-
-        testOutputChannelAdapter(null);
-    }
-
     public void testOutputChannelAdapterRemote() throws IOException {
 
         testOutputChannelAdapter(serviceFrom(getActivity(), RemoteTestService.class));
@@ -450,11 +434,6 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         testPostAdapter(serviceFrom(getActivity(), TestService.class));
     }
 
-    public void testPostAdapterNullContext() throws IOException {
-
-        testPostAdapter(null);
-    }
-
     public void testPostAdapterRemote() throws IOException {
 
         testPostAdapter(serviceFrom(getActivity(), RemoteTestService.class));
@@ -463,11 +442,6 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     public void testStreamChannelAdapter() throws IOException {
 
         testStreamChannelAdapter(serviceFrom(getActivity(), TestService.class));
-    }
-
-    public void testStreamChannelAdapterNullContext() throws IOException {
-
-        testStreamChannelAdapter(null);
     }
 
     public void testStreamChannelAdapterRemote() throws IOException {

@@ -3080,11 +3080,14 @@ public class StreamChannelTest {
         try {
             StreamChannels.streamOf()
                           .liftConfig(
-                                  new BiFunction<StreamConfiguration, Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?, Object>, Channel<?, Object>>>() {
+                                  new BiFunction<StreamConfiguration, Function<Channel<?,
+                                          Object>, Channel<?, Object>>, Function<Channel<?,
+                                          Object>, Channel<?, Object>>>() {
 
                                       public Function<Channel<?, Object>, Channel<?, Object>> apply(
                                               final StreamConfiguration configuration,
-                                              final Function<Channel<?, Object>, Channel<?, Object>> function) {
+                                              final Function<Channel<?, Object>, Channel<?,
+                                                      Object>> function) {
 
                                           throw new NullPointerException();
                                       }
@@ -3097,10 +3100,12 @@ public class StreamChannelTest {
 
         try {
             StreamChannels.streamOf()
-                          .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?, Object>, Channel<?, Object>>>() {
+                          .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>,
+                                  Function<Channel<?, Object>, Channel<?, Object>>>() {
 
                               public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                      final Function<Channel<?, Object>, Channel<?, Object>> function) {
+                                      final Function<Channel<?, Object>, Channel<?, Object>>
+                                              function) {
 
                                   throw new NullPointerException();
                               }
@@ -3113,12 +3118,16 @@ public class StreamChannelTest {
 
         final StreamChannel<Object, Object> stream = //
                 StreamChannels.streamOf()
-                              .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?, Object>, Channel<?, Object>>>() {
+                              .lift(new Function<Function<Channel<?, Object>, Channel<?,
+                                      Object>>, Function<Channel<?, Object>, Channel<?, Object>>>
+                                      () {
 
                                   public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                          final Function<Channel<?, Object>, Channel<?, Object>> function) {
+                                          final Function<Channel<?, Object>, Channel<?, Object>>
+                                                  function) {
 
-                                      return new Function<Channel<?, Object>, Channel<?, Object>>() {
+                                      return new Function<Channel<?, Object>, Channel<?, Object>>
+                                              () {
 
                                           public Channel<?, Object> apply(
                                                   final Channel<?, Object> objects) {

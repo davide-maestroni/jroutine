@@ -3649,14 +3649,16 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .on(loaderFrom(activity))
                                              .map(routine)
                                              .tryCatchMore(
-                                                     new BiConsumer<RoutineException, Channel<String, ?>>() {
+                                                     new BiConsumer<RoutineException,
+                                                             Channel<String, ?>>() {
 
                                                          public void accept(
                                                                  final RoutineException e,
                                                                  final Channel<String, ?> channel) {
 
                                                              if (++count[0] < 3) {
-                                                                 LoaderStreamChannelsCompat.streamOf(
+                                                                 LoaderStreamChannelsCompat
+                                                                         .streamOf(
                                                                          o)
                                                                                            .on(loaderFrom(
                                                                                                    activity))

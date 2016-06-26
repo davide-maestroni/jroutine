@@ -197,8 +197,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
@@ -385,8 +385,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)
@@ -572,8 +572,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.on(context)
                                                   .delegateFactory(factory)

@@ -2059,13 +2059,15 @@ public class StreamChannelsTest {
 
                 case INTEGER:
                     Channels.<Object, Integer>selectInput(result, INTEGER).buildChannels()
-                                                                          .pass(selectable.<Integer>data())
+                                                                          .pass(selectable
+                                                                                  .<Integer>data())
                                                                           .close();
                     break;
 
                 case STRING:
                     Channels.<Object, String>selectInput(result, STRING).buildChannels()
-                                                                        .pass(selectable.<String>data())
+                                                                        .pass(selectable
+                                                                                .<String>data())
                                                                         .close();
                     break;
             }

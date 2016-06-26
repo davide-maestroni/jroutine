@@ -87,7 +87,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactory adapterFactory =
                         LoaderAdapterFactory.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+                final Retrofit retrofit =
+                        new Builder().baseUrl("http://localhost:" + server.getPort())
                                      .addCallAdapterFactory(adapterFactory)
                                      .addConverterFactory(converterFactory)
                                      .build();
@@ -197,12 +198,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.on(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -229,9 +228,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.on(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -385,8 +382,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.on(context)
                                             .delegateFactory(factory)
@@ -572,12 +569,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class)).buildFactory();
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.on(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -604,9 +599,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.on(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())

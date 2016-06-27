@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
@@ -81,6 +82,19 @@ public class ServiceContextTest extends ActivityInstrumentationTestCase2<TestAct
         assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
         assertThat(serviceContext.hashCode()).isEqualTo(
                 serviceFrom(getActivity(), intentExtra2).hashCode());
+        intentExtra2.putExtra("testString", "test");
+        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+        intentExtra2.putExtra("testString", (String) null);
+        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+        intentExtra.putExtra("testString", (String) null);
+        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
+        intentExtra.putExtra("testString", "test");
+        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+        intentExtra2.putExtra("testString", "test");
+        intentExtra2.putExtra("testBundle", new Bundle());
+        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+        intentExtra.putExtra("testBundle", new Bundle());
+        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -112,6 +126,15 @@ public class ServiceContextTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
             serviceFrom(getActivity(), new Intent(getActivity(), Service.class));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            serviceFrom(getActivity(),
+                    new Intent().setClassName(getActivity(), "not.existing.Class"));
             fail();
 
         } catch (final IllegalArgumentException ignored) {

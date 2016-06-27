@@ -49,7 +49,7 @@ import retrofit2.Retrofit;
  * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamChannel} and
  * {@code LoaderStreamChannel} return types.
  * <br>
- * If properly configured, the routine invocations will run in a dedicated Android loader.
+ * The routine invocations will run in a dedicated Android loader.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */

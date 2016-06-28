@@ -21,20 +21,14 @@ package com.github.dm.jrt.android.core.invocation;
  * <p>
  * Created by davide-maestroni on 12/14/2014.
  */
-public class InvocationTypeException extends LoaderInvocationException {
-
-    /**
-     * Constructor.
-     */
-    public InvocationTypeException() {
-    }
+public class TypeClashException extends LoaderClashException {
 
     /**
      * Constructor.
      *
      * @param id the loader ID.
      */
-    public InvocationTypeException(final int id) {
+    public TypeClashException(final int id) {
         super(id);
     }
 }

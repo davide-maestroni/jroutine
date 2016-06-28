@@ -19,10 +19,14 @@ package com.github.dm.jrt.android.v11.core;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Loader;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.R;
@@ -33,7 +37,7 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
-import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
+import com.github.dm.jrt.android.core.invocation.TypeClashException;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
@@ -95,7 +99,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .with(factoryOf(ToUpperCase.class))
                                                               .loaderConfiguration()
                                                               .withLoaderId(0)
-                                                              .withInputClashResolution(
+                                                              .withMatchResolution(
                                                                       ClashResolutionType
                                                                               .ABORT_THIS)
                                                               .applied()
@@ -649,7 +653,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .with(factoryOf(ToUpperCase.class))
                                                               .loaderConfiguration()
                                                               .withLoaderId(0)
-                                                              .withInputClashResolution(
+                                                              .withMatchResolution(
                                                                       ClashResolutionType
                                                                               .ABORT_OTHER)
                                                               .applied()
@@ -914,20 +918,25 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
+        final LoaderManager loaderManager = getActivity().getLoaderManager();
+        loaderManager.initLoader(0, Bundle.EMPTY, new LoaderCallbacks<Object>() {
+
+            @Override
+            public Loader<Object> onCreateLoader(final int id, final Bundle args) {
+                return new Loader<Object>(getActivity());
+            }
+
+            @Override
+            public void onLoadFinished(final Loader<Object> loader, final Object data) {
+            }
+
+            @Override
+            public void onLoaderReset(final Loader<Object> loader) {
+            }
+        });
+
         final UnitDuration timeout = seconds(10);
         final Data data1 = new Data();
-        final Channel<?, Data> result1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                       .with(factoryOf(Delay.class))
-                                                       .loaderConfiguration()
-                                                       .withLoaderId(0)
-                                                       .withCacheStrategy(CacheStrategyType.CACHE)
-                                                       .applied()
-                                                       .asyncCall(data1)
-                                                       .after(timeout);
-
-        assertThat(result1.next()).isSameAs(data1);
-        result1.hasCompleted();
-
         final Channel<?, Data> result2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                        .with(factoryOf(Abort.class))
                                                        .loaderConfiguration()
@@ -942,11 +951,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final InvocationTypeException ignored) {
+        } catch (final TypeClashException ignored) {
 
         }
 
         result2.hasCompleted();
+        loaderManager.destroyLoader(0);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -1513,7 +1523,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .with(factoryOf(ToUpperCase.class))
                                                               .loaderConfiguration()
                                                               .withLoaderId(0)
-                                                              .withInputClashResolution(
+                                                              .withMatchResolution(
                                                                       ClashResolutionType
                                                                               .ABORT_OTHER)
                                                               .applied()
@@ -1793,7 +1803,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                       .applied()
                       .loaderConfiguration()
                       .withLoaderId(0)
-                      .withInputClashResolution(ClashResolutionType.JOIN)
+                      .withMatchResolution(ClashResolutionType.JOIN)
                       .applied()
                       .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
@@ -1808,7 +1818,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                       .applied()
                       .loaderConfiguration()
                       .withLoaderId(0)
-                      .withInputClashResolution(ClashResolutionType.JOIN)
+                      .withMatchResolution(ClashResolutionType.JOIN)
                       .applied()
                       .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(2);

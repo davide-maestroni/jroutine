@@ -24,9 +24,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +36,6 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoader;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
  * Default implementation of a loader channel builder.
@@ -102,33 +99,13 @@ class DefaultLoaderChannelBuilder
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         final InvocationConfiguration invocationConfiguration =
                 builderFromOutput(mChannelConfiguration).applied();
-        final Logger logger = invocationConfiguration.newLogger(this);
-        final ClashResolutionType resolutionType =
-                loaderConfiguration.getClashResolutionTypeOrElse(null);
-        if (resolutionType != null) {
-            logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
-        }
-
-        final ClashResolutionType inputResolutionType =
-                loaderConfiguration.getInputClashResolutionTypeOrElse(null);
-        if (inputResolutionType != null) {
-            logger.wrn("the specified input clash resolution type will be ignored: %s",
-                    inputResolutionType);
-        }
-
-        final UnitDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOrElse(null);
-        if (resultStaleTime != null) {
-            logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
-        }
-
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .applied()
                       .loaderConfiguration()
-                      .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
-                      .withInputClashResolution(ClashResolutionType.JOIN)
-                      .withResultStaleTime(infinity())
+                      .withMatchResolution(ClashResolutionType.JOIN)
+                      .with(loaderConfiguration)
                       .applied()
                       .asyncCall()
                       .close();

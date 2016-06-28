@@ -53,10 +53,9 @@ import java.util.WeakHashMap;
  * The routine invocations will be identified by the loader ID. In case a clash is detected, that
  * is, an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
- * resolved, for example when invocations with different implementations share the same ID, the new
+ * resolved, for example when loaders with different implementations share the same ID, the new
  * invocation is aborted with a
- * {@link com.github.dm.jrt.android.core.invocation.InvocationTypeException
- * InvocationTypeException}.
+ * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>

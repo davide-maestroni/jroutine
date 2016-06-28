@@ -31,8 +31,8 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolution
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
-import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
+import com.github.dm.jrt.android.core.invocation.TypeClashException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
@@ -85,11 +85,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private final ContextInvocationFactory<IN, OUT> mFactory;
 
-    private final ClashResolutionType mInputClashResolutionType;
-
     private final int mLoaderId;
 
     private final Logger mLogger;
+
+    private final ClashResolutionType mMatchResolutionType;
 
     private final OrderType mOrderType;
 
@@ -113,8 +113,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_OTHER);
-        mInputClashResolutionType =
-                configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
+        mMatchResolutionType = configuration.getMatchResolutionTypeOrElse(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
         mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(infinity()).toMillis();
         mOrderType = order;
@@ -402,12 +401,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             throw clashException;
         }
 
-        final boolean isRoutineLoader =
-                (loader != null) && (loader.getClass() == InvocationLoader.class);
+        final boolean isRoutineLoader = InvocationLoader.class.isInstance(loader);
         final boolean isStaleResult =
                 isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
-        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_THAT)
+        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_OTHER)
                 || isStaleResult) {
             final InvocationLoader<IN, OUT> invocationLoader;
             if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
@@ -422,7 +420,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                             loaderId);
             if (callbacks != null) {
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
-                callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
+                callbacks.reset(((clashType == ClashType.ABORT_OTHER) || !isStaleResult)
                         ? new InvocationClashException(loaderId)
                         : new StaleResultException(loaderId));
             }
@@ -435,7 +433,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
         callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel());
-        if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {
+        if ((clashType == ClashType.ABORT_OTHER) || isStaleResult) {
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
@@ -484,33 +482,32 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final Logger logger = mLogger;
         if (loader.getClass() != InvocationLoader.class) {
             logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
-            throw new InvocationTypeException(loaderId);
+            throw new TypeClashException(loaderId);
         }
 
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
-        @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
-                (InvocationLoader<IN, OUT>) loader;
-        if (!(factory instanceof MissingLoaderInvocationFactory)
-                && !invocationLoader.getInvocationFactory().equals(factory)) {
-            logger.wrn("clashing loader ID [%d]: %s", loaderId,
-                    invocationLoader.getInvocationFactory());
-            throw new InvocationTypeException(loaderId);
+        if (factory instanceof MissingLoaderInvocationFactory) {
+            logger.dbg("joining existing invocation [%d]", loaderId);
+            return ClashType.NONE;
         }
 
+        @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
+                (InvocationLoader<IN, OUT>) loader;
         final ClashResolutionType resolution =
-                invocationLoader.areSameInputs(inputs) ? mInputClashResolutionType
+                (invocationLoader.getInvocationFactory().equals(factory)
+                        && invocationLoader.areSameInputs(inputs)) ? mMatchResolutionType
                         : mClashResolutionType;
         if (resolution == ClashResolutionType.JOIN) {
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return ClashType.NONE;
 
-        } else if (resolution == ClashResolutionType.ABORT) {
+        } else if (resolution == ClashResolutionType.ABORT_BOTH) {
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_BOTH;
 
         } else if (resolution == ClashResolutionType.ABORT_OTHER) {
             logger.dbg("restarting existing invocation [%d]", loaderId);
-            return ClashType.ABORT_THAT;
+            return ClashType.ABORT_OTHER;
 
         } else if (resolution == ClashResolutionType.ABORT_THIS) {
             logger.dbg("aborting invocation [%d]", loaderId);
@@ -525,9 +522,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     private enum ClashType {
 
-        NONE,       // no clash detected
-        ABORT_THAT, // need to abort the running loader
-        ABORT_BOTH  // need to abort both the invocation and the running loader
+        NONE,        // no clash detected
+        ABORT_OTHER, // need to abort the running loader
+        ABORT_BOTH   // need to abort both the invocation and the running loader
     }
 
     /**

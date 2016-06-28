@@ -24,8 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to set a specific input clash resolution type for a
- * single method invocations.
+ * Through this annotation it is possible to set a specific match resolution type for a single
+ * method invocations.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.object.annotation.InputClashResolution *;
+ *              &#64;com.github.dm.jrt.android.object.annotation.MatchResolution *;
  *         }
  *     </code>
  * </pre>
@@ -58,7 +58,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InputClashResolution {
+public @interface MatchResolution {
 
     /**
      * The input clash resolution type.

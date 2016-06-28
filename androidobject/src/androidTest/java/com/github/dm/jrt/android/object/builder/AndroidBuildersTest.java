@@ -24,8 +24,8 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolution
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
-import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
+import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
 import com.github.dm.jrt.core.util.UnitDuration;
 

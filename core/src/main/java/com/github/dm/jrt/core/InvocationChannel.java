@@ -186,15 +186,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
+    public Channel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        return after(fromUnit(delay, timeUnit));
+    }
+
+    @NotNull
     public Channel<IN, OUT> after(@NotNull final UnitDuration delay) {
         mInputDelay.set(ConstantConditions.notNull("input delay", delay));
         mResultChanel.after(delay);
         return this;
-    }
-
-    @NotNull
-    public Channel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        return after(fromUnit(delay, timeUnit));
     }
 
     @NotNull

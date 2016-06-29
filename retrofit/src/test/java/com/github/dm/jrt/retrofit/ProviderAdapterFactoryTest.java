@@ -231,7 +231,7 @@ public class ProviderAdapterFactoryTest {
                 public <R> Object adapt(final Call<R> call) {
 
                     final List<Object> result = Collections.emptyList();
-                    return StreamChannels.<List<Object>>streamOf(result);
+                    return StreamChannels.<List<Object>>of(result);
                 }
             };
         }

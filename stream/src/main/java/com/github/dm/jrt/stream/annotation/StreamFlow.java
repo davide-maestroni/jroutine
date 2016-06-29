@@ -59,7 +59,7 @@ public @interface StreamFlow {
          */
         MAP,
         /**
-         * The flow of data is blocked, so that all incoming inputs are collected before a new
+         * The flow of data is blocked, so that all incoming inputs are processed before a new
          * output is produced.
          * <br>
          * A new stream instance is returned by the method, and any further attempt to bind or

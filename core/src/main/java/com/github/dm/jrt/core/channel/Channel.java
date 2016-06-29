@@ -80,12 +80,14 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * Note that the implementing class should ensure that calls of this method from different
      * threads will not interfere with each others.
      *
-     * @param delay the delay.
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalArgumentException            if the specified delay is negative.
      */
     @NotNull
-    Channel<IN, OUT> after(@NotNull UnitDuration delay);
+    Channel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Tells the channel to delay the following operations of the specified time duration.
@@ -99,14 +101,12 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * Note that the implementing class should ensure that calls of this method from different
      * threads will not interfere with each others.
      *
-     * @param delay    the delay value.
-     * @param timeUnit the delay time unit.
+     * @param delay the delay.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalArgumentException            if the specified delay is negative.
      */
     @NotNull
-    Channel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
+    Channel<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
      * Consumes all the results by waiting for the routine to complete at the maximum for the set

@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumerWrapper;
+import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +35,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
-    private final BiConsumerWrapper<? super RoutineException, ? super Channel<OUT, ?>>
-            mCatchConsumer;
+    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
     private final ChannelConfiguration mConfiguration;
 
@@ -47,7 +46,7 @@ class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
      * @param catchConsumer the error consumer instance.
      */
     BindTryCatch(@NotNull final ChannelConfiguration configuration,
-            @NotNull final BiConsumerWrapper<? super RoutineException, ? super
+            @NotNull final BiConsumer<? super RoutineException, ? super
                     Channel<OUT, ?>> catchConsumer) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);

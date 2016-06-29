@@ -19,44 +19,52 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
+
 /**
- * Try/finally binding function.
+ * Delay binding function.
  * <p>
- * Created by davide-maestroni on 05/07/2016.
+ * Created by davide-maestroni on 06/29/2016.
  *
  * @param <OUT> the output data type.
  */
-class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
+class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
-    private final Action mFinally;
+    private final long mDelay;
+
+    private final TimeUnit mDelayUnit;
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param finallyAction the finally action.
+     * @param delay         the delay value.
+     * @param timeUnit      the delay time unit.
      */
-    BindTryFinally(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Action finallyAction) {
+    BindDelay(@NotNull final ChannelConfiguration configuration, final long delay,
+            @NotNull final TimeUnit timeUnit) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mFinally = ConstantConditions.notNull("action instance", finallyAction);
+        mDelay = ConstantConditions.notNegative("delay value", delay);
+        mDelayUnit = ConstantConditions.notNull("delay unit", timeUnit);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+        final ChannelConfiguration configuration = mConfiguration;
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
-                                                            .with(mConfiguration)
+                                                            .with(configuration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
+        channel.bind(new DelayChannelConsumer<OUT>(mDelay, mDelayUnit,
+                configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
         return outputChannel;
     }
 }

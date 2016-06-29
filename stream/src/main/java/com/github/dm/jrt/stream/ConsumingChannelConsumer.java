@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
+import com.github.dm.jrt.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ class ConsumingChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     private final Channel<?, ?> mOutputChannel;
 
-    private final ConsumerWrapper<? super OUT> mOutputConsumer;
+    private final Consumer<? super OUT> mOutputConsumer;
 
     /**
      * Constructor.
@@ -43,7 +43,7 @@ class ConsumingChannelConsumer<OUT> implements ChannelConsumer<OUT> {
      * @param outputConsumer the consumer instance.
      * @param outputChannel  the output channel.
      */
-    ConsumingChannelConsumer(@NotNull final ConsumerWrapper<? super OUT> outputConsumer,
+    ConsumingChannelConsumer(@NotNull final Consumer<? super OUT> outputConsumer,
             @NotNull final Channel<?, ?> outputChannel) {
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);

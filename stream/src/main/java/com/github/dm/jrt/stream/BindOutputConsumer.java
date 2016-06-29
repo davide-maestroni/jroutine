@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Vo
 
     private final ChannelConfiguration mConfiguration;
 
-    private final ConsumerWrapper<? super OUT> mOutputConsumer;
+    private final Consumer<? super OUT> mOutputConsumer;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Vo
      * @param outputConsumer the consumer instance.
      */
     BindOutputConsumer(@NotNull final ChannelConfiguration configuration,
-            @NotNull final ConsumerWrapper<? super OUT> outputConsumer) {
+            @NotNull final Consumer<? super OUT> outputConsumer) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mOutputConsumer = ConstantConditions.notNull("consumer instance", outputConsumer);
     }

@@ -87,7 +87,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to

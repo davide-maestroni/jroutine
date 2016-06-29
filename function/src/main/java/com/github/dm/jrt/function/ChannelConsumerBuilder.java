@@ -32,7 +32,7 @@ import static com.github.dm.jrt.function.ConsumerWrapper.wrap;
  */
 public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
 
-    private final ConsumerWrapper<Void> mOnComplete;
+    private final ActionWrapper mOnComplete;
 
     private final ConsumerWrapper<RoutineException> mOnError;
 
@@ -41,20 +41,21 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
     /**
      * Constructor.
      *
-     * @param onComplete the complete consumer.
+     * @param onComplete the complete action.
      * @param onError    the error consumer.
      * @param onOutput   the output consumer.
      */
-    ChannelConsumerBuilder(@NotNull final Consumer<Void> onComplete,
-            @NotNull final Consumer<RoutineException> onError,
-            @NotNull final Consumer<OUT> onOutput) {
-        mOnOutput = wrap(onOutput);
-        mOnError = wrap(onError);
-        mOnComplete = wrap(onComplete);
+    @SuppressWarnings("unchecked")
+    ChannelConsumerBuilder(@NotNull final Action onComplete,
+            @NotNull final Consumer<? super RoutineException> onError,
+            @NotNull final Consumer<? super OUT> onOutput) {
+        mOnOutput = (ConsumerWrapper<OUT>) wrap(onOutput);
+        mOnError = (ConsumerWrapper<RoutineException>) wrap(onError);
+        mOnComplete = ActionWrapper.wrap(onComplete);
     }
 
     public void onComplete() throws Exception {
-        mOnComplete.accept(null);
+        mOnComplete.perform();
     }
 
     public void onError(@NotNull final RoutineException error) throws Exception {
@@ -69,36 +70,37 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation completion.
      *
-     * @param consumer the consumer function.
+     * @param onComplete the action instance.
      * @return the builder instance.
      */
     @NotNull
-    public ChannelConsumerBuilder<OUT> thenComplete(@NotNull final Consumer<Void> consumer) {
-        return new ChannelConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
+    public ChannelConsumerBuilder<OUT> thenComplete(@NotNull final Action onComplete) {
+        return new ChannelConsumerBuilder<OUT>(mOnComplete.andThen(onComplete), mOnError,
+                mOnOutput);
     }
 
     /**
      * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation errors.
      *
-     * @param consumer the consumer function.
+     * @param onError the consumer function.
      * @return the builder instance.
      */
     @NotNull
     public ChannelConsumerBuilder<OUT> thenError(
-            @NotNull final Consumer<? super RoutineException> consumer) {
-        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
+            @NotNull final Consumer<? super RoutineException> onError) {
+        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(onError), mOnOutput);
     }
 
     /**
      * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation outputs.
      *
-     * @param consumer the consumer function.
+     * @param onOutput the consumer function.
      * @return the builder instance.
      */
     @NotNull
-    public ChannelConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> consumer) {
-        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
+    public ChannelConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> onOutput) {
+        return new ChannelConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(onOutput));
     }
 }

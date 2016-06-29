@@ -55,6 +55,7 @@ import static com.github.dm.jrt.function.Functions.maxBy;
 import static com.github.dm.jrt.function.Functions.min;
 import static com.github.dm.jrt.function.Functions.minBy;
 import static com.github.dm.jrt.function.Functions.negative;
+import static com.github.dm.jrt.function.Functions.noOp;
 import static com.github.dm.jrt.function.Functions.positive;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.sink;
@@ -182,6 +183,120 @@ public class FunctionsTest {
                 return s.length() > 0;
             }
         });
+    }
+
+    @Test
+    public void testAction() throws Exception {
+
+        final TestAction action1 = new TestAction();
+        final ActionWrapper action2 = wrap(action1);
+        assertThat(wrap(action2)).isSameAs(action2);
+        action2.perform();
+        assertThat(action1.isCalled()).isTrue();
+        action1.reset();
+        final TestAction action3 = new TestAction();
+        final ActionWrapper action4 = action2.andThen(action3);
+        action4.perform();
+        assertThat(action1.isCalled()).isTrue();
+        assertThat(action3.isCalled()).isTrue();
+
+        final TestRunnable runnable1 = new TestRunnable();
+        final ActionWrapper action5 = wrap(runnable1);
+        assertThat(wrap(action5)).isSameAs(action5);
+        action5.perform();
+        assertThat(runnable1.isCalled()).isTrue();
+        runnable1.reset();
+        final TestRunnable runnable3 = new TestRunnable();
+        final ActionWrapper action6 = action5.andThen(runnable3);
+        action6.perform();
+        assertThat(runnable1.isCalled()).isTrue();
+        assertThat(runnable3.isCalled()).isTrue();
+    }
+
+    @Test
+    public void testActionContext() {
+
+        assertThat(wrap(new TestAction()).hasStaticScope()).isTrue();
+        assertThat(wrap(new Action() {
+
+            public void perform() {
+
+            }
+        }).hasStaticScope()).isFalse();
+
+        assertThat(wrap(new TestRunnable()).hasStaticScope()).isTrue();
+        assertThat(wrap(new Runnable() {
+
+            public void run() {
+
+            }
+        }).hasStaticScope()).isFalse();
+    }
+
+    @Test
+    public void testActionEquals() {
+
+        final TestAction action1 = new TestAction();
+        assertThat(wrap(action1)).isEqualTo(wrap(action1));
+        final ActionWrapper action2 = wrap(action1);
+        assertThat(action2).isEqualTo(action2);
+        assertThat(action2).isNotEqualTo(null);
+        assertThat(action2).isNotEqualTo("test");
+        assertThat(wrap(action1).andThen(action2).hashCode()).isEqualTo(
+                action2.andThen(action2).hashCode());
+        assertThat(wrap(action1).andThen(action2)).isEqualTo(action2.andThen(action2));
+        assertThat(action2.andThen(action2)).isEqualTo(wrap(action1).andThen(action2));
+        assertThat(wrap(action1).andThen(action2).hashCode()).isEqualTo(
+                action2.andThen(action1).hashCode());
+        assertThat(wrap(action1).andThen(action2)).isEqualTo(action2.andThen(action1));
+        assertThat(action2.andThen(action1)).isEqualTo(wrap(action1).andThen(action2));
+        assertThat(wrap(action1).andThen(action2).hashCode()).isNotEqualTo(
+                action2.andThen(action2.andThen(action1)).hashCode());
+        assertThat(wrap(action1).andThen(action2)).isNotEqualTo(
+                action2.andThen(action2.andThen(action1)));
+        assertThat(action2.andThen(action2.andThen(action1))).isNotEqualTo(
+                wrap(action1).andThen(action2));
+        assertThat(wrap(action1).andThen(action1).hashCode()).isNotEqualTo(
+                action2.andThen(action2.andThen(action1)).hashCode());
+        assertThat(wrap(action1).andThen(action1)).isNotEqualTo(
+                action2.andThen(action2.andThen(action1)));
+        assertThat(action2.andThen(action2.andThen(action1))).isNotEqualTo(
+                wrap(action1).andThen(action1));
+        assertThat(action2.andThen(action1).hashCode()).isNotEqualTo(
+                action2.andThen(noOp()).hashCode());
+        assertThat(action2.andThen(action1)).isNotEqualTo(action2.andThen(noOp()));
+        assertThat(action2.andThen(noOp())).isNotEqualTo(action2.andThen(action1));
+
+        final TestRunnable runnable1 = new TestRunnable();
+        assertThat(wrap(runnable1)).isEqualTo(wrap(runnable1));
+        final ActionWrapper action3 = wrap(runnable1);
+        assertThat(action3).isEqualTo(action3);
+        assertThat(action3).isNotEqualTo(null);
+        assertThat(action3).isNotEqualTo("test");
+        assertThat(wrap(runnable1).andThen(action3).hashCode()).isEqualTo(
+                action3.andThen(action3).hashCode());
+        assertThat(wrap(runnable1).andThen(action3)).isEqualTo(action3.andThen(action3));
+        assertThat(action3.andThen(action3)).isEqualTo(wrap(runnable1).andThen(action3));
+        assertThat(wrap(runnable1).andThen(action3).hashCode()).isEqualTo(
+                action3.andThen(runnable1).hashCode());
+        assertThat(wrap(runnable1).andThen(action3)).isEqualTo(action3.andThen(runnable1));
+        assertThat(action3.andThen(runnable1)).isEqualTo(wrap(runnable1).andThen(action3));
+        assertThat(wrap(runnable1).andThen(action3).hashCode()).isNotEqualTo(
+                action3.andThen(action3.andThen(runnable1)).hashCode());
+        assertThat(wrap(runnable1).andThen(action3)).isNotEqualTo(
+                action3.andThen(action3.andThen(runnable1)));
+        assertThat(action3.andThen(action3.andThen(runnable1))).isNotEqualTo(
+                wrap(runnable1).andThen(action3));
+        assertThat(wrap(runnable1).andThen(runnable1).hashCode()).isNotEqualTo(
+                action3.andThen(action3.andThen(runnable1)).hashCode());
+        assertThat(wrap(runnable1).andThen(runnable1)).isNotEqualTo(
+                action3.andThen(action3.andThen(runnable1)));
+        assertThat(action3.andThen(action3.andThen(runnable1))).isNotEqualTo(
+                wrap(runnable1).andThen(runnable1));
+        assertThat(action3.andThen(runnable1).hashCode()).isNotEqualTo(
+                action3.andThen(noOp()).hashCode());
+        assertThat(action3.andThen(runnable1)).isNotEqualTo(action3.andThen(noOp()));
+        assertThat(action3.andThen(noOp())).isNotEqualTo(action3.andThen(runnable1));
     }
 
     @Test
@@ -1683,6 +1798,27 @@ public class FunctionsTest {
         }
     }
 
+    private static class TestAction implements Action {
+
+        private boolean mIsCalled;
+
+        public boolean isCalled() {
+
+            return mIsCalled;
+        }
+
+        public void reset() {
+
+            mIsCalled = false;
+        }
+
+        public void perform() {
+
+            mIsCalled = true;
+        }
+
+    }
+
     private static class TestBiConsumer implements BiConsumer<Object, Object> {
 
         private boolean mIsCalled;
@@ -1783,6 +1919,26 @@ public class FunctionsTest {
 
             mIsCalled = true;
             return in != null;
+        }
+    }
+
+    private static class TestRunnable implements Runnable {
+
+        private boolean mIsCalled;
+
+        public boolean isCalled() {
+
+            return mIsCalled;
+        }
+
+        public void reset() {
+
+            mIsCalled = false;
+        }
+
+        public void run() {
+
+            mIsCalled = true;
         }
     }
 

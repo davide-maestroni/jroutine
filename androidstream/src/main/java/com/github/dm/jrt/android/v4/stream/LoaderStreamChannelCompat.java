@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -84,7 +85,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> after(@NotNull UnitDuration delay);
+    LoaderStreamChannelCompat<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -92,7 +93,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<IN, OUT> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -253,7 +254,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> appendGet(long count,
-            @NotNull Supplier<? extends OUT> supplier);
+            @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -261,7 +262,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> supplier);
+    LoaderStreamChannelCompat<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -270,7 +271,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> appendGetMore(long count,
-            @NotNull Consumer<? super Channel<OUT, ?>> consumer);
+            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -279,7 +280,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> appendGetMore(
-            @NotNull Consumer<? super Channel<OUT, ?>> consumer);
+            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -340,48 +341,6 @@ public interface LoaderStreamChannelCompat<IN, OUT>
      */
     @NotNull
     @Override
-    @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> bind();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> bindAfter(@NotNull UnitDuration delay);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> bindAfter(@NotNull UnitDuration delay,
-            @NotNull ChannelConsumer<OUT> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(START)
-    LoaderStreamChannelCompat<IN, OUT> bindAfter(long delay, @NotNull TimeUnit timeUnit,
-            @NotNull ChannelConsumer<OUT> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
     @StreamFlow(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
@@ -411,6 +370,22 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
+    LoaderStreamChannelCompat<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannelCompat<IN, OUT> delay(@NotNull UnitDuration delay);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
     LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
@@ -424,7 +399,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @StreamFlow(MAP)
     <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> flatLift(
             @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> transformFunction);
+                    AFTER>> liftFunction);
 
     /**
      * {@inheritDoc}
@@ -434,6 +409,41 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> flow();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer,
+            @NotNull Consumer<? super RoutineException> errorConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(START)
+    LoaderStreamChannelCompat<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer,
+            @NotNull Consumer<? super RoutineException> errorConsumer,
+            @NotNull Action completeAction);
 
     /**
      * {@inheritDoc}
@@ -458,10 +468,26 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(MAP)
+    LoaderStreamChannelCompat<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    LoaderStreamChannelCompat<IN, OUT> lag(@NotNull UnitDuration delay);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> lift(
             @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends
                     Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction);
+                    Channel<?, AFTER>>> liftFunction);
 
     /**
      * {@inheritDoc}
@@ -475,7 +501,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> liftConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction);
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> liftFunction);
 
     /**
      * {@inheritDoc}
@@ -550,11 +576,13 @@ public interface LoaderStreamChannelCompat<IN, OUT>
 
     /**
      * {@inheritDoc}
+     *
+     * @param completeAction
      */
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, Void> onComplete(@NotNull Runnable action);
+    LoaderStreamChannelCompat<IN, Void> onComplete(@NotNull Action completeAction);
 
     /**
      * {@inheritDoc}
@@ -744,11 +772,13 @@ public interface LoaderStreamChannelCompat<IN, OUT>
 
     /**
      * {@inheritDoc}
+     *
+     * @param peekAction
      */
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> peekComplete(@NotNull Runnable peekAction);
+    LoaderStreamChannelCompat<IN, OUT> peekComplete(@NotNull Action peekAction);
 
     /**
      * {@inheritDoc}
@@ -935,11 +965,13 @@ public interface LoaderStreamChannelCompat<IN, OUT>
 
     /**
      * {@inheritDoc}
+     *
+     * @param finallyAction
      */
     @NotNull
     @Override
     @StreamFlow(MAP)
-    LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable action);
+    LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Action finallyAction);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).applied()}.

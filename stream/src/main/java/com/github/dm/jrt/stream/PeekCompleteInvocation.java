@@ -18,6 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.ActionWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,20 +33,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
-    private final Runnable mPeekAction;
+    private final ActionWrapper mPeekAction;
 
     /**
      * Constructor.
      *
      * @param peekAction the runnable instance.
      */
-    PeekCompleteInvocation(final Runnable peekAction) {
+    PeekCompleteInvocation(final ActionWrapper peekAction) {
         super(asArgs(ConstantConditions.notNull("runnable instance", peekAction)));
         mPeekAction = peekAction;
     }
 
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-        mPeekAction.run();
+    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+        mPeekAction.perform();
     }
 
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {

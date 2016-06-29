@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Action;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,34 +33,34 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final Runnable mFinallyRunnable;
+    private final Action mFinallyAction;
 
     private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param finallyRunnable the runnable instance.
-     * @param outputChannel   the output channel.
+     * @param finallyAction the action instance.
+     * @param outputChannel the output channel.
      */
-    TryFinallyChannelConsumer(@NotNull final Runnable finallyRunnable,
+    TryFinallyChannelConsumer(@NotNull final Action finallyAction,
             @NotNull final Channel<OUT, ?> outputChannel) {
-        mFinallyRunnable = ConstantConditions.notNull("runnable instance", finallyRunnable);
+        mFinallyAction = ConstantConditions.notNull("runnable instance", finallyAction);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
-    public void onComplete() {
+    public void onComplete() throws Exception {
         try {
-            mFinallyRunnable.run();
+            mFinallyAction.perform();
 
         } finally {
             mOutputChannel.close();
         }
     }
 
-    public void onError(@NotNull final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) throws Exception {
         try {
-            mFinallyRunnable.run();
+            mFinallyAction.perform();
 
         } finally {
             mOutputChannel.abort(error);

@@ -169,18 +169,16 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
 
         final LoaderContext context = loaderFrom(getActivity());
         StreamChannel<String, String> channel1 =
-                LoaderStreamChannels.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
+                LoaderStreamChannels.of("test1", "test2", "test3").on(context).asyncMap(null);
         StreamChannel<String, String> channel2 =
-                LoaderStreamChannels.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
+                LoaderStreamChannels.of("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(LoaderStreamChannels.blend(channel2, channel1)
                                        .buildChannels()
                                        .after(seconds(10))
                                        .all()).containsOnly("test1", "test2", "test3", "test4",
                 "test5", "test6");
-        channel1 =
-                LoaderStreamChannels.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
-        channel2 =
-                LoaderStreamChannels.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
+        channel1 = LoaderStreamChannels.of("test1", "test2", "test3").on(context).asyncMap(null);
+        channel2 = LoaderStreamChannels.of("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(
                 LoaderStreamChannels.blend(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                                     .buildChannels()
@@ -315,22 +313,20 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf("test")
-                                       .on(context)
-                                       .asyncMap(null)
-                                       .after(seconds(10))
-                                       .all()).containsExactly("test");
-        assertThat(LoaderStreamChannels.streamOf("test1", "test2", "test3")
-                                       .on(context)
-                                       .asyncMap(null)
-                                       .after(seconds(10))
-                                       .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreamChannels.streamOf(Arrays.asList("test1", "test2", "test3"))
+        assertThat(
+                LoaderStreamChannels.of("test").on(context).asyncMap(null).after(seconds(10)).all())
+                .containsExactly("test");
+        assertThat(LoaderStreamChannels.of("test1", "test2", "test3")
                                        .on(context)
                                        .asyncMap(null)
                                        .after(seconds(10))
                                        .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreamChannels.streamOf(JRoutineCore.io().of("test1", "test2", "test3"))
+        assertThat(LoaderStreamChannels.of(Arrays.asList("test1", "test2", "test3"))
+                                       .on(context)
+                                       .asyncMap(null)
+                                       .after(seconds(10))
+                                       .all()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreamChannels.of(JRoutineCore.io().of("test1", "test2", "test3"))
                                        .on(context)
                                        .asyncMap(null)
                                        .after(seconds(10))
@@ -403,18 +399,16 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
 
         final LoaderContext context = loaderFrom(getActivity());
         StreamChannel<String, String> channel1 =
-                LoaderStreamChannels.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
+                LoaderStreamChannels.of("test1", "test2", "test3").on(context).asyncMap(null);
         StreamChannel<String, String> channel2 =
-                LoaderStreamChannels.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
+                LoaderStreamChannels.of("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(LoaderStreamChannels.concat(channel2, channel1)
                                        .buildChannels()
                                        .after(seconds(10))
                                        .all()).containsExactly("test4", "test5", "test6", "test1",
                 "test2", "test3");
-        channel1 =
-                LoaderStreamChannels.streamOf("test1", "test2", "test3").on(context).asyncMap(null);
-        channel2 =
-                LoaderStreamChannels.streamOf("test4", "test5", "test6").on(context).asyncMap(null);
+        channel1 = LoaderStreamChannels.of("test1", "test2", "test3").on(context).asyncMap(null);
+        channel2 = LoaderStreamChannels.of("test4", "test5", "test6").on(context).asyncMap(null);
         assertThat(
                 LoaderStreamChannels.concat(Arrays.<StreamChannel<?, ?>>asList(channel1, channel2))
                                     .buildChannels()
@@ -544,9 +538,9 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
     public void testConfiguration() {
 
         final LoaderStreamChannel<String, String> channel1 =
-                LoaderStreamChannels.streamOf("test1", "test2", "test3");
+                LoaderStreamChannels.of("test1", "test2", "test3");
         final LoaderStreamChannel<String, String> channel2 =
-                LoaderStreamChannels.streamOf("test4", "test5", "test6");
+                LoaderStreamChannels.of("test4", "test5", "test6");
         assertThat(LoaderStreamChannels.blend(channel2, channel1)
                                        .channelConfiguration()
                                        .withOrder(OrderType.BY_CALL)
@@ -771,7 +765,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        LoaderStreamChannels.streamOf("test1").on(context).factoryId(11).async().map(toUpperCase());
+        LoaderStreamChannels.of("test1").on(context).factoryId(11).async().map(toUpperCase());
 
         try {
             JRoutineLoader.on(context).withId(11).buildChannel().after(seconds(10)).next();
@@ -781,7 +775,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
 
         }
 
-        assertThat(LoaderStreamChannels.streamOf("test2")
+        assertThat(LoaderStreamChannels.of("test2")
                                        .on(context)
                                        .loaderConfiguration()
                                        .withFactoryId(11)
@@ -791,8 +785,8 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .after(seconds(10))
                                        .next()).isEqualTo("TEST2");
         final AtomicInteger count = new AtomicInteger();
-        LoaderStreamChannels.streamOf().on(context).factoryId(11).thenGet(delayedIncrement(count));
-        assertThat(LoaderStreamChannels.streamOf()
+        LoaderStreamChannels.of().on(context).factoryId(11).thenGet(delayedIncrement(count));
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .factoryId(11)
                                        .thenGet(increment(count))
@@ -809,7 +803,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -819,7 +813,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                 Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
                 Collections.<Number>singletonList(10));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -828,7 +822,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .after(seconds(3))
                                        .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -838,7 +832,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                 Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
                 Collections.<Number>singletonList(10));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -892,7 +886,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -902,7 +896,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                 Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
                 Arrays.<Number>asList(10, 0, 0));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -911,7 +905,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .after(seconds(3))
                                        .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1, -1, -1));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -921,7 +915,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                 Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
                 Arrays.<Number>asList(10, -31, -31));
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -1376,7 +1370,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -1384,7 +1378,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.limit(5))
                                        .after(seconds(3))
                                        .all()).containsExactly(1, 2, 3, 4, 5);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -1392,7 +1386,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.limit(0))
                                        .after(seconds(3))
                                        .all()).isEmpty();
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -1400,7 +1394,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.limit(15))
                                        .after(seconds(3))
                                        .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -1408,7 +1402,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.limit(5))
                                        .after(seconds(3))
                                        .all()).containsExactly(1, 2, 3, 4, 5);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -1416,7 +1410,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.limit(0))
                                        .after(seconds(3))
                                        .all()).isEmpty();
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -1458,38 +1452,33 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        LoaderStreamChannels.streamOf("test1")
-                            .on(context)
-                            .loaderId(11)
-                            .async()
-                            .map(toUpperCase())
-                            .bind();
+        LoaderStreamChannels.of("test1").on(context).loaderId(11).async().map(toUpperCase()).flow();
         assertThat(JRoutineLoader.on(context)
                                  .withId(11)
                                  .buildChannel()
                                  .after(seconds(10))
                                  .next()).isEqualTo("TEST1");
-        LoaderStreamChannels.streamOf("test2")
+        LoaderStreamChannels.of("test2")
                             .on(context)
                             .loaderConfiguration()
                             .withLoaderId(21)
                             .applied()
                             .async()
                             .map(toUpperCase())
-                            .bind();
+                            .flow();
         assertThat(JRoutineLoader.on(context)
                                  .withId(21)
                                  .buildChannel()
                                  .after(seconds(10))
                                  .next()).isEqualTo("TEST2");
-        LoaderStreamChannels.streamOf("test3")
+        LoaderStreamChannels.of("test3")
                             .on(context)
                             .streamLoaderConfiguration()
                             .withLoaderId(31)
                             .applied()
                             .async()
                             .map(toUpperCase())
-                            .bind();
+                            .flow();
         assertThat(JRoutineLoader.on(context)
                                  .withId(31)
                                  .buildChannel()
@@ -1534,12 +1523,12 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         channel2.close();
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf(channelMap.get(Sort.STRING))
+        assertThat(LoaderStreamChannels.of(channelMap.get(Sort.STRING))
                                        .on(context)
                                        .asyncMap(null)
                                        .after(seconds(10))
                                        .all()).containsExactly("0", "1", "2", "3");
-        assertThat(LoaderStreamChannels.streamOf(channelMap.get(Sort.INTEGER))
+        assertThat(LoaderStreamChannels.of(channelMap.get(Sort.INTEGER))
                                        .on(context)
                                        .asyncMap(null)
                                        .after(seconds(10))
@@ -2104,7 +2093,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -2112,7 +2101,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.skip(5))
                                        .after(seconds(3))
                                        .all()).containsExactly(6, 7, 8, 9, 10);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -2120,7 +2109,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.skip(15))
                                        .after(seconds(3))
                                        .all()).isEmpty();
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .on(context)
                                        .sync()
                                        .thenGetMore(range(1, 10))
@@ -2128,7 +2117,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.skip(0))
                                        .after(seconds(3))
                                        .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -2136,7 +2125,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.skip(5))
                                        .after(seconds(3))
                                        .all()).containsExactly(6, 7, 8, 9, 10);
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -2144,7 +2133,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .map(LoaderStreamChannels.skip(15))
                                        .after(seconds(3))
                                        .all()).isEmpty();
-        assertThat(LoaderStreamChannels.streamOf()
+        assertThat(LoaderStreamChannels.of()
                                        .sync()
                                        .thenGetMore(range(1, 10))
                                        .on(context)
@@ -2188,13 +2177,13 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
         final LoaderContext context = loaderFrom(getActivity());
         final AtomicInteger count = new AtomicInteger();
         final Function<String, String> function = stringIncrement(count);
-        LoaderStreamChannels.streamOf("test")
+        LoaderStreamChannels.of("test")
                             .on(context)
                             .async()
                             .cache(CacheStrategyType.CACHE)
                             .map(function)
-                            .immediately();
-        assertThat(LoaderStreamChannels.streamOf("test")
+                            .flow();
+        assertThat(LoaderStreamChannels.of("test")
                                        .on(context)
                                        .staleAfter(2000, TimeUnit.MILLISECONDS)
                                        .async()
@@ -2202,7 +2191,7 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .after(seconds(10))
                                        .next()).isEqualTo("test1");
         seconds(5).sleepAtLeast();
-        assertThat(LoaderStreamChannels.streamOf("test")
+        assertThat(LoaderStreamChannels.of("test")
                                        .on(context)
                                        .staleAfter(zero())
                                        .async()
@@ -2210,14 +2199,14 @@ public class LoaderStreamChannelsTest extends ActivityInstrumentationTestCase2<T
                                        .after(seconds(10))
                                        .next()).isEqualTo("test2");
         seconds(5).sleepAtLeast();
-        LoaderStreamChannels.streamOf("test")
+        LoaderStreamChannels.of("test")
                             .on(context)
                             .cache(CacheStrategyType.CACHE_IF_SUCCESS)
                             .async()
                             .map(function)
-                            .immediately();
+                            .flow();
         seconds(5).sleepAtLeast();
-        assertThat(LoaderStreamChannels.streamOf("test")
+        assertThat(LoaderStreamChannels.of("test")
                                        .on(context)
                                        .staleAfter(zero())
                                        .async()

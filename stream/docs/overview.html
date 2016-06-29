@@ -39,7 +39,7 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final Double rms = StreamChannels.streamOf(args)
+                final Double rms = StreamChannels.of(args)
                                                  .parallel()
                                                  .map(Integer::parseInt)
                                                  .map(integer -&gt; integer * integer)

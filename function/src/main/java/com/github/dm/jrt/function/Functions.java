@@ -384,16 +384,27 @@ public class Functions {
     }
 
     /**
-     * Returns a channel consumer builder employing the specified consumer function to handle the
-     * invocation completion.
+     * Returns an action wrapper doing nothing.
+     * <br>
+     * The returned object will support concatenation and comparison.
      *
-     * @param consumer the consumer function.
+     * @return the action wrapper.
+     */
+    @NotNull
+    public static ActionWrapper noOp() {
+        return ActionWrapper.noOp();
+    }
+
+    /**
+     * Returns a channel consumer builder employing the specified action to handle the invocation
+     * completion.
+     *
+     * @param onComplete the action instance.
      * @return the builder instance.
      */
     @NotNull
-    public static ChannelConsumerBuilder<Object> onComplete(
-            @NotNull final Consumer<Void> consumer) {
-        return new ChannelConsumerBuilder<Object>(consumer, Functions.<RoutineException>sink(),
+    public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
+        return new ChannelConsumerBuilder<Object>(onComplete, Functions.<RoutineException>sink(),
                 Functions.sink());
     }
 
@@ -401,29 +412,28 @@ public class Functions {
      * Returns a channel consumer builder employing the specified consumer function to handle the
      * invocation errors.
      *
-     * @param consumer the consumer function.
+     * @param onError the consumer function.
      * @return the builder instance.
      */
     @NotNull
     public static ChannelConsumerBuilder<Object> onError(
-            @NotNull final Consumer<RoutineException> consumer) {
-        return new ChannelConsumerBuilder<Object>(Functions.<Void>sink(), consumer,
-                Functions.sink());
+            @NotNull final Consumer<? super RoutineException> onError) {
+        return new ChannelConsumerBuilder<Object>(Functions.noOp(), onError, Functions.sink());
     }
 
     /**
      * Returns a channel consumer builder employing the specified consumer function to handle the
      * invocation outputs.
      *
-     * @param consumer the consumer function.
+     * @param onOutput the consumer function.
      * @param <OUT>    the output data type.
      * @return the builder instance.
      */
     @NotNull
     public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-            @NotNull final Consumer<OUT> consumer) {
-        return new ChannelConsumerBuilder<OUT>(Functions.<Void>sink(),
-                Functions.<RoutineException>sink(), consumer);
+            @NotNull final Consumer<? super OUT> onOutput) {
+        return new ChannelConsumerBuilder<OUT>(Functions.noOp(), Functions.<RoutineException>sink(),
+                onOutput);
     }
 
     /**
@@ -534,11 +544,49 @@ public class Functions {
     }
 
     /**
+     * Wraps the specified action instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param action the action instance.
+     * @return the wrapped action.
+     */
+    @NotNull
+    public static ActionWrapper wrap(@NotNull final Action action) {
+        return ActionWrapper.wrap(action);
+    }
+
+    /**
+     * Wraps the specified runnable instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param action the runnable instance.
+     * @return the wrapped action.
+     */
+    @NotNull
+    public static ActionWrapper wrap(@NotNull final Runnable action) {
+        return ActionWrapper.wrap(action);
+    }
+
+    /**
      * Wraps the specified bi-consumer instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to
@@ -560,7 +608,7 @@ public class Functions {
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to
@@ -583,7 +631,7 @@ public class Functions {
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to
@@ -603,7 +651,7 @@ public class Functions {
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to
@@ -625,7 +673,7 @@ public class Functions {
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to
@@ -645,7 +693,7 @@ public class Functions {
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
-     * Note that the passed object is expected to behave like a function, that is, it must not
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
      * retain a mutable internal state.
      * <br>
      * Note also that any external object used inside the function must be synchronized in order to

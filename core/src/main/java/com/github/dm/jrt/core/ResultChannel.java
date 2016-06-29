@@ -218,14 +218,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> after(@NotNull final UnitDuration delay) {
-        mResultDelay.set(ConstantConditions.notNull("result delay", delay));
-        return this;
+    public Channel<OUT, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        return after(fromUnit(delay, timeUnit));
     }
 
     @NotNull
-    public Channel<OUT, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        return after(fromUnit(delay, timeUnit));
+    public Channel<OUT, OUT> after(@NotNull final UnitDuration delay) {
+        mResultDelay.set(ConstantConditions.notNull("result delay", delay));
+        return this;
     }
 
     @NotNull

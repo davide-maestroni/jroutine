@@ -90,14 +90,14 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<DATA, DATA> after(@NotNull final UnitDuration delay) {
-        mChannel.after(delay);
+    public Channel<DATA, DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        mChannel.after(delay, timeUnit);
         return this;
     }
 
     @NotNull
-    public Channel<DATA, DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        mChannel.after(delay, timeUnit);
+    public Channel<DATA, DATA> after(@NotNull final UnitDuration delay) {
+        mChannel.after(delay);
         return this;
     }
 

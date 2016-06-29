@@ -436,7 +436,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                             getRoutine()));
                         }
                     };
-            return StreamChannels.streamOf(call)
+            return StreamChannels.of(call)
                                  .invocationConfiguration()
                                  .with(mInvocationConfiguration)
                                  .applied()

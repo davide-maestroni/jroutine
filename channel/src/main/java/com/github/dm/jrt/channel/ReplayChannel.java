@@ -93,14 +93,14 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> after(@NotNull final UnitDuration timeout) {
-        mOutputChannel.after(timeout);
+    public Channel<OUT, OUT> after(final long timeout, @NotNull final TimeUnit timeUnit) {
+        mOutputChannel.after(timeout, timeUnit);
         return this;
     }
 
     @NotNull
-    public Channel<OUT, OUT> after(final long timeout, @NotNull final TimeUnit timeUnit) {
-        mOutputChannel.after(timeout, timeUnit);
+    public Channel<OUT, OUT> after(@NotNull final UnitDuration timeout) {
+        mOutputChannel.after(timeout);
         return this;
     }
 

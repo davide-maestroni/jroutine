@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindCompleteConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, Void>> {
 
-    private final Runnable mCompleteAction;
+    private final Action mCompleteAction;
 
     private final ChannelConfiguration mConfiguration;
 
@@ -41,12 +42,12 @@ class BindCompleteConsumer<OUT> implements Function<Channel<?, OUT>, Channel<?, 
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param action        the runnable instance.
+     * @param action        the action instance.
      */
     BindCompleteConsumer(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Runnable action) {
+            @NotNull final Action action) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mCompleteAction = ConstantConditions.notNull("runnable instance", action);
+        mCompleteAction = ConstantConditions.notNull("action instance", action);
     }
 
     public Channel<?, Void> apply(final Channel<?, OUT> channel) throws Exception {

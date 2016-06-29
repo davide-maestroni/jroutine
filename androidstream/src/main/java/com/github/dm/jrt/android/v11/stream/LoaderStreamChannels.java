@@ -31,7 +31,9 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.StreamChannels;
 
@@ -390,6 +392,38 @@ public class LoaderStreamChannels extends StreamChannels {
         return SparseChannels.distribute(placeholder, channels);
     }
 
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> from(final long count,
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        final LoaderStreamChannel<OUT, OUT> stream = of();
+        return stream.thenGet(count, outputSupplier);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> from(
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        final LoaderStreamChannel<OUT, OUT> stream = of();
+        return stream.thenGet(outputSupplier);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> fromMore(final long count,
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        final LoaderStreamChannel<OUT, OUT> stream = of();
+        return stream.thenGetMore(count, outputsConsumer);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> fromMore(
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        final LoaderStreamChannel<OUT, OUT> stream = of();
+        return stream.thenGetMore(outputsConsumer);
+    }
+
     /**
      * Returns a builder of loader streams joining the data coming from the specified channels.
      * <br>
@@ -615,6 +649,83 @@ public class LoaderStreamChannels extends StreamChannels {
             ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
+    }
+
+    /**
+     * Builds and returns a new loader stream channel.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param <OUT> the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> of() {
+        return of(JRoutineCore.io().<OUT>buildChannel().close());
+    }
+
+    /**
+     * Builds and returns a new loader stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> of(@Nullable final Iterable<OUT> outputs) {
+        return of(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new loader stream channel generating the specified output.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param output the output.
+     * @param <OUT>  the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> of(@Nullable final OUT output) {
+        return of(JRoutineCore.io().of(output));
+    }
+
+    /**
+     * Builds and returns a new loader stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param outputs the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> of(@Nullable final OUT... outputs) {
+        return of(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new loader stream channel generating the specified outputs.
+     * <br>
+     * The specified channel will be bound as a result of the call.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param output the channel returning the output data.
+     * @param <OUT>  the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannel<OUT, OUT> of(@Nullable final Channel<?, OUT> output) {
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
+        return new DefaultLoaderStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
     }
 
     /**
@@ -924,85 +1035,6 @@ public class LoaderStreamChannels extends StreamChannels {
             @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
                 SparseChannels.selectableOutput(channel, index));
-    }
-
-    /**
-     * Builds and returns a new loader stream channel.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf() {
-        return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
-    }
-
-    /**
-     * Builds and returns a new loader stream channel generating the specified outputs.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
-            @Nullable final Iterable<OUT> outputs) {
-        return streamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new loader stream channel generating the specified output.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param output the output.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
-        return streamOf(JRoutineCore.io().of(output));
-    }
-
-    /**
-     * Builds and returns a new loader stream channel generating the specified outputs.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param outputs the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
-        return streamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new loader stream channel generating the specified outputs.
-     * <br>
-     * The specified channel will be bound as a result of the call.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param output the channel returning the output data.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
-            @Nullable final Channel<?, OUT> output) {
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
-        return new DefaultLoaderStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
     }
 
     /**

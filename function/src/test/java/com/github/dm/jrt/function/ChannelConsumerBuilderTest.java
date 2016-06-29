@@ -41,8 +41,8 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            new ChannelConsumerBuilder<Object>(Functions.<Void>sink(),
-                    Functions.<RoutineException>sink(), null);
+            new ChannelConsumerBuilder<Object>(Functions.noOp(), Functions.<RoutineException>sink(),
+                    null);
 
             fail();
 
@@ -52,7 +52,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            new ChannelConsumerBuilder<Object>(Functions.<Void>sink(), null, sink());
+            new ChannelConsumerBuilder<Object>(Functions.noOp(), null, sink());
 
             fail();
 
@@ -74,55 +74,56 @@ public class ChannelConsumerBuilderTest {
     @Test
     public void testOnComplete() throws Exception {
 
-        final TestConsumer<Void> consumer1 = new TestConsumer<Void>();
-        final TestConsumer<Void> consumer2 = new TestConsumer<Void>();
-        final TestConsumer<Void> consumer3 = new TestConsumer<Void>();
-        ChannelConsumerBuilder<Object> channelConsumer = onComplete(consumer1);
+        final TestAction action1 = new TestAction();
+        final TestAction action2 = new TestAction();
+        final TestAction action3 = new TestAction();
+        ChannelConsumerBuilder<Object> channelConsumer = onComplete(action1);
         channelConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
         channelConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
         channelConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        consumer1.reset();
-        channelConsumer = channelConsumer.thenComplete(consumer2);
+        assertThat(action1.isCalled()).isTrue();
+        action1.reset();
+        channelConsumer = channelConsumer.thenComplete(action2);
         channelConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
+        assertThat(action2.isCalled()).isFalse();
         channelConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
+        assertThat(action2.isCalled()).isFalse();
         channelConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        consumer1.reset();
-        consumer2.reset();
-        channelConsumer = onComplete(consumer1).thenComplete(wrap(consumer2).andThen(consumer3));
+        assertThat(action1.isCalled()).isTrue();
+        assertThat(action2.isCalled()).isTrue();
+        action1.reset();
+        action2.reset();
+        channelConsumer =
+                onComplete(action1).thenComplete(ActionWrapper.wrap(action2).andThen(action3));
         channelConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
+        assertThat(action2.isCalled()).isFalse();
+        assertThat(action3.isCalled()).isFalse();
         channelConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
-        assertThat(consumer2.isCalled()).isFalse();
-        assertThat(consumer3.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
+        assertThat(action2.isCalled()).isFalse();
+        assertThat(action3.isCalled()).isFalse();
         channelConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.isCalled()).isTrue();
-        assertThat(consumer3.isCalled()).isTrue();
-        consumer1.reset();
+        assertThat(action1.isCalled()).isTrue();
+        assertThat(action2.isCalled()).isTrue();
+        assertThat(action3.isCalled()).isTrue();
+        action1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        channelConsumer = onComplete(consumer1).thenOutput(outConsumer).thenError(errorConsumer);
+        channelConsumer = onComplete(action1).thenOutput(outConsumer).thenError(errorConsumer);
         channelConsumer.onOutput("test");
-        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
         assertThat(errorConsumer.isCalled()).isFalse();
         channelConsumer.onError(new RoutineException());
-        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(action1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();
         channelConsumer.onComplete();
-        assertThat(consumer1.isCalled()).isTrue();
+        assertThat(action1.isCalled()).isTrue();
     }
 
     @Test
@@ -141,7 +142,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenComplete(null);
+            onComplete(Functions.noOp()).thenComplete(null);
 
             fail();
 
@@ -151,7 +152,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenError(null);
+            onComplete(Functions.noOp()).thenError(null);
 
             fail();
 
@@ -161,7 +162,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenOutput(null);
+            onComplete(Functions.noOp()).thenOutput(null);
 
             fail();
 
@@ -211,15 +212,15 @@ public class ChannelConsumerBuilderTest {
         assertThat(consumer3.isCalled()).isTrue();
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
-        final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        channelConsumer = onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
+        final TestAction completeAction = new TestAction();
+        channelConsumer = onError(consumer1).thenOutput(outConsumer).thenComplete(completeAction);
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
-        assertThat(completeConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isFalse();
         channelConsumer.onComplete();
         assertThat(consumer1.isCalled()).isFalse();
-        assertThat(completeConsumer.isCalled()).isTrue();
+        assertThat(completeAction.isCalled()).isTrue();
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isTrue();
     }
@@ -310,16 +311,15 @@ public class ChannelConsumerBuilderTest {
         assertThat(consumer3.isCalled()).isTrue();
         consumer1.reset();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        channelConsumer =
-                onOutput(consumer1).thenError(errorConsumer).thenComplete(completeConsumer);
+        final TestAction completeAction = new TestAction();
+        channelConsumer = onOutput(consumer1).thenError(errorConsumer).thenComplete(completeAction);
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();
-        assertThat(completeConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isFalse();
         channelConsumer.onComplete();
         assertThat(consumer1.isCalled()).isFalse();
-        assertThat(completeConsumer.isCalled()).isTrue();
+        assertThat(completeAction.isCalled()).isTrue();
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isTrue();
     }
@@ -366,6 +366,26 @@ public class ChannelConsumerBuilderTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    private static class TestAction implements Action {
+
+        private boolean mIsCalled;
+
+        public boolean isCalled() {
+
+            return mIsCalled;
+        }
+
+        public void perform() {
+
+            mIsCalled = true;
+        }
+
+        public void reset() {
+
+            mIsCalled = false;
         }
     }
 

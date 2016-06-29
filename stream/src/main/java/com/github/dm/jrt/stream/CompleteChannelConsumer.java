@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Action;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,27 +31,27 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public class CompleteChannelConsumer<OUT> implements ChannelConsumer<OUT> {
+class CompleteChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final Runnable mCompleteAction;
+    private final Action mCompleteAction;
 
     private final Channel<?, Void> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param action        the runnable instance.
+     * @param action        the action instance.
      * @param outputChannel the output channel.
      */
-    public CompleteChannelConsumer(@NotNull final Runnable action,
+    CompleteChannelConsumer(@NotNull final Action action,
             @NotNull final Channel<?, Void> outputChannel) {
-        mCompleteAction = ConstantConditions.notNull("runnable instance", action);
+        mCompleteAction = ConstantConditions.notNull("action instance", action);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() throws Exception {
         try {
-            mCompleteAction.run();
+            mCompleteAction.perform();
 
         } finally {
             mOutputChannel.close();

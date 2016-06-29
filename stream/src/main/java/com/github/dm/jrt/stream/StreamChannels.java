@@ -29,6 +29,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
 
@@ -57,25 +58,6 @@ public class StreamChannels extends Operators {
      */
     protected StreamChannels() {
         ConstantConditions.avoid();
-    }
-
-    /**
-     * Returns an invocation factory, whose invocation instances employ the stream channels,
-     * provided by the specified function, to process input data.
-     * <br>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param function the function providing the stream channels.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> asFactory(
-            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
-                    super IN, ? extends OUT>> function) {
-        return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -365,6 +347,38 @@ public class StreamChannels extends Operators {
         return Channels.distribute(placeholder, channels);
     }
 
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> from(final long count,
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        final StreamChannel<OUT, OUT> stream = of();
+        return stream.thenGet(count, outputSupplier);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> from(
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        final StreamChannel<OUT, OUT> stream = of();
+        return stream.thenGet(outputSupplier);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> fromMore(final long count,
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        final StreamChannel<OUT, OUT> stream = of();
+        return stream.thenGetMore(count, outputsConsumer);
+    }
+
+    // TODO: 29/06/16 javadoc
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> fromMore(
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        final StreamChannel<OUT, OUT> stream = of();
+        return stream.thenGetMore(outputsConsumer);
+    }
+
     /**
      * Returns a builder of stream channels joining the data coming from the specified ones.
      * <br>
@@ -586,6 +600,83 @@ public class StreamChannels extends Operators {
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
             extends Selectable<OUT>>> merge(@NotNull final Channel<?, ?>... channels) {
         return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(channels));
+    }
+
+    /**
+     * Builds and returns a new stream channel.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param <OUT> the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> of() {
+        return of(JRoutineCore.io().<OUT>of());
+    }
+
+    /**
+     * Builds and returns a new stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> of(@Nullable final Iterable<OUT> outputs) {
+        return of(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new stream channel generating the specified output.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param output the output.
+     * @param <OUT>  the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> of(@Nullable final OUT output) {
+        return of(JRoutineCore.io().of(output));
+    }
+
+    /**
+     * Builds and returns a new stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param outputs the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> of(@Nullable final OUT... outputs) {
+        return of(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new stream channel generating the specified outputs.
+     * <br>
+     * The specified channel will be bound as a result of the call.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link Channel}
+     * methods is called.
+     *
+     * @param output the channel returning the output data.
+     * @param <OUT>  the output data type.
+     * @return the newly created stream instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT, OUT> of(@Nullable final Channel<?, OUT> output) {
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
+        return new DefaultStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
     }
 
     /**
@@ -894,80 +985,22 @@ public class StreamChannels extends Operators {
     }
 
     /**
-     * Builds and returns a new stream channel.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> StreamChannel<OUT, OUT> streamOf() {
-        return streamOf(JRoutineCore.io().<OUT>of());
-    }
-
-    /**
-     * Builds and returns a new stream channel generating the specified outputs.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
-        return streamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new stream channel generating the specified output.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param output the output.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
-        return streamOf(JRoutineCore.io().of(output));
-    }
-
-    /**
-     * Builds and returns a new stream channel generating the specified outputs.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
-     *
-     * @param outputs the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
-        return streamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new stream channel generating the specified outputs.
+     * Returns an invocation factory, whose invocation instances employ the stream channels,
+     * provided by the specified function, to process input data.
      * <br>
-     * The specified channel will be bound as a result of the call.
-     * <p>
-     * Note that the stream will start producing results only when one of the {@link Channel}
-     * methods is called.
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
      *
-     * @param output the channel returning the output data.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
+     * @param function the function providing the stream channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final Channel<?, OUT> output) {
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.io().buildChannel();
-        return new DefaultStreamChannel<OUT, OUT>(outputChannel.pass(output).close());
+    public static <IN, OUT> InvocationFactory<IN, OUT> streamFactory(
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
+                    super IN, ? extends OUT>> function) {
+        return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -986,7 +1019,7 @@ public class StreamChannels extends Operators {
     public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
                     super IN, ? extends OUT>> function) {
-        return JRoutineCore.with(asFactory(function));
+        return JRoutineCore.with(streamFactory(function));
     }
 
     @NotNull

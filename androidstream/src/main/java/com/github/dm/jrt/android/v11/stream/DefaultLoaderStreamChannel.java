@@ -41,6 +41,7 @@ import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -172,14 +173,14 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
-        return (LoaderStreamChannel<IN, OUT>) super.after(delay);
+    public LoaderStreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+        return (LoaderStreamChannel<IN, OUT>) super.after(delay, timeUnit);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        return (LoaderStreamChannel<IN, OUT>) super.after(delay, timeUnit);
+    public LoaderStreamChannel<IN, OUT> after(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannel<IN, OUT>) super.after(delay);
     }
 
     @NotNull
@@ -299,32 +300,33 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @NotNull
     @Override
     public LoaderStreamChannel<IN, OUT> appendGet(final long count,
-            @NotNull final Supplier<? extends OUT> supplier) {
-        checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<IN, OUT>) super.appendGet(count, supplier);
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        checkStatic(wrap(outputSupplier), outputSupplier);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGet(count, outputSupplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> appendGet(@NotNull final Supplier<? extends OUT> supplier) {
-        checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<IN, OUT>) super.appendGet(supplier);
+    public LoaderStreamChannel<IN, OUT> appendGet(
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        checkStatic(wrap(outputSupplier), outputSupplier);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGet(outputSupplier);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<IN, OUT> appendGetMore(final long count,
-            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(count, consumer);
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(count, outputsConsumer);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<IN, OUT> appendGetMore(
-            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(consumer);
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        return (LoaderStreamChannel<IN, OUT>) super.appendGetMore(outputsConsumer);
     }
 
     @NotNull
@@ -368,39 +370,6 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> bind() {
-        return (LoaderStreamChannel<IN, OUT>) super.bind();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<IN, OUT> bindAfter(@NotNull final UnitDuration delay) {
-        return (LoaderStreamChannel<IN, OUT>) super.bindAfter(delay);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<IN, OUT> bindAfter(@NotNull final UnitDuration delay,
-            @NotNull final ChannelConsumer<OUT> consumer) {
-        return (LoaderStreamChannel<IN, OUT>) super.bindAfter(delay, consumer);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<IN, OUT> bindAfter(final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        return (LoaderStreamChannel<IN, OUT>) super.bindAfter(delay, timeUnit);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<IN, OUT> bindAfter(final long delay,
-            @NotNull final TimeUnit timeUnit, @NotNull final ChannelConsumer<OUT> consumer) {
-        return (LoaderStreamChannel<IN, OUT>) super.bindAfter(delay, timeUnit, consumer);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> accumulateConsumer) {
         checkStatic(wrap(accumulateConsumer), accumulateConsumer);
@@ -427,6 +396,18 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<IN, OUT> delay(final long delay, @NotNull final TimeUnit timeUnit) {
+        return (LoaderStreamChannel<IN, OUT>) super.delay(delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> delay(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannel<IN, OUT>) super.delay(delay);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<IN, OUT> filter(
             @NotNull final Predicate<? super OUT> filterPredicate) {
         checkStatic(wrap(filterPredicate), filterPredicate);
@@ -437,8 +418,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @Override
     public <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> flatLift(
             @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
-                    StreamChannel<BEFORE, AFTER>> transformFunction) {
-        return (LoaderStreamChannel<BEFORE, AFTER>) super.flatLift(transformFunction);
+                    StreamChannel<BEFORE, AFTER>> liftFunction) {
+        return (LoaderStreamChannel<BEFORE, AFTER>) super.flatLift(liftFunction);
     }
 
     @NotNull
@@ -448,6 +429,34 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
                     mappingFunction) {
         checkStatic(wrap(mappingFunction), mappingFunction);
         return (LoaderStreamChannel<IN, AFTER>) super.flatMap(mappingFunction);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> flow() {
+        return (LoaderStreamChannel<IN, OUT>) super.flow();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> flow(@NotNull final Consumer<? super OUT> outputConsumer) {
+        return (LoaderStreamChannel<IN, OUT>) super.flow(outputConsumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> flow(@NotNull final Consumer<? super OUT> outputConsumer,
+            @NotNull final Consumer<? super RoutineException> errorConsumer) {
+        return (LoaderStreamChannel<IN, OUT>) super.flow(outputConsumer, errorConsumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> flow(@NotNull final Consumer<? super OUT> outputConsumer,
+            @NotNull final Consumer<? super RoutineException> errorConsumer,
+            @NotNull final Action completeAction) {
+        return (LoaderStreamChannel<IN, OUT>) super.flow(outputConsumer, errorConsumer,
+                completeAction);
     }
 
     @NotNull
@@ -467,11 +476,23 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<IN, OUT> lag(final long delay, @NotNull final TimeUnit timeUnit) {
+        return (LoaderStreamChannel<IN, OUT>) super.lag(delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> lag(@NotNull final UnitDuration delay) {
+        return (LoaderStreamChannel<IN, OUT>) super.lag(delay);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> lift(
             @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
                     Channel<?, OUT>>, ? extends Function<? super Channel<?, IN>, ? extends
-                    Channel<?, AFTER>>> transformFunction) {
-        return (LoaderStreamChannel<IN, AFTER>) super.lift(transformFunction);
+                    Channel<?, AFTER>>> liftFunction) {
+        return (LoaderStreamChannel<IN, AFTER>) super.lift(liftFunction);
     }
 
     @NotNull
@@ -479,8 +500,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public <AFTER> LoaderStreamChannel<IN, AFTER> liftConfig(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> transformFunction) {
-        return (LoaderStreamChannel<IN, AFTER>) super.liftConfig(transformFunction);
+                    Channel<?, IN>, ? extends Channel<?, AFTER>>> liftFunction) {
+        return (LoaderStreamChannel<IN, AFTER>) super.liftConfig(liftFunction);
     }
 
     @NotNull
@@ -547,8 +568,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, Void> onComplete(@NotNull final Runnable action) {
-        return (LoaderStreamChannel<IN, Void>) super.onComplete(action);
+    public LoaderStreamChannel<IN, Void> onComplete(@NotNull final Action completeAction) {
+        return (LoaderStreamChannel<IN, Void>) super.onComplete(completeAction);
     }
 
     @NotNull
@@ -714,7 +735,7 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> peekComplete(@NotNull final Runnable peekAction) {
+    public LoaderStreamChannel<IN, OUT> peekComplete(@NotNull final Action peekAction) {
         return (LoaderStreamChannel<IN, OUT>) super.peekComplete(peekAction);
     }
 
@@ -870,8 +891,8 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<IN, OUT> tryFinally(@NotNull final Runnable action) {
-        return (LoaderStreamChannel<IN, OUT>) super.tryFinally(action);
+    public LoaderStreamChannel<IN, OUT> tryFinally(@NotNull final Action finallyAction) {
+        return (LoaderStreamChannel<IN, OUT>) super.tryFinally(finallyAction);
     }
 
     @NotNull

@@ -641,7 +641,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class TestTransform extends StreamContextInvocation<String, String> {
+    private static class TestTransform extends ChannelContextInvocation<String, String> {
 
         @NotNull
         @Override

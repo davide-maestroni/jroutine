@@ -33,20 +33,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
-    private final ActionWrapper mPeekAction;
+    private final ActionWrapper mCompleteAction;
 
     /**
      * Constructor.
      *
-     * @param peekAction the runnable instance.
+     * @param completeAction the action instance.
      */
-    PeekCompleteInvocation(final ActionWrapper peekAction) {
-        super(asArgs(ConstantConditions.notNull("runnable instance", peekAction)));
-        mPeekAction = peekAction;
+    PeekCompleteInvocation(final ActionWrapper completeAction) {
+        super(asArgs(ConstantConditions.notNull("action instance", completeAction)));
+        mCompleteAction = completeAction;
     }
 
     public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
-        mPeekAction.perform();
+        mCompleteAction.perform();
     }
 
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {

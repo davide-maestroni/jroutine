@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.StreamInvocation;
+import com.github.dm.jrt.core.ChannelInvocation;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -64,7 +64,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionStreamInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
+    private static class FunctionStreamInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
         private final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super IN,
                 ? extends OUT>>

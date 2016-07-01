@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
+public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
     private final InvocationMode mInvocationMode;
 

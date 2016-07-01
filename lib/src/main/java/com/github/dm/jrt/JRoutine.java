@@ -32,7 +32,9 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
+import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.stream.StreamRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -431,5 +433,16 @@ public class JRoutine extends StreamChannels {
     public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingMore(
             @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.with(consumerMapping(consumer));
+    }
+
+    /**
+     * Returns a stream routine builder.
+     *
+     * @param <IN> the input data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN> StreamRoutineBuilder<IN, IN> withStream() {
+        return JRoutineStream.withStream();
     }
 }

@@ -16,11 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -40,415 +37,167 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
-import com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CACHE;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.COLLECT;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CONFIG;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.REDUCE;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.START;
 
 /**
- * Interface defining a stream channel, that is, a channel concatenating map and reduce functions.
+ * Interface defining a builder of routines concatenating map and reduce functions.
  * <br>
- * Each function in the stream is backed by a routine instance, which may have its own specific
- * configuration and invocation mode.
+ * Each function in the stream will be backed by a routine instance, which may have its own
+ * specific configuration and invocation mode.
  * <p>
  * To better document the effect of each method on the underlying stream, a {@link StreamFlow}
  * annotation indicates for each one the type of transformation applied.
- * <p>
- * Note that each {@code START} method may throw a {@link com.github.dm.jrt.stream.StreamException}
- * if an unexpected error occurs while initiating the flow of data.
  * <br>
  * Note also that, if at least one reduce function is part of the chain, the results will be
- * propagated only when the previous routine invocations complete.
+ * propagated only when the built routine invocation completes.
  * <p>
- * Created by davide-maestroni on 12/23/2015.
+ * Created by davide-maestroni on 07/01/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StreamChannel<IN, OUT>
-        extends Channel<IN, OUT>, InvocationConfigurable<StreamChannel<IN, OUT>> {
+public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
     /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean abort();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean abort(@Nullable Throwable reason);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> after(@NotNull UnitDuration delay);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    List<OUT> all();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull CHANNEL channel);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> close();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    Iterator<OUT> eventualIterator();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyAbort();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyBreak();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> eventuallyFail();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nullable
-    @StreamFlow(START)
-    RoutineException getError();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean hasCompleted();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean hasNext();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    OUT next();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> immediately();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    int inputCount();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean isBound();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean isEmpty();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    boolean isOpen();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(START)
-    List<OUT> next(int count);
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    OUT nextOrElse(OUT output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    int outputCount();
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable IN input);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> pass(@Nullable IN... inputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    int size();
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> skipNext(int count);
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> sortedByCall();
-
-    /**
-     * {@inheritDoc}.
-     */
-    @NotNull
-    StreamChannel<IN, OUT> sortedByDelay();
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    void throwError();
-
-    /**
-     * Returns a stream appending the specified output to this stream ones.
+     * Concatenates a channel appending the specified output.
      * <br>
-     * The output will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
+     * The output will be appended to the ones produced by the previous routine.
      *
      * @param output the output to append.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> append(@Nullable OUT output);
+    StreamRoutineBuilder<IN, OUT> append(@Nullable OUT output);
 
     /**
-     * Returns a stream concatenating the specified outputs to this stream ones.
+     * Concatenates a channel appending the specified outputs.
      * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
+     * The outputs will be appended to the ones produced by the previous routine.
      *
      * @param outputs the outputs to append.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> append(@Nullable OUT... outputs);
+    StreamRoutineBuilder<IN, OUT> append(@Nullable OUT... outputs);
 
     /**
-     * Returns a stream appending the specified outputs to this stream ones.
+     * Concatenates a channel appending the specified outputs.
      * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
+     * The outputs will be appended to the ones produced by the previous routine.
      *
      * @param outputs the iterable returning the outputs to append.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
+    StreamRoutineBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
 
     /**
-     * Returns a stream appending the specified channel outputs to this stream ones.
+     * Concatenates a channel appending the specified channel outputs.
      * <br>
-     * The outputs will be appended to the ones produced by this stream.
-     * <p>
-     * Note that both the specified channel and this stream will be bound as a result of the call.
+     * The outputs will be appended to the ones produced by the previous routine.
      *
      * @param channel the output channel.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
+    StreamRoutineBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
 
     /**
-     * Concatenates a stream appending the outputs returned by the specified supplier.
+     * Concatenates a routine appending the outputs returned by the specified supplier.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocation completes. The count number must be positive.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count          the number of generated outputs.
      * @param outputSupplier the supplier instance.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> appendGet(long count, @NotNull Supplier<? extends OUT> outputSupplier);
+    StreamRoutineBuilder<IN, OUT> appendGet(long count,
+            @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a stream appending the outputs returned by the specified supplier.
+     * Concatenates a routine appending the outputs returned by the specified supplier.
      * <br>
-     * The supplier will be called only when the previous routine invocations complete.
+     * The supplier will be called only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputSupplier the supplier instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    StreamRoutineBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a stream appending the outputs returned by the specified consumer.
+     * Concatenates a routine appending the outputs returned by the specified consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
      * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocations completes. The count number must be positive.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count           the number of generated outputs.
      * @param outputsConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> appendGetMore(long count,
+    StreamRoutineBuilder<IN, OUT> appendGetMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
-     * Concatenates a stream appending the outputs returned by the specified consumer.
+     * Concatenates a routine appending the outputs returned by the specified consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
-     * The consumer will be called only when the previous routine invocations complete.
+     * The consumer will be called only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputsConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> appendGetMore(
+    StreamRoutineBuilder<IN, OUT> appendGetMore(
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
      * asynchronous mode.
      *
-     * @return the new stream instance.
+     * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> async();
+    StreamRoutineBuilder<IN, OUT> async();
 
     /**
      * Short for {@code async().streamInvocationConfiguration().withRunner(runner).applied()}.
@@ -458,11 +207,11 @@ public interface StreamChannel<IN, OUT>
      * Note that output data will not be automatically delivered through the runner.
      *
      * @param runner the runner instance.
-     * @return the new stream instance.
+     * @return the this builder.
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> async(@Nullable Runner runner);
+    StreamRoutineBuilder<IN, OUT> async(@Nullable Runner runner);
 
     /**
      * Short for {@code async(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
@@ -473,12 +222,12 @@ public interface StreamChannel<IN, OUT>
      * the output data through the specified runner.
      *
      * @param runner the runner instance.
-     * @return the new stream instance.
+     * @return this builder.
      * @see #async(Runner)
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> asyncMap(@Nullable Runner runner);
+    StreamRoutineBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -494,12 +243,13 @@ public interface StreamChannel<IN, OUT>
      * @param limit   the maximum number of buffered inputs before starting to slow down the
      *                feeding thread.
      * @param backoff the backoff policy to apply to the feeding thread.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit, @NotNull Backoff backoff);
+    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
+            @NotNull Backoff backoff);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -516,13 +266,13 @@ public interface StreamChannel<IN, OUT>
      *                 feeding thread.
      * @param delay    the constant delay to apply to the feeding thread.
      * @param timeUnit the delay time unit.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified limit or the specified delay are
      *                                            negative.
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
+    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
             @NotNull TimeUnit timeUnit);
 
     /**
@@ -539,16 +289,16 @@ public interface StreamChannel<IN, OUT>
      * @param limit  the maximum number of buffered inputs before starting to slow down the
      *               feeding thread.
      * @param delay  the constant delay to apply to the feeding thread.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified limit is negative.
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
+    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
             @Nullable UnitDuration delay);
 
     /**
-     * Concatenates a stream accumulating data through the specified consumer.
+     * Concatenates a routine accumulating data through the specified consumer.
      * <br>
      * The output will be computed as follows:
      * <pre>
@@ -562,19 +312,17 @@ public interface StreamChannel<IN, OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param accumulateConsumer the bi-consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamChannel<IN, OUT> collect(
+    StreamRoutineBuilder<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
 
     /**
-     * Concatenates a stream accumulating data through the specified consumer.
+     * Concatenates a routine accumulating data through the specified consumer.
      * <br>
      * The output will be computed as follows:
      * <pre>
@@ -588,74 +336,73 @@ public interface StreamChannel<IN, OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param seedSupplier       the supplier of initial accumulation values.
      * @param accumulateConsumer the bi-consumer instance.
      * @param <AFTER>            the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
 
     /**
-     * Concatenates a stream accumulating the outputs by adding them to the collections returned by
+     * Concatenates a routine accumulating the outputs by adding them to the collections returned by
      * the specified supplier.
      * <br>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param collectionSupplier the supplier of collections.
      * @param <AFTER>            the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collectInto(
+    <AFTER extends Collection<? super OUT>> StreamRoutineBuilder<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> collectionSupplier);
 
     /**
      * Adds a delay at the end of this stream, so that any data, exception or completion
      * notification will be dispatched to the next concatenated routine after the specified time.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
+    StreamRoutineBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Adds a delay at the end of this stream, so that any data, exception or completion
      * notification will be dispatched to the next concatenated routine after the specified time.
-     *
-     * @param delay the delay.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> delay(@NotNull UnitDuration delay);
-
-    /**
-     * Concatenates a stream filtering data based on the values returned by the specified predicate.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
-     * @param filterPredicate the predicate instance.
-     * @return the new stream instance.
+     * @param delay the delay.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
+    StreamRoutineBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
+
+    /**
+     * Concatenates a routine filtering data based on the values returned by the specified
+     * predicate.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param filterPredicate the predicate instance.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamRoutineBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
      * Transforms this stream by applying the specified function.
@@ -666,506 +413,400 @@ public interface StreamChannel<IN, OUT>
      * @param liftFunction the lift function.
      * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
-     * @return the lifted stream.
+     * @return the lifted builder.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> flatLift(
-            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
-                    AFTER>> liftFunction);
+    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamRoutineBuilder<IN, OUT>, ? extends
+                    StreamRoutineBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
-     * Concatenates a stream mapping this stream outputs by applying the specified function to each
+     * Concatenates a routine mapping this stream outputs by applying the specified function to each
      * one of them.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param mappingFunction the function instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> flatMap(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
-     * Initiates the flow of this stream.
-     *
-     * @return this stream instance.
-     */
-    @NotNull
-    @StreamFlow(START)
-    StreamChannel<IN, OUT> flow();
-
-    /**
-     * Short for {@code bind(Functions.onOutput(consumer))}.
-     *
-     * @param outputConsumer the consumer instance.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer);
-
-    /**
-     * Short for {@code bind(Functions.onOutput(outputConsumer).thenError(errorConsumer))}.
-     *
-     * @param outputConsumer the consumer instance.
-     * @param errorConsumer  the consumer instance.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer,
-            @NotNull Consumer<? super RoutineException> errorConsumer);
-
-    /**
-     * Short for {@code bind(Functions.onOutput(outputConsumer).thenError(errorConsumer)
-     * .thenComplete(completeAction))}.
-     *
-     * @param outputConsumer the consumer instance.
-     * @param errorConsumer  the consumer instance.
-     * @param completeAction the action to perform.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, OUT> flow(@NotNull Consumer<? super OUT> outputConsumer,
-            @NotNull Consumer<? super RoutineException> errorConsumer,
-            @NotNull Action completeAction);
-
-    /**
-     * Gets the invocation configuration builder related only to the next concatenated routine
-     * instance. Any further addition to the chain will retain only the stream configuration.
-     * <br>
-     * Only the options set in this configuration (that is, the ones with a value different from the
-     * default) will override the stream ones.
-     * <p>
-     * Note that the configuration builder will be initialized with the current configuration for
-     * the next routine.
-     *
-     * @return the invocation configuration builder.
+     * {@inheritDoc}
      */
     @NotNull
     @StreamFlow(CONFIG)
-    Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration();
+    Builder<? extends StreamRoutineBuilder<IN, OUT>> invocationConfiguration();
 
     /**
      * Makes the stream invoke concatenated routines with the specified mode.
      *
      * @param invocationMode the invocation mode.
-     * @return the new stream instance.
+     * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
-
-    /**
-     * {@inheritDoc}
-     */
-    @StreamFlow(START)
-    Iterator<OUT> iterator();
+    StreamRoutineBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * Adds a delay at the beginning of this stream, so that any data, exception or completion
      * notification coming from the source will be dispatched to this stream after the specified
      * time.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
+    StreamRoutineBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Adds a delay at the beginning of this stream, so that any data, exception or completion
      * notification coming from the source will be dispatched to this stream after the specified
      * time.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param delay the delay.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> lag(@NotNull UnitDuration delay);
+    StreamRoutineBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
 
     /**
-     * Transforms the stream by modifying the flow building function.
+     * Transforms the stream by modifying the chain building function.
      * <br>
-     * The returned function will be employed when the flow of input data is initiated (see
-     * {@link TransformationType#START}).
+     * The returned function will be employed when the routine instance is built (see
+     * {@link #buildRoutine()}).
      *
      * @param liftFunction the function modifying the flow one.
+     * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> lift(@NotNull Function<? extends Function<? super
-            Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-            Channel<?, IN>, ? extends Channel<?, AFTER>>> liftFunction);
+    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> lift(
+            @NotNull Function<? extends Function<? super
+                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+                    Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
 
     /**
-     * Transforms the stream by modifying the flow building function.
+     * Transforms the stream by modifying the chain building function.
      * <br>
      * The current configuration of the stream will be passed as the first parameter.
      * <br>
-     * The returned function will be employed when the flow of input data is initiated (see
-     * {@link TransformationType#START}).
+     * The returned function will be employed when the routine instance is built (see
+     * {@link #buildRoutine()}).
      *
      * @param liftFunction the bi-function modifying the flow one.
+     * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> liftConfig(
+    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> liftConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, AFTER>>> liftFunction);
+                    Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
 
     /**
-     * Concatenates a stream limiting the maximum number of outputs to the specified count.
+     * Concatenates a routine limiting the maximum number of outputs to the specified count.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count the maximum number of outputs.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> limit(int count);
+    StreamRoutineBuilder<IN, OUT> limit(int count);
 
     /**
-     * Concatenates a stream mapping this stream outputs by applying the specified function.
+     * Concatenates a routine mapping this stream outputs by applying the specified function.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param mappingFunction the function instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
     /**
-     * Concatenates a stream mapping this stream outputs through the specified invocation factory.
+     * Concatenates a routine mapping this stream outputs through the specified invocation factory.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Concatenates a stream mapping this stream outputs through the specified routine.
+     * Concatenates a routine mapping this stream outputs through the specified routine.
      * <p>
      * Note that the stream configuration will be ignored.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
+    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
-     * Concatenates a stream mapping this stream outputs through the specified routine builder.
+     * Concatenates a routine mapping this stream outputs through the specified routine builder.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param builder the routine builder instance.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> map(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
-     * Concatenates a stream mapping the whole collection of outputs by applying the specified
+     * Concatenates a routine mapping the whole collection of outputs by applying the specified
      * function.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param mappingFunction the function instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> mapAll(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
     /**
-     * Concatenates a stream mapping the whole collection of outputs through the specified consumer.
+     * Concatenates a routine mapping the whole collection of outputs through the specified
+     * consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param mappingConsumer the bi-consumer instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamChannel<IN, AFTER> mapAllMore(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
-     * Concatenates a stream mapping this stream outputs through the specified consumer.
+     * Concatenates a routine mapping this stream outputs through the specified consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param mappingConsumer the bi-consumer instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> mapMore(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
      * Concatenates a consumer handling the outputs completion.
      * <br>
      * The stream outputs will be no further propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param completeAction the action to perform.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, Void> onComplete(@NotNull Action completeAction);
+    StreamRoutineBuilder<IN, Void> onComplete(@NotNull Action completeAction);
 
     /**
      * Concatenates a consumer handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
      *
      * @param errorConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
+    StreamRoutineBuilder<IN, OUT> onError(
+            @NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * Concatenates a consumer handling this stream outputs.
      * <br>
      * The stream outputs will be no further propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
+    StreamRoutineBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
-     * Concatenates a stream producing the specified output in case this one produced none.
+     * Concatenates a routine producing the specified output in case this one produced none.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param output the output to return.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElse(@Nullable OUT output);
+    StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT output);
 
     /**
-     * Concatenates a stream producing the specified outputs in case this one produced none.
+     * Concatenates a routine producing the specified outputs in case this one produced none.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElse(@Nullable OUT... outputs);
+    StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
-     * Concatenates a stream producing the specified outputs in case this one produced none.
+     * Concatenates a routine producing the specified outputs in case this one produced none.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+    StreamRoutineBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
-     * Concatenates a stream producing the outputs returned by the specified supplier in case this
+     * Concatenates a routine producing the outputs returned by the specified supplier in case this
      * one produced none.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocations completes. The count number must be positive.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count          the number of generated outputs.
      * @param outputSupplier the supplier instance.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> outputSupplier);
+    StreamRoutineBuilder<IN, OUT> orElseGet(long count,
+            @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a stream producing the outputs returned by the specified supplier in case this
+     * Concatenates a routine producing the outputs returned by the specified supplier in case this
      * one produced none.
      * <br>
-     * The supplier will be called only when the previous routine invocations complete.
+     * The supplier will be called only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputSupplier the supplier instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    StreamRoutineBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a stream producing the outputs returned by the specified consumer in case this
+     * Concatenates a routine producing the outputs returned by the specified consumer in case this
      * one produced none.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
      * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocations completes. The count number must be positive.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count           the number of generated outputs.
      * @param outputsConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGetMore(long count,
+    StreamRoutineBuilder<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
-     * Concatenates a stream producing the outputs returned by the specified consumer in case this
+     * Concatenates a routine producing the outputs returned by the specified consumer in case this
      * one produced none.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
-     * The consumer will be called only when the previous routine invocations complete.
+     * The consumer will be called only when the previous routine invocation completes.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputsConsumer the consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> orElseGetMore(
+    StreamRoutineBuilder<IN, OUT> orElseGetMore(
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
-
-    /**
-     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
-     * <br>
-     * This method is useful to easily make the stream ordered or not.
-     * <p>
-     * Note that an ordered stream has a slightly increased cost in memory and computation.
-     *
-     * @param orderType the order type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> sort(@Nullable OrderType orderType);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
      * mode.
      *
-     * @return the new stream instance.
+     * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> parallel();
+    StreamRoutineBuilder<IN, OUT> parallel();
 
     /**
      * Short for
@@ -1175,34 +816,13 @@ public interface StreamChannel<IN, OUT>
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
      *
      * @param maxInvocations the maximum number of concurrent invocations.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified number is 0 or negative.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> parallel(int maxInvocations);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different channel instance.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available channels.
-     * <p>
-     * Note that the created channels will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param count          the number of groups.
-     * @param streamFunction the function creating the processing stream channels.
-     * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction);
+    StreamRoutineBuilder<IN, OUT> parallel(int maxInvocations);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -1211,18 +831,17 @@ public interface StreamChannel<IN, OUT>
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param count   the number of groups.
      * @param factory the processing invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -1242,7 +861,7 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -1252,40 +871,18 @@ public interface StreamChannel<IN, OUT>
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param count   the number of groups.
      * @param builder the builder of processing routine instances.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallel(int count,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different channel instance.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created channels will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction    the function assigning a key to each output.
-     * @param streamFunction the function creating the processing stream channels.
-     * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
-                    super OUT, ? extends AFTER>> streamFunction);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -1294,17 +891,17 @@ public interface StreamChannel<IN, OUT>
      * Each output will be assigned to a specific group based on the key returned by the specified
      * function.
      * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param keyFunction the function assigning a key to each output.
      * @param factory     the processing invocation factory.
      * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
+            @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -1319,11 +916,12 @@ public interface StreamChannel<IN, OUT>
      * @param keyFunction the function assigning a key to each output.
      * @param routine     the processing routine instance.
      * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
+            @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -1333,50 +931,68 @@ public interface StreamChannel<IN, OUT>
      * Each output will be assigned to a specific group based on the key returned by the specified
      * function.
      * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
+     * Note that the created routine will be initialized with the current configuration.
      *
      * @param keyFunction the function assigning a key to each output.
      * @param builder     the builder of processing routine instances.
      * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamChannel<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
+            @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
-     * Concatenates a stream based on the specified peeking consumer.
+     * Concatenates a routine performing the specified action when the previous routine invocation
+     * completes.
      * <br>
-     * Outputs will be automatically passed on.
+     * Outputs will be automatically passed on, while the invocation will be aborted if an exception
+     * escapes the consumer.
      * <p>
-     * Note that the invocation will be aborted if an exception escapes the consumer.
+     * Note that the created routine will be initialized with the current configuration.
      *
-     * @param peekConsumer the consumer instance.
-     * @return the new stream instance.
+     * @param completeAction the action instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> peekConsumer);
+    StreamRoutineBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
 
     /**
-     * Concatenates a stream performing the specified action when the previous routine invocations
-     * complete.
+     * Concatenates a routine peeking the stream errors as they are passed on.
      * <br>
-     * Outputs will be automatically passed on.
+     * Outputs will be automatically passed on, while the invocation will be aborted if an exception
+     * escapes the consumer.
      * <p>
-     * Note that the invocation will be aborted if an exception escapes the consumer.
+     * Note that the created routine will be initialized with the current configuration.
      *
-     * @param peekAction the action instance.
-     * @return the new stream instance.
+     * @param errorConsumer the consumer instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> peekComplete(@NotNull Action peekAction);
+    StreamRoutineBuilder<IN, OUT> peekError(
+            @NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
-     * Concatenates a stream accumulating data through the specified function.
+     * Concatenates a routine peeking the stream data as they are passed on.
+     * <br>
+     * Outputs will be automatically passed on, while the invocation will be aborted if an exception
+     * escapes the consumer.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param outputConsumer the consumer instance.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamRoutineBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
+
+    /**
+     * Concatenates a routine accumulating data through the specified function.
      * <br>
      * The output will be computed as follows:
      * <pre>
@@ -1390,19 +1006,17 @@ public interface StreamChannel<IN, OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param accumulateFunction the bi-function instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    StreamChannel<IN, OUT> reduce(
+    StreamRoutineBuilder<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
 
     /**
-     * Concatenates a stream accumulating data through the specified function.
+     * Concatenates a routine accumulating data through the specified function.
      * <br>
      * The output will be computed as follows:
      * <pre>
@@ -1416,42 +1030,28 @@ public interface StreamChannel<IN, OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param seedSupplier       the supplier of initial accumulation values.
      * @param accumulateFunction the bi-function instance.
      * @param <AFTER>            the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
-
-    /**
-     * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting multiple binding.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CACHE)
-    StreamChannel<IN, OUT> replay();
 
     /**
      * Returns a new stream retrying the whole flow of data at maximum for the specified number of
      * times.
      *
      * @param count the maximum number of retries.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamChannel<IN, OUT> retry(int count);
+    StreamRoutineBuilder<IN, OUT> retry(int count);
 
     /**
      * Returns a new stream retrying the whole flow of data at maximum for the specified number of
@@ -1461,12 +1061,12 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count   the maximum number of retries.
      * @param backoff the backoff policy.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamChannel<IN, OUT> retry(int count, @NotNull Backoff backoff);
+    StreamRoutineBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     /**
      * Returns a new stream retrying the whole flow of data until the specified function does not
@@ -1481,53 +1081,51 @@ public interface StreamChannel<IN, OUT>
      * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
      *
      * @param backoffFunction the retry function.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamChannel<IN, OUT> retry(
+    StreamRoutineBuilder<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
-
-    /**
-     * Returns a new stream making this one selectable.
-     * <br>
-     * Each output will be passed along unchanged.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
-     *
-     * @param index the stream index.
-     * @return the selectable stream.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamChannel<IN, ? extends Selectable<OUT>> selectable(int index);
 
     /**
      * Makes the stream sequential, that is, the concatenated routines will be invoked in sequential
      * mode.
      *
-     * @return the new stream instance.
+     * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> sequential();
+    StreamRoutineBuilder<IN, OUT> sequential();
 
     /**
-     * Concatenates a stream skipping the specified number of outputs.
+     * Concatenates a routine skipping the specified number of outputs.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count the number of outputs to skip.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> skip(int count);
+    StreamRoutineBuilder<IN, OUT> skip(int count);
+
+    /**
+     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
+     * <br>
+     * This method is useful to easily make the stream ordered or not.
+     * <p>
+     * Note that a sorted channel has a slightly increased cost in memory and computation.
+     *
+     * @param orderType the order type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    StreamRoutineBuilder<IN, OUT> sort(@Nullable OrderType orderType);
 
     /**
      * Short for
@@ -1546,13 +1144,13 @@ public interface StreamChannel<IN, OUT>
      * Note that the runner will be employed with asynchronous and parallel invocation modes, while
      * the synchronous and sequential modes will behave as before.
      *
-     * @return the new stream instance.
+     * @return this builder.
      * @see #async()
      * @see #parallel()
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> straight();
+    StreamRoutineBuilder<IN, OUT> straight();
 
     /**
      * Gets the invocation configuration builder related to the whole stream.
@@ -1567,180 +1165,165 @@ public interface StreamChannel<IN, OUT>
      */
     @NotNull
     @StreamFlow(CONFIG)
-    Builder<? extends StreamChannel<IN, OUT>> streamInvocationConfiguration();
+    Builder<? extends StreamRoutineBuilder<IN, OUT>> streamInvocationConfiguration();
 
     /**
      * Makes the stream synchronous, that is, the concatenated routines will be invoked in
      * synchronous mode.
      *
-     * @return the new stream instance.
+     * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> sync();
+    StreamRoutineBuilder<IN, OUT> sync();
 
     /**
-     * Concatenates a stream generating the specified output.
+     * Concatenates a routine generating the specified output.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param output  the output.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> then(@Nullable AFTER output);
+    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable AFTER output);
 
     /**
-     * Concatenates a stream generating the specified outputs.
+     * Concatenates a routine generating the specified outputs.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> then(@Nullable AFTER... outputs);
+    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable AFTER... outputs);
 
     /**
-     * Concatenates a stream generating the output returned by the specified iterable.
+     * Concatenates a routine generating the output returned by the specified iterable.
      * <br>
-     * The outputs will be generated only when the previous routine invocations complete.
+     * The outputs will be generated only when the previous routine invocation completes.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the iterable returning the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
-     * Concatenates a stream generating the outputs returned by the specified supplier.
+     * Concatenates a routine generating the outputs returned by the specified supplier.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocation completes. The count number must be positive.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count          the number of generated outputs.
      * @param outputSupplier the supplier instance.
      * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGet(long count,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
-     * Concatenates a stream generating the outputs returned by the specified supplier.
+     * Concatenates a routine generating the outputs returned by the specified supplier.
      * <br>
-     * The supplier will be called only when the previous routine invocations complete.
+     * The supplier will be called only when the previous routine invocation completes.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputSupplier the supplier instance.
      * @param <AFTER>        the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> outputSupplier);
+    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGet(
+            @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
-     * Concatenates a stream generating the outputs returned by the specified consumer.
+     * Concatenates a routine generating the outputs returned by the specified consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
      * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
+     * invocation completes. The count number must be positive.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param count           the number of generated outputs.
      * @param outputsConsumer the consumer instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGetMore(long count,
+    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGetMore(long count,
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
-     * Concatenates a stream generating the outputs returned by the specified consumer.
+     * Concatenates a routine generating the outputs returned by the specified consumer.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
      * <br>
-     * The consumer will be called only when the previous routine invocations complete.
+     * The consumer will be called only when the previous routine invocation completes.
      * <br>
      * Previous results will not be propagated.
      * <p>
      * Note that the created routine will be initialized with the current configuration.
-     * <br>
-     * Note also that this stream will be bound as a result of the call.
      *
      * @param outputsConsumer the consumer instance.
      * @param <AFTER>         the concatenation output type.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamChannel<IN, AFTER> thenGetMore(
+    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGetMore(
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
-     * Concatenates a function handling invocation exceptions.
+     * Concatenates a consumer handling invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
      *
      * @param catchFunction the function instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> tryCatch(
+    StreamRoutineBuilder<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
 
     /**
@@ -1750,15 +1333,13 @@ public interface StreamChannel<IN, OUT>
      * or no results may be generated.
      * <br>
      * The errors will not be automatically further propagated.
-     * <p>
-     * Note that this stream will be bound as a result of the call.
      *
      * @param catchConsumer the bi-consumer instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> tryCatchMore(
+    StreamRoutineBuilder<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer);
 
     /**
@@ -1767,11 +1348,11 @@ public interface StreamChannel<IN, OUT>
      * Both outputs and errors will be automatically passed on.
      *
      * @param finallyAction the action instance.
-     * @return the new stream instance.
+     * @return this builder.
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamChannel<IN, OUT> tryFinally(@NotNull Action finallyAction);
+    StreamRoutineBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
 
     /**
      * Interface defining a stream configuration.

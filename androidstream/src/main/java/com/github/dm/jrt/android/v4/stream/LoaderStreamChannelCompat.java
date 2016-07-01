@@ -666,7 +666,7 @@ public interface LoaderStreamChannelCompat<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannelCompat<IN, OUT> order(@Nullable OrderType orderType);
+    LoaderStreamChannelCompat<IN, OUT> sort(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}

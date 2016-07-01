@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+public abstract class ChannelInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
     private Channel<IN, IN> mInputChannel;
 
@@ -40,7 +40,7 @@ public abstract class StreamInvocation<IN, OUT> extends TemplateInvocation<IN, O
     /**
      * Constructor.
      */
-    public StreamInvocation() {
+    public ChannelInvocation() {
         mInputChannel = null;
         mOutputChannel = null;
     }

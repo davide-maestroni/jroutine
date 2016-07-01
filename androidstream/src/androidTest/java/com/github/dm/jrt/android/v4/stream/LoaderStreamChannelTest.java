@@ -511,7 +511,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsOnly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel(1)
                                              .map(new Function<String, String>() {
 
@@ -524,7 +524,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel(1)
                                              .map(new Function<String, String>() {
 
@@ -961,7 +961,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel()
                                              .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
@@ -987,7 +987,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .sequential()
                                              .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
@@ -1017,7 +1017,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel()
                                              .map(new Function<String, String>() {
 
@@ -1041,7 +1041,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(activity))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .sequential()
                                              .map(new Function<String, String>() {
 
@@ -2376,7 +2376,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel()
                                              .map(factory)
                                              .after(seconds(10))
@@ -2388,7 +2388,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .sequential()
                                              .map(factory)
                                              .after(seconds(10))
@@ -2491,7 +2491,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel()
                                              .map(factory)
                                              .after(seconds(10))
@@ -2503,7 +2503,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .sequential()
                                              .map(factory)
                                              .after(seconds(10))
@@ -2568,7 +2568,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .parallel()
                                              .map(new UpperCase())
                                              .after(seconds(10))
@@ -2580,7 +2580,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                              .all()).containsExactly("TEST1", "TEST2");
         assertThat(LoaderStreamChannelsCompat.of("test1", "test2")
                                              .on(loaderFrom(getActivity()))
-                                             .order(OrderType.BY_CALL)
+                                             .sort(OrderType.BY_CALL)
                                              .sequential()
                                              .map(new UpperCase())
                                              .after(seconds(10))

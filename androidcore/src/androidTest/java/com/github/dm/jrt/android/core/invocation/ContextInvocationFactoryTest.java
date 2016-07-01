@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.StreamContextInvocation;
+import com.github.dm.jrt.android.core.ChannelContextInvocation;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -104,7 +104,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                                .syncCall()
                                .close()
                                .getError()).isNull();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(StreamContextTest.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
                                .syncCall()
                                .close()
                                .getError()).isNull();
@@ -196,7 +196,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
-    public static class StreamContextTest extends StreamContextInvocation<Object, Object> {
+    public static class ChannelContextTest extends ChannelContextInvocation<Object, Object> {
 
         @NotNull
         @Override

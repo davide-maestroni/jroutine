@@ -45,7 +45,7 @@ class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
      */
     TryFinallyChannelConsumer(@NotNull final Action finallyAction,
             @NotNull final Channel<OUT, ?> outputChannel) {
-        mFinallyAction = ConstantConditions.notNull("runnable instance", finallyAction);
+        mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 

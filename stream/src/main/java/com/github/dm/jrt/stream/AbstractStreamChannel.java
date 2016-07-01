@@ -694,7 +694,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> order(@Nullable final OrderType orderType) {
+    public StreamChannel<IN, OUT> sort(@Nullable final OrderType orderType) {
         return streamInvocationConfiguration().withOutputOrder(orderType).applied();
     }
 
@@ -771,7 +771,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> peek(@NotNull final Consumer<? super OUT> peekConsumer) {
-        return map(new PeekInvocation<OUT>(wrap(peekConsumer)));
+        return map(new PeekOutputInvocation<OUT>(wrap(peekConsumer)));
     }
 
     @NotNull

@@ -660,8 +660,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> order(@Nullable final OrderType orderType) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.order(orderType);
+    public LoaderStreamChannelCompat<IN, OUT> sort(@Nullable final OrderType orderType) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sort(orderType);
     }
 
     @NotNull

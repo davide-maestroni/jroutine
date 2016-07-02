@@ -404,8 +404,7 @@ public class Functions {
      */
     @NotNull
     public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<Object>(onComplete, Functions.<RoutineException>sink(),
-                Functions.sink());
+        return ChannelConsumerBuilder.onComplete(onComplete);
     }
 
     /**
@@ -418,7 +417,7 @@ public class Functions {
     @NotNull
     public static ChannelConsumerBuilder<Object> onError(
             @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<Object>(Functions.noOp(), onError, Functions.sink());
+        return ChannelConsumerBuilder.onError(onError);
     }
 
     /**
@@ -432,8 +431,41 @@ public class Functions {
     @NotNull
     public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
             @NotNull final Consumer<? super OUT> onOutput) {
-        return new ChannelConsumerBuilder<OUT>(Functions.noOp(), Functions.<RoutineException>sink(),
-                onOutput);
+        return ChannelConsumerBuilder.onOutput(onOutput);
+    }
+
+    /**
+     * Returns a channel consumer builder employing the specified consumer function to handle the
+     * invocation outputs.
+     *
+     * @param onOutput the consumer function.
+     * @param onError  the consumer function.
+     * @param <OUT>    the output data type.
+     * @return the builder instance.
+     */
+    @NotNull
+    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+            @NotNull final Consumer<? super OUT> onOutput,
+            @NotNull final Consumer<? super RoutineException> onError) {
+        return ChannelConsumerBuilder.onOutput(onOutput, onError);
+    }
+
+    /**
+     * Returns a channel consumer builder employing the specified functions to handle the invocation
+     * outputs, errors adn completion.
+     *
+     * @param onOutput   the consumer function.
+     * @param onError    the consumer function.
+     * @param onComplete the action instance.
+     * @param <OUT>      the output data type.
+     * @return the builder instance.
+     */
+    @NotNull
+    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+            @NotNull final Consumer<? super OUT> onOutput,
+            @NotNull final Consumer<? super RoutineException> onError,
+            @NotNull final Action onComplete) {
+        return ChannelConsumerBuilder.onOutput(onOutput, onError, onComplete);
     }
 
     /**

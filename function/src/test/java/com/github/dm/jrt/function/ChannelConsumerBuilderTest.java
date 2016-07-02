@@ -41,8 +41,8 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            new ChannelConsumerBuilder<Object>(Functions.noOp(), Functions.<RoutineException>sink(),
-                    null);
+            ChannelConsumerBuilder.onOutput(null, Functions.<RoutineException>sink(),
+                    Functions.noOp());
 
             fail();
 
@@ -52,7 +52,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            new ChannelConsumerBuilder<Object>(Functions.noOp(), null, sink());
+            ChannelConsumerBuilder.onOutput(sink(), null, Functions.noOp());
 
             fail();
 
@@ -62,7 +62,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            new ChannelConsumerBuilder<Object>(null, Functions.<RoutineException>sink(), sink());
+            ChannelConsumerBuilder.onOutput(sink(), Functions.<RoutineException>sink(), null);
 
             fail();
 
@@ -322,6 +322,39 @@ public class ChannelConsumerBuilderTest {
         assertThat(completeAction.isCalled()).isTrue();
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isTrue();
+        consumer1.reset();
+        errorConsumer.reset();
+        completeAction.reset();
+        channelConsumer = onOutput(consumer1, errorConsumer);
+        channelConsumer.onOutput("test");
+        assertThat(consumer1.isCalled()).isTrue();
+        assertThat(errorConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isFalse();
+        consumer1.reset();
+        channelConsumer.onError(new RoutineException());
+        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(errorConsumer.isCalled()).isTrue();
+        assertThat(completeAction.isCalled()).isFalse();
+        errorConsumer.reset();
+        channelConsumer.onComplete();
+        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(errorConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isFalse();
+        channelConsumer = onOutput(consumer1, errorConsumer, completeAction);
+        channelConsumer.onOutput("test");
+        assertThat(consumer1.isCalled()).isTrue();
+        assertThat(errorConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isFalse();
+        consumer1.reset();
+        channelConsumer.onError(new RoutineException());
+        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(errorConsumer.isCalled()).isTrue();
+        assertThat(completeAction.isCalled()).isFalse();
+        errorConsumer.reset();
+        channelConsumer.onComplete();
+        assertThat(consumer1.isCalled()).isFalse();
+        assertThat(errorConsumer.isCalled()).isFalse();
+        assertThat(completeAction.isCalled()).isTrue();
     }
 
     @Test

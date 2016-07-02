@@ -298,6 +298,14 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
             @Nullable UnitDuration delay);
 
     /**
+     * Builds a new invocation factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    InvocationFactory<IN, OUT> buildFactory();
+
+    /**
      * Concatenates a routine accumulating data through the specified consumer.
      * <br>
      * The output will be computed as follows:

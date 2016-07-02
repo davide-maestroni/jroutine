@@ -44,6 +44,7 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.StreamRoutineBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType;
 
@@ -65,7 +66,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.stream.StreamChannels.range;
+import static com.github.dm.jrt.stream.StreamInputs.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -955,9 +956,10 @@ public class StreamRoutineBuilderTest {
                                                                  final RoutineException e,
                                                                  final Channel<String, ?> channel) {
                                                              if (++count[0] < 3) {
-                                                                 StreamChannels.of(o)
+                                                                 JRoutineStream.withStream()
                                                                                .map(routine)
                                                                                .tryCatchMore(this)
+                                                                               .asyncCall(o)
                                                                                .bind(channel);
 
                                                              } else {
@@ -1302,8 +1304,11 @@ public class StreamRoutineBuilderTest {
     @Test
     public void testMapFactory() {
         final InvocationFactory<String, String> factory = factoryOf(UpperCase.class);
-        assertThat(StreamChannels.of("test1", "test2").async().map(factory).after(seconds(3)).all())
-                .containsExactly("TEST1", "TEST2");
+        assertThat(JRoutineStream.<String>withStream().async()
+                                                      .map(factory)
+                                                      .asyncCall("test1", "test2")
+                                                      .after(seconds(3))
+                                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted(OrderType.BY_CALL)
                                                       .parallel()
                                                       .map(factory)
@@ -1907,7 +1912,7 @@ public class StreamRoutineBuilderTest {
     public void testPeekError() {
         final AtomicBoolean isError = new AtomicBoolean(false);
         final Channel<String, String> channel = //
-                JRoutineStream.<String>withStream().async()
+                JRoutineStream.<String>withStream().sync()
                                                    .peekError(new Consumer<RoutineException>() {
 
                                                        public void accept(
@@ -2201,7 +2206,7 @@ public class StreamRoutineBuilderTest {
                                          return Math.sqrt(number.doubleValue());
                                      }
                                  })
-                                 .map(StreamChannels.averageDouble())
+                                 .map(Operators.averageDouble())
                                  .syncCall()
                                  .close()
                                  .next()).isCloseTo(21, Offset.offset(0.1));

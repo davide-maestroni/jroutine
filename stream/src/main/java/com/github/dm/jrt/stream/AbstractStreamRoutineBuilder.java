@@ -80,7 +80,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 }
             };
 
-    private static final StraightRunner sSequentialRunner = new StraightRunner();
+    private static final StraightRunner sStraightRunner = new StraightRunner();
 
     private FunctionWrapper<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;
 
@@ -212,6 +212,11 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                                         .withInputLimit(limit)
                                         .withInputBackoff(delay)
                                         .applied();
+    }
+
+    @NotNull
+    public InvocationFactory<IN, OUT> buildFactory() {
+        return new StreamInvocationFactory<IN, OUT>(getBindingFunction());
     }
 
     @NotNull
@@ -612,7 +617,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     @NotNull
     public StreamRoutineBuilder<IN, OUT> straight() {
-        return async().streamInvocationConfiguration().withRunner(sSequentialRunner).applied();
+        return async().streamInvocationConfiguration().withRunner(sStraightRunner).applied();
     }
 
     @NotNull
@@ -716,8 +721,8 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @SuppressWarnings("unchecked")
     public Routine<IN, OUT> buildRoutine() {
         final Routine<? super IN, ? extends OUT> routine =
-                ConstantConditions.notNull("routine instance", newRoutine(mStreamConfiguration,
-                        new StreamInvocationFactory<IN, OUT>(getBindingFunction())));
+                ConstantConditions.notNull("routine instance",
+                        newRoutine(mStreamConfiguration, buildFactory()));
         resetConfiguration();
         return (Routine<IN, OUT>) routine;
     }

@@ -778,6 +778,8 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
+    // TODO: 02/07/16 orElseThrow
+
     /**
      * Concatenates a routine producing the outputs returned by the specified consumer in case this
      * one produced none.
@@ -1125,7 +1127,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> sort(@Nullable OrderType orderType);
+    StreamRoutineBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
 
     /**
      * Short for

@@ -600,7 +600,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     }
 
     @NotNull
-    public StreamRoutineBuilder<IN, OUT> sort(@Nullable final OrderType orderType) {
+    public StreamRoutineBuilder<IN, OUT> sorted(@Nullable final OrderType orderType) {
         return streamInvocationConfiguration().withOutputOrder(orderType).applied();
     }
 
@@ -820,18 +820,18 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     // TODO: 01/07/16 javadoc
     private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final StreamInvocation<IN, OUT> mInvocation;
+        private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
         private StreamInvocationFactory(
                 @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
             super(asArgs(bindingFunction));
-            mInvocation = new StreamInvocation<IN, OUT>(bindingFunction);
+            mBindingFunction = bindingFunction;
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() throws Exception {
-            return mInvocation;
+            return new StreamInvocation<IN, OUT>(mBindingFunction);
         }
     }
 }

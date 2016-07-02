@@ -443,6 +443,7 @@ public class JRoutine extends StreamChannels {
      */
     @NotNull
     public static <IN> StreamRoutineBuilder<IN, IN> withStream() {
+        // TODO: 02/07/16 unit test
         return JRoutineStream.withStream();
     }
 }

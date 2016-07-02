@@ -37,7 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-    private final PeekErrorInvocation<DATA> mInvocation;
+    private final ConsumerWrapper<? super RoutineException> mErrorConsumer;
 
     /**
      * Constructor.
@@ -47,13 +47,13 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     PeekErrorInvocationFactory(
             @NotNull final ConsumerWrapper<? super RoutineException> errorConsumer) {
         super(asArgs(ConstantConditions.notNull("consumer instance", errorConsumer)));
-        mInvocation = new PeekErrorInvocation<DATA>(errorConsumer);
+        mErrorConsumer = errorConsumer;
     }
 
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() throws Exception {
-        return mInvocation;
+        return new PeekErrorInvocation<DATA>(mErrorConsumer);
     }
 
     // TODO: 01/07/16 javadoc

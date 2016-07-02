@@ -56,11 +56,20 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         return new PeekErrorInvocation<DATA>(mErrorConsumer);
     }
 
-    // TODO: 01/07/16 javadoc
+    /**
+     * Invocation peeking errors as they are passed along.
+     *
+     * @param <DATA> the data type.
+     */
     private static class PeekErrorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
         private final ConsumerWrapper<? super RoutineException> mErrorConsumer;
 
+        /**
+         * Constructor.
+         *
+         * @param errorConsumer the consumer instance.
+         */
         private PeekErrorInvocation(
                 @NotNull final ConsumerWrapper<? super RoutineException> errorConsumer) {
             mErrorConsumer = errorConsumer;

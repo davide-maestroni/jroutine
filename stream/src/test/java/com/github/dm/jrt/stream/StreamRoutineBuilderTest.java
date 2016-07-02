@@ -1861,6 +1861,22 @@ public class StreamRoutineBuilderTest {
     }
 
     @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testOrElseThrow() {
+        assertThat(JRoutineStream.<String>withStream().orElseThrow(new IllegalStateException())
+                                                      .asyncCall("test")
+                                                      .after(seconds(3))
+                                                      .all()).containsExactly("test");
+        assertThat(JRoutineStream.<String>withStream().orElseThrow(new IllegalStateException())
+                                                      .asyncCall()
+                                                      .close()
+                                                      .after(seconds(3))
+                                                      .getError()
+                                                      .getCause()).isExactlyInstanceOf(
+                IllegalStateException.class);
+    }
+
+    @Test
     public void testPeekComplete() {
         final AtomicBoolean isComplete = new AtomicBoolean(false);
         assertThat(JRoutineStream.<String>withStream().async().peekComplete(new Action() {

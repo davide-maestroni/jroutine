@@ -681,7 +681,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
-     * Concatenates a routine producing the specified output in case this one produced none.
+     * Concatenates a routine producing the specified output in case the stream produced none.
      * <br>
      * The outputs will be generated only when the previous routine invocation completes.
      * <p>
@@ -695,7 +695,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT output);
 
     /**
-     * Concatenates a routine producing the specified outputs in case this one produced none.
+     * Concatenates a routine producing the specified outputs in case the stream produced none.
      * <br>
      * The outputs will be generated only when the previous routine invocation completes.
      * <p>
@@ -709,7 +709,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
-     * Concatenates a routine producing the specified outputs in case this one produced none.
+     * Concatenates a routine producing the specified outputs in case the stream produced none.
      * <br>
      * The outputs will be generated only when the previous routine invocation completes.
      * <p>
@@ -723,8 +723,8 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
-     * Concatenates a routine producing the outputs returned by the specified supplier in case this
-     * one produced none.
+     * Concatenates a routine producing the outputs returned by the specified supplier in case the
+     * stream produced none.
      * <br>
      * The supplier will be called {@code count} number of times only when the previous routine
      * invocations completes. The count number must be positive.
@@ -742,8 +742,8 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
             @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a routine producing the outputs returned by the specified supplier in case this
-     * one produced none.
+     * Concatenates a routine producing the outputs returned by the specified supplier in case the
+     * stream produced none.
      * <br>
      * The supplier will be called only when the previous routine invocation completes.
      * <p>
@@ -757,8 +757,8 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
-     * Concatenates a routine producing the outputs returned by the specified consumer in case this
-     * one produced none.
+     * Concatenates a routine producing the outputs returned by the specified consumer in case the
+     * stream produced none.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
@@ -778,11 +778,9 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamRoutineBuilder<IN, OUT> orElseGetMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
-    // TODO: 02/07/16 orElseThrow
-
     /**
-     * Concatenates a routine producing the outputs returned by the specified consumer in case this
-     * one produced none.
+     * Concatenates a routine producing the outputs returned by the specified consumer in case the
+     * stream produced none.
      * <br>
      * The result channel of the backing routine will be passed to the consumer, so that multiple
      * or no results may be generated.
@@ -798,6 +796,19 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     @StreamFlow(MAP)
     StreamRoutineBuilder<IN, OUT> orElseGetMore(
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
+
+    /**
+     * Concatenates a routine aborting the execution with the specified error in case the stream
+     * produced no output.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param error the error.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    StreamRoutineBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel

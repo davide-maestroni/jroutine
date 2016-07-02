@@ -68,6 +68,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
 /**
  * Created by davide-maestroni on 07/01/2016.
  */
+// TODO: 01/07/16 javadoc
 public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
         implements StreamRoutineBuilder<IN, OUT> {
 
@@ -477,6 +478,11 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     }
 
     @NotNull
+    public StreamRoutineBuilder<IN, OUT> orElseThrow(@Nullable final Throwable error) {
+        return map(new OrElseThrowInvocationFactory<OUT>(error));
+    }
+
+    @NotNull
     public StreamRoutineBuilder<IN, OUT> parallel() {
         return invocationMode(InvocationMode.PARALLEL);
     }
@@ -799,11 +805,21 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 streamConfiguration.getInvocationMode());
     }
 
-    // TODO: 01/07/16 javadoc
+    /**
+     * Invocations building a stream of routines by applying a binding function.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     private static class StreamInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
         private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
+        /**
+         * Constructor.
+         *
+         * @param bindingFunction the binding function.
+         */
         private StreamInvocation(
                 @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
             mBindingFunction = bindingFunction;
@@ -817,11 +833,21 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
         }
     }
 
-    // TODO: 01/07/16 javadoc
+    /**
+     * Factory of stream invocations.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
+        /**
+         * Constructor.
+         *
+         * @param bindingFunction the binding function.
+         */
         private StreamInvocationFactory(
                 @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
             super(asArgs(bindingFunction));

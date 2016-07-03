@@ -110,7 +110,7 @@ public class StreamRoutineBuilderTest {
     public void testAnnotation() {
         // Just for coverage...
         assertThat(TransformationType.values()).containsOnly(TransformationType.START,
-                // TODO: 01/07/16 remove START
+                // TODO: 01/07/16 remove START and CACHE
                 TransformationType.MAP, TransformationType.REDUCE, TransformationType.CACHE,
                 TransformationType.COLLECT, TransformationType.CONFIG);
     }

@@ -102,7 +102,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         };
     }
 
-    private static void testAppend(final FragmentActivity activity) {
+    private static void testAppend(@NotNull final FragmentActivity activity) {
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .append("test2")
@@ -129,7 +129,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsExactly("test1", "test2", "test3");
     }
 
-    private static void testAppend2(final FragmentActivity activity) {
+    private static void testAppend2(@NotNull final FragmentActivity activity) {
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sync()

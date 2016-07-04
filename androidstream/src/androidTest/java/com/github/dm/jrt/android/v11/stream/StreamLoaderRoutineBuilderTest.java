@@ -102,7 +102,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         };
     }
 
-    private static void testAppend(final Activity activity) {
+    private static void testAppend(@NotNull final Activity activity) {
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(activity))
                                        .append("test2")
@@ -129,7 +129,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                        .all()).containsExactly("test1", "test2", "test3");
     }
 
-    private static void testAppend2(final Activity activity) {
+    private static void testAppend2(@NotNull final Activity activity) {
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(activity))
                                        .sync()
@@ -979,7 +979,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-    private static void testOnComplete(final Activity activity) {
+    private static void testOnComplete(@NotNull final Activity activity) {
         final AtomicBoolean isComplete = new AtomicBoolean(false);
         assertThat(
                 JRoutineStreamLoader.withStream().on(loaderFrom(activity)).onComplete(new Action() {
@@ -1006,7 +1006,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(isComplete.get()).isFalse();
     }
 
-    private static void testOrElse(final Activity activity) {
+    private static void testOrElse(@NotNull final Activity activity) {
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(activity))
                                        .orElse("est")
@@ -1108,7 +1108,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                 }).asyncCall().close().after(seconds(10)).all()).containsExactly("est", "est");
     }
 
-    private static void testPeekComplete(final Activity activity) {
+    private static void testPeekComplete(@NotNull final Activity activity) {
         final AtomicBoolean isComplete = new AtomicBoolean(false);
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity)).peekComplete(new Action() {
@@ -1140,7 +1140,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(isComplete.get()).isFalse();
     }
 
-    private static void testPeekError(final Activity activity) {
+    private static void testPeekError(@NotNull final Activity activity) {
         final AtomicBoolean isError = new AtomicBoolean(false);
         final Channel<String, String> channel = JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))

@@ -77,7 +77,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
-    private static void testCallFunction(final Activity activity) {
+    private static void testCallFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine =
                 JRoutineAndroid.on(activity).withCall(new Function<List<String>, String>() {
 
@@ -93,7 +93,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }
 
-    private static void testConsumerCommand(final Activity activity) {
+    private static void testConsumerCommand(@NotNull final Activity activity) {
         final Routine<Void, String> routine =
                 JRoutineAndroid.on(activity).withCommandMore(new Consumer<Channel<String, ?>>() {
 
@@ -104,7 +104,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall().close().after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerFunction(final Activity activity) {
+    private static void testConsumerFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine = //
                 JRoutineAndroid.on(activity)
                                .withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
@@ -123,7 +123,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }
 
-    private static void testConsumerMapping(final Activity activity) {
+    private static void testConsumerMapping(@NotNull final Activity activity) {
         final Routine<Object, String> routine = //
                 JRoutineAndroid.on(activity)
                                .withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
@@ -137,7 +137,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("test", 1).after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testFunctionMapping(final Activity activity) {
+    private static void testFunctionMapping(@NotNull final Activity activity) {
 
         final Routine<Object, String> routine =
                 JRoutineAndroid.on(activity).withMapping(new Function<Object, String>() {
@@ -150,7 +150,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("test", 1).after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testPredicateFilter(final Activity activity) {
+    private static void testPredicateFilter(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
                 JRoutineAndroid.on(activity).withFilter(new Predicate<String>() {
@@ -163,7 +163,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test");
     }
 
-    private static void testSupplierCommand(final Activity activity) {
+    private static void testStream(@NotNull final Activity activity) {
+        assertThat(JRoutineAndroid.withStream()
+                                  .on(loaderFrom(activity))
+                                  .thenGetMore(range(1, 1000))
+                                  .map(new Function<Number, Double>() {
+
+                                      public Double apply(final Number number) {
+                                          final double value = number.doubleValue();
+                                          return Math.sqrt(value);
+                                      }
+                                  })
+                                  .sync()
+                                  .map(Operators.<Double>averageDouble())
+                                  .asyncCall()
+                                  .close()
+                                  .after(seconds(10))
+                                  .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    private static void testSupplierCommand(@NotNull final Activity activity) {
 
         final Routine<Void, String> routine =
                 JRoutineAndroid.on(activity).withCommand(new Supplier<String>() {
@@ -176,7 +195,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall().close().after(seconds(10)).all()).containsOnly("test");
     }
 
-    private static void testSupplierContextFactory(final Activity activity) {
+    private static void testSupplierContextFactory(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
                 JRoutineAndroid.on(activity).withContextFactory(new Supplier<PassString>() {
@@ -189,7 +208,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(routine.asyncCall("TEST").after(seconds(10)).all()).containsOnly("TEST");
     }
 
-    private static void testSupplierFactory(final Activity activity) {
+    private static void testSupplierFactory(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
                 JRoutineAndroid.on(activity).withFactory(new Supplier<PassString>() {
@@ -732,22 +751,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             return;
         }
 
-        assertThat(JRoutineAndroid.withStream()
-                                  .on(loaderFrom(getActivity()))
-                                  .thenGetMore(range(1, 1000))
-                                  .map(new Function<Number, Double>() {
-
-                                      public Double apply(final Number number) {
-                                          final double value = number.doubleValue();
-                                          return Math.sqrt(value);
-                                      }
-                                  })
-                                  .sync()
-                                  .map(Operators.<Double>averageDouble())
-                                  .asyncCall()
-                                  .close()
-                                  .after(seconds(10))
-                                  .next()).isCloseTo(21, Offset.offset(0.1));
+        testStream(getActivity());
     }
 
     public void testSupplierCommand() {

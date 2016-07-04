@@ -59,10 +59,14 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
+ * Default implementation of a stream loader routine builder.
+ * <p>
  * Created by davide-maestroni on 07/04/2016.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
-        extends AbstractStreamRoutineBuilder<IN, OUT>
+class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRoutineBuilder<IN, OUT>
         implements StreamLoaderRoutineBuilderCompat<IN, OUT> {
 
     private LoaderStreamConfigurationCompat mStreamConfiguration;
@@ -74,7 +78,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
                 @NotNull
                 public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
-                    final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+                    final LoaderStreamConfigurationCompat streamConfiguration =
+                            mStreamConfiguration;
                     return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(streamConfiguration.getStreamConfiguration(),
                                     configuration, streamConfiguration.getInvocationMode()));
@@ -114,7 +119,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
                 @NotNull
                 public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
-                    final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+                    final LoaderStreamConfigurationCompat streamConfiguration =
+                            mStreamConfiguration;
                     return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(configuration,
                                     streamConfiguration.getCurrentConfiguration(),
@@ -126,7 +132,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
      * Constructor.
      */
     DefaultStreamLoaderRoutineBuilderCompat() {
-        this(new DefaultLoaderStreamConfigurationCompat(null, LoaderConfiguration.defaultConfiguration(),
+        this(new DefaultLoaderStreamConfigurationCompat(null,
+                LoaderConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC));
@@ -760,7 +767,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
             @NotNull final InvocationConfiguration currentConfiguration,
             @NotNull final InvocationMode invocationMode) {
         final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
+        return new DefaultLoaderStreamConfigurationCompat(
+                loaderStreamConfiguration.getLoaderContext(),
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 loaderStreamConfiguration.getCurrentLoaderConfiguration(), streamConfiguration,
                 currentConfiguration, invocationMode);
@@ -802,7 +810,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode) {
         final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
+        return new DefaultLoaderStreamConfigurationCompat(
+                loaderStreamConfiguration.getLoaderContext(),
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), streamConfiguration,
                 InvocationConfiguration.defaultConfiguration(), invocationMode);
@@ -913,7 +922,12 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
                 mStreamConfiguration.getStreamLoaderConfiguration());
     }
 
-    // TODO: 04/07/16 javadoc
+    /**
+     * Applies the specified stream configuration.
+     *
+     * @param configuration the stream configuration.
+     * @return this builder.
+     */
     @NotNull
     protected StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
             @NotNull final LoaderStreamConfigurationCompat configuration) {
@@ -939,8 +953,8 @@ public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
             @NotNull final LoaderConfiguration streamConfiguration,
             @NotNull final LoaderConfiguration configuration) {
         final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
-                streamConfiguration, configuration,
+        return new DefaultLoaderStreamConfigurationCompat(
+                loaderStreamConfiguration.getLoaderContext(), streamConfiguration, configuration,
                 loaderStreamConfiguration.getStreamConfiguration(),
                 loaderStreamConfiguration.getCurrentConfiguration(),
                 loaderStreamConfiguration.getInvocationMode());

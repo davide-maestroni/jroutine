@@ -46,7 +46,9 @@ import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
+import com.github.dm.jrt.operator.Operators;
 
+import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -59,6 +61,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.stream.StreamInputs.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -648,6 +651,25 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testStream() {
+        assertThat(JRoutineAndroidCompat.withStream()
+                                        .on(loaderFrom(getActivity()))
+                                        .thenGetMore(range(1, 1000))
+                                        .map(new Function<Number, Double>() {
+
+                                            public Double apply(final Number number) {
+                                                final double value = number.doubleValue();
+                                                return Math.sqrt(value);
+                                            }
+                                        })
+                                        .sync()
+                                        .map(Operators.<Double>averageDouble())
+                                        .asyncCall()
+                                        .close()
+                                        .after(seconds(10))
+                                        .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     public void testSupplierCommand() {

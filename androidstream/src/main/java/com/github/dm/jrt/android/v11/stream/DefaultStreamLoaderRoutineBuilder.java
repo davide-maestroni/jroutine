@@ -59,10 +59,14 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
+ * Default implementation of a stream loader routine builder.
+ * <p>
  * Created by davide-maestroni on 07/03/2016.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
-        extends AbstractStreamRoutineBuilder<IN, OUT>
+class DefaultStreamLoaderRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBuilder<IN, OUT>
         implements StreamLoaderRoutineBuilder<IN, OUT> {
 
     private LoaderStreamConfiguration mStreamConfiguration;
@@ -904,7 +908,12 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
                 mStreamLoaderConfigurable, mStreamConfiguration.getStreamLoaderConfiguration());
     }
 
-    // TODO: 04/07/16 javadoc
+    /**
+     * Applies the specified stream configuration.
+     *
+     * @param configuration the stream configuration.
+     * @return this builder.
+     */
     @NotNull
     protected StreamLoaderRoutineBuilder<IN, OUT> apply(
             @NotNull final LoaderStreamConfiguration configuration) {

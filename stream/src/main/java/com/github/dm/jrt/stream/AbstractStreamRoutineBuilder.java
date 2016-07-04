@@ -66,9 +66,16 @@ import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
+ * Abstract implementation of a stream routine builder.
+ * <p>
+ * This class provides a default implementation of all the stream builder features. The inheriting
+ * class just needs to create routine and configuration instances when required.
+ * <p>
  * Created by davide-maestroni on 07/01/2016.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-// TODO: 01/07/16 javadoc
 public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
         implements StreamRoutineBuilder<IN, OUT> {
 
@@ -731,7 +738,12 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 mStreamConfiguration.getCurrentConfiguration());
     }
 
-    // TODO: 04/07/16 javadoc
+    /**
+     * Applies the specified stream configuration.
+     *
+     * @param configuration the stream configuration.
+     * @return this builder.
+     */
     @NotNull
     protected StreamRoutineBuilder<IN, OUT> apply(
             @NotNull final StreamConfiguration configuration) {

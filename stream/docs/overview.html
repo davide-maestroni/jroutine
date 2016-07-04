@@ -39,14 +39,15 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final Double rms = StreamChannels.of(args)
+                final Double rms = JRoutineStream.&lt;String&gt;withStream()
                                                  .parallel()
                                                  .map(Integer::parseInt)
-                                                 .map(integer -&gt; integer * integer)
+                                                 .map(i -&gt; i * i)
                                                  .straight()
                                                  .map(averageFloat())
                                                  .map(Math::sqrt)
-                                                 .afterMax(seconds(1))
+                                                 .asyncCall(args)
+                                                 .after(seconds(1))
                                                  .next();
                 System.out.println(rms);
                 System.exit(0);

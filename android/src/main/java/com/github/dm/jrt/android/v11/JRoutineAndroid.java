@@ -26,7 +26,9 @@ import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.stream.JRoutineStreamLoader;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamChannels;
+import com.github.dm.jrt.android.v11.stream.StreamLoaderRoutineBuilder;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -164,5 +166,16 @@ public class JRoutineAndroid extends LoaderStreamChannels {
     @NotNull
     public static ServiceBuilder on(@NotNull final ServiceContext context) {
         return new ServiceBuilder(context) {};
+    }
+
+    /**
+     * Returns a stream routine builder.
+     *
+     * @param <IN> the input data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN> StreamLoaderRoutineBuilder<IN, IN> withStream() {
+        return JRoutineStreamLoader.withStream();
     }
 }

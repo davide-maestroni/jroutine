@@ -74,13 +74,13 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                LoaderStreamChannels.of(IMAGE_URI)
+                JRoutineStreamLoader.withStream()
                                     .on(loaderFrom(this))
                                     .factoryId(11)
                                     .map(loadUri())
                                     .onError(showToast(this))
                                     .onOutput(showImage(imageView))
-                                    .flow();
+                                    .asyncCall(IMAGE_URI);
             }
         }
     </code>

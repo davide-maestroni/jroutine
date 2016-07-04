@@ -54,7 +54,24 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.REDUCE;
 
 /**
+ * Interface defining a builder of routines concatenating map and reduce functions.
+ * <br>
+ * Each function in the stream will be backed by a routine instance, which may have its own
+ * specific configuration and invocation mode.
+ * <br>
+ * In order to prevent undesired leaks, the class of the specified functions must have a static
+ * scope.
+ * <p>
+ * To better document the effect of each method on the underlying stream, a {@link StreamFlow}
+ * annotation indicates for each one the type of transformation applied.
+ * <br>
+ * Note also that, if at least one reduce function is part of the chain, the results will be
+ * propagated only when the built routine invocation completes.
+ * <p>
  * Created by davide-maestroni on 07/03/2016.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilder<IN, OUT> {
 
@@ -750,7 +767,11 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @StreamFlow(MAP)
     StreamLoaderRoutineBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
 
-    // TODO: 03/07/16 javadoc
+    /**
+     * Builds a new context invocation factory instance.
+     *
+     * @return the factory instance.
+     */
     @NotNull
     ContextInvocationFactory<IN, OUT> buildContextFactory();
 
@@ -777,7 +798,15 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @StreamFlow(CONFIG)
     StreamLoaderRoutineBuilder<IN, OUT> factoryId(int factoryId);
 
-    // TODO: 03/07/16 javadoc
+    /**
+     * Gets the loader configuration builder related to the instance.
+     * <br>
+     * The configuration options not supported by the specific implementation might be ignored.
+     * <p>
+     * Note that the configuration builder must be initialized with the current configuration.
+     *
+     * @return the loader configuration builder.
+     */
     @NotNull
     @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>

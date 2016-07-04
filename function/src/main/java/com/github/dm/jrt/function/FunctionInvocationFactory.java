@@ -47,7 +47,7 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param function the function instance.
      */
     FunctionInvocationFactory(
-            @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
+            @NotNull final FunctionDecorator<? super List<IN>, ? extends OUT> function) {
         super(asArgs(ConstantConditions.notNull("function wrapper", function)));
         mInvocation = new FunctionInvocation<IN, OUT>(function);
     }
@@ -66,7 +66,7 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     private static class FunctionInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
-        private final FunctionWrapper<? super List<IN>, ? extends OUT> mFunction;
+        private final FunctionDecorator<? super List<IN>, ? extends OUT> mFunction;
 
         /**
          * Constructor.
@@ -74,7 +74,7 @@ class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
          * @param function the function instance.
          */
         private FunctionInvocation(
-                @NotNull FunctionWrapper<? super List<IN>, ? extends OUT> function) {
+                @NotNull FunctionDecorator<? super List<IN>, ? extends OUT> function) {
             mFunction = function;
         }
 

@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,14 +41,14 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>> {
 
-    private final FunctionWrapper<? super IN, KEY> mFunction;
+    private final FunctionDecorator<? super IN, KEY> mFunction;
 
     /**
      * Constructor.
      *
      * @param function the function extracting the key.
      */
-    ToMapInvocationFactory(@NotNull final FunctionWrapper<? super IN, KEY> function) {
+    ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> function) {
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }
@@ -67,7 +67,7 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
      */
     private static class ToMapInvocation<IN, KEY> extends TemplateInvocation<IN, Map<KEY, IN>> {
 
-        private final FunctionWrapper<? super IN, KEY> mFunction;
+        private final FunctionDecorator<? super IN, KEY> mFunction;
 
         private HashMap<KEY, IN> mMap;
 
@@ -76,7 +76,7 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
          *
          * @param function the function extracting the key.
          */
-        private ToMapInvocation(@NotNull final FunctionWrapper<? super IN, KEY> function) {
+        private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> function) {
             mFunction = function;
         }
 

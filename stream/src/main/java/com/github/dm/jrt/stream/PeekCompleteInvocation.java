@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ActionWrapper;
+import com.github.dm.jrt.function.ActionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,14 +33,14 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
-    private final ActionWrapper mCompleteAction;
+    private final ActionDecorator mCompleteAction;
 
     /**
      * Constructor.
      *
      * @param completeAction the action instance.
      */
-    PeekCompleteInvocation(final ActionWrapper completeAction) {
+    PeekCompleteInvocation(final ActionDecorator completeAction) {
         super(asArgs(ConstantConditions.notNull("action instance", completeAction)));
         mCompleteAction = completeAction;
     }

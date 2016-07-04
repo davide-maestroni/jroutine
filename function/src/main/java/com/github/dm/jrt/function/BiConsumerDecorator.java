@@ -29,18 +29,18 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a bi-consumer instance.
+ * Class decorating a bi-consumer instance.
  * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
-        implements BiConsumer<IN1, IN2>, Wrapper {
+public class BiConsumerDecorator<IN1, IN2> extends DeepEqualObject
+        implements BiConsumer<IN1, IN2>, Decorator {
 
-    private static final BiConsumerWrapper<Object, Object> sBiSink =
-            new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
+    private static final BiConsumerDecorator<Object, Object> sBiSink =
+            new BiConsumerDecorator<Object, Object>(new BiConsumer<Object, Object>() {
 
                 public void accept(final Object in1, final Object in2) {}
             });
@@ -52,7 +52,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      *
      * @param consumer the wrapped consumer.
      */
-    private BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
+    private BiConsumerDecorator(@NotNull final BiConsumer<?, ?> consumer) {
         this(Collections.<BiConsumer<?, ?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
     }
@@ -62,28 +62,28 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      *
      * @param consumers the list of wrapped consumers.
      */
-    private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
+    private BiConsumerDecorator(@NotNull final List<BiConsumer<?, ?>> consumers) {
         super(asArgs(consumers));
         mConsumers = consumers;
     }
 
     /**
-     * Returns a bi-consumer wrapper just discarding the passed inputs.
+     * Returns a bi-consumer decorator just discarding the passed inputs.
      * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the bi-consumer wrapper.
+     * @return the bi-consumer decorator.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
-        return (BiConsumerWrapper<IN1, IN2>) sBiSink;
+    public static <IN1, IN2> BiConsumerDecorator<IN1, IN2> biSink() {
+        return (BiConsumerDecorator<IN1, IN2>) sBiSink;
     }
 
     /**
-     * Wraps the specified bi-consumer instance so to provide additional features.
+     * Decorates the specified bi-consumer instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -96,41 +96,41 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      * @param consumer the bi-consumer instance.
      * @param <IN1>    the first input data type.
      * @param <IN2>    the second input data type.
-     * @return the wrapped bi-consumer.
+     * @return the decorated bi-consumer.
      */
     @NotNull
-    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
+    public static <IN1, IN2> BiConsumerDecorator<IN1, IN2> decorate(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
-        if (consumer instanceof BiConsumerWrapper) {
-            return (BiConsumerWrapper<IN1, IN2>) consumer;
+        if (consumer instanceof BiConsumerDecorator) {
+            return (BiConsumerDecorator<IN1, IN2>) consumer;
         }
 
-        return new BiConsumerWrapper<IN1, IN2>(consumer);
+        return new BiConsumerDecorator<IN1, IN2>(consumer);
     }
 
     /**
-     * Returns a composed bi-consumer wrapper that performs, in sequence, this operation followed
+     * Returns a composed bi-consumer decorator that performs, in sequence, this operation followed
      * by the after operation.
      *
      * @param after the operation to perform after this operation.
      * @return the composed bi-consumer.
      */
     @NotNull
-    public BiConsumerWrapper<IN1, IN2> andThen(
+    public BiConsumerDecorator<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
         ConstantConditions.notNull("consumer instance", after);
         final List<BiConsumer<?, ?>> consumers = mConsumers;
         final ArrayList<BiConsumer<?, ?>> newConsumers =
                 new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
-        if (after instanceof BiConsumerWrapper) {
-            newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
+        if (after instanceof BiConsumerDecorator) {
+            newConsumers.addAll(((BiConsumerDecorator<?, ?>) after).mConsumers);
 
         } else {
             newConsumers.add(after);
         }
 
-        return new BiConsumerWrapper<IN1, IN2>(newConsumers);
+        return new BiConsumerDecorator<IN1, IN2>(newConsumers);
     }
 
     public boolean hasStaticScope() {

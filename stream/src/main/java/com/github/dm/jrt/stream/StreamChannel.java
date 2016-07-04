@@ -1143,20 +1143,6 @@ public interface StreamChannel<IN, OUT>
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
-     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
-     * <br>
-     * This method is useful to easily make the stream ordered or not.
-     * <p>
-     * Note that an ordered stream has a slightly increased cost in memory and computation.
-     *
-     * @param orderType the order type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    StreamChannel<IN, OUT> sort(@Nullable OrderType orderType);
-
-    /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
      * mode.
      *
@@ -1528,6 +1514,20 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamFlow(MAP)
     StreamChannel<IN, OUT> skip(int count);
+
+    /**
+     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
+     * <br>
+     * This method is useful to easily make the stream ordered or not.
+     * <p>
+     * Note that an ordered stream has a slightly increased cost in memory and computation.
+     *
+     * @param orderType the order type.
+     * @return the new stream instance.
+     */
+    @NotNull
+    @StreamFlow(CONFIG)
+    StreamChannel<IN, OUT> sort(@Nullable OrderType orderType);
 
     /**
      * Short for

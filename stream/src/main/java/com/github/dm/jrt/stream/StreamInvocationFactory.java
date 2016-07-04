@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super
+    private final FunctionDecorator<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super
             IN, ? extends OUT>> mFunction;
 
     /**
@@ -46,8 +46,9 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      *
      * @param function the function used to instantiate the stream channel.
      */
-    StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends
-            StreamChannel<? super IN, ? extends OUT>> function) {
+    StreamInvocationFactory(
+            @NotNull final FunctionDecorator<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }

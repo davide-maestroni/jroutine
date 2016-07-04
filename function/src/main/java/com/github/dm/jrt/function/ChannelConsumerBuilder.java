@@ -30,11 +30,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
 
-    private final ActionWrapper mOnComplete;
+    private final ActionDecorator mOnComplete;
 
-    private final ConsumerWrapper<RoutineException> mOnError;
+    private final ConsumerDecorator<RoutineException> mOnError;
 
-    private final ConsumerWrapper<OUT> mOnOutput;
+    private final ConsumerDecorator<OUT> mOnOutput;
 
     /**
      * Constructor.
@@ -44,11 +44,11 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      * @param onComplete the complete action.
      */
     @SuppressWarnings("unchecked")
-    private ChannelConsumerBuilder(@NotNull final ConsumerWrapper<? super OUT> onOutput,
-            @NotNull final ConsumerWrapper<? super RoutineException> onError,
-            @NotNull final ActionWrapper onComplete) {
-        mOnOutput = (ConsumerWrapper<OUT>) onOutput;
-        mOnError = (ConsumerWrapper<RoutineException>) onError;
+    private ChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
+            @NotNull final ConsumerDecorator<? super RoutineException> onError,
+            @NotNull final ActionDecorator onComplete) {
+        mOnOutput = (ConsumerDecorator<OUT>) onOutput;
+        mOnError = (ConsumerDecorator<RoutineException>) onError;
         mOnComplete = onComplete;
     }
 
@@ -61,8 +61,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      */
     @NotNull
     public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<Object>(ConsumerWrapper.sink(),
-                ConsumerWrapper.<RoutineException>sink(), ActionWrapper.wrap(onComplete));
+        return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+                ConsumerDecorator.<RoutineException>sink(), ActionDecorator.decorate(onComplete));
     }
 
     /**
@@ -75,8 +75,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
     @NotNull
     public static ChannelConsumerBuilder<Object> onError(
             @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<Object>(ConsumerWrapper.sink(),
-                ConsumerWrapper.wrap(onError), ActionWrapper.noOp());
+        return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+                ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
     }
 
     /**
@@ -90,8 +90,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
     @NotNull
     public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
             @NotNull final Consumer<? super OUT> onOutput) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerWrapper.wrap(onOutput),
-                ConsumerWrapper.<RoutineException>sink(), ActionWrapper.noOp());
+        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+                ConsumerDecorator.<RoutineException>sink(), ActionDecorator.noOp());
     }
 
     /**
@@ -107,8 +107,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
     public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
             @NotNull final Consumer<? super OUT> onOutput,
             @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerWrapper.wrap(onOutput),
-                ConsumerWrapper.wrap(onError), ActionWrapper.noOp());
+        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+                ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
     }
 
     /**
@@ -126,8 +126,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
             @NotNull final Consumer<? super OUT> onOutput,
             @NotNull final Consumer<? super RoutineException> onError,
             @NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerWrapper.wrap(onOutput),
-                ConsumerWrapper.wrap(onError), ActionWrapper.wrap(onComplete));
+        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+                ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
     }
 
     public void onComplete() throws Exception {

@@ -20,11 +20,11 @@ import com.github.dm.jrt.core.error.RoutineException;
 
 import org.junit.Test;
 
+import static com.github.dm.jrt.function.ActionDecorator.decorate;
 import static com.github.dm.jrt.function.Functions.onComplete;
 import static com.github.dm.jrt.function.Functions.onError;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.function.Functions.sink;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -97,8 +97,7 @@ public class ChannelConsumerBuilderTest {
         assertThat(action2.isCalled()).isTrue();
         action1.reset();
         action2.reset();
-        channelConsumer =
-                onComplete(action1).thenComplete(ActionWrapper.wrap(action2).andThen(action3));
+        channelConsumer = onComplete(action1).thenComplete(decorate(action2).andThen(action3));
         channelConsumer.onOutput("test");
         assertThat(action1.isCalled()).isFalse();
         assertThat(action2.isCalled()).isFalse();
@@ -197,7 +196,8 @@ public class ChannelConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        channelConsumer = onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
+        channelConsumer =
+                onError(consumer1).thenError(Functions.decorate(consumer2).andThen(consumer3));
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -296,7 +296,8 @@ public class ChannelConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        channelConsumer = onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
+        channelConsumer =
+                onOutput(consumer1).thenOutput(Functions.decorate(consumer2).andThen(consumer3));
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();

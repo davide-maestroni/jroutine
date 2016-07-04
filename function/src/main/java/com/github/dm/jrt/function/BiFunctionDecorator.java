@@ -27,7 +27,7 @@ import java.util.Comparator;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a bi-function instance.
+ * Class decorating a bi-function instance.
  * <p>
  * Created by davide-maestroni on 10/16/2015.
  *
@@ -35,21 +35,22 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
-        implements BiFunction<IN1, IN2, OUT>, Wrapper {
+public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
+        implements BiFunction<IN1, IN2, OUT>, Decorator {
 
-    private static final BiFunctionWrapper<Object, Object, Object> sFirst =
-            new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+    private static final BiFunctionDecorator<Object, Object, Object> sFirst =
+            new BiFunctionDecorator<Object, Object, Object>(
+                    new BiFunction<Object, Object, Object>() {
 
-                public Object apply(final Object in1, final Object in2) {
-                    return in1;
-                }
-            });
+                        public Object apply(final Object in1, final Object in2) {
+                            return in1;
+                        }
+                    });
 
-    private static final BiFunctionWrapper<? extends Comparable<?>, ? extends Comparable<?>, ?
+    private static final BiFunctionDecorator<? extends Comparable<?>, ? extends Comparable<?>, ?
             extends
             Comparable<?>> sMax =
-            new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
+            new BiFunctionDecorator<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
                     new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
                         public Comparable<Object> apply(final Comparable<Object> in1,
@@ -58,10 +59,10 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
                         }
                     });
 
-    private static final BiFunctionWrapper<? extends Comparable<?>, ? extends Comparable<?>, ?
+    private static final BiFunctionDecorator<? extends Comparable<?>, ? extends Comparable<?>, ?
             extends
             Comparable<?>> sMin =
-            new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
+            new BiFunctionDecorator<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
                     new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
                         public Comparable<Object> apply(final Comparable<Object> in1,
@@ -70,26 +71,27 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
                         }
                     });
 
-    private static final BiFunctionWrapper<Object, Object, Object> sSecond =
-            new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+    private static final BiFunctionDecorator<Object, Object, Object> sSecond =
+            new BiFunctionDecorator<Object, Object, Object>(
+                    new BiFunction<Object, Object, Object>() {
 
-                public Object apply(final Object in1, final Object in2) {
-                    return in2;
-                }
-            });
+                        public Object apply(final Object in1, final Object in2) {
+                            return in2;
+                        }
+                    });
 
     private final BiFunction<IN1, IN2, ?> mBiFunction;
 
-    private final FunctionWrapper<?, ? extends OUT> mFunction;
+    private final FunctionDecorator<?, ? extends OUT> mFunction;
 
     /**
      * Constructor.
      *
      * @param biFunction the wrapped supplier.
      */
-    private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
+    private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
         this(ConstantConditions.notNull("bi-function instance", biFunction),
-                FunctionWrapper.<OUT>identity());
+                FunctionDecorator.<OUT>identity());
     }
 
     /**
@@ -98,107 +100,15 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @param biFunction the initial wrapped supplier.
      * @param function   the concatenated function chain.
      */
-    private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
-            @NotNull final FunctionWrapper<?, ? extends OUT> function) {
+    private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
+            @NotNull final FunctionDecorator<?, ? extends OUT> function) {
         super(asArgs(biFunction, function));
         mBiFunction = biFunction;
         mFunction = function;
     }
 
     /**
-     * Returns a bi-function wrapper just returning the first passed argument.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the bi-function wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
-        return (BiFunctionWrapper<IN1, IN2, IN1>) sFirst;
-    }
-
-    /**
-     * Returns a bi-function wrapper returning the greater of the two inputs as per natural
-     * ordering.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the bi-function wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> max() {
-        return (BiFunctionWrapper<IN, IN, IN>) sMax;
-    }
-
-    /**
-     * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
-     * specified comparator.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param comparator the comparator instance.
-     * @param <IN>       the input data type.
-     * @return the bi-function wrapper.
-     */
-    public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
-            @NotNull final Comparator<? super IN> comparator) {
-        return new BiFunctionWrapper<IN, IN, IN>(
-                new MaxByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
-    }
-
-    /**
-     * Returns a bi-function wrapper returning the smaller of the two inputs as per natural
-     * ordering.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the bi-function wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> min() {
-        return (BiFunctionWrapper<IN, IN, IN>) sMin;
-    }
-
-    /**
-     * Returns a bi-function wrapper returning the smaller of the two inputs as indicated by the
-     * specified comparator.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param comparator the comparator instance.
-     * @param <IN>       the input data type.
-     * @return the bi-function wrapper.
-     */
-    public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
-            @NotNull final Comparator<? super IN> comparator) {
-        return new BiFunctionWrapper<IN, IN, IN>(
-                new MinByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
-    }
-
-    /**
-     * Returns a bi-function wrapper just returning the second passed argument.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the bi-function wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
-        return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
-    }
-
-    /**
-     * Wraps the specified bi-function instance so to provide additional features.
+     * Decorates the specified bi-function instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -212,20 +122,112 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @param <IN1>    the first input data type.
      * @param <IN2>    the second input data type.
      * @param <OUT>    the output data type.
-     * @return the wrapped bi-function.
+     * @return the decorated bi-function.
      */
     @NotNull
-    public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
+    public static <IN1, IN2, OUT> BiFunctionDecorator<IN1, IN2, OUT> decorate(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
-        if (function instanceof BiFunctionWrapper) {
-            return (BiFunctionWrapper<IN1, IN2, OUT>) function;
+        if (function instanceof BiFunctionDecorator) {
+            return (BiFunctionDecorator<IN1, IN2, OUT>) function;
         }
 
-        return new BiFunctionWrapper<IN1, IN2, OUT>(function);
+        return new BiFunctionDecorator<IN1, IN2, OUT>(function);
     }
 
     /**
-     * Returns a composed bi-function wrapper that first applies this function to its input, and
+     * Returns a bi-function decorator just returning the first passed argument.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-function decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionDecorator<IN1, IN2, IN1> first() {
+        return (BiFunctionDecorator<IN1, IN2, IN1>) sFirst;
+    }
+
+    /**
+     * Returns a bi-function decorator returning the greater of the two inputs as per natural
+     * ordering.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN extends Comparable<? super IN>> BiFunctionDecorator<IN, IN, IN> max() {
+        return (BiFunctionDecorator<IN, IN, IN>) sMax;
+    }
+
+    /**
+     * Returns a bi-function decorator returning the greater of the two inputs as indicated by the
+     * specified comparator.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function decorator.
+     */
+    public static <IN> BiFunctionDecorator<IN, IN, IN> maxBy(
+            @NotNull final Comparator<? super IN> comparator) {
+        return new BiFunctionDecorator<IN, IN, IN>(
+                new MaxByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
+    }
+
+    /**
+     * Returns a bi-function decorator returning the smaller of the two inputs as per natural
+     * ordering.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN extends Comparable<? super IN>> BiFunctionDecorator<IN, IN, IN> min() {
+        return (BiFunctionDecorator<IN, IN, IN>) sMin;
+    }
+
+    /**
+     * Returns a bi-function decorator returning the smaller of the two inputs as indicated by the
+     * specified comparator.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function decorator.
+     */
+    public static <IN> BiFunctionDecorator<IN, IN, IN> minBy(
+            @NotNull final Comparator<? super IN> comparator) {
+        return new BiFunctionDecorator<IN, IN, IN>(
+                new MinByFunction<IN>(ConstantConditions.notNull("comparator", comparator)));
+    }
+
+    /**
+     * Returns a bi-function decorator just returning the second passed argument.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-function decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionDecorator<IN1, IN2, IN2> second() {
+        return (BiFunctionDecorator<IN1, IN2, IN2>) sSecond;
+    }
+
+    /**
+     * Returns a composed bi-function decorator that first applies this function to its input, and
      * then applies the after function to the result.
      *
      * @param after   the function to apply after this function is applied.
@@ -233,9 +235,9 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      * @return the composed bi-function.
      */
     @NotNull
-    public <AFTER> BiFunctionWrapper<IN1, IN2, AFTER> andThen(
+    public <AFTER> BiFunctionDecorator<IN1, IN2, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
-        return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
+        return new BiFunctionDecorator<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
     }
 
     public boolean hasStaticScope() {
@@ -294,6 +296,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
 
     @SuppressWarnings("unchecked")
     public OUT apply(final IN1 in1, final IN2 in2) throws Exception {
-        return ((FunctionWrapper<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
+        return ((FunctionDecorator<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
     }
 }

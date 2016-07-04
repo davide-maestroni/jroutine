@@ -34,7 +34,6 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
-import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
@@ -42,7 +41,7 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
@@ -60,10 +59,10 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerMapping;
+import static com.github.dm.jrt.function.Functions.decorate;
 import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Abstract implementation of a stream routine builder.
@@ -89,7 +88,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     private static final StraightRunner sStraightRunner = new StraightRunner();
 
-    private FunctionWrapper<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;
+    private FunctionDecorator<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;
 
     private StreamConfiguration mStreamConfiguration;
 
@@ -124,10 +123,11 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
      *
      * @param streamConfiguration the stream configuration.
      */
+    @SuppressWarnings("unchecked")
     protected AbstractStreamRoutineBuilder(@NotNull final StreamConfiguration streamConfiguration) {
         mStreamConfiguration =
                 ConstantConditions.notNull("stream configuration", streamConfiguration);
-        mBindingFunction = null;
+        mBindingFunction = Functions.identity();
     }
 
     @NotNull
@@ -156,7 +156,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public StreamRoutineBuilder<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(outputSupplier)));
+        return map(new ConcatLoopSupplierInvocation<OUT>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -168,7 +168,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public StreamRoutineBuilder<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(outputsConsumer)));
+        return map(new ConcatLoopConsumerInvocation<OUT>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
@@ -280,7 +280,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     public <AFTER> StreamRoutineBuilder<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
-        return map(new MapInvocation<OUT, AFTER>(wrap(mappingFunction)));
+        return map(new MapInvocation<OUT, AFTER>(decorate(mappingFunction)));
     }
 
     @NotNull
@@ -313,9 +313,9 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                     Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
                     Channel<?, AFTER>>> liftFunction) {
         try {
-            mBindingFunction =
-                    wrap(((Function<Function<Channel<?, IN>, Channel<?, OUT>>,
-                            Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
+            mBindingFunction = decorate(
+                    ((Function<Function<Channel<?, IN>, Channel<?, OUT>>, Function<Channel<?,
+                            BEFORE>, Channel<?, AFTER>>>) liftFunction)
                             .apply(getBindingFunction()));
             return (StreamRoutineBuilder<BEFORE, AFTER>) this;
 
@@ -334,9 +334,9 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
         try {
-            mBindingFunction =
-                    wrap(((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?,
-                            OUT>>, Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
+            mBindingFunction = decorate(
+                    ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
+                            Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
                             .apply(mStreamConfiguration, getBindingFunction()));
             return (StreamRoutineBuilder<BEFORE, AFTER>) this;
 
@@ -465,7 +465,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public StreamRoutineBuilder<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return map(new OrElseSupplierInvocationFactory<OUT>(count, wrap(outputSupplier)));
+        return map(new OrElseSupplierInvocationFactory<OUT>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -477,7 +477,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public StreamRoutineBuilder<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return map(new OrElseConsumerInvocationFactory<OUT>(count, wrap(outputsConsumer)));
+        return map(new OrElseConsumerInvocationFactory<OUT>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
@@ -554,19 +554,19 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     @NotNull
     public StreamRoutineBuilder<IN, OUT> peekComplete(@NotNull final Action completeAction) {
-        return map(new PeekCompleteInvocation<OUT>(wrap(completeAction)));
+        return map(new PeekCompleteInvocation<OUT>(decorate(completeAction)));
     }
 
     @NotNull
     public StreamRoutineBuilder<IN, OUT> peekError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
-        return map(new PeekErrorInvocationFactory<OUT>(wrap(errorConsumer)));
+        return map(new PeekErrorInvocationFactory<OUT>(decorate(errorConsumer)));
     }
 
     @NotNull
     public StreamRoutineBuilder<IN, OUT> peekOutput(
             @NotNull final Consumer<? super OUT> outputConsumer) {
-        return map(new PeekOutputInvocation<OUT>(wrap(outputConsumer)));
+        return map(new PeekOutputInvocation<OUT>(decorate(outputConsumer)));
     }
 
     @NotNull
@@ -597,8 +597,8 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     public StreamRoutineBuilder<IN, OUT> retry(
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
-        mBindingFunction =
-                wrap(new BindRetry<IN, OUT>(mStreamConfiguration.asChannelConfiguration(),
+        mBindingFunction = decorate(
+                new BindRetry<IN, OUT>(mStreamConfiguration.asChannelConfiguration(),
                         getBindingFunction(), backoffFunction));
         resetConfiguration();
         return this;
@@ -674,7 +674,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public <AFTER> StreamRoutineBuilder<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        return map(new LoopSupplierInvocation<AFTER>(count, wrap(outputSupplier)));
+        return map(new LoopSupplierInvocation<AFTER>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -686,7 +686,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     @NotNull
     public <AFTER> StreamRoutineBuilder<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        return map(new LoopConsumerInvocation<AFTER>(count, wrap(outputsConsumer)));
+        return map(new LoopConsumerInvocation<AFTER>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
@@ -767,8 +767,6 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     /**
      * Creates a new routine instance based on the specified factory.
-     * <p>
-     * Note that this method should be never directly called by the implementing class.
      *
      * @param streamConfiguration the stream configuration.
      * @param factory             the invocation factory.
@@ -779,6 +777,25 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     protected abstract <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
             @NotNull StreamConfiguration streamConfiguration,
             @NotNull InvocationFactory<? super BEFORE, ? extends AFTER> factory);
+
+    /**
+     * Creates a new routine instance based on the specified builder.
+     *
+     * @param streamConfiguration the stream configuration.
+     * @param builder             the routine builder.
+     * @param <AFTER>             the concatenation output type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
+            @NotNull StreamConfiguration streamConfiguration,
+            @NotNull RoutineBuilder<? super BEFORE, ? extends AFTER> builder) {
+        return builder.invocationConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asInvocationConfiguration())
+                      .applied()
+                      .buildRoutine();
+    }
 
     /**
      * Creates a new stream configuration instance where the current one is reset to the its
@@ -795,30 +812,22 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     @NotNull
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
-            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return builder.invocationConfiguration()
-                      .with(null)
-                      .with(mStreamConfiguration.asInvocationConfiguration())
-                      .applied()
-                      .buildRoutine();
-    }
-
-    @NotNull
-    private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         return ConstantConditions.notNull("routine instance",
                 newRoutine(mStreamConfiguration, factory));
     }
 
     @NotNull
+    private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        return ConstantConditions.notNull("routine instance",
+                newRoutine(mStreamConfiguration, builder));
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
-    private FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
-        final FunctionWrapper<? extends Channel<?, ?>, ? extends Channel<?, ?>> bindingFunction =
-                mBindingFunction;
-        return (bindingFunction != null)
-                ? (FunctionWrapper<Channel<?, IN>, Channel<?, OUT>>) bindingFunction
-                : Functions.<Channel<?, IN>, Channel<?, OUT>>castTo(
-                        new ClassToken<Channel<?, OUT>>() {});
+    private FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
+        return (FunctionDecorator<Channel<?, IN>, Channel<?, OUT>>) mBindingFunction;
     }
 
     private void resetConfiguration() {
@@ -835,7 +844,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
      */
     private static class StreamInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
-        private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+        private final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
         /**
          * Constructor.
@@ -843,7 +852,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
          * @param bindingFunction the binding function.
          */
         private StreamInvocation(
-                @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
+                @NotNull final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
             mBindingFunction = bindingFunction;
         }
 
@@ -863,7 +872,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
      */
     private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+        private final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
         /**
          * Constructor.
@@ -871,7 +880,7 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
          * @param bindingFunction the binding function.
          */
         private StreamInvocationFactory(
-                @NotNull final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
+                @NotNull final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> bindingFunction) {
             super(asArgs(bindingFunction));
             mBindingFunction = bindingFunction;
         }

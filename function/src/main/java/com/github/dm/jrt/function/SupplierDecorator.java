@@ -25,15 +25,15 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a supplier instance.
+ * Class decorating a supplier instance.
  * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <OUT> the output data type.
  */
-public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OUT>, Wrapper {
+public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<OUT>, Decorator {
 
-    private final FunctionWrapper<?, OUT> mFunction;
+    private final FunctionDecorator<?, OUT> mFunction;
 
     private final Supplier<?> mSupplier;
 
@@ -42,9 +42,9 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      *
      * @param supplier the initial wrapped supplier.
      */
-    private SupplierWrapper(@NotNull final Supplier<?> supplier) {
+    private SupplierDecorator(@NotNull final Supplier<?> supplier) {
         this(ConstantConditions.notNull("supplier instance", supplier),
-                FunctionWrapper.<OUT>identity());
+                FunctionDecorator.<OUT>identity());
     }
 
     /**
@@ -53,29 +53,29 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      * @param supplier the initial wrapped supplier.
      * @param function the concatenated function chain.
      */
-    private SupplierWrapper(@NotNull final Supplier<?> supplier,
-            @NotNull final FunctionWrapper<?, OUT> function) {
+    private SupplierDecorator(@NotNull final Supplier<?> supplier,
+            @NotNull final FunctionDecorator<?, OUT> function) {
         super(asArgs(supplier, function));
         mSupplier = supplier;
         mFunction = function;
     }
 
     /**
-     * Returns a supplier wrapper always returning the same result.
+     * Returns a supplier decorator always returning the same result.
      * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param result the result.
      * @param <OUT>  the output data type.
-     * @return the supplier wrapper.
+     * @return the supplier decorator.
      */
     @NotNull
-    public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
-        return new SupplierWrapper<OUT>(new ConstantSupplier<OUT>(result));
+    public static <OUT> SupplierDecorator<OUT> constant(final OUT result) {
+        return new SupplierDecorator<OUT>(new ConstantSupplier<OUT>(result));
     }
 
     /**
-     * Wraps the specified supplier instance so to provide additional features.
+     * Decorates the specified supplier instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -87,19 +87,19 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
-     * @return the wrapped supplier.
+     * @return the decorated supplier.
      */
     @NotNull
-    public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
-        if (supplier instanceof SupplierWrapper) {
-            return (SupplierWrapper<OUT>) supplier;
+    public static <OUT> SupplierDecorator<OUT> decorate(@NotNull final Supplier<OUT> supplier) {
+        if (supplier instanceof SupplierDecorator) {
+            return (SupplierDecorator<OUT>) supplier;
         }
 
-        return new SupplierWrapper<OUT>(supplier);
+        return new SupplierDecorator<OUT>(supplier);
     }
 
     /**
-     * Returns a composed supplier wrapper that first gets this supplier result, and then applies
+     * Returns a composed supplier decorator that first gets this supplier result, and then applies
      * the after function to it.
      *
      * @param after   the function to apply after this function is applied.
@@ -107,9 +107,9 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      * @return the composed function.
      */
     @NotNull
-    public <AFTER> SupplierWrapper<AFTER> andThen(
+    public <AFTER> SupplierDecorator<AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
-        return new SupplierWrapper<AFTER>(mSupplier, mFunction.andThen(after));
+        return new SupplierDecorator<AFTER>(mSupplier, mFunction.andThen(after));
     }
 
     @SuppressWarnings("unchecked")

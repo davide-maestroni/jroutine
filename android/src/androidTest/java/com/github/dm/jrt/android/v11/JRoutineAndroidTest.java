@@ -62,7 +62,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.stream.StreamInputs.range;
+import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

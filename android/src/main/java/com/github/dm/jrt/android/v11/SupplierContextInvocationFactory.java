@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.SupplierWrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SupplierContextInvocationFactory<IN, OUT> extends ContextInvocationFactory<IN, OUT> {
 
-    private final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends OUT>> mSupplier;
+    private final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends OUT>>
+            mSupplier;
 
     /**
      * Constructor.
@@ -43,7 +44,7 @@ class SupplierContextInvocationFactory<IN, OUT> extends ContextInvocationFactory
      * @param supplier the supplier function.
      */
     SupplierContextInvocationFactory(
-            @NotNull final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends
+            @NotNull final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends
                     OUT>> supplier) {
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;

@@ -29,16 +29,16 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a consumer instance.
+ * Class decorating a consumer instance.
  * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN> the input data type.
  */
-public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>, Wrapper {
+public class ConsumerDecorator<IN> extends DeepEqualObject implements Consumer<IN>, Decorator {
 
-    private static final ConsumerWrapper<Object> sSink =
-            new ConsumerWrapper<Object>(new Consumer<Object>() {
+    private static final ConsumerDecorator<Object> sSink =
+            new ConsumerDecorator<Object>(new Consumer<Object>() {
 
                 public void accept(final Object in) {}
             });
@@ -50,7 +50,7 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      *
      * @param consumer the wrapped consumer.
      */
-    private ConsumerWrapper(@NotNull final Consumer<?> consumer) {
+    private ConsumerDecorator(@NotNull final Consumer<?> consumer) {
         this(Collections.<Consumer<?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
     }
@@ -60,27 +60,13 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      *
      * @param consumers the list of wrapped consumers.
      */
-    private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
+    private ConsumerDecorator(@NotNull final List<Consumer<?>> consumers) {
         super(asArgs(consumers));
         mConsumers = consumers;
     }
 
     /**
-     * Returns a consumer wrapper just discarding the passed inputs.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the consumer wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> ConsumerWrapper<IN> sink() {
-        return (ConsumerWrapper<IN>) sSink;
-    }
-
-    /**
-     * Wraps the specified consumer instance so to provide additional features.
+     * Decorates the specified consumer instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -92,39 +78,53 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      *
      * @param consumer the consumer instance.
      * @param <IN>     the input data type.
-     * @return the wrapped consumer.
+     * @return the decorated consumer.
      */
     @NotNull
-    public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
-        if (consumer instanceof ConsumerWrapper) {
-            return (ConsumerWrapper<IN>) consumer;
+    public static <IN> ConsumerDecorator<IN> decorate(@NotNull final Consumer<IN> consumer) {
+        if (consumer instanceof ConsumerDecorator) {
+            return (ConsumerDecorator<IN>) consumer;
         }
 
-        return new ConsumerWrapper<IN>(consumer);
+        return new ConsumerDecorator<IN>(consumer);
     }
 
     /**
-     * Returns a composed consumer wrapper that performs, in sequence, this operation followed by
+     * Returns a consumer decorator just discarding the passed inputs.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the consumer decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> ConsumerDecorator<IN> sink() {
+        return (ConsumerDecorator<IN>) sSink;
+    }
+
+    /**
+     * Returns a composed consumer decorator that performs, in sequence, this operation followed by
      * the after operation.
      *
      * @param after the operation to perform after this operation.
      * @return the composed consumer.
      */
     @NotNull
-    public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
+    public ConsumerDecorator<IN> andThen(@NotNull final Consumer<? super IN> after) {
         ConstantConditions.notNull("consumer instance", after);
         final List<Consumer<?>> consumers = mConsumers;
         final ArrayList<Consumer<?>> newConsumers =
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
-        if (after instanceof ConsumerWrapper) {
-            newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
+        if (after instanceof ConsumerDecorator) {
+            newConsumers.addAll(((ConsumerDecorator<?>) after).mConsumers);
 
         } else {
             newConsumers.add(after);
         }
 
-        return new ConsumerWrapper<IN>(newConsumers);
+        return new ConsumerDecorator<IN>(newConsumers);
     }
 
     public boolean hasStaticScope() {

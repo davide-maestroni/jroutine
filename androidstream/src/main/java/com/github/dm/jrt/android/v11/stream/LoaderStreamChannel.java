@@ -664,14 +664,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    LoaderStreamChannel<IN, OUT> sort(@Nullable OrderType orderType);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
     LoaderStreamChannel<IN, OUT> parallel();
 
     /**
@@ -849,6 +841,14 @@ public interface LoaderStreamChannel<IN, OUT>
     @Override
     @StreamFlow(MAP)
     LoaderStreamChannel<IN, OUT> skip(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(CONFIG)
+    LoaderStreamChannel<IN, OUT> sort(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}

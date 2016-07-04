@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.SupplierWrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
 
     private final long mCount;
 
-    private final SupplierWrapper<? extends DATA> mOutputSupplier;
+    private final SupplierDecorator<? extends DATA> mOutputSupplier;
 
     /**
      * Constructor.
@@ -44,7 +44,7 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
      * @param outputSupplier the supplier instance.
      */
     ConcatLoopSupplierInvocation(final long count,
-            @NotNull final SupplierWrapper<? extends DATA> outputSupplier) {
+            @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
@@ -53,7 +53,7 @@ class ConcatLoopSupplierInvocation<DATA> extends GenerateInvocation<DATA, DATA> 
 
     public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
         final long count = mCount;
-        final SupplierWrapper<? extends DATA> supplier = mOutputSupplier;
+        final SupplierDecorator<? extends DATA> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }

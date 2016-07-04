@@ -22,12 +22,12 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.function.BiFunctionDecorator;
+import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Invocation implementation computing the result by applying a bi-function instance to the inputs.
@@ -64,7 +64,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     @NotNull
     static <DATA> InvocationFactory<DATA, DATA> functionFactory(
             @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
-        return new BinaryOperatorInvocationFactory<DATA>(wrap(binaryFunction));
+        return new BinaryOperatorInvocationFactory<DATA>(Functions.decorate(binaryFunction));
     }
 
     @Override
@@ -105,7 +105,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     private static class BinaryOperatorInvocationFactory<DATA>
             extends InvocationFactory<DATA, DATA> {
 
-        private final BiFunctionWrapper<DATA, DATA, DATA> mBinaryFunction;
+        private final BiFunctionDecorator<DATA, DATA, DATA> mBinaryFunction;
 
         /**
          * Constructor.
@@ -113,7 +113,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
          * @param binaryFunction the operator bi-function instance.
          */
         private BinaryOperatorInvocationFactory(
-                @NotNull final BiFunctionWrapper<DATA, DATA, DATA> binaryFunction) {
+                @NotNull final BiFunctionDecorator<DATA, DATA, DATA> binaryFunction) {
             super(asArgs(binaryFunction));
             mBinaryFunction = binaryFunction;
         }

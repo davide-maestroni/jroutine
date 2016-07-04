@@ -22,15 +22,15 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiConsumerWrapper;
+import com.github.dm.jrt.function.BiConsumerDecorator;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierWrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
@@ -42,9 +42,9 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final BiConsumerWrapper<? super OUT, ? super IN> mAccumulateConsumer;
+    private final BiConsumerDecorator<? super OUT, ? super IN> mAccumulateConsumer;
 
-    private final SupplierWrapper<? extends OUT> mSeedSupplier;
+    private final SupplierDecorator<? extends OUT> mSeedSupplier;
 
     private OUT mAccumulated;
 
@@ -57,8 +57,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @param accumulateConsumer the accumulating bi-consumer instance.
      */
     private AccumulateConsumerInvocation(
-            @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
-            @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
+            @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
+            @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
         mSeedSupplier = seedSupplier;
         mAccumulateConsumer = accumulateConsumer;
     }
@@ -74,7 +74,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     @NotNull
     static <IN> InvocationFactory<IN, IN> consumerFactory(
             @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
-        return new AccumulateInvocationFactory<IN, IN>(null, wrap(accumulateConsumer));
+        return new AccumulateInvocationFactory<IN, IN>(null, decorate(accumulateConsumer));
     }
 
     /**
@@ -91,8 +91,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
             @NotNull final Supplier<? extends OUT> seedSupplier,
             @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
-        return new AccumulateInvocationFactory<IN, OUT>(wrap(seedSupplier),
-                wrap(accumulateConsumer));
+        return new AccumulateInvocationFactory<IN, OUT>(decorate(seedSupplier),
+                decorate(accumulateConsumer));
     }
 
     @Override
@@ -107,7 +107,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
             mAccumulated = null;
 
         } else {
-            final SupplierWrapper<? extends OUT> supplier = mSeedSupplier;
+            final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
             if (supplier != null) {
                 result.pass(supplier.get());
             }
@@ -119,7 +119,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         if (mIsFirst) {
             mIsFirst = false;
-            final SupplierWrapper<? extends OUT> supplier = mSeedSupplier;
+            final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
             if (supplier != null) {
                 mAccumulated = supplier.get();
                 mAccumulateConsumer.accept(mAccumulated, input);
@@ -146,9 +146,9 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      */
     private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final BiConsumerWrapper<? super OUT, ? super IN> mAccumulateConsumer;
+        private final BiConsumerDecorator<? super OUT, ? super IN> mAccumulateConsumer;
 
-        private final SupplierWrapper<? extends OUT> mSeedSupplier;
+        private final SupplierDecorator<? extends OUT> mSeedSupplier;
 
         /**
          * Constructor.
@@ -157,8 +157,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
          * @param accumulateConsumer the accumulating bi-consumer instance.
          */
         private AccumulateInvocationFactory(
-                @Nullable final SupplierWrapper<? extends OUT> seedSupplier,
-                @NotNull final BiConsumerWrapper<? super OUT, ? super IN> accumulateConsumer) {
+                @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
+                @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
             super(asArgs(seedSupplier, accumulateConsumer));
             mSeedSupplier = seedSupplier;
             mAccumulateConsumer = accumulateConsumer;

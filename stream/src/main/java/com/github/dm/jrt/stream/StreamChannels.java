@@ -26,9 +26,10 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.function.BiFunctionDecorator;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
 import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
 
@@ -697,7 +697,8 @@ public class StreamChannels extends Operators {
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> incrementFunction) {
         return new RangeConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.notNull("end element", end), wrap(incrementFunction));
+                ConstantConditions.notNull("end element", end),
+                Functions.decorate(incrementFunction));
     }
 
     /**
@@ -981,7 +982,8 @@ public class StreamChannels extends Operators {
     public static <AFTER> Consumer<Channel<AFTER, ?>> sequence(@NotNull final AFTER start,
             final long count, @NotNull final BiFunction<AFTER, Long, AFTER> nextFunction) {
         return new SequenceConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.positive("sequence size", count), wrap(nextFunction));
+                ConstantConditions.positive("sequence size", count),
+                Functions.decorate(nextFunction));
     }
 
     /**
@@ -1000,7 +1002,7 @@ public class StreamChannels extends Operators {
     public static <IN, OUT> InvocationFactory<IN, OUT> streamFactory(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
                     super IN, ? extends OUT>> function) {
-        return new StreamInvocationFactory<IN, OUT>(wrap(function));
+        return new StreamInvocationFactory<IN, OUT>(Functions.decorate(function));
     }
 
     /**
@@ -1387,7 +1389,7 @@ public class StreamChannels extends Operators {
 
         private final long mCount;
 
-        private final BiFunctionWrapper<OUT, Long, OUT> mNextFunction;
+        private final BiFunctionDecorator<OUT, Long, OUT> mNextFunction;
 
         private final OUT mStart;
 
@@ -1399,7 +1401,7 @@ public class StreamChannels extends Operators {
          * @param nextFunction the function computing the next element.
          */
         private SequenceConsumer(@NotNull final OUT start, final long count,
-                @NotNull final BiFunctionWrapper<OUT, Long, OUT> nextFunction) {
+                @NotNull final BiFunctionDecorator<OUT, Long, OUT> nextFunction) {
             super(asArgs(start, count, nextFunction));
             mStart = start;
             mCount = count;
@@ -1407,7 +1409,7 @@ public class StreamChannels extends Operators {
         }
 
         public void accept(final Channel<OUT, ?> result) throws Exception {
-            final BiFunctionWrapper<OUT, Long, OUT> next = mNextFunction;
+            final BiFunctionDecorator<OUT, Long, OUT> next = mNextFunction;
             OUT current = mStart;
             final long count = mCount;
             final long last = count - 1;

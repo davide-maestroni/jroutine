@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.SupplierWrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
     private final long mCount;
 
-    private final SupplierWrapper<? extends OUT> mOutputSupplier;
+    private final SupplierDecorator<? extends OUT> mOutputSupplier;
 
     /**
      * Constructor.
@@ -44,7 +44,7 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
      * @param outputSupplier the supplier instance.
      */
     LoopSupplierInvocation(final long count,
-            @NotNull final SupplierWrapper<? extends OUT> outputSupplier) {
+            @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
         super(asArgs(ConstantConditions.positive("count number", count),
                 ConstantConditions.notNull("supplier instance", outputSupplier)));
         mCount = count;
@@ -53,7 +53,7 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
     public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         final long count = mCount;
-        final SupplierWrapper<? extends OUT> supplier = mOutputSupplier;
+        final SupplierDecorator<? extends OUT> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }

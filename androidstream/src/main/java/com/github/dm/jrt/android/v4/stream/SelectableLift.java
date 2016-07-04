@@ -20,9 +20,8 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
-
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Selectable lift function.
@@ -51,7 +50,8 @@ class SelectableLift<IN, OUT> implements
     public Function<Channel<?, IN>, Channel<?, ParcelableSelectable<OUT>>> apply(
             final StreamConfiguration configuration,
             final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return wrap(function).andThen(
-                new BindSelectable<OUT>(configuration.asChannelConfiguration(), mIndex));
+        return Functions.decorate(function)
+                        .andThen(new BindSelectable<OUT>(configuration.asChannelConfiguration(),
+                                mIndex));
     }
 }

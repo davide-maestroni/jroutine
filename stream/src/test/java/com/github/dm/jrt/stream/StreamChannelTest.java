@@ -72,7 +72,6 @@ import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.noOp;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.StreamChannels.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -3022,20 +3021,26 @@ public class StreamChannelTest {
                                                          configuration.getInvocationMode())
                                                          .isEqualTo(
                                                          InvocationMode.ASYNC);
-                                                 return wrap(function).andThen(
-                                                         new Function<Channel<?, String>,
-                                                                 Channel<?, String>>() {
+                                                 return Functions.decorate(function)
+                                                                 .andThen(
+                                                                         new Function<Channel<?,
+                                                                                 String>,
+                                                                                 Channel<?,
+                                                                                         String>>
+                                                                                 () {
 
-                                                             public Channel<?, String> apply(
-                                                                     final Channel<?, String>
-                                                                             channel) {
+                                                                             public Channel<?,
+                                                                                     String> apply(
+                                                                                     final
+                                                                                     Channel<?,
+                                                                                             String> channel) {
 
-                                                                 return JRoutineCore.with(
-                                                                         new UpperCase())
-                                                                                    .asyncCall(
-                                                                                            channel);
-                                                             }
-                                                         });
+                                                                                 return JRoutineCore
+                                                                                         .with(new UpperCase())
+                                                                                         .asyncCall(
+                                                                                                 channel);
+                                                                             }
+                                                                         });
                                              }
                                          })
                                  .after(seconds(3))
@@ -3049,17 +3054,23 @@ public class StreamChannelTest {
                                              final Function<Channel<?, String>, Channel<?,
                                                      String>> function) {
 
-                                         return wrap(function).andThen(
-                                                 new Function<Channel<?, String>, Channel<?,
-                                                         String>>() {
+                                         return Functions.decorate(function)
+                                                         .andThen(
+                                                                 new Function<Channel<?, String>,
+                                                                         Channel<?, String>>() {
 
-                                                     public Channel<?, String> apply(
-                                                             final Channel<?, String> channel) {
+                                                                     public Channel<?, String>
+                                                                     apply(
+                                                                             final Channel<?,
+                                                                                     String>
+                                                                                     channel) {
 
-                                                         return JRoutineCore.with(new UpperCase())
-                                                                            .asyncCall(channel);
-                                                     }
-                                                 });
+                                                                         return JRoutineCore.with(
+                                                                                 new UpperCase())
+                                                                                            .asyncCall(
+                                                                                                    channel);
+                                                                     }
+                                                                 });
                                      }
                                  })
                                  .after(seconds(3))

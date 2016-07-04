@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
@@ -50,7 +51,6 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamChannel}
@@ -431,9 +431,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                         public Function<Channel<?, Call<OUT>>, Channel<?, Object>> apply(
                                 final Function<Channel<?, Call<OUT>>, Channel<?,
                                         ParcelableSelectable<Object>>> function) {
-                            return wrap(function).andThen(
-                                    new BindService(mChannelConfiguration, mConverter,
-                                            getRoutine()));
+                            return Functions.decorate(function)
+                                            .andThen(new BindService(mChannelConfiguration,
+                                                    mConverter, getRoutine()));
                         }
                     };
             return StreamChannels.of(call)

@@ -77,8 +77,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.stream.StreamInputs.range;
+import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -1505,13 +1504,15 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                 assertThat(configuration.asLoaderConfiguration()).isEqualTo(
                         LoaderConfiguration.defaultConfiguration());
                 assertThat(configuration.getLoaderContext()).isInstanceOf(LoaderContext.class);
-                return wrap(function).andThen(
-                        new Function<Channel<?, String>, Channel<?, String>>() {
+                return Functions.decorate(function)
+                                .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
 
-                            public Channel<?, String> apply(final Channel<?, String> channel) {
-                                return JRoutineCore.with(new UpperCase()).asyncCall(channel);
-                            }
-                        });
+                                    public Channel<?, String> apply(
+                                            final Channel<?, String> channel) {
+                                        return JRoutineCore.with(new UpperCase())
+                                                           .asyncCall(channel);
+                                    }
+                                });
             }
         };
     }
@@ -1524,13 +1525,15 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
 
             public Function<Channel<?, String>, Channel<?, String>> apply(
                     final Function<Channel<?, String>, Channel<?, String>> function) {
-                return wrap(function).andThen(
-                        new Function<Channel<?, String>, Channel<?, String>>() {
+                return Functions.decorate(function)
+                                .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
 
-                            public Channel<?, String> apply(final Channel<?, String> channel) {
-                                return JRoutineCore.with(new UpperCase()).asyncCall(channel);
-                            }
-                        });
+                                    public Channel<?, String> apply(
+                                            final Channel<?, String> channel) {
+                                        return JRoutineCore.with(new UpperCase())
+                                                           .asyncCall(channel);
+                                    }
+                                });
             }
         };
     }

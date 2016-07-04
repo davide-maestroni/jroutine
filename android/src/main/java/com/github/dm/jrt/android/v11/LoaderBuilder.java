@@ -33,11 +33,11 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Decorator;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierWrapper;
-import com.github.dm.jrt.function.Wrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,12 +52,12 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerMapping;
+import static com.github.dm.jrt.function.Functions.decorate;
 import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Context based builder of loader routine builders.
@@ -77,9 +77,9 @@ public class LoaderBuilder {
         mContext = ConstantConditions.notNull("loader context", context);
     }
 
-    private static void checkStatic(@NotNull final Wrapper wrapper,
+    private static void checkStatic(@NotNull final Decorator decorator,
             @NotNull final Object function) {
-        if (!wrapper.hasStaticScope()) {
+        if (!decorator.hasStaticScope()) {
             throw new IllegalArgumentException(
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());
@@ -356,7 +356,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCall(
             @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-        checkStatic(wrap(consumer), consumer);
+        checkStatic(decorate(consumer), consumer);
         return with(consumerCall(consumer));
     }
 
@@ -374,7 +374,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-        checkStatic(wrap(function), function);
+        checkStatic(decorate(function), function);
         return with(functionCall(function));
     }
 
@@ -410,7 +410,7 @@ public class LoaderBuilder {
     @NotNull
     public <OUT> LoaderRoutineBuilder<Void, OUT> withCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
-        checkStatic(wrap(supplier), supplier);
+        checkStatic(decorate(supplier), supplier);
         return with(supplierCommand(supplier));
     }
 
@@ -426,7 +426,7 @@ public class LoaderBuilder {
     @NotNull
     public <OUT> LoaderRoutineBuilder<Void, OUT> withCommandMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-        checkStatic(wrap(consumer), consumer);
+        checkStatic(decorate(consumer), consumer);
         return with(consumerCommand(consumer));
     }
 
@@ -444,8 +444,8 @@ public class LoaderBuilder {
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withContextFactory(
             @NotNull final Supplier<? extends ContextInvocation<? super IN, ? extends OUT>>
                     supplier) {
-        final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends OUT>> wrapper =
-                wrap(supplier);
+        final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends OUT>> wrapper =
+                decorate(supplier);
         checkStatic(wrapper, supplier);
         return with(new SupplierContextInvocationFactory<IN, OUT>(wrapper));
     }
@@ -463,7 +463,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-        checkStatic(wrap(supplier), supplier);
+        checkStatic(decorate(supplier), supplier);
         return with(supplierFactory(supplier));
     }
 
@@ -479,7 +479,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN> LoaderRoutineBuilder<IN, IN> withFilter(
             @NotNull final Predicate<? super IN> predicate) {
-        checkStatic(wrap(predicate), predicate);
+        checkStatic(decorate(predicate), predicate);
         return with(predicateFilter(predicate));
     }
 
@@ -558,7 +558,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMapping(
             @NotNull final Function<? super IN, ? extends OUT> function) {
-        checkStatic(wrap(function), function);
+        checkStatic(decorate(function), function);
         return with(functionMapping(function));
     }
 
@@ -575,7 +575,7 @@ public class LoaderBuilder {
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMappingMore(
             @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
-        checkStatic(wrap(consumer), consumer);
+        checkStatic(decorate(consumer), consumer);
         return with(consumerMapping(consumer));
     }
 }

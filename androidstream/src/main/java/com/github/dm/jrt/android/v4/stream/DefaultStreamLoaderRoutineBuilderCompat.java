@@ -43,10 +43,10 @@ import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Decorator;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamRoutineBuilder;
 import com.github.dm.jrt.stream.StreamRoutineBuilder;
 
@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
-import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Default implementation of a stream loader routine builder.
@@ -160,9 +160,9 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
         }
     }
 
-    private static void checkStatic(@NotNull final Wrapper wrapper,
+    private static void checkStatic(@NotNull final Decorator decorator,
             @NotNull final Object function) {
-        if (!wrapper.hasStaticScope()) {
+        if (!decorator.hasStaticScope()) {
             throw new IllegalArgumentException(
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());
@@ -199,7 +199,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGet(count, outputSupplier);
     }
 
@@ -207,7 +207,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGet(outputSupplier);
     }
 
@@ -215,7 +215,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGetMore(count,
                 outputsConsumer);
     }
@@ -224,7 +224,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGetMore(outputsConsumer);
     }
 
@@ -272,7 +272,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> accumulateConsumer) {
-        checkStatic(wrap(accumulateConsumer), accumulateConsumer);
+        checkStatic(decorate(accumulateConsumer), accumulateConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.collect(accumulateConsumer);
     }
 
@@ -281,8 +281,8 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> accumulateConsumer) {
-        checkStatic(wrap(seedSupplier), seedSupplier);
-        checkStatic(wrap(accumulateConsumer), accumulateConsumer);
+        checkStatic(decorate(seedSupplier), seedSupplier);
+        checkStatic(decorate(accumulateConsumer), accumulateConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.collect(seedSupplier,
                 accumulateConsumer);
     }
@@ -292,7 +292,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER extends Collection<? super OUT>> StreamLoaderRoutineBuilderCompat<IN, AFTER>
     collectInto(
             @NotNull final Supplier<? extends AFTER> collectionSupplier) {
-        checkStatic(wrap(collectionSupplier), collectionSupplier);
+        checkStatic(decorate(collectionSupplier), collectionSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.collectInto(collectionSupplier);
     }
 
@@ -313,7 +313,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> filter(
             @NotNull final Predicate<? super OUT> filterPredicate) {
-        checkStatic(wrap(filterPredicate), filterPredicate);
+        checkStatic(decorate(filterPredicate), filterPredicate);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.filter(filterPredicate);
     }
 
@@ -330,7 +330,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.flatMap(mappingFunction);
     }
 
@@ -382,7 +382,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.map(mappingFunction);
     }
 
@@ -413,7 +413,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapAll(mappingFunction);
     }
 
@@ -422,7 +422,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapAllMore(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
-        checkStatic(wrap(mappingConsumer), mappingConsumer);
+        checkStatic(decorate(mappingConsumer), mappingConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapAllMore(mappingConsumer);
     }
 
@@ -430,7 +430,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
-        checkStatic(wrap(mappingConsumer), mappingConsumer);
+        checkStatic(decorate(mappingConsumer), mappingConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapMore(mappingConsumer);
     }
 
@@ -478,7 +478,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGet(count, outputSupplier);
     }
 
@@ -486,7 +486,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGet(outputSupplier);
     }
 
@@ -494,7 +494,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGetMore(count,
                 outputsConsumer);
     }
@@ -503,7 +503,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGetMore(outputsConsumer);
     }
 
@@ -553,7 +553,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("factory", factory);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallelBy(keyFunction, factory);
     }
@@ -563,7 +563,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("routine", routine);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallelBy(keyFunction, routine);
     }
@@ -580,7 +580,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> peekComplete(
             @NotNull final Action completeAction) {
-        checkStatic(wrap(completeAction), completeAction);
+        checkStatic(decorate(completeAction), completeAction);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekComplete(completeAction);
     }
 
@@ -588,7 +588,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> peekError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
-        checkStatic(wrap(errorConsumer), errorConsumer);
+        checkStatic(decorate(errorConsumer), errorConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekError(errorConsumer);
     }
 
@@ -596,7 +596,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> peekOutput(
             @NotNull final Consumer<? super OUT> outputConsumer) {
-        checkStatic(wrap(outputConsumer), outputConsumer);
+        checkStatic(decorate(outputConsumer), outputConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekOutput(outputConsumer);
     }
 
@@ -604,7 +604,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction) {
-        checkStatic(wrap(accumulateFunction), accumulateFunction);
+        checkStatic(decorate(accumulateFunction), accumulateFunction);
         return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.reduce(accumulateFunction);
     }
 
@@ -614,8 +614,8 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER>
                     accumulateFunction) {
-        checkStatic(wrap(seedSupplier), seedSupplier);
-        checkStatic(wrap(accumulateFunction), accumulateFunction);
+        checkStatic(decorate(seedSupplier), seedSupplier);
+        checkStatic(decorate(accumulateFunction), accumulateFunction);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.reduce(seedSupplier,
                 accumulateFunction);
     }
@@ -703,7 +703,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGet(count, outputSupplier);
     }
 
@@ -711,7 +711,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGet(
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGet(outputSupplier);
     }
 
@@ -719,7 +719,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGetMore(count,
                 outputsConsumer);
     }
@@ -728,7 +728,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGetMore(outputsConsumer);
     }
 
@@ -904,7 +904,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
             throw new IllegalStateException("the loader context is null");
         }
 
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("factory", factory);
         return parallelBy(keyFunction, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }

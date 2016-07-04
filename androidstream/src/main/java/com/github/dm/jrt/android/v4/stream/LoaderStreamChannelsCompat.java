@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.StreamChannels;
@@ -44,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -302,7 +302,8 @@ public class LoaderStreamChannelsCompat extends StreamChannels {
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> contextFactory(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
-        return factoryFrom(withStream(function), wrap(function).hashCode(), InvocationMode.SYNC);
+        return factoryFrom(withStream(function), Functions.decorate(function).hashCode(),
+                InvocationMode.SYNC);
     }
 
     /**
@@ -1067,7 +1068,7 @@ public class LoaderStreamChannelsCompat extends StreamChannels {
     public static <IN, OUT> RoutineBuilder<IN, OUT> withStream(
             @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
                     StreamChannel<? super IN, ? extends OUT>> function) {
-        if (!wrap(function).hasStaticScope()) {
+        if (!Functions.decorate(function).hasStaticScope()) {
             throw new IllegalArgumentException(
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());

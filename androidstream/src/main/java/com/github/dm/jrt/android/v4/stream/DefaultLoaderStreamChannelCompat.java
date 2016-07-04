@@ -45,10 +45,10 @@ import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Decorator;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamChannel;
 import com.github.dm.jrt.stream.StreamChannel;
 
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
-import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Default implementation of a loader stream channel.
@@ -170,9 +170,9 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
         }
     }
 
-    private static void checkStatic(@NotNull final Wrapper wrapper,
+    private static void checkStatic(@NotNull final Decorator decorator,
             @NotNull final Object function) {
-        if (!wrapper.hasStaticScope()) {
+        if (!decorator.hasStaticScope()) {
             throw new IllegalArgumentException(
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());
@@ -315,7 +315,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, OUT>) super.appendGet(count, outputSupplier);
     }
 
@@ -323,7 +323,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> appendGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, OUT>) super.appendGet(outputSupplier);
     }
 
@@ -331,7 +331,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.appendGetMore(count, outputsConsumer);
     }
 
@@ -339,7 +339,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.appendGetMore(outputsConsumer);
     }
 
@@ -386,7 +386,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> accumulateConsumer) {
-        checkStatic(wrap(accumulateConsumer), accumulateConsumer);
+        checkStatic(decorate(accumulateConsumer), accumulateConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.collect(accumulateConsumer);
     }
 
@@ -395,8 +395,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> accumulateConsumer) {
-        checkStatic(wrap(seedSupplier), seedSupplier);
-        checkStatic(wrap(accumulateConsumer), accumulateConsumer);
+        checkStatic(decorate(seedSupplier), seedSupplier);
+        checkStatic(decorate(accumulateConsumer), accumulateConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.collect(seedSupplier,
                 accumulateConsumer);
     }
@@ -405,7 +405,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collectInto(
             @NotNull final Supplier<? extends AFTER> collectionSupplier) {
-        checkStatic(wrap(collectionSupplier), collectionSupplier);
+        checkStatic(decorate(collectionSupplier), collectionSupplier);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.collectInto(collectionSupplier);
     }
 
@@ -426,7 +426,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> filter(
             @NotNull final Predicate<? super OUT> filterPredicate) {
-        checkStatic(wrap(filterPredicate), filterPredicate);
+        checkStatic(decorate(filterPredicate), filterPredicate);
         return (LoaderStreamChannelCompat<IN, OUT>) super.filter(filterPredicate);
     }
 
@@ -443,7 +443,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.flatMap(mappingFunction);
     }
 
@@ -521,7 +521,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, AFTER>>> liftFunction) {
-        checkStatic(wrap(liftFunction), liftFunction);
+        checkStatic(decorate(liftFunction), liftFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.liftConfig(liftFunction);
     }
 
@@ -535,7 +535,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.map(mappingFunction);
     }
 
@@ -566,7 +566,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
-        checkStatic(wrap(mappingFunction), mappingFunction);
+        checkStatic(decorate(mappingFunction), mappingFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAll(mappingFunction);
     }
 
@@ -575,7 +575,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAllMore(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
-        checkStatic(wrap(mappingConsumer), mappingConsumer);
+        checkStatic(decorate(mappingConsumer), mappingConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAllMore(mappingConsumer);
     }
 
@@ -583,7 +583,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
-        checkStatic(wrap(mappingConsumer), mappingConsumer);
+        checkStatic(decorate(mappingConsumer), mappingConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.mapMore(mappingConsumer);
     }
 
@@ -630,7 +630,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(count, outputSupplier);
     }
 
@@ -638,7 +638,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> orElseGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(outputSupplier);
     }
 
@@ -646,7 +646,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetMore(count, outputsConsumer);
     }
 
@@ -654,14 +654,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGetMore(outputsConsumer);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<IN, OUT> sort(@Nullable final OrderType orderType) {
-        return (LoaderStreamChannelCompat<IN, OUT>) super.sort(orderType);
     }
 
     @NotNull
@@ -681,7 +675,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallel(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
-        checkStatic(wrap(streamFunction), streamFunction);
+        checkStatic(decorate(streamFunction), streamFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.parallel(count, streamFunction);
     }
 
@@ -714,8 +708,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
-        checkStatic(wrap(keyFunction), keyFunction);
-        checkStatic(wrap(streamFunction), streamFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
+        checkStatic(decorate(streamFunction), streamFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.parallelBy(keyFunction, streamFunction);
     }
 
@@ -724,7 +718,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("factory", factory);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.parallelBy(keyFunction, factory);
     }
@@ -734,7 +728,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("routine", routine);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.parallelBy(keyFunction, routine);
     }
@@ -744,7 +738,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.parallelBy(keyFunction, builder);
     }
 
@@ -752,7 +746,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> peek(
             @NotNull final Consumer<? super OUT> peekConsumer) {
-        checkStatic(wrap(peekConsumer), peekConsumer);
+        checkStatic(decorate(peekConsumer), peekConsumer);
         return (LoaderStreamChannelCompat<IN, OUT>) super.peek(peekConsumer);
     }
 
@@ -766,7 +760,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public LoaderStreamChannelCompat<IN, OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction) {
-        checkStatic(wrap(accumulateFunction), accumulateFunction);
+        checkStatic(decorate(accumulateFunction), accumulateFunction);
         return (LoaderStreamChannelCompat<IN, OUT>) super.reduce(accumulateFunction);
     }
 
@@ -776,8 +770,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER>
                     accumulateFunction) {
-        checkStatic(wrap(seedSupplier), seedSupplier);
-        checkStatic(wrap(accumulateFunction), accumulateFunction);
+        checkStatic(decorate(seedSupplier), seedSupplier);
+        checkStatic(decorate(accumulateFunction), accumulateFunction);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.reduce(seedSupplier,
                 accumulateFunction);
     }
@@ -830,6 +824,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<IN, OUT> sort(@Nullable final OrderType orderType) {
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sort(orderType);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<IN, OUT> straight() {
         return (LoaderStreamChannelCompat<IN, OUT>) super.straight();
     }
@@ -871,7 +871,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(count, outputSupplier);
     }
 
@@ -879,7 +879,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(wrap(outputSupplier), outputSupplier);
+        checkStatic(decorate(outputSupplier), outputSupplier);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(outputSupplier);
     }
 
@@ -887,7 +887,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetMore(count, outputsConsumer);
     }
 
@@ -895,7 +895,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @Override
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(wrap(outputsConsumer), outputsConsumer);
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
         return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGetMore(outputsConsumer);
     }
 
@@ -1072,7 +1072,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             throw new IllegalStateException("the loader context is null");
         }
 
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         checkStatic("factory", factory);
         return parallelBy(keyFunction, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
@@ -1082,7 +1082,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        checkStatic(wrap(keyFunction), keyFunction);
+        checkStatic(decorate(keyFunction), keyFunction);
         return parallelBy(keyFunction, buildRoutine(builder));
     }
 

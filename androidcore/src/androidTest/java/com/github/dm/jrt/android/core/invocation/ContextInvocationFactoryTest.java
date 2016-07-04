@@ -104,10 +104,11 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                                .syncCall()
                                .close()
                                .getError()).isNull();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
-                               .syncCall()
-                               .close()
-                               .getError()).isNull();
+        assertThat(
+                JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
+                            .syncCall()
+                            .close()
+                            .getError()).isNull();
     }
 
     public void testToken() {
@@ -188,14 +189,6 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
-    public static class ContextTest extends TemplateContextInvocation<Object, Object> {
-
-        @Override
-        public void onComplete(@NotNull final Channel<Object, ?> result) {
-            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
-        }
-    }
-
     public static class ChannelContextTest extends ChannelContextInvocation<Object, Object> {
 
         @NotNull
@@ -203,6 +196,14 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         protected Channel<?, Object> onChannel(@NotNull final Channel<?, Object> channel) {
             assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
             return channel;
+        }
+    }
+
+    public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+
+        @Override
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
+            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
         }
     }
 }

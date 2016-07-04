@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.PredicateWrapper;
+import com.github.dm.jrt.function.PredicateDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,14 +36,14 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
 
-    private final PredicateWrapper<? super IN> mFilterPredicate;
+    private final PredicateDecorator<? super IN> mFilterPredicate;
 
     /**
      * Constructor.
      *
      * @param filterPredicate the predicate defining the condition.
      */
-    AnyMatchInvocationFactory(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
+    AnyMatchInvocationFactory(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
         super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
         mFilterPredicate = filterPredicate;
     }
@@ -61,7 +61,7 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
      */
     private static class AnyMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
 
-        private final PredicateWrapper<? super IN> mFilterPredicate;
+        private final PredicateDecorator<? super IN> mFilterPredicate;
 
         private boolean mIsMatch;
 
@@ -70,7 +70,7 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
          *
          * @param filterPredicate the predicate defining the condition.
          */
-        private AnyMatchInvocation(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
+        private AnyMatchInvocation(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
             mFilterPredicate = filterPredicate;
         }
 

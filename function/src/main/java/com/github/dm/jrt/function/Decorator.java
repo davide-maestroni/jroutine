@@ -17,16 +17,16 @@
 package com.github.dm.jrt.function;
 
 /**
- * Interface defining a wrapper of functions.
+ * Interface defining a decorator of functions.
  * <p>
  * Created by davide-maestroni on 02/13/2016.
  */
-public interface Wrapper {
+public interface Decorator {
 
     /**
      * Checks if the class of the wrapped functions are static or top level.
      *
-     * @return whether this wrapper has a static scope.
+     * @return whether this decorator has a static scope.
      */
     boolean hasStaticScope();
 }

@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
+import com.github.dm.jrt.function.ConsumerDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-    private final ConsumerWrapper<? super RoutineException> mErrorConsumer;
+    private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      * @param errorConsumer the consumer instance.
      */
     PeekErrorInvocationFactory(
-            @NotNull final ConsumerWrapper<? super RoutineException> errorConsumer) {
+            @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
         super(asArgs(ConstantConditions.notNull("consumer instance", errorConsumer)));
         mErrorConsumer = errorConsumer;
     }
@@ -63,7 +63,7 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      */
     private static class PeekErrorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-        private final ConsumerWrapper<? super RoutineException> mErrorConsumer;
+        private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
 
         /**
          * Constructor.
@@ -71,7 +71,7 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
          * @param errorConsumer the consumer instance.
          */
         private PeekErrorInvocation(
-                @NotNull final ConsumerWrapper<? super RoutineException> errorConsumer) {
+                @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
             mErrorConsumer = errorConsumer;
         }
 

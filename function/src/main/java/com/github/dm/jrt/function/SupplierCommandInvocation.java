@@ -33,14 +33,14 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-    private final SupplierWrapper<? extends OUT> mSupplier;
+    private final SupplierDecorator<? extends OUT> mSupplier;
 
     /**
      * Constructor.
      *
      * @param supplier the supplier instance.
      */
-    public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
+    public SupplierCommandInvocation(@NotNull final SupplierDecorator<? extends OUT> supplier) {
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;
     }

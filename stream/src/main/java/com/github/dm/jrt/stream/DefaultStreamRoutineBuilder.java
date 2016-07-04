@@ -68,11 +68,7 @@ class DefaultStreamRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBuilder<
     protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
             @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final InvocationFactory<? super BEFORE, ? extends AFTER> factory) {
-        return JRoutineCore.with(factory)
-                           .invocationConfiguration()
-                           .with(streamConfiguration.asInvocationConfiguration())
-                           .applied()
-                           .buildRoutine();
+        return newRoutine(streamConfiguration, JRoutineCore.with(factory));
     }
 
     @NotNull

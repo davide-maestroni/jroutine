@@ -30,13 +30,13 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a predicate instance.
+ * Class decorating a predicate instance.
  * <p>
  * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN> the input data type.
  */
-public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<IN>, Wrapper {
+public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate<IN>, Decorator {
 
     private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -48,25 +48,25 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
 
     private static final LogicalPredicate OR_PREDICATE = new LogicalPredicate();
 
-    private static final PredicateWrapper<Object> sNegative =
-            new PredicateWrapper<Object>(new Predicate<Object>() {
+    private static final PredicateDecorator<Object> sNegative =
+            new PredicateDecorator<Object>(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
                     return false;
                 }
             });
 
-    private static final PredicateWrapper<Object> sNotNull =
-            new PredicateWrapper<Object>(new Predicate<Object>() {
+    private static final PredicateDecorator<Object> sNotNull =
+            new PredicateDecorator<Object>(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
                     return (o != null);
                 }
             });
 
-    private static final PredicateWrapper<Object> sIsNull = sNotNull.negate();
+    private static final PredicateDecorator<Object> sIsNull = sNotNull.negate();
 
-    private static final PredicateWrapper<Object> sPositive = sNegative.negate();
+    private static final PredicateDecorator<Object> sPositive = sNegative.negate();
 
     private final Predicate<? super IN> mPredicate;
 
@@ -77,7 +77,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      *
      * @param predicate the core predicate.
      */
-    private PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
+    private PredicateDecorator(@NotNull final Predicate<? super IN> predicate) {
         this(predicate, Collections.<Predicate<?>>singletonList(
                 ConstantConditions.notNull("predicate instance", predicate)));
     }
@@ -88,7 +88,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      * @param predicate  the core predicate.
      * @param predicates the list of wrapped predicates.
      */
-    private PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
+    private PredicateDecorator(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
         super(asArgs(predicates));
         mPredicate = predicate;
@@ -96,115 +96,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     }
 
     /**
-     * Returns a predicate wrapper testing for equality to the specified object.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param targetRef the target reference.
-     * @param <IN>      the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN> PredicateWrapper<IN> isEqualTo(@Nullable final Object targetRef) {
-        if (targetRef == null) {
-            return isNull();
-        }
-
-        return new PredicateWrapper<IN>(new EqualToPredicate<IN>(targetRef));
-    }
-
-    /**
-     * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
-     * class.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param type the class type.
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
-        return new PredicateWrapper<IN>(
-                new InstanceOfPredicate<IN>(ConstantConditions.notNull("type", type)));
-    }
-
-    /**
-     * Returns a predicate wrapper returning true when the passed argument is not null.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> PredicateWrapper<IN> isNotNull() {
-        return (PredicateWrapper<IN>) sNotNull;
-    }
-
-    /**
-     * Returns a predicate wrapper returning true when the passed argument is null.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> PredicateWrapper<IN> isNull() {
-        return (PredicateWrapper<IN>) sIsNull;
-    }
-
-    /**
-     * Returns a predicate wrapper testing for identity to the specified object.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param targetRef the target reference.
-     * @param <IN>      the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN> PredicateWrapper<IN> isSameAs(@Nullable final Object targetRef) {
-        if (targetRef == null) {
-            return isNull();
-        }
-
-        return new PredicateWrapper<IN>(new SameAsPredicate<IN>(targetRef));
-    }
-
-    /**
-     * Returns a predicate wrapper always returning the false.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> PredicateWrapper<IN> negative() {
-        return (PredicateWrapper<IN>) sNegative;
-    }
-
-    /**
-     * Returns a predicate wrapper always returning the true.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> PredicateWrapper<IN> positive() {
-        return (PredicateWrapper<IN>) sPositive;
-    }
-
-    /**
-     * Wraps the specified predicate instance so to provide additional features.
+     * Decorates the specified predicate instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -216,26 +108,134 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      *
      * @param predicate the predicate instance.
      * @param <IN>      the input data type.
-     * @return the wrapped predicate.
+     * @return the decorated predicate.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
-        if (predicate instanceof PredicateWrapper) {
-            return (PredicateWrapper<IN>) predicate;
+    public static <IN> PredicateDecorator<IN> decorate(@NotNull final Predicate<IN> predicate) {
+        if (predicate instanceof PredicateDecorator) {
+            return (PredicateDecorator<IN>) predicate;
         }
 
-        return new PredicateWrapper<IN>(predicate);
+        return new PredicateDecorator<IN>(predicate);
     }
 
     /**
-     * Returns a composed predicate wrapper that represents a short-circuiting logical AND of this
+     * Returns a predicate decorator testing for equality to the specified object.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN>      the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    public static <IN> PredicateDecorator<IN> isEqualTo(@Nullable final Object targetRef) {
+        if (targetRef == null) {
+            return isNull();
+        }
+
+        return new PredicateDecorator<IN>(new EqualToPredicate<IN>(targetRef));
+    }
+
+    /**
+     * Returns a predicate decorator testing whether the passed inputs are instances of the
+     * specified class.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param type the class type.
+     * @param <IN> the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    public static <IN> PredicateDecorator<IN> isInstanceOf(@NotNull final Class<?> type) {
+        return new PredicateDecorator<IN>(
+                new InstanceOfPredicate<IN>(ConstantConditions.notNull("type", type)));
+    }
+
+    /**
+     * Returns a predicate decorator returning true when the passed argument is not null.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateDecorator<IN> isNotNull() {
+        return (PredicateDecorator<IN>) sNotNull;
+    }
+
+    /**
+     * Returns a predicate decorator returning true when the passed argument is null.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateDecorator<IN> isNull() {
+        return (PredicateDecorator<IN>) sIsNull;
+    }
+
+    /**
+     * Returns a predicate decorator testing for identity to the specified object.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN>      the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    public static <IN> PredicateDecorator<IN> isSameAs(@Nullable final Object targetRef) {
+        if (targetRef == null) {
+            return isNull();
+        }
+
+        return new PredicateDecorator<IN>(new SameAsPredicate<IN>(targetRef));
+    }
+
+    /**
+     * Returns a predicate decorator always returning the false.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateDecorator<IN> negative() {
+        return (PredicateDecorator<IN>) sNegative;
+    }
+
+    /**
+     * Returns a predicate decorator always returning the true.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateDecorator<IN> positive() {
+        return (PredicateDecorator<IN>) sPositive;
+    }
+
+    /**
+     * Returns a composed predicate decorator that represents a short-circuiting logical AND of this
      * predicate and another.
      *
      * @param other a predicate that will be logically-ANDed with this predicate.
      * @return the composed predicate.
      */
     @NotNull
-    public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
+    public PredicateDecorator<IN> and(@NotNull final Predicate<? super IN> other) {
         ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
@@ -243,15 +243,15 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
         newPredicates.add(AND_PREDICATE);
-        if (other instanceof PredicateWrapper) {
-            newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
+        if (other instanceof PredicateDecorator) {
+            newPredicates.addAll(((PredicateDecorator<?>) other).mPredicates);
 
         } else {
             newPredicates.add(other);
         }
 
         newPredicates.add(CLOSE_PREDICATE);
-        return new PredicateWrapper<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
+        return new PredicateDecorator<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
     }
 
     public boolean hasStaticScope() {
@@ -265,13 +265,13 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     }
 
     /**
-     * Returns a predicate wrapper that represents the logical negation of this predicate.
+     * Returns a predicate decorator that represents the logical negation of this predicate.
      *
      * @return the negated predicate.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public PredicateWrapper<IN> negate() {
+    public PredicateDecorator<IN> negate() {
         final List<Predicate<?>> predicates = mPredicates;
         final int size = predicates.size();
         final ArrayList<Predicate<?>> newPredicates = new ArrayList<Predicate<?>>(size + 1);
@@ -310,22 +310,22 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
 
         final Predicate<? super IN> predicate = mPredicate;
         if (predicate instanceof NegatePredicate) {
-            return new PredicateWrapper<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
+            return new PredicateDecorator<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
                     newPredicates);
         }
 
-        return new PredicateWrapper<IN>(new NegatePredicate<IN>(predicate), newPredicates);
+        return new PredicateDecorator<IN>(new NegatePredicate<IN>(predicate), newPredicates);
     }
 
     /**
-     * Returns a composed predicate wrapper that represents a short-circuiting logical OR of this
+     * Returns a composed predicate decorator that represents a short-circuiting logical OR of this
      * predicate and another.
      *
      * @param other a predicate that will be logically-ORed with this predicate.
      * @return the composed predicate.
      */
     @NotNull
-    public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
+    public PredicateDecorator<IN> or(@NotNull final Predicate<? super IN> other) {
         ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
@@ -333,15 +333,15 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
         newPredicates.add(OR_PREDICATE);
-        if (other instanceof PredicateWrapper) {
-            newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
+        if (other instanceof PredicateDecorator) {
+            newPredicates.addAll(((PredicateDecorator<?>) other).mPredicates);
 
         } else {
             newPredicates.add(other);
         }
 
         newPredicates.add(CLOSE_PREDICATE);
-        return new PredicateWrapper<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
+        return new PredicateDecorator<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
     }
 
     /**

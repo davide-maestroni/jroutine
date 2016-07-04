@@ -30,8 +30,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.stream.StreamInputs.range;
-import static com.github.dm.jrt.stream.StreamInputs.sequence;
+import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.Streams.sequence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -40,7 +40,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/02/2016.
  */
-public class StreamInputsTest {
+public class StreamsTest {
 
     @Test
     public void testRange() {
@@ -443,7 +443,7 @@ public class StreamInputsTest {
     @Test
     public void testRangeEquals() {
         final Consumer<? extends Channel<? extends Number, ?>> range1 =
-                StreamInputs.range(BigDecimal.ONE, 10);
+                Streams.range(BigDecimal.ONE, 10);
         assertThat(range1).isEqualTo(range1);
         assertThat(range1).isNotEqualTo(null);
         assertThat(range1).isNotEqualTo("test");
@@ -452,7 +452,7 @@ public class StreamInputsTest {
         assertThat(range1.hashCode()).isEqualTo(range(BigDecimal.ONE, 10).hashCode());
 
         final Consumer<? extends Channel<? extends Number, ?>> range2 =
-                StreamInputs.range(BigInteger.ONE, 10);
+                Streams.range(BigInteger.ONE, 10);
         assertThat(range2).isEqualTo(range2);
         assertThat(range2).isNotEqualTo(null);
         assertThat(range2).isNotEqualTo("test");
@@ -460,7 +460,7 @@ public class StreamInputsTest {
         assertThat(range2).isEqualTo(range(BigInteger.ONE, 10));
         assertThat(range2.hashCode()).isEqualTo(range(BigInteger.ONE, 10).hashCode());
 
-        final Consumer<? extends Channel<? extends Number, ?>> range3 = StreamInputs.range(1, 10);
+        final Consumer<? extends Channel<? extends Number, ?>> range3 = Streams.range(1, 10);
         assertThat(range3).isEqualTo(range3);
         assertThat(range3).isNotEqualTo(null);
         assertThat(range3).isNotEqualTo("test");
@@ -468,8 +468,7 @@ public class StreamInputsTest {
         assertThat(range3).isEqualTo(range(1, 10));
         assertThat(range3.hashCode()).isEqualTo(range(1, 10).hashCode());
 
-        final Consumer<? extends Channel<? extends Number, ?>> range4 =
-                StreamInputs.range(1, 10, -2);
+        final Consumer<? extends Channel<? extends Number, ?>> range4 = Streams.range(1, 10, -2);
         assertThat(range4).isEqualTo(range4);
         assertThat(range4).isNotEqualTo(null);
         assertThat(range4).isNotEqualTo("test");
@@ -484,7 +483,7 @@ public class StreamInputsTest {
             }
         };
         final Consumer<? extends Channel<? extends Character, ?>> range5 =
-                StreamInputs.range('a', 'f', function);
+                Streams.range('a', 'f', function);
         assertThat(range5).isEqualTo(range5);
         assertThat(range5).isNotEqualTo(null);
         assertThat(range5).isNotEqualTo("test");
@@ -497,7 +496,7 @@ public class StreamInputsTest {
     @SuppressWarnings("ConstantConditions")
     public void testRangeError() {
         try {
-            StreamInputs.range(null, 'f', new Function<Character, Character>() {
+            Streams.range(null, 'f', new Function<Character, Character>() {
 
                 public Character apply(final Character character) {
                     return (char) (character + 1);
@@ -509,7 +508,7 @@ public class StreamInputsTest {
         }
 
         try {
-            StreamInputs.range('a', null, new Function<Character, Character>() {
+            Streams.range('a', null, new Function<Character, Character>() {
 
                 public Character apply(final Character character) {
                     return (char) (character + 1);
@@ -521,28 +520,28 @@ public class StreamInputsTest {
         }
 
         try {
-            StreamInputs.range('a', 'f', null);
+            Streams.range('a', 'f', null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            StreamInputs.range(null, 1, 1);
+            Streams.range(null, 1, 1);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            StreamInputs.range(1, null, 1);
+            Streams.range(1, null, 1);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            StreamInputs.range(1, 1, (Number) null);
+            Streams.range(1, 1, (Number) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -572,14 +571,14 @@ public class StreamInputsTest {
         };
 
         try {
-            StreamInputs.range(number, number, number);
+            Streams.range(number, number, number);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
         }
 
         try {
-            StreamInputs.range(number, number);
+            Streams.range(number, number);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -635,23 +634,21 @@ public class StreamInputsTest {
     @Test
     public void testSequenceEquals() {
         final Consumer<Channel<Integer, ?>> sequence =
-                StreamInputs.sequence(1, 10, Functions.<Integer, Long>first());
+                Streams.sequence(1, 10, Functions.<Integer, Long>first());
         assertThat(sequence).isEqualTo(sequence);
         assertThat(sequence).isNotEqualTo(null);
         assertThat(sequence).isNotEqualTo("test");
-        assertThat(sequence).isNotEqualTo(
-                StreamInputs.sequence(1, 9, Functions.<Integer, Long>first()));
-        assertThat(sequence).isEqualTo(
-                StreamInputs.sequence(1, 10, Functions.<Integer, Long>first()));
+        assertThat(sequence).isNotEqualTo(Streams.sequence(1, 9, Functions.<Integer, Long>first()));
+        assertThat(sequence).isEqualTo(Streams.sequence(1, 10, Functions.<Integer, Long>first()));
         assertThat(sequence.hashCode()).isEqualTo(
-                StreamInputs.sequence(1, 10, Functions.<Integer, Long>first()).hashCode());
+                Streams.sequence(1, 10, Functions.<Integer, Long>first()).hashCode());
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testSequenceError() {
         try {
-            StreamInputs.sequence(null, 2, new BiFunction<Character, Long, Character>() {
+            Streams.sequence(null, 2, new BiFunction<Character, Long, Character>() {
 
                 public Character apply(final Character character, final Long n) {
                     return (char) (character + 1);
@@ -663,14 +660,14 @@ public class StreamInputsTest {
         }
 
         try {
-            StreamInputs.sequence('a', 2, null);
+            Streams.sequence('a', 2, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            StreamInputs.sequence(1, -1, Functions.<Integer, Long>first());
+            Streams.sequence(1, -1, Functions.<Integer, Long>first());
             fail();
 
         } catch (final IllegalArgumentException ignored) {

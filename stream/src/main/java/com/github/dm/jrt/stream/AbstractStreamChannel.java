@@ -43,7 +43,7 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
@@ -61,10 +61,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerMapping;
+import static com.github.dm.jrt.function.Functions.decorate;
 import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Abstract implementation of a stream channel.
@@ -92,7 +92,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     private static final StraightRunner sSequentialRunner = new StraightRunner();
 
-    private final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+    private final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
     private final Object mMutex = new Object();
 
@@ -158,7 +158,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
         mStreamConfiguration =
                 ConstantConditions.notNull("stream configuration", streamConfiguration);
         mSourceChannel = ConstantConditions.notNull("source channel", sourceChannel);
-        mBindingFunction = (bindingFunction != null) ? wrap(bindingFunction) : null;
+        mBindingFunction = (bindingFunction != null) ? decorate(bindingFunction) : null;
     }
 
     public boolean abort() {
@@ -359,7 +359,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return map(new ConcatLoopSupplierInvocation<OUT>(count, wrap(outputSupplier)));
+        return map(new ConcatLoopSupplierInvocation<OUT>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -370,7 +370,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return map(new ConcatLoopConsumerInvocation<OUT>(count, wrap(outputsConsumer)));
+        return map(new ConcatLoopConsumerInvocation<OUT>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
@@ -475,7 +475,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
-        return map(new MapInvocation<OUT, AFTER>(wrap(mappingFunction)));
+        return map(new MapInvocation<OUT, AFTER>(decorate(mappingFunction)));
     }
 
     @NotNull
@@ -673,7 +673,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return map(new OrElseSupplierInvocationFactory<OUT>(count, wrap(outputSupplier)));
+        return map(new OrElseSupplierInvocationFactory<OUT>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -684,18 +684,13 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return map(new OrElseConsumerInvocationFactory<OUT>(count, wrap(outputsConsumer)));
+        return map(new OrElseConsumerInvocationFactory<OUT>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
     public StreamChannel<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
         return orElseGetMore(1, outputsConsumer);
-    }
-
-    @NotNull
-    public StreamChannel<IN, OUT> sort(@Nullable final OrderType orderType) {
-        return streamInvocationConfiguration().withOutputOrder(orderType).applied();
     }
 
     @NotNull
@@ -712,7 +707,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     public <AFTER> StreamChannel<IN, AFTER> parallel(final int count,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
-        return parallel(count, new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
+        return parallel(count, new StreamInvocationFactory<OUT, AFTER>(decorate(streamFunction)));
     }
 
     @NotNull
@@ -742,7 +737,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> streamFunction) {
         return parallelBy(keyFunction,
-                new StreamInvocationFactory<OUT, AFTER>(wrap(streamFunction)));
+                new StreamInvocationFactory<OUT, AFTER>(decorate(streamFunction)));
     }
 
     @NotNull
@@ -771,12 +766,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> peek(@NotNull final Consumer<? super OUT> peekConsumer) {
-        return map(new PeekOutputInvocation<OUT>(wrap(peekConsumer)));
+        return map(new PeekOutputInvocation<OUT>(decorate(peekConsumer)));
     }
 
     @NotNull
     public StreamChannel<IN, OUT> peekComplete(@NotNull final Action peekAction) {
-        return map(new PeekCompleteInvocation<OUT>(wrap(peekAction)));
+        return map(new PeekCompleteInvocation<OUT>(decorate(peekAction)));
     }
 
     @NotNull
@@ -830,6 +825,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> skip(final int count) {
         return map(Operators.<OUT>skip(count));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> sort(@Nullable final OrderType orderType) {
+        return streamInvocationConfiguration().withOutputOrder(orderType).applied();
     }
 
     @NotNull
@@ -887,7 +887,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public <AFTER> StreamChannel<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        return map(new LoopSupplierInvocation<AFTER>(count, wrap(outputSupplier)));
+        return map(new LoopSupplierInvocation<AFTER>(count, decorate(outputSupplier)));
     }
 
     @NotNull
@@ -899,7 +899,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public <AFTER> StreamChannel<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        return map(new LoopConsumerInvocation<AFTER>(count, wrap(outputsConsumer)));
+        return map(new LoopConsumerInvocation<AFTER>(count, decorate(outputsConsumer)));
     }
 
     @NotNull
@@ -1085,8 +1085,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    private FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
-        final FunctionWrapper<Channel<?, IN>, Channel<?, OUT>> bindingFunction = mBindingFunction;
+    private FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
+        final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> bindingFunction = mBindingFunction;
         return (bindingFunction != null) ? bindingFunction
                 : Functions.<Channel<?, IN>, Channel<?, OUT>>castTo(
                         new ClassToken<Channel<?, OUT>>() {});

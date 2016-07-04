@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Utility class providing several operators implemented as invocation factories.
@@ -86,7 +86,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> allMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AllMatchInvocationFactory<IN>(wrap(predicate));
+        return new AllMatchInvocationFactory<IN>(decorate(predicate));
     }
 
     /**
@@ -100,7 +100,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> anyMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AnyMatchInvocationFactory<IN>(wrap(predicate));
+        return new AnyMatchInvocationFactory<IN>(decorate(predicate));
     }
 
     /**
@@ -530,7 +530,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> noneMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AllMatchInvocationFactory<IN>(wrap(predicate).negate());
+        return new AllMatchInvocationFactory<IN>(decorate(predicate).negate());
     }
 
     /**
@@ -544,7 +544,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> notAllMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AnyMatchInvocationFactory<IN>(wrap(predicate).negate());
+        return new AnyMatchInvocationFactory<IN>(decorate(predicate).negate());
     }
 
     /**
@@ -713,7 +713,7 @@ public class Operators {
     @NotNull
     public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
             @NotNull final Function<? super IN, KEY> keyFunction) {
-        return new ToMapInvocationFactory<IN, KEY>(wrap(keyFunction));
+        return new ToMapInvocationFactory<IN, KEY>(decorate(keyFunction));
     }
 
     /**

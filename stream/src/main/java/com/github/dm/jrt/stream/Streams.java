@@ -20,9 +20,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.function.BiFunctionDecorator;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
 
 /**
@@ -38,12 +38,12 @@ import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
  * <p>
  * Created by davide-maestroni on 07/02/2016.
  */
-public class StreamInputs {
+public class Streams {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected StreamInputs() {
+    protected Streams() {
         ConstantConditions.avoid();
     }
 
@@ -64,7 +64,8 @@ public class StreamInputs {
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> incrementFunction) {
         return new RangeConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.notNull("end element", end), wrap(incrementFunction));
+                ConstantConditions.notNull("end element", end),
+                Functions.decorate(incrementFunction));
     }
 
     /**
@@ -124,7 +125,8 @@ public class StreamInputs {
     public static <AFTER> Consumer<Channel<AFTER, ?>> sequence(@NotNull final AFTER start,
             final long count, @NotNull final BiFunction<AFTER, Long, AFTER> nextFunction) {
         return new SequenceConsumer<AFTER>(ConstantConditions.notNull("start element", start),
-                ConstantConditions.positive("sequence size", count), wrap(nextFunction));
+                ConstantConditions.positive("sequence size", count),
+                Functions.decorate(nextFunction));
     }
 
     @NotNull
@@ -492,7 +494,7 @@ public class StreamInputs {
 
         private final long mCount;
 
-        private final BiFunctionWrapper<OUT, Long, OUT> mNextFunction;
+        private final BiFunctionDecorator<OUT, Long, OUT> mNextFunction;
 
         private final OUT mStart;
 
@@ -504,7 +506,7 @@ public class StreamInputs {
          * @param nextFunction the function computing the next element.
          */
         private SequenceConsumer(@NotNull final OUT start, final long count,
-                @NotNull final BiFunctionWrapper<OUT, Long, OUT> nextFunction) {
+                @NotNull final BiFunctionDecorator<OUT, Long, OUT> nextFunction) {
             super(asArgs(start, count, nextFunction));
             mStart = start;
             mCount = count;
@@ -512,7 +514,7 @@ public class StreamInputs {
         }
 
         public void accept(final Channel<OUT, ?> result) throws Exception {
-            final BiFunctionWrapper<OUT, Long, OUT> next = mNextFunction;
+            final BiFunctionDecorator<OUT, Long, OUT> next = mNextFunction;
             OUT current = mStart;
             final long count = mCount;
             final long last = count - 1;

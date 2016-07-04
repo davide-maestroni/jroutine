@@ -30,18 +30,18 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class wrapping a function instance.
+ * Class decorating a function instance.
  * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionWrapper<IN, OUT> extends DeepEqualObject
-        implements Function<IN, OUT>, Wrapper {
+public class FunctionDecorator<IN, OUT> extends DeepEqualObject
+        implements Function<IN, OUT>, Decorator {
 
-    private static final FunctionWrapper<Object, Object> sIdentity =
-            new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
+    private static final FunctionDecorator<Object, Object> sIdentity =
+            new FunctionDecorator<Object, Object>(new Function<Object, Object>() {
 
                 public Object apply(final Object in) {
                     return in;
@@ -55,7 +55,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      *
      * @param function the wrapped function.
      */
-    private FunctionWrapper(@NotNull final Function<?, ?> function) {
+    private FunctionDecorator(@NotNull final Function<?, ?> function) {
         this(Collections.<Function<?, ?>>singletonList(
                 ConstantConditions.notNull("function instance", function)));
     }
@@ -65,60 +65,46 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      *
      * @param functions the list of wrapped functions.
      */
-    private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
+    private FunctionDecorator(@NotNull final List<Function<?, ?>> functions) {
         super(asArgs(functions));
         mFunctions = functions;
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class.
+     * Returns a function decorator casting the passed inputs to the specified class.
      * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param type  the class type.
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
-     * @return the function wrapper.
+     * @return the function decorator.
      */
     @NotNull
-    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+    public static <IN, OUT> FunctionDecorator<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
-        return new FunctionWrapper<IN, OUT>(
+        return new FunctionDecorator<IN, OUT>(
                 new ClassCastFunction<IN, OUT>(ConstantConditions.notNull("type", type)));
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class token type.
+     * Returns a function decorator casting the passed inputs to the specified class token type.
      * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param token the class token.
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
-     * @return the function wrapper.
+     * @return the function decorator.
      */
     @NotNull
-    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+    public static <IN, OUT> FunctionDecorator<IN, OUT> castTo(
             @NotNull final ClassToken<? extends OUT> token) {
         return castTo(token.getRawClass());
     }
 
     /**
-     * Returns the identity function wrapper.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the function wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> FunctionWrapper<IN, IN> identity() {
-        return (FunctionWrapper<IN, IN>) sIdentity;
-    }
-
-    /**
-     * Wraps the specified function instance so to provide additional features.
+     * Decorates the specified function instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
      * <p>
@@ -131,20 +117,34 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the wrapped function.
+     * @return the decorated function.
      */
     @NotNull
-    public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
+    public static <IN, OUT> FunctionDecorator<IN, OUT> decorate(
             @NotNull final Function<IN, OUT> function) {
-        if (function instanceof FunctionWrapper) {
-            return (FunctionWrapper<IN, OUT>) function;
+        if (function instanceof FunctionDecorator) {
+            return (FunctionDecorator<IN, OUT>) function;
         }
 
-        return new FunctionWrapper<IN, OUT>(function);
+        return new FunctionDecorator<IN, OUT>(function);
     }
 
     /**
-     * Returns a composed function wrapper that first applies this function to its input, and then
+     * Returns the identity function decorator.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the function decorator.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> FunctionDecorator<IN, IN> identity() {
+        return (FunctionDecorator<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Returns a composed function decorator that first applies this function to its input, and then
      * applies the after function to the result.
      *
      * @param after   the function to apply after this function is applied.
@@ -152,25 +152,25 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      * @return the composed function.
      */
     @NotNull
-    public <AFTER> FunctionWrapper<IN, AFTER> andThen(
+    public <AFTER> FunctionDecorator<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
         ConstantConditions.notNull("function instance", after);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
         newFunctions.addAll(functions);
-        if (after instanceof FunctionWrapper) {
-            newFunctions.addAll(((FunctionWrapper<?, ?>) after).mFunctions);
+        if (after instanceof FunctionDecorator) {
+            newFunctions.addAll(((FunctionDecorator<?, ?>) after).mFunctions);
 
         } else {
             newFunctions.add(after);
         }
 
-        return new FunctionWrapper<IN, AFTER>(newFunctions);
+        return new FunctionDecorator<IN, AFTER>(newFunctions);
     }
 
     /**
-     * Returns a composed function wrapper that first applies the before function to its input,
+     * Returns a composed function decorator that first applies the before function to its input,
      * and then applies this function to the result.
      *
      * @param before   the function to apply before this function is applied.
@@ -178,21 +178,21 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      * @return the composed function.
      */
     @NotNull
-    public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
+    public <BEFORE> FunctionDecorator<BEFORE, OUT> compose(
             @NotNull final Function<? super BEFORE, ? extends IN> before) {
         ConstantConditions.notNull("function instance", before);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
-        if (before instanceof FunctionWrapper) {
-            newFunctions.addAll(((FunctionWrapper<?, ?>) before).mFunctions);
+        if (before instanceof FunctionDecorator) {
+            newFunctions.addAll(((FunctionDecorator<?, ?>) before).mFunctions);
 
         } else {
             newFunctions.add(before);
         }
 
         newFunctions.addAll(functions);
-        return new FunctionWrapper<BEFORE, OUT>(newFunctions);
+        return new FunctionDecorator<BEFORE, OUT>(newFunctions);
     }
 
     public boolean hasStaticScope() {

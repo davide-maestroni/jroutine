@@ -24,7 +24,9 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -1536,6 +1538,34 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .asyncCall("test")
                                              .after(seconds(10))
                                              .all()).containsExactly("test");
+    }
+
+    public void testCache() {
+        assertThat(JRoutineStreamLoaderCompat.withStream()
+                                             .on(loaderFrom(getActivity()))
+                                             .loaderId(0)
+                                             .cache(CacheStrategyType.CACHE)
+                                             .asyncCall("test")
+                                             .after(seconds(10))
+                                             .hasCompleted()).isTrue();
+        assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                       .withId(0)
+                                       .buildChannel()
+                                       .after(seconds(10))
+                                       .next()).isEqualTo("test");
+        assertThat(JRoutineStreamLoaderCompat.withStream()
+                                             .on(loaderFrom(getActivity()))
+                                             .loaderId(0)
+                                             .staleAfter(1, TimeUnit.MILLISECONDS)
+                                             .asyncCall("test")
+                                             .after(seconds(10))
+                                             .hasCompleted()).isTrue();
+        assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                       .withId(0)
+                                       .buildChannel()
+                                       .after(seconds(10))
+                                       .getError()).isExactlyInstanceOf(
+                MissingLoaderException.class);
     }
 
     public void testCollect() {

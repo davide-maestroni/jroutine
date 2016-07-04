@@ -37,6 +37,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -1548,6 +1549,26 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         testAppend2(getActivity());
     }
 
+    public void testAsync() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .async(null)
+                                       .map(IdentityInvocation.factoryOf())
+                                       .asyncCall("test")
+                                       .after(seconds(10))
+                                       .all()).containsExactly("test");
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .asyncMap(null)
+                                       .asyncCall("test")
+                                       .after(seconds(10))
+                                       .all()).containsExactly("test");
+    }
+
     public void testCollect() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -2686,6 +2707,28 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         }
     }
 
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testOrElseThrow() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineStreamLoader //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .orElseThrow(new IllegalStateException())
+                                     .asyncCall("test")
+                                     .after(seconds(3))
+                                     .all()).containsExactly("test");
+        assertThat(JRoutineStreamLoader //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .orElseThrow(new IllegalStateException())
+                                     .asyncCall()
+                                     .close()
+                                     .after(seconds(3))
+                                     .getError()
+                                     .getCause()).isExactlyInstanceOf(IllegalStateException.class);
+    }
+
     public void testPeekComplete() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -2883,12 +2926,12 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             return;
         }
 
-        final ContextInvocationFactory<String, String> factory =
-                ContextInvocationFactory.factoryOf(UpperCase.class);
+        final StreamLoaderRoutineBuilder<String, String> builder =
+                JRoutineStreamLoader.<String>withStream().map(new UpperCase());
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(getActivity()))
                                        .then("test1", "test2", "test3")
-                                       .parallel(2, factory)
+                                       .parallel(2, builder.buildFactory())
                                        .asyncCall()
                                        .close()
                                        .after(seconds(3))
@@ -2896,16 +2939,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(getActivity()))
                                        .then("test1", "test2", "test3")
-                                       .parallelBy(Functions.<String>identity(), factory)
-                                       .asyncCall()
-                                       .close()
-                                       .after(seconds(3))
-                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
-        final RoutineBuilder<String, String> builder = JRoutineCore.with(new UpperCase());
-        assertThat(JRoutineStreamLoader.withStream()
-                                       .on(loaderFrom(getActivity()))
-                                       .then("test1", "test2", "test3")
-                                       .parallel(2, builder)
+                                       .parallel(2, builder.buildContextFactory())
                                        .asyncCall()
                                        .close()
                                        .after(seconds(3))
@@ -2913,13 +2947,40 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(getActivity()))
                                        .then("test1", "test2", "test3")
-                                       .parallelBy(Functions.<String>identity(), builder)
+                                       .parallelBy(Functions.<String>identity(),
+                                               builder.buildFactory())
+                                       .asyncCall()
+                                       .close()
+                                       .after(seconds(3))
+                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .then("test1", "test2", "test3")
+                                       .parallelBy(Functions.<String>identity(),
+                                               builder.buildContextFactory())
+                                       .asyncCall()
+                                       .close()
+                                       .after(seconds(3))
+                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        final RoutineBuilder<String, String> routineBuilder = JRoutineCore.with(new UpperCase());
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .then("test1", "test2", "test3")
+                                       .parallel(2, routineBuilder)
+                                       .asyncCall()
+                                       .close()
+                                       .after(seconds(3))
+                                       .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .then("test1", "test2", "test3")
+                                       .parallelBy(Functions.<String>identity(), routineBuilder)
                                        .asyncCall()
                                        .close()
                                        .after(seconds(3))
                                        .all()).containsOnly("TEST1", "TEST2", "TEST3");
         final LoaderRoutineBuilder<String, String> loaderBuilder =
-                JRoutineLoader.on(loaderFrom(getActivity())).with(factory);
+                JRoutineLoader.on(loaderFrom(getActivity())).with(builder.buildContextFactory());
         assertThat(JRoutineStreamLoader.withStream()
                                        .then("test1", "test2", "test3")
                                        .parallel(2, loaderBuilder)

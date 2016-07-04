@@ -2161,7 +2161,21 @@ public class StreamRoutineBuilderTest {
                 });
         assertThat(JRoutineStream.withStream()
                                  .thenGetMore(range(1, 3))
+                                 .parallel(2, sqr.buildFactory())
+                                 .asyncCall()
+                                 .close()
+                                 .after(seconds(3))
+                                 .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream.withStream()
+                                 .thenGetMore(range(1, 3))
                                  .parallel(2, sqr)
+                                 .asyncCall()
+                                 .close()
+                                 .after(seconds(3))
+                                 .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream.withStream()
+                                 .thenGetMore(range(1, 3))
+                                 .parallelBy(Functions.<Integer>identity(), sqr.buildFactory())
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))

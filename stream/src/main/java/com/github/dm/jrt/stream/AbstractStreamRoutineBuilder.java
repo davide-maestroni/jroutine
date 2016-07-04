@@ -93,10 +93,9 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 public StreamRoutineBuilder<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
                     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-                    mStreamConfiguration =
+                    return AbstractStreamRoutineBuilder.this.apply(
                             newConfiguration(streamConfiguration.getStreamConfiguration(),
-                                    configuration, streamConfiguration.getInvocationMode());
-                    return AbstractStreamRoutineBuilder.this;
+                                    configuration, streamConfiguration.getInvocationMode()));
                 }
             };
 
@@ -107,10 +106,9 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 public StreamRoutineBuilder<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
                     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-                    mStreamConfiguration = newConfiguration(configuration,
+                    return AbstractStreamRoutineBuilder.this.apply(newConfiguration(configuration,
                             streamConfiguration.getCurrentConfiguration(),
-                            streamConfiguration.getInvocationMode());
-                    return AbstractStreamRoutineBuilder.this;
+                            streamConfiguration.getInvocationMode()));
                 }
             };
 
@@ -282,10 +280,9 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
     public StreamRoutineBuilder<IN, OUT> invocationMode(
             @NotNull final InvocationMode invocationMode) {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        mStreamConfiguration = ConstantConditions.notNull("stream configuration",
+        return apply(ConstantConditions.notNull("stream configuration",
                 newConfiguration(streamConfiguration.getStreamConfiguration(),
-                        streamConfiguration.getCurrentConfiguration(), invocationMode));
-        return this;
+                        streamConfiguration.getCurrentConfiguration(), invocationMode)));
     }
 
     @NotNull
@@ -734,6 +731,14 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
                 mStreamConfiguration.getCurrentConfiguration());
     }
 
+    // TODO: 04/07/16 javadoc
+    @NotNull
+    protected StreamRoutineBuilder<IN, OUT> apply(
+            @NotNull final StreamConfiguration configuration) {
+        mStreamConfiguration = ConstantConditions.notNull("stream configuration", configuration);
+        return this;
+    }
+
     /**
      * Creates a new stream configuration instance.
      *
@@ -806,8 +811,8 @@ public abstract class AbstractStreamRoutineBuilder<IN, OUT> extends TemplateRout
 
     private void resetConfiguration() {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        mStreamConfiguration = resetConfiguration(streamConfiguration.getStreamConfiguration(),
-                streamConfiguration.getInvocationMode());
+        apply(resetConfiguration(streamConfiguration.getStreamConfiguration(),
+                streamConfiguration.getInvocationMode()));
     }
 
     /**

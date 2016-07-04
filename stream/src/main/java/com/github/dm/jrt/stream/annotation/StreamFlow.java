@@ -49,21 +49,13 @@ public @interface StreamFlow {
     enum TransformationType {
 
         /**
-         * A new instance is created and chained to the current one.
-         * <br>
          * The effect on the flow will depend on the logic implemented in the mapping routine or
          * function.
-         * <br>
-         * A new stream instance is returned by the method, and any further attempt to bind or
-         * read from the current one will raise an exception.
          */
         MAP,
         /**
          * The flow of data is blocked, so that all incoming inputs are processed before a new
          * output is produced.
-         * <br>
-         * A new stream instance is returned by the method, and any further attempt to bind or
-         * read from the current one will raise an exception.
          */
         REDUCE,
         /**
@@ -77,16 +69,10 @@ public @interface StreamFlow {
         /**
          * The flow of data is blocked and incoming inputs are possibly retained, so that outputs
          * are produced only when inputs complete.
-         * <br>
-         * A new stream instance is returned by the method, and any further attempt to bind or
-         * read from the current one will raise an exception.
          */
         COLLECT,
         /**
          * The current stream configuration is modified.
-         * <br>
-         * A new stream instance is returned by the method, and any further attempt to bind or
-         * read from the current one will raise an exception.
          */
         CONFIG,
         /**

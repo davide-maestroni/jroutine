@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.stream;
+package com.github.dm.jrt.android.v4.stream;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -59,63 +59,63 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
- * Created by davide-maestroni on 07/03/2016.
+ * Created by davide-maestroni on 07/04/2016.
  */
-public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
+public class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT>
         extends AbstractStreamRoutineBuilder<IN, OUT>
-        implements StreamLoaderRoutineBuilder<IN, OUT> {
+        implements StreamLoaderRoutineBuilderCompat<IN, OUT> {
 
-    private LoaderStreamConfiguration mStreamConfiguration;
+    private LoaderStreamConfigurationCompat mStreamConfiguration;
 
-    private final InvocationConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>
+    private final InvocationConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>
             mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>() {
+            new InvocationConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>() {
 
                 @NotNull
-                public StreamLoaderRoutineBuilder<IN, OUT> apply(
+                public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
-                    final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-                    return DefaultStreamLoaderRoutineBuilder.this.apply(
+                    final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+                    return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(streamConfiguration.getStreamConfiguration(),
                                     configuration, streamConfiguration.getInvocationMode()));
                 }
             };
 
-    private final LoaderConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>
+    private final LoaderConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>
             mLoaderConfigurable =
-            new LoaderConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>() {
+            new LoaderConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>() {
 
                 @NotNull
-                public StreamLoaderRoutineBuilder<IN, OUT> apply(
+                public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final LoaderConfiguration configuration) {
-                    return DefaultStreamLoaderRoutineBuilder.this.apply(mStreamConfiguration =
+                    return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
                                     configuration));
                 }
             };
 
-    private final LoaderConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>
+    private final LoaderConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>
             mStreamLoaderConfigurable =
-            new LoaderConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>() {
+            new LoaderConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>() {
 
                 @NotNull
-                public StreamLoaderRoutineBuilder<IN, OUT> apply(
+                public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final LoaderConfiguration configuration) {
-                    return DefaultStreamLoaderRoutineBuilder.this.apply(
+                    return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(configuration,
                                     mStreamConfiguration.getCurrentLoaderConfiguration()));
                 }
             };
 
-    private final InvocationConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>
+    private final InvocationConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>
             mStreamInvocationConfigurable =
-            new InvocationConfiguration.Configurable<StreamLoaderRoutineBuilder<IN, OUT>>() {
+            new InvocationConfiguration.Configurable<StreamLoaderRoutineBuilderCompat<IN, OUT>>() {
 
                 @NotNull
-                public StreamLoaderRoutineBuilder<IN, OUT> apply(
+                public StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
-                    final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-                    return DefaultStreamLoaderRoutineBuilder.this.apply(
+                    final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+                    return DefaultStreamLoaderRoutineBuilderCompat.this.apply(
                             newConfiguration(configuration,
                                     streamConfiguration.getCurrentConfiguration(),
                                     streamConfiguration.getInvocationMode()));
@@ -125,8 +125,8 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
     /**
      * Constructor.
      */
-    DefaultStreamLoaderRoutineBuilder() {
-        this(new DefaultLoaderStreamConfiguration(null, LoaderConfiguration.defaultConfiguration(),
+    DefaultStreamLoaderRoutineBuilderCompat() {
+        this(new DefaultLoaderStreamConfigurationCompat(null, LoaderConfiguration.defaultConfiguration(),
                 LoaderConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC));
@@ -137,8 +137,8 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
      *
      * @param streamConfiguration the stream configuration.
      */
-    DefaultStreamLoaderRoutineBuilder(
-            @NotNull final LoaderStreamConfiguration streamConfiguration) {
+    DefaultStreamLoaderRoutineBuilderCompat(
+            @NotNull final LoaderStreamConfigurationCompat streamConfiguration) {
         super(streamConfiguration);
         mStreamConfiguration = streamConfiguration;
     }
@@ -162,403 +162,406 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> append(@Nullable final OUT output) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.append(output);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> append(@Nullable final OUT output) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.append(output);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> append(@Nullable final OUT... outputs) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.append(outputs);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> append(@Nullable final OUT... outputs) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.append(outputs);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> append(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> append(
             @Nullable final Iterable<? extends OUT> outputs) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.append(outputs);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.append(outputs);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> append(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> append(
             @NotNull final Channel<?, ? extends OUT> channel) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.append(channel);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.append(channel);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> appendGet(final long count,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.appendGet(count, outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGet(count, outputSupplier);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> appendGet(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.appendGet(outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGet(outputSupplier);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> appendGetMore(final long count,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.appendGetMore(count, outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGetMore(count,
+                outputsConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> appendGetMore(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> appendGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.appendGetMore(outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.appendGetMore(outputsConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> async() {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.async();
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> async() {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.async();
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> async(@Nullable final Runner runner) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.async(runner);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> async(@Nullable final Runner runner) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.async(runner);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> asyncMap(@Nullable final Runner runner) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.asyncMap(runner);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> asyncMap(@Nullable final Runner runner) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.asyncMap(runner);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable final Runner runner,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
             final int limit, @NotNull final Backoff backoff) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.backoffOn(runner, limit, backoff);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.backoffOn(runner, limit, backoff);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable final Runner runner,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
             final int limit, final long delay, @NotNull final TimeUnit timeUnit) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.backoffOn(runner, limit, delay,
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.backoffOn(runner, limit, delay,
                 timeUnit);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable final Runner runner,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> backoffOn(@Nullable final Runner runner,
             final int limit, @Nullable final UnitDuration delay) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.backoffOn(runner, limit, delay);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.backoffOn(runner, limit, delay);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> collect(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> accumulateConsumer) {
         checkStatic(wrap(accumulateConsumer), accumulateConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.collect(accumulateConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.collect(accumulateConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> collect(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> accumulateConsumer) {
         checkStatic(wrap(seedSupplier), seedSupplier);
         checkStatic(wrap(accumulateConsumer), accumulateConsumer);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.collect(seedSupplier,
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.collect(seedSupplier,
                 accumulateConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER extends Collection<? super OUT>> StreamLoaderRoutineBuilder<IN, AFTER>
+    public <AFTER extends Collection<? super OUT>> StreamLoaderRoutineBuilderCompat<IN, AFTER>
     collectInto(
             @NotNull final Supplier<? extends AFTER> collectionSupplier) {
         checkStatic(wrap(collectionSupplier), collectionSupplier);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.collectInto(collectionSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.collectInto(collectionSupplier);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> delay(final long delay,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> delay(final long delay,
             @NotNull final TimeUnit timeUnit) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.delay(delay, timeUnit);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.delay(delay, timeUnit);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> delay(@NotNull final UnitDuration delay) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.delay(delay);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> delay(@NotNull final UnitDuration delay) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.delay(delay);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> filter(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> filter(
             @NotNull final Predicate<? super OUT> filterPredicate) {
         checkStatic(wrap(filterPredicate), filterPredicate);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.filter(filterPredicate);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.filter(filterPredicate);
     }
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> flatLift(
+    public <BEFORE, AFTER> StreamLoaderRoutineBuilderCompat<BEFORE, AFTER> flatLift(
             @NotNull final Function<? super StreamRoutineBuilder<IN, OUT>, ? extends
                     StreamRoutineBuilder<BEFORE, AFTER>> liftFunction) {
-        return (StreamLoaderRoutineBuilder<BEFORE, AFTER>) super.flatLift(liftFunction);
+        return (StreamLoaderRoutineBuilderCompat<BEFORE, AFTER>) super.flatLift(liftFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> flatMap(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
         checkStatic(wrap(mappingFunction), mappingFunction);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.flatMap(mappingFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.flatMap(mappingFunction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> invocationMode(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> invocationMode(
             @NotNull final InvocationMode invocationMode) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.invocationMode(invocationMode);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.invocationMode(invocationMode);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> lag(final long delay,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> lag(final long delay,
             @NotNull final TimeUnit timeUnit) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.lag(delay, timeUnit);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.lag(delay, timeUnit);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> lag(@NotNull final UnitDuration delay) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.lag(delay);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> lag(@NotNull final UnitDuration delay) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.lag(delay);
     }
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> lift(
+    public <BEFORE, AFTER> StreamLoaderRoutineBuilderCompat<BEFORE, AFTER> lift(
             @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
                     Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
                     Channel<?, AFTER>>> liftFunction) {
-        return (StreamLoaderRoutineBuilder<BEFORE, AFTER>) super.lift(liftFunction);
+        return (StreamLoaderRoutineBuilderCompat<BEFORE, AFTER>) super.lift(liftFunction);
     }
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> liftConfig(
+    public <BEFORE, AFTER> StreamLoaderRoutineBuilderCompat<BEFORE, AFTER> liftConfig(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
-        return (StreamLoaderRoutineBuilder<BEFORE, AFTER>) super.liftConfig(liftFunction);
+        return (StreamLoaderRoutineBuilderCompat<BEFORE, AFTER>) super.liftConfig(liftFunction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> limit(final int count) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.limit(count);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> limit(final int count) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.limit(count);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
         checkStatic(wrap(mappingFunction), mappingFunction);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.map(mappingFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.map(mappingFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         checkStatic("factory", factory);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.map(factory);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.map(factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         checkStatic("routine", routine);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.map(routine);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.map(routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
         return map(builder.buildRoutine());
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapAll(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
         checkStatic(wrap(mappingFunction), mappingFunction);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.mapAll(mappingFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapAll(mappingFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapAllMore(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapAllMore(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         checkStatic(wrap(mappingConsumer), mappingConsumer);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.mapAllMore(mappingConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapAllMore(mappingConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapMore(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> mapMore(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         checkStatic(wrap(mappingConsumer), mappingConsumer);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.mapMore(mappingConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.mapMore(mappingConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, Void> onComplete(@NotNull final Action completeAction) {
-        return (StreamLoaderRoutineBuilder<IN, Void>) super.onComplete(completeAction);
+    public StreamLoaderRoutineBuilderCompat<IN, Void> onComplete(
+            @NotNull final Action completeAction) {
+        return (StreamLoaderRoutineBuilderCompat<IN, Void>) super.onComplete(completeAction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> onError(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> onError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.onError(errorConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.onError(errorConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, Void> onOutput(
+    public StreamLoaderRoutineBuilderCompat<IN, Void> onOutput(
             @NotNull final Consumer<? super OUT> outputConsumer) {
-        return (StreamLoaderRoutineBuilder<IN, Void>) super.onOutput(outputConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, Void>) super.onOutput(outputConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElse(@Nullable final OUT output) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElse(output);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElse(@Nullable final OUT output) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElse(output);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElse(@Nullable final OUT... outputs) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElse(outputs);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElse(@Nullable final OUT... outputs) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElse(outputs);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElse(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElse(
             @Nullable final Iterable<? extends OUT> outputs) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElse(outputs);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElse(outputs);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElseGet(final long count,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElseGet(count, outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGet(count, outputSupplier);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElseGet(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGet(
             @NotNull final Supplier<? extends OUT> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElseGet(outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGet(outputSupplier);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElseGetMore(final long count,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGetMore(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElseGetMore(count, outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGetMore(count,
+                outputsConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElseGetMore(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseGetMore(
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElseGetMore(outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseGetMore(outputsConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> orElseThrow(@Nullable final Throwable error) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.orElseThrow(error);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> orElseThrow(@Nullable final Throwable error) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.orElseThrow(error);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> parallel() {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.parallel();
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> parallel() {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.parallel();
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> parallel(final int maxInvocations) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.parallel(maxInvocations);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> parallel(final int maxInvocations) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.parallel(maxInvocations);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(final int count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallel(final int count,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         checkStatic("factory", factory);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.parallel(count, factory);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallel(count, factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(final int count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallel(final int count,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         checkStatic("routine", routine);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.parallel(count, routine);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallel(count, routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(final int count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallel(final int count,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
         return parallel(count, builder.buildRoutine());
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.parallelBy(keyFunction, factory);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallelBy(keyFunction, factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("routine", routine);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.parallelBy(keyFunction, routine);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.parallelBy(keyFunction, routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
         return parallelBy(keyFunction, builder.buildRoutine());
@@ -566,194 +569,198 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> peekComplete(@NotNull final Action completeAction) {
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> peekComplete(
+            @NotNull final Action completeAction) {
         checkStatic(wrap(completeAction), completeAction);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.peekComplete(completeAction);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekComplete(completeAction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> peekError(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> peekError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
         checkStatic(wrap(errorConsumer), errorConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.peekError(errorConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekError(errorConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> peekOutput(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> peekOutput(
             @NotNull final Consumer<? super OUT> outputConsumer) {
         checkStatic(wrap(outputConsumer), outputConsumer);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.peekOutput(outputConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.peekOutput(outputConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> reduce(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction) {
         checkStatic(wrap(accumulateFunction), accumulateFunction);
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.reduce(accumulateFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.reduce(accumulateFunction);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> reduce(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> reduce(
             @NotNull final Supplier<? extends AFTER> seedSupplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER>
                     accumulateFunction) {
         checkStatic(wrap(seedSupplier), seedSupplier);
         checkStatic(wrap(accumulateFunction), accumulateFunction);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.reduce(seedSupplier,
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.reduce(seedSupplier,
                 accumulateFunction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> retry(final int count) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.retry(count);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> retry(final int count) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.retry(count);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> retry(final int count,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> retry(final int count,
             @NotNull final Backoff backoff) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.retry(count, backoff);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.retry(count, backoff);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> retry(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> retry(
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.retry(backoffFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.retry(backoffFunction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> sequential() {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.sequential();
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> sequential() {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.sequential();
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> skip(final int count) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.skip(count);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> skip(final int count) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.skip(count);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> sorted(@Nullable final OrderType orderType) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.sorted(orderType);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> sorted(@Nullable final OrderType orderType) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.sorted(orderType);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> straight() {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.straight();
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> straight() {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.straight();
     }
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
+    public InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilderCompat<IN, OUT>>
     streamInvocationConfiguration() {
-        return new InvocationConfiguration.Builder<StreamLoaderRoutineBuilder<IN, OUT>>(
+        return new InvocationConfiguration.Builder<StreamLoaderRoutineBuilderCompat<IN, OUT>>(
                 mStreamInvocationConfigurable, mStreamConfiguration.getStreamConfiguration());
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> sync() {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.sync();
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> sync() {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.sync();
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(@Nullable final AFTER output) {
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.then(output);
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> then(@Nullable final AFTER output) {
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.then(output);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(@Nullable final AFTER... outputs) {
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.then(outputs);
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> then(
+            @Nullable final AFTER... outputs) {
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.then(outputs);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> then(
             @Nullable final Iterable<? extends AFTER> outputs) {
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.then(outputs);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.then(outputs);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGet(final long count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.thenGet(count, outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGet(count, outputSupplier);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGet(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGet(
             @NotNull final Supplier<? extends AFTER> outputSupplier) {
         checkStatic(wrap(outputSupplier), outputSupplier);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.thenGet(outputSupplier);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGet(outputSupplier);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGetMore(final long count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGetMore(final long count,
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.thenGetMore(count, outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGetMore(count,
+                outputsConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGetMore(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> thenGetMore(
             @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
         checkStatic(wrap(outputsConsumer), outputsConsumer);
-        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.thenGetMore(outputsConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.thenGetMore(outputsConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> tryCatch(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> catchFunction) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.tryCatch(catchFunction);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.tryCatch(catchFunction);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> tryCatchMore(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> tryCatchMore(
             @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.tryCatchMore(catchConsumer);
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.tryCatchMore(catchConsumer);
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> tryFinally(@NotNull final Action finallyAction) {
-        return (StreamLoaderRoutineBuilder<IN, OUT>) super.tryFinally(finallyAction);
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> tryFinally(
+            @NotNull final Action finallyAction) {
+        return (StreamLoaderRoutineBuilderCompat<IN, OUT>) super.tryFinally(finallyAction);
     }
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
+    public InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilderCompat<IN, OUT>>
     invocationConfiguration() {
-        return new InvocationConfiguration.Builder<StreamLoaderRoutineBuilder<IN, OUT>>(
+        return new InvocationConfiguration.Builder<StreamLoaderRoutineBuilderCompat<IN, OUT>>(
                 mInvocationConfigurable, mStreamConfiguration.getCurrentConfiguration());
     }
 
     @NotNull
     @Override
-    protected LoaderStreamConfiguration newConfiguration(
+    protected LoaderStreamConfigurationCompat newConfiguration(
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationConfiguration currentConfiguration,
             @NotNull final InvocationMode invocationMode) {
-        final LoaderStreamConfiguration loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfiguration(loaderStreamConfiguration.getLoaderContext(),
+        final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
+        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 loaderStreamConfiguration.getCurrentLoaderConfiguration(), streamConfiguration,
                 currentConfiguration, invocationMode);
@@ -764,9 +771,9 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
     protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
             @NotNull final StreamConfiguration streamConfiguration,
             @NotNull final InvocationFactory<? super BEFORE, ? extends AFTER> factory) {
-        final LoaderStreamConfiguration loaderStreamConfiguration =
-                (LoaderStreamConfiguration) streamConfiguration;
-        final LoaderContext loaderContext = loaderStreamConfiguration.getLoaderContext();
+        final LoaderStreamConfigurationCompat loaderStreamConfiguration =
+                (LoaderStreamConfigurationCompat) streamConfiguration;
+        final LoaderContextCompat loaderContext = loaderStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             return JRoutineCore.with(factory)
                                .invocationConfiguration()
@@ -778,24 +785,24 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
         final ContextInvocationFactory<? super BEFORE, ? extends AFTER> invocationFactory =
                 factoryFrom(JRoutineCore.with(factory).buildRoutine(), factory.hashCode(),
                         InvocationMode.SYNC);
-        return JRoutineLoader.on(loaderContext)
-                             .with(invocationFactory)
-                             .invocationConfiguration()
-                             .with(loaderStreamConfiguration.asInvocationConfiguration())
-                             .applied()
-                             .loaderConfiguration()
-                             .with(loaderStreamConfiguration.asLoaderConfiguration())
-                             .applied()
-                             .buildRoutine();
+        return JRoutineLoaderCompat.on(loaderContext)
+                                   .with(invocationFactory)
+                                   .invocationConfiguration()
+                                   .with(loaderStreamConfiguration.asInvocationConfiguration())
+                                   .applied()
+                                   .loaderConfiguration()
+                                   .with(loaderStreamConfiguration.asLoaderConfiguration())
+                                   .applied()
+                                   .buildRoutine();
     }
 
     @NotNull
     @Override
-    protected LoaderStreamConfiguration resetConfiguration(
+    protected LoaderStreamConfigurationCompat resetConfiguration(
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode) {
-        final LoaderStreamConfiguration loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfiguration(loaderStreamConfiguration.getLoaderContext(),
+        final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
+        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 LoaderConfiguration.defaultConfiguration(), streamConfiguration,
                 InvocationConfiguration.defaultConfiguration(), invocationMode);
@@ -811,112 +818,115 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> cache(
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> cache(
             @Nullable final CacheStrategyType strategyType) {
         return loaderConfiguration().withCacheStrategy(strategyType).applied();
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> factoryId(final int factoryId) {
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> factoryId(final int factoryId) {
         return loaderConfiguration().withFactoryId(factoryId).applied();
     }
 
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
-    loaderConfiguration() {
-        return new LoaderConfiguration.Builder<StreamLoaderRoutineBuilder<IN, OUT>>(
-                mLoaderConfigurable, mStreamConfiguration.getCurrentLoaderConfiguration());
+    public Builder<? extends StreamLoaderRoutineBuilderCompat<IN, OUT>> loaderConfiguration() {
+        return new Builder<StreamLoaderRoutineBuilderCompat<IN, OUT>>(mLoaderConfigurable,
+                mStreamConfiguration.getCurrentLoaderConfiguration());
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> loaderId(final int loaderId) {
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> loaderId(final int loaderId) {
         return loaderConfiguration().withLoaderId(loaderId).applied();
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final LoaderContext loaderContext = mStreamConfiguration.getLoaderContext();
+        final LoaderContextCompat loaderContext = mStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             throw new IllegalStateException("the loader context is null");
         }
 
-        return map(JRoutineLoader.on(loaderContext).with(factory));
+        return map(JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> on(@Nullable final LoaderContext context) {
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> on(
+            @Nullable final LoaderContextCompat context) {
         return apply(newConfiguration(context));
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(final int count,
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallel(final int count,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        final LoaderContext loaderContext = streamConfiguration.getLoaderContext();
+        final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+        final LoaderContextCompat loaderContext = streamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             throw new IllegalStateException("the loader context is null");
         }
 
         checkStatic("factory", factory);
-        return parallel(count, JRoutineLoader.on(loaderContext).with(factory));
+        return parallel(count, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
     @Override
-    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        final LoaderContext loaderContext = streamConfiguration.getLoaderContext();
+        final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+        final LoaderContextCompat loaderContext = streamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             throw new IllegalStateException("the loader context is null");
         }
 
         checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return parallelBy(keyFunction, JRoutineLoader.on(loaderContext).with(factory));
+        return parallelBy(keyFunction, JRoutineLoaderCompat.on(loaderContext).with(factory));
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> staleAfter(@Nullable final UnitDuration staleTime) {
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> staleAfter(
+            @Nullable final UnitDuration staleTime) {
         return loaderConfiguration().withResultStaleTime(staleTime).applied();
     }
 
     @NotNull
     @Override
-    public StreamLoaderRoutineBuilder<IN, OUT> staleAfter(final long time,
+    public StreamLoaderRoutineBuilderCompat<IN, OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
         return loaderConfiguration().withResultStaleTime(time, timeUnit).applied();
     }
 
     @NotNull
     @Override
-    public Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>> streamLoaderConfiguration() {
-        return new LoaderConfiguration.Builder<StreamLoaderRoutineBuilder<IN, OUT>>(
-                mStreamLoaderConfigurable, mStreamConfiguration.getStreamLoaderConfiguration());
+    public Builder<? extends StreamLoaderRoutineBuilderCompat<IN, OUT>> streamLoaderConfiguration
+            () {
+        return new Builder<StreamLoaderRoutineBuilderCompat<IN, OUT>>(mStreamLoaderConfigurable,
+                mStreamConfiguration.getStreamLoaderConfiguration());
     }
 
     // TODO: 04/07/16 javadoc
     @NotNull
-    protected StreamLoaderRoutineBuilder<IN, OUT> apply(
-            @NotNull final LoaderStreamConfiguration configuration) {
+    protected StreamLoaderRoutineBuilderCompat<IN, OUT> apply(
+            @NotNull final LoaderStreamConfigurationCompat configuration) {
         super.apply(configuration);
         mStreamConfiguration = configuration;
         return this;
     }
 
     @NotNull
-    private LoaderStreamConfiguration newConfiguration(@Nullable final LoaderContext context) {
-        final LoaderStreamConfiguration loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfiguration(context,
+    private LoaderStreamConfigurationCompat newConfiguration(
+            @Nullable final LoaderContextCompat context) {
+        final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
+        return new DefaultLoaderStreamConfigurationCompat(context,
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 loaderStreamConfiguration.getCurrentLoaderConfiguration(),
                 loaderStreamConfiguration.getStreamConfiguration(),
@@ -925,11 +935,11 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
     }
 
     @NotNull
-    private LoaderStreamConfiguration newConfiguration(
+    private LoaderStreamConfigurationCompat newConfiguration(
             @NotNull final LoaderConfiguration streamConfiguration,
             @NotNull final LoaderConfiguration configuration) {
-        final LoaderStreamConfiguration loaderStreamConfiguration = mStreamConfiguration;
-        return new DefaultLoaderStreamConfiguration(loaderStreamConfiguration.getLoaderContext(),
+        final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
+        return new DefaultLoaderStreamConfigurationCompat(loaderStreamConfiguration.getLoaderContext(),
                 streamConfiguration, configuration,
                 loaderStreamConfiguration.getStreamConfiguration(),
                 loaderStreamConfiguration.getCurrentConfiguration(),
@@ -939,7 +949,8 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
     /**
      * Default implementation of a loader stream configuration.
      */
-    private static class DefaultLoaderStreamConfiguration implements LoaderStreamConfiguration {
+    private static class DefaultLoaderStreamConfigurationCompat
+            implements LoaderStreamConfigurationCompat {
 
         private final InvocationConfiguration mCurrentConfiguration;
 
@@ -947,7 +958,7 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
 
         private final InvocationMode mInvocationMode;
 
-        private final LoaderContext mLoaderContext;
+        private final LoaderContextCompat mLoaderContext;
 
         private final InvocationConfiguration mStreamConfiguration;
 
@@ -969,7 +980,7 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
          * @param currentConfiguration       the current invocation configuration.
          * @param invocationMode             the invocation mode.
          */
-        private DefaultLoaderStreamConfiguration(@Nullable final LoaderContext context,
+        private DefaultLoaderStreamConfigurationCompat(@Nullable final LoaderContextCompat context,
                 @NotNull final LoaderConfiguration streamLoaderConfiguration,
                 @NotNull final LoaderConfiguration currentLoaderConfiguration,
                 @NotNull final InvocationConfiguration streamConfiguration,
@@ -1045,7 +1056,7 @@ public class DefaultStreamLoaderRoutineBuilder<IN, OUT>
 
         @Nullable
         @Override
-        public LoaderContext getLoaderContext() {
+        public LoaderContextCompat getLoaderContext() {
             return mLoaderContext;
         }
 

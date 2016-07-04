@@ -1171,7 +1171,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> straight();
+    StreamRoutineBuilder<IN, OUT> straight(); // TODO: 04/07/16 reset runner??
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

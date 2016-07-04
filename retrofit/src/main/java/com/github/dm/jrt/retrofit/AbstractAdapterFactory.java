@@ -25,8 +25,8 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.StreamRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Abstract implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamChannel} return types.
+ * {@code StreamRoutineBuilder} return types.
+ * <br>
+ * Note that the routines generated through the returned builders will ignore any input.
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
@@ -156,7 +158,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     @Nullable
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
         final Type rawType = returnType.getRawType();
-        if ((Channel.class == rawType) || (StreamChannel.class == rawType)) {
+        if ((Channel.class == rawType) || (StreamRoutineBuilder.class == rawType)) {
             return returnType.getActualTypeArguments()[1];
         }
 
@@ -184,8 +186,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
 
-        } else if (StreamChannel.class == returnRawType) {
-            return new StreamChannelAdapter(invocationMode,
+        } else if (StreamRoutineBuilder.class == returnRawType) {
+            return new StreamRoutineBuilderAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -373,9 +375,9 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Stream channel adapter implementation.
+     * Stream routine builder adapter implementation.
      */
-    private static class StreamChannelAdapter extends BaseAdapter<StreamChannel> {
+    private static class StreamRoutineBuilderAdapter extends BaseAdapter<StreamRoutineBuilder> {
 
         private final InvocationMode mInvocationMode;
 
@@ -386,25 +388,18 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private StreamChannelAdapter(@NotNull final InvocationMode invocationMode,
+        private StreamRoutineBuilderAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
-        public <OUT> StreamChannel adapt(final Call<OUT> call) {
-            final InvocationMode invocationMode = mInvocationMode;
-            final StreamChannel<Call<OUT>, Call<OUT>> stream;
-            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
-                    == InvocationMode.PARALLEL)) {
-                stream = StreamChannels.of(call).async();
-
-            } else {
-                stream = StreamChannels.of(call).sync();
-            }
-
-            return stream.map(getRoutine()).invocationMode(invocationMode);
+        public <OUT> StreamRoutineBuilder adapt(final Call<OUT> call) {
+            return JRoutineStream.<Call<OUT>>withStream().sync()
+                                                         .then(call)
+                                                         .invocationMode(mInvocationMode)
+                                                         .map(getRoutine());
         }
     }
 }

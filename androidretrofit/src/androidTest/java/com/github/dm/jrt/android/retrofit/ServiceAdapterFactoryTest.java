@@ -323,6 +323,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
             }
@@ -354,6 +356,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
             }
@@ -382,6 +386,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
             }
@@ -410,6 +416,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
             }

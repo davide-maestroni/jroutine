@@ -16,11 +16,14 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.StreamRoutineBuilder;
 
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +68,7 @@ public class ProviderAdapterFactoryTest {
             assertThat(factory2.isCalled()).isFalse();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
-            service.streamRepos("octocat");
+            service.streamRepos("octocat").syncCall().close();
             assertThat(factory1.isCalled()).isFalse();
             assertThat(factory2.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
@@ -231,7 +234,13 @@ public class ProviderAdapterFactoryTest {
                 public <R> Object adapt(final Call<R> call) {
 
                     final List<Object> result = Collections.emptyList();
-                    return StreamChannels.<List<Object>>of(result);
+                    final StreamRoutineBuilder<Object, List<Object>> builder =
+                            JRoutineStream.withStream().sync().<List<Object>>then(result);
+                    if (((ParameterizedType) returnType).getRawType() == Channel.class) {
+                        return builder.syncCall().close();
+                    }
+
+                    return builder;
                 }
             };
         }

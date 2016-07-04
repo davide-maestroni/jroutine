@@ -270,6 +270,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }
@@ -298,6 +300,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }
@@ -326,6 +330,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }
@@ -354,6 +360,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }
@@ -381,6 +389,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }
@@ -408,6 +418,8 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
+                                  .asyncCall()
+                                  .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
             }

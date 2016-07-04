@@ -24,8 +24,8 @@ import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.stream.LoaderStreamChannel;
-import com.github.dm.jrt.android.v11.stream.LoaderStreamChannels;
+import com.github.dm.jrt.android.v11.stream.JRoutineStreamLoader;
+import com.github.dm.jrt.android.v11.stream.StreamLoaderRoutineBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -46,10 +46,12 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 /**
- * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamChannel} and
- * {@code LoaderStreamChannel} return types.
+ * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamRoutineBuilder}
+ * and {@code StreamLoaderRoutineBuilder} return types.
  * <br>
  * The routine invocations will run in a dedicated Android loader.
+ * <br>
+ * Note that the routines generated through the returned builders will ignore any input.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
@@ -117,7 +119,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     @Nullable
     @Override
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
-        if (LoaderStreamChannel.class == returnType.getRawType()) {
+        if (StreamLoaderRoutineBuilder.class == returnType.getRawType()) {
             return returnType.getActualTypeArguments()[1];
         }
 
@@ -130,8 +132,8 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-        if (LoaderStreamChannel.class == returnRawType) {
-            return new LoaderStreamChannelAdapter(mLoaderContext, invocationMode,
+        if (StreamLoaderRoutineBuilder.class == returnRawType) {
+            return new StreamLoaderRoutineBuilderAdapter(mLoaderContext, invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -243,9 +245,10 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     }
 
     /**
-     * Loader stream channel adapter implementation.
+     * Stream loader routine builder adapter implementation.
      */
-    private static class LoaderStreamChannelAdapter extends BaseAdapter<LoaderStreamChannel> {
+    private static class StreamLoaderRoutineBuilderAdapter
+            extends BaseAdapter<StreamLoaderRoutineBuilder> {
 
         private final LoaderContext mContext;
 
@@ -259,7 +262,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private LoaderStreamChannelAdapter(@Nullable final LoaderContext context,
+        private StreamLoaderRoutineBuilderAdapter(@Nullable final LoaderContext context,
                 @NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
@@ -269,19 +272,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         }
 
         @Override
-        public <OUT> LoaderStreamChannel adapt(final Call<OUT> call) {
-            final InvocationMode invocationMode = mInvocationMode;
-            final Call<OUT> comparableCall = ComparableCall.of(call);
-            final LoaderStreamChannel<Call<OUT>, Call<OUT>> stream;
-            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
-                    == InvocationMode.PARALLEL)) {
-                stream = LoaderStreamChannels.of(comparableCall).on(mContext).async();
-
-            } else {
-                stream = LoaderStreamChannels.of(comparableCall).on(mContext).sync();
-            }
-
-            return stream.map(getRoutine()).invocationMode(invocationMode);
+        public <OUT> StreamLoaderRoutineBuilder adapt(final Call<OUT> call) {
+            return JRoutineStreamLoader.<Call<OUT>>withStream().on(mContext)
+                                                               .sync()
+                                                               .then(ComparableCall.of(call))
+                                                               .invocationMode(mInvocationMode)
+                                                               .map(getRoutine());
         }
     }
 }

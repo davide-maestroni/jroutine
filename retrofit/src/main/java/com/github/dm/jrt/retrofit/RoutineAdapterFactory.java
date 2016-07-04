@@ -32,8 +32,10 @@ import java.lang.reflect.Method;
 import retrofit2.CallAdapter;
 
 /**
- * Implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamChannel} return types.
+ * Abstract implementation of a call adapter factory supporting {@code Channel} and
+ * {@code StreamRoutineBuilder} return types.
+ * <br>
+ * Note that the routines generated through the returned builders will ignore any input.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */

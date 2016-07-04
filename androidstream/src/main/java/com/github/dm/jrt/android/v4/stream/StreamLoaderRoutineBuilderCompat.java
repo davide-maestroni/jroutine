@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android.v4.stream;
 
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
@@ -848,6 +849,20 @@ public interface StreamLoaderRoutineBuilderCompat<IN, OUT> extends StreamRoutine
     @StreamFlow(MAP)
     <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * Concatenates a routine mapping this stream outputs through the specified routine builder.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param builder the routine builder instance.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Sets the stream loader context.

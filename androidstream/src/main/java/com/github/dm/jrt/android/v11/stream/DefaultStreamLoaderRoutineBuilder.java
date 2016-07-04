@@ -16,10 +16,12 @@
 
 package com.github.dm.jrt.android.v11.stream;
 
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -400,7 +402,7 @@ class DefaultStreamLoaderRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBu
     @Override
     public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return map(builder.buildRoutine());
+        return (StreamLoaderRoutineBuilder<IN, AFTER>) super.map(builder);
     }
 
     @NotNull
@@ -854,6 +856,13 @@ class DefaultStreamLoaderRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBu
 
     @NotNull
     @Override
+    public <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        return map(buildRoutine(builder));
+    }
+
+    @NotNull
+    @Override
     public StreamLoaderRoutineBuilder<IN, OUT> on(@Nullable final LoaderContext context) {
         return apply(newConfiguration(context));
     }
@@ -920,6 +929,21 @@ class DefaultStreamLoaderRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBu
         super.apply(configuration);
         mStreamConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    private <AFTER> LoaderRoutine<? super OUT, ? extends AFTER> buildRoutine(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
+        return builder.invocationConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asInvocationConfiguration())
+                      .applied()
+                      .loaderConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asLoaderConfiguration())
+                      .applied()
+                      .buildRoutine();
     }
 
     @NotNull

@@ -16,10 +16,12 @@
 
 package com.github.dm.jrt.android.v4.stream;
 
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -404,7 +406,7 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
     @Override
     public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return map(builder.buildRoutine());
+        return (StreamLoaderRoutineBuilderCompat<IN, AFTER>) super.map(builder);
     }
 
     @NotNull
@@ -865,6 +867,13 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
 
     @NotNull
     @Override
+    public <AFTER> StreamLoaderRoutineBuilderCompat<IN, AFTER> map(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        return map(buildRoutine(builder));
+    }
+
+    @NotNull
+    @Override
     public StreamLoaderRoutineBuilderCompat<IN, OUT> on(
             @Nullable final LoaderContextCompat context) {
         return apply(newConfiguration(context));
@@ -934,6 +943,21 @@ class DefaultStreamLoaderRoutineBuilderCompat<IN, OUT> extends AbstractStreamRou
         super.apply(configuration);
         mStreamConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    private <AFTER> LoaderRoutine<? super OUT, ? extends AFTER> buildRoutine(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
+        return builder.invocationConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asInvocationConfiguration())
+                      .applied()
+                      .loaderConfiguration()
+                      .with(null)
+                      .with(streamConfiguration.asLoaderConfiguration())
+                      .applied()
+                      .buildRoutine();
     }
 
     @NotNull

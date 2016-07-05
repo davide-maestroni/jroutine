@@ -33,8 +33,8 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.StreamBuilder;
 import com.github.dm.jrt.stream.StreamChannels;
-import com.github.dm.jrt.stream.StreamRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -442,7 +442,7 @@ public class JRoutine extends StreamChannels {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> StreamRoutineBuilder<IN, IN> withStream() {
+    public static <IN> StreamBuilder<IN, IN> withStream() {
         return JRoutineStream.withStream();
     }
 }

@@ -59,7 +59,7 @@ public class JRoutineStreamLoader {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> StreamLoaderRoutineBuilder<IN, IN> withStream() {
-        return new DefaultStreamLoaderRoutineBuilder<IN, IN>();
+    public static <IN> LoaderStreamBuilder<IN, IN> withStream() {
+        return new DefaultLoaderStreamBuilder<IN, IN>();
     }
 }

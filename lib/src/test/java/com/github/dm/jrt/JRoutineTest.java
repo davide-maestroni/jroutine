@@ -46,6 +46,7 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
@@ -66,6 +67,27 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 02/29/2016.
  */
 public class JRoutineTest {
+
+    private static class Tipo {
+        void passObject(Object o) {
+        }
+        <T> void pass(T... o) {
+        }
+        <T> void pass(Iterable<? extends T> o) {
+        }
+        void passMore(Object... o) {
+        }
+        void passMore(Iterable<?> o) {
+        }
+    }
+
+    public static void ciao() {
+        final Tipo channel = new Tipo();
+        channel.passMore(Arrays.asList("test", "test"));
+        channel.passMore(new String[]{"test", "test"});
+        channel.pass(Arrays.asList("test", "test"));
+        channel.pass(new String[]{"test", "test"});
+    }
 
     @Test
     public void testAliasMethod() throws NoSuchMethodException {
@@ -492,7 +514,7 @@ public class JRoutineTest {
     @Test
     public void testStream() {
         assertThat(JRoutine.withStream()
-                           .thenGetMore(range(1, 1000))
+                           .andThenMore(range(1, 1000))
                            .map(new Function<Number, Double>() {
 
                                public Double apply(final Number number) {

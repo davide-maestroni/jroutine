@@ -59,7 +59,7 @@ public class JRoutineStreamLoaderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> StreamLoaderRoutineBuilderCompat<IN, IN> withStream() {
-        return new DefaultStreamLoaderRoutineBuilderCompat<IN, IN>();
+    public static <IN> LoaderStreamBuilderCompat<IN, IN> withStream() {
+        return new DefaultLoaderStreamBuilderCompat<IN, IN>();
     }
 }

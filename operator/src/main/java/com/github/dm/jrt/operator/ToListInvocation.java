@@ -17,14 +17,12 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +32,7 @@ import java.util.List;
  *
  * @param <DATA> the data type.
  */
-class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
+class ToListInvocation<DATA> extends CallInvocation<DATA, List<DATA>> {
 
     private static final InvocationFactory<?, ? extends List<?>> sFactory =
             new InvocationFactory<Object, List<Object>>(null) {
@@ -45,8 +43,6 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
                     return new ToListInvocation<Object>();
                 }
             };
-
-    private ArrayList<DATA> mList;
 
     /**
      * Constructor.
@@ -67,23 +63,9 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
     }
 
     @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-        mList = null;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<List<DATA>, ?> result) {
-        result.pass(mList);
-        mList = null;
-    }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<List<DATA>, ?> result) {
-        mList.add(input);
-    }
-
-    @Override
-    public void onRestart() {
-        mList = new ArrayList<DATA>();
+    @SuppressWarnings("unchecked")
+    protected void onCall(@NotNull final List<? extends DATA> inputs,
+            @NotNull final Channel<List<DATA>, ?> result) {
+        result.pass((List<DATA>) inputs);
     }
 }

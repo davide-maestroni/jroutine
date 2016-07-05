@@ -850,38 +850,18 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public <AFTER> StreamChannel<IN, AFTER> then(@Nullable final AFTER output) {
-        return map(new GenerateOutputInvocation<AFTER>(Collections.singletonList(output)));
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(output)));
     }
 
     @NotNull
     public <AFTER> StreamChannel<IN, AFTER> then(@Nullable final AFTER... outputs) {
-        final List<AFTER> list;
-        if (outputs != null) {
-            list = new ArrayList<AFTER>();
-            Collections.addAll(list, outputs);
-
-        } else {
-            list = Collections.emptyList();
-        }
-
-        return map(new GenerateOutputInvocation<AFTER>(list));
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
     }
 
     @NotNull
     public <AFTER> StreamChannel<IN, AFTER> then(
             @Nullable final Iterable<? extends AFTER> outputs) {
-        final List<AFTER> list;
-        if (outputs != null) {
-            list = new ArrayList<AFTER>();
-            for (final AFTER output : outputs) {
-                list.add(output);
-            }
-
-        } else {
-            list = Collections.emptyList();
-        }
-
-        return map(new GenerateOutputInvocation<AFTER>(list));
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
     }
 
     @NotNull

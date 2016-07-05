@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.operator.Operators;
 
 import org.junit.Test;
 
@@ -259,7 +259,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -270,7 +270,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
@@ -289,7 +288,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -300,7 +299,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
@@ -319,7 +317,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -330,7 +328,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
@@ -349,7 +346,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -360,7 +357,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
@@ -378,7 +374,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -389,7 +385,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();
@@ -407,7 +402,7 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -418,7 +413,6 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(3))
                                   .getError()).isNull();

@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.stream.StreamLoaderRoutineBuilderCompat
+import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat
         .LoaderStreamConfigurationCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -57,7 +57,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
-import com.github.dm.jrt.stream.StreamRoutineBuilder;
+import com.github.dm.jrt.stream.StreamBuilder;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -86,9 +86,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 07/04/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public StreamLoaderRoutineBuilderTest() {
+    public LoaderStreamBuilderTest() {
         super(TestActivity.class);
     }
 
@@ -143,7 +143,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .appendGetMore(new Consumer<Channel<String, ?>>() {
+                                     .appendMore(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(
                                                  final Channel<String, ?> resultChannel) {
@@ -168,7 +168,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .appendGetMore(3, new Consumer<Channel<String, ?>>() {
+                                     .appendMore(3, new Consumer<Channel<String, ?>>() {
 
                                          public void accept(
                                                  final Channel<String, ?> resultChannel) {
@@ -192,7 +192,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
-                                     .appendGetMore(new Consumer<Channel<String, ?>>() {
+                                     .appendMore(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(
                                                  final Channel<String, ?> resultChannel) {
@@ -218,7 +218,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
-                                     .appendGetMore(3, new Consumer<Channel<String, ?>>() {
+                                     .appendMore(3, new Consumer<Channel<String, ?>>() {
 
                                          public void accept(
                                                  final Channel<String, ?> resultChannel) {
@@ -243,7 +243,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .parallel()
-                                     .appendGetMore(new Consumer<Channel<String, ?>>() {
+                                     .appendMore(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(
                                                  final Channel<String, ?> resultChannel) {
@@ -268,7 +268,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                 "TEST2");
         assertThat(JRoutineStreamLoaderCompat.<String>withStream().on(loaderFrom(activity))
                                                                   .parallel()
-                                                                  .appendGetMore(3,
+                                                                  .appendMore(3,
                                                                           new Consumer<Channel<String, ?>>() {
 
                                                                               public void accept(
@@ -456,10 +456,10 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
         final Runner handlerRunner = AndroidRunners.handlerRunner(
-                new HandlerThread(StreamLoaderRoutineBuilderTest.class.getName()));
+                new HandlerThread(LoaderStreamBuilderTest.class.getName()));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .async()
-                                             .thenGetMore(range(1, 1000))
+                                             .andThenMore(range(1, 1000))
                                              .backoffOn(handlerRunner, 2,
                                                      Backoffs.linearDelay(seconds(10)))
                                              .map(Functions.<Number>identity())
@@ -498,7 +498,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .async()
-                                             .thenGetMore(range(1, 1000))
+                                             .andThenMore(range(1, 1000))
                                              .backoffOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
                                              .map(Functions.<Number>identity())
                                              .on(loaderFrom(activity))
@@ -536,7 +536,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .async()
-                                             .thenGetMore(range(1, 1000))
+                                             .andThenMore(range(1, 1000))
                                              .backoffOn(handlerRunner, 2, seconds(10))
                                              .map(Functions.<Number>identity())
                                              .on(loaderFrom(activity))
@@ -1003,7 +1003,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsExactly("test");
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .orElseGetMore(new Consumer<Channel<String, ?>>() {
+                                     .orElseMore(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(final Channel<String, ?> result) {
                                              result.pass("est");
@@ -1046,7 +1046,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsExactly("est1", "est2");
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .orElseGetMore(new Consumer<Channel<String, ?>>() {
+                                     .orElseMore(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(final Channel<String, ?> result) {
                                              result.pass("est");
@@ -1058,7 +1058,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                      .all()).containsExactly("est");
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .orElseGetMore(2, new Consumer<Channel<String, ?>>() {
+                                     .orElseMore(2, new Consumer<Channel<String, ?>>() {
 
                                          public void accept(final Channel<String, ?> result) {
                                              result.pass("est");
@@ -1244,7 +1244,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sync()
-                                             .thenGetMore(new Consumer<Channel<String, ?>>() {
+                                             .andThenMore(new Consumer<Channel<String, ?>>() {
 
                                                  public void accept(
                                                          final Channel<String, ?> resultChannel) {
@@ -1256,7 +1256,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sync()
-                                             .thenGet(new Supplier<String>() {
+                                             .andThenGet(new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1267,7 +1267,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sync()
-                                             .thenGet(3, new Supplier<String>() {
+                                             .andThenGet(3, new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1279,7 +1279,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .async()
-                                             .thenGetMore(new Consumer<Channel<String, ?>>() {
+                                             .andThenMore(new Consumer<Channel<String, ?>>() {
 
                                                  public void accept(
                                                          final Channel<String, ?> resultChannel) {
@@ -1292,7 +1292,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .async()
-                                             .thenGet(new Supplier<String>() {
+                                             .andThenGet(new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1304,7 +1304,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .async()
-                                             .thenGet(3, new Supplier<String>() {
+                                             .andThenGet(3, new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1316,7 +1316,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .parallel()
-                                             .thenGetMore(3, new Consumer<Channel<String, ?>>() {
+                                             .andThenMore(3, new Consumer<Channel<String, ?>>() {
 
                                                  public void accept(
                                                          final Channel<String, ?> resultChannel) {
@@ -1329,7 +1329,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .parallel()
-                                             .thenGet(3, new Supplier<String>() {
+                                             .andThenGet(3, new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1341,7 +1341,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sequential()
-                                             .thenGetMore(3, new Consumer<Channel<String, ?>>() {
+                                             .andThenMore(3, new Consumer<Channel<String, ?>>() {
 
                                                  public void accept(
                                                          final Channel<String, ?> resultChannel) {
@@ -1354,7 +1354,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .sequential()
-                                             .thenGet(3, new Supplier<String>() {
+                                             .andThenGet(3, new Supplier<String>() {
 
                                                  public String get() {
                                                      return "TEST2";
@@ -1866,12 +1866,12 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .flatLift(
-                                             new Function<StreamRoutineBuilder<String, String>,
-                                                     StreamRoutineBuilder<String, String>>() {
+                                             new Function<StreamBuilder<String, String>,
+                                                     StreamBuilder<String, String>>() {
 
-                                                 public StreamRoutineBuilder<String, String> apply(
-                                                         final StreamRoutineBuilder<String,
-                                                                 String> builder) {
+                                                 public StreamBuilder<String, String> apply(
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
                                                      return builder.append("test2");
                                                  }
                                              })
@@ -1881,15 +1881,15 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .flatLift(
-                                             new Function<StreamRoutineBuilder<String, String>,
-                                                     StreamLoaderRoutineBuilderCompat<String,
-                                                             String>>() {
+                                             new Function<StreamBuilder<String, String>,
+                                                     LoaderStreamBuilderCompat<String, String>>() {
 
-                                                 public StreamLoaderRoutineBuilderCompat<String,
-                                                         String> apply(
-                                                         final StreamRoutineBuilder<String,
-                                                                 String> builder) {
-                                                     return ((StreamLoaderRoutineBuilderCompat<String, String>) builder)
+                                                 public LoaderStreamBuilderCompat<String, String>
+                                                 apply(
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return ((LoaderStreamBuilderCompat<String,
+                                                             String>) builder)
                                                              .append("test2");
                                                  }
                                              })
@@ -1980,7 +1980,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
     public void testLimit() {
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .limit(5)
@@ -1990,7 +1990,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .limit(0)
@@ -2000,7 +2000,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .limit(15)
@@ -2011,7 +2011,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .limit(0)
@@ -2528,7 +2528,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         try {
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
-                                      .orElseGetMore(null);
+                                      .orElseMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2537,7 +2537,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         try {
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
-                                      .orElseGetMore(1, null);
+                                      .orElseMore(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2705,7 +2705,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
     public void testSkip() {
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .skip(5)
@@ -2715,7 +2715,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).isEqualTo(Arrays.asList(6, 7, 8, 9, 10));
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .skip(15)
@@ -2725,7 +2725,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .sync()
-                                             .thenGetMore(range(1, 10))
+                                             .andThenMore(range(1, 10))
                                              .on(loaderFrom(getActivity()))
                                              .async()
                                              .skip(0)
@@ -2737,11 +2737,11 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
     }
 
     public void testSplit() {
-        final StreamLoaderRoutineBuilderCompat<String, String> builder =
+        final LoaderStreamBuilderCompat<String, String> builder =
                 JRoutineStreamLoaderCompat.<String>withStream().map(new UpperCase());
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallel(2, builder.buildFactory())
                                              .asyncCall()
                                              .close()
@@ -2749,7 +2749,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallel(2, builder.buildContextFactory())
                                              .asyncCall()
                                              .close()
@@ -2757,7 +2757,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallelBy(Functions.<String>identity(),
                                                      builder.buildFactory())
                                              .asyncCall()
@@ -2766,7 +2766,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallelBy(Functions.<String>identity(),
                                                      builder.buildContextFactory())
                                              .asyncCall()
@@ -2776,7 +2776,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         final RoutineBuilder<String, String> routineBuilder = JRoutineCore.with(new UpperCase());
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallel(2, routineBuilder)
                                              .asyncCall()
                                              .close()
@@ -2784,7 +2784,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                                              .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallelBy(Functions.<String>identity(),
                                                      routineBuilder)
                                              .asyncCall()
@@ -2795,14 +2795,14 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(builder.buildContextFactory());
         assertThat(JRoutineStreamLoaderCompat.withStream()
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallel(2, loaderBuilder)
                                              .asyncCall()
                                              .close()
                                              .after(seconds(3))
                                              .all()).containsOnly("TEST1", "TEST2", "TEST3");
         assertThat(JRoutineStreamLoaderCompat.withStream()
-                                             .then("test1", "test2", "test3")
+                                             .andThen("test1", "test2", "test3")
                                              .parallelBy(Functions.<String>identity(),
                                                      loaderBuilder)
                                              .asyncCall()
@@ -2814,7 +2814,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
     public void testStraight() {
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .straight()
-                                             .thenGetMore(range(1, 1000))
+                                             .andThenMore(range(1, 1000))
                                              .streamInvocationConfiguration()
                                              .withInputMaxSize(1)
                                              .withOutputMaxSize(1)
@@ -2834,216 +2834,216 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then((String) null)
+                                             .andThen((String) null)
                                              .syncCall("test1")
                                              .all()).containsOnly((String) null);
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then((String[]) null)
+                                             .andThen((String[]) null)
                                              .syncCall("test1")
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then()
+                                             .andThen()
                                              .syncCall("test1")
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then((List<String>) null)
+                                             .andThen((List<String>) null)
                                              .syncCall("test1")
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then(Collections.<String>emptyList())
+                                             .andThen(Collections.<String>emptyList())
                                              .syncCall("test1")
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then("TEST2")
+                                             .andThen("TEST2")
                                              .syncCall("test1")
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then("TEST2", "TEST2")
+                                             .andThen("TEST2", "TEST2")
                                              .syncCall("test1")
                                              .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sync()
-                                             .then(Collections.singletonList("TEST2"))
+                                             .andThen(Collections.singletonList("TEST2"))
                                              .syncCall("test1")
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then((String) null)
+                                             .andThen((String) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly((String) null);
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then((String[]) null)
+                                             .andThen((String[]) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then()
+                                             .andThen()
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then((List<String>) null)
+                                             .andThen((List<String>) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then(Collections.<String>emptyList())
+                                             .andThen(Collections.<String>emptyList())
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then("TEST2")
+                                             .andThen("TEST2")
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then("TEST2", "TEST2")
+                                             .andThen("TEST2", "TEST2")
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .async()
-                                             .then(Collections.singletonList("TEST2"))
+                                             .andThen(Collections.singletonList("TEST2"))
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then((String) null)
+                                             .andThen((String) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly((String) null);
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then((String[]) null)
+                                             .andThen((String[]) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then()
+                                             .andThen()
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then((List<String>) null)
+                                             .andThen((List<String>) null)
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then(Collections.<String>emptyList())
+                                             .andThen(Collections.<String>emptyList())
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then("TEST2")
+                                             .andThen("TEST2")
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then("TEST2", "TEST2")
+                                             .andThen("TEST2", "TEST2")
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .parallel()
-                                             .then(Collections.singletonList("TEST2"))
+                                             .andThen(Collections.singletonList("TEST2"))
                                              .asyncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then((String) null)
+                                             .andThen((String) null)
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly((String) null);
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then((String[]) null)
+                                             .andThen((String[]) null)
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then()
+                                             .andThen()
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then((List<String>) null)
+                                             .andThen((List<String>) null)
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then(Collections.<String>emptyList())
+                                             .andThen(Collections.<String>emptyList())
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).isEmpty();
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then("TEST2")
+                                             .andThen("TEST2")
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then("TEST2", "TEST2")
+                                             .andThen("TEST2", "TEST2")
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStreamLoaderCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .sequential()
-                                             .then(Collections.singletonList("TEST2"))
+                                             .andThen(Collections.singletonList("TEST2"))
                                              .syncCall("test1")
                                              .after(seconds(10))
                                              .all()).containsOnly("TEST2");
@@ -3054,7 +3054,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
-                                      .thenGet(-1, Functions.constant(null));
+                                      .andThenGet(-1, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3064,7 +3064,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
-                                      .thenGet(0, Functions.constant(null));
+                                      .andThenGet(0, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3074,7 +3074,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
-                                      .thenGet(-1, Functions.constant(null));
+                                      .andThenGet(-1, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3084,7 +3084,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
-                                      .thenGet(-1, Functions.constant(null));
+                                      .andThenGet(-1, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3094,7 +3094,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
-                                      .thenGetMore(-1, Functions.sink());
+                                      .andThenMore(-1, Functions.sink());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3104,7 +3104,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
-                                      .thenGet(-1, Functions.constant(null));
+                                      .andThenGet(-1, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3114,7 +3114,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
-                                      .thenGet(-1, Functions.constant(null));
+                                      .andThenGet(-1, Functions.constant(null));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3124,7 +3124,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
-                                      .thenGetMore(-1, Functions.sink());
+                                      .andThenMore(-1, Functions.sink());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -3137,7 +3137,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
-                                      .thenGetMore(3, null);
+                                      .andThenMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3147,7 +3147,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
-                                      .thenGetMore(null);
+                                      .andThenMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3157,7 +3157,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
-                                      .thenGet(3, null);
+                                      .andThenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3167,7 +3167,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
-                                      .thenGet(null);
+                                      .andThenGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3177,7 +3177,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
-                                      .thenGetMore(3, null);
+                                      .andThenMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3187,7 +3187,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
-                                      .thenGetMore(null);
+                                      .andThenMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3197,7 +3197,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
-                                      .thenGet(null);
+                                      .andThenGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3207,7 +3207,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
-                                      .thenGet(3, null);
+                                      .andThenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3217,7 +3217,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
-                                      .thenGet(3, null);
+                                      .andThenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3227,7 +3227,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
-                                      .thenGetMore(3, null);
+                                      .andThenMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3237,7 +3237,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
-                                      .thenGet(3, null);
+                                      .andThenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3247,7 +3247,7 @@ public class StreamLoaderRoutineBuilderTest extends ActivityInstrumentationTestC
             JRoutineStreamLoaderCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
-                                      .thenGetMore(3, null);
+                                      .andThenMore(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {

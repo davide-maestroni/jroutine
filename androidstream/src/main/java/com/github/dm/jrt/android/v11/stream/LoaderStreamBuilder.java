@@ -39,7 +39,7 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.stream.StreamRoutineBuilder;
+import com.github.dm.jrt.stream.StreamBuilder;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
 
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +74,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilder<IN, OUT> {
+public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
 
     /**
      * {@inheritDoc}
@@ -82,7 +82,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> append(@Nullable OUT output);
+    LoaderStreamBuilder<IN, OUT> append(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
@@ -90,7 +90,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> append(@Nullable OUT... outputs);
+    LoaderStreamBuilder<IN, OUT> append(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
@@ -98,7 +98,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
+    LoaderStreamBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
@@ -106,7 +106,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
+    LoaderStreamBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
 
     /**
      * {@inheritDoc}
@@ -114,7 +114,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> appendGet(long count,
+    LoaderStreamBuilder<IN, OUT> appendGet(long count,
             @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
@@ -123,7 +123,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    LoaderStreamBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -131,7 +131,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> appendGetMore(long count,
+    LoaderStreamBuilder<IN, OUT> appendMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -140,7 +140,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> appendGetMore(
+    LoaderStreamBuilder<IN, OUT> appendMore(
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -149,7 +149,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> async();
+    LoaderStreamBuilder<IN, OUT> async();
 
     /**
      * {@inheritDoc}
@@ -157,7 +157,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> async(@Nullable Runner runner);
+    LoaderStreamBuilder<IN, OUT> async(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
@@ -165,7 +165,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
+    LoaderStreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
@@ -173,7 +173,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
+    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
             @NotNull Backoff backoff);
 
     /**
@@ -182,7 +182,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
+    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
             @NotNull TimeUnit timeUnit);
 
     /**
@@ -191,7 +191,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
+    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
             @Nullable UnitDuration delay);
 
     /**
@@ -207,7 +207,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    StreamLoaderRoutineBuilder<IN, OUT> collect(
+    LoaderStreamBuilder<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
 
     /**
@@ -216,8 +216,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> collect(
-            @NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
 
     /**
@@ -226,7 +225,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    <AFTER extends Collection<? super OUT>> StreamLoaderRoutineBuilder<IN, AFTER> collectInto(
+    <AFTER extends Collection<? super OUT>> LoaderStreamBuilder<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> collectionSupplier);
 
     /**
@@ -235,7 +234,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
+    LoaderStreamBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -243,7 +242,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
+    LoaderStreamBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -251,7 +250,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
+    LoaderStreamBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
      * {@inheritDoc}
@@ -259,9 +258,9 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> flatLift(
-            @NotNull Function<? super StreamRoutineBuilder<IN, OUT>, ? extends
-                    StreamRoutineBuilder<BEFORE, AFTER>> liftFunction);
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+                    StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * {@inheritDoc}
@@ -269,7 +268,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> flatMap(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
@@ -278,7 +277,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
+    InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     invocationConfiguration();
 
     /**
@@ -287,7 +286,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+    LoaderStreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * {@inheritDoc}
@@ -295,7 +294,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
+    LoaderStreamBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -303,7 +302,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
+    LoaderStreamBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -311,7 +310,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> lift(
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> lift(
             @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends Channel<?,
                     OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends Channel<?,
                     AFTER>>> liftFunction);
@@ -322,7 +321,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamLoaderRoutineBuilder<BEFORE, AFTER> liftConfig(
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
@@ -333,7 +332,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> limit(int count);
+    LoaderStreamBuilder<IN, OUT> limit(int count);
 
     /**
      * {@inheritDoc}
@@ -341,7 +340,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
     /**
@@ -350,7 +349,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -359,7 +358,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -368,7 +367,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -377,7 +376,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapAll(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
     /**
@@ -386,7 +385,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapAllMore(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -395,7 +394,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> mapMore(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -404,7 +403,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, Void> onComplete(@NotNull Action completeAction);
+    LoaderStreamBuilder<IN, Void> onComplete(@NotNull Action completeAction);
 
     /**
      * {@inheritDoc}
@@ -412,8 +411,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> onError(
-            @NotNull Consumer<? super RoutineException> errorConsumer);
+    LoaderStreamBuilder<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * {@inheritDoc}
@@ -421,7 +419,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
+    LoaderStreamBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * {@inheritDoc}
@@ -429,7 +427,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElse(@Nullable OUT output);
+    LoaderStreamBuilder<IN, OUT> orElse(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
@@ -437,7 +435,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
+    LoaderStreamBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
@@ -445,7 +443,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+    LoaderStreamBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
@@ -453,7 +451,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElseGet(long count,
+    LoaderStreamBuilder<IN, OUT> orElseGet(long count,
             @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
@@ -462,7 +460,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    LoaderStreamBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * {@inheritDoc}
@@ -470,7 +468,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElseGetMore(long count,
+    LoaderStreamBuilder<IN, OUT> orElseMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -479,7 +477,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElseGetMore(
+    LoaderStreamBuilder<IN, OUT> orElseMore(
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -488,7 +486,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
+    LoaderStreamBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
 
     /**
      * {@inheritDoc}
@@ -496,7 +494,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> parallel();
+    LoaderStreamBuilder<IN, OUT> parallel();
 
     /**
      * {@inheritDoc}
@@ -504,7 +502,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> parallel(int maxInvocations);
+    LoaderStreamBuilder<IN, OUT> parallel(int maxInvocations);
 
     /**
      * {@inheritDoc}
@@ -512,7 +510,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -521,7 +519,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -530,7 +528,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -539,8 +537,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -549,8 +546,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -559,8 +555,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -569,7 +564,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
+    LoaderStreamBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
 
     /**
      * {@inheritDoc}
@@ -577,7 +572,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> peekError(
+    LoaderStreamBuilder<IN, OUT> peekError(
             @NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
@@ -586,7 +581,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
+    LoaderStreamBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * {@inheritDoc}
@@ -594,7 +589,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    StreamLoaderRoutineBuilder<IN, OUT> reduce(
+    LoaderStreamBuilder<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
 
     /**
@@ -603,8 +598,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> reduce(
-            @NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
 
     /**
@@ -613,7 +607,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    StreamLoaderRoutineBuilder<IN, OUT> retry(int count);
+    LoaderStreamBuilder<IN, OUT> retry(int count);
 
     /**
      * {@inheritDoc}
@@ -621,7 +615,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    StreamLoaderRoutineBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
+    LoaderStreamBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     /**
      * {@inheritDoc}
@@ -629,7 +623,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(COLLECT)
-    StreamLoaderRoutineBuilder<IN, OUT> retry(
+    LoaderStreamBuilder<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
 
@@ -639,7 +633,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> sequential();
+    LoaderStreamBuilder<IN, OUT> sequential();
 
     /**
      * {@inheritDoc}
@@ -647,7 +641,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> skip(int count);
+    LoaderStreamBuilder<IN, OUT> skip(int count);
 
     /**
      * {@inheritDoc}
@@ -655,7 +649,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
+    LoaderStreamBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}
@@ -663,7 +657,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> straight();
+    LoaderStreamBuilder<IN, OUT> straight();
 
     /**
      * {@inheritDoc}
@@ -671,7 +665,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    InvocationConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
+    InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     streamInvocationConfiguration();
 
     /**
@@ -680,7 +674,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> sync();
+    LoaderStreamBuilder<IN, OUT> sync();
 
     /**
      * {@inheritDoc}
@@ -688,7 +682,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(@Nullable AFTER output);
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
 
     /**
      * {@inheritDoc}
@@ -696,7 +690,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(@Nullable AFTER... outputs);
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
 
     /**
      * {@inheritDoc}
@@ -704,7 +698,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * {@inheritDoc}
@@ -712,7 +706,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGet(long count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(long count,
             @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
@@ -721,7 +715,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGet(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
             @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
@@ -730,7 +724,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGetMore(long count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(long count,
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
@@ -739,7 +733,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(REDUCE)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> thenGetMore(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
@@ -748,7 +742,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> tryCatch(
+    LoaderStreamBuilder<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
 
     /**
@@ -757,7 +751,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> tryCatchMore(
+    LoaderStreamBuilder<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer);
 
     /**
@@ -766,7 +760,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
     @NotNull
     @Override
     @StreamFlow(MAP)
-    StreamLoaderRoutineBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
+    LoaderStreamBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
 
     /**
      * Builds a new context invocation factory instance.
@@ -784,7 +778,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> cache(@Nullable CacheStrategyType strategyType);
+    LoaderStreamBuilder<IN, OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
      * Short for {@code loaderConfiguration().withFactoryId(factoryId).applied()}.
@@ -797,7 +791,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> factoryId(int factoryId);
+    LoaderStreamBuilder<IN, OUT> factoryId(int factoryId);
 
     /**
      * Gets the loader configuration builder related to the instance.
@@ -810,8 +804,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    LoaderConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
-    loaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> loaderConfiguration();
 
     /**
      * Short for {@code loaderConfiguration().withLoaderId(loaderId).applied()}.
@@ -824,7 +817,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> loaderId(int loaderId);
+    LoaderStreamBuilder<IN, OUT> loaderId(int loaderId);
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
@@ -840,7 +833,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -854,7 +847,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> map(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -870,7 +863,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> on(@Nullable LoaderContext context);
+    LoaderStreamBuilder<IN, OUT> on(@Nullable LoaderContext context);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -889,7 +882,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -909,8 +902,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamLoaderRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -921,7 +913,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> staleAfter(@Nullable UnitDuration staleTime);
+    LoaderStreamBuilder<IN, OUT> staleAfter(@Nullable UnitDuration staleTime);
 
     /**
      * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).applied()}.
@@ -932,7 +924,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamLoaderRoutineBuilder<IN, OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
+    LoaderStreamBuilder<IN, OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
      * Gets the loader configuration builder related to the whole stream.
@@ -947,8 +939,7 @@ public interface StreamLoaderRoutineBuilder<IN, OUT> extends StreamRoutineBuilde
      */
     @NotNull
     @StreamFlow(CONFIG)
-    LoaderConfiguration.Builder<? extends StreamLoaderRoutineBuilder<IN, OUT>>
-    streamLoaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> streamLoaderConfiguration();
 
     /**
      * Interface defining a loader stream configuration.

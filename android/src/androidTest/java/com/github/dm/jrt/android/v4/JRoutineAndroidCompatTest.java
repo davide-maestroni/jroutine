@@ -176,7 +176,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     private static void testStream(@NotNull final FragmentActivity activity) {
         assertThat(JRoutineAndroidCompat.withStream()
                                         .on(loaderFrom(activity))
-                                        .thenGetMore(range(1, 1000))
+                                        .andThenMore(range(1, 1000))
                                         .map(new Function<Number, Double>() {
 
                                             public Double apply(final Number number) {

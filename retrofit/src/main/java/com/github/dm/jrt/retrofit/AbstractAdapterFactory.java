@@ -23,10 +23,11 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.StreamRoutineBuilder;
+import com.github.dm.jrt.stream.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,10 +42,11 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Abstract implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamRoutineBuilder} return types.
+ * {@code StreamBuilder} return types.
  * <br>
  * Note that the routines generated through the returned builders will ignore any input.
  * <p>
@@ -80,6 +82,14 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         mDelegateFactory = delegateFactory;
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+    }
+
+    // TODO: 7/5/16 javadoc
+    @NotNull
+    public static <OUT> Function<Function<Channel<?, Object>, Channel<?, Object>>,
+            Function<Channel<?, Object>, Channel<?, Call<OUT>>>> inputCall(
+            @NotNull final Call<OUT> call) {
+        return new LiftCall<OUT>(ConstantConditions.notNull("call instance", call));
     }
 
     /**
@@ -158,7 +168,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     @Nullable
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
         final Type rawType = returnType.getRawType();
-        if ((Channel.class == rawType) || (StreamRoutineBuilder.class == rawType)) {
+        if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
             return returnType.getActualTypeArguments()[1];
         }
 
@@ -186,8 +196,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
 
-        } else if (StreamRoutineBuilder.class == returnRawType) {
-            return new StreamRoutineBuilderAdapter(invocationMode,
+        } else if (StreamBuilder.class == returnRawType) {
+            return new StreamBuilderAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -261,6 +271,21 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         @NotNull
         protected Routine<Call<?>, ?> getRoutine() {
             return mRoutine;
+        }
+    }
+
+    // TODO: 7/5/16 javadoc
+    private static class BindCall<OUT>
+            implements Function<Channel<?, Object>, Channel<?, Call<OUT>>> {
+
+        private final Call<OUT> mCall;
+
+        private BindCall(@NotNull final Call<OUT> call) {
+            mCall = call;
+        }
+
+        public Channel<?, Call<OUT>> apply(final Channel<?, Object> objects) throws Exception {
+            return JRoutineCore.io().of(mCall);
         }
     }
 
@@ -374,10 +399,28 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
     }
 
+    // TODO: 7/5/16 javadoc
+    private static class LiftCall<OUT> implements
+            Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?,
+                    Object>, Channel<?, Call<OUT>>>> {
+
+        private final Call<OUT> mCall;
+
+        private LiftCall(@NotNull final Call<OUT> call) {
+            mCall = call;
+        }
+
+        public Function<Channel<?, Object>, Channel<?, Call<OUT>>> apply(
+                final Function<Channel<?, Object>, Channel<?, Object>> bindingFunction) throws
+                Exception {
+            return decorate(bindingFunction).andThen(new BindCall<OUT>(mCall));
+        }
+    }
+
     /**
-     * Stream routine builder adapter implementation.
+     * Stream builder adapter implementation.
      */
-    private static class StreamRoutineBuilderAdapter extends BaseAdapter<StreamRoutineBuilder> {
+    private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
 
         private final InvocationMode mInvocationMode;
 
@@ -388,18 +431,18 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private StreamRoutineBuilderAdapter(@NotNull final InvocationMode invocationMode,
+        private StreamBuilderAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
-        public <OUT> StreamRoutineBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<OUT>>withStream().sync()
-                                                         .then(call)
-                                                         .invocationMode(mInvocationMode)
-                                                         .map(getRoutine());
+        public <OUT> StreamBuilder adapt(final Call<OUT> call) {
+            return JRoutineStream.withStream()
+                                 .lift(new LiftCall<OUT>(call))
+                                 .invocationMode(mInvocationMode)
+                                 .map(getRoutine());
         }
     }
 }

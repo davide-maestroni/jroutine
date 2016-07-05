@@ -58,7 +58,7 @@ public class JRoutineStream {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> StreamRoutineBuilder<IN, IN> withStream() {
-        return new DefaultStreamRoutineBuilder<IN, IN>();
+    public static <IN> StreamBuilder<IN, IN> withStream() {
+        return new DefaultStreamBuilder<IN, IN>();
     }
 }

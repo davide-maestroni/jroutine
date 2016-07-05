@@ -18,7 +18,7 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.StreamRoutineBuilder;
+import com.github.dm.jrt.stream.StreamBuilder;
 
 import org.junit.Test;
 
@@ -234,8 +234,8 @@ public class ProviderAdapterFactoryTest {
                 public <R> Object adapt(final Call<R> call) {
 
                     final List<Object> result = Collections.emptyList();
-                    final StreamRoutineBuilder<Object, List<Object>> builder =
-                            JRoutineStream.withStream().sync().<List<Object>>then(result);
+                    final StreamBuilder<Object, List<Object>> builder =
+                            JRoutineStream.withStream().sync().<List<Object>>andThen(result);
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.syncCall().close();
                     }

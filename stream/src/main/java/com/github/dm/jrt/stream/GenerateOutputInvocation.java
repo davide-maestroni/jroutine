@@ -20,12 +20,10 @@ import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation generating a list of outputs.
+ * Invocation implementation generating outputs.
  * <p>
  * Created by davide-maestroni on 04/19/2016.
  *
@@ -33,20 +31,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class GenerateOutputInvocation<OUT> extends GenerateInvocation<Object, OUT> {
 
-    private final List<OUT> mOutputs;
+    private final Channel<?, ? extends OUT> mChannel;
 
     /**
      * Constructor.
      *
-     * @param outputs the list of outputs.
+     * @param channel the output channel.
      */
-    GenerateOutputInvocation(@NotNull final List<OUT> outputs) {
-        super(asArgs(outputs));
-        mOutputs = outputs;
+    GenerateOutputInvocation(@NotNull final Channel<?, ? extends OUT> channel) {
+        super(asArgs(channel));
+        mChannel = channel;
     }
 
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
-        result.pass(mOutputs);
+        result.pass(mChannel);
     }
 
     public void onInput(final Object input, @NotNull final Channel<OUT, ?> result) {

@@ -34,12 +34,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultStreamRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBuilder<IN, OUT> {
+class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
 
     /**
      * Constructor.
      */
-    DefaultStreamRoutineBuilder() {
+    DefaultStreamBuilder() {
         this(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
                 InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC));
     }
@@ -49,7 +49,7 @@ class DefaultStreamRoutineBuilder<IN, OUT> extends AbstractStreamRoutineBuilder<
      *
      * @param streamConfiguration the stream configuration.
      */
-    DefaultStreamRoutineBuilder(@NotNull final StreamConfiguration streamConfiguration) {
+    DefaultStreamBuilder(@NotNull final StreamConfiguration streamConfiguration) {
         super(streamConfiguration);
     }
 

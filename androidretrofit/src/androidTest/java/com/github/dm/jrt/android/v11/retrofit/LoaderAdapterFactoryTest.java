@@ -32,7 +32,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.operator.Operators;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -94,7 +94,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -105,7 +105,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -127,7 +126,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -138,7 +137,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -157,7 +155,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -168,7 +166,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -187,7 +184,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -198,7 +195,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -218,7 +214,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -229,7 +225,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -247,7 +242,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -258,7 +253,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -480,7 +474,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -491,7 +485,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -510,7 +503,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -521,7 +514,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -540,7 +532,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -551,7 +543,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -570,7 +561,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -581,7 +572,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -601,7 +591,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -612,7 +602,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();
@@ -630,7 +619,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(StreamChannels.<Repo>unfold())
+                                  .map(Operators.<Repo>unfold())
                                   .onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -641,7 +630,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
                                   })
-                                  .asyncCall()
                                   .close()
                                   .after(seconds(10))
                                   .getError()).isNull();

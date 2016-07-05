@@ -67,7 +67,7 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
+public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel<IN, OUT> {
 
     /**
      * Concatenates a channel appending the specified output.
@@ -79,7 +79,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> append(@Nullable OUT output);
+    StreamBuilder<IN, OUT> append(@Nullable OUT output);
 
     /**
      * Concatenates a channel appending the specified outputs.
@@ -91,7 +91,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> append(@Nullable OUT... outputs);
+    StreamBuilder<IN, OUT> append(@Nullable OUT... outputs);
 
     /**
      * Concatenates a channel appending the specified outputs.
@@ -103,7 +103,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
+    StreamBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * Concatenates a channel appending the specified channel outputs.
@@ -115,7 +115,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
+    StreamBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
 
     /**
      * Concatenates a routine appending the outputs returned by the specified supplier.
@@ -132,8 +132,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> appendGet(long count,
-            @NotNull Supplier<? extends OUT> outputSupplier);
+    StreamBuilder<IN, OUT> appendGet(long count, @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a routine appending the outputs returned by the specified supplier.
@@ -147,7 +146,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    StreamBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a routine appending the outputs returned by the specified consumer.
@@ -167,7 +166,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> appendGetMore(long count,
+    StreamBuilder<IN, OUT> appendMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -185,8 +184,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> appendGetMore(
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
+    StreamBuilder<IN, OUT> appendMore(@NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -197,7 +195,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> async();
+    StreamBuilder<IN, OUT> async();
 
     /**
      * Short for {@code async().streamInvocationConfiguration().withRunner(runner).applied()}.
@@ -211,7 +209,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> async(@Nullable Runner runner);
+    StreamBuilder<IN, OUT> async(@Nullable Runner runner);
 
     /**
      * Short for {@code async(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
@@ -227,7 +225,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
+    StreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -248,8 +246,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
-            @NotNull Backoff backoff);
+    StreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, @NotNull Backoff backoff);
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -272,7 +269,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
+    StreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
             @NotNull TimeUnit timeUnit);
 
     /**
@@ -294,7 +291,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
+    StreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
             @Nullable UnitDuration delay);
 
     /**
@@ -304,6 +301,50 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     InvocationFactory<IN, OUT> buildFactory();
+
+    /**
+     * Invokes the execution of the automatically built routine based on the configured mode.
+     *
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> call();
+
+    /**
+     * Short for {@code call().pass(input).close()}.
+     *
+     * @param input the input.
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> call(@Nullable IN input);
+
+    /**
+     * Short for {@code call().pass(inputs).close()}.
+     *
+     * @param inputs the input data.
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> call(@Nullable IN... inputs);
+
+    /**
+     * Short for {@code call().pass(inputs).close()}.
+     *
+     * @param inputs the iterable returning the input data.
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> call(@Nullable Iterable<? extends IN> inputs);
+
+    /**
+     * Short for {@code call().pass(inputs).close()}.
+     *
+     * @param inputs the channel returning the input data.
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> call(@Nullable Channel<?, ? extends IN> inputs);
 
     /**
      * Concatenates a routine accumulating data through the specified consumer.
@@ -326,7 +367,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamRoutineBuilder<IN, OUT> collect(
+    StreamBuilder<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
 
     /**
@@ -352,7 +393,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> StreamBuilder<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
 
     /**
@@ -369,7 +410,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER extends Collection<? super OUT>> StreamRoutineBuilder<IN, AFTER> collectInto(
+    <AFTER extends Collection<? super OUT>> StreamBuilder<IN, AFTER> collectInto(
             @NotNull Supplier<? extends AFTER> collectionSupplier);
 
     /**
@@ -384,7 +425,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
+    StreamBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Adds a delay at the end of this stream, so that any data, exception or completion
@@ -397,7 +438,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
+    StreamBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
 
     /**
      * Concatenates a routine filtering data based on the values returned by the specified
@@ -410,7 +451,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
+    StreamBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
 
     /**
      * Transforms this stream by applying the specified function.
@@ -426,9 +467,9 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> flatLift(
-            @NotNull Function<? super StreamRoutineBuilder<IN, OUT>, ? extends
-                    StreamRoutineBuilder<BEFORE, AFTER>> liftFunction);
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+                    StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * Concatenates a routine mapping this stream outputs by applying the specified function to each
@@ -442,7 +483,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> flatMap(
+    <AFTER> StreamBuilder<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
@@ -450,7 +491,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    Builder<? extends StreamRoutineBuilder<IN, OUT>> invocationConfiguration();
+    Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
 
     /**
      * Makes the stream invoke concatenated routines with the specified mode.
@@ -461,7 +502,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
+    StreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * Adds a delay at the beginning of this stream, so that any data, exception or completion
@@ -476,7 +517,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
+    StreamBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * Adds a delay at the beginning of this stream, so that any data, exception or completion
@@ -490,7 +531,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
+    StreamBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
 
     /**
      * Transforms the stream by modifying the chain building function.
@@ -506,10 +547,9 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> lift(
-            @NotNull Function<? extends Function<? super
-                    Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-                    Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(@NotNull Function<? extends Function<? super
+            Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
+            Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
 
     /**
      * Transforms the stream by modifying the chain building function.
@@ -527,7 +567,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamRoutineBuilder<BEFORE, AFTER> liftConfig(
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
@@ -543,7 +583,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> limit(int count);
+    StreamBuilder<IN, OUT> limit(int count);
 
     /**
      * Concatenates a routine mapping this stream outputs by applying the specified function.
@@ -556,7 +596,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
+    <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
     /**
@@ -570,7 +610,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
+    <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -584,8 +624,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+    <AFTER> StreamBuilder<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Concatenates a routine mapping this stream outputs through the specified routine builder.
@@ -598,7 +637,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> map(
+    <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -613,7 +652,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> mapAll(
+    <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
     /**
@@ -631,7 +670,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> mapAllMore(
+    <AFTER> StreamBuilder<IN, AFTER> mapAllMore(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -648,7 +687,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> mapMore(
+    <AFTER> StreamBuilder<IN, AFTER> mapMore(
             @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -661,7 +700,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, Void> onComplete(@NotNull Action completeAction);
+    StreamBuilder<IN, Void> onComplete(@NotNull Action completeAction);
 
     /**
      * Concatenates a consumer handling invocation exceptions.
@@ -673,8 +712,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> onError(
-            @NotNull Consumer<? super RoutineException> errorConsumer);
+    StreamBuilder<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * Concatenates a consumer handling this stream outputs.
@@ -686,7 +724,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
+    StreamBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * Concatenates a routine producing the specified output in case the stream produced none.
@@ -700,7 +738,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT output);
+    StreamBuilder<IN, OUT> orElse(@Nullable OUT output);
 
     /**
      * Concatenates a routine producing the specified outputs in case the stream produced none.
@@ -714,7 +752,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
+    StreamBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
      * Concatenates a routine producing the specified outputs in case the stream produced none.
@@ -728,7 +766,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+    StreamBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * Concatenates a routine producing the outputs returned by the specified supplier in case the
@@ -746,8 +784,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElseGet(long count,
-            @NotNull Supplier<? extends OUT> outputSupplier);
+    StreamBuilder<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a routine producing the outputs returned by the specified supplier in case the
@@ -762,7 +799,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
+    StreamBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
 
     /**
      * Concatenates a routine producing the outputs returned by the specified consumer in case the
@@ -783,7 +820,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElseGetMore(long count,
+    StreamBuilder<IN, OUT> orElseMore(long count,
             @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
@@ -802,8 +839,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElseGetMore(
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
+    StreamBuilder<IN, OUT> orElseMore(@NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
 
     /**
      * Concatenates a routine aborting the execution with the specified error in case the stream
@@ -816,7 +852,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
+    StreamBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
@@ -827,7 +863,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> parallel();
+    StreamBuilder<IN, OUT> parallel();
 
     /**
      * Short for
@@ -843,7 +879,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> parallel(int maxInvocations);
+    StreamBuilder<IN, OUT> parallel(int maxInvocations);
 
     /**
      * Splits the outputs produced by this stream, so that each group will be processed by a
@@ -862,7 +898,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> StreamBuilder<IN, AFTER> parallel(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -882,7 +918,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> StreamBuilder<IN, AFTER> parallel(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -902,7 +938,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallel(int count,
+    <AFTER> StreamBuilder<IN, AFTER> parallel(int count,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -921,8 +957,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -941,8 +976,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -961,8 +995,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> parallelBy(
-            @NotNull Function<? super OUT, ?> keyFunction,
+    <AFTER> StreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
@@ -979,7 +1012,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
+    StreamBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
 
     /**
      * Concatenates a routine peeking the stream errors as they are passed on.
@@ -994,8 +1027,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> peekError(
-            @NotNull Consumer<? super RoutineException> errorConsumer);
+    StreamBuilder<IN, OUT> peekError(@NotNull Consumer<? super RoutineException> errorConsumer);
 
     /**
      * Concatenates a routine peeking the stream data as they are passed on.
@@ -1010,7 +1042,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
+    StreamBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
 
     /**
      * Concatenates a routine accumulating data through the specified function.
@@ -1033,7 +1065,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    StreamRoutineBuilder<IN, OUT> reduce(
+    StreamBuilder<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
 
     /**
@@ -1059,7 +1091,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
+    <AFTER> StreamBuilder<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
 
     /**
@@ -1072,7 +1104,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamRoutineBuilder<IN, OUT> retry(int count);
+    StreamBuilder<IN, OUT> retry(int count);
 
     /**
      * Returns a new stream retrying the whole flow of data at maximum for the specified number of
@@ -1087,7 +1119,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamRoutineBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
+    StreamBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     /**
      * Returns a new stream retrying the whole flow of data until the specified function does not
@@ -1106,7 +1138,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(COLLECT)
-    StreamRoutineBuilder<IN, OUT> retry(
+    StreamBuilder<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction);
 
@@ -1119,7 +1151,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> sequential();
+    StreamBuilder<IN, OUT> sequential();
 
     /**
      * Concatenates a routine skipping the specified number of outputs.
@@ -1132,7 +1164,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> skip(int count);
+    StreamBuilder<IN, OUT> skip(int count);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).applied()}.
@@ -1146,7 +1178,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
+    StreamBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
 
     /**
      * Short for
@@ -1171,7 +1203,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> straight(); // TODO: 04/07/16 reset runner??
+    StreamBuilder<IN, OUT> straight();
 
     /**
      * Gets the invocation configuration builder related to the whole stream.
@@ -1186,7 +1218,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    Builder<? extends StreamRoutineBuilder<IN, OUT>> streamInvocationConfiguration();
+    Builder<? extends StreamBuilder<IN, OUT>> streamInvocationConfiguration();
 
     /**
      * Makes the stream synchronous, that is, the concatenated routines will be invoked in
@@ -1197,7 +1229,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(CONFIG)
-    StreamRoutineBuilder<IN, OUT> sync();
+    StreamBuilder<IN, OUT> sync();
 
     /**
      * Concatenates a routine generating the specified output.
@@ -1214,7 +1246,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable AFTER output);
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
 
     /**
      * Concatenates a routine generating the specified outputs.
@@ -1231,7 +1263,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable AFTER... outputs);
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
 
     /**
      * Concatenates a routine generating the output returned by the specified iterable.
@@ -1248,7 +1280,24 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
+
+    /**
+     * Concatenates a routine generating the output returned by the specified channel.
+     * <br>
+     * The outputs will be generated only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param channel the channel returning the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@NotNull Channel<?, ? extends AFTER> channel);
 
     /**
      * Concatenates a routine generating the outputs returned by the specified supplier.
@@ -1268,7 +1317,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGet(long count,
+    <AFTER> StreamBuilder<IN, AFTER> andThenGet(long count,
             @NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
@@ -1286,8 +1335,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGet(
-            @NotNull Supplier<? extends AFTER> outputSupplier);
+    <AFTER> StreamBuilder<IN, AFTER> andThenGet(@NotNull Supplier<? extends AFTER> outputSupplier);
 
     /**
      * Concatenates a routine generating the outputs returned by the specified consumer.
@@ -1310,7 +1358,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGetMore(long count,
+    <AFTER> StreamBuilder<IN, AFTER> andThenMore(long count,
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
@@ -1331,7 +1379,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(REDUCE)
-    <AFTER> StreamRoutineBuilder<IN, AFTER> thenGetMore(
+    <AFTER> StreamBuilder<IN, AFTER> andThenMore(
             @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
@@ -1344,7 +1392,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> tryCatch(
+    StreamBuilder<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
 
     /**
@@ -1360,7 +1408,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> tryCatchMore(
+    StreamBuilder<IN, OUT> tryCatchMore(
             @NotNull BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer);
 
     /**
@@ -1373,7 +1421,7 @@ public interface StreamRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     @StreamFlow(MAP)
-    StreamRoutineBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
+    StreamBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
 
     /**
      * Interface defining a stream configuration.

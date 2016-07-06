@@ -419,6 +419,19 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testConstructor() {
+        boolean failed = false;
+        try {
+            new Operators();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testCount() {
         assertThat(JRoutineCore.with(Operators.count())
                                .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)

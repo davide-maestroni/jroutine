@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import java.util.List;
 

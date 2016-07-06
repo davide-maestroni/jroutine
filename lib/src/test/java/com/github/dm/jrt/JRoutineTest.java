@@ -46,7 +46,6 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
@@ -57,7 +56,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
-import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.input.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -67,27 +66,6 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 02/29/2016.
  */
 public class JRoutineTest {
-
-    private static class Tipo {
-        void passObject(Object o) {
-        }
-        <T> void pass(T... o) {
-        }
-        <T> void pass(Iterable<? extends T> o) {
-        }
-        void passMore(Object... o) {
-        }
-        void passMore(Iterable<?> o) {
-        }
-    }
-
-    public static void ciao() {
-        final Tipo channel = new Tipo();
-        channel.passMore(Arrays.asList("test", "test"));
-        channel.passMore(new String[]{"test", "test"});
-        channel.pass(Arrays.asList("test", "test"));
-        channel.pass(new String[]{"test", "test"});
-    }
 
     @Test
     public void testAliasMethod() throws NoSuchMethodException {

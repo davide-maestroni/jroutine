@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.input;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
@@ -22,6 +22,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.stream.JRoutineStream;
 
 import org.junit.Test;
 
@@ -30,8 +31,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.stream.Streams.range;
-import static com.github.dm.jrt.stream.Streams.sequence;
+import static com.github.dm.jrt.stream.input.Streams.range;
+import static com.github.dm.jrt.stream.input.Streams.sequence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

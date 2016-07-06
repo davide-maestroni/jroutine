@@ -59,14 +59,6 @@ public @interface StreamFlow {
          */
         REDUCE,
         /**
-         * The flow of data is cached, so that all incoming inputs are possibly retained, but
-         * outputs are produced anyway without interruption.
-         * <br>
-         * A new stream instance is returned by the method, and any further attempt to bind or
-         * read from the current one will raise an exception.
-         */
-        CACHE,
-        /**
          * The flow of data is blocked and incoming inputs are possibly retained, so that outputs
          * are produced only when inputs complete.
          */
@@ -74,13 +66,6 @@ public @interface StreamFlow {
         /**
          * The current stream configuration is modified.
          */
-        CONFIG,
-        /**
-         * The flow of input data is initiated.
-         * <br>
-         * Note that all the stream instances are lazy, that is, the flow of data will not begin
-         * until a method of this type gets called.
-         */
-        START
+        CONFIG
     }
 }

@@ -46,8 +46,10 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
-import com.github.dm.jrt.stream.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
+import com.github.dm.jrt.stream.builder.StreamBuildingException;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +69,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
-import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.input.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -110,10 +112,8 @@ public class StreamBuilderTest {
     @Test
     public void testAnnotation() {
         // Just for coverage...
-        assertThat(TransformationType.values()).containsOnly(TransformationType.START,
-                // TODO: 01/07/16 remove START and CACHE
-                TransformationType.MAP, TransformationType.REDUCE, TransformationType.CACHE,
-                TransformationType.COLLECT, TransformationType.CONFIG);
+        assertThat(TransformationType.values()).containsOnly(TransformationType.MAP,
+                TransformationType.REDUCE, TransformationType.COLLECT, TransformationType.CONFIG);
     }
 
     @Test
@@ -148,19 +148,13 @@ public class StreamBuilderTest {
                 return "TEST2";
             }
         }).syncCall("test1").all()).containsExactly("test1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .appendMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().appendMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .syncCall("test1")
-                                                      .all()).containsExactly("test1", "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).syncCall("test1").all()).containsExactly("test1", "TEST2");
         assertThat(JRoutineStream.withStream().sync().appendGet(3, new Supplier<String>() {
 
             public String get() {
@@ -168,40 +162,26 @@ public class StreamBuilderTest {
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
                 "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .appendMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().appendMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .syncCall("test1")
-                                                      .all()).containsExactly("test1", "TEST2",
-                "TEST2", "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).syncCall("test1").all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.<String>withStream().async().appendGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .appendMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().async().appendMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().async().appendGet(3, new Supplier<String>() {
 
             public String get() {
@@ -209,20 +189,13 @@ public class StreamBuilderTest {
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
                 "TEST2");
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .appendMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().async().appendMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "TEST2",
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2",
                 "TEST2", "TEST2");
         assertThat(JRoutineStream.<String>withStream().parallel().appendGet(new Supplier<String>() {
 
@@ -230,20 +203,13 @@ public class StreamBuilderTest {
                 return "TEST2";
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .appendMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel().appendMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
         assertThat(
                 JRoutineStream.<String>withStream().parallel().appendGet(3, new Supplier<String>() {
 
@@ -252,20 +218,13 @@ public class StreamBuilderTest {
                     }
                 }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2",
                 "TEST2", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .appendMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel().appendMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "TEST2",
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2",
                 "TEST2", "TEST2");
     }
 
@@ -512,66 +471,50 @@ public class StreamBuilderTest {
 
     @Test
     public void testCollect() {
-        assertThat(JRoutineStream.<StringBuilder>withStream().async()
-                                                             .collect(
-                                                                     new BiConsumer<StringBuilder, StringBuilder>() {
+        assertThat(JRoutineStream //
+                .<StringBuilder>withStream().async()
+                                            .collect(
+                                                    new BiConsumer<StringBuilder, StringBuilder>() {
 
-                                                                         public void accept(
-                                                                                 final
-                                                                                 StringBuilder
-                                                                                         builder,
-                                                                                 final
-                                                                                 StringBuilder
-                                                                                         builder2) {
-                                                                             builder.append(
-                                                                                     builder2);
-                                                                         }
-                                                                     })
-                                                             .map(new Function<StringBuilder,
-                                                                     String>() {
+                                                        public void accept(
+                                                                final StringBuilder builder,
+                                                                final StringBuilder builder2) {
+                                                            builder.append(builder2);
+                                                        }
+                                                    })
+                                            .map(new Function<StringBuilder, String>() {
 
-                                                                 public String apply(
-                                                                         final StringBuilder
-                                                                                 builder) {
-                                                                     return builder.toString();
-                                                                 }
-                                                             })
-                                                             .asyncCall(new StringBuilder("test1"),
-                                                                     new StringBuilder("test2"),
-                                                                     new StringBuilder("test3"))
-                                                             .after(seconds(3))
-                                                             .all()).containsExactly(
-                "test1test2test3");
-        assertThat(JRoutineStream.<StringBuilder>withStream().sync()
-                                                             .collect(
-                                                                     new BiConsumer<StringBuilder, StringBuilder>() {
+                                                public String apply(final StringBuilder builder) {
+                                                    return builder.toString();
+                                                }
+                                            })
+                                            .asyncCall(new StringBuilder("test1"),
+                                                    new StringBuilder("test2"),
+                                                    new StringBuilder("test3"))
+                                            .after(seconds(3))
+                                            .all()).containsExactly("test1test2test3");
+        assertThat(JRoutineStream //
+                .<StringBuilder>withStream().sync()
+                                            .collect(
+                                                    new BiConsumer<StringBuilder, StringBuilder>() {
 
-                                                                         public void accept(
-                                                                                 final
-                                                                                 StringBuilder
-                                                                                         builder,
-                                                                                 final
-                                                                                 StringBuilder
-                                                                                         builder2) {
-                                                                             builder.append(
-                                                                                     builder2);
-                                                                         }
-                                                                     })
-                                                             .map(new Function<StringBuilder,
-                                                                     String>() {
+                                                        public void accept(
+                                                                final StringBuilder builder,
+                                                                final StringBuilder builder2) {
+                                                            builder.append(builder2);
+                                                        }
+                                                    })
+                                            .map(new Function<StringBuilder, String>() {
 
-                                                                 public String apply(
-                                                                         final StringBuilder
-                                                                                 builder) {
-                                                                     return builder.toString();
-                                                                 }
-                                                             })
-                                                             .asyncCall(new StringBuilder("test1"),
-                                                                     new StringBuilder("test2"),
-                                                                     new StringBuilder("test3"))
-                                                             .after(seconds(3))
-                                                             .all()).containsExactly(
-                "test1test2test3");
+                                                public String apply(final StringBuilder builder) {
+                                                    return builder.toString();
+                                                }
+                                            })
+                                            .asyncCall(new StringBuilder("test1"),
+                                                    new StringBuilder("test2"),
+                                                    new StringBuilder("test3"))
+                                            .after(seconds(3))
+                                            .all()).containsExactly("test1test2test3");
     }
 
     @Test
@@ -894,6 +837,19 @@ public class StreamBuilderTest {
     }
 
     @Test
+    public void testConstructor() {
+        boolean failed = false;
+        try {
+            new JRoutineStream();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+        }
+
+        assertThat(failed).isFalse();
+    }
+
+    @Test
     public void testConsume() {
         final List<String> list = Collections.synchronizedList(new ArrayList<String>());
         assertThat(JRoutineStream.<String>withStream().sync().onOutput(new Consumer<String>() {
@@ -1069,77 +1025,53 @@ public class StreamBuilderTest {
 
     @Test
     public void testFlatMap() {
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .flatMap(
-                                                              new Function<String, Channel<?,
-                                                                      String>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().flatMap(new Function<String, Channel<?, String>>() {
 
-                                                                  public Channel<?, String> apply(
-                                                                          final String s) {
-                                                                      return JRoutineStream
-                                                                              .<String>withStream()
-                                                                              .sync()
-                                                                              .filter(Functions
-                                                                                      .<String>isNotNull())
-                                                                              .syncCall(s);
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", null, "test2", null)
-                                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .flatMap(
-                                                              new Function<String, Channel<?,
-                                                                      String>>() {
+                    public Channel<?, String> apply(final String s) {
+                        return JRoutineStream.<String>withStream().sync()
+                                                                  .filter(Functions
+                                                                          .<String>isNotNull())
+                                                                  .syncCall(s);
+                    }
+                }).syncCall("test1", null, "test2", null).all()).containsExactly("test1", "test2");
+        assertThat(JRoutineStream //
+                .<String>withStream().async().flatMap(new Function<String, Channel<?, String>>() {
 
-                                                                  public Channel<?, String> apply(
-                                                                          final String s) {
-                                                                      return JRoutineStream
-                                                                              .<String>withStream()
-                                                                              .sync()
-                                                                              .filter(Functions
-                                                                                      .<String>isNotNull())
-                                                                              .syncCall(s);
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", null, "test2", null)
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .flatMap(
-                                                              new Function<String, Channel<?,
-                                                                      String>>() {
+                    public Channel<?, String> apply(final String s) {
+                        return JRoutineStream.<String>withStream().sync()
+                                                                  .filter(Functions
+                                                                          .<String>isNotNull())
+                                                                  .syncCall(s);
+                    }
+                }).syncCall("test1", null, "test2", null).after(seconds(3)).all()).containsExactly(
+                "test1", "test2");
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel()
+                                     .flatMap(new Function<String, Channel<?, String>>() {
 
-                                                                  public Channel<?, String> apply(
-                                                                          final String s) {
-                                                                      return JRoutineStream
-                                                                              .<String>withStream()
-                                                                              .sync()
-                                                                              .filter(Functions
-                                                                                      .<String>isNotNull())
-                                                                              .syncCall(s);
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", null, "test2", null)
-                                                      .after(seconds(3))
-                                                      .all()).containsOnly("test1", "test2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
-                                                      .flatMap(
-                                                              new Function<String, Channel<?,
-                                                                      String>>() {
+                                         public Channel<?, String> apply(final String s) {
+                                             return JRoutineStream.<String>withStream().sync()
+                                                                                       .filter(Functions.<String>isNotNull())
+                                                                                       .syncCall(s);
+                                         }
+                                     })
+                                     .syncCall("test1", null, "test2", null)
+                                     .after(seconds(3))
+                                     .all()).containsOnly("test1", "test2");
+        assertThat(JRoutineStream //
+                .<String>withStream().sequential()
+                                     .flatMap(new Function<String, Channel<?, String>>() {
 
-                                                                  public Channel<?, String> apply(
-                                                                          final String s) {
-                                                                      return JRoutineStream
-                                                                              .<String>withStream()
-                                                                              .sync()
-                                                                              .filter(Functions
-                                                                                      .<String>isNotNull())
-                                                                              .syncCall(s);
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", null, "test2", null)
-                                                      .after(seconds(3))
-                                                      .all()).containsOnly("test1", "test2");
+                                         public Channel<?, String> apply(final String s) {
+                                             return JRoutineStream.<String>withStream().sync()
+                                                                                       .filter(Functions.<String>isNotNull())
+                                                                                       .syncCall(s);
+                                         }
+                                     })
+                                     .syncCall("test1", null, "test2", null)
+                                     .after(seconds(3))
+                                     .all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -1252,7 +1184,36 @@ public class StreamBuilderTest {
                                   });
             fail();
 
-        } catch (final StreamException e) {
+        } catch (final StreamBuildingException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+
+        assertThat(JRoutineStream.<String>withStream().flatLiftWithConfig(
+                new BiFunction<StreamConfiguration, StreamBuilder<String, String>,
+                        StreamBuilder<String, String>>() {
+
+                    public StreamBuilder<String, String> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final StreamBuilder<String, String> builder) {
+                        return builder.append("test2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "test2");
+
+        try {
+            JRoutineStream.withStream()
+                          .flatLiftWithConfig(
+                                  new BiFunction<StreamConfiguration, StreamBuilder<Object,
+                                          Object>, StreamBuilder<Object, Object>>() {
+
+                                      public StreamBuilder<Object, Object> apply(
+                                              final StreamConfiguration streamConfiguration,
+                                              final StreamBuilder<Object, Object> builder) {
+                                          throw new NullPointerException();
+                                      }
+                                  });
+            fail();
+
+        } catch (final StreamBuildingException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
     }
@@ -1488,47 +1449,37 @@ public class StreamBuilderTest {
                     }
                 }).asyncCall("test1", "test2").after(seconds(3)).all()).containsExactly("TEST1",
                 "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sorted(OrderType.BY_CALL)
-                                                      .parallel()
-                                                      .mapMore(
-                                                              new BiConsumer<String,
-                                                                      Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sorted(OrderType.BY_CALL)
+                                     .parallel()
+                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
-                                                                  public void accept(final String s,
-                                                                          final Channel<String,
-                                                                                  ?> result) {
-                                                                      result.pass(s.toUpperCase());
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1", "test2")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .mapMore(
-                                                              new BiConsumer<String,
-                                                                      Channel<String, ?>>() {
+                                         public void accept(final String s,
+                                                 final Channel<String, ?> result) {
+                                             result.pass(s.toUpperCase());
+                                         }
+                                     })
+                                     .asyncCall("test1", "test2")
+                                     .after(seconds(3))
+                                     .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JRoutineStream//
+                .<String>withStream().sync().mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
-                                                                  public void accept(final String s,
-                                                                          final Channel<String,
-                                                                                  ?> result) {
-                                                                      result.pass(s.toUpperCase());
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", "test2")
-                                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
-                                                      .mapMore(
-                                                              new BiConsumer<String,
-                                                                      Channel<String, ?>>() {
+                    public void accept(final String s, final Channel<String, ?> result) {
+                        result.pass(s.toUpperCase());
+                    }
+                }).syncCall("test1", "test2").all()).containsExactly("TEST1", "TEST2");
+        assertThat(JRoutineStream//
+                .<String>withStream().sequential()
+                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
 
-                                                                  public void accept(final String s,
-                                                                          final Channel<String,
-                                                                                  ?> result) {
-                                                                      result.pass(s.toUpperCase());
-                                                                  }
-                                                              })
-                                                      .syncCall("test1", "test2")
-                                                      .all()).containsExactly("TEST1", "TEST2");
+                                         public void accept(final String s,
+                                                 final Channel<String, ?> result) {
+                                             result.pass(s.toUpperCase());
+                                         }
+                                     })
+                                     .syncCall("test1", "test2")
+                                     .all()).containsExactly("TEST1", "TEST2");
     }
 
     @Test
@@ -2220,29 +2171,21 @@ public class StreamBuilderTest {
 
     @Test
     public void testReduce() {
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .reduce(new BiFunction<String, String,
-                                                              String>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().async().reduce(new BiFunction<String, String, String>() {
 
-                                                          public String apply(final String s,
-                                                                  final String s2) {
-                                                              return s + s2;
-                                                          }
-                                                      })
-                                                      .asyncCall("test1", "test2", "test3")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1test2test3");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .reduce(new BiFunction<String, String,
-                                                              String>() {
+                    public String apply(final String s, final String s2) {
+                        return s + s2;
+                    }
+                }).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
+                "test1test2test3");
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().reduce(new BiFunction<String, String, String>() {
 
-                                                          public String apply(final String s,
-                                                                  final String s2) {
-                                                              return s + s2;
-                                                          }
-                                                      })
-                                                      .syncCall("test1", "test2", "test3")
-                                                      .all()).containsExactly("test1test2test3");
+                    public String apply(final String s, final String s2) {
+                        return s + s2;
+                    }
+                }).syncCall("test1", "test2", "test3").all()).containsExactly("test1test2test3");
     }
 
     @Test
@@ -2475,59 +2418,39 @@ public class StreamBuilderTest {
                 return "TEST2";
             }
         }).syncCall("test1").all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .andThenMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().andThenMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .syncCall("test1")
-                                                      .all()).containsOnly("TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).syncCall("test1").all()).containsOnly("TEST2");
         assertThat(JRoutineStream.<String>withStream().sync().andThenGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sync()
-                                                      .andThenMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().sync().andThenMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .syncCall("test1")
-                                                      .all()).containsOnly("TEST2", "TEST2",
-                "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).syncCall("test1").all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.<String>withStream().async().andThenGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         }).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .andThenMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().async().andThenMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsOnly("TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
         assertThat(
                 JRoutineStream.<String>withStream().async().andThenGet(3, new Supplier<String>() {
 
@@ -2536,20 +2459,13 @@ public class StreamBuilderTest {
                     }
                 }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
                 "TEST2");
-        assertThat(JRoutineStream.<String>withStream().async()
-                                                      .andThenMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().async().andThenMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsOnly("TEST2", "TEST2",
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2",
                 "TEST2");
         assertThat(
                 JRoutineStream.<String>withStream().parallel().andThenGet(new Supplier<String>() {
@@ -2558,45 +2474,28 @@ public class StreamBuilderTest {
                         return "TEST2";
                     }
                 }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .andThenMore(
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel().andThenMore(new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .andThenGet(3, new Supplier<String>() {
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel().andThenGet(3, new Supplier<String>() {
 
-                                                          public String get() {
-                                                              return "TEST2";
-                                                          }
-                                                      })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("TEST2", "TEST2",
+                    public String get() {
+                        return "TEST2";
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
                 "TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
-                                                      .andThenMore(3,
-                                                              new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream //
+                .<String>withStream().parallel().andThenMore(3, new Consumer<Channel<String, ?>>() {
 
-                                                                  public void accept(
-                                                                          final Channel<String,
-                                                                                  ?>
-                                                                                  resultChannel) {
-                                                                      resultChannel.pass("TEST2");
-                                                                  }
-                                                              })
-                                                      .asyncCall("test1")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("TEST2", "TEST2",
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                }).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
                 "TEST2");
     }
 
@@ -2923,7 +2822,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testTransform() {
-        assertThat(JRoutineStream.<String>withStream().liftConfig(
+        assertThat(JRoutineStream.<String>withStream().liftWithConfig(
                 new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?,
                         String>>, Function<Channel<?, String>, Channel<?, String>>>() {
 
@@ -2970,7 +2869,7 @@ public class StreamBuilderTest {
                 }).asyncCall("test").after(seconds(3)).next()).isEqualTo("TEST");
         try {
             JRoutineStream.withStream()
-                          .liftConfig(
+                          .liftWithConfig(
                                   new BiFunction<StreamConfiguration, Function<Channel<?,
                                           Object>, Channel<?, Object>>, Function<Channel<?,
                                           Object>, Channel<?, Object>>>() {
@@ -2984,7 +2883,7 @@ public class StreamBuilderTest {
                                   });
             fail();
 
-        } catch (final StreamException e) {
+        } catch (final StreamBuildingException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
 
@@ -3001,7 +2900,7 @@ public class StreamBuilderTest {
                           });
             fail();
 
-        } catch (final StreamException e) {
+        } catch (final StreamBuildingException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
 

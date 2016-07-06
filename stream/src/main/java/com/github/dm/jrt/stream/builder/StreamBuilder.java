@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.builder;
 
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -68,6 +68,157 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <OUT> the output data type.
  */
 public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel<IN, OUT> {
+
+    /**
+     * Concatenates a routine generating the specified output.
+     * <br>
+     * The outputs will be generated only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param output  the output.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
+
+    /**
+     * Concatenates a routine generating the specified outputs.
+     * <br>
+     * The outputs will be generated only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param outputs the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
+
+    /**
+     * Concatenates a routine generating the output returned by the specified iterable.
+     * <br>
+     * The outputs will be generated only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param outputs the iterable returning the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
+
+    /**
+     * Concatenates a routine generating the output returned by the specified channel.
+     * <br>
+     * The outputs will be generated only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param channel the channel returning the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThen(@NotNull Channel<?, ? extends AFTER> channel);
+
+    /**
+     * Concatenates a routine generating the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called {@code count} number of times only when the previous routine
+     * invocation completes. The count number must be positive.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param count          the number of generated outputs.
+     * @param outputSupplier the supplier instance.
+     * @param <AFTER>        the concatenation output type.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThenGet(long count,
+            @NotNull Supplier<? extends AFTER> outputSupplier);
+
+    /**
+     * Concatenates a routine generating the outputs returned by the specified supplier.
+     * <br>
+     * The supplier will be called only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param outputSupplier the supplier instance.
+     * @param <AFTER>        the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThenGet(@NotNull Supplier<? extends AFTER> outputSupplier);
+
+    /**
+     * Concatenates a routine generating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocation completes. The count number must be positive.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <AFTER>         the concatenation output type.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThenMore(long count,
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
+
+    /**
+     * Concatenates a routine generating the outputs returned by the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <br>
+     * The consumer will be called only when the previous routine invocation completes.
+     * <br>
+     * Previous results will not be propagated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <AFTER>         the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    @StreamFlow(REDUCE)
+    <AFTER> StreamBuilder<IN, AFTER> andThenMore(
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * Concatenates a channel appending the specified output.
@@ -455,7 +606,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
 
     /**
      * Transforms this stream by applying the specified function.
-     * <br>
+     * <p>
      * This method provides a convenient way to apply a set of configurations and concatenations
      * without breaking the fluent chain.
      *
@@ -463,13 +614,35 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
      * @return the lifted builder.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+     *                                                                  occurs.
      */
     @NotNull
     @StreamFlow(MAP)
     <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLift(
             @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction);
+
+    /**
+     * Transforms this stream by applying the specified function.
+     * <br>
+     * The current configuration of the stream will be passed as the first parameter.
+     * <p>
+     * This method provides a convenient way to apply a set of configurations and concatenations
+     * without breaking the fluent chain.
+     *
+     * @param liftFunction the lift function.
+     * @param <BEFORE>     the concatenation input type.
+     * @param <AFTER>      the concatenation output type.
+     * @return the lifted builder.
+     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+     *                                                                  occurs.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+                    extends StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * Concatenates a routine mapping this stream outputs by applying the specified function to each
@@ -543,7 +716,8 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
      * @return this builder.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+     *                                                                  occurs.
      */
     @NotNull
     @StreamFlow(MAP)
@@ -563,11 +737,12 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @param <BEFORE>     the concatenation input type.
      * @param <AFTER>      the concatenation output type.
      * @return this builder.
-     * @throws com.github.dm.jrt.stream.StreamException if an unexpected error occurs.
+     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+     *                                                                  occurs.
      */
     @NotNull
     @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftConfig(
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
@@ -1230,157 +1405,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     @NotNull
     @StreamFlow(CONFIG)
     StreamBuilder<IN, OUT> sync();
-
-    /**
-     * Concatenates a routine generating the specified output.
-     * <br>
-     * The outputs will be generated only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param output  the output.
-     * @param <AFTER> the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
-
-    /**
-     * Concatenates a routine generating the specified outputs.
-     * <br>
-     * The outputs will be generated only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param outputs the outputs.
-     * @param <AFTER> the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
-
-    /**
-     * Concatenates a routine generating the output returned by the specified iterable.
-     * <br>
-     * The outputs will be generated only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param outputs the iterable returning the outputs.
-     * @param <AFTER> the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
-
-    /**
-     * Concatenates a routine generating the output returned by the specified channel.
-     * <br>
-     * The outputs will be generated only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param channel the channel returning the outputs.
-     * @param <AFTER> the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThen(@NotNull Channel<?, ? extends AFTER> channel);
-
-    /**
-     * Concatenates a routine generating the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called {@code count} number of times only when the previous routine
-     * invocation completes. The count number must be positive.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param count          the number of generated outputs.
-     * @param outputSupplier the supplier instance.
-     * @param <AFTER>        the concatenation output type.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThenGet(long count,
-            @NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * Concatenates a routine generating the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param outputSupplier the supplier instance.
-     * @param <AFTER>        the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThenGet(@NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * Concatenates a routine generating the outputs returned by the specified consumer.
-     * <br>
-     * The result channel of the backing routine will be passed to the consumer, so that multiple
-     * or no results may be generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the previous routine
-     * invocation completes. The count number must be positive.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <AFTER>         the concatenation output type.
-     * @return this builder.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThenMore(long count,
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * Concatenates a routine generating the outputs returned by the specified consumer.
-     * <br>
-     * The result channel of the backing routine will be passed to the consumer, so that multiple
-     * or no results may be generated.
-     * <br>
-     * The consumer will be called only when the previous routine invocation completes.
-     * <br>
-     * Previous results will not be propagated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <AFTER>         the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(REDUCE)
-    <AFTER> StreamBuilder<IN, AFTER> andThenMore(
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * Concatenates a consumer handling invocation exceptions.

@@ -15,8 +15,8 @@
  */
 
 /**
- * Core classes related to building and invocation of streams of routines.
+ * Utility classes for generating stream inputs.
  * <p>
- * Created by davide-maestroni on 10/22/2015.
+ * Created by davide-maestroni on 07/06/2016.
  */
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.input;

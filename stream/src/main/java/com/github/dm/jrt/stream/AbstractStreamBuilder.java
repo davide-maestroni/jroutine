@@ -47,6 +47,8 @@ import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuildingException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -295,6 +297,52 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable final AFTER output) {
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(output)));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable final AFTER... outputs) {
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThen(
+            @Nullable final Iterable<? extends AFTER> outputs) {
+        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThen(
+            @NotNull final Channel<?, ? extends AFTER> channel) {
+        return map(new GenerateOutputInvocation<AFTER>(channel));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThenGet(final long count,
+            @NotNull final Supplier<? extends AFTER> outputSupplier) {
+        return map(new LoopSupplierInvocation<AFTER>(count, decorate(outputSupplier)));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThenGet(
+            @NotNull final Supplier<? extends AFTER> outputSupplier) {
+        return andThenGet(1, outputSupplier);
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThenMore(final long count,
+            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
+        return map(new LoopConsumerInvocation<AFTER>(count, decorate(outputsConsumer)));
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> andThenMore(
+            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
+        return andThenMore(1, outputsConsumer);
+    }
+
+    @NotNull
     public StreamBuilder<IN, OUT> append(@Nullable final OUT output) {
         return append(JRoutineCore.io().of(output));
     }
@@ -470,7 +518,23 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             return ConstantConditions.notNull("transformed stream", liftFunction.apply(this));
 
         } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
+            throw StreamBuildingException.wrapIfNeeded(e);
+        }
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
+                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        try {
+            return ConstantConditions.notNull("transformed stream",
+                    ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
+                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration,
+                            this));
+
+        } catch (final Exception e) {
+            throw StreamBuildingException.wrapIfNeeded(e);
         }
     }
 
@@ -517,7 +581,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             return (StreamBuilder<BEFORE, AFTER>) this;
 
         } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
+            throw StreamBuildingException.wrapIfNeeded(e);
 
         } finally {
             resetConfiguration();
@@ -526,7 +590,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftConfig(
+    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
@@ -538,7 +602,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             return (StreamBuilder<BEFORE, AFTER>) this;
 
         } catch (final Exception e) {
-            throw StreamException.wrapIfNeeded(e);
+            throw StreamBuildingException.wrapIfNeeded(e);
 
         } finally {
             resetConfiguration();
@@ -827,52 +891,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public StreamBuilder<IN, OUT> sync() {
         return invocationMode(InvocationMode.SYNC);
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable final AFTER output) {
-        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(output)));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThen(@Nullable final AFTER... outputs) {
-        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThen(
-            @Nullable final Iterable<? extends AFTER> outputs) {
-        return map(new GenerateOutputInvocation<AFTER>(JRoutineCore.io().of(outputs)));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThen(
-            @NotNull final Channel<?, ? extends AFTER> channel) {
-        return map(new GenerateOutputInvocation<AFTER>(channel));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThenGet(final long count,
-            @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        return map(new LoopSupplierInvocation<AFTER>(count, decorate(outputSupplier)));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThenGet(
-            @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        return andThenGet(1, outputSupplier);
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThenMore(final long count,
-            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        return map(new LoopConsumerInvocation<AFTER>(count, decorate(outputsConsumer)));
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> andThenMore(
-            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        return andThenMore(1, outputsConsumer);
     }
 
     @NotNull

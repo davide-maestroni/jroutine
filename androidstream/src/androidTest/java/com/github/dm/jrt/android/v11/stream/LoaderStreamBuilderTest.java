@@ -57,7 +57,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +77,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.input.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -1705,6 +1705,18 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         testConfiguration(getActivity());
     }
 
+    public void testConstructor() {
+        boolean failed = false;
+        try {
+            new JRoutineStreamLoader();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testConsume() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -1976,6 +1988,44 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                      LoaderStreamBuilder<String, String>>() {
 
                                                  public LoaderStreamBuilder<String, String> apply(
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return ((LoaderStreamBuilder<String,
+                                                             String>) builder)
+                                                             .append("test2");
+                                                 }
+                                             })
+                                     .asyncCall("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineStreamLoader //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .flatLiftWithConfig(
+                                             new BiFunction<LoaderStreamConfiguration,
+                                                     StreamBuilder<String, String>,
+                                                     StreamBuilder<String, String>>() {
+
+                                                 public StreamBuilder<String, String> apply(
+                                                         final LoaderStreamConfiguration
+                                                                 configuration,
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return builder.append("test2");
+                                                 }
+                                             })
+                                     .asyncCall("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineStreamLoader //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .flatLiftWithConfig(
+                                             new BiFunction<LoaderStreamConfiguration,
+                                                     StreamBuilder<String, String>,
+                                                     LoaderStreamBuilder<String, String>>() {
+
+                                                 public LoaderStreamBuilder<String, String> apply(
+                                                         final LoaderStreamConfiguration
+                                                                 configuration,
                                                          final StreamBuilder<String, String>
                                                                  builder) {
                                                      return ((LoaderStreamBuilder<String,
@@ -3395,7 +3445,10 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).sync().andThenGet(3, null);
+            JRoutineStreamLoader.withStream()
+                                .on(loaderFrom(getActivity()))
+                                .sync()
+                                .andThenGet(3, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3429,7 +3482,10 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).async().andThenGet(null);
+            JRoutineStreamLoader.withStream()
+                                .on(loaderFrom(getActivity()))
+                                .async()
+                                .andThenGet(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3493,7 +3549,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .liftConfig(transformBiFunction())
+                                     .liftWithConfig(transformBiFunction())
                                      .asyncCall("test")
                                      .after(seconds(10))
                                      .next()).isEqualTo("TEST");

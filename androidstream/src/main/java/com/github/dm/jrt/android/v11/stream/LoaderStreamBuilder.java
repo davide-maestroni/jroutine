@@ -39,8 +39,8 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.stream.StreamBuilder;
 import com.github.dm.jrt.stream.annotation.StreamFlow;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +75,66 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * @param <OUT> the output data type.
  */
 public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(long count,
+            @NotNull Supplier<? extends AFTER> outputSupplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
+            @NotNull Supplier<? extends AFTER> outputSupplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(long count,
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    @StreamFlow(REDUCE)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
+            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * {@inheritDoc}
@@ -254,6 +314,10 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the passed builder will be this one.
+     * <br>
+     * A {@code LoaderStreamBuilder} is expected as the function result.
      */
     @NotNull
     @Override
@@ -261,6 +325,21 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
     <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLift(
             @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the passed configuration will be an instance of {@code LoaderStreamConfiguration}
+     * and the passed builder will be this one.
+     * <br>
+     * A {@code LoaderStreamBuilder} is expected as the function result.
+     */
+    @NotNull
+    @Override
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+            @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+                    extends StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * {@inheritDoc}
@@ -317,11 +396,13 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the passed configuration will be an instance of {@code LoaderStreamConfiguration}.
      */
     @NotNull
     @Override
     @StreamFlow(MAP)
-    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftConfig(
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
@@ -675,66 +756,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
     @Override
     @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> sync();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(long count,
-            @NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
-            @NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(long count,
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
 
     /**
      * {@inheritDoc}

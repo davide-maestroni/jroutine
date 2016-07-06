@@ -18,7 +18,7 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.retrofit.annotation.CallAdapterFactory;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import java.util.List;
 

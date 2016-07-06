@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.builder;
 
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -33,15 +33,18 @@ public class ExceptionTest {
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void testStreamException() {
 
-        assertThat(StreamException.wrapIfNeeded(new NullPointerException())
-                                  .getCause()).isExactlyInstanceOf(NullPointerException.class);
-        assertThat(StreamException.wrapIfNeeded(null)).hasNoCause();
-        assertThat(StreamException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
-                StreamException.class);
-        assertThat(StreamException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
-                StreamException.class);
-        assertThat(StreamException.wrapIfNeeded(
-                StreamException.wrapIfNeeded(null))).isExactlyInstanceOf(StreamException.class);
-        assertThat(StreamException.wrapIfNeeded(StreamException.wrapIfNeeded(null))).hasNoCause();
+        assertThat(StreamBuildingException.wrapIfNeeded(new NullPointerException())
+                                          .getCause()).isExactlyInstanceOf(
+                NullPointerException.class);
+        assertThat(StreamBuildingException.wrapIfNeeded(null)).hasNoCause();
+        assertThat(StreamBuildingException.wrapIfNeeded(
+                new NullPointerException())).isExactlyInstanceOf(StreamBuildingException.class);
+        assertThat(
+                StreamBuildingException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+                StreamBuildingException.class);
+        assertThat(StreamBuildingException.wrapIfNeeded(StreamBuildingException.wrapIfNeeded(null)))
+                .isExactlyInstanceOf(StreamBuildingException.class);
+        assertThat(StreamBuildingException.wrapIfNeeded(StreamBuildingException.wrapIfNeeded(null)))
+                .hasNoCause();
     }
 }

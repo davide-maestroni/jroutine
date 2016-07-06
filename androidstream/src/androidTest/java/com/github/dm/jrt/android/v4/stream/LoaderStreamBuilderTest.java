@@ -57,7 +57,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +77,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.input.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -1646,6 +1646,18 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         testConfiguration(getActivity());
     }
 
+    public void testConstructor() {
+        boolean failed = false;
+        try {
+            new JRoutineStreamLoaderCompat();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+        }
+
+        assertThat(failed).isFalse();
+    }
+
     public void testConsume() {
         testConsume(getActivity());
     }
@@ -1886,6 +1898,45 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
                                                  public LoaderStreamBuilderCompat<String, String>
                                                  apply(
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return ((LoaderStreamBuilderCompat<String,
+                                                             String>) builder)
+                                                             .append("test2");
+                                                 }
+                                             })
+                                     .asyncCall("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineStreamLoaderCompat //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .flatLiftWithConfig(
+                                             new BiFunction<LoaderStreamConfigurationCompat,
+                                                     StreamBuilder<String, String>,
+                                                     StreamBuilder<String, String>>() {
+
+                                                 public StreamBuilder<String, String> apply(
+                                                         final LoaderStreamConfigurationCompat
+                                                                 configuration,
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return builder.append("test2");
+                                                 }
+                                             })
+                                     .asyncCall("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineStreamLoaderCompat //
+                .<String>withStream().on(loaderFrom(getActivity()))
+                                     .flatLiftWithConfig(
+                                             new BiFunction<LoaderStreamConfigurationCompat,
+                                                     StreamBuilder<String, String>,
+                                                     LoaderStreamBuilderCompat<String, String>>() {
+
+                                                 public LoaderStreamBuilderCompat<String, String>
+                                                 apply(
+                                                         final LoaderStreamConfigurationCompat
+                                                                 configuration,
                                                          final StreamBuilder<String, String>
                                                                  builder) {
                                                      return ((LoaderStreamBuilderCompat<String,
@@ -2526,9 +2577,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testOrElseNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
-                                      .on(loaderFrom(getActivity()))
-                                      .orElseMore(null);
+            JRoutineStreamLoaderCompat.withStream().on(loaderFrom(getActivity())).orElseMore(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -3257,7 +3306,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     public void testTransform() {
         assertThat(JRoutineStreamLoaderCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .liftConfig(transformBiFunction())
+                                     .liftWithConfig(transformBiFunction())
                                      .asyncCall("test")
                                      .after(seconds(10))
                                      .next()).isEqualTo("TEST");

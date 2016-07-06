@@ -291,7 +291,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    private static void testStreamChannelAdapter(@NotNull final ServiceContext context) throws
+    private static void testStreamBuilderAdapter(@NotNull final ServiceContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -443,13 +443,13 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
         testPostAdapter(serviceFrom(getActivity(), RemoteTestService.class));
     }
 
-    public void testStreamChannelAdapter() throws IOException {
+    public void testStreamBuilderAdapter() throws IOException {
 
-        testStreamChannelAdapter(serviceFrom(getActivity(), TestService.class));
+        testStreamBuilderAdapter(serviceFrom(getActivity(), TestService.class));
     }
 
-    public void testStreamChannelAdapterRemote() throws IOException {
+    public void testStreamBuilderAdapterRemote() throws IOException {
 
-        testStreamChannelAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+        testStreamBuilderAdapter(serviceFrom(getActivity(), RemoteTestService.class));
     }
 }

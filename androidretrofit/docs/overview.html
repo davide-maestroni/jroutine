@@ -41,11 +41,11 @@
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
@@ -60,7 +60,7 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final LoaderAdapterFactory adapterFactory = 
+                final LoaderAdapterFactory adapterFactory =
                         LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -70,16 +70,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(StreamChannels.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {
@@ -111,11 +111,11 @@
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
@@ -130,7 +130,7 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final LoaderAdapterFactoryCompat adapterFactory = 
+                final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -140,16 +140,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(StreamChannels.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {
@@ -181,11 +181,11 @@
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
@@ -200,7 +200,7 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final ServiceAdapterFactory adapterFactory = 
+                final ServiceAdapterFactory adapterFactory =
                         ServiceAdapterFactory.on(serviceFrom(this, MyRetrofitService.class)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -210,16 +210,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(StreamChannels.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {

@@ -70,7 +70,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         super(TestActivity.class);
     }
 
-    private static void testLoaderStreamChannelAdapter(
+    private static void testLoaderStreamBuilderAdapter(
             @NotNull final LoaderContextCompat context) throws IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -454,7 +454,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testStreamChannelAdapter(@NotNull final LoaderContextCompat context) throws
+    private static void testStreamBuilderAdapter(@NotNull final LoaderContextCompat context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -647,17 +647,17 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    public void testLoaderStreamChannelAdapter() throws IOException {
+    public void testLoaderStreamBuilderAdapter() throws IOException {
 
-        testLoaderStreamChannelAdapter(loaderFrom(getActivity()));
+        testLoaderStreamBuilderAdapter(loaderFrom(getActivity()));
     }
 
-    public void testLoaderStreamChannelAdapterFragment() throws IOException {
+    public void testLoaderStreamBuilderAdapterFragment() throws IOException {
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testLoaderStreamChannelAdapter(loaderFrom(fragment));
+        testLoaderStreamBuilderAdapter(loaderFrom(fragment));
     }
 
     public void testOutputChannelAdapter() throws IOException {
@@ -673,17 +673,17 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         testOutputChannelAdapter(loaderFrom(fragment));
     }
 
-    public void testStreamChannelAdapter() throws IOException {
+    public void testStreamBuilderAdapter() throws IOException {
 
-        testStreamChannelAdapter(loaderFrom(getActivity()));
+        testStreamBuilderAdapter(loaderFrom(getActivity()));
     }
 
-    public void testStreamChannelAdapterFragment() throws IOException {
+    public void testStreamBuilderAdapterFragment() throws IOException {
 
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testStreamChannelAdapter(loaderFrom(fragment));
+        testStreamBuilderAdapter(loaderFrom(fragment));
     }
 
     private static class BodyAdapterFactory extends CallAdapter.Factory {

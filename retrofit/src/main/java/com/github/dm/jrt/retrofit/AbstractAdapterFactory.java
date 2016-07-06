@@ -27,7 +27,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,12 +84,18 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    // TODO: 7/5/16 javadoc
+    /**
+     * Returns a lifting function making sure the specified call will the only stream output.
+     *
+     * @param call  the Retrofit call.
+     * @param <OUT> the output data type.
+     * @return the lifting function.
+     */
     @NotNull
     public static <OUT> Function<Function<Channel<?, Object>, Channel<?, Object>>,
-            Function<Channel<?, Object>, Channel<?, Call<OUT>>>> inputCall(
+            Function<Channel<?, Object>, Channel<?, Call<OUT>>>> outputCall(
             @NotNull final Call<OUT> call) {
-        return new LiftCall<OUT>(ConstantConditions.notNull("call instance", call));
+        return new LiftOutputCall<OUT>(ConstantConditions.notNull("call instance", call));
     }
 
     /**
@@ -274,13 +280,22 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
     }
 
-    // TODO: 7/5/16 javadoc
-    private static class BindCall<OUT>
+    /**
+     * Binding function making sure the specified call will the only stream output.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class BindOutputCall<OUT>
             implements Function<Channel<?, Object>, Channel<?, Call<OUT>>> {
 
         private final Call<OUT> mCall;
 
-        private BindCall(@NotNull final Call<OUT> call) {
+        /**
+         * Constructor.
+         *
+         * @param call the Retrofit call.
+         */
+        private BindOutputCall(@NotNull final Call<OUT> call) {
             mCall = call;
         }
 
@@ -399,21 +414,30 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
     }
 
-    // TODO: 7/5/16 javadoc
-    private static class LiftCall<OUT> implements
+    /**
+     * Lifting function making sure the specified call will the only stream output.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class LiftOutputCall<OUT> implements
             Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?,
                     Object>, Channel<?, Call<OUT>>>> {
 
         private final Call<OUT> mCall;
 
-        private LiftCall(@NotNull final Call<OUT> call) {
+        /**
+         * Constructor.
+         *
+         * @param call the Retrofit call.
+         */
+        private LiftOutputCall(@NotNull final Call<OUT> call) {
             mCall = call;
         }
 
         public Function<Channel<?, Object>, Channel<?, Call<OUT>>> apply(
                 final Function<Channel<?, Object>, Channel<?, Object>> bindingFunction) throws
                 Exception {
-            return decorate(bindingFunction).andThen(new BindCall<OUT>(mCall));
+            return decorate(bindingFunction).andThen(new BindOutputCall<OUT>(mCall));
         }
     }
 
@@ -440,7 +464,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .lift(new LiftCall<OUT>(call))
+                                 .lift(outputCall(call))
                                  .invocationMode(mInvocationMode)
                                  .map(getRoutine());
         }

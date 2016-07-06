@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -33,8 +34,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.StreamBuilder;
-import com.github.dm.jrt.stream.StreamChannels;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +58,7 @@ import static com.github.dm.jrt.object.InvocationTarget.instance;
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutine extends StreamChannels {
+public class JRoutine extends Channels {
 
     /**
      * Avoid explicit instantiation.

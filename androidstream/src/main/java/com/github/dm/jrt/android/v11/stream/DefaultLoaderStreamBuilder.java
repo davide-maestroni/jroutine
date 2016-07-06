@@ -48,7 +48,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.AbstractStreamBuilder;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -161,6 +161,57 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());
         }
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable final AFTER output) {
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(output);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable final AFTER... outputs) {
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(outputs);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(
+            @Nullable final Iterable<? extends AFTER> outputs) {
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(outputs);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(final long count,
+            @NotNull final Supplier<? extends AFTER> outputSupplier) {
+        checkStatic(decorate(outputSupplier), outputSupplier);
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThenGet(count, outputSupplier);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
+            @NotNull final Supplier<? extends AFTER> outputSupplier) {
+        checkStatic(decorate(outputSupplier), outputSupplier);
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThenGet(outputSupplier);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(final long count,
+            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThenMore(count, outputsConsumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
+            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
+        checkStatic(decorate(outputsConsumer), outputsConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.andThenMore(outputsConsumer);
     }
 
     @NotNull
@@ -314,6 +365,14 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
+                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        return (LoaderStreamBuilder<BEFORE, AFTER>) super.flatLiftWithConfig(liftFunction);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -351,11 +410,11 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftConfig(
+    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
-        return (LoaderStreamBuilder<BEFORE, AFTER>) super.liftConfig(liftFunction);
+        return (LoaderStreamBuilder<BEFORE, AFTER>) super.liftWithConfig(liftFunction);
     }
 
     @NotNull
@@ -657,57 +716,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> sync() {
         return (LoaderStreamBuilder<IN, OUT>) super.sync();
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable final AFTER output) {
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(output);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable final AFTER... outputs) {
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(outputs);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(
-            @Nullable final Iterable<? extends AFTER> outputs) {
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThen(outputs);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(final long count,
-            @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(decorate(outputSupplier), outputSupplier);
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThenGet(count, outputSupplier);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
-            @NotNull final Supplier<? extends AFTER> outputSupplier) {
-        checkStatic(decorate(outputSupplier), outputSupplier);
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThenGet(outputSupplier);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(final long count,
-            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(decorate(outputsConsumer), outputsConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThenMore(count, outputsConsumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
-            @NotNull final Consumer<? super Channel<AFTER, ?>> outputsConsumer) {
-        checkStatic(decorate(outputsConsumer), outputsConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.andThenMore(outputsConsumer);
     }
 
     @NotNull

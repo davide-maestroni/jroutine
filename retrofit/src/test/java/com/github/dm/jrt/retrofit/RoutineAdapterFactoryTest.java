@@ -238,7 +238,7 @@ public class RoutineAdapterFactoryTest {
     }
 
     @Test
-    public void testStreamChannelAdapter() throws IOException {
+    public void testStreamBuilderAdapter() throws IOException {
 
         final MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(BODY));

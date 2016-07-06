@@ -33,7 +33,7 @@ import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.function.Functions.decorate;
-import static com.github.dm.jrt.retrofit.AbstractAdapterFactory.inputCall;
+import static com.github.dm.jrt.retrofit.AbstractAdapterFactory.outputCall;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel} and
@@ -440,7 +440,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .lift(inputCall(call))
+                                 .lift(outputCall(call))
                                  .invocationMode(mInvocationMode)
                                  .invocationConfiguration()
                                  .with(mInvocationConfiguration)

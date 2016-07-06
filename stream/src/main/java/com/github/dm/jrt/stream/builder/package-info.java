@@ -15,8 +15,8 @@
  */
 
 /**
- * Core classes related to building and invocation of streams of routines.
+ * Stream builders interfaces and utility classes.
  * <p>
- * Created by davide-maestroni on 10/22/2015.
+ * Created by davide-maestroni on 07/06/2016.
  */
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.builder;

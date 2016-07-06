@@ -42,8 +42,9 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(StreamChannels.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(System.out::println)
+                       .close()
                        .afterMax(seconds(3))
                        .hasCompleted();
                 System.exit(0);
@@ -52,7 +53,7 @@
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {

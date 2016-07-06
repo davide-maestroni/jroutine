@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.builder;
 
 import com.github.dm.jrt.core.error.RoutineException;
 
@@ -26,14 +26,14 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 05/10/2016.
  */
-public class StreamException extends RoutineException {
+public class StreamBuildingException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param cause the wrapped exception.
      */
-    private StreamException(@Nullable final Throwable cause) {
+    private StreamBuildingException(@Nullable final Throwable cause) {
         super(cause);
     }
 
@@ -48,12 +48,13 @@ public class StreamException extends RoutineException {
      * @return the throwable or a stream exception wrapping it.
      */
     @NotNull
-    public static StreamException wrapIfNeeded(@Nullable final Throwable cause) {
-        if (cause instanceof StreamException) {
-            return (StreamException) cause;
+    public static StreamBuildingException wrapIfNeeded(@Nullable final Throwable cause) {
+        if (cause instanceof StreamBuildingException) {
+            return (StreamBuildingException) cause;
         }
 
         // Unwrap routine exception to get the original cause
-        return new StreamException((cause instanceof RoutineException) ? cause.getCause() : cause);
+        return new StreamBuildingException(
+                (cause instanceof RoutineException) ? cause.getCause() : cause);
     }
 }

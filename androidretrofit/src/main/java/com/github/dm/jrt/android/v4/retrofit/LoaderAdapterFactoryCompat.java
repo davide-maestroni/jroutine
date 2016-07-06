@@ -275,7 +275,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         public <OUT> LoaderStreamBuilderCompat adapt(final Call<OUT> call) {
             return JRoutineStreamLoaderCompat.withStream()
                                              .on(mContext)
-                                             .lift(inputCall(ComparableCall.of(call)))
+                                             .lift(outputCall(ComparableCall.of(call)))
                                              .invocationMode(mInvocationMode)
                                              .map(getRoutine());
         }

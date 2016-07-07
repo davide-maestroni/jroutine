@@ -17,8 +17,6 @@
 package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -28,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
@@ -36,6 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.operator.Operators.replace;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -235,10 +233,8 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final InvocationFactory<Object, List<Object>> replaceCall =
-                            Operators.<Object, List<Object>>replace(Collections.emptyList());
-                    final StreamBuilder<Object, List<Object>> builder =
-                            JRoutineStream.withStream().sync().map(replaceCall);
+                    final StreamBuilder<?, ?> builder = JRoutineStream.withStream().sync();
+                    builder.map(replace((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.syncCall().close();
                     }

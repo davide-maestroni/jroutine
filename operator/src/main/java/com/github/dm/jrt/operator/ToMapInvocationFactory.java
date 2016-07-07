@@ -36,48 +36,62 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 05/05/2016.
  *
- * @param <IN>  the input data type.
- * @param <KEY> the map key type.
+ * @param <IN>    the input data type.
+ * @param <KEY>   the map key type.
+ * @param <VALUE> the map value type.
  */
-class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>> {
+class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<KEY, VALUE>> {
 
-    private final FunctionDecorator<? super IN, KEY> mFunction;
+    private final FunctionDecorator<? super IN, KEY> mKeyFunction;
+
+    private final FunctionDecorator<? super IN, VALUE> mValueFunction;
 
     /**
      * Constructor.
      *
-     * @param function the function extracting the key.
+     * @param keyFunction   the function extracting the key.
+     * @param valueFunction the function extracting the value.
      */
-    ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> function) {
-        super(asArgs(ConstantConditions.notNull("function instance", function)));
-        mFunction = function;
+    ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
+            @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
+        super(asArgs(ConstantConditions.notNull("key function instance", keyFunction),
+                ConstantConditions.notNull("value function instance", valueFunction)));
+        mKeyFunction = keyFunction;
+        mValueFunction = valueFunction;
     }
 
     @NotNull
     @Override
-    public Invocation<IN, Map<KEY, IN>> newInvocation() {
-        return new ToMapInvocation<IN, KEY>(mFunction);
+    public Invocation<IN, Map<KEY, VALUE>> newInvocation() {
+        return new ToMapInvocation<IN, KEY, VALUE>(mKeyFunction, mValueFunction);
     }
 
     /**
      * Invocation collecting inputs into a map.
      *
-     * @param <IN>  the input data type.
-     * @param <KEY> the map key type.
+     * @param <IN>    the input data type.
+     * @param <KEY>   the map key type.
+     * @param <VALUE> the map value type.
      */
-    private static class ToMapInvocation<IN, KEY> extends TemplateInvocation<IN, Map<KEY, IN>> {
+    private static class ToMapInvocation<IN, KEY, VALUE>
+            extends TemplateInvocation<IN, Map<KEY, VALUE>> {
 
-        private final FunctionDecorator<? super IN, KEY> mFunction;
+        private final FunctionDecorator<? super IN, KEY> mKeyFunction;
 
-        private HashMap<KEY, IN> mMap;
+        private final FunctionDecorator<? super IN, VALUE> mValueFunction;
+
+        private HashMap<KEY, VALUE> mMap;
 
         /**
          * Constructor.
          *
-         * @param function the function extracting the key.
+         * @param keyFunction   the function extracting the key.
+         * @param valueFunction the function extracting the value.
          */
-        private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> function) {
-            mFunction = function;
+        private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
+                @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
+            mKeyFunction = keyFunction;
+            mValueFunction = valueFunction;
         }
 
         @Override
@@ -86,20 +100,20 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
         }
 
         @Override
-        public void onComplete(@NotNull final Channel<Map<KEY, IN>, ?> result) {
+        public void onComplete(@NotNull final Channel<Map<KEY, VALUE>, ?> result) {
             result.pass(mMap);
             mMap = null;
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final Channel<Map<KEY, IN>, ?> result) throws
-                Exception {
-            mMap.put(mFunction.apply(input), input);
+        public void onInput(final IN input,
+                @NotNull final Channel<Map<KEY, VALUE>, ?> result) throws Exception {
+            mMap.put(mKeyFunction.apply(input), mValueFunction.apply(input));
         }
 
         @Override
         public void onRestart() {
-            mMap = new HashMap<KEY, IN>();
+            mMap = new HashMap<KEY, VALUE>();
         }
     }
 }

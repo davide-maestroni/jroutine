@@ -29,6 +29,7 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
@@ -1488,7 +1489,25 @@ public class Operators {
     @NotNull
     public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
             @NotNull final Function<? super IN, KEY> keyFunction) {
-        return new ToMapInvocationFactory<IN, KEY>(decorate(keyFunction));
+        return toMap(keyFunction, FunctionDecorator.<IN>identity());
+    }
+
+    /**
+     * Returns a factory of invocations collecting inputs into a map.
+     *
+     * @param keyFunction   the key function.
+     * @param valueFunction the value function.
+     * @param <IN>          the input data type.
+     * @param <KEY>         the map key type.
+     * @param <VALUE>       the map value type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, KEY, VALUE> InvocationFactory<? super IN, Map<KEY, VALUE>> toMap(
+            @NotNull final Function<? super IN, KEY> keyFunction,
+            @NotNull final Function<? super IN, VALUE> valueFunction) {
+        return new ToMapInvocationFactory<IN, KEY, VALUE>(decorate(keyFunction),
+                decorate(valueFunction));
     }
 
     /**

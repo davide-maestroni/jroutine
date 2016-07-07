@@ -147,13 +147,13 @@ public class Transformations {
     }
 
     @NotNull
+    // TODO: 7/7/16 remove??
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> order(
             @Nullable final OrderType orderType) {
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.parallel()
-                              .invocationConfiguration()
+                return builder.streamInvocationConfiguration()
                               .withOutputOrder(orderType)
                               .applied();
             }

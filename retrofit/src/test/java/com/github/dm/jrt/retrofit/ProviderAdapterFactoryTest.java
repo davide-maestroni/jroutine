@@ -17,6 +17,8 @@
 package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -233,9 +235,10 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final List<Object> result = Collections.emptyList();
+                    final InvocationFactory<Object, List<Object>> replaceCall =
+                            Operators.<Object, List<Object>>replace(Collections.emptyList());
                     final StreamBuilder<Object, List<Object>> builder =
-                            JRoutineStream.withStream().sync().<List<Object>>andThen(result);
+                            JRoutineStream.withStream().sync().map(replaceCall);
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.syncCall().close();
                     }

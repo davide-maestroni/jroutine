@@ -577,19 +577,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     private Channel<IN, OUT> call() {
-        // TODO: 7/7/16 Builders.call()
-        final InvocationMode invocationMode = mStreamConfiguration.getInvocationMode();
-        if (invocationMode == InvocationMode.ASYNC) {
-            return asyncCall();
-
-        } else if (invocationMode == InvocationMode.PARALLEL) {
-            return parallelCall();
-
-        } else if (invocationMode == InvocationMode.SYNC) {
-            return syncCall();
-        }
-
-        return sequentialCall();
+        return mStreamConfiguration.getInvocationMode().call(this);
     }
 
     @NotNull

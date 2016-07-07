@@ -76,11 +76,7 @@ public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
     @NotNull
     @Override
     protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
-        final InvocationMode invocationMode = mInvocationMode;
-        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
-                                : mRoutine.sequentialCall(channel);
+        return mInvocationMode.call(mRoutine).pass(channel).close();
     }
 
     /**

@@ -85,6 +85,8 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     StreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
     // TODO: 7/6/16 mapOn
 
+    // TODO: 07/07/16 sorted(), unsorted()
+
     /**
      * Builds a new invocation factory instance.
      *

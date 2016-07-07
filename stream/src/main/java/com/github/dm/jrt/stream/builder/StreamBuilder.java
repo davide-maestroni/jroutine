@@ -460,7 +460,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return the invocation channel.
      */
     @NotNull
-    Channel<IN, OUT> call();
+    Channel<IN, OUT> call(); // TODO: 07/07/16 remove
 
     /**
      * Short for {@code call().pass(input).close()}.

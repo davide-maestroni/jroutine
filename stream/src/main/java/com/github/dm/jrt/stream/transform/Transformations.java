@@ -13,7 +13,6 @@ import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -38,6 +37,7 @@ public class Transformations {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
             @Nullable final Runner runner, final int limit, @NotNull final Backoff backoff) {
+        ConstantConditions.notNull("backoff instance", backoff);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -54,6 +54,7 @@ public class Transformations {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
             @Nullable final Runner runner, final int limit, final long delay,
             @NotNull final TimeUnit timeUnit) {
+        ConstantConditions.notNull("time unit", timeUnit);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -84,6 +85,7 @@ public class Transformations {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
             final long delay, @NotNull final TimeUnit timeUnit) {
+        ConstantConditions.notNull("time unit", timeUnit);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -115,6 +117,7 @@ public class Transformations {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
             final long delay, @NotNull final TimeUnit timeUnit) {
+        ConstantConditions.notNull("time unit", timeUnit);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -141,62 +144,6 @@ public class Transformations {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
             @NotNull final UnitDuration delay) {
         return lag(delay.value, delay.unit);
-    }
-
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, Void>> onComplete(
-            @NotNull final Action completeAction) {
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, Void>>() {
-
-            public StreamBuilder<IN, Void> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, Void>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, Void>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindCompleteConsumer<OUT>(
-                                        streamConfiguration.asChannelConfiguration(),
-                                        completeAction));
-                            }
-                        });
-            }
-        };
-    }
-
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> onError(
-            @NotNull final Consumer<? super RoutineException> errorConsumer) {
-        return tryCatchWith(new TryCatchBiConsumerConsumer<OUT>(errorConsumer));
-    }
-
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, Void>> onOutput(
-            @NotNull final Consumer<? super OUT> outputConsumer) {
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, Void>>() {
-
-            public StreamBuilder<IN, Void> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, Void>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, Void>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindOutputConsumer<OUT>(
-                                        streamConfiguration.asChannelConfiguration(),
-                                        outputConsumer));
-                            }
-                        });
-            }
-        };
     }
 
     @NotNull
@@ -231,6 +178,7 @@ public class Transformations {
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
     parallel(
             final int count, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+        ConstantConditions.notNull("routine instance", routine);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
 
             public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
@@ -265,6 +213,8 @@ public class Transformations {
     parallelBy(
             @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+        ConstantConditions.notNull("function instance", keyFunction);
+        ConstantConditions.notNull("routine instance", routine);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
 
             public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
@@ -311,6 +261,7 @@ public class Transformations {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
+        ConstantConditions.notNull("function instance", backoffFunction);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -345,6 +296,7 @@ public class Transformations {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchWith(
             @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer) {
+        ConstantConditions.notNull("consumer instance", catchConsumer);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -371,6 +323,7 @@ public class Transformations {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryFinally(
             @NotNull final Action finallyAction) {
+        ConstantConditions.notNull("action instance", finallyAction);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {

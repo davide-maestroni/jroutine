@@ -73,9 +73,9 @@ public interface LoaderChannelBuilder extends ChannelConfigurable<LoaderChannelB
     void clear(@Nullable Iterable<?> inputs);
 
     /**
-     * Note that the clash resolution types will be ignored.
-     *
-     * @return the loader configuration builder.
+     * {@inheritDoc}
+     * <p>
+     * The clash resolution types will be ignored.
      */
     @NotNull
     @Override

@@ -377,6 +377,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     @NotNull
     @StreamFlow(MAP)
     StreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
+    // TODO: 7/6/16 mapOn
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -705,6 +706,25 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     @NotNull
     @StreamFlow(MAP)
     StreamBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
+
+    /**
+     * Transforms this stream by applying the specified function.
+     * <p>
+     * This method provides a convenient way to apply a set of configurations and concatenations
+     * without breaking the fluent chain.
+     *
+     * @param liftFunction the lift function.
+     * @param <BEFORE>     the concatenation input type.
+     * @param <AFTER>      the concatenation output type.
+     * @return the lifted builder.
+     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+     *                                                                  occurs.
+     */
+    @NotNull
+    @StreamFlow(MAP)
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
+            @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+                    StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * Transforms the stream by modifying the chain building function.

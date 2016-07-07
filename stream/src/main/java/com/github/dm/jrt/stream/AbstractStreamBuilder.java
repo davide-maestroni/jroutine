@@ -568,6 +568,19 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
+    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
+            @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
+                    StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        try {
+            return ConstantConditions.notNull("transformed stream builder",
+                    liftFunction.apply(this));
+
+        } catch (final Exception e) {
+            throw StreamBuildingException.wrapIfNeeded(e);
+        }
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(
             @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends

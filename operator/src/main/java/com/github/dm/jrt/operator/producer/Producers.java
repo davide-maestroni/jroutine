@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.input;
+package com.github.dm.jrt.operator.producer;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -38,12 +38,12 @@ import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
  * <p>
  * Created by davide-maestroni on 07/02/2016.
  */
-public class Streams {
+public class Producers {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Streams() {
+    protected Producers() {
         ConstantConditions.avoid();
     }
 
@@ -119,7 +119,7 @@ public class Streams {
      * @param nextFunction the function computing the next element.
      * @param <AFTER>      the concatenation output type.
      * @return the consumer instance.
-     * @throws java.lang.IllegalArgumentException if the count is not positive.
+     * @throws IllegalArgumentException if the count is not positive.
      */
     @NotNull
     public static <AFTER> Consumer<Channel<AFTER, ?>> sequence(@NotNull final AFTER start,

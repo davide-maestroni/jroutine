@@ -98,9 +98,9 @@ public interface LoaderProxyRoutineBuilder
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
-     * Note that the configured asynchronous runner will be ignored.
-     *
-     * @return the invocation configuration builder.
+     * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
      */
     @NotNull
     @Override

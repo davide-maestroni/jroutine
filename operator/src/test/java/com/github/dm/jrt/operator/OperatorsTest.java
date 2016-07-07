@@ -17,23 +17,55 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.function.Action;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.Supplier;
 
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.operator.Operators.append;
+import static com.github.dm.jrt.operator.Operators.appendGet;
+import static com.github.dm.jrt.operator.Operators.appendWith;
+import static com.github.dm.jrt.operator.Operators.collect;
+import static com.github.dm.jrt.operator.Operators.collectInto;
+import static com.github.dm.jrt.operator.Operators.filter;
+import static com.github.dm.jrt.operator.Operators.orElse;
+import static com.github.dm.jrt.operator.Operators.orElseGet;
+import static com.github.dm.jrt.operator.Operators.orElseThrow;
+import static com.github.dm.jrt.operator.Operators.orElseWith;
+import static com.github.dm.jrt.operator.Operators.peekComplete;
+import static com.github.dm.jrt.operator.Operators.peekError;
+import static com.github.dm.jrt.operator.Operators.peekOutput;
+import static com.github.dm.jrt.operator.Operators.prepend;
+import static com.github.dm.jrt.operator.Operators.prependGet;
+import static com.github.dm.jrt.operator.Operators.prependWith;
+import static com.github.dm.jrt.operator.Operators.reduce;
+import static com.github.dm.jrt.operator.Operators.replace;
+import static com.github.dm.jrt.operator.Operators.replaceGet;
+import static com.github.dm.jrt.operator.Operators.replaceWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -86,6 +118,107 @@ public class OperatorsTest {
                 return "test1".equals(s);
             }
         })).asyncCall("test1", "test2").after(seconds(3)).all()).containsExactly(true);
+    }
+
+    @Test
+    public void testAppend() {
+        assertThat(JRoutineCore.with(append("test2"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineCore.with(append("test2", "test3"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineCore.with(append(Arrays.asList("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineCore.with(append(JRoutineCore.io().of("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    public void testAppend2() {
+        assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
+                "TEST2");
+        assertThat(JRoutineCore.with(appendWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
+                "TEST2");
+        assertThat(JRoutineCore.with(appendWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
+                "TEST2");
+        assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+        assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2",
+                "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(appendWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2",
+                "TEST2", "TEST2");
     }
 
     @Test
@@ -419,6 +552,145 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testCollect() {
+        assertThat(JRoutineCore.with(collect(new BiConsumer<StringBuilder, StringBuilder>() {
+
+            public void accept(final StringBuilder builder, final StringBuilder builder2) {
+                builder.append(builder2);
+            }
+        }))
+                               .asyncCall(new StringBuilder("test1"), new StringBuilder("test2"),
+                                       new StringBuilder("test3"))
+                               .after(seconds(3))
+                               .next()
+                               .toString()).isEqualTo("test1test2test3");
+        assertThat(JRoutineCore.with(collect(new BiConsumer<StringBuilder, StringBuilder>() {
+
+            public void accept(final StringBuilder builder, final StringBuilder builder2) {
+                builder.append(builder2);
+            }
+        }))
+                               .syncCall(new StringBuilder("test1"), new StringBuilder("test2"),
+                                       new StringBuilder("test3"))
+                               .after(seconds(3))
+                               .next()
+                               .toString()).isEqualTo("test1test2test3");
+    }
+
+    @Test
+    public void testCollectCollection() {
+        assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
+
+            public List<String> get() {
+                return new ArrayList<String>();
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).next()).containsExactly("test1",
+                "test2", "test3");
+        assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
+
+            public List<String> get() {
+                return new ArrayList<String>();
+            }
+        })).syncCall("test1", "test2", "test3").after(seconds(3)).next()).containsExactly("test1",
+                "test2", "test3");
+        assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
+
+            public List<String> get() {
+                return new ArrayList<String>();
+            }
+        })).asyncCall().close().after(seconds(3)).next()).isEmpty();
+        assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
+
+            public List<String> get() {
+                return new ArrayList<String>();
+            }
+        })).syncCall().close().after(seconds(3)).next()).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectCollectionNullPointerError() {
+        try {
+            JRoutineCore.with(collectInto(null));
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectNullPointerError() {
+        try {
+            collect(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    public void testCollectSeed() {
+        assertThat(JRoutineCore.with(collect(new Supplier<StringBuilder>() {
+
+            public StringBuilder get() {
+                return new StringBuilder();
+            }
+        }, new BiConsumer<StringBuilder, String>() {
+
+            public void accept(final StringBuilder b, final String s) {
+                b.append(s);
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).next().toString()).isEqualTo(
+                "test1test2test3");
+        assertThat(JRoutineCore.with(collect(new Supplier<StringBuilder>() {
+
+            public StringBuilder get() {
+                return new StringBuilder();
+            }
+        }, new BiConsumer<StringBuilder, String>() {
+
+            public void accept(final StringBuilder b, final String s) {
+                b.append(s);
+            }
+        })).syncCall("test1", "test2", "test3").after(seconds(3)).next().toString()).isEqualTo(
+                "test1test2test3");
+        assertThat(JRoutineCore.with(collect(new Supplier<StringBuilder>() {
+
+            public StringBuilder get() {
+                return new StringBuilder();
+            }
+        }, new BiConsumer<StringBuilder, String>() {
+
+            public void accept(final StringBuilder b, final String s) {
+                b.append(s);
+            }
+        })).asyncCall().close().after(seconds(3)).next().toString()).isEqualTo("");
+        assertThat(JRoutineCore.with(collect(new Supplier<List<Object>>() {
+
+            public List<Object> get() {
+                return new ArrayList<Object>();
+            }
+        }, new BiConsumer<List<Object>, Object>() {
+
+            public void accept(final List<Object> l, final Object o) {
+                l.add(o);
+            }
+        })).asyncCall().close().after(seconds(3)).next()).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectSeedNullPointerError() {
+        try {
+            collect(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
     public void testConstructor() {
         boolean failed = false;
         try {
@@ -457,6 +729,25 @@ public class OperatorsTest {
                                .all()).isEmpty();
         assertThat(Operators.isEqualTo("test")).isEqualTo(Operators.isEqualTo("test"));
         assertThat(Operators.isEqualTo(null)).isEqualTo(Operators.isEqualTo(null));
+    }
+
+    @Test
+    public void testFilter() {
+        assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
+                               .asyncCall(null, "test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
+                               .parallelCall(null, "test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
+                               .syncCall(null, "test")
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
+                               .sequentialCall(null, "test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
     }
 
     @Test
@@ -811,6 +1102,582 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testOrElse() {
+        assertThat(JRoutineCore.with(orElse("est"))
+                               .asyncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(
+                JRoutineCore.with(orElse("est1", "est2")).asyncCall("test").after(seconds(3)).all())
+                .containsExactly("test");
+        assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
+                               .asyncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> result) {
+                result.pass("est");
+            }
+        })).asyncCall("test").after(seconds(3)).all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseWith(2, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> result) {
+                result.pass("est");
+            }
+        })).asyncCall().close().after(seconds(3)).all()).containsExactly("est", "est");
+        assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
+
+            public String get() {
+                return "est";
+            }
+        })).asyncCall("test").after(seconds(3)).all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseGet(2, new Supplier<String>() {
+
+            public String get() {
+                return "est";
+            }
+        })).asyncCall().close().after(seconds(3)).all()).containsExactly("est", "est");
+        assertThat(JRoutineCore.with(orElse("est"))
+                               .syncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElse("est1", "est2"))
+                               .syncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
+                               .syncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> result) {
+                result.pass("est");
+            }
+        })).syncCall("test").after(seconds(3)).all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseWith(2, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> result) {
+                result.pass("est");
+            }
+        })).syncCall().close().after(seconds(3)).all()).containsExactly("est", "est");
+        assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
+
+            public String get() {
+                return "est";
+            }
+        })).syncCall("test").after(seconds(3)).all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseGet(2, new Supplier<String>() {
+
+            public String get() {
+                return "est";
+            }
+        })).syncCall().close().after(seconds(3)).all()).containsExactly("est", "est");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOrElseNullPointerError() {
+        try {
+            orElseWith(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            orElseWith(1, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            orElseGet(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            orElseGet(1, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testOrElseThrow() {
+        assertThat(JRoutineCore.with(orElseThrow(new IllegalStateException()))
+                               .asyncCall("test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(orElseThrow(new IllegalStateException()))
+                               .asyncCall()
+                               .close()
+                               .after(seconds(3))
+                               .getError()
+                               .getCause()).isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    public void testPeekComplete() {
+        final AtomicBoolean isComplete = new AtomicBoolean(false);
+        assertThat(JRoutineCore.with(peekComplete(new Action() {
+
+            public void perform() {
+                isComplete.set(true);
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1",
+                "test2", "test3");
+        assertThat(isComplete.get()).isTrue();
+        isComplete.set(false);
+        final Channel<Object, Object> channel = JRoutineCore.with(peekComplete(new Action() {
+
+            public void perform() {
+                isComplete.set(true);
+            }
+        })).asyncCall();
+        channel.abort(new NoSuchElementException());
+        assertThat(channel.after(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
+        assertThat(isComplete.get()).isFalse();
+    }
+
+    @Test
+    public void testPeekError() {
+        final AtomicBoolean isError = new AtomicBoolean(false);
+        final Channel<String, String> channel =
+                JRoutineCore.with(Operators.<String>peekError(new Consumer<RoutineException>() {
+
+                    public void accept(final RoutineException e) {
+                        isError.set(true);
+                    }
+                })).asyncCall();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.after(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
+        assertThat(isError.get()).isTrue();
+        isError.set(false);
+        assertThat(JRoutineCore.with(peekError(new Consumer<RoutineException>() {
+
+            public void accept(final RoutineException e) {
+                isError.set(true);
+            }
+        })).asyncCall("test").after(seconds(3)).all()).containsExactly("test");
+        assertThat(isError.get()).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testPeekNullPointerError() {
+        try {
+            peekOutput(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            peekComplete(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            peekError(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    public void testPeekOutput() {
+        final ArrayList<String> data = new ArrayList<String>();
+        assertThat(JRoutineCore.with(peekOutput(new Consumer<String>() {
+
+            public void accept(final String s) {
+                data.add(s);
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1",
+                "test2", "test3");
+        assertThat(data).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    public void testPrepend() {
+        assertThat(JRoutineCore.with(prepend("test2"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test1");
+        assertThat(JRoutineCore.with(prepend("test2", "test3"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3", "test1");
+        assertThat(JRoutineCore.with(prepend(Arrays.asList("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3", "test1");
+        assertThat(JRoutineCore.with(prepend(JRoutineCore.io().of("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3", "test1");
+    }
+
+    @Test
+    public void testPrepend2() {
+        assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
+                "test1");
+        assertThat(JRoutineCore.with(prependWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
+        assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
+                "test1");
+        assertThat(JRoutineCore.with(prependWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
+                "test1");
+        assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+        assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                "TEST2", "test1");
+        assertThat(JRoutineCore.with(prependWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                "TEST2", "test1");
+    }
+
+    @Test
+    public void testReduce() {
+        assertThat(JRoutineCore.with(reduce(new BiFunction<String, String, String>() {
+
+            public String apply(final String s, final String s2) {
+                return s + s2;
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
+                "test1test2test3");
+        assertThat(JRoutineCore.with(reduce(new BiFunction<String, String, String>() {
+
+            public String apply(final String s, final String s2) {
+                return s + s2;
+            }
+        })).syncCall("test1", "test2", "test3").all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceNullPointerError() {
+        try {
+            reduce(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    public void testReduceSeed() {
+        assertThat(JRoutineCore.with(reduce(new Supplier<StringBuilder>() {
+
+            public StringBuilder get() {
+                return new StringBuilder();
+            }
+        }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+            public StringBuilder apply(final StringBuilder b, final String s) {
+                return b.append(s);
+            }
+        })).asyncCall("test1", "test2", "test3").after(seconds(3)).next().toString()).isEqualTo(
+                "test1test2test3");
+        assertThat(JRoutineCore.with(reduce(new Supplier<StringBuilder>() {
+
+            public StringBuilder get() {
+                return new StringBuilder();
+            }
+        }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+            public StringBuilder apply(final StringBuilder b, final String s) {
+                return b.append(s);
+            }
+        })).syncCall("test1", "test2", "test3").next().toString()).isEqualTo("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceSeedNullPointerError() {
+        try {
+            reduce(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    public void testReplace() {
+        assertThat(JRoutineCore.with(replaceGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replaceWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replaceGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replaceWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsOnly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replaceGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replaceWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replaceGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replaceWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replaceGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(replaceWith(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(replaceGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replaceWith(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testReplace2() {
+        assertThat(JRoutineCore.with(replace((String) null)).syncCall("test1").all()).containsOnly(
+                (String) null);
+        assertThat(JRoutineCore.with(replace((String[]) null)).syncCall("test1").all()).isEmpty();
+        assertThat(JRoutineCore.with(replace()).syncCall("test1").all()).isEmpty();
+        assertThat(
+                JRoutineCore.with(replace((List<String>) null)).syncCall("test1").all()).isEmpty();
+        assertThat(
+                JRoutineCore.with(replace(Collections.<String>emptyList())).syncCall("test1").all())
+                .isEmpty();
+        assertThat(JRoutineCore.with(replace("TEST2")).syncCall("test1").all()).containsOnly(
+                "TEST2");
+        assertThat(
+                JRoutineCore.with(replace("TEST2", "TEST2")).syncCall("test1").all()).containsOnly(
+                "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replace(Collections.singletonList("TEST2")))
+                               .syncCall("test1")
+                               .all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replace(JRoutineCore.io().of("TEST2", "TEST2")))
+                               .syncCall("test1")
+                               .all()).containsOnly("TEST2");
+
+        assertThat(JRoutineCore.with(replace((String) null))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly((String) null);
+        assertThat(JRoutineCore.with(replace((String[]) null))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(
+                JRoutineCore.with(replace()).asyncCall("test1").after(seconds(3)).all()).isEmpty();
+        assertThat(JRoutineCore.with(replace((List<String>) null))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace(Collections.<String>emptyList()))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace("TEST2"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replace("TEST2", "TEST2"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replace(Collections.singletonList("TEST2")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replace(JRoutineCore.io().of("TEST2", "TEST2")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+
+        assertThat(JRoutineCore.with(replace((String) null))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly((String) null);
+        assertThat(JRoutineCore.with(replace((String[]) null))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace())
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace((List<String>) null))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace(Collections.<String>emptyList()))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(replace("TEST2"))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replace("TEST2", "TEST2"))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2", "TEST2");
+        assertThat(JRoutineCore.with(replace(Collections.singletonList("TEST2")))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+        assertThat(JRoutineCore.with(replace(JRoutineCore.io().of("TEST2", "TEST2")))
+                               .parallelCall("test1")
+                               .after(seconds(3))
+                               .all()).containsOnly("TEST2");
+    }
+
+    @Test
+    public void testReplaceNegativeCount() {
+        try {
+            replaceGet(-1, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            replaceGet(0, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            replaceWith(-1, Functions.sink());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            replaceWith(0, Functions.sink());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
     public void testSameAs() {
         final Object ref = new Object();
         assertThat(JRoutineCore.with(Operators.isSameAs(ref))
@@ -972,6 +1839,38 @@ public class OperatorsTest {
                                .asyncCall(1, 2, 3, 4)
                                .after(seconds(3))
                                .next()).isEqualTo((short) 10);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testThenNullPointerError() {
+        try {
+            replaceWith(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            replaceWith(3, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            replaceGet(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            replaceGet(3, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
     }
 
     @Test

@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
@@ -282,44 +283,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public StreamBuilder<IN, OUT> asyncMap(@Nullable final Runner runner) {
-        return async().streamInvocationConfiguration()
-                      .withRunner(runner)
-                      .applied()
-                      .map(IdentityInvocation.<OUT>factoryOf());
-    }
-
-    @NotNull
     public InvocationFactory<IN, OUT> buildFactory() {
         return new StreamInvocationFactory<IN, OUT>(getBindingFunction());
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLift(
-            @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-                    StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        try {
-            return ConstantConditions.notNull("transformed stream", liftFunction.apply(this));
-
-        } catch (final Exception e) {
-            throw StreamBuildingException.wrapIfNeeded(e);
-        }
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
-                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        try {
-            return ConstantConditions.notNull("transformed stream",
-                    ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration,
-                            this));
-
-        } catch (final Exception e) {
-            throw StreamBuildingException.wrapIfNeeded(e);
-        }
     }
 
     @NotNull
@@ -344,6 +309,22 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         try {
             return ConstantConditions.notNull("transformed stream builder",
                     liftFunction.apply(this));
+
+        } catch (final Exception e) {
+            throw StreamBuildingException.wrapIfNeeded(e);
+        }
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
+                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        try {
+            return ConstantConditions.notNull("transformed stream",
+                    ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
+                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration,
+                            this));
 
         } catch (final Exception e) {
             throw StreamBuildingException.wrapIfNeeded(e);
@@ -427,14 +408,22 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> mapAllMore(
+    public <AFTER> StreamBuilder<IN, AFTER> mapAllWith(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         return map(consumerCall(mappingConsumer));
     }
 
     @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> mapMore(
+    public StreamBuilder<IN, OUT> mapOn(@Nullable final Runner runner) {
+        return async().streamInvocationConfiguration()
+                      .withRunner(runner)
+                      .applied()
+                      .map(IdentityInvocation.<OUT>factoryOf());
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> mapWith(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         return map(consumerMapping(mappingConsumer));
     }
@@ -447,6 +436,11 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public StreamBuilder<IN, OUT> sequential() {
         return invocationMode(InvocationMode.SEQUENTIAL);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> sorted() {
+        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_CALL).applied();
     }
 
     @NotNull
@@ -463,6 +457,11 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public StreamBuilder<IN, OUT> sync() {
         return invocationMode(InvocationMode.SYNC);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> unsorted() {
+        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_DELAY).applied();
     }
 
     @NotNull

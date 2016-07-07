@@ -160,28 +160,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamBuilder<IN, OUT> asyncMap(@Nullable final Runner runner) {
-        return (LoaderStreamBuilder<IN, OUT>) super.asyncMap(runner);
-    }
-
-    @NotNull
-    @Override
-    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLift(
-            @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-                    StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        return (LoaderStreamBuilder<BEFORE, AFTER>) super.flatLift(liftFunction);
-    }
-
-    @NotNull
-    @Override
-    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
-                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        return (LoaderStreamBuilder<BEFORE, AFTER>) super.flatLiftWithConfig(liftFunction);
-    }
-
-    @NotNull
-    @Override
     public <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -202,6 +180,14 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
         return (LoaderStreamBuilder<BEFORE, AFTER>) super.let(liftFunction);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> letWithConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
+                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        return (LoaderStreamBuilder<BEFORE, AFTER>) super.letWithConfig(liftFunction);
     }
 
     @NotNull
@@ -263,19 +249,25 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllMore(
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllWith(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.mapAllMore(mappingConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.mapAllWith(mappingConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapMore(
+    public LoaderStreamBuilder<IN, OUT> mapOn(@Nullable final Runner runner) {
+        return (LoaderStreamBuilder<IN, OUT>) super.mapOn(runner);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapWith(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.mapMore(mappingConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.mapWith(mappingConsumer);
     }
 
     @NotNull
@@ -288,6 +280,12 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> sequential() {
         return (LoaderStreamBuilder<IN, OUT>) super.sequential();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilder<IN, OUT> sorted() {
+        return (LoaderStreamBuilder<IN, OUT>) super.sorted();
     }
 
     @NotNull
@@ -308,6 +306,12 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> sync() {
         return (LoaderStreamBuilder<IN, OUT>) super.sync();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilder<IN, OUT> unsorted() {
+        return (LoaderStreamBuilder<IN, OUT>) super.unsorted();
     }
 
     @NotNull

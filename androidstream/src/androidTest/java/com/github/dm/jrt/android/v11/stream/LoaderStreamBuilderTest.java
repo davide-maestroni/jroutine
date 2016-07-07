@@ -45,7 +45,6 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.transform.Transformations;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -202,7 +201,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
-                                     .mapAllMore(new BiConsumer<List<?
+                                     .mapAllWith(new BiConsumer<List<?
                                              extends String>, Channel<String, ?>>() {
 
                                          public void accept(final List<?
@@ -222,7 +221,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .mapAllMore(
+                                     .mapAllWith(
                                              new BiConsumer<List<? extends String>,
                                                      Channel<String, ?>>() {
 
@@ -282,7 +281,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     private static void testMapConsumer(@NotNull final Activity activity) {
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -294,9 +293,9 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .parallel()
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -309,7 +308,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -324,7 +323,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .withOutputOrder(OrderType.BY_CALL)
                                      .applied()
                                      .sequential()
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -351,7 +350,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .parallel()
                                      .map(new Function<String, String>() {
 
@@ -377,7 +376,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .sequential()
                                      .map(new Function<String, String>() {
 
@@ -444,7 +443,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(getActivity()))
-                                       .asyncMap(null)
+                                       .mapOn(null)
                                        .asyncCall("test")
                                        .after(seconds(10))
                                        .all()).containsExactly("test");
@@ -545,7 +544,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .flatLift(
+                                     .let(
                                              new Function<StreamBuilder<String, String>,
                                                      StreamBuilder<String, String>>() {
 
@@ -560,7 +559,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("test1", "test2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .flatLift(
+                                     .let(
                                              new Function<StreamBuilder<String, String>,
                                                      LoaderStreamBuilder<String, String>>() {
 
@@ -577,7 +576,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("test1", "test2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .flatLiftWithConfig(
+                                     .letWithConfig(
                                              new BiFunction<LoaderStreamConfiguration,
                                                      StreamBuilder<String, String>,
                                                      StreamBuilder<String, String>>() {
@@ -595,7 +594,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("test1", "test2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .flatLiftWithConfig(
+                                     .letWithConfig(
                                              new BiFunction<LoaderStreamConfiguration,
                                                      StreamBuilder<String, String>,
                                                      LoaderStreamBuilder<String, String>>() {
@@ -687,7 +686,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             JRoutineStreamLoader.withStream()
                                 .on(loaderFrom(getActivity()))
                                 .async()
-                                .mapAllMore(null);
+                                .mapAllWith(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -731,7 +730,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).async().mapMore(null);
+            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).async().mapWith(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -754,7 +753,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .parallel()
                                      .map(factory)
                                      .asyncCall("test1", "test2")
@@ -768,7 +767,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .sequential()
                                      .map(factory)
                                      .syncCall("test1", "test2")
@@ -875,7 +874,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .parallel()
                                      .map(factory)
                                      .asyncCall("test1", "test2")
@@ -889,7 +888,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .sequential()
                                      .map(factory)
                                      .syncCall("test1", "test2")
@@ -958,7 +957,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .parallel()
                                      .map(new UpperCase())
                                      .asyncCall("test1", "test2")
@@ -972,7 +971,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(Transformations.<String, String>order(OrderType.BY_CALL))
+                                     .sorted()
                                      .sequential()
                                      .map(new UpperCase())
                                      .syncCall("test1", "test2")

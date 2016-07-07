@@ -28,16 +28,11 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.stream.annotation.StreamFlow;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.COLLECT;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
 
 /**
  * Interface defining a builder of routines concatenating map and reduce functions.
@@ -45,11 +40,8 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * Each function in the stream will be backed by a routine instance, which may have its own
  * specific configuration and invocation mode.
  * <p>
- * To better document the effect of each method on the underlying stream, a {@link StreamFlow}
- * annotation indicates for each one the type of transformation applied.
- * <br>
- * Note also that, if at least one reduce function is part of the chain, the results will be
- * propagated only when the built routine invocation completes.
+ * Note that, if at least one reduce function is part of the chain, the results will be propagated
+ * only when the built routine invocation completes.
  * <p>
  * Created by davide-maestroni on 07/01/2016.
  *
@@ -66,26 +58,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
-    @StreamFlow(CONFIG)
     StreamBuilder<IN, OUT> async();
-
-    /**
-     * Short for {@code async(runner).map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
-     * <br>
-     * This method is useful to easily make the stream run on the specified runner.
-     * <p>
-     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-     * the output data through the specified runner.
-     *
-     * @param runner the runner instance.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    StreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
-    // TODO: 7/6/16 mapOn
-
-    // TODO: 07/07/16 sorted(), unsorted()
 
     /**
      * Builds a new invocation factory instance.
@@ -94,6 +67,36 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      */
     @NotNull
     InvocationFactory<IN, OUT> buildFactory();
+
+    /**
+     * Concatenates a routine mapping this stream outputs by applying the specified function to each
+     * one of them.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param mappingFunction the function instance.
+     * @param <AFTER>         the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    <AFTER> StreamBuilder<IN, AFTER> flatMap(
+            @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
+
+    /**
+     * Makes the stream invoke concatenated routines with the specified mode.
+     *
+     * @param invocationMode the invocation mode.
+     * @return this builder.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * Transforms this stream by applying the specified function.
@@ -109,8 +112,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      *                                                                  occurs.
      */
     @NotNull
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLift(
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
             @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction);
 
@@ -130,62 +132,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      *                                                                  occurs.
      */
     @NotNull
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
                     extends StreamBuilder<BEFORE, AFTER>> liftFunction);
-
-    /**
-     * Concatenates a routine mapping this stream outputs by applying the specified function to each
-     * one of them.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param mappingFunction the function instance.
-     * @param <AFTER>         the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamBuilder<IN, AFTER> flatMap(
-            @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
-
-    /**
-     * Makes the stream invoke concatenated routines with the specified mode.
-     *
-     * @param invocationMode the invocation mode.
-     * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    StreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
-
-    /**
-     * Transforms this stream by applying the specified function.
-     * <p>
-     * This method provides a convenient way to apply a set of configurations and concatenations
-     * without breaking the fluent chain.
-     *
-     * @param liftFunction the lift function.
-     * @param <BEFORE>     the concatenation input type.
-     * @param <AFTER>      the concatenation output type.
-     * @return the lifted builder.
-     * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
-     *                                                                  occurs.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
-            @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-                    StreamBuilder<BEFORE, AFTER>> liftFunction);
 
     /**
      * Transforms the stream by modifying the chain building function.
@@ -201,7 +150,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      *                                                                  occurs.
      */
     @NotNull
-    @StreamFlow(MAP)
     <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(@NotNull Function<? extends Function<? super
             Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
             Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
@@ -222,7 +170,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      *                                                                  occurs.
      */
     @NotNull
-    @StreamFlow(MAP)
     <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
@@ -238,7 +185,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
@@ -252,7 +198,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -266,7 +211,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> StreamBuilder<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
@@ -279,7 +223,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -294,7 +237,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(COLLECT)
     <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
@@ -312,9 +254,23 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(COLLECT)
-    <AFTER> StreamBuilder<IN, AFTER> mapAllMore(
+    <AFTER> StreamBuilder<IN, AFTER> mapAllWith(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
+
+    /**
+     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).applied()
+     * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
+     * <br>
+     * This method is useful to easily make the stream run on the specified runner.
+     * <p>
+     * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
+     * the output data through the specified runner.
+     *
+     * @param runner the runner instance.
+     * @return this builder.
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
 
     /**
      * Concatenates a routine mapping this stream outputs through the specified consumer.
@@ -329,8 +285,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
-    <AFTER> StreamBuilder<IN, AFTER> mapMore(
+    <AFTER> StreamBuilder<IN, AFTER> mapWith(
             @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -341,7 +296,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
-    @StreamFlow(CONFIG)
     StreamBuilder<IN, OUT> parallel();
 
     /**
@@ -352,8 +306,15 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
-    @StreamFlow(CONFIG)
     StreamBuilder<IN, OUT> sequential();
+
+    /**
+     * Makes the outputs of this stream sorted by the order they are passed to the result channel.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> sorted();
 
     /**
      * Short for
@@ -362,12 +323,12 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * This method is useful to set the stream runner so that each input is immediately passed
      * through the whole chain as soon as it is fed to the stream.
      * <p>
-     * On the contrary of the default synchronous runner, the set one makes so that each routine
+     * On the contrary to the default synchronous runner, the set one makes so that each routine
      * in the chain is passed any input as soon as it is produced by the previous one. Such behavior
      * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
      * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
-     * the latter approach is that all input data are accumulated before actually being processed by
-     * the next routine invocation.
+     * the latter approach is that all input data might be accumulated before actually being
+     * processed by the next routine invocation.
      * <p>
      * Note that the runner will be employed with asynchronous and parallel invocation modes, while
      * the synchronous and sequential modes will behave as before.
@@ -377,8 +338,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @see #parallel()
      */
     @NotNull
-    @StreamFlow(CONFIG)
-    StreamBuilder<IN, OUT> straight();
+    StreamBuilder<IN, OUT> straight(); // TODO: 07/07/16 ???
 
     /**
      * Gets the invocation configuration builder related to the whole stream.
@@ -392,7 +352,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return the invocation configuration builder.
      */
     @NotNull
-    @StreamFlow(CONFIG)
     Builder<? extends StreamBuilder<IN, OUT>> streamInvocationConfiguration();
 
     /**
@@ -403,8 +362,15 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
-    @StreamFlow(CONFIG)
     StreamBuilder<IN, OUT> sync();
+
+    /**
+     * Makes the outputs of this stream unsorted.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> unsorted();
 
     /**
      * Interface defining a stream configuration.

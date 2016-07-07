@@ -15,8 +15,8 @@
  */
 
 /**
- * Stream annotation definitions.
+ * Stream transformation utility classes.
  * <p>
- * Created by davide-maestroni on 05/07/2016.
+ * Created by davide-maestroni on 07/07/2016.
  */
-package com.github.dm.jrt.stream.annotation;
+package com.github.dm.jrt.stream.transform;

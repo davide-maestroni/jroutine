@@ -166,28 +166,6 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
     @NotNull
     @Override
-    public LoaderStreamBuilderCompat<IN, OUT> asyncMap(@Nullable final Runner runner) {
-        return (LoaderStreamBuilderCompat<IN, OUT>) super.asyncMap(runner);
-    }
-
-    @NotNull
-    @Override
-    public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> flatLift(
-            @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-                    StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.flatLift(liftFunction);
-    }
-
-    @NotNull
-    @Override
-    public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> flatLiftWithConfig(
-            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
-                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
-        return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.flatLiftWithConfig(liftFunction);
-    }
-
-    @NotNull
-    @Override
     public <AFTER> LoaderStreamBuilderCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -208,6 +186,14 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
         return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.let(liftFunction);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> letWithConfig(
+            @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
+                    OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.letWithConfig(liftFunction);
     }
 
     @NotNull
@@ -269,19 +255,25 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilderCompat<IN, AFTER> mapAllMore(
+    public <AFTER> LoaderStreamBuilderCompat<IN, AFTER> mapAllWith(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilderCompat<IN, AFTER>) super.mapAllMore(mappingConsumer);
+        return (LoaderStreamBuilderCompat<IN, AFTER>) super.mapAllWith(mappingConsumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilderCompat<IN, AFTER> mapMore(
+    public LoaderStreamBuilderCompat<IN, OUT> mapOn(@Nullable final Runner runner) {
+        return (LoaderStreamBuilderCompat<IN, OUT>) super.mapOn(runner);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamBuilderCompat<IN, AFTER> mapWith(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilderCompat<IN, AFTER>) super.mapMore(mappingConsumer);
+        return (LoaderStreamBuilderCompat<IN, AFTER>) super.mapWith(mappingConsumer);
     }
 
     @NotNull
@@ -294,6 +286,12 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     @Override
     public LoaderStreamBuilderCompat<IN, OUT> sequential() {
         return (LoaderStreamBuilderCompat<IN, OUT>) super.sequential();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilderCompat<IN, OUT> sorted() {
+        return (LoaderStreamBuilderCompat<IN, OUT>) super.sorted();
     }
 
     @NotNull
@@ -314,6 +312,12 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     @Override
     public LoaderStreamBuilderCompat<IN, OUT> sync() {
         return (LoaderStreamBuilderCompat<IN, OUT>) super.sync();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilderCompat<IN, OUT> unsorted() {
+        return (LoaderStreamBuilderCompat<IN, OUT>) super.unsorted();
     }
 
     @NotNull

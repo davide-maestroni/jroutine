@@ -41,7 +41,6 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.operator.Operators;
-import com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
@@ -105,13 +104,6 @@ public class StreamBuilderTest {
 
         assertThat(streamChannel.getError().getCause()).isExactlyInstanceOf(
                 IllegalArgumentException.class);
-    }
-
-    @Test
-    public void testAnnotation() {
-        // Just for coverage...
-        assertThat(TransformationType.values()).containsOnly(TransformationType.MAP,
-                TransformationType.REDUCE, TransformationType.COLLECT, TransformationType.CONFIG);
     }
 
     @Test
@@ -441,7 +433,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testFlatTransform() {
-        assertThat(JRoutineStream.<String>withStream().flatLift(
+        assertThat(JRoutineStream.<String>withStream().let(
                 new Function<StreamBuilder<String, String>, StreamBuilder<String, String>>() {
 
                     public StreamBuilder<String, String> apply(
@@ -452,22 +444,21 @@ public class StreamBuilderTest {
 
         try {
             JRoutineStream.withStream()
-                          .flatLift(
-                                  new Function<StreamBuilder<Object, Object>,
-                                          StreamBuilder<Object, Object>>() {
+                          .let(new Function<StreamBuilder<Object, Object>, StreamBuilder<Object,
+                                  Object>>() {
 
-                                      public StreamBuilder<Object, Object> apply(
-                                              final StreamBuilder<Object, Object> builder) {
-                                          throw new NullPointerException();
-                                      }
-                                  });
+                              public StreamBuilder<Object, Object> apply(
+                                      final StreamBuilder<Object, Object> builder) {
+                                  throw new NullPointerException();
+                              }
+                          });
             fail();
 
         } catch (final StreamBuildingException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
 
-        assertThat(JRoutineStream.<String>withStream().flatLiftWithConfig(
+        assertThat(JRoutineStream.<String>withStream().letWithConfig(
                 new BiFunction<StreamConfiguration, StreamBuilder<String, String>,
                         StreamBuilder<String, String>>() {
 
@@ -480,7 +471,7 @@ public class StreamBuilderTest {
 
         try {
             JRoutineStream.withStream()
-                          .flatLiftWithConfig(
+                          .letWithConfig(
                                   new BiFunction<StreamConfiguration, StreamBuilder<Object,
                                           Object>, StreamBuilder<Object, Object>>() {
 
@@ -600,7 +591,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testMapAllConsumer() {
-        assertThat(JRoutineStream.<String>withStream().async().mapAllMore(new BiConsumer<List<?
+        assertThat(JRoutineStream.<String>withStream().async().mapAllWith(new BiConsumer<List<?
                 extends String>, Channel<String, ?>>() {
 
             public void accept(final List<?
@@ -616,7 +607,7 @@ public class StreamBuilderTest {
         }).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
                 "test1test2test3");
         assertThat(
-                JRoutineStream.<String>withStream().sync().mapAllMore(new BiConsumer<List<? extends
+                JRoutineStream.<String>withStream().sync().mapAllWith(new BiConsumer<List<? extends
                         String>, Channel<String, ?>>() {
 
                     public void accept(final List<? extends
@@ -635,7 +626,7 @@ public class StreamBuilderTest {
     @SuppressWarnings("ConstantConditions")
     public void testMapAllConsumerNullPointerError() {
         try {
-            JRoutineStream.withStream().async().mapAllMore(null);
+            JRoutineStream.withStream().async().mapAllWith(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -684,7 +675,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testMapConsumer() {
-        assertThat(JRoutineStream.<String>withStream().mapMore(
+        assertThat(JRoutineStream.<String>withStream().mapWith(
                 new BiConsumer<String, Channel<String, ?>>() {
 
                     public void accept(final String s, final Channel<String, ?> result) {
@@ -693,9 +684,9 @@ public class StreamBuilderTest {
                 }).asyncCall("test1", "test2").after(seconds(3)).all()).containsExactly("TEST1",
                 "TEST2");
         assertThat(JRoutineStream //
-                .<String>withStream().let(Transformations.<String, String>order(OrderType.BY_CALL))
+                .<String>withStream().sorted()
                                      .parallel()
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -706,7 +697,7 @@ public class StreamBuilderTest {
                                      .after(seconds(3))
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream//
-                .<String>withStream().sync().mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                .<String>withStream().sync().mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                     public void accept(final String s, final Channel<String, ?> result) {
                         result.pass(s.toUpperCase());
@@ -714,7 +705,7 @@ public class StreamBuilderTest {
                 }).syncCall("test1", "test2").all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream//
                 .<String>withStream().sequential()
-                                     .mapMore(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -729,7 +720,7 @@ public class StreamBuilderTest {
     @SuppressWarnings("ConstantConditions")
     public void testMapConsumerNullPointerError() {
         try {
-            JRoutineStream.withStream().async().mapMore(null);
+            JRoutineStream.withStream().async().mapWith(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -744,8 +735,7 @@ public class StreamBuilderTest {
                                                       .asyncCall("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>order(OrderType.BY_CALL))
+        assertThat(JRoutineStream.<String>withStream().sorted()
                                                       .parallel()
                                                       .map(factory)
                                                       .asyncCall("test1", "test2")
@@ -800,8 +790,7 @@ public class StreamBuilderTest {
                                                       .asyncCall("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>order(OrderType.BY_CALL))
+        assertThat(JRoutineStream.<String>withStream().sorted()
                                                       .parallel()
                                                       .map(new UpperCase())
                                                       .asyncCall("test1", "test2")
@@ -857,8 +846,7 @@ public class StreamBuilderTest {
                 return s.toUpperCase();
             }
         }).asyncCall("test1", "test2").after(seconds(3)).all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>order(OrderType.BY_CALL))
+        assertThat(JRoutineStream.<String>withStream().sorted()
                                                       .parallel()
                                                       .map(new Function<String, String>() {
 

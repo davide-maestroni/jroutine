@@ -3,7 +3,6 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -178,7 +177,7 @@ public class TransformationsTest {
                                          return data.sum / data.count;
                                      }
                                  })
-                                 .asyncMap(null)
+                                 .mapOn(null)
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -201,6 +200,19 @@ public class TransformationsTest {
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    @Test
+    public void testConstructor() {
+        boolean failed = false;
+        try {
+            new Transformations();
+            failed = true;
+
+        } catch (final Throwable ignored) {
+        }
+
+        assertThat(failed).isFalse();
     }
 
     @Test
@@ -306,8 +318,7 @@ public class TransformationsTest {
                                                    .asyncCall("test1", "test2")
                                                    .after(seconds(3))
                                                    .all()).containsOnly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>order(OrderType.BY_CALL))
+        assertThat(JRoutineStream.<String>withStream().sorted()
                                                       .let(Transformations.<String, String>parallel(
                                                               1))
                                                       .map(new Function<String, String>() {
@@ -319,8 +330,7 @@ public class TransformationsTest {
                                                       .asyncCall("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>order(OrderType.BY_CALL))
+        assertThat(JRoutineStream.<String>withStream().sorted()
                                                       .let(Transformations.<String, String>parallel(
                                                               1))
                                                       .map(new Function<String, String>() {

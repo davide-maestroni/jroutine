@@ -17,12 +17,7 @@
 
 <FindBugsFilter>
     <Match>
-        <!-- TODO review -->
-        <!-- Too many false positives... -->
-        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.stream.RetryChannelConsumer$SafeChannelConsumer"/>
+        <Class name="com.github.dm.jrt.stream.transform.RetryChannelConsumer$SafeChannelConsumer"/>
         <Or>
             <Method name="onComplete"/>
             <Method name="onError"/>

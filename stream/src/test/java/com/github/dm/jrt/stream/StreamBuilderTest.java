@@ -62,9 +62,9 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
+import static com.github.dm.jrt.operator.Operators.instead;
+import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
-import static com.github.dm.jrt.operator.Operators.replace;
-import static com.github.dm.jrt.operator.Operators.replaceWith;
 import static com.github.dm.jrt.operator.producer.Producers.range;
 import static com.github.dm.jrt.stream.transform.Transformations.tryCatchWith;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -147,21 +147,21 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream().sync().abort(new IllegalStateException())).isTrue();
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .after(seconds(3))
                                  .immediately()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .after(3, TimeUnit.SECONDS)
                                  .immediately()
                                  .close()
                                  .next()).isEqualTo("test");
         try {
             final ArrayList<String> results = new ArrayList<String>();
-            JRoutineStream.withStream().sync().map(replace("test")).allInto(results).hasCompleted();
+            JRoutineStream.withStream().sync().map(instead("test")).allInto(results).hasCompleted();
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -170,7 +170,7 @@ public class StreamBuilderTest {
         try {
             JRoutineStream.withStream()
                           .sync()
-                          .map(replace("test"))
+                          .map(instead("test"))
                           .bind(JRoutineCore.io().buildChannel())
                           .next();
             fail();
@@ -180,7 +180,7 @@ public class StreamBuilderTest {
 
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .bind(onOutput(new Consumer<String>() {
 
                                      public void accept(final String s) {
@@ -190,17 +190,17 @@ public class StreamBuilderTest {
                                  .close()
                                  .getError()).isNull();
         assertThat(
-                JRoutineStream.withStream().sync().map(replace("test")).close().next()).isEqualTo(
+                JRoutineStream.withStream().sync().map(instead("test")).close().next()).isEqualTo(
                 "test");
         try {
-            JRoutineStream.withStream().sync().map(replace("test")).eventualIterator().next();
+            JRoutineStream.withStream().sync().map(instead("test")).eventualIterator().next();
             fail();
 
         } catch (final TimeoutException ignored) {
         }
 
         try {
-            JRoutineStream.withStream().sync().map(replace("test")).iterator().next();
+            JRoutineStream.withStream().sync().map(instead("test")).iterator().next();
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -208,25 +208,25 @@ public class StreamBuilderTest {
 
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .eventuallyAbort()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .eventuallyAbort(new IllegalStateException())
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .eventuallyBreak()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .eventuallyFail()
                                  .close()
                                  .next()).isEqualTo("test");
@@ -241,7 +241,7 @@ public class StreamBuilderTest {
 
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .map(replace("test"))
+                                 .map(instead("test"))
                                  .immediately()
                                  .close()
                                  .next()).isEqualTo("test");
@@ -1024,7 +1024,7 @@ public class StreamBuilderTest {
     public void testMaxSizeDeadlock() {
         try {
             assertThat(JRoutineStream.withStream()
-                                     .map(replaceWith(range(1, 1000)))
+                                     .map(insteadAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withInputLimit(2)
@@ -1072,7 +1072,7 @@ public class StreamBuilderTest {
 
         try {
             assertThat(JRoutineStream.withStream()
-                                     .map(replaceWith(range(1, 1000)))
+                                     .map(insteadAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withOutputLimit(2)
@@ -1117,7 +1117,7 @@ public class StreamBuilderTest {
 
         try {
             assertThat(JRoutineStream.withStream()
-                                     .map(replaceWith(range(1, 1000)))
+                                     .map(insteadAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withInputLimit(2)
@@ -1166,7 +1166,7 @@ public class StreamBuilderTest {
     public void testStraight() {
         assertThat(JRoutineStream.withStream()
                                  .straight()
-                                 .map(replaceWith(range(1, 1000)))
+                                 .map(insteadAccept(range(1, 1000)))
                                  .streamInvocationConfiguration()
                                  .withInputMaxSize(1)
                                  .withOutputMaxSize(1)

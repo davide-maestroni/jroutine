@@ -173,6 +173,47 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations appending the outputs returned by the specified consumer to
+     * the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the routine invocation
+     * completes. The count number must be positive.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> appendAccept(final long count,
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return new AppendConsumerInvocation<DATA>(count, decorate(outputsConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations appending the outputs returned by the specified consumer to
+     * the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called only when the routine invocation completes.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> appendAccept(
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return appendAccept(1, outputsConsumer);
+    }
+
+    /**
      * Returns a factory of invocations appending the outputs returned by the specified supplier to
      * the invocation ones.
      * <br>
@@ -205,47 +246,6 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> appendGet(
             @NotNull final Supplier<? extends DATA> outputSupplier) {
         return appendGet(1, outputSupplier);
-    }
-
-    /**
-     * Returns a factory of invocations appending the outputs returned by the specified consumer to
-     * the invocation ones.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> appendWith(final long count,
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new AppendConsumerInvocation<DATA>(count, decorate(outputsConsumer));
-    }
-
-    /**
-     * Returns a factory of invocations appending the outputs returned by the specified consumer to
-     * the invocation ones.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called only when the routine invocation completes.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> appendWith(
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return appendWith(1, outputsConsumer);
     }
 
     /**
@@ -541,6 +541,169 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations generating the specified output in place of the invocation
+     * ones.
+     * <br>
+     * The output will be published only when the invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param output the output.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(@Nullable final OUT output) {
+        return instead(JRoutineCore.io().of(output));
+    }
+
+    /**
+     * Returns a factory of invocations generating the specified outputs in place of the invocation
+     * ones.
+     * <br>
+     * The outputs will be published only when the invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param outputs the outputs.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
+            @Nullable final OUT... outputs) {
+        return instead(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified iterable in
+     * place of the invocation ones.
+     * <br>
+     * The outputs will be published only when the invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
+            @Nullable final Iterable<? extends OUT> outputs) {
+        return instead(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified channel in
+     * place of the invocation ones.
+     * <br>
+     * The outputs will be published only when the invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param channel the output channel.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
+            @NotNull final Channel<?, ? extends OUT> channel) {
+        return new ThenOutputInvocation<OUT>(channel);
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified consumer in
+     * place of the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the routine invocation
+     * completes. The count number must be positive.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadAccept(final long count,
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        return new ThenConsumerInvocation<OUT>(count, decorate(outputsConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified consumer in
+     * place of the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called only when the routine invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadAccept(
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        return insteadAccept(1, outputsConsumer);
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified supplier in
+     * place of the invocation ones.
+     * <br>
+     * The supplier will be called {@code count} number of times only when the routine invocation
+     * completes. The count number must be positive.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param count          the number of generated outputs.
+     * @param outputSupplier the supplier instance.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadGet(final long count,
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        return new ThenSupplierInvocation<OUT>(count, decorate(outputSupplier));
+    }
+
+    /**
+     * Returns a factory of invocations generating the outputs returned by the specified supplier in
+     * place of the invocation ones.
+     * <br>
+     * The supplier will be called only when the routine invocation completes.
+     * <br>
+     * The invocation inputs will be ignored.
+     *
+     * @param outputSupplier the supplier instance.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadGet(
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        return insteadGet(1, outputSupplier);
+    }
+
+    /**
      * Returns a factory of invocations filtering out all the inputs that are not equal to the
      * specified object.
      *
@@ -831,6 +994,47 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations producing the outputs returned by the specified consumer in
+     * case the invocation produced none.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the routine invocation
+     * completes. The count number must be positive.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> orElseAccept(final long count,
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return new OrElseConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations producing the outputs returned by the specified consumer in
+     * case the invocation produced none.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called only when the routine invocation completes.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> orElseAccept(
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return orElseAccept(1, outputsConsumer);
+    }
+
+    /**
      * Returns a factory of invocations producing the outputs returned by the specified supplier in
      * case the invocation produced none.
      * <br>
@@ -876,47 +1080,6 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElseThrow(@NotNull final Throwable error) {
         return new OrElseThrowInvocationFactory<DATA>(error);
-    }
-
-    /**
-     * Returns a factory of invocations producing the outputs returned by the specified consumer in
-     * case the invocation produced none.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> orElseWith(final long count,
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new OrElseConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
-    }
-
-    /**
-     * Returns a factory of invocations producing the outputs returned by the specified consumer in
-     * case the invocation produced none.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called only when the routine invocation completes.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> orElseWith(
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return orElseWith(1, outputsConsumer);
     }
 
     /**
@@ -1033,6 +1196,50 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations prepending the outputs returned by the specified consumer to
+     * the invocation ones.
+     * <br>
+     * If no input is passed to the invocation, the outputs will be produced only when the
+     * invocation completes.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called {@code count} number of times. The count number must be positive.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> prependAccept(final long count,
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return new PrependConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations prepending the outputs returned by the specified consumer to
+     * the invocation ones.
+     * <br>
+     * If no input is passed to the invocation, the outputs will be produced only when the
+     * invocation completes.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <DATA>          the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> prependAccept(
+            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+        return prependAccept(1, outputsConsumer);
+    }
+
+    /**
      * Returns a factory of invocations prepending the outputs returned by the specified supplier to
      * the invocation ones.
      * <br>
@@ -1068,50 +1275,6 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> prependGet(
             @NotNull final Supplier<? extends DATA> outputSupplier) {
         return prependGet(1, outputSupplier);
-    }
-
-    /**
-     * Returns a factory of invocations prepending the outputs returned by the specified consumer to
-     * the invocation ones.
-     * <br>
-     * If no input is passed to the invocation, the outputs will be produced only when the
-     * invocation completes.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called {@code count} number of times. The count number must be positive.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> prependWith(final long count,
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new PrependConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
-    }
-
-    /**
-     * Returns a factory of invocations prepending the outputs returned by the specified consumer to
-     * the invocation ones.
-     * <br>
-     * If no input is passed to the invocation, the outputs will be produced only when the
-     * invocation completes.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <DATA>          the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> prependWith(
-            @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return prependWith(1, outputsConsumer);
     }
 
     /**
@@ -1166,161 +1329,6 @@ public class Operators {
             @NotNull final Supplier<? extends OUT> seedSupplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> accumulateFunction) {
         return AccumulateFunctionInvocation.functionFactory(seedSupplier, accumulateFunction);
-    }
-
-    /**
-     * Returns a factory of invocations generating the specified output.
-     * <br>
-     * The output will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param output the output.
-     * @param <IN>   the input data type.
-     * @param <OUT>  the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replace(@Nullable final OUT output) {
-        return replace(JRoutineCore.io().of(output));
-    }
-
-    /**
-     * Returns a factory of invocations generating the specified outputs.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputs the outputs.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replace(
-            @Nullable final OUT... outputs) {
-        return replace(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified iterable.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replace(
-            @Nullable final Iterable<? extends OUT> outputs) {
-        return replace(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified channel.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param channel the output channel.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replace(
-            @NotNull final Channel<?, ? extends OUT> channel) {
-        return new ThenOutputInvocation<OUT>(channel);
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param count          the number of generated outputs.
-     * @param outputSupplier the supplier instance.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replaceGet(final long count,
-            @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return new ThenSupplierInvocation<OUT>(count, decorate(outputSupplier));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified supplier.
-     * <br>
-     * The supplier will be called only when the routine invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputSupplier the supplier instance.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replaceGet(
-            @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return replaceGet(1, outputSupplier);
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified consumer.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replaceWith(final long count,
-            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return new ThenConsumerInvocation<OUT>(count, decorate(outputsConsumer));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified consumer.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called only when the routine invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> replaceWith(
-            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return replaceWith(1, outputsConsumer);
     }
 
     /**

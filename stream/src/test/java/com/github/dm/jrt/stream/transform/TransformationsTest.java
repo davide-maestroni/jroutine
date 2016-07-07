@@ -31,8 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
-import static com.github.dm.jrt.operator.Operators.replaceWith;
 import static com.github.dm.jrt.operator.producer.Producers.range;
 import static com.github.dm.jrt.stream.transform.Transformations.backoffOn;
 import static com.github.dm.jrt.stream.transform.Transformations.delay;
@@ -68,7 +68,7 @@ public class TransformationsTest {
     public void testBackoff() {
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(replaceWith(range(1, 1000)))
+                                 .map(insteadAccept(range(1, 1000)))
                                  .let(Transformations.<Object, Integer>backoffOn(
                                          getSingleThreadRunner(), 2,
                                          Backoffs.linearDelay(seconds(10))))
@@ -107,7 +107,7 @@ public class TransformationsTest {
                                  .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(replaceWith(range(1, 1000)))
+                                 .map(insteadAccept(range(1, 1000)))
                                  .let(Transformations.<Object, Integer>backoffOn(
                                          getSingleThreadRunner(), 2, 10, TimeUnit.SECONDS))
                                  .map(Functions.<Number>identity())
@@ -145,7 +145,7 @@ public class TransformationsTest {
                                  .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(replaceWith(range(1, 1000)))
+                                 .map(insteadAccept(range(1, 1000)))
                                  .let(Transformations.<Object, Integer>backoffOn(
                                          getSingleThreadRunner(), 2, seconds(10)))
                                  .map(Functions.<Number>identity())
@@ -361,21 +361,21 @@ public class TransformationsTest {
                     }
                 });
         assertThat(JRoutineStream.withStream()
-                                 .map(replaceWith(range(1, 3)))
+                                 .map(insteadAccept(range(1, 3)))
                                  .let(parallel(2, sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
-                                 .map(replaceWith(range(1, 3)))
+                                 .map(insteadAccept(range(1, 3)))
                                  .let(parallelBy(Functions.<Integer>identity(), sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
-                                 .map(replaceWith(range(1, 3)))
+                                 .map(insteadAccept(range(1, 3)))
                                  .let(parallel(2, JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
@@ -383,7 +383,7 @@ public class TransformationsTest {
                                  .after(seconds(3))
                                  .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream.withStream()
-                                 .map(replaceWith(range(1, 3)))
+                                 .map(insteadAccept(range(1, 3)))
                                  .let(parallelBy(Functions.<Integer>identity(), JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()

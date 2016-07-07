@@ -57,7 +57,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
-import static com.github.dm.jrt.operator.Operators.replaceWith;
+import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.producer.Producers.range;
 import static com.github.dm.jrt.stream.transform.Transformations.tryCatchWith;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -544,33 +544,29 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(
-                                             new Function<StreamBuilder<String, String>,
-                                                     StreamBuilder<String, String>>() {
+                                     .let(new Function<StreamBuilder<String, String>,
+                                             StreamBuilder<String, String>>() {
 
-                                                 public StreamBuilder<String, String> apply(
-                                                         final StreamBuilder<String, String>
-                                                                 builder) {
-                                                     return builder.map(append("test2"));
-                                                 }
-                                             })
+                                         public StreamBuilder<String, String> apply(
+                                                 final StreamBuilder<String, String> builder) {
+                                             return builder.map(append("test2"));
+                                         }
+                                     })
                                      .asyncCall("test1")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(
-                                             new Function<StreamBuilder<String, String>,
-                                                     LoaderStreamBuilder<String, String>>() {
+                                     .let(new Function<StreamBuilder<String, String>,
+                                             LoaderStreamBuilder<String, String>>() {
 
-                                                 public LoaderStreamBuilder<String, String> apply(
-                                                         final StreamBuilder<String, String>
-                                                                 builder) {
-                                                     return ((LoaderStreamBuilder<String,
-                                                             String>) builder)
-                                                             .map(append("test2"));
-                                                 }
-                                             })
+                                         public LoaderStreamBuilder<String, String> apply(
+                                                 final StreamBuilder<String, String> builder) {
+                                             return ((LoaderStreamBuilder<String, String>)
+                                                     builder).map(
+                                                     append("test2"));
+                                         }
+                                     })
                                      .asyncCall("test1")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
@@ -1235,7 +1231,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineStreamLoader.withStream()
                                        .straight()
-                                       .map(replaceWith(range(1, 1000)))
+                                       .map(insteadAccept(range(1, 1000)))
                                        .streamInvocationConfiguration()
                                        .withInputMaxSize(1)
                                        .withOutputMaxSize(1)

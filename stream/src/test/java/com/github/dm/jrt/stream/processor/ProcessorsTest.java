@@ -1,4 +1,20 @@
-package com.github.dm.jrt.stream.transform;
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.dm.jrt.stream.processor;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -34,15 +50,6 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.transform.Transformations.backoffOn;
-import static com.github.dm.jrt.stream.transform.Transformations.delay;
-import static com.github.dm.jrt.stream.transform.Transformations.lag;
-import static com.github.dm.jrt.stream.transform.Transformations.parallel;
-import static com.github.dm.jrt.stream.transform.Transformations.parallelBy;
-import static com.github.dm.jrt.stream.transform.Transformations.retry;
-import static com.github.dm.jrt.stream.transform.Transformations.tryCatch;
-import static com.github.dm.jrt.stream.transform.Transformations.tryCatchWith;
-import static com.github.dm.jrt.stream.transform.Transformations.tryFinally;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,7 +58,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class TransformationsTest {
+public class ProcessorsTest {
 
     private static Runner sSingleThreadRunner;
 
@@ -69,9 +76,8 @@ public class TransformationsTest {
         assertThat(JRoutineStream.withStream()
                                  .async()
                                  .map(insteadAccept(range(1, 1000)))
-                                 .let(Transformations.<Object, Integer>backoffOn(
-                                         getSingleThreadRunner(), 2,
-                                         Backoffs.linearDelay(seconds(10))))
+                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
+                                         2, Backoffs.linearDelay(seconds(10))))
                                  .map(Functions.<Number>identity())
                                  .map(new Function<Number, Double>() {
 
@@ -108,8 +114,8 @@ public class TransformationsTest {
         assertThat(JRoutineStream.withStream()
                                  .async()
                                  .map(insteadAccept(range(1, 1000)))
-                                 .let(Transformations.<Object, Integer>backoffOn(
-                                         getSingleThreadRunner(), 2, 10, TimeUnit.SECONDS))
+                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
+                                         2, 10, TimeUnit.SECONDS))
                                  .map(Functions.<Number>identity())
                                  .map(new Function<Number, Double>() {
 
@@ -146,8 +152,8 @@ public class TransformationsTest {
         assertThat(JRoutineStream.withStream()
                                  .async()
                                  .map(insteadAccept(range(1, 1000)))
-                                 .let(Transformations.<Object, Integer>backoffOn(
-                                         getSingleThreadRunner(), 2, seconds(10)))
+                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
+                                         2, seconds(10)))
                                  .map(Functions.<Number>identity())
                                  .map(new Function<Number, Double>() {
 
@@ -188,14 +194,14 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testBackoffNullPointerError() {
         try {
-            backoffOn(null, 1, (Backoff) null);
+            Processors.backoffOn(null, 1, (Backoff) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            backoffOn(null, 1, 0, null);
+            Processors.backoffOn(null, 1, 0, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -206,7 +212,7 @@ public class TransformationsTest {
     public void testConstructor() {
         boolean failed = false;
         try {
-            new Transformations();
+            new Processors();
             failed = true;
 
         } catch (final Throwable ignored) {
@@ -219,21 +225,21 @@ public class TransformationsTest {
     public void testDelay() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(delay(1, TimeUnit.SECONDS))
+                                 .let(Processors.delay(1, TimeUnit.SECONDS))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(delay(seconds(1)))
+                                 .let(Processors.delay(seconds(1)))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(delay(1, TimeUnit.SECONDS))
+                                 .let(Processors.delay(1, TimeUnit.SECONDS))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -241,7 +247,7 @@ public class TransformationsTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(delay(seconds(1)))
+                                 .let(Processors.delay(seconds(1)))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -253,7 +259,7 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testDelayNullPointerError() {
         try {
-            delay(1, null);
+            Processors.delay(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -264,21 +270,21 @@ public class TransformationsTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(lag(1, TimeUnit.SECONDS))
+                                 .let(Processors.lag(1, TimeUnit.SECONDS))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(lag(seconds(1)))
+                                 .let(Processors.lag(seconds(1)))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(lag(1, TimeUnit.SECONDS))
+                                 .let(Processors.lag(1, TimeUnit.SECONDS))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -286,7 +292,7 @@ public class TransformationsTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(lag(seconds(1)))
+                                 .let(Processors.lag(seconds(1)))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -298,7 +304,7 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testLagNullPointerError() {
         try {
-            lag(1, null);
+            Processors.lag(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -307,20 +313,18 @@ public class TransformationsTest {
 
     @Test
     public void testParallelConfiguration() {
-        assertThat(
-                JRoutineStream.<String>withStream().let(Transformations.<String, String>parallel(1))
-                                                   .map(new Function<String, String>() {
+        assertThat(JRoutineStream.<String>withStream().let(Processors.<String, String>parallel(1))
+                                                      .map(new Function<String, String>() {
 
-                                                       public String apply(final String s) {
-                                                           return s.toUpperCase();
-                                                       }
-                                                   })
-                                                   .asyncCall("test1", "test2")
-                                                   .after(seconds(3))
-                                                   .all()).containsOnly("TEST1", "TEST2");
+                                                          public String apply(final String s) {
+                                                              return s.toUpperCase();
+                                                          }
+                                                      })
+                                                      .asyncCall("test1", "test2")
+                                                      .after(seconds(3))
+                                                      .all()).containsOnly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .let(Transformations.<String, String>parallel(
-                                                              1))
+                                                      .let(Processors.<String, String>parallel(1))
                                                       .map(new Function<String, String>() {
 
                                                           public String apply(final String s) {
@@ -331,8 +335,7 @@ public class TransformationsTest {
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .let(Transformations.<String, String>parallel(
-                                                              1))
+                                                      .let(Processors.<String, String>parallel(1))
                                                       .map(new Function<String, String>() {
 
                                                           public String apply(final String s) {
@@ -362,21 +365,21 @@ public class TransformationsTest {
                 });
         assertThat(JRoutineStream.withStream()
                                  .map(insteadAccept(range(1, 3)))
-                                 .let(parallel(2, sqr))
+                                 .let(Processors.parallel(2, sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .map(insteadAccept(range(1, 3)))
-                                 .let(parallelBy(Functions.<Integer>identity(), sqr))
+                                 .let(Processors.parallelBy(Functions.<Integer>identity(), sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .map(insteadAccept(range(1, 3)))
-                                 .let(parallel(2, JRoutineCore.with(
+                                 .let(Processors.parallel(2, JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
                                  .close()
@@ -384,8 +387,9 @@ public class TransformationsTest {
                                  .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream.withStream()
                                  .map(insteadAccept(range(1, 3)))
-                                 .let(parallelBy(Functions.<Integer>identity(), JRoutineCore.with(
-                                         IdentityInvocation.<Integer>factoryOf())))
+                                 .let(Processors.parallelBy(Functions.<Integer>identity(),
+                                         JRoutineCore.with(
+                                                 IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -396,42 +400,42 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testParallelSplitNullPointerError() {
         try {
-            parallel(1, (Routine<Object, ?>) null);
+            Processors.parallel(1, (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            parallel(1, null);
+            Processors.parallel(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            parallelBy(null, JRoutineStream.withStream().buildRoutine());
+            Processors.parallelBy(null, JRoutineStream.withStream().buildRoutine());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            parallelBy(null, JRoutineStream.withStream());
+            Processors.parallelBy(null, JRoutineStream.withStream());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            parallelBy(Functions.identity(), (Routine<Object, ?>) null);
+            Processors.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            parallelBy(Functions.identity(), null);
+            Processors.parallelBy(Functions.identity(), null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -444,7 +448,7 @@ public class TransformationsTest {
         try {
             JRoutineStream.<String>withStream().map(new UpperCase())
                                                .map(factoryOf(ThrowException.class, count1))
-                                               .let(Transformations.<String, Object>retry(2))
+                                               .let(Processors.<String, Object>retry(2))
                                                .asyncCall("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -458,7 +462,7 @@ public class TransformationsTest {
         assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                       .map(factoryOf(ThrowException.class, count2,
                                                               1))
-                                                      .let(Transformations.<String, Object>retry(1))
+                                                      .let(Processors.<String, Object>retry(1))
                                                       .asyncCall("test")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST");
@@ -467,7 +471,7 @@ public class TransformationsTest {
         try {
             JRoutineStream.<String>withStream().map(new AbortInvocation())
                                                .map(factoryOf(ThrowException.class, count3))
-                                               .let(Transformations.<String, Object>retry(2))
+                                               .let(Processors.<String, Object>retry(2))
                                                .asyncCall("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -482,14 +486,14 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testRetryNullPointerError() {
         try {
-            retry(1, null);
+            Processors.retry(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            retry(null);
+            Processors.retry(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -505,8 +509,7 @@ public class TransformationsTest {
                                                               throw new NullPointerException();
                                                           }
                                                       })
-                                                      .let(Transformations.<String,
-                                                              Object>tryCatchWith(
+                                                      .let(Processors.<String, Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -526,8 +529,7 @@ public class TransformationsTest {
                                                               return o;
                                                           }
                                                       })
-                                                      .let(Transformations.<String,
-                                                              Object>tryCatchWith(
+                                                      .let(Processors.<String, Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -545,7 +547,7 @@ public class TransformationsTest {
             public Object apply(final Object o) {
                 throw new NullPointerException();
             }
-        }).let(Transformations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+        }).let(Processors.<String, Object>tryCatch(new Function<RoutineException, Object>() {
 
             public Object apply(final RoutineException e) {
                 return "exception";
@@ -557,14 +559,14 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryCatchNullPointerError() {
         try {
-            tryCatchWith(null);
+            Processors.tryCatchAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            tryCatch(null);
+            Processors.tryCatch(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -580,7 +582,7 @@ public class TransformationsTest {
                 public Object apply(final Object o) {
                     throw new NullPointerException();
                 }
-            }).let(Transformations.<String, Object>tryFinally(new Action() {
+            }).let(Processors.<String, Object>tryFinally(new Action() {
 
                 public void perform() {
                     isRun.set(true);
@@ -596,7 +598,7 @@ public class TransformationsTest {
             public Object apply(final Object o) {
                 return o;
             }
-        }).let(Transformations.<String, Object>tryFinally(new Action() {
+        }).let(Processors.<String, Object>tryFinally(new Action() {
 
             public void perform() {
                 isRun.set(true);
@@ -609,7 +611,7 @@ public class TransformationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryFinallyNullPointerError() {
         try {
-            tryFinally(null);
+            Processors.tryFinally(null);
             fail();
 
         } catch (final NullPointerException ignored) {

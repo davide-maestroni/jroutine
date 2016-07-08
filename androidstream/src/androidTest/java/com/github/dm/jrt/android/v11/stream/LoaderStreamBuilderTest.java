@@ -62,7 +62,7 @@ import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.transform.Transformations.tryCatchWith;
+import static com.github.dm.jrt.stream.processor.Processors.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -1337,7 +1337,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             return JRoutineStreamLoader.withStream()
                                        .on(loaderFrom(activity))
                                        .map(routine)
-                                       .let(tryCatchWith(
+                                       .let(tryCatchAccept(
                                                new BiConsumer<RoutineException, Channel<String,
                                                        ?>>() {
 
@@ -1348,7 +1348,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                                                .on(loaderFrom(
                                                                                        activity))
                                                                                .map(routine)
-                                                                               .let(tryCatchWith(
+                                                                               .let(tryCatchAccept(
                                                                                        this))
                                                                                .asyncCall(o)
                                                                                .bind(channel);

@@ -14,57 +14,64 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream.processor;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Delay binding function.
+ * Retry binding function.
  * <p>
- * Created by davide-maestroni on 06/29/2016.
+ * Created by davide-maestroni on 05/07/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
+class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
+
+    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+            mBackoffFunction;
+
+    private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
     private final ChannelConfiguration mConfiguration;
-
-    private final long mDelay;
-
-    private final TimeUnit mDelayUnit;
 
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param delay         the delay value.
-     * @param timeUnit      the delay time unit.
+     * @param configuration   the channel configuration.
+     * @param bindingFunction the binding function.
+     * @param backoffFunction the backoff function.
      */
-    BindDelay(@NotNull final ChannelConfiguration configuration, final long delay,
-            @NotNull final TimeUnit timeUnit) {
+    BindRetry(@NotNull final ChannelConfiguration configuration,
+            @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    backoffFunction) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mDelay = ConstantConditions.notNegative("delay value", delay);
-        mDelayUnit = ConstantConditions.notNull("delay unit", timeUnit);
+        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+        mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final ChannelConfiguration configuration = mConfiguration;
+        final Channel<?, IN> inputChannel = Channels.replay(channel).buildChannels();
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(configuration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new DelayChannelConsumer<OUT>(mDelay, mDelayUnit,
-                configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
+        new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
+                configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
+                mBackoffFunction).run();
         return outputChannel;
     }
 }

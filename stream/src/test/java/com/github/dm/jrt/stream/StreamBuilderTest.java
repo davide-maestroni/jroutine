@@ -44,7 +44,7 @@ import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
-import com.github.dm.jrt.stream.transform.Transformations;
+import com.github.dm.jrt.stream.processor.Processors;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +66,7 @@ import static com.github.dm.jrt.operator.Operators.instead;
 import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.transform.Transformations.tryCatchWith;
+import static com.github.dm.jrt.stream.processor.Processors.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -392,7 +392,7 @@ public class StreamBuilderTest {
                         final int[] count = {0};
                         return JRoutineStream.withStream()
                                              .map(routine)
-                                             .let(tryCatchWith(
+                                             .let(tryCatchAccept(
                                                      new BiConsumer<RoutineException,
                                                              Channel<String, ?>>() {
 
@@ -402,7 +402,7 @@ public class StreamBuilderTest {
                                                              if (++count[0] < 3) {
                                                                  JRoutineStream.withStream()
                                                                                .map(routine)
-                                                                               .let(tryCatchWith(
+                                                                               .let(tryCatchAccept(
                                                                                        this))
                                                                                .asyncCall(o)
                                                                                .bind(channel);
@@ -559,33 +559,33 @@ public class StreamBuilderTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>lag(1, TimeUnit.SECONDS))
+                Processors.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .asyncCall("test")
                                                       .after(seconds(3))
                                                       .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>lag(seconds(1)))
-                                                      .asyncCall("test")
-                                                      .after(seconds(3))
-                                                      .next()).isEqualTo("test");
+        assertThat(
+                JRoutineStream.<String>withStream().let(Processors.<String, String>lag(seconds(1)))
+                                                   .asyncCall("test")
+                                                   .after(seconds(3))
+                                                   .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>lag(1, TimeUnit.SECONDS))
+                Processors.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .asyncCall()
                                                       .close()
                                                       .after(seconds(3))
                                                       .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
-        assertThat(JRoutineStream.<String>withStream().let(
-                Transformations.<String, String>lag(seconds(1)))
-                                                      .asyncCall()
-                                                      .close()
-                                                      .after(seconds(3))
-                                                      .all()).isEmpty();
+        assertThat(
+                JRoutineStream.<String>withStream().let(Processors.<String, String>lag(seconds(1)))
+                                                   .asyncCall()
+                                                   .close()
+                                                   .after(seconds(3))
+                                                   .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 

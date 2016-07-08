@@ -14,62 +14,49 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream.processor;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
-import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Parallel by key binding function.
+ * Try/finally binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
- * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
+class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
-    private final InvocationMode mInvocationMode;
-
-    private final Function<? super IN, ?> mKeyFunction;
-
-    private final Routine<? super IN, ? extends OUT> mRoutine;
+    private final Action mFinally;
 
     /**
      * Constructor.
      *
-     * @param configuration  the channel configuration.
-     * @param keyFunction    the key function.
-     * @param routine        the routine instance.
-     * @param invocationMode the invocation mode.
+     * @param configuration the channel configuration.
+     * @param finallyAction the finally action.
      */
-    BindParallelKey(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<? super IN, ?> keyFunction,
-            @NotNull final Routine<? super IN, ? extends OUT> routine,
-            @NotNull final InvocationMode invocationMode) {
+    BindTryFinally(@NotNull final ChannelConfiguration configuration,
+            @NotNull final Action finallyAction) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
-        mRoutine = ConstantConditions.notNull("routine instance", routine);
-        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+        mFinally = ConstantConditions.notNull("action instance", finallyAction);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
                                                             .applied()
                                                             .buildChannel();
-        channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
-                mInvocationMode));
+        channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
         return outputChannel;
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream.processor;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;

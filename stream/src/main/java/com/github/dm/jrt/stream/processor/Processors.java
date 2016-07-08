@@ -1,4 +1,20 @@
-package com.github.dm.jrt.stream.transform;
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.dm.jrt.stream.processor;
 
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -28,12 +44,12 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Created by davide-maestroni on 07/06/2016.
  */
-public class Transformations {
+public class Processors {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Transformations() {
+    protected Processors() {
         ConstantConditions.avoid();
     }
 
@@ -502,7 +518,7 @@ public class Transformations {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> catchFunction) {
-        return tryCatchWith(new TryCatchBiConsumerFunction<OUT>(catchFunction));
+        return tryCatchAccept(new TryCatchBiConsumerFunction<OUT>(catchFunction));
     }
 
     /**
@@ -519,7 +535,7 @@ public class Transformations {
      * @return the transformation function.
      */
     @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchWith(
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchAccept(
             @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer) {
         ConstantConditions.notNull("consumer instance", catchConsumer);

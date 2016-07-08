@@ -18,7 +18,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ChannelInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     private Channel<IN, IN> mInputChannel;
 
@@ -45,14 +45,12 @@ public abstract class ChannelInvocation<IN, OUT> extends TemplateInvocation<IN, 
         mOutputChannel = null;
     }
 
-    @Override
     public final void onAbort(@NotNull final RoutineException reason) {
         mInputChannel.abort(reason);
         mInputChannel = null;
         mOutputChannel = null;
     }
 
-    @Override
     public final void onComplete(@NotNull final Channel<OUT, ?> result) {
         bind(result);
         mInputChannel.close();
@@ -60,17 +58,14 @@ public abstract class ChannelInvocation<IN, OUT> extends TemplateInvocation<IN, 
         mOutputChannel = null;
     }
 
-    @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-    }
-
-    @Override
     public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
         bind(result);
         mInputChannel.pass(input);
     }
 
-    @Override
+    public void onRecycle(final boolean isReused) throws Exception {
+    }
+
     public final void onRestart() throws Exception {
         final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
         mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));

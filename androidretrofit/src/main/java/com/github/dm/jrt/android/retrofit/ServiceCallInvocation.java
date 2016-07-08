@@ -94,14 +94,6 @@ public class ServiceCallInvocation extends
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
-        mRequestData = null;
-        mMediaType = null;
-        mInputChannel = null;
-        mHasMediaType = false;
-    }
-
-    @Override
     public void onInput(final ParcelableSelectable<Object> input,
             @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
         switch (input.index) {
@@ -131,6 +123,14 @@ public class ServiceCallInvocation extends
         if (mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
             asyncRequest(result);
         }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+        mRequestData = null;
+        mMediaType = null;
+        mInputChannel = null;
+        mHasMediaType = false;
     }
 
     private void asyncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws

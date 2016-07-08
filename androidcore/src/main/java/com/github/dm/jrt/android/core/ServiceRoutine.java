@@ -440,12 +440,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         }
 
         @Override
-        public void onRecycle(final boolean isReused) {
-            mInputChannel = null;
-            mOutputChannel = null;
-        }
-
-        @Override
         public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             final Channel<OUT, OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
@@ -453,6 +447,12 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             }
 
             mInputChannel.pass(input);
+        }
+
+        @Override
+        public void onRecycle(final boolean isReused) {
+            mInputChannel = null;
+            mOutputChannel = null;
         }
 
         @Override

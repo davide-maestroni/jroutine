@@ -46,10 +46,11 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
     @Override
     public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         onCall(mInputs, result);
+        mInputs = null;
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public void onRecycle(final boolean isReused) throws Exception {
         mInputs = null;
     }
 

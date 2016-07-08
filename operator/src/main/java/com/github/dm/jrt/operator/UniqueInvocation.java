@@ -34,6 +34,8 @@ import java.util.HashSet;
  */
 class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
+    // TODO: 08/07/16 uniqueBy(Comparator)
+
     private static final InvocationFactory<?, ?> sFactory =
             new InvocationFactory<Object, Object>(null) {
 
@@ -44,12 +46,13 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
                 }
             };
 
-    private final HashSet<DATA> mSet = new HashSet<DATA>();
+    private HashSet<DATA> mSet;
 
     /**
      * Constructor.
      */
     private UniqueInvocation() {
+        mSet = null;
     }
 
     /**
@@ -66,7 +69,7 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     @Override
     public void onRecycle(final boolean isReused) {
-        mSet.clear();
+        mSet = null;
     }
 
     @Override
@@ -74,5 +77,10 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
         if (mSet.add(input)) {
             result.pass(input);
         }
+    }
+
+    @Override
+    public void onRestart() {
+        mSet = new HashSet<DATA>();
     }
 }

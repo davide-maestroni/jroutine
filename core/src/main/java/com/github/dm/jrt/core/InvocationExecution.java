@@ -116,8 +116,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     /**
      * Forces the recycling of the invocation.
+     *
+     * @param reason the reason.
      */
-    public void recycle(@NotNull final Throwable error) {
+    public void recycle(@NotNull final Throwable reason) {
         synchronized (mMutex) {
             final Invocation<IN, OUT> invocation = mInvocation;
             if ((invocation != null) && !mIsTerminated) {
@@ -125,7 +127,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 final InvocationManager<IN, OUT> invocationManager = mInvocationManager;
                 if (mIsInitialized) {
                     try {
-                        invocation.onAbort(InvocationException.wrapIfNeeded(error));
+                        invocation.onAbort(InvocationException.wrapIfNeeded(reason));
                         invocation.onRecycle(true);
                         invocationManager.recycle(invocation);
 

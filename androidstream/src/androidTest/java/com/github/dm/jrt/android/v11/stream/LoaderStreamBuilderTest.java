@@ -23,7 +23,9 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder.LoaderStreamConfiguration;
@@ -50,6 +52,7 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
@@ -449,6 +452,41 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .all()).containsExactly("test");
     }
 
+    public void testCache() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .loaderConfiguration()
+                                       .withLoaderId(0)
+                                       .withCacheStrategy(CacheStrategyType.CACHE)
+                                       .applied()
+                                       .asyncCall("test")
+                                       .after(seconds(10))
+                                       .hasCompleted()).isTrue();
+        assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                                 .withId(0)
+                                 .buildChannel()
+                                 .after(seconds(10))
+                                 .next()).isEqualTo("test");
+        assertThat(JRoutineStreamLoader.withStream()
+                                       .on(loaderFrom(getActivity()))
+                                       .streamLoaderConfiguration()
+                                       .withLoaderId(0)
+                                       .withResultStaleTime(1, TimeUnit.MILLISECONDS)
+                                       .applied()
+                                       .asyncCall("test")
+                                       .after(seconds(10))
+                                       .hasCompleted()).isTrue();
+        assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                                 .withId(0)
+                                 .buildChannel()
+                                 .after(seconds(10))
+                                 .getError()).isExactlyInstanceOf(MissingLoaderException.class);
+    }
+
     public void testConstructor() {
         boolean failed = false;
         try {
@@ -459,6 +497,25 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         assertThat(failed).isFalse();
+    }
+
+    public void testFactory() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final LoaderStreamBuilder<String, String> builder =
+                JRoutineStreamLoader.<String>withStream().on(loaderFrom(getActivity()))
+                                                         .map(new UpperCase());
+        assertThat(JRoutineCore.with(builder.buildFactory())
+                               .asyncCall("test")
+                               .after(seconds(10))
+                               .next()).isEqualTo("TEST");
+        assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                                 .with(builder.buildContextFactory())
+                                 .asyncCall("test")
+                                 .after(seconds(10))
+                                 .next()).isEqualTo("TEST");
     }
 
     public void testFlatMap() {

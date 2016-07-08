@@ -369,10 +369,15 @@ public class RunnerTest {
         final AtomicReference<Runner> runner = new AtomicReference<Runner>();
         runner.set(Runners.zeroDelayRunner(new RunnerDecorator(Runners.syncRunner()) {
 
+            @NotNull
             @Override
-            public boolean isManagedThread() {
+            protected ThreadManager getThreadManager() {
+                return new ThreadManager() {
 
-                return true;
+                    public boolean isManagedThread() {
+                        return true;
+                    }
+                };
             }
         }));
         final TestExecution testExecution1 = new TestExecution() {
@@ -621,18 +626,14 @@ public class RunnerTest {
 
         private Execution mLastExecution;
 
-        private long mThreadId;
+        private TestRunner() {
+            super(new TestManager());
+        }
 
         @Override
         public void cancel(@NotNull final Execution execution) {
 
             mLastCancelExecution = execution;
-        }
-
-        @Override
-        public boolean isManagedThread() {
-
-            return (Thread.currentThread().getId() == mThreadId);
         }
 
         @Override
@@ -654,7 +655,16 @@ public class RunnerTest {
 
         private void setExecutionThread(final Thread thread) {
 
-            mThreadId = thread.getId();
+            ((TestManager) getThreadManager()).mThreadId = thread.getId();
+        }
+
+        private static class TestManager implements ThreadManager {
+
+            private volatile long mThreadId;
+
+            public boolean isManagedThread() {
+                return (Thread.currentThread().getId() == mThreadId);
+            }
         }
     }
 }

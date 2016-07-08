@@ -41,15 +41,13 @@ class HandlerRunner extends AsyncRunner {
 
     private final Handler mHandler;
 
-    private final Looper mLooper;
-
     /**
      * Constructor.
      *
      * @param handler the handler to employ.
      */
     HandlerRunner(@NotNull final Handler handler) {
-        mLooper = handler.getLooper();
+        super(new HandlerThreadManager(handler.getLooper()));
         mHandler = handler;
     }
 
@@ -61,11 +59,6 @@ class HandlerRunner extends AsyncRunner {
         }
 
         mHandler.removeCallbacks(decorator);
-    }
-
-    @Override
-    public boolean isManagedThread() {
-        return (mLooper == Looper.myLooper());
     }
 
     @Override
@@ -86,6 +79,28 @@ class HandlerRunner extends AsyncRunner {
 
         } else {
             mHandler.post(decorator);
+        }
+    }
+
+    /**
+     * Thread manager implementation.
+     */
+    private static class HandlerThreadManager implements ThreadManager {
+
+        private final Looper mLooper;
+
+        /**
+         * Constructor.
+         *
+         * @param looper the handler looper.
+         */
+        private HandlerThreadManager(@NotNull final Looper looper) {
+            mLooper = looper;
+        }
+
+        @Override
+        public boolean isManagedThread() {
+            return (mLooper == Looper.myLooper());
         }
     }
 }

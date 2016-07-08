@@ -47,8 +47,6 @@ class AsyncTaskRunner extends AsyncRunner {
 
     private final Executor mExecutor;
 
-    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
-
     private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
             new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
 
@@ -60,6 +58,7 @@ class AsyncTaskRunner extends AsyncRunner {
      * @param executor the executor.
      */
     AsyncTaskRunner(@Nullable final Executor executor) {
+        super(new AsyncTaskThreadManager());
         mExecutor = executor;
     }
 
@@ -74,12 +73,6 @@ class AsyncTaskRunner extends AsyncRunner {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean isManagedThread() {
-        final Boolean isManaged = mIsManaged.get();
-        return (isManaged != null) && isManaged;
     }
 
     @Override
@@ -99,6 +92,30 @@ class AsyncTaskRunner extends AsyncRunner {
 
         // We need to ensure that a task is always started from the main thread
         sMainRunner.run(task, delay, timeUnit);
+    }
+
+    @NotNull
+    @Override
+    protected AsyncTaskThreadManager getThreadManager() {
+        return (AsyncTaskThreadManager) super.getThreadManager();
+    }
+
+    /**
+     * Thread manager implementation.
+     */
+    private static class AsyncTaskThreadManager implements ThreadManager {
+
+        private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
+        @Override
+        public boolean isManagedThread() {
+            final Boolean isManaged = mIsManaged.get();
+            return (isManaged != null) && isManaged;
+        }
+
+        private void setManaged() {
+            mIsManaged.set(true);
+        }
     }
 
     /**
@@ -138,7 +155,7 @@ class AsyncTaskRunner extends AsyncRunner {
         protected Void doInBackground(@NotNull final Void... voids) {
             final Looper looper = Looper.myLooper();
             if (looper != Looper.getMainLooper()) {
-                mIsManaged.set(true);
+                getThreadManager().setManaged();
             }
 
             mExecution.run();

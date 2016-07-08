@@ -393,7 +393,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
          * @return the invocation configuration.
          */
         @NotNull
-        InvocationConfiguration getCurrentConfiguration();
+        InvocationConfiguration getCurrentInvocationConfiguration();
 
         /**
          * Gets the stream invocation mode.
@@ -409,6 +409,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
          * @return the invocation configuration.
          */
         @NotNull
-        InvocationConfiguration getStreamConfiguration();
+        InvocationConfiguration getStreamInvocationConfiguration();
     }
 }

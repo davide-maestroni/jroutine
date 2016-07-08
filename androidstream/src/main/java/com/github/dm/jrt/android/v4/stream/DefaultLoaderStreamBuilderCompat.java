@@ -72,7 +72,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
                     final LoaderStreamConfigurationCompat streamConfiguration =
                             mStreamConfiguration;
                     return DefaultLoaderStreamBuilderCompat.this.apply(
-                            newConfiguration(streamConfiguration.getStreamConfiguration(),
+                            newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
                                     configuration, streamConfiguration.getInvocationMode()));
                 }
             };
@@ -114,7 +114,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
                             mStreamConfiguration;
                     return DefaultLoaderStreamBuilderCompat.this.apply(
                             newConfiguration(configuration,
-                                    streamConfiguration.getCurrentConfiguration(),
+                                    streamConfiguration.getCurrentInvocationConfiguration(),
                                     streamConfiguration.getInvocationMode()));
                 }
             };
@@ -305,7 +305,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
     streamInvocationConfiguration() {
         return new InvocationConfiguration.Builder<LoaderStreamBuilderCompat<IN, OUT>>(
-                mStreamInvocationConfigurable, mStreamConfiguration.getStreamConfiguration());
+                mStreamInvocationConfigurable,
+                mStreamConfiguration.getStreamInvocationConfiguration());
     }
 
     @NotNull
@@ -325,7 +326,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
     invocationConfiguration() {
         return new InvocationConfiguration.Builder<LoaderStreamBuilderCompat<IN, OUT>>(
-                mInvocationConfigurable, mStreamConfiguration.getCurrentConfiguration());
+                mInvocationConfigurable, mStreamConfiguration.getCurrentInvocationConfiguration());
     }
 
     @NotNull
@@ -468,8 +469,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         return new DefaultLoaderStreamConfigurationCompat(context,
                 loaderStreamConfiguration.getStreamLoaderConfiguration(),
                 loaderStreamConfiguration.getCurrentLoaderConfiguration(),
-                loaderStreamConfiguration.getStreamConfiguration(),
-                loaderStreamConfiguration.getCurrentConfiguration(),
+                loaderStreamConfiguration.getStreamInvocationConfiguration(),
+                loaderStreamConfiguration.getCurrentInvocationConfiguration(),
                 loaderStreamConfiguration.getInvocationMode());
     }
 
@@ -480,8 +481,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         final LoaderStreamConfigurationCompat loaderStreamConfiguration = mStreamConfiguration;
         return new DefaultLoaderStreamConfigurationCompat(
                 loaderStreamConfiguration.getLoaderContext(), streamConfiguration, configuration,
-                loaderStreamConfiguration.getStreamConfiguration(),
-                loaderStreamConfiguration.getCurrentConfiguration(),
+                loaderStreamConfiguration.getStreamInvocationConfiguration(),
+                loaderStreamConfiguration.getCurrentInvocationConfiguration(),
                 loaderStreamConfiguration.getInvocationMode());
     }
 
@@ -559,7 +560,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
         @NotNull
         @Override
-        public InvocationConfiguration getCurrentConfiguration() {
+        public InvocationConfiguration getCurrentInvocationConfiguration() {
             return mCurrentConfiguration;
         }
 
@@ -571,7 +572,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
         @NotNull
         @Override
-        public InvocationConfiguration getStreamConfiguration() {
+        public InvocationConfiguration getStreamInvocationConfiguration() {
             return mStreamConfiguration;
         }
 

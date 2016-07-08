@@ -36,6 +36,13 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     private ArrayList<IN> mInputs;
 
+    /**
+     * Constructor.
+     */
+    public CallInvocation() {
+        mInputs = null;
+    }
+
     @Override
     public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         onCall(mInputs, result);

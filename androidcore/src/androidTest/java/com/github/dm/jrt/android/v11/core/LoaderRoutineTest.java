@@ -2003,10 +2003,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onDiscard() throws Exception {
+        public void onRecycle(final boolean isReused) throws Exception {
 
-            super.onDiscard();
-            sSemaphore.release();
+            super.onRecycle(isReused);
+            if (!isReused) {
+                sSemaphore.release();
+            }
         }
 
         @Override

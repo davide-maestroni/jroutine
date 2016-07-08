@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -96,16 +95,15 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     }
 
     @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-        mAccumulated = null;
-    }
-
-    @Override
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
         if (!mIsFirst) {
             result.pass(mAccumulated);
-            mAccumulated = null;
         }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+        mAccumulated = null;
     }
 
     @Override

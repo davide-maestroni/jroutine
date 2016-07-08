@@ -52,17 +52,20 @@ import org.jetbrains.annotations.NotNull;
  *         |             |     |            (*)    |   onAbort()   |-----   |
  *         |             V     V             |     -----------------        |
  *         |           -----------------     |             |                |
- *          -----------|  onComplete() |-----              |                |
- *                     -----------------                   |                |
- *                       |                                 |                |
- *                       |      ---------------------------                 |
- *                       |     |                                            |
- *                       |     |      --------------------------------------
- *                       |     |     |
- *                       V     V     V
- *                     -----------------
- *                     |  onDiscard()  |
- *                     -----------------
+ *         |           |  onComplete() |-----              |                |
+ *         |           -----------------                   |                |
+ *         |                 |                             |                |
+ *         |                 |    -------------------------                 |
+ *         |                 |   |                                          |
+ *         |      -------    |   |    --------------------------------------
+ *         |     |       |   |   |   |
+ *         |     |       V   V   V   V
+ *         |     |     -----------------
+ *         |      -----|  onRecycle()  |
+ *         |           -----------------
+ *         |                   |
+ *         |                   |
+ *          -------------------
  *
  *      (*) only when an exception escapes the method
  *     </code>
@@ -82,10 +85,11 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * Note that the method will be called also right after the object instantiation.
  * <p>
- * The {@code onDiscard()} method is meant to indicate that the invocation object is no longer
- * needed, so any associated resource must be released. Note that this method may never get
- * called if the routine {@link com.github.dm.jrt.core.routine.Routine#clear() clear()} method is
- * not invoked.
+ * The {@code onRecycle()} method is meant to indicate that the invocation instance has completed
+ * its lifecycle, so any associated resource can be released. The input flag indicates if the same
+ * instance is going to be re-used or not. Note, however, that this method may never get called
+ * with {@code false} if the routine {@link com.github.dm.jrt.core.routine.Routine#clear() clear()}
+ * method is not invoked.
  * <p>
  * Keep in mind, when implementing an invocation class, that the result channel passed to the
  * {@code onInput()} and {@code onComplete()} methods will be closed as soon as the latter exits.
@@ -135,13 +139,6 @@ public interface Invocation<IN, OUT> {
     void onComplete(@NotNull Channel<OUT, ?> result) throws Exception;
 
     /**
-     * Called when the routine invocation is no longer needed.
-     *
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onDiscard() throws Exception;
-
-    /**
      * Called when an input is passed to the routine.
      * <br>
      * This method is called once for each input object.
@@ -151,6 +148,14 @@ public interface Invocation<IN, OUT> {
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     void onInput(IN input, @NotNull Channel<OUT, ?> result) throws Exception;
+
+    /**
+     * Called when the routine invocation is recycled.
+     *
+     * @param isReused whether the invocation is going to be reused.
+     * @throws java.lang.Exception if an unexpected error occurs.
+     */
+    void onRecycle(boolean isReused) throws Exception;
 
     /**
      * Called when the routine invocation is initialized.

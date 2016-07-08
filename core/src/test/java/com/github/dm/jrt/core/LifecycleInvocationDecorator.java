@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,14 +38,18 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<IN, OUT> {
 
-    private static final List<State> TO_ABORT_STATES = Arrays.asList(State.START, State.COMPLETE);
+    private static final List<State> TO_ABORT_STATES =
+            Arrays.asList(State.START, State.INPUT, State.COMPLETE);
 
-    private static final List<State> TO_INPUT_STATES = Collections.singletonList(State.START);
+    private static final List<State> TO_INPUT_STATES = Arrays.asList(State.START, State.INPUT);
 
-    private static final List<State> TO_RESULT_STATES = Collections.singletonList(State.START);
+    private static final List<State> TO_RECYCLE_STATES =
+            Arrays.asList(State.START, State.ABORT, State.COMPLETE, State.RECYCLE);
+
+    private static final List<State> TO_RESULT_STATES = Arrays.asList(State.START, State.INPUT);
 
     private static final List<State> TO_START_STATES =
-            Arrays.asList(State.ABORT, State.COMPLETE, null);
+            Arrays.asList(State.ABORT, State.RECYCLE, null);
 
     private State mState;
 
@@ -80,11 +83,26 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     }
 
     @Override
+    public void onRecycle(final boolean isReused) throws Exception {
+        if (!TO_RECYCLE_STATES.contains(mState)) {
+            throw new InvocationInterruptedException(null);
+        }
+
+        if (isReused && (mState == State.RECYCLE)) {
+            throw new InvocationInterruptedException(null);
+        }
+
+        mState = State.RECYCLE;
+        super.onRecycle(isReused);
+    }
+
+    @Override
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         if (!TO_INPUT_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
         }
 
+        mState = State.INPUT;
         super.onInput(input, result);
     }
 
@@ -100,7 +118,9 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
 
     private enum State {
         START,
+        INPUT,
         COMPLETE,
         ABORT,
+        RECYCLE,
     }
 }

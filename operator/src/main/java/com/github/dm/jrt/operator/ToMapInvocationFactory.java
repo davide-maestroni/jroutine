@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -95,13 +94,12 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
         }
 
         @Override
-        public void onAbort(@NotNull final RoutineException reason) {
-            mMap = null;
+        public void onComplete(@NotNull final Channel<Map<KEY, VALUE>, ?> result) {
+            result.pass(mMap);
         }
 
         @Override
-        public void onComplete(@NotNull final Channel<Map<KEY, VALUE>, ?> result) {
-            result.pass(mMap);
+        public void onRecycle(final boolean isReused) {
             mMap = null;
         }
 

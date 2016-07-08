@@ -61,7 +61,7 @@ public abstract class ChannelInvocation<IN, OUT> extends TemplateInvocation<IN, 
     }
 
     @Override
-    public void onDiscard() throws Exception {
+    public void onRecycle(final boolean isReused) throws Exception {
     }
 
     @Override

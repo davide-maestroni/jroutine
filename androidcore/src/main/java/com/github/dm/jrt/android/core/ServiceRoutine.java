@@ -427,8 +427,6 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mInputChannel.abort(reason);
-            mInputChannel = null;
-            mOutputChannel = null;
         }
 
         @Override
@@ -439,6 +437,10 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             }
 
             mInputChannel.close();
+        }
+
+        @Override
+        public void onRecycle(final boolean isReused) {
             mInputChannel = null;
             mOutputChannel = null;
         }

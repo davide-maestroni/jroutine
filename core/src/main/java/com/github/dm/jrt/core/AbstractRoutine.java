@@ -160,7 +160,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
             for (final Invocation<IN, OUT> invocation : syncInvocations) {
                 try {
-                    invocation.onDiscard();
+                    invocation.onRecycle(false);
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
@@ -172,7 +172,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {
                 try {
-                    invocation.onDiscard();
+                    invocation.onRecycle(false);
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
@@ -187,8 +187,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     /**
      * Converts an invocation instance to the specified type.
      * <br>
-     * It is responsibility of the implementing class to call {@link Invocation#onDiscard()} on the
-     * passed invocation, in case it gets discarded during the conversion.
+     * It is responsibility of the implementing class to call {@link Invocation#onRecycle(boolean)}
+     * on the passed invocation, in case it gets discarded during the conversion.
      *
      * @param invocation the invocation to convert.
      * @param type       the type of the invocation after the conversion.
@@ -445,7 +445,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 final Logger logger = mLogger;
                 logger.wrn("discarding invocation instance after error: %s", invocation);
                 try {
-                    invocation.onDiscard();
+                    invocation.onRecycle(false);
 
                 } catch (final Throwable t) {
                     InvocationInterruptedException.throwIfInterrupt(t);
@@ -477,7 +477,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                     logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
                             coreInvocations, coreInvocations, invocation);
                     try {
-                        invocation.onDiscard();
+                        invocation.onRecycle(false);
 
                     } catch (final Throwable t) {
                         InvocationInterruptedException.throwIfInterrupt(t);

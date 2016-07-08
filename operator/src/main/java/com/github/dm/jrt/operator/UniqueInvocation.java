@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -66,12 +65,7 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-        mSet.clear();
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+    public void onRecycle(final boolean isReused) {
         mSet.clear();
     }
 
@@ -80,10 +74,5 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
         if (mSet.add(input)) {
             result.pass(input);
         }
-    }
-
-    @Override
-    public void onRestart() {
-        mSet.clear();
     }
 }

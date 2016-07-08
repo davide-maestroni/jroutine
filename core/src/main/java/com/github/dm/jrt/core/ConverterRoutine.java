@@ -47,7 +47,7 @@ public abstract class ConverterRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
             @NotNull final InvocationType type) throws Exception {
         try {
-            invocation.onDiscard();
+            invocation.onRecycle(false);
 
         } catch (final Throwable t) {
             InvocationInterruptedException.throwIfInterrupt(t);

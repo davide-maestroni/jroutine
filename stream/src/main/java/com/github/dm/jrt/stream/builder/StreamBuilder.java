@@ -317,28 +317,21 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     StreamBuilder<IN, OUT> sorted();
 
     /**
-     * Short for
-     * {@code async().streamInvocationConfiguration().withRunner(straightRunner).applied()}.
-     * <br>
-     * This method is useful to set the stream runner so that each input is immediately passed
-     * through the whole chain as soon as it is fed to the stream.
+     * Makes so the stream straight so that each input is immediately passed through the following
+     * chain of routines.
      * <p>
-     * On the contrary to the default synchronous runner, the set one makes so that each routine
-     * in the chain is passed any input as soon as it is produced by the previous one. Such behavior
-     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
-     * the latter approach is that all input data might be accumulated before actually being
-     * processed by the next routine invocation.
-     * <p>
-     * Note that the runner will be employed with asynchronous and parallel invocation modes, while
-     * the synchronous and sequential modes will behave as before.
+     * On the contrary to the default synchronous runner, the employed one makes so that each
+     * routine in the chain is passed any input as soon as it is produced by the previous one. Such
+     * behavior decreases memory demands at the expense of a deeper stack of calls. In fact, the
+     * default synchronous runner breaks up routine calls so to perform them in a loop. The main
+     * drawback of the latter approach is that all input data might be accumulated before actually
+     * being processed by the next routine invocation.
      *
      * @return this builder.
-     * @see #async()
-     * @see #parallel()
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
-    StreamBuilder<IN, OUT> straight(); // TODO: 07/07/16 ???
+    StreamBuilder<IN, OUT> straight();
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

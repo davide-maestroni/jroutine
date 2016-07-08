@@ -75,6 +75,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     private FunctionDecorator<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;
 
+    private boolean mIsStraight;
+
     private StreamConfiguration mStreamConfiguration;
 
     private final Configurable<StreamBuilder<IN, OUT>> mConfigurable =
@@ -296,10 +298,10 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
+        mIsStraight = false;
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return apply(ConstantConditions.notNull("stream configuration",
-                newConfiguration(streamConfiguration.getStreamConfiguration(),
-                        streamConfiguration.getCurrentConfiguration(), invocationMode)));
+        return apply(newConfiguration(streamConfiguration.getStreamConfiguration(),
+                streamConfiguration.getCurrentConfiguration(), invocationMode));
     }
 
     @NotNull
@@ -445,7 +447,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> straight() {
-        return async().streamInvocationConfiguration().withRunner(sStraightRunner).applied();
+        mIsStraight = true;
+        return this;
     }
 
     @NotNull
@@ -563,8 +566,14 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        return ConstantConditions.notNull("routine instance",
-                newRoutine(mStreamConfiguration, factory));
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        final StreamConfiguration configuration =
+                (mIsStraight) ? newConfiguration(streamConfiguration.getStreamConfiguration(),
+                        streamConfiguration.getCurrentConfiguration()
+                                           .builderFrom()
+                                           .withRunner(sStraightRunner)
+                                           .applied(), InvocationMode.ASYNC) : streamConfiguration;
+        return ConstantConditions.notNull("routine instance", newRoutine(configuration, factory));
     }
 
     @NotNull

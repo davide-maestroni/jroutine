@@ -111,7 +111,7 @@ public abstract class Runner {
     public abstract boolean isExecutionThread();
 
     /**
-     * Checks if the specified thread belongs to the ones managed by the runner implementation.
+     * Checks if the calling thread belongs to the ones managed by the runner implementation.
      * <p>
      * The implementation of this method is not strictly mandatory, even if, the classes always
      * returning false effectively prevent the correct detection of possible deadlocks.

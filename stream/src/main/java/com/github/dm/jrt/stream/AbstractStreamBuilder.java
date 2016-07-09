@@ -384,7 +384,9 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        return mapRoutine(factory);
+        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        return map(newRoutine(streamConfiguration, factory),
+                streamConfiguration.getInvocationMode());
     }
 
     @NotNull
@@ -396,7 +398,15 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return mapRoutine(builder);
+        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        return map(newRoutine(streamConfiguration, builder),
+                streamConfiguration.getInvocationMode());
+    }
+
+    @NotNull
+    public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
+            @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
+        return map(consumerMapping(mappingConsumer));
     }
 
     @NotNull
@@ -418,12 +428,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
                       .withRunner(runner)
                       .applied()
                       .map(IdentityInvocation.<OUT>factoryOf());
-    }
-
-    @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
-            @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
-        return map(consumerMapping(mappingConsumer));
     }
 
     @NotNull
@@ -469,7 +473,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public Routine<IN, OUT> buildRoutine() {
         final Routine<? super IN, ? extends OUT> routine =
                 ConstantConditions.notNull("routine instance",
-                        newRoutine(mStreamConfiguration, buildFactory()));
+                        newRoutine(getStraightConfiguration(), buildFactory()));
         resetConfiguration();
         return (Routine<IN, OUT>) routine;
     }
@@ -593,22 +597,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
                 getBindingFunction().andThen(new BindMap<OUT, AFTER>(routine, invocationMode));
         resetConfiguration();
         return (StreamBuilder<IN, AFTER>) this;
-    }
-
-    @NotNull
-    private <AFTER> StreamBuilder<IN, AFTER> mapRoutine(
-            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final StreamConfiguration streamConfiguration = getStraightConfiguration();
-        return map(newRoutine(streamConfiguration, factory),
-                streamConfiguration.getInvocationMode());
-    }
-
-    @NotNull
-    private <AFTER> StreamBuilder<IN, AFTER> mapRoutine(
-            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        final StreamConfiguration streamConfiguration = getStraightConfiguration();
-        return map(newRoutine(streamConfiguration, builder),
-                streamConfiguration.getInvocationMode());
     }
 
     private void resetConfiguration() {

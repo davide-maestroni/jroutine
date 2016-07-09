@@ -51,14 +51,6 @@ import java.util.List;
 public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel<IN, OUT> {
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the stream configuration will be employed to build the routine instance.
-     */
-    @NotNull
-    Routine<IN, OUT> buildRoutine();
-
-    /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
      * asynchronous mode.
      *
@@ -75,6 +67,14 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      */
     @NotNull
     InvocationFactory<IN, OUT> buildFactory();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the stream configuration will be employed to build the routine instance.
+     */
+    @NotNull
+    Routine<IN, OUT> buildRoutine();
 
     /**
      * Concatenates a routine mapping this stream outputs by applying the specified function to each
@@ -235,6 +235,22 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
+     * Concatenates a routine mapping this stream outputs through the specified consumer.
+     * <br>
+     * The result channel of the backing routine will be passed to the consumer, so that multiple
+     * or no results may be generated.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param mappingConsumer the bi-consumer instance.
+     * @param <AFTER>         the concatenation output type.
+     * @return this builder.
+     */
+    @NotNull
+    <AFTER> StreamBuilder<IN, AFTER> mapAccept(
+            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
+
+    /**
      * Concatenates a routine mapping the whole collection of outputs by applying the specified
      * function.
      * <p>
@@ -262,7 +278,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * @return this builder.
      */
     @NotNull
-    <AFTER> StreamBuilder<IN, AFTER> mapAllWith(
+    <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -279,22 +295,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      */
     @NotNull
     StreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
-
-    /**
-     * Concatenates a routine mapping this stream outputs through the specified consumer.
-     * <br>
-     * The result channel of the backing routine will be passed to the consumer, so that multiple
-     * or no results may be generated.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param mappingConsumer the bi-consumer instance.
-     * @param <AFTER>         the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    <AFTER> StreamBuilder<IN, AFTER> mapWith(
-            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel

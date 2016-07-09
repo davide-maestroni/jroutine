@@ -249,11 +249,11 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllWith(
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.mapAllWith(mappingConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.mapAllAccept(mappingConsumer);
     }
 
     @NotNull
@@ -264,10 +264,10 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapWith(
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> mapAccept(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         checkStatic(decorate(mappingConsumer), mappingConsumer);
-        return (LoaderStreamBuilder<IN, AFTER>) super.mapWith(mappingConsumer);
+        return (LoaderStreamBuilder<IN, AFTER>) super.mapAccept(mappingConsumer);
     }
 
     @NotNull

@@ -204,7 +204,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
-                                     .mapAllWith(new BiConsumer<List<?
+                                     .mapAllAccept(new BiConsumer<List<?
                                              extends String>, Channel<String, ?>>() {
 
                                          public void accept(final List<?
@@ -224,7 +224,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .mapAllWith(
+                                     .mapAllAccept(
                                              new BiConsumer<List<? extends String>,
                                                      Channel<String, ?>>() {
 
@@ -284,7 +284,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     private static void testMapConsumer(@NotNull final Activity activity) {
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -298,7 +298,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
                                      .parallel()
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -311,7 +311,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineStreamLoader //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -326,7 +326,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .withOutputOrder(OrderType.BY_CALL)
                                      .applied()
                                      .sequential()
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -739,7 +739,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             JRoutineStreamLoader.withStream()
                                 .on(loaderFrom(getActivity()))
                                 .async()
-                                .mapAllWith(null);
+                                .mapAllAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -783,7 +783,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).async().mapWith(null);
+            JRoutineStreamLoader.withStream().on(loaderFrom(getActivity())).async().mapAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {

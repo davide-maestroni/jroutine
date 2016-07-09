@@ -591,7 +591,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testMapAllConsumer() {
-        assertThat(JRoutineStream.<String>withStream().async().mapAllWith(new BiConsumer<List<?
+        assertThat(JRoutineStream.<String>withStream().async().mapAllAccept(new BiConsumer<List<?
                 extends String>, Channel<String, ?>>() {
 
             public void accept(final List<?
@@ -606,27 +606,31 @@ public class StreamBuilderTest {
             }
         }).asyncCall("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
                 "test1test2test3");
-        assertThat(
-                JRoutineStream.<String>withStream().sync().mapAllWith(new BiConsumer<List<? extends
-                        String>, Channel<String, ?>>() {
+        assertThat(JRoutineStream.<String>withStream().sync()
+                                                      .mapAllAccept(new BiConsumer<List<? extends
+                                                              String>, Channel<String, ?>>() {
 
-                    public void accept(final List<? extends
-                            String> strings, final Channel<String, ?> result) {
-                        final StringBuilder builder = new StringBuilder();
-                        for (final String string : strings) {
-                            builder.append(string);
-                        }
+                                                          public void accept(final List<? extends
+                                                                  String> strings,
+                                                                  final Channel<String, ?> result) {
+                                                              final StringBuilder builder =
+                                                                      new StringBuilder();
+                                                              for (final String string : strings) {
+                                                                  builder.append(string);
+                                                              }
 
-                        result.pass(builder.toString());
-                    }
-                }).syncCall("test1", "test2", "test3").all()).containsExactly("test1test2test3");
+                                                              result.pass(builder.toString());
+                                                          }
+                                                      })
+                                                      .syncCall("test1", "test2", "test3")
+                                                      .all()).containsExactly("test1test2test3");
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testMapAllConsumerNullPointerError() {
         try {
-            JRoutineStream.withStream().async().mapAllWith(null);
+            JRoutineStream.withStream().async().mapAllAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -675,7 +679,7 @@ public class StreamBuilderTest {
 
     @Test
     public void testMapConsumer() {
-        assertThat(JRoutineStream.<String>withStream().mapWith(
+        assertThat(JRoutineStream.<String>withStream().mapAccept(
                 new BiConsumer<String, Channel<String, ?>>() {
 
                     public void accept(final String s, final Channel<String, ?> result) {
@@ -686,7 +690,7 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream //
                 .<String>withStream().sorted()
                                      .parallel()
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -697,15 +701,19 @@ public class StreamBuilderTest {
                                      .after(seconds(3))
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream//
-                .<String>withStream().sync().mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                .<String>withStream().sync()
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
-                    public void accept(final String s, final Channel<String, ?> result) {
-                        result.pass(s.toUpperCase());
-                    }
-                }).syncCall("test1", "test2").all()).containsExactly("TEST1", "TEST2");
+                                         public void accept(final String s,
+                                                 final Channel<String, ?> result) {
+                                             result.pass(s.toUpperCase());
+                                         }
+                                     })
+                                     .syncCall("test1", "test2")
+                                     .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream//
                 .<String>withStream().sequential()
-                                     .mapWith(new BiConsumer<String, Channel<String, ?>>() {
+                                     .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
                                                  final Channel<String, ?> result) {
@@ -720,7 +728,7 @@ public class StreamBuilderTest {
     @SuppressWarnings("ConstantConditions")
     public void testMapConsumerNullPointerError() {
         try {
-            JRoutineStream.withStream().async().mapWith(null);
+            JRoutineStream.withStream().async().mapAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {

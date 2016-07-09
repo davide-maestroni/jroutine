@@ -384,23 +384,19 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        return map(buildRoutine(factory));
+        return mapRoutine(factory);
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
-        mBindingFunction = getBindingFunction().andThen(
-                new BindMap<OUT, AFTER>(routine, mStreamConfiguration.getInvocationMode()));
-        resetConfiguration();
-        return (StreamBuilder<IN, AFTER>) this;
+        return map(routine, mStreamConfiguration.getInvocationMode());
     }
 
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return map(buildRoutine(builder));
+        return mapRoutine(builder);
     }
 
     @NotNull
@@ -410,7 +406,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> mapAllWith(
+    public <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         return map(consumerCall(mappingConsumer));
@@ -425,7 +421,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public <AFTER> StreamBuilder<IN, AFTER> mapWith(
+    public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         return map(consumerMapping(mappingConsumer));
     }
@@ -565,26 +561,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull InvocationMode invocationMode);
 
     @NotNull
-    private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
-            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        final StreamConfiguration configuration = (mIsStraight) ? newConfiguration(
-                streamConfiguration.getStreamInvocationConfiguration(),
-                streamConfiguration.getCurrentInvocationConfiguration()
-                                   .builderFrom()
-                                   .withRunner(sStraightRunner)
-                                   .applied(), InvocationMode.ASYNC) : streamConfiguration;
-        return ConstantConditions.notNull("routine instance", newRoutine(configuration, factory));
-    }
-
-    @NotNull
-    private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
-            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return ConstantConditions.notNull("routine instance",
-                newRoutine(mStreamConfiguration, builder));
-    }
-
-    @NotNull
     private Channel<IN, OUT> call() {
         return mStreamConfiguration.getInvocationMode().call(this);
     }
@@ -593,6 +569,46 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     private FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
         return (FunctionDecorator<Channel<?, IN>, Channel<?, OUT>>) mBindingFunction;
+    }
+
+    @NotNull
+    private StreamConfiguration getStraightConfiguration() {
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        if (mIsStraight) {
+            return newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
+                    streamConfiguration.getCurrentInvocationConfiguration()
+                                       .builderFrom()
+                                       .withRunner(sStraightRunner)
+                                       .applied(), InvocationMode.ASYNC);
+        }
+
+        return streamConfiguration;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <AFTER> StreamBuilder<IN, AFTER> map(
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine,
+            @NotNull final InvocationMode invocationMode) {
+        mBindingFunction =
+                getBindingFunction().andThen(new BindMap<OUT, AFTER>(routine, invocationMode));
+        resetConfiguration();
+        return (StreamBuilder<IN, AFTER>) this;
+    }
+
+    @NotNull
+    private <AFTER> StreamBuilder<IN, AFTER> mapRoutine(
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        return map(newRoutine(streamConfiguration, factory),
+                streamConfiguration.getInvocationMode());
+    }
+
+    @NotNull
+    private <AFTER> StreamBuilder<IN, AFTER> mapRoutine(
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        return map(newRoutine(streamConfiguration, builder),
+                streamConfiguration.getInvocationMode());
     }
 
     private void resetConfiguration() {

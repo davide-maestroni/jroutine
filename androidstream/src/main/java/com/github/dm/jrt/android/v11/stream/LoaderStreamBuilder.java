@@ -178,6 +178,14 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAccept(
+            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     <AFTER> LoaderStreamBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
@@ -186,7 +194,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllWith(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -195,14 +203,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
     @NotNull
     @Override
     LoaderStreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    <AFTER> LoaderStreamBuilder<IN, AFTER> mapWith(
-            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
      * {@inheritDoc}

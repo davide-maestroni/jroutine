@@ -447,6 +447,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> straight() {
+        sync();
         mIsStraight = true;
         return this;
     }

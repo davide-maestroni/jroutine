@@ -85,13 +85,13 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         }
 
         @Override
-        public void onRecycle(final boolean isReused) {
-            mList.clear();
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+            mList.add(input);
         }
 
         @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mList.add(input);
+        public void onRecycle(final boolean isReused) {
+            mList.clear();
         }
     }
 }

@@ -156,28 +156,15 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @Override
     public void clear() {
         synchronized (mMutex) {
-            final Logger logger = mLogger;
             final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
             for (final Invocation<IN, OUT> invocation : syncInvocations) {
-                try {
-                    invocation.onRecycle(false);
-
-                } catch (final Throwable t) {
-                    InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while discarding invocation instance");
-                }
+                discard(invocation);
             }
 
             syncInvocations.clear();
             final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {
-                try {
-                    invocation.onRecycle(false);
-
-                } catch (final Throwable t) {
-                    InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while discarding invocation instance");
-                }
+                discard(invocation);
             }
 
             asyncInvocations.clear();
@@ -186,9 +173,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     /**
      * Converts an invocation instance to the specified type.
-     * <br>
-     * It is responsibility of the implementing class to call {@link Invocation#onRecycle(boolean)}
-     * on the passed invocation, in case it gets discarded during the conversion.
      *
      * @param invocation the invocation to convert.
      * @param type       the type of the invocation after the conversion.
@@ -233,6 +217,16 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     protected abstract Invocation<IN, OUT> newInvocation(@NotNull InvocationType type) throws
             Exception;
 
+    private void discard(final @NotNull Invocation<IN, OUT> invocation) {
+        try {
+            invocation.onRecycle(false);
+
+        } catch (final Throwable t) {
+            InvocationInterruptedException.throwIfInterrupt(t);
+            mLogger.wrn(t, "ignoring exception while discarding invocation instance");
+        }
+    }
+
     @NotNull
     private Routine<IN, OUT> getElementRoutine() {
         if (mElementRoutine == null) {
@@ -245,7 +239,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         protected Invocation<IN, OUT> convertInvocation(
                                 @NotNull final Invocation<IN, OUT> invocation,
                                 @NotNull final InvocationType type) throws Exception {
-                            // No need to discard the old one
                             return newInvocation(type);
                         }
 
@@ -444,14 +437,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             synchronized (mMutex) {
                 final Logger logger = mLogger;
                 logger.wrn("discarding invocation instance after error: %s", invocation);
-                try {
-                    invocation.onRecycle(false);
-
-                } catch (final Throwable t) {
-                    InvocationInterruptedException.throwIfInterrupt(t);
-                    logger.wrn(t, "ignoring exception while discarding invocation instance");
-                }
-
+                AbstractRoutine.this.discard(invocation);
                 hasDelayed = !mObservers.isEmpty();
                 --mRunningCount;
             }
@@ -476,13 +462,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 } else {
                     logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
                             coreInvocations, coreInvocations, invocation);
-                    try {
-                        invocation.onRecycle(false);
-
-                    } catch (final Throwable t) {
-                        InvocationInterruptedException.throwIfInterrupt(t);
-                        logger.wrn(t, "ignoring exception while discarding invocation instance");
-                    }
+                    AbstractRoutine.this.discard(invocation);
                 }
 
                 hasDelayed = !mObservers.isEmpty();
@@ -531,6 +511,9 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                                         invocationType, invocations.size() + 1, coreInvocations,
                                         convertInvocation);
                                 invocation = convertInvocation(convertInvocation, invocationType);
+                                if (invocation != convertInvocation) {
+                                    discard(convertInvocation);
+                                }
 
                             } else {
                                 mLogger.dbg("creating %s invocation instance [1/%d]",

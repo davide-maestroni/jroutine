@@ -1940,4 +1940,45 @@ public class OperatorsTest {
                                .after(seconds(3))
                                .all()).containsExactly("test1", "test2");
     }
+
+    @Test
+    public void testUniqueIdentity() {
+        final Object o = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return false;
+            }
+        };
+        List<Object> objects = JRoutineCore.with(Operators.uniqueIdentity())
+                                           .asyncCall(o, o)
+                                           .after(seconds(3))
+                                           .all();
+        assertThat(objects).hasSize(1);
+        assertThat(objects.get(0)).isSameAs(o);
+        final Object o1 = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return true;
+            }
+        };
+        final Object o2 = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return true;
+            }
+        };
+        objects = JRoutineCore.with(Operators.uniqueIdentity())
+                              .asyncCall(o1, o2)
+                              .after(seconds(3))
+                              .all();
+        assertThat(objects).hasSize(2);
+        assertThat(objects.get(0)).isSameAs(o1);
+        assertThat(objects.get(1)).isSameAs(o2);
+    }
 }

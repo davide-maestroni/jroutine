@@ -73,12 +73,12 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
-        mList.clear();
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+        mList.add(input);
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        mList.add(input);
+    public void onRecycle(final boolean isReused) {
+        mList.clear();
     }
 }

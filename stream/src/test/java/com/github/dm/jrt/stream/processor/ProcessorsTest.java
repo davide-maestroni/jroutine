@@ -509,7 +509,8 @@ public class ProcessorsTest {
                                                               throw new NullPointerException();
                                                           }
                                                       })
-                                                      .let(Processors.<String, Object>tryCatchAccept(
+                                                      .let(Processors.<String,
+                                                              Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -529,7 +530,8 @@ public class ProcessorsTest {
                                                               return o;
                                                           }
                                                       })
-                                                      .let(Processors.<String, Object>tryCatchAccept(
+                                                      .let(Processors.<String,
+                                                              Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 

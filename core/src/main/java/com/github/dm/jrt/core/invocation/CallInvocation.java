@@ -50,13 +50,13 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
     }
 
     @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-        mInputs = null;
+    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+        mInputs.add(input);
     }
 
     @Override
-    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-        mInputs.add(input);
+    public void onRecycle(final boolean isReused) throws Exception {
+        mInputs = null;
     }
 
     @Override

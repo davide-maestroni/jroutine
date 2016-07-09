@@ -51,6 +51,14 @@ import java.util.List;
 public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel<IN, OUT> {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the stream configuration will be employed to build the routine instance.
+     */
+    @NotNull
+    Routine<IN, OUT> buildRoutine();
+
+    /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
      * asynchronous mode.
      *
@@ -320,12 +328,12 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * Makes so the stream straight so that each input is immediately passed through the following
      * chain of routines.
      * <p>
-     * On the contrary to the default synchronous runner, the employed one makes so that each
-     * routine in the chain is passed any input as soon as it is produced by the previous one. Such
-     * behavior decreases memory demands at the expense of a deeper stack of calls. In fact, the
-     * default synchronous runner breaks up routine calls so to perform them in a loop. The main
-     * drawback of the latter approach is that all input data might be accumulated before actually
-     * being processed by the next routine invocation.
+     * Unlike the default synchronous runner, the employed one makes so that each routine in the
+     * chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data might be accumulated before actually being
+     * processed by the next routine invocation.
      *
      * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine

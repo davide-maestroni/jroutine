@@ -74,11 +74,6 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
-        mResult = null;
-    }
-
-    @Override
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
         if (mIsFirst) {
             mIsFirst = false;
@@ -87,6 +82,11 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
         } else {
             mResult = mBinaryFunction.apply(mResult, input);
         }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+        mResult = null;
     }
 
     @Override

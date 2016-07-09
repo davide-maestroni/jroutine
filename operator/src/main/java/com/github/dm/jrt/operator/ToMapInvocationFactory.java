@@ -99,14 +99,14 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
         }
 
         @Override
-        public void onRecycle(final boolean isReused) {
-            mMap = null;
-        }
-
-        @Override
         public void onInput(final IN input,
                 @NotNull final Channel<Map<KEY, VALUE>, ?> result) throws Exception {
             mMap.put(mKeyFunction.apply(input), mValueFunction.apply(input));
+        }
+
+        @Override
+        public void onRecycle(final boolean isReused) {
+            mMap = null;
         }
 
         @Override

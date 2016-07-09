@@ -108,11 +108,6 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
-        mAccumulated = null;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         if (mIsFirst) {
@@ -129,6 +124,11 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
         } else {
             mAccumulateConsumer.accept(mAccumulated, input);
         }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+        mAccumulated = null;
     }
 
     @Override

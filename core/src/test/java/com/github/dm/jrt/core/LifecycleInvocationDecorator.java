@@ -83,6 +83,16 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     }
 
     @Override
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+        if (!TO_INPUT_STATES.contains(mState)) {
+            throw new InvocationInterruptedException(null);
+        }
+
+        mState = State.INPUT;
+        super.onInput(input, result);
+    }
+
+    @Override
     public void onRecycle(final boolean isReused) throws Exception {
         if (!TO_RECYCLE_STATES.contains(mState)) {
             throw new InvocationInterruptedException(null);
@@ -94,16 +104,6 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
 
         mState = State.RECYCLE;
         super.onRecycle(isReused);
-    }
-
-    @Override
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        if (!TO_INPUT_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
-
-        mState = State.INPUT;
-        super.onInput(input, result);
     }
 
     @Override

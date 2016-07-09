@@ -71,13 +71,13 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
-        mSet = null;
+    public void onInput(final DATA input, @NotNull final Channel<Set<DATA>, ?> result) {
+        mSet.add(input);
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final Channel<Set<DATA>, ?> result) {
-        mSet.add(input);
+    public void onRecycle(final boolean isReused) {
+        mSet = null;
     }
 
     @Override

@@ -473,7 +473,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public Routine<IN, OUT> buildRoutine() {
         final Routine<? super IN, ? extends OUT> routine =
                 ConstantConditions.notNull("routine instance",
-                        newRoutine(getStraightConfiguration(), buildFactory()));
+                        newRoutine(mStreamConfiguration, buildFactory()));
         resetConfiguration();
         return (Routine<IN, OUT>) routine;
     }

@@ -17,7 +17,7 @@
 
 <FindBugsFilter>
     <Match>
-        <Class name="com.github.dm.jrt.stream.transform.RetryChannelConsumer$SafeChannelConsumer"/>
+        <Class name="com.github.dm.jrt.stream.processor.RetryChannelConsumer$SafeChannelConsumer"/>
         <Or>
             <Method name="onComplete"/>
             <Method name="onError"/>

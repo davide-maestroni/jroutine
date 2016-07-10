@@ -304,7 +304,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
-            mChannel = null;
         }
 
         @Override
@@ -321,13 +320,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         @Override
         public void onComplete(@NotNull final Channel<Object, ?> result) {
             result.pass(mChannel.close());
-            mChannel = null;
         }
 
         @Override
-        public void onDiscard() {
-            mRoutine = null;
-            mInstance = null;
+        public void onRecycle(final boolean isReused) {
+            mChannel = null;
+            if (!isReused) {
+                mRoutine = null;
+                mInstance = null;
+            }
         }
 
         @Override
@@ -383,19 +384,20 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
-            mChannel = null;
         }
 
         @Override
         public void onComplete(@NotNull final Channel<Object, ?> result) {
             result.pass(mChannel.close());
-            mChannel = null;
         }
 
         @Override
-        public void onDiscard() {
-            mRoutine = null;
-            mInstance = null;
+        public void onRecycle(final boolean isReused) {
+            mChannel = null;
+            if (!isReused) {
+                mRoutine = null;
+                mInstance = null;
+            }
         }
 
         @Override

@@ -26,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
@@ -34,6 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.operator.Operators.instead;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -233,9 +233,8 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final List<Object> result = Collections.emptyList();
-                    final StreamBuilder<Object, List<Object>> builder =
-                            JRoutineStream.withStream().sync().<List<Object>>andThen(result);
+                    final StreamBuilder<?, ?> builder = JRoutineStream.withStream().sync();
+                    builder.map(instead((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.syncCall().close();
                     }

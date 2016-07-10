@@ -3225,16 +3225,18 @@ public class RoutineTest {
         }
 
         @Override
-        public void onDiscard() {
-            sInstanceCount.decrementAndGet();
+        public void onRecycle(final boolean isReused) {
+            if (!isReused) {
+                sInstanceCount.decrementAndGet();
+            }
         }
     }
 
     private static class TestDiscardException extends TestDiscard {
 
         @Override
-        public void onDiscard() {
-            super.onDiscard();
+        public void onRecycle(final boolean isReused) {
+            super.onRecycle(isReused);
             throw new IllegalArgumentException("test");
         }
     }

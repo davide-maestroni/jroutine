@@ -134,7 +134,7 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         }
 
         @NotNull
-        public InvocationConfiguration getCurrentConfiguration() {
+        public InvocationConfiguration getCurrentInvocationConfiguration() {
             return mConfiguration;
         }
 
@@ -144,7 +144,7 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         }
 
         @NotNull
-        public InvocationConfiguration getStreamConfiguration() {
+        public InvocationConfiguration getStreamInvocationConfiguration() {
             return mStreamConfiguration;
         }
     }

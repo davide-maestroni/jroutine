@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,19 +52,19 @@ public abstract class Runner {
 
     private static final Object sMutex = new Object();
 
-    private static volatile WeakIdentityHashMap<Runner, Void> sRunners =
-            new WeakIdentityHashMap<Runner, Void>();
+    private static volatile WeakIdentityHashMap<ThreadManager, Void> sManagers =
+            new WeakIdentityHashMap<ThreadManager, Void>();
+
+    private final ThreadManager mManager;
 
     /**
      * Constructor.
+     *
+     * @param manager the manager of threads.
      */
-    public Runner() {
-        synchronized (sMutex) {
-            // Copy-on-write pattern
-            sRunners = new WeakIdentityHashMap<Runner, Void>(sRunners) {{
-                put(Runner.this, null);
-            }};
-        }
+    protected Runner(@NotNull final ThreadManager manager) {
+        registerManager(ConstantConditions.notNull("thread manager", manager));
+        mManager = manager;
     }
 
     /**
@@ -72,13 +73,22 @@ public abstract class Runner {
      * @return whether the calling thread is managed by a runner.
      */
     public static boolean isCurrentThreadManaged() {
-        for (final Runner runner : sRunners.prune().keySet()) {
-            if ((runner != null) && runner.isManagedThread()) {
+        for (final ThreadManager manager : sManagers.prune().keySet()) {
+            if ((manager != null) && manager.isManagedThread()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static void registerManager(@NotNull final ThreadManager manager) {
+        synchronized (sMutex) {
+            // Copy-on-write pattern
+            sManagers = new WeakIdentityHashMap<ThreadManager, Void>(sManagers) {{
+                put(manager, null);
+            }};
+        }
     }
 
     /**
@@ -111,18 +121,6 @@ public abstract class Runner {
     public abstract boolean isExecutionThread();
 
     /**
-     * Checks if the specified thread belongs to the ones managed by the runner implementation.
-     * <p>
-     * The implementation of this method is not strictly mandatory, even if, the classes always
-     * returning false effectively prevent the correct detection of possible deadlocks.
-     * <br>
-     * A synchronous runner implementation will always return false.
-     *
-     * @return whether the thread is managed by the runner.
-     */
-    public abstract boolean isManagedThread();
-
-    /**
      * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
      * runner thread).
      *
@@ -131,4 +129,32 @@ public abstract class Runner {
      * @param timeUnit  the delay time unit.
      */
     public abstract void run(@NotNull Execution execution, long delay, @NotNull TimeUnit timeUnit);
+
+    /**
+     * Returns this runner thread manager.
+     *
+     * @return the thread manager.
+     */
+    @NotNull
+    protected ThreadManager getThreadManager() {
+        return mManager;
+    }
+
+    /**
+     * Interface defining a manager of the runner threads.
+     */
+    protected interface ThreadManager {
+
+        /**
+         * Checks if the calling thread belongs to the ones managed by the runner implementation.
+         * <p>
+         * The implementation of this method is not strictly mandatory, even if, the classes always
+         * returning false effectively prevent the correct detection of possible deadlocks.
+         * <br>
+         * A synchronous runner implementation will always return false.
+         *
+         * @return whether the thread is managed by the runner.
+         */
+        boolean isManagedThread();
+    }
 }

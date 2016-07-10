@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,16 +50,21 @@ public class ComparableCallTest extends AndroidTestCase {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         ComparableCall<List<Repo>> call = ComparableCall.of(service.listRepos("octocat"));
-        assertThat(call.execute().body()).isNotEmpty();
+        final Response<List<Repo>> response = call.execute();
+        if (response.isSuccessful()) {
+            assertThat(response.body()).isNotEmpty();
+
+        } else {
+            assertThat(response.errorBody()).isNotNull();
+        }
+
         call = ComparableCall.of(service.listRepos("octocat"));
         final Semaphore semaphore = new Semaphore(0);
-        final AtomicBoolean isSuccess = new AtomicBoolean(false);
         call.enqueue(new Callback<List<Repo>>() {
 
             @Override
             public void onResponse(final Call<List<Repo>> call,
                     final Response<List<Repo>> response) {
-                isSuccess.set(true);
                 semaphore.release();
             }
 

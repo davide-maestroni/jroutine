@@ -36,36 +36,32 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     private ArrayList<IN> mInputs;
 
+    /**
+     * Constructor.
+     */
+    public CallInvocation() {
+        mInputs = null;
+    }
+
     @Override
     public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        final ArrayList<IN> inputs = mInputs;
-        final ArrayList<IN> clone;
-        if (inputs == null) {
-            clone = new ArrayList<IN>(0);
-
-        } else {
-            clone = new ArrayList<IN>(inputs);
-            inputs.clear();
-        }
-
-        onCall(clone, result);
+        onCall(mInputs, result);
+        mInputs = null;
     }
 
     @Override
     public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-        if (mInputs == null) {
-            mInputs = new ArrayList<IN>();
-        }
-
         mInputs.add(input);
     }
 
     @Override
-    public final void onRestart() throws Exception {
-        final ArrayList<IN> inputs = mInputs;
-        if (inputs != null) {
-            inputs.clear();
-        }
+    public void onRecycle(final boolean isReused) throws Exception {
+        mInputs = null;
+    }
+
+    @Override
+    public final void onRestart() {
+        mInputs = new ArrayList<IN>();
     }
 
     /**

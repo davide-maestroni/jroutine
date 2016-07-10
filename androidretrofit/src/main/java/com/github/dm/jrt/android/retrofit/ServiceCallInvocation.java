@@ -25,7 +25,6 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -82,11 +81,6 @@ public class ServiceCallInvocation extends
     private RequestData mRequestData;
 
     @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-        reset();
-    }
-
-    @Override
     public void onComplete(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
             Exception {
         final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel = mInputChannel;
@@ -97,8 +91,6 @@ public class ServiceCallInvocation extends
         } else {
             syncRequest(result);
         }
-
-        reset();
     }
 
     @Override
@@ -131,6 +123,14 @@ public class ServiceCallInvocation extends
         if (mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
             asyncRequest(result);
         }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+        mRequestData = null;
+        mMediaType = null;
+        mInputChannel = null;
+        mHasMediaType = false;
     }
 
     private void asyncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
@@ -192,13 +192,6 @@ public class ServiceCallInvocation extends
         } finally {
             outputStream.close();
         }
-    }
-
-    private void reset() {
-        mRequestData = null;
-        mMediaType = null;
-        mInputChannel = null;
-        mHasMediaType = false;
     }
 
     private void syncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws

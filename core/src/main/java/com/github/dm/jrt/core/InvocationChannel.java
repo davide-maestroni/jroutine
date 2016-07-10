@@ -153,7 +153,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
                         } else {
                             // Make sure the invocation is properly recycled
-                            mExecution.recycle();
+                            mExecution.recycle(reason);
                             mResultChanel.close(reason);
                         }
                     }

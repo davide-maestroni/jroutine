@@ -53,10 +53,10 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
     public final void onAbort(@NotNull final RoutineException reason) {
     }
 
-    public final void onDiscard() {
+    public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
     }
 
-    public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
+    public final void onRecycle(final boolean isReused) {
     }
 
     public final void onRestart() {

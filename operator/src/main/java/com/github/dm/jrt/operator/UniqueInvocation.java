@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -27,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 /**
- * Invocation filtering out inputs which are not unique.
+ * Invocation filtering out inputs which are not unique (according to the {@code equals(Object)}
+ * method).
  * <p>
  * Created by davide-maestroni on 05/01/2016.
  *
@@ -45,12 +45,13 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
                 }
             };
 
-    private final HashSet<DATA> mSet = new HashSet<DATA>();
+    private HashSet<DATA> mSet;
 
     /**
      * Constructor.
      */
     private UniqueInvocation() {
+        mSet = null;
     }
 
     /**
@@ -66,16 +67,6 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-        mSet.clear();
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-        mSet.clear();
-    }
-
-    @Override
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
         if (mSet.add(input)) {
             result.pass(input);
@@ -83,7 +74,12 @@ class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
     }
 
     @Override
+    public void onRecycle(final boolean isReused) {
+        mSet = null;
+    }
+
+    @Override
     public void onRestart() {
-        mSet.clear();
+        mSet = new HashSet<DATA>();
     }
 }

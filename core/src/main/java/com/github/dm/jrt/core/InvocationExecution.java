@@ -18,6 +18,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -115,18 +116,28 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     /**
      * Forces the recycling of the invocation.
+     *
+     * @param reason the reason.
      */
-    public void recycle() {
+    public void recycle(@NotNull final Throwable reason) {
         synchronized (mMutex) {
             final Invocation<IN, OUT> invocation = mInvocation;
             if ((invocation != null) && !mIsTerminated) {
                 mIsTerminated = true;
+                final InvocationManager<IN, OUT> invocationManager = mInvocationManager;
                 if (mIsInitialized) {
-                    mInvocationManager.recycle(invocation);
+                    try {
+                        invocation.onAbort(InvocationException.wrapIfNeeded(reason));
+                        invocation.onRecycle(true);
+                        invocationManager.recycle(invocation);
+
+                    } catch (final Throwable t) {
+                        invocationManager.discard(invocation);
+                    }
 
                 } else {
                     // Initialization failed, so just discard the invocation
-                    mInvocationManager.discard(invocation);
+                    invocationManager.discard(invocation);
                 }
             }
         }
@@ -189,6 +200,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 invocation.onComplete(resultChannel);
                 try {
                     mIsTerminated = true;
+                    invocation.onRecycle(true);
                     manager.recycle(invocation);
 
                 } catch (final Throwable t) {
@@ -204,7 +216,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         } catch (final Throwable t) {
             if (!resultChannel.abortImmediately(t)) {
                 // Needed if the result channel is explicitly closed by the invocation
-                recycle();
+                recycle(t);
             }
         }
     }
@@ -290,6 +302,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                             if (mIsInitialized) {
                                 invocation.onAbort(exception);
+                                invocation.onRecycle(true);
                                 mIsTerminated = true;
                                 manager.recycle(invocation);
 

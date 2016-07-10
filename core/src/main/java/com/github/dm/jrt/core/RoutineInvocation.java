@@ -68,19 +68,16 @@ public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
-    public void onDiscard() throws Exception {
-        super.onDiscard();
+    @Override
+    public void onRecycle(final boolean isReused) throws Exception {
+        super.onRecycle(isReused);
         mRoutine.clear();
     }
 
     @NotNull
     @Override
     protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
-        final InvocationMode invocationMode = mInvocationMode;
-        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
-                                : mRoutine.sequentialCall(channel);
+        return mInvocationMode.call(mRoutine).pass(channel).close();
     }
 
     /**

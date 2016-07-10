@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -79,21 +78,20 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
         }
 
         @Override
-        public void onAbort(@NotNull final RoutineException reason) {
-            mList.clear();
-        }
-
-        @Override
         public void onComplete(@NotNull final Channel<DATA, ?> result) {
             final ArrayList<DATA> list = mList;
             Collections.sort(list, mComparator);
             result.pass(list);
-            list.clear();
         }
 
         @Override
         public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
             mList.add(input);
+        }
+
+        @Override
+        public void onRecycle(final boolean isReused) {
+            mList.clear();
         }
     }
 }

@@ -18,41 +18,24 @@ package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.util.Backoff;
-import com.github.dm.jrt.core.util.UnitDuration;
-import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.stream.annotation.StreamFlow;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.COLLECT;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.MAP;
-import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.REDUCE;
 
 /**
  * Interface defining a builder of routines concatenating map and reduce functions.
@@ -63,11 +46,8 @@ import static com.github.dm.jrt.stream.annotation.StreamFlow.TransformationType.
  * In order to prevent undesired leaks, the class of the specified functions must have a static
  * scope.
  * <p>
- * To better document the effect of each method on the underlying stream, a {@link StreamFlow}
- * annotation indicates for each one the type of transformation applied.
- * <br>
- * Note also that, if at least one reduce function is part of the chain, the results will be
- * propagated only when the built routine invocation completes.
+ * Note that, if at least one reduce function is part of the chain, the results will be propagated
+ * only when the built routine invocation completes.
  * <p>
  * Created by davide-maestroni on 07/03/2016.
  *
@@ -81,178 +61,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable AFTER... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThen(@Nullable Iterable<? extends AFTER> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(long count,
-            @NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenGet(
-            @NotNull Supplier<? extends AFTER> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(long count,
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> andThenMore(
-            @NotNull Consumer<? super Channel<AFTER, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> append(@Nullable OUT output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> append(@Nullable OUT... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> append(@Nullable Iterable<? extends OUT> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> append(@NotNull Channel<?, ? extends OUT> channel);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> appendGet(long count,
-            @NotNull Supplier<? extends OUT> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> appendGet(@NotNull Supplier<? extends OUT> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> appendMore(long count,
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> appendMore(
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> async();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> async(@Nullable Runner runner);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> asyncMap(@Nullable Runner runner);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
-            @NotNull Backoff backoff);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit, long delay,
-            @NotNull TimeUnit timeUnit);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> backoffOn(@Nullable Runner runner, int limit,
-            @Nullable UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -266,51 +75,23 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(COLLECT)
-    LoaderStreamBuilder<IN, OUT> collect(
-            @NotNull BiConsumer<? super OUT, ? super OUT> accumulateConsumer);
+    <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
+            @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    @StreamFlow(COLLECT)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> seedSupplier,
-            @NotNull BiConsumer<? super AFTER, ? super OUT> accumulateConsumer);
+    InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
+    invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    @StreamFlow(COLLECT)
-    <AFTER extends Collection<? super OUT>> LoaderStreamBuilder<IN, AFTER> collectInto(
-            @NotNull Supplier<? extends AFTER> collectionSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> delay(long delay, @NotNull TimeUnit timeUnit);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> delay(@NotNull UnitDuration delay);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> filter(@NotNull Predicate<? super OUT> filterPredicate);
+    LoaderStreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * {@inheritDoc}
@@ -320,9 +101,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * A {@code LoaderStreamBuilder} is expected as the function result.
      */
     @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLift(
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> let(
             @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction);
 
@@ -336,8 +115,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> flatLiftWithConfig(
+    <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> letWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
                     extends StreamBuilder<BEFORE, AFTER>> liftFunction);
 
@@ -346,49 +124,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
-            @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
-    invocationConfiguration();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> lag(long delay, @NotNull TimeUnit timeUnit);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> lag(@NotNull UnitDuration delay);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
     <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> lift(
             @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends Channel<?,
                     OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends Channel<?,
@@ -401,7 +136,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
     <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> liftWithConfig(
             @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
@@ -412,15 +146,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> limit(int count);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> mappingFunction);
 
@@ -429,7 +154,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -438,7 +162,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -447,7 +170,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -456,7 +178,14 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(COLLECT)
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAccept(
+            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     <AFTER> LoaderStreamBuilder<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> mappingFunction);
 
@@ -465,8 +194,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(COLLECT)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllMore(
+    <AFTER> LoaderStreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
@@ -474,107 +202,13 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> mapMore(
-            @NotNull BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer);
+    LoaderStreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, Void> onComplete(@NotNull Action completeAction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> onError(@NotNull Consumer<? super RoutineException> errorConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, Void> onOutput(@NotNull Consumer<? super OUT> outputConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElse(@Nullable OUT output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElse(@Nullable OUT... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElseGet(long count,
-            @NotNull Supplier<? extends OUT> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> outputSupplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElseMore(long count,
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElseMore(
-            @NotNull Consumer<? super Channel<OUT, ?>> outputsConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> orElseThrow(@Nullable Throwable error);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> parallel();
 
     /**
@@ -582,138 +216,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> parallel(int maxInvocations);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull RoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> peekComplete(@NotNull Action completeAction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> peekError(
-            @NotNull Consumer<? super RoutineException> errorConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> peekOutput(@NotNull Consumer<? super OUT> outputConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    LoaderStreamBuilder<IN, OUT> reduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> accumulateFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(REDUCE)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> seedSupplier,
-            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> accumulateFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(COLLECT)
-    LoaderStreamBuilder<IN, OUT> retry(int count);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(COLLECT)
-    LoaderStreamBuilder<IN, OUT> retry(int count, @NotNull Backoff backoff);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(COLLECT)
-    LoaderStreamBuilder<IN, OUT> retry(
-            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    backoffFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> sequential();
 
     /**
@@ -721,23 +223,13 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> skip(int count);
+    LoaderStreamBuilder<IN, OUT> sorted();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> sorted(@Nullable OrderType orderType);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> straight();
 
     /**
@@ -745,7 +237,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(CONFIG)
     InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     streamInvocationConfiguration();
 
@@ -754,7 +245,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> sync();
 
     /**
@@ -762,26 +252,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> tryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> catchFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> tryCatchMore(
-            @NotNull BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    @StreamFlow(MAP)
-    LoaderStreamBuilder<IN, OUT> tryFinally(@NotNull Action finallyAction);
+    LoaderStreamBuilder<IN, OUT> unsorted();
 
     /**
      * Builds a new context invocation factory instance.
@@ -790,29 +261,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      */
     @NotNull
     ContextInvocationFactory<IN, OUT> buildContextFactory();
-
-    /**
-     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).applied()}.
-     *
-     * @param strategyType the cache strategy type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> cache(@Nullable CacheStrategyType strategyType);
-
-    /**
-     * Short for {@code loaderConfiguration().withFactoryId(factoryId).applied()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the factory ID to the specified one.
-     *
-     * @param factoryId the factory ID.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> factoryId(int factoryId);
 
     /**
      * Gets the loader configuration builder related to the instance.
@@ -824,21 +272,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * @return the loader configuration builder.
      */
     @NotNull
-    @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> loaderConfiguration();
-
-    /**
-     * Short for {@code loaderConfiguration().withLoaderId(loaderId).applied()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the routine loader ID.
-     *
-     * @param loaderId the loader ID.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> loaderId(int loaderId);
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
@@ -853,7 +287,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -867,7 +300,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * @return this builder.
      */
     @NotNull
-    @StreamFlow(MAP)
     <AFTER> LoaderStreamBuilder<IN, AFTER> map(
             @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
@@ -883,69 +315,7 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * @return the new stream instance.
      */
     @NotNull
-    @StreamFlow(CONFIG)
     LoaderStreamBuilder<IN, OUT> on(@Nullable LoaderContext context);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the load of the available
-     * invocations.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param count   the number of groups.
-     * @param factory the processing invocation factory.
-     * @param <AFTER> the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallel(int count,
-            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * Splits the outputs produced by this stream, so that each group will be processed by a
-     * different routine invocation.
-     * <br>
-     * Each output will be assigned to a specific group based on the key returned by the specified
-     * function.
-     * <p>
-     * Note that the created routine will employ the same configuration and invocation mode as this
-     * stream.
-     *
-     * @param keyFunction the function assigning a key to each output.
-     * @param factory     the processing invocation factory.
-     * @param <AFTER>     the concatenation output type.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(MAP)
-    <AFTER> LoaderStreamBuilder<IN, AFTER> parallelBy(@NotNull Function<? super OUT, ?> keyFunction,
-            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).applied()}.
-     *
-     * @param staleTime the stale time.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> staleAfter(@Nullable UnitDuration staleTime);
-
-    /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).applied()}.
-     *
-     * @param time     the time.
-     * @param timeUnit the time unit.
-     * @return the new stream instance.
-     */
-    @NotNull
-    @StreamFlow(CONFIG)
-    LoaderStreamBuilder<IN, OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
      * Gets the loader configuration builder related to the whole stream.
@@ -959,7 +329,6 @@ public interface LoaderStreamBuilder<IN, OUT> extends StreamBuilder<IN, OUT> {
      * @return the invocation configuration builder.
      */
     @NotNull
-    @StreamFlow(CONFIG)
     LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> streamLoaderConfiguration();
 
     /**

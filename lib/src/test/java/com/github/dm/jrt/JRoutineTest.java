@@ -56,7 +56,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
-import static com.github.dm.jrt.stream.input.Streams.range;
+import static com.github.dm.jrt.operator.Operators.insteadAccept;
+import static com.github.dm.jrt.operator.producer.Producers.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -492,7 +493,7 @@ public class JRoutineTest {
     @Test
     public void testStream() {
         assertThat(JRoutine.withStream()
-                           .andThenMore(range(1, 1000))
+                           .map(insteadAccept(range(1, 1000)))
                            .map(new Function<Number, Double>() {
 
                                public Double apply(final Number number) {

@@ -40,8 +40,6 @@ class ScheduledRunner extends AsyncRunner {
     private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
             new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
 
-    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
-
     private final ScheduledExecutorService mService;
 
     /**
@@ -50,6 +48,7 @@ class ScheduledRunner extends AsyncRunner {
      * @param service the executor service.
      */
     private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
+        super(new ScheduledThreadManager());
         mService = ConstantConditions.notNull("executor service", service);
     }
 
@@ -91,12 +90,6 @@ class ScheduledRunner extends AsyncRunner {
     }
 
     @Override
-    public boolean isManagedThread() {
-        final Boolean isManaged = mIsManaged.get();
-        return (isManaged != null) && isManaged;
-    }
-
-    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
         final ScheduledFuture<?> future =
@@ -111,6 +104,29 @@ class ScheduledRunner extends AsyncRunner {
             }
 
             scheduledFutures.put(future, null);
+        }
+    }
+
+    @NotNull
+    @Override
+    protected ScheduledThreadManager getThreadManager() {
+        return (ScheduledThreadManager) super.getThreadManager();
+    }
+
+    /**
+     * Thread manager implementation.
+     */
+    private static class ScheduledThreadManager implements ThreadManager {
+
+        private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
+        public boolean isManagedThread() {
+            final Boolean isManaged = mIsManaged.get();
+            return (isManaged != null) && isManaged;
+        }
+
+        private void setManaged() {
+            mIsManaged.set(true);
         }
     }
 
@@ -136,7 +152,7 @@ class ScheduledRunner extends AsyncRunner {
         public void run() {
             final Thread currentThread = Thread.currentThread();
             if (currentThread.getId() != mCurrentThreadId) {
-                mIsManaged.set(true);
+                getThreadManager().setManaged();
             }
 
             mExecution.run();

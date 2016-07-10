@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Exceptions unit tests.
@@ -56,5 +57,20 @@ public class ExceptionTest {
                 new InterruptedException()).getCause()).isExactlyInstanceOf(
                 InterruptedException.class);
         assertThat(new InvocationInterruptedException(null)).hasNoCause();
+        InvocationInterruptedException.throwIfInterrupt(new NullPointerException());
+        try {
+            InvocationInterruptedException.throwIfInterrupt(new InterruptedException());
+            fail();
+
+        } catch (final InvocationInterruptedException ignored) {
+        }
+
+        try {
+            InvocationInterruptedException.throwIfInterrupt(
+                    new InvocationInterruptedException(new InterruptedException()));
+            fail();
+
+        } catch (final InvocationInterruptedException ignored) {
+        }
     }
 }

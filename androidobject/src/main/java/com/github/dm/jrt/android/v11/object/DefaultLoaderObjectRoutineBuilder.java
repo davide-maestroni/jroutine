@@ -249,7 +249,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
-            mChannel = null;
         }
 
         @Override
@@ -269,9 +268,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDiscard() {
-            mRoutine = null;
-            mInstance = null;
+        public void onRecycle(final boolean isReused) {
+            mChannel = null;
+            if (!isReused) {
+                mRoutine = null;
+                mInstance = null;
+            }
         }
 
         @Override
@@ -287,7 +289,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             result.pass(mChannel.close());
-            mChannel = null;
         }
     }
 
@@ -367,13 +368,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public void onAbort(@NotNull final RoutineException reason) {
             mChannel.abort(reason);
-            mChannel = null;
         }
 
         @Override
-        public void onDiscard() {
-            mRoutine = null;
-            mInstance = null;
+        public void onRecycle(final boolean isReused) {
+            mChannel = null;
+            if (!isReused) {
+                mRoutine = null;
+                mInstance = null;
+            }
         }
 
         @Override
@@ -389,7 +392,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             result.pass(mChannel.close());
-            mChannel = null;
         }
 
         @Override
@@ -504,8 +506,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        public void onDiscard() {
-            mInstance = null;
+        public void onRecycle(final boolean isReused) {
+            if (!isReused) {
+                mInstance = null;
+            }
         }
 
         @Override

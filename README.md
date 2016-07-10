@@ -24,7 +24,7 @@ The library adheres to [The Reactive Manifesto][reactive manifesto]. It's *respo
 It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response to inputs, and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br/>
 It's *resilient*, since errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br/>
 It's *elastic*, since the needed number of threads is allocated in response to higher loads.<br/>
-It's *message driven*, since both ouputs and errors are dispatched along the chain of invocations.
+It's *message driven*, since both outputs and errors are dispatched along the chain of invocations.
 
 ## Why not RxJava?
 

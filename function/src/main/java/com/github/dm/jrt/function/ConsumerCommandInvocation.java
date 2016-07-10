@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -33,19 +33,19 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-    private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
+    private final ConsumerDecorator<? super Channel<OUT, ?>> mConsumer;
 
     /**
      * Constructor.
      *
      * @param consumer the consumer instance.
      */
-    ConsumerCommandInvocation(@NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
+    ConsumerCommandInvocation(@NotNull final ConsumerDecorator<? super Channel<OUT, ?>> consumer) {
         super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         mConsumer.accept(result);
     }
 }

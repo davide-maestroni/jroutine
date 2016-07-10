@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -64,24 +64,24 @@ class AverageDoubleInvocation extends TemplateInvocation<Number, Double> {
     }
 
     @Override
-    public void onInitialize() {
-        mSum = (byte) 0;
-        mCount = 0;
-    }
-
-    @Override
-    public void onInput(final Number input, @NotNull final ResultChannel<Double> result) {
-        mSum = addOptimistic(mSum, input).doubleValue();
-        ++mCount;
-    }
-
-    @Override
-    public void onResult(@NotNull final ResultChannel<Double> result) {
+    public void onComplete(@NotNull final Channel<Double, ?> result) {
         if (mCount == 0) {
             result.pass(0d);
 
         } else {
             result.pass(mSum.doubleValue() / mCount);
         }
+    }
+
+    @Override
+    public void onInput(final Number input, @NotNull final Channel<Double, ?> result) {
+        mSum = addOptimistic(mSum, input).doubleValue();
+        ++mCount;
+    }
+
+    @Override
+    public void onRestart() {
+        mSum = (byte) 0;
+        mCount = 0;
     }
 }

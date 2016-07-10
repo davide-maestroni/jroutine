@@ -16,10 +16,9 @@
 
 package com.github.dm.jrt.processor;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -103,15 +102,13 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private final HashMap<String, TypeMirror> mPrimitiveMirrors = new HashMap<String, TypeMirror>();
 
-    protected TypeMirror invocationChannelType;
+    protected TypeMirror channelType;
 
     protected TypeMirror iterableType;
 
     protected TypeMirror listType;
 
     protected TypeMirror objectType;
-
-    protected TypeMirror outputChannelType;
 
     protected TypeMirror routineType;
 
@@ -212,8 +209,7 @@ public class RoutineProcessor extends AbstractProcessor {
         primitiveMirrors.put(double[].class.getCanonicalName(),
                 typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.DOUBLE)));
         routineType = getMirrorFromName(Routine.class.getCanonicalName());
-        invocationChannelType = getMirrorFromName(InvocationChannel.class.getCanonicalName());
-        outputChannelType = getMirrorFromName(OutputChannel.class.getCanonicalName());
+        channelType = getMirrorFromName(Channel.class.getCanonicalName());
         iterableType = getMirrorFromName(Iterable.class.getCanonicalName());
         listType = getMirrorFromName(List.class.getCanonicalName());
         objectType = getMirrorFromName(Object.class.getCanonicalName());
@@ -325,7 +321,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, @Nullable final InputMode inputMode) {
         return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION))
-                ? ".orderByCall()" : "";
+                ? ".sortedByCall()" : "";
     }
 
     /**
@@ -343,14 +339,14 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement) {
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror outputChannelType = this.outputChannelType;
+        final TypeMirror outputChannelType = this.channelType;
         final StringBuilder builder = new StringBuilder();
         for (final VariableElement variableElement : methodElement.getParameters()) {
             builder.append(".pass(");
             if (typeUtils.isAssignable(outputChannelType,
                     typeUtils.erasure(variableElement.asType())) && (
                     variableElement.getAnnotation(AsyncIn.class) != null)) {
-                builder.append("(").append(typeUtils.erasure(outputChannelType)).append("<?>)");
+                builder.append("(").append(typeUtils.erasure(outputChannelType)).append("<?, ?>)");
 
             } else {
                 builder.append("(Object)");
@@ -893,7 +889,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final AsyncIn annotation, @NotNull final VariableElement targetParameter,
             final int length) {
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror outputChannelType = this.outputChannelType;
+        final TypeMirror outputChannelType = this.channelType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
         final Element annotationElement =
@@ -950,7 +946,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
         final InvocationMode invocationMode = annotation.value();
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (methodElement.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1315,7 +1311,7 @@ public class RoutineProcessor extends AbstractProcessor {
     protected OutputMode getOutputMode(@NotNull final ExecutableElement methodElement,
             @NotNull final ExecutableElement targetMethodElement) {
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror outputChannelType = this.outputChannelType;
+        final TypeMirror outputChannelType = this.channelType;
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror erasure = typeUtils.erasure(returnType);
         final TypeMirror targetMirror = typeUtils.erasure(targetMethodElement.getReturnType());
@@ -1771,8 +1767,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnErasure = typeUtils.erasure(returnType);
-            if (!typeUtils.isAssignable(invocationChannelType, returnErasure)
-                    && !typeUtils.isAssignable(routineType, returnErasure)) {
+            if (!typeUtils.isAssignable(channelType, returnErasure) && !typeUtils.isAssignable(
+                    routineType, returnErasure)) {
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
             }
@@ -1783,12 +1779,12 @@ public class RoutineProcessor extends AbstractProcessor {
                 targetReturnType = objectType;
 
             } else {
-                targetReturnType = typeArguments.get(1);
+                targetReturnType = typeArguments.get(typeArguments.size() - 1);
             }
 
             inputMode = InputMode.VALUE;
             outputMode = asyncMethodAnnotation.mode();
-            if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
+            if (typeUtils.isAssignable(channelType, returnErasure)) {
                 method = getMethodInputsChannelTemplate(annotationElement, element, targetElement,
                         methodElement, count);
 
@@ -1800,7 +1796,7 @@ public class RoutineProcessor extends AbstractProcessor {
         } else if (asyncOutputAnnotation != null) {
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
-            if (!typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            if (!typeUtils.isAssignable(channelType, returnTypeErasure)) {
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
             }
@@ -1811,7 +1807,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 targetReturnType = objectType;
 
             } else {
-                targetReturnType = typeArguments.get(0);
+                targetReturnType = typeArguments.get(typeArguments.size() - 1);
             }
 
             method =
@@ -1833,7 +1829,7 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (targetMethod.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
@@ -1890,10 +1886,10 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
         method = method.replace("${invokeMethod}",
-                (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
-                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelInvoke"
-                                : (invocationMode == InvocationMode.SERIAL) ? "serialInvoke"
-                                        : "asyncInvoke");
+                (invocationMode == InvocationMode.SYNC) ? "syncCall"
+                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelCall"
+                                : (invocationMode == InvocationMode.SEQUENTIAL) ? "sequentialCall"
+                                        : "asyncCall");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader =

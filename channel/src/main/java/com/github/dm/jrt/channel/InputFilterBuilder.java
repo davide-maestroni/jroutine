@@ -17,9 +17,8 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -33,51 +32,54 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <IN> the input data type.
  */
-class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> {
+class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>> {
 
-    private final InputChannel<? super IN> mChannel;
+    private final Channel<? super IN, ?> mChannel;
 
     private final int mIndex;
 
     /**
      * Constructor.
      *
-     * @param channel the input channel.
+     * @param channel the channel.
      * @param index   the selectable index.
      */
-    InputFilterBuilder(@NotNull final InputChannel<? super IN> channel, final int index) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+    InputFilterBuilder(@NotNull final Channel<? super IN, ?> channel, final int index) {
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 
     @NotNull
     @Override
-    protected IOChannel<Selectable<IN>> build(@NotNull final ChannelConfiguration configuration) {
-        final IOChannel<Selectable<IN>> inputChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-        ioChannel.bind(mChannel);
-        return inputChannel.bind(new FilterOutputConsumer<IN>(ioChannel, mIndex));
+    protected Channel<Selectable<IN>, ?> build(@NotNull final ChannelConfiguration configuration) {
+        final Channel<Selectable<IN>, Selectable<IN>> inputChannel = JRoutineCore.io()
+                                                                                 .channelConfiguration()
+                                                                                 .with(configuration)
+                                                                                 .applied()
+                                                                                 .buildChannel();
+        final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+        outputChannel.bind(mChannel);
+        return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mIndex));
     }
 
     /**
-     * Output consumer filtering selectable data.
+     * Channel consumer filtering selectable data.
      *
      * @param <IN> the input data type.
      */
-    private static class FilterOutputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
+    private static class FilterChannelConsumer<IN> implements ChannelConsumer<Selectable<IN>> {
 
-        private final IOChannel<? super IN> mChannel;
+        private final Channel<? super IN, ?> mChannel;
 
         private final int mIndex;
 
         /**
          * Constructor.
          *
-         * @param channel the input channel to feed.
+         * @param channel the channel to feed.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@NotNull final IOChannel<? super IN> channel,
+        private FilterChannelConsumer(@NotNull final Channel<? super IN, ?> channel,
                 final int index) {
             mChannel = channel;
             mIndex = index;

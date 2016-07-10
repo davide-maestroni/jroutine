@@ -18,17 +18,16 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.stream.StreamChannel;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,10 +42,13 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
- * Abstract implementation of a call adapter factory supporting {@code OutputChannel} and
- * {@code StreamChannel} return types.
+ * Abstract implementation of a call adapter factory supporting {@code Channel} and
+ * {@code StreamBuilder} return types.
+ * <br>
+ * Note that the routines generated through the returned builders will ignore any input.
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
@@ -56,7 +58,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             new MappingInvocation<Call<Object>, Object>(null) {
 
                 public void onInput(final Call<Object> input,
-                        @NotNull final ResultChannel<Object> result) throws IOException {
+                        @NotNull final Channel<Object, ?> result) throws IOException {
                     result.pass(input.execute().body());
                 }
             };
@@ -83,14 +85,28 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Returns a type representing an output channel with the specified output data type.
+     * Returns a lifting function making sure the specified call will the only stream output.
+     *
+     * @param call  the Retrofit call.
+     * @param <OUT> the output data type.
+     * @return the lifting function.
+     */
+    @NotNull
+    public static <OUT> Function<Function<Channel<?, Object>, Channel<?, Object>>,
+            Function<Channel<?, Object>, Channel<?, Call<OUT>>>> outputCall(
+            @NotNull final Call<OUT> call) {
+        return new LiftOutputCall<OUT>(ConstantConditions.notNull("call instance", call));
+    }
+
+    /**
+     * Returns a type representing a channel with the specified output data type.
      *
      * @param outputType the output data type.
      * @return the parameterized type.
      */
     @NotNull
-    protected static ParameterizedType getOutputChannelType(@NotNull final Type outputType) {
-        return new OutputChannelType(ConstantConditions.notNull("outputs type", outputType));
+    protected static ParameterizedType getChannelType(@NotNull final Type outputType) {
+        return new ChannelType(ConstantConditions.notNull("outputs type", outputType));
     }
 
     @Override
@@ -142,10 +158,10 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                 Builders.withAnnotations(configuration, annotations);
         final MappingInvocation<Call<Object>, Object> factory =
                 getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-        return JRoutineCore.on(factory)
+        return JRoutineCore.with(factory)
                            .invocationConfiguration()
                            .with(invocationConfiguration)
-                           .apply()
+                           .applied()
                            .buildRoutine();
     }
 
@@ -158,10 +174,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     @Nullable
     protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
         final Type rawType = returnType.getRawType();
-        if (OutputChannel.class == rawType) {
-            return returnType.getActualTypeArguments()[0];
-
-        } else if (StreamChannel.class == rawType) {
+        if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
             return returnType.getActualTypeArguments()[1];
         }
 
@@ -184,13 +197,13 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
-        if (OutputChannel.class == returnRawType) {
-            return new OutputChannelAdapter(invocationMode,
+        if (Channel.class == returnRawType) {
+            return new ChannelAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
 
-        } else if (StreamChannel.class == returnRawType) {
-            return new StreamChannelAdapter(invocationMode,
+        } else if (StreamBuilder.class == returnRawType) {
+            return new StreamBuilderAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -208,9 +221,9 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             return sCallInvocation;
         }
 
-        @SuppressWarnings("unchecked") final CallAdapter<OutputChannel<?>> channelAdapter =
-                (CallAdapter<OutputChannel<?>>) delegateFactory.get(
-                        new OutputChannelType(responseType), annotations, retrofit);
+        @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
+                (CallAdapter<Channel<?, ?>>) delegateFactory.get(new ChannelType(responseType),
+                        annotations, retrofit);
         if (channelAdapter != null) {
             return new ChannelAdapterInvocation(
                     asArgs(delegateFactory, configuration, invocationMode, responseType,
@@ -268,6 +281,30 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
+     * Binding function making sure the specified call will the only stream output.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class BindOutputCall<OUT>
+            implements Function<Channel<?, Object>, Channel<?, Call<OUT>>> {
+
+        private final Call<OUT> mCall;
+
+        /**
+         * Constructor.
+         *
+         * @param call the Retrofit call.
+         */
+        private BindOutputCall(@NotNull final Call<OUT> call) {
+            mCall = call;
+        }
+
+        public Channel<?, Call<OUT>> apply(final Channel<?, Object> objects) throws Exception {
+            return JRoutineCore.io().of(mCall);
+        }
+    }
+
+    /**
      * Mapping invocation employing a call adapter.
      */
     private static class BodyAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
@@ -286,39 +323,15 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             mCallAdapter = callAdapter;
         }
 
-        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
+        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
             result.pass(mCallAdapter.adapt(input));
         }
     }
 
     /**
-     * Mapping invocation employing a call adapter.
+     * Channel adapter implementation.
      */
-    private static class ChannelAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
-
-        private final CallAdapter<OutputChannel<?>> mCallAdapter;
-
-        /**
-         * Constructor.
-         *
-         * @param args        the factory arguments.
-         * @param callAdapter the call adapter instance.
-         */
-        private ChannelAdapterInvocation(@Nullable final Object[] args,
-                @NotNull final CallAdapter<OutputChannel<?>> callAdapter) {
-            super(args);
-            mCallAdapter = callAdapter;
-        }
-
-        public void onInput(final Call<Object> input, @NotNull final ResultChannel<Object> result) {
-            result.pass(mCallAdapter.adapt(input));
-        }
-    }
-
-    /**
-     * Output channel adapter implementation.
-     */
-    private static class OutputChannelAdapter extends BaseAdapter<OutputChannel> {
+    private static class ChannelAdapter extends BaseAdapter<Channel> {
 
         private final InvocationMode mInvocationMode;
 
@@ -329,14 +342,14 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private OutputChannelAdapter(@NotNull final InvocationMode invocationMode,
+        private ChannelAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
-        public <OUT> OutputChannel adapt(final Call<OUT> call) {
+        public <OUT> Channel adapt(final Call<OUT> call) {
             final InvocationMode invocationMode = mInvocationMode;
             final Routine<Call<?>, ?> routine = getRoutine();
             if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
@@ -349,9 +362,33 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Parameterized type implementation mimicking an output channel type.
+     * Mapping invocation employing a call adapter.
      */
-    private static class OutputChannelType implements ParameterizedType {
+    private static class ChannelAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
+
+        private final CallAdapter<Channel<?, ?>> mCallAdapter;
+
+        /**
+         * Constructor.
+         *
+         * @param args        the factory arguments.
+         * @param callAdapter the call adapter instance.
+         */
+        private ChannelAdapterInvocation(@Nullable final Object[] args,
+                @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+            super(args);
+            mCallAdapter = callAdapter;
+        }
+
+        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
+            result.pass(mCallAdapter.adapt(input));
+        }
+    }
+
+    /**
+     * Parameterized type implementation mimicking a channel type.
+     */
+    private static class ChannelType implements ParameterizedType {
 
         private final Type[] mTypeArguments;
 
@@ -360,8 +397,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          *
          * @param outputType the output data type.
          */
-        private OutputChannelType(@NotNull final Type outputType) {
-            mTypeArguments = new Type[]{outputType};
+        private ChannelType(@NotNull final Type outputType) {
+            mTypeArguments = new Type[]{Object.class, outputType};
         }
 
         public Type[] getActualTypeArguments() {
@@ -369,18 +406,45 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
 
         public Type getRawType() {
-            return OutputChannel.class;
+            return Channel.class;
         }
 
         public Type getOwnerType() {
-            return Channel.class;
+            return null;
         }
     }
 
     /**
-     * Stream channel adapter implementation.
+     * Lifting function making sure the specified call will the only stream output.
+     *
+     * @param <OUT> the output data type.
      */
-    private static class StreamChannelAdapter extends BaseAdapter<StreamChannel> {
+    private static class LiftOutputCall<OUT> implements
+            Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?,
+                    Object>, Channel<?, Call<OUT>>>> {
+
+        private final Call<OUT> mCall;
+
+        /**
+         * Constructor.
+         *
+         * @param call the Retrofit call.
+         */
+        private LiftOutputCall(@NotNull final Call<OUT> call) {
+            mCall = call;
+        }
+
+        public Function<Channel<?, Object>, Channel<?, Call<OUT>>> apply(
+                final Function<Channel<?, Object>, Channel<?, Object>> bindingFunction) throws
+                Exception {
+            return decorate(bindingFunction).andThen(new BindOutputCall<OUT>(mCall));
+        }
+    }
+
+    /**
+     * Stream builder adapter implementation.
+     */
+    private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
 
         private final InvocationMode mInvocationMode;
 
@@ -391,25 +455,18 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private StreamChannelAdapter(@NotNull final InvocationMode invocationMode,
+        private StreamBuilderAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
-        public <OUT> StreamChannel adapt(final Call<OUT> call) {
-            final InvocationMode invocationMode = mInvocationMode;
-            final StreamChannel<Call<OUT>, Call<OUT>> stream;
-            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
-                    == InvocationMode.PARALLEL)) {
-                stream = Streams.streamOf(call).async();
-
-            } else {
-                stream = Streams.streamOf(call).sync();
-            }
-
-            return stream.map(getRoutine()).invocationMode(invocationMode);
+        public <OUT> StreamBuilder adapt(final Call<OUT> call) {
+            return JRoutineStream.withStream()
+                                 .lift(outputCall(call))
+                                 .invocationMode(mInvocationMode)
+                                 .map(getRoutine());
         }
     }
 }

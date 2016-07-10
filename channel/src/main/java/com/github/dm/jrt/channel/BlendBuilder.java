@@ -17,8 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,22 +31,22 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class BlendBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
-    private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+    private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
     /**
      * Constructor.
      *
-     * @param channels the output channels to blend.
+     * @param channels the channels to blend.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
-    BlendBuilder(@NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-        final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>();
-        for (final OutputChannel<? extends OUT> channel : channels) {
+    BlendBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        final ArrayList<Channel<?, ? extends OUT>> channelList =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        for (final Channel<?, ? extends OUT> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -65,13 +64,16 @@ class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
-        final IOChannel<OUT> ioChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        for (final OutputChannel<? extends OUT> channel : mChannels) {
-            channel.bind(ioChannel);
+    protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                            .channelConfiguration()
+                                                            .with(configuration)
+                                                            .applied()
+                                                            .buildChannel();
+        for (final Channel<?, ? extends OUT> channel : mChannels) {
+            channel.bind(outputChannel);
         }
 
-        return ioChannel.close();
+        return outputChannel.close();
     }
 }

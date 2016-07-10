@@ -17,38 +17,37 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
 /**
- * Builder implementation returning a channel concatenating data from a set of output channels.
+ * Builder implementation returning a channel concatenating data from a set of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
-    private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+    private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
     /**
      * Constructor.
      *
-     * @param channels the output channels to concat.
+     * @param channels the channels to concat.
      * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
      * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
-    ConcatBuilder(@NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
-        final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>();
-        for (final OutputChannel<? extends OUT> channel : channels) {
+    ConcatBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        final ArrayList<Channel<?, ? extends OUT>> channelList =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        for (final Channel<?, ? extends OUT> channel : channels) {
             if (channel == null) {
                 throw new NullPointerException(
                         "the collection of channels must not contain null objects");
@@ -66,17 +65,17 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
-        final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .with(configuration)
-                                                     .withOrder(OrderType.BY_CALL)
-                                                     .apply()
-                                                     .buildChannel();
-        for (final OutputChannel<? extends OUT> channel : mChannels) {
-            channel.bind(ioChannel);
+    protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                            .channelConfiguration()
+                                                            .with(configuration)
+                                                            .withOrder(OrderType.BY_CALL)
+                                                            .applied()
+                                                            .buildChannel();
+        for (final Channel<?, ? extends OUT> channel : mChannels) {
+            channel.bind(outputChannel);
         }
 
-        return ioChannel.close();
+        return outputChannel.close();
     }
 }

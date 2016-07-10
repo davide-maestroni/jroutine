@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
+import com.github.dm.jrt.core.builder.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the built object type.
  */
-public interface ChannelsBuilder<TYPE> extends ChannelConfigurableBuilder<ChannelsBuilder<TYPE>> {
+public interface ChannelsBuilder<TYPE> extends ChannelConfigurable<ChannelsBuilder<TYPE>> {
 
     /**
      * Builds and returns an object instance.

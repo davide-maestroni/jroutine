@@ -181,31 +181,31 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
 
     @NotNull
     private LoaderObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineLoaderObjectCompat.with(mContext)
-                                         .on(mTarget)
+        return JRoutineLoaderObjectCompat.on(mContext)
+                                         .with(mTarget)
                                          .invocationConfiguration()
                                          .with(mInvocationConfiguration)
-                                         .apply()
+                                         .applied()
                                          .objectConfiguration()
                                          .with(mObjectConfiguration)
-                                         .apply()
+                                         .applied()
                                          .loaderConfiguration()
                                          .with(mLoaderConfiguration)
-                                         .apply();
+                                         .applied();
     }
 
     @NotNull
     private LoaderProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineLoaderProxyCompat.with(mContext)
-                                        .on(mTarget)
+        return JRoutineLoaderProxyCompat.on(mContext)
+                                        .with(mTarget)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
-                                        .apply()
+                                        .applied()
                                         .objectConfiguration()
                                         .with(mObjectConfiguration)
-                                        .apply()
+                                        .applied()
                                         .loaderConfiguration()
                                         .with(mLoaderConfiguration)
-                                        .apply();
+                                        .applied();
     }
 }

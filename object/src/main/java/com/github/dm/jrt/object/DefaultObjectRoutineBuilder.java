@@ -17,7 +17,7 @@
 package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.invocation.CallInvocation;
@@ -184,10 +184,10 @@ class DefaultObjectRoutineBuilder
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(objectConfiguration, target, method, inputMode,
                                 outputMode);
-                routine = JRoutineCore.on(factory)
+                routine = JRoutineCore.with(factory)
                                       .invocationConfiguration()
                                       .with(invocationConfiguration)
-                                      .apply()
+                                      .applied()
                                       .buildRoutine();
                 routineMap.put(routineInfo, routine);
             }
@@ -235,7 +235,7 @@ class DefaultObjectRoutineBuilder
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) throws Exception {
+                @NotNull final Channel<Object, ?> result) throws Exception {
             final Object target = mTarget.getTarget();
             if (target == null) {
                 throw new IllegalStateException("the target object has been destroyed");

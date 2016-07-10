@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.builder;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the interface type.
  */
-public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>,
-        ServiceConfigurableBuilder<ServiceProxyObjectBuilder<TYPE>> {
+public interface ServiceProxyObjectBuilder<TYPE>
+        extends ProxyObjectBuilder<TYPE>, ServiceConfigurable<ServiceProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

@@ -22,7 +22,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -116,11 +116,11 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     @Override
     protected void onReset() {
         try {
-            mInvocation.onDestroy();
+            mInvocation.onRecycle(false);
 
         } catch (final Throwable t) {
             InvocationInterruptedException.throwIfInterrupt(t);
-            mLogger.wrn(t, "ignoring exception while destroying invocation instance");
+            mLogger.wrn(t, "ignoring exception while discarding invocation instance");
         }
 
         mLogger.dbg("resetting result");
@@ -131,16 +131,16 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     @Override
     public InvocationResult<OUT> loadInBackground() {
         final Logger logger = mLogger;
-        final InvocationOutputConsumer<OUT> consumer =
-                new InvocationOutputConsumer<OUT>(this, logger);
+        final InvocationChannelConsumer<OUT> consumer =
+                new InvocationChannelConsumer<OUT>(this, logger);
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-        JRoutineCore.on(fromFactory(getContext(), factory))
+        JRoutineCore.with(fromFactory(getContext(), factory))
                     .invocationConfiguration()
                     .withOutputOrder(mOrderType)
                     .withLog(logger.getLog())
                     .withLogLevel(logger.getLogLevel())
-                    .apply()
+                    .applied()
                     .syncCall(mInputs)
                     .bind(consumer);
         return consumer.createResult();

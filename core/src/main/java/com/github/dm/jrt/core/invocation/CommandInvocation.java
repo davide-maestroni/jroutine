@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -53,15 +53,12 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
     public final void onAbort(@NotNull final RoutineException reason) {
     }
 
-    public final void onDestroy() {
+    public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
     }
 
-    public final void onInitialize() {
+    public final void onRecycle(final boolean isReused) {
     }
 
-    public final void onInput(final Void input, @NotNull final ResultChannel<OUT> result) {
-    }
-
-    public final void onTerminate() {
+    public final void onRestart() {
     }
 }

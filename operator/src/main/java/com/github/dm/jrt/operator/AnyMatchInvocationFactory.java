@@ -16,12 +16,12 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.PredicateWrapper;
+import com.github.dm.jrt.function.PredicateDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,14 +36,14 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
 
-    private final PredicateWrapper<? super IN> mFilterPredicate;
+    private final PredicateDecorator<? super IN> mFilterPredicate;
 
     /**
      * Constructor.
      *
      * @param filterPredicate the predicate defining the condition.
      */
-    AnyMatchInvocationFactory(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
+    AnyMatchInvocationFactory(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
         super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
         mFilterPredicate = filterPredicate;
     }
@@ -61,7 +61,7 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
      */
     private static class AnyMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
 
-        private final PredicateWrapper<? super IN> mFilterPredicate;
+        private final PredicateDecorator<? super IN> mFilterPredicate;
 
         private boolean mIsMatch;
 
@@ -70,17 +70,19 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
          *
          * @param filterPredicate the predicate defining the condition.
          */
-        private AnyMatchInvocation(@NotNull final PredicateWrapper<? super IN> filterPredicate) {
+        private AnyMatchInvocation(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
             mFilterPredicate = filterPredicate;
         }
 
         @Override
-        public void onInitialize() {
-            mIsMatch = false;
+        public void onComplete(@NotNull final Channel<Boolean, ?> result) {
+            if (!mIsMatch) {
+                result.pass(false);
+            }
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<Boolean> result) throws
+        public void onInput(final IN input, @NotNull final Channel<Boolean, ?> result) throws
                 Exception {
             if (!mIsMatch && mFilterPredicate.test(input)) {
                 mIsMatch = true;
@@ -89,10 +91,8 @@ class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Boolean> result) {
-            if (!mIsMatch) {
-                result.pass(false);
-            }
+        public void onRestart() {
+            mIsMatch = false;
         }
     }
 }

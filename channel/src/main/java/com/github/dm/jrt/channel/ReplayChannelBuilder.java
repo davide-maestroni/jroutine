@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -29,22 +29,22 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class ReplayChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class ReplayChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
-    private final OutputChannel<OUT> mChannel;
+    private final Channel<?, OUT> mChannel;
 
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param channel the channel.
      */
-    ReplayChannelBuilder(@NotNull final OutputChannel<OUT> channel) {
-        mChannel = ConstantConditions.notNull("output channel", channel);
+    ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
+        mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
+    protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
         return new ReplayChannel<OUT>(configuration, mChannel);
     }
 }

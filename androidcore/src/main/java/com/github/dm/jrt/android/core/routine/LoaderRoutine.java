@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a routine that can purge specific invocation instances, identifying them by
+ * Interface defining a routine that can clear specific invocation instances, identifying them by
  * their inputs.
  * <p>
  * Created by davide-maestroni on 03/09/2015.
@@ -32,23 +32,23 @@ import org.jetbrains.annotations.Nullable;
 public interface LoaderRoutine<IN, OUT> extends Routine<IN, OUT> {
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
+     * Makes the builder discard the cached invocation instances with the specified input.
      *
      * @param input the input.
      */
-    void purge(@Nullable IN input);
+    void clear(@Nullable IN input);
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Makes the builder discard the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    void purge(@Nullable IN... inputs);
+    void clear(@Nullable IN... inputs);
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Makes the builder discard the cached invocation instances with the specified inputs.
      *
      * @param inputs the inputs.
      */
-    void purge(@Nullable Iterable<? extends IN> inputs);
+    void clear(@Nullable Iterable<? extends IN> inputs);
 }

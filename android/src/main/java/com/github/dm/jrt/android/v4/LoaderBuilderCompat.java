@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -33,11 +33,11 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Decorator;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierWrapper;
-import com.github.dm.jrt.function.Wrapper;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,12 +52,12 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerMapping;
+import static com.github.dm.jrt.function.Functions.decorate;
 import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Context based builder of loader routine builders.
@@ -77,9 +77,9 @@ public class LoaderBuilderCompat {
         mContext = ConstantConditions.notNull("loader context", context);
     }
 
-    private static void checkStatic(@NotNull final Wrapper wrapper,
+    private static void checkStatic(@NotNull final Decorator decorator,
             @NotNull final Object function) {
-        if (!wrapper.hasStaticScope()) {
+        if (!decorator.hasStaticScope()) {
             throw new IllegalArgumentException(
                     "the function instance does not have a static scope: " + function.getClass()
                                                                                      .getName());
@@ -105,9 +105,9 @@ public class LoaderBuilderCompat {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-        return on(factoryOf(invocationClass));
+        return with(factoryOf(invocationClass));
     }
 
     /**
@@ -131,10 +131,10 @@ public class LoaderBuilderCompat {
      *                                            the specified objects as parameters is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationClass, args));
+        return with(factoryOf(invocationClass, args));
     }
 
     /**
@@ -156,9 +156,9 @@ public class LoaderBuilderCompat {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-        return on(factoryOf(invocationToken));
+        return with(factoryOf(invocationToken));
     }
 
     /**
@@ -182,10 +182,10 @@ public class LoaderBuilderCompat {
      *                                            the specified objects as parameters is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationToken, args));
+        return with(factoryOf(invocationToken, args));
     }
 
     /**
@@ -198,9 +198,9 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <OUT> LoaderRoutineBuilder<Void, OUT> on(
+    public <OUT> LoaderRoutineBuilder<Void, OUT> with(
             @NotNull final CommandInvocation<OUT> invocation) {
-        return on((InvocationFactory<Void, OUT>) invocation);
+        return with((InvocationFactory<Void, OUT>) invocation);
     }
 
     /**
@@ -214,9 +214,9 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final MappingInvocation<IN, OUT> invocation) {
-        return on((InvocationFactory<IN, OUT>) invocation);
+        return with((InvocationFactory<IN, OUT>) invocation);
     }
 
     /**
@@ -238,9 +238,9 @@ public class LoaderBuilderCompat {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final Invocation<IN, OUT> invocation) {
-        return on(tokenOf(invocation));
+        return with(tokenOf(invocation));
     }
 
     /**
@@ -263,9 +263,9 @@ public class LoaderBuilderCompat {
      *                                            static scope or no default construct is found.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation,
-            @Nullable final Object... args) {
-        return on(tokenOf(invocation), args);
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
+            @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+        return with(tokenOf(invocation), args);
     }
 
     /**
@@ -290,9 +290,9 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-        return JRoutineLoaderCompat.with(mContext).on(factory);
+        return JRoutineLoaderCompat.on(mContext).with(factory);
     }
 
     /**
@@ -311,7 +311,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+    public LoaderAutoProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
         return new DefaultLoaderAutoProxyRoutineBuilderCompat(mContext, target);
     }
 
@@ -337,9 +337,9 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
             @NotNull final InvocationFactory<IN, OUT> factory) {
-        return JRoutineLoaderCompat.with(mContext).on(factoryFrom(factory));
+        return JRoutineLoaderCompat.on(mContext).with(factoryFrom(factory));
     }
 
     /**
@@ -354,10 +354,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-        checkStatic(wrap(consumer), consumer);
-        return on(consumerCall(consumer));
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+        checkStatic(decorate(consumer), consumer);
+        return with(consumerCall(consumer));
     }
 
     /**
@@ -372,10 +372,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onCall(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-        checkStatic(wrap(function), function);
-        return on(functionCall(function));
+        checkStatic(decorate(function), function);
+        return with(functionCall(function));
     }
 
     /**
@@ -394,8 +394,8 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
-        return on(classOfType(targetClass));
+    public LoaderAutoProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+        return with(classOfType(targetClass));
     }
 
     /**
@@ -408,10 +408,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <OUT> LoaderRoutineBuilder<Void, OUT> onCommand(
+    public <OUT> LoaderRoutineBuilder<Void, OUT> withCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
-        checkStatic(wrap(supplier), supplier);
-        return on(supplierCommand(supplier));
+        checkStatic(decorate(supplier), supplier);
+        return with(supplierCommand(supplier));
     }
 
     /**
@@ -424,10 +424,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <OUT> LoaderRoutineBuilder<Void, OUT> onCommandMore(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-        checkStatic(wrap(consumer), consumer);
-        return on(consumerCommand(consumer));
+    public <OUT> LoaderRoutineBuilder<Void, OUT> withCommandMore(
+            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
+        checkStatic(decorate(consumer), consumer);
+        return with(consumerCommand(consumer));
     }
 
     /**
@@ -441,13 +441,13 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onContextFactory(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withContextFactory(
             @NotNull final Supplier<? extends ContextInvocation<? super IN, ? extends OUT>>
                     supplier) {
-        final SupplierWrapper<? extends ContextInvocation<? super IN, ? extends OUT>> wrapper =
-                wrap(supplier);
+        final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends OUT>> wrapper =
+                decorate(supplier);
         checkStatic(wrapper, supplier);
-        return on(new SupplierContextInvocationFactory<IN, OUT>(wrapper));
+        return with(new SupplierContextInvocationFactory<IN, OUT>(wrapper));
     }
 
     /**
@@ -461,10 +461,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onFactory(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-        checkStatic(wrap(supplier), supplier);
-        return on(supplierFactory(supplier));
+        checkStatic(decorate(supplier), supplier);
+        return with(supplierFactory(supplier));
     }
 
     /**
@@ -477,14 +477,14 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN> LoaderRoutineBuilder<IN, IN> onFilter(
+    public <IN> LoaderRoutineBuilder<IN, IN> withFilter(
             @NotNull final Predicate<? super IN> predicate) {
-        checkStatic(wrap(predicate), predicate);
-        return on(predicateFilter(predicate));
+        checkStatic(decorate(predicate), predicate);
+        return with(predicateFilter(predicate));
     }
 
     /**
-     * Returns a builder of output channels bound to the loader identified by the specified ID.
+     * Returns a builder of channels bound to the loader identified by the specified ID.
      * <br>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
@@ -499,8 +499,8 @@ public class LoaderBuilderCompat {
      * @return the channel builder instance.
      */
     @NotNull
-    public LoaderChannelBuilder onId(final int loaderId) {
-        return JRoutineLoaderCompat.with(mContext).onId(loaderId);
+    public LoaderChannelBuilder withId(final int loaderId) {
+        return JRoutineLoaderCompat.on(mContext).withId(loaderId);
     }
 
     /**
@@ -519,8 +519,8 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
-        return on(instanceOf(targetClass));
+    public LoaderAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+        return with(instanceOf(targetClass));
     }
 
     /**
@@ -540,9 +540,9 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
+    public LoaderAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
-        return on(instanceOf(targetClass, factoryArgs));
+        return with(instanceOf(targetClass, factoryArgs));
     }
 
     /**
@@ -556,10 +556,10 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onMapping(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMapping(
             @NotNull final Function<? super IN, ? extends OUT> function) {
-        checkStatic(wrap(function), function);
-        return on(functionMapping(function));
+        checkStatic(decorate(function), function);
+        return with(functionMapping(function));
     }
 
     /**
@@ -573,9 +573,9 @@ public class LoaderBuilderCompat {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onMappingMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-        checkStatic(wrap(consumer), consumer);
-        return on(consumerMapping(consumer));
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMappingMore(
+            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
+        checkStatic(decorate(consumer), consumer);
+        return with(consumerMapping(consumer));
     }
 }

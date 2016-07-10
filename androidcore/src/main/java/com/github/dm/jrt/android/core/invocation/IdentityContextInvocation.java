@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
         result.pass(input);
     }
 }

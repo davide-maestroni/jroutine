@@ -64,7 +64,7 @@ public class JRoutineLoaderProxy {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderProxyBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderProxyBuilder on(@NotNull final LoaderContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContext, LoaderProxyBuilder> builders = sBuilders;
             LoaderProxyBuilder builder = builders.get(context);
@@ -112,7 +112,7 @@ public class JRoutineLoaderProxy {
          * @return the routine builder instance.
          */
         @NotNull
-        public LoaderProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public LoaderProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }
     }

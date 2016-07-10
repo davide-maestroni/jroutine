@@ -16,10 +16,11 @@
 
 package com.github.dm.jrt;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -32,7 +33,8 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +58,7 @@ import static com.github.dm.jrt.object.InvocationTarget.instance;
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutine extends Streams {
+public class JRoutine extends Channels {
 
     /**
      * Avoid explicit instantiation.
@@ -66,12 +68,12 @@ public class JRoutine extends Streams {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns a channel builder.
      *
      * @return the channel builder instance.
      */
     @NotNull
-    public static IOChannelBuilder io() {
+    public static ChannelBuilder io() {
         return JRoutineCore.io();
     }
 
@@ -86,9 +88,9 @@ public class JRoutine extends Streams {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-        return on(factoryOf(invocationClass));
+        return with(factoryOf(invocationClass));
     }
 
     /**
@@ -110,10 +112,10 @@ public class JRoutine extends Streams {
      *                                            parameters was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationClass, args));
+        return with(factoryOf(invocationClass, args));
     }
 
     /**
@@ -127,9 +129,9 @@ public class JRoutine extends Streams {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-        return on(factoryOf(invocationToken));
+        return with(factoryOf(invocationToken));
     }
 
     /**
@@ -151,10 +153,10 @@ public class JRoutine extends Streams {
      *                                            parameters was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationToken, args));
+        return with(factoryOf(invocationToken, args));
     }
 
     /**
@@ -165,9 +167,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> on(
+    public static <OUT> RoutineBuilder<Void, OUT> with(
             @NotNull final CommandInvocation<OUT> invocation) {
-        return on((InvocationFactory<Void, OUT>) invocation);
+        return with((InvocationFactory<Void, OUT>) invocation);
     }
 
     /**
@@ -179,9 +181,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final MappingInvocation<IN, OUT> invocation) {
-        return on((InvocationFactory<IN, OUT>) invocation);
+        return with((InvocationFactory<IN, OUT>) invocation);
     }
 
     /**
@@ -195,9 +197,9 @@ public class JRoutine extends Streams {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Invocation<IN, OUT> invocation) {
-        return on(factoryOf(invocation));
+        return with(factoryOf(invocation));
     }
 
     /**
@@ -219,9 +221,9 @@ public class JRoutine extends Streams {
      *                                            parameters was found.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-        return on(factoryOf(invocation, args));
+        return with(factoryOf(invocation, args));
     }
 
     /**
@@ -236,9 +238,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final InvocationFactory<IN, OUT> factory) {
-        return JRoutineCore.on(factory);
+        return JRoutineCore.with(factory);
     }
 
     /**
@@ -257,7 +259,7 @@ public class JRoutine extends Streams {
      *                                            interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static AutoProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
         return new DefaultAutoProxyRoutineBuilder(target);
     }
 
@@ -280,8 +282,9 @@ public class JRoutine extends Streams {
      *                                            interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder on(@NotNull final Object object) {
-        return (object instanceof Class) ? onClassOfType((Class<?>) object) : onInstance(object);
+    public static AutoProxyRoutineBuilder with(@NotNull final Object object) {
+        return (object instanceof Class) ? withClassOfType((Class<?>) object)
+                : withInstance(object);
     }
 
     /**
@@ -294,9 +297,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-        return JRoutineCore.on(consumerCall(consumer));
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+        return JRoutineCore.with(consumerCall(consumer));
     }
 
     /**
@@ -309,9 +312,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-        return JRoutineCore.on(functionCall(function));
+        return JRoutineCore.with(functionCall(function));
     }
 
     /**
@@ -329,7 +332,7 @@ public class JRoutine extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
+    public static AutoProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
         return new DefaultAutoProxyRoutineBuilder(classOfType(targetClass));
     }
 
@@ -341,9 +344,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> onCommand(
+    public static <OUT> RoutineBuilder<Void, OUT> withCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
-        return JRoutineCore.on(supplierCommand(supplier));
+        return JRoutineCore.with(supplierCommand(supplier));
     }
 
     /**
@@ -354,9 +357,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> onCommandMore(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-        return JRoutineCore.on(consumerCommand(consumer));
+    public static <OUT> RoutineBuilder<Void, OUT> withCommandMore(
+            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
+        return JRoutineCore.with(consumerCommand(consumer));
     }
 
     /**
@@ -368,9 +371,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onFactory(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-        return JRoutineCore.on(supplierFactory(supplier));
+        return JRoutineCore.with(supplierFactory(supplier));
     }
 
     /**
@@ -381,9 +384,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> RoutineBuilder<IN, IN> onFilter(
+    public static <IN> RoutineBuilder<IN, IN> withFilter(
             @NotNull final Predicate<? super IN> predicate) {
-        return JRoutineCore.on(predicateFilter(predicate));
+        return JRoutineCore.with(predicateFilter(predicate));
     }
 
     /**
@@ -400,7 +403,7 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder onInstance(@NotNull final Object object) {
+    public static AutoProxyRoutineBuilder withInstance(@NotNull final Object object) {
         return new DefaultAutoProxyRoutineBuilder(instance(object));
     }
 
@@ -413,9 +416,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onMapping(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withMapping(
             @NotNull final Function<? super IN, ? extends OUT> function) {
-        return JRoutineCore.on(functionMapping(function));
+        return JRoutineCore.with(functionMapping(function));
     }
 
     /**
@@ -427,8 +430,19 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onMappingMore(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-        return JRoutineCore.on(consumerMapping(consumer));
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingMore(
+            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
+        return JRoutineCore.with(consumerMapping(consumer));
+    }
+
+    /**
+     * Returns a stream routine builder.
+     *
+     * @param <IN> the input data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN> StreamBuilder<IN, IN> withStream() {
+        return JRoutineStream.withStream();
     }
 }

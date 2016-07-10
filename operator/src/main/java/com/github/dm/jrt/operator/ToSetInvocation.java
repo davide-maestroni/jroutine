@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -66,23 +66,22 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
     }
 
     @Override
-    public void onInitialize() {
-        mSet = new HashSet<DATA>();
+    public void onComplete(@NotNull final Channel<Set<DATA>, ?> result) {
+        result.pass(mSet);
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<Set<DATA>> result) {
+    public void onInput(final DATA input, @NotNull final Channel<Set<DATA>, ?> result) {
         mSet.add(input);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Set<DATA>> result) {
-        result.pass(mSet);
+    public void onRecycle(final boolean isReused) {
         mSet = null;
     }
 
     @Override
-    public void onTerminate() {
-        mSet = null;
+    public void onRestart() {
+        mSet = new HashSet<DATA>();
     }
 }

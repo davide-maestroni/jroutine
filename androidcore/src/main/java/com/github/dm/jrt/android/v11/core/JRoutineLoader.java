@@ -52,10 +52,9 @@ import java.util.WeakHashMap;
  * The routine invocations will be identified by the loader ID. In case a clash is detected, that
  * is, an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
- * resolved, for example when invocations with different implementations share the same ID, the new
+ * resolved, for example when loaders with different implementations share the same ID, the new
  * invocation is aborted with a
- * {@link com.github.dm.jrt.android.core.invocation.InvocationTypeException
- * InvocationTypeException}.
+ * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
  * <pre>
@@ -63,7 +62,6 @@ import java.util.WeakHashMap;
  *
  *         &#64;Override
  *         protected void onCreate(final Bundle savedInstanceState) {
- *
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *             if (savedInstanceState != null) {
@@ -75,21 +73,19 @@ import java.util.WeakHashMap;
  *
  *             } else {
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutineLoader.with(loaderFrom(this))
- *                                       .on(factoryOf(LoadResource.class))
+ *                         JRoutineLoader.on(loaderFrom(this))
+ *                                       .with(factoryOf(LoadResource.class))
  *                                       .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
- *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *                        .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                            &#64;Override
  *                            public void onError(&#64;NotNull final RoutineException error) {
- *
  *                                displayError(error);
  *                            }
  *
  *                            &#64;Override
  *                            public void onOutput(final MyResource resource) {
- *
  *                                mResource = resource;
  *                                displayResource(resource);
  *                            }
@@ -118,17 +114,15 @@ import java.util.WeakHashMap;
  *
  *             &#64;Override
  *             public void onContext(&#64;Nonnull final Context context) {
- *
  *                 super.onContext(context);
- *                 mRoutine = JRoutineService.with(serviceFrom(context))
- *                                           .on(factoryOf(LoadResourceUri.class))
+ *                 mRoutine = JRoutineService.on(serviceFrom(context))
+ *                                           .with(factoryOf(LoadResourceUri.class))
  *                                           .buildRoutine();
  *             }
  *
  *             &#64;Override
  *             protected void onCall(final List&lt;? extends URI&gt; uris,
- *                     &#64;Nonnull final ResultChannel&lt;MyResource&gt; result) {
- *
+ *                     &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
  *                 result.pass(mRoutine.asyncCall(uris));
  *             }
  *         }
@@ -159,7 +153,7 @@ public class JRoutineLoader {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderBuilder on(@NotNull final LoaderContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContext, LoaderBuilder> builders = sBuilders;
             LoaderBuilder builder = builders.get(context);
@@ -210,13 +204,13 @@ public class JRoutineLoader {
          *                                            a static scope.
          */
         @NotNull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }
 
         /**
-         * Returns a builder of output channels bound to the loader identified by the specified ID.
+         * Returns a builder of channels bound to the loader identified by the specified ID.
          * <br>
          * If no loader with the specified ID is running at the time of the channel creation, the
          * output will be aborted with a
@@ -231,10 +225,10 @@ public class JRoutineLoader {
          * @return the channel builder instance.
          */
         @NotNull
-        public LoaderChannelBuilder onId(final int loaderId) {
+        public LoaderChannelBuilder withId(final int loaderId) {
             return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
                                                             .withLoaderId(loaderId)
-                                                            .apply();
+                                                            .applied();
         }
     }
 }

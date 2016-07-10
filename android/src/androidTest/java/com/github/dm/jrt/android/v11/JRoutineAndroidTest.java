@@ -36,8 +36,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
@@ -48,7 +47,9 @@ import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
+import com.github.dm.jrt.operator.Operators;
 
+import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -61,6 +62,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.operator.Operators.insteadAccept;
+import static com.github.dm.jrt.operator.producer.Producers.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -75,9 +78,9 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
-    private static void testCallFunction(final Activity activity) {
+    private static void testCallFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine =
-                JRoutineAndroid.with(activity).onCall(new Function<List<String>, String>() {
+                JRoutineAndroid.on(activity).withCall(new Function<List<String>, String>() {
 
                     public String apply(final List<String> strings) {
                         final StringBuilder builder = new StringBuilder();
@@ -88,28 +91,27 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                         return builder.toString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
-                "test1");
+        assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }
 
-    private static void testConsumerCommand(final Activity activity) {
+    private static void testConsumerCommand(@NotNull final Activity activity) {
         final Routine<Void, String> routine =
-                JRoutineAndroid.with(activity).onCommandMore(new Consumer<ResultChannel<String>>() {
+                JRoutineAndroid.on(activity).withCommandMore(new Consumer<Channel<String, ?>>() {
 
-                    public void accept(final ResultChannel<String> result) {
+                    public void accept(final Channel<String, ?> result) {
                         result.pass("test", "1");
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test", "1");
+        assertThat(routine.asyncCall().close().after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testConsumerFunction(final Activity activity) {
+    private static void testConsumerFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine = //
-                JRoutineAndroid.with(activity)
-                               .onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutineAndroid.on(activity)
+                               .withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                                    public void accept(final List<String> strings,
-                                           final ResultChannel<String> result) {
+                                           final Channel<String, ?> result) {
                                        final StringBuilder builder = new StringBuilder();
                                        for (final String string : strings) {
                                            builder.append(string);
@@ -119,89 +121,105 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                    }
                                })
                                .buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly(
-                "test1");
+        assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }
 
-    private static void testConsumerMapping(final Activity activity) {
+    private static void testConsumerMapping(@NotNull final Activity activity) {
         final Routine<Object, String> routine = //
-                JRoutineAndroid.with(activity)
-                               .onMappingMore(new BiConsumer<Object, ResultChannel<String>>() {
+                JRoutineAndroid.on(activity)
+                               .withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
 
                                    public void accept(final Object o,
-                                           final ResultChannel<String> result) {
+                                           final Channel<String, ?> result) {
                                        result.pass(o.toString());
                                    }
                                })
                                .buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.asyncCall("test", 1).after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testFunctionMapping(final Activity activity) {
+    private static void testFunctionMapping(@NotNull final Activity activity) {
 
         final Routine<Object, String> routine =
-                JRoutineAndroid.with(activity).onMapping(new Function<Object, String>() {
+                JRoutineAndroid.on(activity).withMapping(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
                         return o.toString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(10)).all()).containsOnly("test",
-                "1");
+        assertThat(routine.asyncCall("test", 1).after(seconds(10)).all()).containsOnly("test", "1");
     }
 
-    private static void testPredicateFilter(final Activity activity) {
+    private static void testPredicateFilter(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
-                JRoutineAndroid.with(activity).onFilter(new Predicate<String>() {
+                JRoutineAndroid.on(activity).withFilter(new Predicate<String>() {
 
                     public boolean test(final String s) {
 
                         return s.length() > 1;
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("test", "1").afterMax(seconds(10)).all()).containsOnly("test");
+        assertThat(routine.asyncCall("test", "1").after(seconds(10)).all()).containsOnly("test");
     }
 
-    private static void testSupplierCommand(final Activity activity) {
+    private static void testStream(@NotNull final Activity activity) {
+        assertThat(JRoutineAndroid.withStream()
+                                  .on(loaderFrom(activity))
+                                  .map(insteadAccept(range(1, 1000)))
+                                  .map(new Function<Number, Double>() {
+
+                                      public Double apply(final Number number) {
+                                          final double value = number.doubleValue();
+                                          return Math.sqrt(value);
+                                      }
+                                  })
+                                  .sync()
+                                  .map(Operators.<Double>averageDouble())
+                                  .asyncCall()
+                                  .close()
+                                  .after(seconds(10))
+                                  .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    private static void testSupplierCommand(@NotNull final Activity activity) {
 
         final Routine<Void, String> routine =
-                JRoutineAndroid.with(activity).onCommand(new Supplier<String>() {
+                JRoutineAndroid.on(activity).withCommand(new Supplier<String>() {
 
                     public String get() {
 
                         return "test";
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall().afterMax(seconds(10)).all()).containsOnly("test");
+        assertThat(routine.asyncCall().close().after(seconds(10)).all()).containsOnly("test");
     }
 
-    private static void testSupplierContextFactory(final Activity activity) {
+    private static void testSupplierContextFactory(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
-                JRoutineAndroid.with(activity).onContextFactory(new Supplier<PassString>() {
+                JRoutineAndroid.on(activity).withContextFactory(new Supplier<PassString>() {
 
                     public PassString get() {
 
                         return new PassString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+        assertThat(routine.asyncCall("TEST").after(seconds(10)).all()).containsOnly("TEST");
     }
 
-    private static void testSupplierFactory(final Activity activity) {
+    private static void testSupplierFactory(@NotNull final Activity activity) {
 
         final Routine<String, String> routine =
-                JRoutineAndroid.with(activity).onFactory(new Supplier<PassString>() {
+                JRoutineAndroid.on(activity).withFactory(new Supplier<PassString>() {
 
                     public PassString get() {
 
                         return new PassString();
                     }
                 }).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(10)).all()).containsOnly("TEST");
+        assertThat(routine.asyncCall("TEST").after(seconds(10)).all()).containsOnly("TEST");
     }
 
     public void testCallFunction() {
@@ -275,33 +293,33 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         final ClassToken<Join<String>> token = new ClassToken<Join<String>>() {};
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(factoryOf(token))
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .on(factoryOf(token))
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .with(factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity(), getActivity())
-                                  .on(factoryOf(token))
+        assertThat(JRoutineAndroid.on(getActivity(), getActivity())
+                                  .with(factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        assertThat(JRoutineAndroid.with(fragment)
-                                  .on(factoryOf(token))
+        assertThat(JRoutineAndroid.on(fragment)
+                                  .with(factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(fragment, getActivity())
-                                  .on(factoryOf(token))
+        assertThat(JRoutineAndroid.on(fragment, getActivity())
+                                  .with(factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
     }
 
@@ -312,23 +330,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onClassOfType(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withClassOfType(TestClass.class)
                                   .method("getStringUp")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onClassOfType(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .on(classOfType(TestClass.class))
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .with(classOfType(TestClass.class))
                                   .method("TEST")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
     }
 
@@ -339,20 +360,21 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .loaderConfiguration()
                                   .withLoaderId(33)
                                   .withCacheStrategy(CacheStrategyType.CACHE)
-                                  .apply()
+                                  .applied()
                                   .method("getStringLow")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onId(33)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withId(33)
                                   .buildChannel()
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
     }
 
@@ -362,23 +384,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             return;
         }
 
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class, "TEST")
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .method("getStringLow")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .on(instanceOf(TestClass.class))
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .with(instanceOf(TestClass.class))
                                   .method("test")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
     }
 
@@ -389,35 +414,35 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         final ClassToken<JoinString> token = new ClassToken<JoinString>() {};
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(token)
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(token)
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1,test2");
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(token, ";")
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(token, ";")
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1;test2");
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(JoinString.class)
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(JoinString.class)
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1,test2");
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(JoinString.class, " ")
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(JoinString.class, " ")
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1 test2");
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(new JoinString())
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(new JoinString())
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1,test2");
-        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(new JoinString(), " ")
+        assertThat(JRoutineAndroid.on(loaderFrom(getActivity()))
+                                  .with(new JoinString(), " ")
                                   .asyncCall("test1", "test2")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test1 test2");
     }
 
@@ -428,36 +453,36 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("TEST");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(TestProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(tokenOf(TestProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
@@ -471,17 +496,17 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("TEST");
-        assertThat(JRoutineAndroid.with(getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on(getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .invocationConfiguration()
                                   .withLog(AndroidLogs.androidLog())
-                                  .apply()
+                                  .applied()
                                   .objectConfiguration()
                                   .withSharedFields()
-                                  .apply()
+                                  .applied()
                                   .loaderConfiguration()
                                   .withFactoryId(11)
-                                  .apply()
+                                  .applied()
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
@@ -495,7 +520,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         try {
-            JRoutineAndroid.with(getActivity()).on((ContextInvocationTarget<?>) null);
+            JRoutineAndroid.on(getActivity()).with((ContextInvocationTarget<?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -519,26 +544,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(TargetInvocationFactory.factoryOf(token))
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .on(TargetInvocationFactory.factoryOf(token))
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .with(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity(), InvocationService.class)
-                                  .on(TargetInvocationFactory.factoryOf(token))
+        assertThat(JRoutineAndroid.on(getActivity(), InvocationService.class)
+                                  .with(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(getActivity(),
+        assertThat(JRoutineAndroid.on(getActivity(),
                 new Intent(getActivity(), InvocationService.class))
-                                  .on(TargetInvocationFactory.factoryOf(token))
+                                  .with(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
     }
 
@@ -549,23 +574,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onClassOfType(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withClassOfType(TestClass.class)
                                   .method("getStringUp")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onClassOfType(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .on(classOfType(TestClass.class))
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .with(classOfType(TestClass.class))
                                   .method("TEST")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST");
     }
 
@@ -575,23 +603,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             return;
         }
 
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class, "TEST")
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .method("getStringLow")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .on(instanceOf(TestClass.class))
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .with(instanceOf(TestClass.class))
                                   .method("test")
                                   .asyncCall()
-                                  .afterMax(seconds(10))
+                                  .close()
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
     }
 
@@ -602,35 +633,35 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(token)
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(token)
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(token, 2)
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(token, 2)
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test", "test");
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(PassString.class)
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(PassString.class)
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(PassString.class, 3)
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(PassString.class, 3)
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test", "test", "test");
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(new Pass<String>())
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(new Pass<String>())
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(new Pass<String>(), 2)
+        assertThat(JRoutineAndroid.on(serviceFrom(getActivity()))
+                                  .with(new Pass<String>(), 2)
                                   .asyncCall("test")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("test", "test");
     }
 
@@ -641,36 +672,36 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("TEST");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(TestProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(tokenOf(TestProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
@@ -684,17 +715,17 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         new TestClass("TEST");
-        assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .onInstanceOf(TestClass.class)
+        assertThat(JRoutineAndroid.on((Context) getActivity())
+                                  .withInstanceOf(TestClass.class)
                                   .invocationConfiguration()
                                   .withLog(AndroidLogs.androidLog())
-                                  .apply()
+                                  .applied()
                                   .objectConfiguration()
                                   .withSharedFields()
-                                  .apply()
+                                  .applied()
                                   .serviceConfiguration()
                                   .withLogClass(AndroidLog.class)
-                                  .apply()
+                                  .applied()
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
@@ -708,12 +739,20 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         try {
-            JRoutineAndroid.with((Context) getActivity()).on((ContextInvocationTarget<?>) null);
+            JRoutineAndroid.on((Context) getActivity()).with((ContextInvocationTarget<?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testStream() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testStream(getActivity());
     }
 
     public void testSupplierCommand() {
@@ -753,7 +792,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         @AsyncOut
         @OutputTimeout(value = 10, unit = TimeUnit.SECONDS)
-        OutputChannel<String> getStringLow();
+        Channel<?, String> getStringLow();
     }
 
     public static class Join<DATA> extends CallContextInvocation<DATA, String> {
@@ -772,7 +811,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         @Override
         protected void onCall(@NotNull final List<? extends DATA> inputs,
-                @NotNull final ResultChannel<String> result) throws Exception {
+                @NotNull final Channel<String, ?> result) throws Exception {
 
             final String separator = mSeparator;
             final StringBuilder builder = new StringBuilder();
@@ -816,7 +855,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) throws
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws
                 Exception {
 
             final int count = mCount;

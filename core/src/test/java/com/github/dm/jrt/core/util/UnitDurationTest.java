@@ -561,7 +561,8 @@ public class UnitDurationTest {
     public void testSinceMillis() throws InterruptedException {
 
         final long past = System.currentTimeMillis() - 180000;
-        assertThat(UnitDuration.timeSinceMillis(past)).isEqualTo(UnitDuration.minutes(3));
+        assertThat(UnitDuration.timeSinceMillis(past)).isGreaterThanOrEqualTo(
+                UnitDuration.minutes(3));
         assertThat(UnitDuration.timeSinceMillis(System.currentTimeMillis())).isEqualTo(zero());
         final long future = System.currentTimeMillis() + 177777;
         assertThat(UnitDuration.timeSinceMillis(future)).isEqualTo(zero());
@@ -573,7 +574,7 @@ public class UnitDurationTest {
     public void testSinceNanos() throws InterruptedException {
 
         final long past = System.nanoTime() - 180000000000L;
-        assertThat(UnitDuration.timeSinceNanos(past).millisTime()).isEqualTo(
+        assertThat(UnitDuration.timeSinceNanos(past).millisTime()).isGreaterThanOrEqualTo(
                 UnitDuration.minutes(3));
         assertThat(UnitDuration.timeSinceNanos(System.nanoTime()).millisTime()).isEqualTo(zero());
         final long future = System.nanoTime() + 177777777777L;

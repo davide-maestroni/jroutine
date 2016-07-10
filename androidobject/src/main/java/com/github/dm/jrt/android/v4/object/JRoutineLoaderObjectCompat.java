@@ -53,10 +53,9 @@ import java.util.WeakHashMap;
  * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
  * an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
- * resolved, for example when invocations with different implementations share the same ID, the new
+ * resolved, for example when loaders with different implementations share the same ID, the new
  * invocation is aborted with a
- * {@link com.github.dm.jrt.android.core.invocation.InvocationTypeException
- * InvocationTypeException}.
+ * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>
  * The class provides an additional way to build a routine, based on the asynchronous invocation of
  * a method of an existing class or object via reflection.
@@ -92,7 +91,7 @@ public class JRoutineLoaderObjectCompat {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderObjectBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderObjectBuilderCompat on(@NotNull final LoaderContextCompat context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContextCompat, LoaderObjectBuilderCompat> builders = sBuilders;
             LoaderObjectBuilderCompat builder = builders.get(context);
@@ -141,7 +140,7 @@ public class JRoutineLoaderObjectCompat {
          * @return the routine builder instance.
          */
         @NotNull
-        public LoaderObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public LoaderObjectRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultLoaderObjectRoutineBuilder(mContext, target);
         }
     }

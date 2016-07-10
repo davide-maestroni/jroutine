@@ -46,7 +46,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public static ContextBuilder with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context) {
+    public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context) {
         return new ContextBuilder(context);
     }
 
@@ -54,7 +54,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     private static <OUT> com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.TargetInvocationFactory<Object, OUT> target) {
-        return com.github.dm.jrt.android.core.JRoutineService.with(context).on(target);
+        return com.github.dm.jrt.android.core.JRoutineService.on(context).with(target);
     }
 
     public static class ContextBuilder {
@@ -66,7 +66,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @org.jetbrains.annotations.NotNull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
             if (!target.isOfType(${classErasure}.class)) {
                 throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                         "${classFullName}");

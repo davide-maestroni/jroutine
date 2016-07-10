@@ -24,8 +24,8 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolution
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
-import com.github.dm.jrt.android.object.annotation.InputClashResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
+import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
 import com.github.dm.jrt.core.util.UnitDuration;
 
@@ -45,12 +45,12 @@ public class AndroidBuildersTest extends AndroidTestCase {
         assertThat(withAnnotations(LoaderConfiguration.defaultConfiguration(),
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                         .withClashResolution(ClashResolutionType.ABORT)
+                         .withClashResolution(ClashResolutionType.ABORT_BOTH)
                          .withFactoryId(13)
-                         .withInputClashResolution(ClashResolutionType.ABORT_THIS)
+                         .withMatchResolution(ClashResolutionType.ABORT_THIS)
                          .withLoaderId(-77)
                          .withResultStaleTime(UnitDuration.millis(333))
-                         .apply());
+                         .applied());
     }
 
     public void testConstructor() {
@@ -70,9 +70,9 @@ public class AndroidBuildersTest extends AndroidTestCase {
     public interface AnnotationItf {
 
         @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-        @ClashResolution(ClashResolutionType.ABORT)
+        @ClashResolution(ClashResolutionType.ABORT_BOTH)
         @FactoryId(13)
-        @InputClashResolution(ClashResolutionType.ABORT_THIS)
+        @MatchResolution(ClashResolutionType.ABORT_THIS)
         @LoaderId(-77)
         @ResultStaleTime(333)
         String toString();

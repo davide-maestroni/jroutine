@@ -18,24 +18,23 @@ package com.github.dm.jrt.android.channel;
 
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel passing selectable data to an input channel.
+ * Builder implementation returning a channel passing selectable data to an input one.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
  */
-class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChannel<IN>> {
+class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<IN, ?>> {
 
-    private final InputChannel<? super ParcelableSelectable<DATA>> mChannel;
+    private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
 
     private final int mIndex;
 
@@ -45,19 +44,23 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
      * @param channel the input channel.
      * @param index   the selectable index.
      */
-    InputSelectBuilder(@NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+    InputSelectBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             final int index) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         mIndex = index;
     }
 
     @NotNull
     @Override
-    protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
-        final IOChannel<IN> inputChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        final IOChannel<ParcelableSelectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();
-        ioChannel.bind(mChannel);
-        return inputChannel.bind(new SelectableOutputConsumer<DATA, IN>(ioChannel, mIndex));
+    protected Channel<IN, ?> build(@NotNull final ChannelConfiguration configuration) {
+        final Channel<IN, IN> inputChannel = JRoutineCore.io()
+                                                         .channelConfiguration()
+                                                         .with(configuration)
+                                                         .applied()
+                                                         .buildChannel();
+        final Channel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> outputChannel =
+                JRoutineCore.io().buildChannel();
+        outputChannel.bind(mChannel);
+        return inputChannel.bind(new SelectableChannelConsumer<DATA, IN>(outputChannel, mIndex));
     }
 }

@@ -24,9 +24,7 @@ import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +72,7 @@ public class ServiceCallInvocation extends
 
     private boolean mHasMediaType;
 
-    private IOChannel<ParcelableByteBuffer> mInputChannel;
+    private Channel<ParcelableByteBuffer, ParcelableByteBuffer> mInputChannel;
 
     private boolean mIsRequest;
 
@@ -83,8 +81,21 @@ public class ServiceCallInvocation extends
     private RequestData mRequestData;
 
     @Override
+    public void onComplete(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+            Exception {
+        final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel = mInputChannel;
+        if (inputChannel != null) {
+            inputChannel.close();
+            asyncRequest(result);
+
+        } else {
+            syncRequest(result);
+        }
+    }
+
+    @Override
     public void onInput(final ParcelableSelectable<Object> input,
-            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
+            @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
         switch (input.index) {
             case REQUEST_DATA_INDEX:
                 mRequestData = input.data();
@@ -115,28 +126,15 @@ public class ServiceCallInvocation extends
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws
-            Exception {
-        final IOChannel<ParcelableByteBuffer> inputChannel = mInputChannel;
-        if (inputChannel != null) {
-            inputChannel.close();
-            asyncRequest(result);
-
-        } else {
-            syncRequest(result);
-        }
-    }
-
-    @Override
-    public void onTerminate() {
+    public void onRecycle(final boolean isReused) {
         mRequestData = null;
         mMediaType = null;
         mInputChannel = null;
         mHasMediaType = false;
     }
 
-    private void asyncRequest(
-            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
+    private void asyncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+            Exception {
         if (mIsRequest) {
             return;
         }
@@ -144,7 +142,7 @@ public class ServiceCallInvocation extends
         mIsRequest = true;
         final Request request =
                 mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
-        final IOChannel<ParcelableSelectable<Object>> outputChannel =
+        final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
                 JRoutineCore.io().buildChannel();
         outputChannel.bind(result);
         getClient().newCall(request).enqueue(new Callback() {
@@ -178,15 +176,16 @@ public class ServiceCallInvocation extends
     }
 
     private void publishResult(@NotNull final ResponseBody responseBody,
-            @NotNull final InputChannel<ParcelableSelectable<Object>> result) throws IOException {
+            @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
         final MediaType mediaType = responseBody.contentType();
         if (mediaType != null) {
             result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
         }
 
-        final IOChannel<Object> channel =
-                AndroidChannels.selectParcelable(result, BYTES_INDEX).buildChannels();
-        final BufferOutputStream outputStream = ParcelableByteChannel.byteChannel().bind(channel);
+        final Channel<Object, ?> channel =
+                AndroidChannels.selectParcelableInput(result, BYTES_INDEX).buildChannels();
+        final BufferOutputStream outputStream =
+                ParcelableByteChannel.byteChannel().bindDeep(channel);
         try {
             outputStream.transferFrom(responseBody.byteStream());
 
@@ -195,8 +194,8 @@ public class ServiceCallInvocation extends
         }
     }
 
-    private void syncRequest(
-            @NotNull final ResultChannel<ParcelableSelectable<Object>> result) throws Exception {
+    private void syncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+            Exception {
         final Request request = mRequestData.requestWithBody(null);
         final ResponseBody responseBody = getClient().newCall(request).execute().body();
         publishResult(responseBody, result);
@@ -207,7 +206,7 @@ public class ServiceCallInvocation extends
      */
     private static class AsyncRequestBody extends RequestBody {
 
-        private final IOChannel<ParcelableByteBuffer> mInputChannel;
+        private final Channel<ParcelableByteBuffer, ParcelableByteBuffer> mInputChannel;
 
         private final MediaType mMediaType;
 
@@ -218,7 +217,7 @@ public class ServiceCallInvocation extends
          * @param inputChannel the input channel.
          */
         private AsyncRequestBody(@Nullable final MediaType mediaType,
-                @NotNull final IOChannel<ParcelableByteBuffer> inputChannel) {
+                @NotNull final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel) {
             mMediaType = mediaType;
             mInputChannel = inputChannel;
         }
@@ -232,7 +231,7 @@ public class ServiceCallInvocation extends
         public void writeTo(final BufferedSink sink) throws IOException {
             final OutputStream outputStream = sink.outputStream();
             try {
-                for (final ParcelableByteBuffer buffer : mInputChannel.afterMax(infinity())) {
+                for (final ParcelableByteBuffer buffer : mInputChannel.after(infinity())) {
                     ParcelableByteChannel.inputStream(buffer).transferTo(outputStream);
                 }
 

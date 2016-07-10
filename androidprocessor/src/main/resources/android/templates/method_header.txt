@@ -32,9 +32,9 @@
         return getBuilder(mContext, targetFactory).invocationConfiguration()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
-                                                  .apply()
+                                                  .applied()
                                                   .serviceConfiguration()
                                                   .with(serviceConfiguration)
-                                                  .apply()
+                                                  .applied()
                                                   .buildRoutine();
     }

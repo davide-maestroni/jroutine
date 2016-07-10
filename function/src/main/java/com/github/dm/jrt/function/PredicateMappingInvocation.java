@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -33,19 +33,19 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
 
-    private final PredicateWrapper<? super IN> mPredicate;
+    private final PredicateDecorator<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
      * @param predicate the predicate instance.
      */
-    PredicateMappingInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
+    PredicateMappingInvocation(@NotNull final PredicateDecorator<? super IN> predicate) {
         super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
         mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<IN, ?> result) throws Exception {
         if (mPredicate.test(input)) {
             result.pass(input);
         }

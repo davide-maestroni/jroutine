@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 
@@ -39,25 +39,19 @@ public class InvocationTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testCommandInvocation() throws Exception {
-
         final CommandInvocation<Object> invocation = new CommandInvocation<Object>(null) {
 
-            public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
-
+            public void onComplete(@NotNull final Channel<Object, ?> result) throws Exception {
             }
         };
-
-        invocation.onInitialize();
+        invocation.onRestart();
         invocation.onInput(null, null);
-        invocation.onResult(null);
+        invocation.onComplete(null);
         invocation.onAbort(null);
-        invocation.onTerminate();
-        invocation.onDestroy();
     }
 
     @Test
     public void testComparableCommandInvocation() {
-
         final TestComparableCommandInvocation factory =
                 new TestComparableCommandInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
@@ -67,7 +61,6 @@ public class InvocationTest {
             @NotNull
             @Override
             public Invocation<Object, Object> newInvocation() {
-
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
@@ -79,7 +72,6 @@ public class InvocationTest {
 
     @Test
     public void testComparableInvocationFactory() {
-
         final TestComparableInvocationFactory factory =
                 new TestComparableInvocationFactory(asArgs(1));
         assertThat(factory).isEqualTo(factory);
@@ -89,7 +81,6 @@ public class InvocationTest {
             @NotNull
             @Override
             public Invocation<Object, Object> newInvocation() {
-
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
@@ -101,7 +92,6 @@ public class InvocationTest {
 
     @Test
     public void testComparableMappingInvocation() {
-
         final TestComparableMappingInvocation factory =
                 new TestComparableMappingInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
@@ -111,7 +101,6 @@ public class InvocationTest {
             @NotNull
             @Override
             public Invocation<Object, Object> newInvocation() {
-
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
@@ -124,7 +113,6 @@ public class InvocationTest {
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() throws Exception {
-
         assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
         assertThat(factoryOf(
@@ -136,7 +124,6 @@ public class InvocationTest {
 
     @Test
     public void testInvocationFactoryEquals() {
-
         final InvocationFactory<Object, Object> factory = factoryOf(TestInvocation.class);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
@@ -144,7 +131,6 @@ public class InvocationTest {
             @NotNull
             @Override
             public Invocation<Object, Object> newInvocation() {
-
                 return new TemplateInvocation<Object, Object>() {};
             }
         });
@@ -172,75 +158,54 @@ public class InvocationTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullClassError() {
-
         try {
-
             factoryOf((Class<TestInvocation>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
 
         try {
-
             factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullInvocationError() {
-
         try {
-
             factoryOf((TestInvocation) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
 
         try {
-
             factoryOf((TestInvocation) null, Reflection.NO_ARGS);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testNullTokenError() {
-
         try {
-
             factoryOf((ClassToken<TestInvocation>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
 
         try {
-
             factoryOf((ClassToken<TestInvocation>) null, Reflection.NO_ARGS);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
     }
 
@@ -252,12 +217,10 @@ public class InvocationTest {
          * @param args the constructor arguments.
          */
         protected TestComparableCommandInvocation(@Nullable final Object[] args) {
-
             super(args);
         }
 
-        public void onResult(@NotNull final ResultChannel<Object> result) {
-
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
         }
     }
 
@@ -269,14 +232,12 @@ public class InvocationTest {
          * @param args the constructor arguments.
          */
         protected TestComparableInvocationFactory(@Nullable final Object[] args) {
-
             super(args);
         }
 
         @NotNull
         @Override
         public Invocation<Object, Object> newInvocation() {
-
             return new TemplateInvocation<Object, Object>() {};
         }
     }
@@ -289,12 +250,10 @@ public class InvocationTest {
          * @param args the constructor arguments.
          */
         protected TestComparableMappingInvocation(@Nullable final Object[] args) {
-
             super(args);
         }
 
-        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
-
+        public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
         }
     }
 
@@ -304,12 +263,10 @@ public class InvocationTest {
          * Constructor.
          */
         protected TestInvocation() {
-
             super(null);
         }
 
-        public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
-
+        public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
         }
     }
 }

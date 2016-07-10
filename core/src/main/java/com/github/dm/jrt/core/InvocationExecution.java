@@ -18,6 +18,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -43,7 +44,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     private final Object mMutex = new Object();
 
-    private final DefaultResultChannel<OUT> mResultChannel;
+    private final ResultChannel<OUT> mResultChannel;
 
     private volatile AbortExecution mAbortExecution;
 
@@ -68,8 +69,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      * @param logger  the logger instance.
      */
     InvocationExecution(@NotNull final InvocationManager<IN, OUT> manager,
-            @NotNull final InputIterator<IN> inputs,
-            @NotNull final DefaultResultChannel<OUT> result, @NotNull final Logger logger) {
+            @NotNull final InputIterator<IN> inputs, @NotNull final ResultChannel<OUT> result,
+            @NotNull final Logger logger) {
         mInvocationManager = ConstantConditions.notNull("invocation manager", manager);
         mInputIterator = ConstantConditions.notNull("input iterator", inputs);
         mResultChannel = ConstantConditions.notNull("result channel", result);
@@ -93,7 +94,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
         synchronized (mMutex) {
             mIsWaitingInvocation = false;
-            final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+            final ResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
             final int count = mExecutionCount;
             mExecutionCount = 1;
@@ -108,6 +109,35 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 final AbortExecution abortExecution = mAbortExecution;
                 if (mIsWaitingAbortInvocation && (abortExecution != null)) {
                     abortExecution.onCreate(invocation);
+                }
+            }
+        }
+    }
+
+    /**
+     * Forces the recycling of the invocation.
+     *
+     * @param reason the reason.
+     */
+    public void recycle(@NotNull final Throwable reason) {
+        synchronized (mMutex) {
+            final Invocation<IN, OUT> invocation = mInvocation;
+            if ((invocation != null) && !mIsTerminated) {
+                mIsTerminated = true;
+                final InvocationManager<IN, OUT> invocationManager = mInvocationManager;
+                if (mIsInitialized) {
+                    try {
+                        invocation.onAbort(InvocationException.wrapIfNeeded(reason));
+                        invocation.onRecycle(true);
+                        invocationManager.recycle(invocation);
+
+                    } catch (final Throwable t) {
+                        invocationManager.discard(invocation);
+                    }
+
+                } else {
+                    // Initialization failed, so just discard the invocation
+                    invocationManager.discard(invocation);
                 }
             }
         }
@@ -142,18 +172,19 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     private void execute(@NotNull final Invocation<IN, OUT> invocation) {
+        final Logger logger = mLogger;
         final InputIterator<IN> inputIterator = mInputIterator;
         final InvocationManager<IN, OUT> manager = mInvocationManager;
-        final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+        final ResultChannel<OUT> resultChannel = mResultChannel;
         try {
             inputIterator.onConsumeStart();
-            mLogger.dbg("running execution");
+            logger.dbg("running execution");
             final boolean isComplete;
             try {
                 if (mInvocation == null) {
                     mInvocation = invocation;
-                    mLogger.dbg("initializing invocation: %s", invocation);
-                    invocation.onInitialize();
+                    logger.dbg("initializing invocation: %s", invocation);
+                    invocation.onRestart();
                     mIsInitialized = true;
                 }
 
@@ -166,13 +197,14 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             }
 
             if (isComplete) {
-                invocation.onResult(resultChannel);
+                invocation.onComplete(resultChannel);
                 try {
                     mIsTerminated = true;
-                    invocation.onTerminate();
+                    invocation.onRecycle(true);
                     manager.recycle(invocation);
 
-                } catch (final Throwable ignored) {
+                } catch (final Throwable t) {
+                    logger.wrn(t, "Discarding invocation since it failed to be recycled");
                     manager.discard(invocation);
 
                 } finally {
@@ -182,7 +214,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             }
 
         } catch (final Throwable t) {
-            resultChannel.abortImmediately(t);
+            if (!resultChannel.abortImmediately(t)) {
+                // Needed if the result channel is explicitly closed by the invocation
+                recycle(t);
+            }
         }
     }
 
@@ -248,30 +283,32 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
             synchronized (mMutex) {
                 mIsWaitingAbortInvocation = false;
+                final Logger logger = mLogger;
                 final InputIterator<IN> inputIterator = mInputIterator;
                 final InvocationManager<IN, OUT> manager = mInvocationManager;
-                final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+                final ResultChannel<OUT> resultChannel = mResultChannel;
                 resultChannel.enterInvocation();
                 try {
                     final RoutineException exception = inputIterator.getAbortException();
-                    mLogger.dbg(exception, "aborting invocation");
+                    logger.dbg(exception, "aborting invocation");
                     try {
                         if (!mIsTerminated) {
                             if (mInvocation == null) {
                                 mInvocation = invocation;
-                                mLogger.dbg("initializing invocation: %s", invocation);
-                                invocation.onInitialize();
+                                logger.dbg("initializing invocation: %s", invocation);
+                                invocation.onRestart();
                                 mIsInitialized = true;
                             }
 
                             if (mIsInitialized) {
                                 invocation.onAbort(exception);
+                                invocation.onRecycle(true);
                                 mIsTerminated = true;
-                                invocation.onTerminate();
                                 manager.recycle(invocation);
 
                             } else {
                                 // Initialization failed, so just discard the invocation
+                                mIsTerminated = true;
                                 manager.discard(invocation);
                             }
                         }
@@ -279,7 +316,11 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                         resultChannel.close(exception);
 
                     } catch (final Throwable t) {
-                        manager.discard(invocation);
+                        if (!mIsTerminated) {
+                            mIsTerminated = true;
+                            manager.discard(invocation);
+                        }
+
                         resultChannel.close(t);
                     }
 
@@ -295,7 +336,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
         public void onError(@NotNull final Throwable error) {
             synchronized (mMutex) {
-                final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+                final ResultChannel<OUT> resultChannel = mResultChannel;
                 resultChannel.stopWaitingInvocation();
                 resultChannel.close(error);
             }
@@ -331,7 +372,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     public void onError(@NotNull final Throwable error) {
         synchronized (mMutex) {
-            final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+            final ResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
             resultChannel.close(error);
         }

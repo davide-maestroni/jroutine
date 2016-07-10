@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
@@ -48,23 +48,23 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> asyncInvoke() {
-        return buildRoutine().asyncInvoke();
+    public Channel<IN, OUT> asyncCall() {
+        return buildRoutine().asyncCall();
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> parallelInvoke() {
-        return buildRoutine().parallelInvoke();
+    public Channel<IN, OUT> parallelCall() {
+        return buildRoutine().parallelCall();
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> serialInvoke() {
-        return buildRoutine().serialInvoke();
+    public Channel<IN, OUT> sequentialCall() {
+        return buildRoutine().sequentialCall();
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> syncInvoke() {
-        return buildRoutine().syncInvoke();
+    public Channel<IN, OUT> syncCall() {
+        return buildRoutine().syncCall();
     }
 
     @NotNull

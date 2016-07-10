@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,18 +36,15 @@ public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT>
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
     }
 
-    public void onDestroy() throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
     }
 
-    public void onInitialize() throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onRecycle(final boolean isReused) throws Exception {
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-    }
-
-    public void onTerminate() throws Exception {
+    public void onRestart() throws Exception {
     }
 }

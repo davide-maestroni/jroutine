@@ -21,13 +21,10 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +34,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.android.v11.core.LoaderInvocation.purgeLoader;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
+import static com.github.dm.jrt.android.v11.core.LoaderInvocation.clearLoader;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
 
 /**
  * Default implementation of a loader channel builder.
@@ -81,7 +78,7 @@ class DefaultLoaderChannelBuilder
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> buildChannel() {
+    public <OUT> Channel<?, OUT> buildChannel() {
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         if (loaderId == LoaderConfiguration.AUTO) {
@@ -91,9 +88,9 @@ class DefaultLoaderChannelBuilder
         final LoaderContext context = mContext;
         final Object component = context.getComponent();
         if (component == null) {
-            final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.abort(new MissingLoaderException(loaderId));
-            return ioChannel.close();
+            final Channel<OUT, OUT> channel = JRoutineCore.io().buildChannel();
+            channel.abort(new MissingLoaderException(loaderId));
+            return channel.close();
         }
 
         final MissingLoaderInvocationFactory<OUT> factory =
@@ -101,64 +98,38 @@ class DefaultLoaderChannelBuilder
         final DefaultLoaderRoutineBuilder<Void, OUT> builder =
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         final InvocationConfiguration invocationConfiguration =
-                mChannelConfiguration.toOutputChannelConfiguration().apply();
-        final Logger logger = invocationConfiguration.newLogger(this);
-        final ClashResolutionType resolutionType =
-                loaderConfiguration.getClashResolutionTypeOrElse(null);
-        if (resolutionType != null) {
-            logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
-        }
-
-        final ClashResolutionType inputResolutionType =
-                loaderConfiguration.getInputClashResolutionTypeOrElse(null);
-        if (inputResolutionType != null) {
-            logger.wrn("the specified input clash resolution type will be ignored: %s",
-                    inputResolutionType);
-        }
-
-        final UnitDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOrElse(null);
-        if (resultStaleTime != null) {
-            logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
-        }
-
+                builderFromOutput(mChannelConfiguration).applied();
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applied()
                       .loaderConfiguration()
-                      .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
-                      .withInputClashResolution(ClashResolutionType.JOIN)
-                      .withResultStaleTime(infinity())
-                      .apply()
-                      .asyncCall();
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
+                      .withMatchResolution(ClashResolutionType.JOIN)
+                      .with(loaderConfiguration)
+                      .applied()
+                      .asyncCall()
+                      .close();
     }
 
     @Override
-    public void purge() {
+    public void clear() {
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
         }
     }
 
     @Override
-    public void purge(@Nullable final Object input) {
+    public void clear(@Nullable final Object input) {
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     Collections.singletonList(input));
         }
     }
 
     @Override
-    public void purge(@Nullable final Object... inputs) {
+    public void clear(@Nullable final Object... inputs) {
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList;
@@ -169,13 +140,13 @@ class DefaultLoaderChannelBuilder
                 inputList = Arrays.asList(inputs);
             }
 
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     inputList);
         }
     }
 
     @Override
-    public void purge(@Nullable final Iterable<?> inputs) {
+    public void clear(@Nullable final Iterable<?> inputs) {
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList;
@@ -189,9 +160,16 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     inputList);
         }
+    }
+
+    @NotNull
+    @Override
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @NotNull

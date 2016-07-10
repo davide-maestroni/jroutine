@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.proxy.builder;
 
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.object.builder.ObjectConfigurableBuilder;
+import com.github.dm.jrt.object.builder.ObjectConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBuilder>,
-        ObjectConfigurableBuilder<ProxyRoutineBuilder> {
+public interface ProxyRoutineBuilder extends InvocationConfigurable<ProxyRoutineBuilder>,
+        ObjectConfigurable<ProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

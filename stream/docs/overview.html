@@ -39,16 +39,16 @@
         public class Main {
 
             public static void main(final String[] args) {
-
-                final Double rms = Streams.streamOf(args)
-                                          .parallel()
-                                          .map(Integer::parseInt)
-                                          .map(integer -&gt; integer * integer)
-                                          .sequential()
-                                          .map(averageFloat())
-                                          .map(Math::sqrt)
-                                          .afterMax(seconds(1))
-                                          .next();
+                final Double rms = JRoutineStream.&lt;String&gt;withStream()
+                                                 .parallel()
+                                                 .map(Integer::parseInt)
+                                                 .map(i -&gt; i * i)
+                                                 .straight()
+                                                 .map(averageFloat())
+                                                 .map(Math::sqrt)
+                                                 .asyncCall(args)
+                                                 .after(seconds(1))
+                                                 .next();
                 System.out.println(rms);
                 System.exit(0);
             }

@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -51,28 +51,23 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
     }
 
     @Override
-    public void onDestroy() throws Exception {
-        mInvocation.onDestroy();
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+        mInvocation.onComplete(result);
     }
 
     @Override
-    public void onInitialize() throws Exception {
-        mInvocation.onInitialize();
-    }
-
-    @Override
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
         mInvocation.onInput(input, result);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-        mInvocation.onResult(result);
+    public void onRecycle(final boolean isReused) throws Exception {
+        mInvocation.onRecycle(isReused);
     }
 
     @Override
-    public void onTerminate() throws Exception {
-        mInvocation.onTerminate();
+    public void onRestart() throws Exception {
+        mInvocation.onRestart();
     }
 
     @Override

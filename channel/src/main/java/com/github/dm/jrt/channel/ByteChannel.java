@@ -16,10 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +35,7 @@ import java.util.LinkedList;
  * <pre>
  *     <code>
  *
- *         public void onInput(final IN in, final ResultChannel&lt;ByteBuffer&gt; result) {
+ *         public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
  *
  *             ...
  *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bind(result);
@@ -49,7 +47,7 @@ import java.util.LinkedList;
  * <pre>
  *     <code>
  *
- *         public void onInput(final ByteBuffer buffer, final ResultChannel&lt;OUT&gt; result) {
+ *         public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
  *
  *             ...
  *             final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
@@ -88,10 +86,6 @@ public class ByteChannel {
 
     private final int mDataBufferSize;
 
-    private final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
-            mStreams =
-            new WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>();
-
     /**
      * Constructor.
      *
@@ -111,7 +105,7 @@ public class ByteChannel {
      */
     @NotNull
     public static ByteChannel byteChannel() {
-        return new ByteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
+        return byteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
     }
 
     /**
@@ -124,7 +118,7 @@ public class ByteChannel {
      */
     @NotNull
     public static ByteChannel byteChannel(final int dataBufferSize) {
-        return new ByteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
+        return byteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
     }
 
     /**
@@ -197,37 +191,25 @@ public class ByteChannel {
     /**
      * Returns the output stream used to write bytes into the specified channel.
      *
-     * @param channel the input channel to which pass the data.
+     * @param channel the channel to which pass the data.
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream bind(@NotNull final InputChannel<? super ByteBuffer> channel) {
-        BufferOutputStream stream;
-        synchronized (mStreams) {
-            final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
-                    streams = mStreams;
-            stream = streams.get(channel);
-            if (stream == null) {
-                stream = new DefaultBufferOutputStream(channel);
-                streams.put(channel, stream);
-            }
-        }
-
-        return stream;
+    public BufferOutputStream bind(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+        return new DefaultBufferOutputStream(channel, false);
     }
 
     /**
      * Returns the output stream used to write bytes into the specified channel.
-     * <p>
-     * Note that the channel will be automatically closed as soon as the returned output stream is
-     * closed.
+     * <br>
+     * The channel will be automatically closed as soon as the output stream is.
      *
-     * @param channel the I/O channel to which pass the data.
+     * @param channel the channel to which pass the data.
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream bind(@NotNull final IOChannel<? super ByteBuffer> channel) {
-        return new IOBufferOutputStream(bind(channel.asInput()), channel);
+    public BufferOutputStream bindDeep(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+        return new DefaultBufferOutputStream(channel, true);
     }
 
     @NotNull
@@ -465,63 +447,6 @@ public class ByteChannel {
 
         @Override
         public abstract void close();
-    }
-
-    /**
-     * Implementation of a buffer output stream automatically closing the output I/O channel.
-     */
-    private static class IOBufferOutputStream extends BufferOutputStream {
-
-        private final IOChannel<? super ByteBuffer> mIOChannel;
-
-        private final BufferOutputStream mOutputStream;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped stream.
-         * @param channel the I/O channel.
-         */
-        private IOBufferOutputStream(@NotNull final BufferOutputStream wrapped,
-                @NotNull final IOChannel<? super ByteBuffer> channel) {
-            mOutputStream = wrapped;
-            mIOChannel = channel;
-        }
-
-        @Override
-        public int write(@NotNull final InputStream in) throws IOException {
-            return mOutputStream.write(in);
-        }
-
-        @Override
-        public void write(final int b) throws IOException {
-            mOutputStream.write(b);
-        }
-
-        @Override
-        public void write(@NotNull final byte[] b) throws IOException {
-            mOutputStream.write(b);
-        }
-
-        @Override
-        public void write(@NotNull final byte[] b, final int off, final int len) throws
-                IOException {
-            mOutputStream.write(b, off, len);
-        }
-
-        @Override
-        public void flush() {
-            mOutputStream.flush();
-        }
-
-        @Override
-        public void close() {
-            try {
-                mOutputStream.close();
-            } finally {
-                mIOChannel.close();
-            }
-        }
     }
 
     /**
@@ -817,20 +742,9 @@ public class ByteChannel {
             mStream = new DefaultBufferInputStream(this);
         }
 
-        /**
-         * Returns the size in number of bytes of this buffer.
-         *
-         * @return the buffer size.
-         */
-        public int getSize() {
-            synchronized (mMutex) {
-                return mSize;
-            }
-        }
-
         @Override
         public int hashCode() {
-            final int size = getSize();
+            final int size = size();
             final byte[] buffer = mBuffer;
             int result = size;
             for (int i = 0; i < size; ++i) {
@@ -851,8 +765,8 @@ public class ByteChannel {
             }
 
             final ByteBuffer that = (ByteBuffer) o;
-            final int size = getSize();
-            if (size != that.getSize()) {
+            final int size = size();
+            if (size != that.size()) {
                 return false;
             }
 
@@ -865,6 +779,17 @@ public class ByteChannel {
             }
 
             return true;
+        }
+
+        /**
+         * Returns the size in number of bytes of this buffer.
+         *
+         * @return the buffer size.
+         */
+        public int size() {
+            synchronized (mMutex) {
+                return mSize;
+            }
         }
 
         private void changeState(@NotNull final BufferState expected,
@@ -961,7 +886,7 @@ public class ByteChannel {
         public int read(@NotNull final OutputStream out) throws IOException {
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -983,7 +908,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -1007,7 +932,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 final int offset = mOffset;
                 if (offset >= size) {
                     return -1;
@@ -1023,7 +948,7 @@ public class ByteChannel {
         @Override
         public long skip(final long n) {
             synchronized (mMutex) {
-                final long skipped = Math.min(mBuffer.getSize() - mOffset, n);
+                final long skipped = Math.min(mBuffer.size() - mOffset, n);
                 if (skipped > 0) {
                     mOffset += skipped;
                 }
@@ -1035,7 +960,7 @@ public class ByteChannel {
         @Override
         public int available() {
             synchronized (mMutex) {
-                return Math.max(0, mBuffer.getSize() - mOffset);
+                return Math.max(0, mBuffer.size() - mOffset);
             }
         }
 
@@ -1063,7 +988,7 @@ public class ByteChannel {
         public int read() {
             synchronized (mMutex) {
                 final ByteBuffer buffer = mBuffer;
-                final int size = buffer.getSize();
+                final int size = buffer.size();
                 if (mOffset >= size) {
                     return -1;
                 }
@@ -1090,7 +1015,9 @@ public class ByteChannel {
      */
     private class DefaultBufferOutputStream extends BufferOutputStream {
 
-        private final InputChannel<? super ByteBuffer> mChannel;
+        private final Channel<? super ByteBuffer, ?> mChannel;
+
+        private final boolean mCloseChannel;
 
         private final Object mMutex = new Object();
 
@@ -1103,20 +1030,13 @@ public class ByteChannel {
         /**
          * Constructor
          *
-         * @param channel the input channel to which pass the data.
+         * @param channel      the channel to which pass the data.
+         * @param closeChannel whether the underlying channel must be closed when this stream is.
          */
-        private DefaultBufferOutputStream(@NotNull final InputChannel<? super ByteBuffer> channel) {
-            mChannel = ConstantConditions.notNull("input channel", channel);
-        }
-
-        @NotNull
-        private ByteBuffer getBuffer() {
-            final ByteBuffer byteBuffer = mBuffer;
-            if (byteBuffer != null) {
-                return byteBuffer;
-            }
-
-            return (mBuffer = acquire());
+        private DefaultBufferOutputStream(@NotNull final Channel<? super ByteBuffer, ?> channel,
+                final boolean closeChannel) {
+            mChannel = ConstantConditions.notNull("channel instance", channel);
+            mCloseChannel = closeChannel;
         }
 
         @Override
@@ -1186,6 +1106,9 @@ public class ByteChannel {
             }
 
             flush();
+            if (mCloseChannel) {
+                mChannel.close();
+            }
         }
 
         @Override
@@ -1295,6 +1218,16 @@ public class ByteChannel {
                 }
 
             } while (written < len);
+        }
+
+        @NotNull
+        private ByteBuffer getBuffer() {
+            final ByteBuffer byteBuffer = mBuffer;
+            if (byteBuffer != null) {
+                return byteBuffer;
+            }
+
+            return (mBuffer = acquire());
         }
     }
 }

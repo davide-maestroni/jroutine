@@ -56,21 +56,19 @@ import java.util.WeakHashMap;
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutineService.with(serviceFrom(this))
- *                                    .on(factoryOf(LoadResourceUri.class))
+ *                     JRoutineService.on(serviceFrom(this))
+ *                                    .with(factoryOf(LoadResourceUri.class))
  *                                    .buildRoutine();
  *             routine.asyncCall(RESOURCE_URI)
- *                    .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *                    .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                        &#64;Override
  *                        public void onError(&#64;NotNull final RoutineException error) {
- *
  *                            displayError(error);
  *                        }
  *
  *                        &#64;Override
  *                        public void onOutput(final MyResource resource) {
- *
  *                            displayResource(resource);
  *                        }
  *                    });
@@ -99,7 +97,7 @@ public class JRoutineService {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder on(@NotNull final ServiceContext context) {
         synchronized (sBuilders) {
             final WeakHashMap<ServiceContext, ServiceBuilder> builders = sBuilders;
             ServiceBuilder builder = builders.get(context);
@@ -145,7 +143,7 @@ public class JRoutineService {
          * @return the routine builder instance.
          */
         @NotNull
-        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
+        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
                 @NotNull final TargetInvocationFactory<IN, OUT> target) {
             return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
         }

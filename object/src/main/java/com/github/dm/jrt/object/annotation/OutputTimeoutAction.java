@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

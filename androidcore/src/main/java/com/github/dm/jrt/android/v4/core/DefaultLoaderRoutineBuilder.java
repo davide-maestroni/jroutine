@@ -116,8 +116,27 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
-        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.apply(),
+        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.applied(),
                 mLoaderConfiguration);
+    }
+
+    @Override
+    public void clear(@Nullable final IN input) {
+        buildRoutine().clear(input);
+    }
+
+    public void clear(@Nullable final IN... inputs) {
+        buildRoutine().clear(inputs);
+    }
+
+    @Override
+    public void clear(@Nullable final Iterable<? extends IN> inputs) {
+        buildRoutine().clear(inputs);
+    }
+
+    @Override
+    public void clear() {
+        buildRoutine().clear();
     }
 
     @NotNull
@@ -126,25 +145,5 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     loaderConfiguration() {
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
-    }
-
-    @Override
-    public void purge(@Nullable final IN input) {
-        buildRoutine().purge(input);
-    }
-
-    @Override
-    public void purge(@Nullable final IN... inputs) {
-        buildRoutine().purge(inputs);
-    }
-
-    @Override
-    public void purge(@Nullable final Iterable<? extends IN> inputs) {
-        buildRoutine().purge(inputs);
-    }
-
-    @Override
-    public void purge() {
-        buildRoutine().purge();
     }
 }

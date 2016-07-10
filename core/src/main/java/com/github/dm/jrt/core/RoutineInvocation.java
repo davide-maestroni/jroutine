@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
+public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
     private final InvocationMode mInvocationMode;
 
@@ -68,18 +68,16 @@ public class RoutineInvocation<IN, OUT> extends StreamInvocation<IN, OUT> {
         return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
-    public void onDestroy() {
-        mRoutine.purge();
+    @Override
+    public void onRecycle(final boolean isReused) throws Exception {
+        super.onRecycle(isReused);
+        mRoutine.clear();
     }
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> onChannel(@NotNull final OutputChannel<IN> channel) {
-        final InvocationMode invocationMode = mInvocationMode;
-        return (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(channel)
-                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(channel)
-                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(channel)
-                                : mRoutine.serialCall(channel);
+    protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
+        return mInvocationMode.call(mRoutine).pass(channel).close();
     }
 
     /**

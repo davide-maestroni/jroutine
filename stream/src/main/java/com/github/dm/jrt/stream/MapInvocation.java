@@ -16,11 +16,10 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,21 +35,21 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
-    private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
+    private final FunctionDecorator<? super IN, ? extends Channel<?, ? extends OUT>> mFunction;
 
     /**
      * Constructor.
      *
      * @param function the mapping function.
      */
-    MapInvocation(@NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
+    MapInvocation(@NotNull final FunctionDecorator<? super IN, ? extends Channel<?, ? extends
             OUT>> function) {
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
-        final OutputChannel<? extends OUT> channel = mFunction.apply(input);
+    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+        final Channel<?, ? extends OUT> channel = mFunction.apply(input);
         if (channel != null) {
             channel.bind(result);
         }

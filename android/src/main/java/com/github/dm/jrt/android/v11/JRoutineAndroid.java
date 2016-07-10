@@ -25,9 +25,11 @@ import com.github.dm.jrt.JRoutine;
 import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.stream.LoaderStreams;
-import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.android.v11.stream.JRoutineStreamLoader;
+import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +43,7 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public class JRoutineAndroid extends LoaderStreams {
+public class JRoutineAndroid extends SparseChannels {
 
     /**
      * Avoid explicit instantiation.
@@ -51,12 +53,12 @@ public class JRoutineAndroid extends LoaderStreams {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns a channel builder.
      *
      * @return the channel builder instance.
      */
     @NotNull
-    public static IOChannelBuilder io() {
+    public static ChannelBuilder io() {
         return JRoutine.io();
     }
 
@@ -67,8 +69,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final Activity activity) {
-        return with(loaderFrom(activity));
+    public static LoaderBuilder on(@NotNull final Activity activity) {
+        return on(loaderFrom(activity));
     }
 
     /**
@@ -79,9 +81,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final Activity activity,
+    public static LoaderBuilder on(@NotNull final Activity activity,
             @NotNull final Context context) {
-        return with(loaderFrom(activity, context));
+        return on(loaderFrom(activity, context));
     }
 
     /**
@@ -91,8 +93,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context) {
-        return with(serviceFrom(context));
+    public static ServiceBuilder on(@NotNull final Context context) {
+        return on(serviceFrom(context));
     }
 
     /**
@@ -103,9 +105,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context,
+    public static ServiceBuilder on(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
-        return with(serviceFrom(context, serviceClass));
+        return on(serviceFrom(context, serviceClass));
     }
 
     /**
@@ -116,9 +118,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final Context context,
-            @NotNull final Intent service) {
-        return with(serviceFrom(context, service));
+    public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
+        return on(serviceFrom(context, service));
     }
 
     /**
@@ -128,8 +129,8 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final Fragment fragment) {
-        return with(loaderFrom(fragment));
+    public static LoaderBuilder on(@NotNull final Fragment fragment) {
+        return on(loaderFrom(fragment));
     }
 
     /**
@@ -140,9 +141,9 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final Fragment fragment,
+    public static LoaderBuilder on(@NotNull final Fragment fragment,
             @NotNull final Context context) {
-        return with(loaderFrom(fragment, context));
+        return on(loaderFrom(fragment, context));
     }
 
     /**
@@ -152,7 +153,7 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static LoaderBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderBuilder on(@NotNull final LoaderContext context) {
         return new LoaderBuilder(context);
     }
 
@@ -163,7 +164,18 @@ public class JRoutineAndroid extends LoaderStreams {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder on(@NotNull final ServiceContext context) {
         return new ServiceBuilder(context) {};
+    }
+
+    /**
+     * Returns a stream routine builder.
+     *
+     * @param <IN> the input data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN> LoaderStreamBuilder<IN, IN> withStream() {
+        return JRoutineStreamLoader.withStream();
     }
 }

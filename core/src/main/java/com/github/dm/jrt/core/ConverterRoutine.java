@@ -18,7 +18,6 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,14 +45,6 @@ public abstract class ConverterRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     @Override
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
             @NotNull final InvocationType type) throws Exception {
-        try {
-            invocation.onDestroy();
-
-        } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
-            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
-        }
-
         return newInvocation(type);
     }
 }

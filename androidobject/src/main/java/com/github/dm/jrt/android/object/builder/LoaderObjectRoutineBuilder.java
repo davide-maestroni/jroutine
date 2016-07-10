@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  * Created by davide-maestroni on 04/06/2015.
  */
 public interface LoaderObjectRoutineBuilder
-        extends ObjectRoutineBuilder, LoaderConfigurableBuilder<LoaderObjectRoutineBuilder> {
+        extends ObjectRoutineBuilder, LoaderConfigurable<LoaderObjectRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

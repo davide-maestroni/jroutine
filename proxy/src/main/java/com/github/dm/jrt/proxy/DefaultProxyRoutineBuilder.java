@@ -95,10 +95,10 @@ class DefaultProxyRoutineBuilder
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
         return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
-                      .apply()
+                      .applied()
                       .objectConfiguration()
                       .with(mObjectConfiguration)
-                      .apply()
+                      .applied()
                       .buildProxy();
     }
 

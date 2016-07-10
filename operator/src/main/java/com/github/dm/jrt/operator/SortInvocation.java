@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -45,7 +45,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
         }
     };
 
-    private ArrayList<DATA> mList;
+    private ArrayList<DATA> mList = new ArrayList<DATA>();
 
     /**
      * Constructor.
@@ -66,24 +66,19 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
     }
 
     @Override
-    public void onInitialize() {
-        mList = new ArrayList<DATA>();
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+        final ArrayList<DATA> list = mList;
+        Collections.sort(list);
+        result.pass(list);
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
         mList.add(input);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<DATA> result) {
-        Collections.sort(mList);
-        result.pass(mList);
-        mList = null;
-    }
-
-    @Override
-    public void onTerminate() {
-        mList = null;
+    public void onRecycle(final boolean isReused) {
+        mList.clear();
     }
 }

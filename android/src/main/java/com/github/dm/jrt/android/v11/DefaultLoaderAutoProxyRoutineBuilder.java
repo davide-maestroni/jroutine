@@ -181,31 +181,31 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
 
     @NotNull
     private LoaderObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineLoaderObject.with(mContext)
-                                   .on(mTarget)
+        return JRoutineLoaderObject.on(mContext)
+                                   .with(mTarget)
                                    .invocationConfiguration()
                                    .with(mInvocationConfiguration)
-                                   .apply()
+                                   .applied()
                                    .objectConfiguration()
                                    .with(mObjectConfiguration)
-                                   .apply()
+                                   .applied()
                                    .loaderConfiguration()
                                    .with(mLoaderConfiguration)
-                                   .apply();
+                                   .applied();
     }
 
     @NotNull
     private LoaderProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineLoaderProxy.with(mContext)
-                                  .on(mTarget)
+        return JRoutineLoaderProxy.on(mContext)
+                                  .with(mTarget)
                                   .invocationConfiguration()
                                   .with(mInvocationConfiguration)
-                                  .apply()
+                                  .applied()
                                   .objectConfiguration()
                                   .with(mObjectConfiguration)
-                                  .apply()
+                                  .applied()
                                   .loaderConfiguration()
                                   .with(mLoaderConfiguration)
-                                  .apply();
+                                  .applied();
     }
 }

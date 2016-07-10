@@ -17,8 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,15 +27,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Builder implementation returning a channel combining data from a map of input channels.
+ * Builder implementation returning a channel combining data from a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends IN>>> {
+class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final HashMap<Integer, InputChannel<? extends IN>> mChannelMap;
+    private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
 
     /**
      * Constructor.
@@ -46,13 +45,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
      * @throws java.lang.NullPointerException     if the specified map is null or contains a null
      *                                            object.
      */
-    CombineMapBuilder(@NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
+    CombineMapBuilder(@NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
         if (channels.isEmpty()) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final HashMap<Integer, InputChannel<? extends IN>> channelMap =
-                new HashMap<Integer, InputChannel<? extends IN>>(channels);
+        final HashMap<Integer, Channel<? extends IN, ?>> channelMap =
+                new HashMap<Integer, Channel<? extends IN, ?>>(channels);
         if (channelMap.containsValue(null)) {
             throw new NullPointerException("the map of channels must not contain null objects");
         }
@@ -63,24 +62,27 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected IOChannel<Selectable<? extends IN>> build(
+    protected Channel<Selectable<? extends IN>, ?> build(
             @NotNull final ChannelConfiguration configuration) {
-        final HashMap<Integer, InputChannel<? extends IN>> channelMap = mChannelMap;
-        final HashMap<Integer, IOChannel<IN>> ioChannelMap =
-                new HashMap<Integer, IOChannel<IN>>(channelMap.size());
-        for (final Entry<Integer, InputChannel<? extends IN>> entry : channelMap.entrySet()) {
-            final IOChannel<IN> ioChannel = JRoutineCore.io()
-                                                        .channelConfiguration()
-                                                        .with(configuration)
-                                                        .apply()
-                                                        .buildChannel();
-            ioChannel.bind((InputChannel<IN>) entry.getValue());
-            ioChannelMap.put(entry.getKey(), ioChannel);
+        final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
+        final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
+                new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
+        for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.io()
+                                                              .channelConfiguration()
+                                                              .with(configuration)
+                                                              .applied()
+                                                              .buildChannel();
+            outputChannel.bind((Channel<IN, ?>) entry.getValue());
+            inputChannelMap.put(entry.getKey(), outputChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>> ioChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        ioChannel.bind(new SortingMapOutputConsumer<IN>(ioChannelMap));
-        return ioChannel;
+        final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
+                JRoutineCore.io()
+                            .channelConfiguration()
+                            .with(configuration)
+                            .applied()
+                            .buildChannel();
+        return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
     }
 }

@@ -21,9 +21,9 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 The library adheres to [The Reactive Manifesto][reactive manifesto]. It's *responsive*, *resilient*, *elastic* and *message driven*.
 
-It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response of inputs and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br>
-It's *resilient*, since errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br>
-It's *elastic*, since the needed number of threads is allocated in response to higher loads.<br>
+It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response to inputs, and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br/>
+It's *resilient*, since errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br/>
+It's *elastic*, since the needed number of threads is allocated in response to higher loads.<br/>
 It's *message driven*, since both outputs and errors are dispatched along the chain of invocations.
 
 ## Why not RxJava?
@@ -68,7 +68,7 @@ And more:
 ## Why not JRoutine?
 
 The JRoutine library is designed for parallel programming and nothing else. It's no golden hammer and does not pretend to.
-If you need event handling, please use [RxJava][rxjava], it's one of the best library out there. If you need distributed scalable computing, consider using [Akka][akka].
+If you need event handling, please use [RxJava][rxjava]. If you need distributed scalable computing, consider using [Akka][akka].
 For anything else [GitHub][github] is a great source of inspiration.
 
 ## Usage
@@ -107,7 +107,7 @@ dependencies {
 
 ## Documentation
 
-Complete Javadoc with insights and examples is available:
+Complete Javadoc with insights and examples is available for each module:
 
 * [JRoutine][javadoc]
 * [JRoutine-Proxy][javadoc proxy]

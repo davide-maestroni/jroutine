@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the interface type.
  */
-public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>,
-        LoaderConfigurableBuilder<LoaderProxyObjectBuilder<TYPE>> {
+public interface LoaderProxyObjectBuilder<TYPE>
+        extends ProxyObjectBuilder<TYPE>, LoaderConfigurable<LoaderProxyObjectBuilder<TYPE>> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

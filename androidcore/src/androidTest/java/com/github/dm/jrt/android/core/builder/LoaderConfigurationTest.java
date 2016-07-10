@@ -39,17 +39,18 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
     public void testBuildFrom() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withFactoryId(71)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(builderFrom(null).apply()).isEqualTo(LoaderConfiguration.defaultConfiguration());
+                                                           .applied();
+        assertThat(configuration.builderFrom().applied()).isEqualTo(configuration);
+        assertThat(builderFrom(null).applied()).isEqualTo(
+                LoaderConfiguration.defaultConfiguration());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -78,122 +79,118 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
     public void testBuilderFromEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withFactoryId(71)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
-        assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+                                                           .applied();
+        assertThat(builder().with(configuration).applied()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().applied()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().with(null).applied()).isEqualTo(
                 LoaderConfiguration.defaultConfiguration());
     }
 
     public void testCacheStrategyEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
+                                                           .applied();
         assertThat(configuration).isNotEqualTo(
-                builder().withCacheStrategy(CacheStrategyType.CLEAR).apply());
+                builder().withCacheStrategy(CacheStrategyType.CLEAR).applied());
         assertThat(configuration.builderFrom()
                                 .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                                .apply()).isNotEqualTo(
-                builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).apply());
+                                .applied()).isNotEqualTo(
+                builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).applied());
     }
 
     public void testClashResolutionEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
+                                                           .applied();
         assertThat(configuration).isNotEqualTo(
-                builder().withClashResolution(ClashResolutionType.ABORT_THIS).apply());
-        assertThat(configuration.builderFrom()
-                                .withClashResolution(ClashResolutionType.JOIN)
-                                .apply()).isNotEqualTo(
-                builder().withClashResolution(ClashResolutionType.JOIN).apply());
+                builder().withClashResolution(ClashResolutionType.ABORT_THIS).applied());
+        assertThat(
+                configuration.builderFrom().withClashResolution(ClashResolutionType.JOIN).applied())
+                .isNotEqualTo(builder().withClashResolution(ClashResolutionType.JOIN).applied());
     }
 
     public void testFactoryIdEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withFactoryId(71)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
-        assertThat(configuration).isNotEqualTo(builder().withFactoryId(3).apply());
-        assertThat(configuration.builderFrom().withFactoryId(27).apply()).isNotEqualTo(
-                builder().withFactoryId(27).apply());
+                                                           .applied();
+        assertThat(configuration).isNotEqualTo(builder().withFactoryId(3).applied());
+        assertThat(configuration.builderFrom().withFactoryId(27).applied()).isNotEqualTo(
+                builder().withFactoryId(27).applied());
     }
 
     public void testIdEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
-        assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).apply());
-        assertThat(configuration.builderFrom().withLoaderId(27).apply()).isNotEqualTo(
-                builder().withLoaderId(27).apply());
+                                                           .applied();
+        assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).applied());
+        assertThat(configuration.builderFrom().withLoaderId(27).applied()).isNotEqualTo(
+                builder().withLoaderId(27).applied());
     }
 
-    public void testInputClashResolutionEquals() {
+    public void testMatchResolutionEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
+                                                           .applied();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputClashResolution(ClashResolutionType.ABORT_THIS).apply());
-        assertThat(configuration.builderFrom()
-                                .withInputClashResolution(ClashResolutionType.JOIN)
-                                .apply()).isNotEqualTo(
-                builder().withInputClashResolution(ClashResolutionType.JOIN).apply());
+                builder().withMatchResolution(ClashResolutionType.ABORT_THIS).applied());
+        assertThat(
+                configuration.builderFrom().withMatchResolution(ClashResolutionType.JOIN).applied())
+                .isNotEqualTo(builder().withMatchResolution(ClashResolutionType.JOIN).applied());
     }
 
     public void testStaleTimeEquals() {
 
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
+        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
         final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
+                                                           .withMatchResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .apply();
+                                                           .applied();
         assertThat(configuration).isNotEqualTo(
-                builder().withResultStaleTime(UnitDuration.days(3)).apply());
-        assertThat(configuration.builderFrom()
-                                .withResultStaleTime(UnitDuration.hours(7))
-                                .apply()).isNotEqualTo(
-                builder().withResultStaleTime(UnitDuration.hours(7)).apply());
+                builder().withResultStaleTime(UnitDuration.days(3)).applied());
+        assertThat(configuration.builderFrom().withResultStaleTime(UnitDuration.hours(7)).applied())
+                .isNotEqualTo(builder().withResultStaleTime(UnitDuration.hours(7)).applied());
     }
 
     @SuppressWarnings("ConstantConditions")

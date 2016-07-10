@@ -48,13 +48,11 @@ public class ExceptionTest extends ActivityInstrumentationTestCase2<TestActivity
 
         assertThat(new LoaderInvocationException().getId()).isEqualTo(-1);
         assertThat(new LoaderInvocationException(13).getId()).isEqualTo(13);
-        assertThat(new InvocationClashException().getId()).isEqualTo(-1);
+        assertThat(new LoaderClashException(13).getId()).isEqualTo(13);
         assertThat(new InvocationClashException(13).getId()).isEqualTo(13);
-        assertThat(new InvocationTypeException().getId()).isEqualTo(-1);
-        assertThat(new InvocationTypeException(13).getId()).isEqualTo(13);
+        assertThat(new TypeClashException(13).getId()).isEqualTo(13);
         assertThat(new MissingLoaderException().getId()).isEqualTo(-1);
         assertThat(new MissingLoaderException(13).getId()).isEqualTo(13);
-        assertThat(new StaleResultException().getId()).isEqualTo(-1);
         assertThat(new StaleResultException(13).getId()).isEqualTo(13);
     }
 
@@ -67,17 +65,23 @@ public class ExceptionTest extends ActivityInstrumentationTestCase2<TestActivity
         assertThat(object).isExactlyInstanceOf(LoaderInvocationException.class);
         assertThat(((LoaderInvocationException) object).getId()).isEqualTo(17);
         outputStream = new ByteArrayOutputStream();
+        new ObjectOutputStream(outputStream).writeObject(new LoaderClashException(17));
+        object = new ObjectInputStream(
+                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+        assertThat(object).isExactlyInstanceOf(LoaderClashException.class);
+        assertThat(((LoaderClashException) object).getId()).isEqualTo(17);
+        outputStream = new ByteArrayOutputStream();
         new ObjectOutputStream(outputStream).writeObject(new InvocationClashException(17));
         object = new ObjectInputStream(
                 new ByteArrayInputStream(outputStream.toByteArray())).readObject();
         assertThat(object).isExactlyInstanceOf(InvocationClashException.class);
         assertThat(((InvocationClashException) object).getId()).isEqualTo(17);
         outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new InvocationTypeException(17));
+        new ObjectOutputStream(outputStream).writeObject(new TypeClashException(17));
         object = new ObjectInputStream(
                 new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(InvocationTypeException.class);
-        assertThat(((InvocationTypeException) object).getId()).isEqualTo(17);
+        assertThat(object).isExactlyInstanceOf(TypeClashException.class);
+        assertThat(((TypeClashException) object).getId()).isEqualTo(17);
         outputStream = new ByteArrayOutputStream();
         new ObjectOutputStream(outputStream).writeObject(new MissingLoaderException(17));
         object = new ObjectInputStream(

@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core.runner;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.runner.Execution;
@@ -40,15 +41,13 @@ class HandlerRunner extends AsyncRunner {
 
     private final Handler mHandler;
 
-    private final Thread mThread;
-
     /**
      * Constructor.
      *
      * @param handler the handler to employ.
      */
     HandlerRunner(@NotNull final Handler handler) {
-        mThread = handler.getLooper().getThread();
+        super(new HandlerThreadManager(handler.getLooper()));
         mHandler = handler;
     }
 
@@ -60,11 +59,6 @@ class HandlerRunner extends AsyncRunner {
         }
 
         mHandler.removeCallbacks(decorator);
-    }
-
-    @Override
-    public boolean isManagedThread(@NotNull final Thread thread) {
-        return (mThread == thread);
     }
 
     @Override
@@ -85,6 +79,28 @@ class HandlerRunner extends AsyncRunner {
 
         } else {
             mHandler.post(decorator);
+        }
+    }
+
+    /**
+     * Thread manager implementation.
+     */
+    private static class HandlerThreadManager implements ThreadManager {
+
+        private final Looper mLooper;
+
+        /**
+         * Constructor.
+         *
+         * @param looper the handler looper.
+         */
+        private HandlerThreadManager(@NotNull final Looper looper) {
+            mLooper = looper;
+        }
+
+        @Override
+        public boolean isManagedThread() {
+            return (mLooper == Looper.myLooper());
         }
     }
 }

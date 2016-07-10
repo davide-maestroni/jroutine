@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindMap<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
+class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
     private final InvocationMode mInvocationMode;
 
@@ -51,18 +51,7 @@ class BindMap<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OUT>
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
-        final InvocationMode invocationMode = mInvocationMode;
-        if (invocationMode == InvocationMode.ASYNC) {
-            return mRoutine.asyncCall(channel);
-
-        } else if (invocationMode == InvocationMode.PARALLEL) {
-            return mRoutine.parallelCall(channel);
-
-        } else if (invocationMode == InvocationMode.SYNC) {
-            return mRoutine.syncCall(channel);
-        }
-
-        return mRoutine.serialCall(channel);
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+        return mInvocationMode.call(mRoutine).pass(channel).close();
     }
 }

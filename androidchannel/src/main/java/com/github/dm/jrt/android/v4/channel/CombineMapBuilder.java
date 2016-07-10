@@ -21,22 +21,21 @@ import android.support.v4.util.SparseArrayCompat;
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel combining data from a map of input channels.
+ * Builder implementation returning a channel combining data from a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends IN>>> {
+class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final SparseArrayCompat<? extends InputChannel<? extends IN>> mChannelMap;
+    private final SparseArrayCompat<? extends Channel<? extends IN, ?>> mChannelMap;
 
     /**
      * Constructor.
@@ -47,12 +46,12 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
      *                                            object.
      */
     CombineMapBuilder(
-            @NotNull final SparseArrayCompat<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
         if (channels.size() == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final SparseArrayCompat<? extends InputChannel<? extends IN>> channelMap = channels.clone();
+        final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = channels.clone();
         if (channelMap.indexOfValue(null) >= 0) {
             throw new NullPointerException("the map of channels must not contain null objects");
         }
@@ -63,21 +62,25 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected IOChannel<Selectable<? extends IN>> build(
+    protected Channel<Selectable<? extends IN>, ?> build(
             @NotNull final ChannelConfiguration configuration) {
-        final SparseArrayCompat<? extends InputChannel<? extends IN>> channelMap = mChannelMap;
+        final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
         final int size = channelMap.size();
-        final SparseArrayCompat<IOChannel<IN>> ioChannelMap =
-                new SparseArrayCompat<IOChannel<IN>>(size);
+        final SparseArrayCompat<Channel<IN, ?>> inputChannelMap =
+                new SparseArrayCompat<Channel<IN, ?>>(size);
         for (int i = 0; i < size; ++i) {
-            final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.bind(((InputChannel<IN>) channelMap.valueAt(i)));
-            ioChannelMap.put(channelMap.keyAt(i), ioChannel);
+            final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+            outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));
+            inputChannelMap.put(channelMap.keyAt(i), outputChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>> ioChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
-        ioChannel.bind(new SortingMapOutputConsumer<IN>(ioChannelMap));
-        return ioChannel;
+        final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
+                JRoutineCore.io()
+                            .channelConfiguration()
+                            .with(configuration)
+                            .applied()
+                            .buildChannel();
+        inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+        return inputChannel;
     }
 }

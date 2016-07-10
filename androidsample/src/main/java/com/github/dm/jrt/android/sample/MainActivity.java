@@ -24,7 +24,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.dm.jrt.android.v4.retrofit.LoaderAdapterFactoryCompat;
-import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         final LoaderAdapterFactoryCompat adapterFactory =
-                LoaderAdapterFactoryCompat.with(loaderFrom(this));
+                LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
         final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(GsonConverterFactory.create())
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        service.listRepos("octocat").bind(new TemplateOutputConsumer<List<Repo>>() {
+        service.listRepos("octocat").bind(new TemplateChannelConsumer<List<Repo>>() {
 
             @Override
             public void onError(@NotNull final RoutineException error) {

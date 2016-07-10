@@ -37,24 +37,21 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-            
                 return repo -> {
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -63,8 +60,8 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final LoaderAdapterFactory adapterFactory = 
-                        LoaderAdapterFactory.defaultFactory(loaderFrom(this));
+                final LoaderAdapterFactory adapterFactory =
+                        LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")
@@ -73,16 +70,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(Streams.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {
@@ -93,7 +90,6 @@
 
                 &commat;Override
                 public String toString() {
-
                     return name;
                 }
             }
@@ -111,24 +107,21 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-            
                 return repo -> {
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -137,8 +130,8 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final LoaderAdapterFactoryCompat adapterFactory = 
-                        LoaderAdapterFactoryCompat.defaultFactory(loaderFrom(this));
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")
@@ -147,16 +140,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(Streams.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {
@@ -167,7 +160,6 @@
 
                 &commat;Override
                 public String toString() {
-
                     return name;
                 }
             }
@@ -185,24 +177,21 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-            
                 return repo -> {
                     adapter.add(repo);
                 };
             }
-            
+
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load image", Toast.LENGTH_LONG).show();
                 };
             }
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -211,8 +200,8 @@
                     repoList.setAdapter(adapter);
                 }
 
-                final ServiceAdapterFactory adapterFactory = 
-                        ServiceAdapterFactory.defaultFactory(serviceFrom(this, MyRetrofitService.class));
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.on(serviceFrom(this, MyRetrofitService.class)).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")
@@ -221,16 +210,16 @@
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
-                       .map(Streams.&lt;Repo&gt;unfold())
+                       .map(Operators.&lt;Repo&gt;unfold())
                        .onOutput(addRepoTo(adapter))
                        .onError(showToast(this))
-                       .bind();
+                       .close();
             }
 
             public interface GitHubService {
 
                 &commat;GET("users/{user}/repos")
-                StreamChannel&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
+                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
             }
 
             public static class Repo {
@@ -241,7 +230,6 @@
 
                 &commat;Override
                 public String toString() {
-
                     return name;
                 }
             }

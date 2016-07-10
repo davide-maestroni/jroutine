@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.builder;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 03/29/2015.
  */
 public interface ServiceObjectRoutineBuilder
-        extends ObjectRoutineBuilder, ServiceConfigurableBuilder<ServiceObjectRoutineBuilder> {
+        extends ObjectRoutineBuilder, ServiceConfigurable<ServiceObjectRoutineBuilder> {
 
     /**
      * {@inheritDoc}

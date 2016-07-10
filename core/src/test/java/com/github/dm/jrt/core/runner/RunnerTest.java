@@ -136,8 +136,8 @@ public class RunnerTest {
         final TestRunner testRunner = new TestRunner();
         final Runner runner = Runners.priorityRunner(testRunner).getRunner(0);
         assertThat(runner.isExecutionThread()).isFalse();
-        testRunner.setExecutionThread(Thread.currentThread());
-        assertThat(runner.isExecutionThread()).isTrue();
+        testRunner.setExecutionThread(new Thread());
+        assertThat(runner.isExecutionThread()).isFalse();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         assertThat(execution.isRun()).isFalse();
         testRunner.getLastExecution().run();
@@ -369,10 +369,15 @@ public class RunnerTest {
         final AtomicReference<Runner> runner = new AtomicReference<Runner>();
         runner.set(Runners.zeroDelayRunner(new RunnerDecorator(Runners.syncRunner()) {
 
+            @NotNull
             @Override
-            public boolean isManagedThread(@NotNull final Thread thread) {
+            protected ThreadManager getThreadManager() {
+                return new ThreadManager() {
 
-                return true;
+                    public boolean isManagedThread() {
+                        return true;
+                    }
+                };
             }
         }));
         final TestExecution testExecution1 = new TestExecution() {
@@ -621,18 +626,14 @@ public class RunnerTest {
 
         private Execution mLastExecution;
 
-        private Thread mThread;
+        private TestRunner() {
+            super(new TestManager());
+        }
 
         @Override
         public void cancel(@NotNull final Execution execution) {
 
             mLastCancelExecution = execution;
-        }
-
-        @Override
-        public boolean isManagedThread(@NotNull final Thread thread) {
-
-            return (thread == mThread);
         }
 
         @Override
@@ -654,7 +655,16 @@ public class RunnerTest {
 
         private void setExecutionThread(final Thread thread) {
 
-            mThread = thread;
+            ((TestManager) getThreadManager()).mThreadId = thread.getId();
+        }
+
+        private static class TestManager implements ThreadManager {
+
+            private volatile long mThreadId;
+
+            public boolean isManagedThread() {
+                return (Thread.currentThread().getId() == mThreadId);
+            }
         }
     }
 }

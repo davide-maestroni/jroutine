@@ -1,7 +1,6 @@
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -13,16 +12,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder implementation returning a map of input channels accepting selectable data.
+ * Builder implementation returning a map of channels accepting selectable data.
  * <p>
  * Created by davide-maestroni on 05/03/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
  */
-class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer, IOChannel<IN>>> {
+class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer, Channel<IN, ?>>> {
 
-    private final InputChannel<? super Selectable<DATA>> mChannel;
+    private final Channel<? super Selectable<DATA>, ?> mChannel;
 
     private final HashSet<Integer> mIndexes;
 
@@ -34,9 +33,9 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
      * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
      *                                        null object.
      */
-    InputMapBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
+    InputMapBuilder(@NotNull final Channel<? super Selectable<DATA>, ?> channel,
             @NotNull final Set<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("input channel", channel);
+        mChannel = ConstantConditions.notNull("channel instance", channel);
         final HashSet<Integer> indexSet =
                 new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
         if (indexSet.contains(null)) {
@@ -48,18 +47,19 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
 
     @NotNull
     @Override
-    protected Map<Integer, IOChannel<IN>> build(@NotNull final ChannelConfiguration configuration) {
+    protected Map<Integer, Channel<IN, ?>> build(
+            @NotNull final ChannelConfiguration configuration) {
         final HashSet<Integer> indexes = mIndexes;
-        final InputChannel<? super Selectable<DATA>> channel = mChannel;
-        final HashMap<Integer, IOChannel<IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN>>(indexes.size());
+        final Channel<? super Selectable<DATA>, ?> channel = mChannel;
+        final HashMap<Integer, Channel<IN, ?>> channelMap =
+                new HashMap<Integer, Channel<IN, ?>>(indexes.size());
         for (final Integer index : indexes) {
-            final IOChannel<IN> ioChannel =
+            final Channel<IN, ?> inputChannel =
                     new InputSelectBuilder<DATA, IN>(channel, index).channelConfiguration()
                                                                     .with(configuration)
-                                                                    .apply()
+                                                                    .applied()
                                                                     .buildChannels();
-            channelMap.put(index, ioChannel);
+            channelMap.put(index, inputChannel);
         }
 
         return channelMap;

@@ -27,14 +27,14 @@ import com.github.dm.jrt.android.retrofit.Repo;
 import com.github.dm.jrt.android.retrofit.ServiceAdapterFactory;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.operator.Operators;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -53,6 +53,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.function.Functions.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -71,7 +72,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         super(TestActivity.class);
     }
 
-    private static void testLoaderStreamChannelAdapter(@Nullable final LoaderContext context) throws
+    private static void testLoaderStreamBuilderAdapter(@NotNull final LoaderContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -84,7 +85,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory =
+                        LoaderAdapterFactory.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -93,8 +95,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -103,19 +105,19 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .loaderConfiguration()
                                             .withResultStaleTime(seconds(3))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -125,8 +127,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -135,15 +137,15 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory =  //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -154,8 +156,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -164,16 +166,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory =  //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .invocationMode(InvocationMode.SERIAL)
+                        LoaderAdapterFactory.on(context)
+                                            .invocationMode(InvocationMode.SEQUENTIAL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -183,8 +185,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -193,22 +195,18 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -217,8 +215,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -227,18 +225,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -247,8 +243,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService2 service = retrofit.create(GitHubService2.class);
                 assertThat(service.streamLoaderRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -257,8 +253,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -267,7 +264,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testOutputChannelAdapter(@Nullable final LoaderContext context) throws
+    private static void testOutputChannelAdapter(@NotNull final LoaderContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -281,11 +278,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         try {
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -309,12 +305,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -338,12 +333,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -367,12 +361,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .invocationMode(InvocationMode.SERIAL)
+                        LoaderAdapterFactory.on(context)
+                                            .invocationMode(InvocationMode.SEQUENTIAL)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -395,18 +388,15 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .delegateFactory(factory)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -431,12 +421,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .delegateFactory(factory)
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .applied()
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -463,7 +452,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    private static void testStreamChannelAdapter(@Nullable final LoaderContext context) throws
+    private static void testStreamBuilderAdapter(@NotNull final LoaderContext context) throws
             IOException {
 
         final MockWebServer server = new MockWebServer();
@@ -476,7 +465,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         server.start();
         try {
             {
-                final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.with(context);
+                final LoaderAdapterFactory adapterFactory =
+                        LoaderAdapterFactory.on(context).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -485,8 +475,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -495,15 +485,15 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -514,8 +504,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -524,15 +514,15 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
+                        LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.SYNC)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
@@ -543,8 +533,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -553,16 +543,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .invocationMode(InvocationMode.SERIAL)
+                        LoaderAdapterFactory.on(context)
+                                            .invocationMode(InvocationMode.SEQUENTIAL)
                                             .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -572,8 +562,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -582,22 +572,18 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
-                final ServiceAdapterFactory factory =
-                        (context != null) ? ServiceAdapterFactory.defaultFactory(
-                                serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                                        TestService.class))
-                                : ServiceAdapterFactory.defaultFactory();
+                final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
+                        serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                                TestService.class)).buildFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -606,8 +592,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -616,18 +602,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
             {
                 final BodyAdapterFactory factory = new BodyAdapterFactory();
                 final LoaderAdapterFactory adapterFactory = //
-                        LoaderAdapterFactory.builder()
-                                            .with(context)
-                                            .delegateFactory(factory)
-                                            .buildFactory();
+                        LoaderAdapterFactory.on(context).delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -636,8 +620,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -646,8 +630,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(10))
+                                  }))
+                                  .close()
+                                  .after(seconds(10))
                                   .getError()).isNull();
             }
 
@@ -656,16 +641,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         }
     }
 
-    public void testLoaderStreamChannelAdapter() throws IOException {
+    public void testLoaderStreamBuilderAdapter() throws IOException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
         }
 
-        testLoaderStreamChannelAdapter(loaderFrom(getActivity()));
+        testLoaderStreamBuilderAdapter(loaderFrom(getActivity()));
     }
 
-    public void testLoaderStreamChannelAdapterFragment() throws IOException {
+    public void testLoaderStreamBuilderAdapterFragment() throws IOException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -674,16 +659,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testLoaderStreamChannelAdapter(loaderFrom(fragment));
-    }
-
-    public void testLoaderStreamChannelAdapterNullContext() throws IOException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testLoaderStreamChannelAdapter(null);
+        testLoaderStreamBuilderAdapter(loaderFrom(fragment));
     }
 
     public void testOutputChannelAdapter() throws IOException {
@@ -707,25 +683,16 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         testOutputChannelAdapter(loaderFrom(fragment));
     }
 
-    public void testOutputChannelAdapterNullContext() throws IOException {
+    public void testStreamBuilderAdapter() throws IOException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
         }
 
-        testOutputChannelAdapter(null);
+        testStreamBuilderAdapter(loaderFrom(getActivity()));
     }
 
-    public void testStreamChannelAdapter() throws IOException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testStreamChannelAdapter(loaderFrom(getActivity()));
-    }
-
-    public void testStreamChannelAdapterFragment() throws IOException {
+    public void testStreamBuilderAdapterFragment() throws IOException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -734,16 +701,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testStreamChannelAdapter(loaderFrom(fragment));
-    }
-
-    public void testStreamChannelAdapterNullContext() throws IOException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        testStreamChannelAdapter(null);
+        testStreamBuilderAdapter(loaderFrom(fragment));
     }
 
     private static class BodyAdapterFactory extends CallAdapter.Factory {
@@ -753,11 +711,11 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final Retrofit retrofit) {
 
             if (returnType instanceof ParameterizedType) {
-                if (((ParameterizedType) returnType).getRawType() == OutputChannel.class) {
+                if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                     return null;
                 }
 
-            } else if (returnType == OutputChannel.class) {
+            } else if (returnType == Channel.class) {
                 return null;
             }
 

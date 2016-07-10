@@ -20,9 +20,10 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.core.ChannelContextInvocation;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -49,10 +50,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testClass() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                                .syncCall("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class, true)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
                                .syncCall("test")
                                .all()).containsExactly("TEST");
     }
@@ -81,7 +82,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
         final InvocationFactory<String, String> factory =
                 fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryFrom(factory)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
                                .syncCall("TEST")
                                .all()).containsExactly("test");
     }
@@ -98,14 +99,27 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
+    public void testTemplateInvocation() {
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
+                               .syncCall()
+                               .close()
+                               .getError()).isNull();
+        assertThat(
+                JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
+                            .syncCall()
+                            .close()
+                            .getError()).isNull();
+    }
+
     public void testToken() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                                .syncCall("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                               .syncCall("test")
-                               .all()).containsExactly("TEST");
+        assertThat(
+                JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
+                            .syncCall("test")
+                            .all()).containsExactly("TEST");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -130,10 +144,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     public void testWrapper() {
 
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                                .syncCall("TEST")
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
+        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
                                .syncCall("test")
                                .all()).containsExactly("TEST");
     }
@@ -154,7 +168,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
 
         @Override
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) throws
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) throws
                 Exception {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
@@ -172,6 +186,24 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         public CaseWrapper(final boolean isUpper) {
 
             super(new Case(isUpper));
+        }
+    }
+
+    public static class ChannelContextTest extends ChannelContextInvocation<Object, Object> {
+
+        @NotNull
+        @Override
+        protected Channel<?, Object> onChannel(@NotNull final Channel<?, Object> channel) {
+            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
+            return channel;
+        }
+    }
+
+    public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+
+        @Override
+        public void onComplete(@NotNull final Channel<Object, ?> result) {
+            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
         }
     }
 }

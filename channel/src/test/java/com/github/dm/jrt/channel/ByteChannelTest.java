@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.junit.Test;
 
@@ -44,8 +44,8 @@ public class ByteChannelTest {
     @Test
     public void testAvailable() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -62,7 +62,7 @@ public class ByteChannelTest {
     @Test
     public void testBufferEquals() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -114,8 +114,8 @@ public class ByteChannelTest {
     @Test
     public void testConcatAvailable() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel(8).bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel(8).bindDeep(channel);
         final byte[] b = new byte[16];
         stream.write(b);
         stream.close();
@@ -134,7 +134,7 @@ public class ByteChannelTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void testConcatClose() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(2).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -147,8 +147,8 @@ public class ByteChannelTest {
     @Test
     public void testConcatMark() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel(4).bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -173,7 +173,7 @@ public class ByteChannelTest {
     @Test
     public void testConcatReadByte() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(2).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -189,7 +189,7 @@ public class ByteChannelTest {
     @Test
     public void testConcatReadByteArray() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(2).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -210,7 +210,7 @@ public class ByteChannelTest {
     @Test
     public void testConcatReadBytes() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(3).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -234,7 +234,7 @@ public class ByteChannelTest {
     @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
     public void testConcatReadError() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(2).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -319,7 +319,7 @@ public class ByteChannelTest {
     @Test
     public void testConcatReadOutput() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(3).bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -343,7 +343,7 @@ public class ByteChannelTest {
     @Test
     public void testConcatSkip() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
@@ -370,7 +370,7 @@ public class ByteChannelTest {
     @Test
     public void testDataPoolZero() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream =
                 ByteChannel.byteChannel(ByteChannel.DEFAULT_BUFFER_SIZE, 0).bind(channel);
         stream.write(31);
@@ -386,7 +386,7 @@ public class ByteChannelTest {
     @Test
     public void testInputClose() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(31);
         stream.flush();
@@ -426,8 +426,8 @@ public class ByteChannelTest {
     @Test
     public void testMark() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -451,8 +451,8 @@ public class ByteChannelTest {
     @Test
     public void testOutputClose() {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         stream.close();
         assertThat(channel.eventuallyBreak().all()).isEmpty();
         final byte[] b = new byte[16];
@@ -506,7 +506,7 @@ public class ByteChannelTest {
     @Test
     public void testReadAll() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -525,7 +525,7 @@ public class ByteChannelTest {
     @Test
     public void testReadByte() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -547,7 +547,7 @@ public class ByteChannelTest {
     @Test
     public void testReadByteArray() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -590,7 +590,7 @@ public class ByteChannelTest {
     @Test
     public void testReadBytes() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -643,7 +643,7 @@ public class ByteChannelTest {
     @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
     public void testReadError() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -727,7 +727,7 @@ public class ByteChannelTest {
     @Test
     public void testReadOutput() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -764,8 +764,8 @@ public class ByteChannelTest {
     @Test
     public void testSkip() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         final byte[] b =
                 new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7,
                            (byte) 8};
@@ -790,7 +790,7 @@ public class ByteChannelTest {
     @Test
     public void testStream() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(2).bind(channel);
         stream.write(1);
         stream.write(2);
@@ -807,18 +807,9 @@ public class ByteChannelTest {
     }
 
     @Test
-    public void testStreamCache() {
-
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
-        final ByteChannel byteChannel = ByteChannel.byteChannel();
-        final BufferOutputStream stream = byteChannel.bind(channel.asInput());
-        assertThat(byteChannel.bind(channel.asInput())).isSameAs(stream);
-    }
-
-    @Test
     public void testTransferFrom() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
         stream.transferFrom(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
         stream.flush();
@@ -833,7 +824,7 @@ public class ByteChannelTest {
     @Test
     public void testTransferTo() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(new byte[]{31, 17, (byte) 155, 13});
         stream.flush();
@@ -852,7 +843,7 @@ public class ByteChannelTest {
     @Test
     public void testWriteAll() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
         stream.writeAll(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
         stream.flush();
@@ -867,7 +858,7 @@ public class ByteChannelTest {
     @Test
     public void testWriteByte() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(77);
         stream.flush();
@@ -895,7 +886,7 @@ public class ByteChannelTest {
     @Test
     public void testWriteByteArray() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(new byte[]{77, 33});
         stream.flush();
@@ -928,7 +919,7 @@ public class ByteChannelTest {
     @Test
     public void testWriteBytes() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         stream.write(new byte[]{1, 77, 33}, 1, 1);
         stream.flush();
@@ -971,7 +962,7 @@ public class ByteChannelTest {
 
         }
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bind(channel);
         final byte[] b = new byte[16];
 
@@ -1062,7 +1053,7 @@ public class ByteChannelTest {
     @Test
     public void testWriteInput() throws IOException {
 
-        final IOChannel<ByteBuffer> channel = JRoutineCore.io().buildChannel();
+        final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel(4).bind(channel);
         stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
         stream.flush();

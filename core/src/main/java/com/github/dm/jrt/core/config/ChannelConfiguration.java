@@ -16,10 +16,9 @@
 
 package com.github.dm.jrt.core.config;
 
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -69,7 +68,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
     /**
      * Constant indicating the default value of an integer attribute.
      */
-    public static final int DEFAULT = InvocationConfiguration.DEFAULT;
+    public static final int DEFAULT = Integer.MIN_VALUE;
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
@@ -150,74 +149,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
             @Nullable final ChannelConfiguration initialConfiguration) {
         return (initialConfiguration == null) ? builder()
                 : new Builder<ChannelConfiguration>(sDefaultConfigurable, initialConfiguration);
-    }
-
-    /**
-     * Returns a channel configuration builder initialized with a channel configuration converted
-     * from the specified one by applying the matching input channel options.
-     *
-     * @param initialConfiguration the initial configuration.
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<ChannelConfiguration> builderFromInputChannel(
-            @Nullable final InvocationConfiguration initialConfiguration) {
-        if (initialConfiguration == null) {
-            return builder();
-        }
-
-        final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withOrder(initialConfiguration.getInputOrderTypeOrElse(null))
-                      .withLimit(initialConfiguration.getInputLimitOrElse(
-                              ChannelConfiguration.DEFAULT))
-                      .withBackoff(initialConfiguration.getInputBackoffOrElse(null))
-                      .withMaxSize(initialConfiguration.getInputMaxSizeOrElse(
-                              ChannelConfiguration.DEFAULT));
-    }
-
-    /**
-     * Returns a channel configuration builder initialized with a channel configuration converted
-     * from the specified one by applying the matching options.
-     *
-     * @param initialConfiguration the initial configuration.
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<ChannelConfiguration> builderFromInvocation(
-            @Nullable final InvocationConfiguration initialConfiguration) {
-        if (initialConfiguration == null) {
-            return builder();
-        }
-
-        return builder().withRunner(initialConfiguration.getRunnerOrElse(null))
-                        .withOutputTimeout(initialConfiguration.getOutputTimeoutOrElse(null))
-                        .withOutputTimeoutAction(
-                                initialConfiguration.getOutputTimeoutActionOrElse(null))
-                        .withLog(initialConfiguration.getLogOrElse(null))
-                        .withLogLevel(initialConfiguration.getLogLevelOrElse(null));
-    }
-
-    /**
-     * Returns a channel configuration builder initialized with a channel configuration converted
-     * from the specified one by applying the output channel matching options.
-     *
-     * @param initialConfiguration the initial configuration.
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<ChannelConfiguration> builderFromOutputChannel(
-            @Nullable final InvocationConfiguration initialConfiguration) {
-        if (initialConfiguration == null) {
-            return builder();
-        }
-
-        final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withOrder(initialConfiguration.getOutputOrderTypeOrElse(null))
-                      .withLimit(initialConfiguration.getOutputLimitOrElse(
-                              ChannelConfiguration.DEFAULT))
-                      .withBackoff(initialConfiguration.getOutputBackoffOrElse(null))
-                      .withMaxSize(initialConfiguration.getOutputMaxSizeOrElse(
-                              ChannelConfiguration.DEFAULT));
     }
 
     /**
@@ -344,50 +275,62 @@ public final class ChannelConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Converts this configuration into an invocation one by applying the matching options to the
-     * invocation input channel.
+     * Creates a new logger based on this configuration.
      *
-     * @return the invocation configuration builder.
+     * @param context the context.
+     * @return the new logger.
      */
     @NotNull
-    public InvocationConfiguration.Builder<InvocationConfiguration> toInputChannelConfiguration() {
-        return toInvocationConfiguration().withInputOrder(getOrderTypeOrElse(null))
-                                          .withInputLimit(
-                                                  getLimitOrElse(InvocationConfiguration.DEFAULT))
-                                          .withInputBackoff(getBackoffOrElse(null))
-                                          .withInputMaxSize(getMaxSizeOrElse(
-                                                  InvocationConfiguration.DEFAULT));
+    public Logger newLogger(@NotNull final Object context) {
+        return Logger.newLogger(getLogOrElse(null), getLogLevelOrElse(null), context);
     }
 
     /**
-     * Converts this configuration into an invocation one by mapping the matching options.
-     *
-     * @return the invocation configuration builder.
+     * Enumeration defining how data are ordered inside a channel.
      */
-    @NotNull
-    public InvocationConfiguration.Builder<InvocationConfiguration> toInvocationConfiguration() {
-        return InvocationConfiguration.builder()
-                                      .withRunner(getRunnerOrElse(null))
-                                      .withOutputTimeout(getOutputTimeoutOrElse(null))
-                                      .withOutputTimeoutAction(getOutputTimeoutActionOrElse(null))
-                                      .withLog(getLogOrElse(null))
-                                      .withLogLevel(getLogLevelOrElse(null));
+    public enum OrderType {
+
+        /**
+         * Order by call.
+         * <br>
+         * Data are passed to the invocation or the channel consumer in the same order as they are
+         * passed to the channel, independently from the specific delay.
+         */
+        BY_CALL,
+        /**
+         * Order by delay.
+         * <br>
+         * Data are passed to the invocation or the channel consumer based on their delay.
+         */
+        BY_DELAY
     }
 
     /**
-     * Converts this configuration into an invocation one by applying the matching options to the
-     * invocation output channel.
-     *
-     * @return the invocation configuration builder.
+     * Enumeration indicating the type of action to be taken on output channel timeout.
      */
-    @NotNull
-    public InvocationConfiguration.Builder<InvocationConfiguration> toOutputChannelConfiguration() {
-        return toInvocationConfiguration().withOutputOrder(getOrderTypeOrElse(null))
-                                          .withOutputLimit(
-                                                  getLimitOrElse(InvocationConfiguration.DEFAULT))
-                                          .withOutputBackoff(getBackoffOrElse(null))
-                                          .withOutputMaxSize(getMaxSizeOrElse(
-                                                  InvocationConfiguration.DEFAULT));
+    public enum TimeoutActionType {
+
+        /**
+         * Fail with exception.
+         * <br>
+         * If no result is available after the specified timeout, the called method will throw an
+         * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
+         */
+        FAIL,
+        /**
+         * Break execution.
+         * <br>
+         * If no result is available after the specified timeout, the called method will stop its
+         * execution and exit immediately.
+         */
+        BREAK,
+        /**
+         * Abort invocation.
+         * <br>
+         * If no result is available after the specified timeout, the invocation will be aborted and
+         * the method will immediately exit.
+         */
+        ABORT
     }
 
     /**
@@ -463,7 +406,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE apply() {
+        public TYPE applied() {
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -589,7 +532,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * <p>
          * This configuration option is useful when the data coming from the invocation execution
          * are meant to be explicitly read through this channel. The execution will slow down until
-         * enough data are consumed. Note, however, that binding the channel to an output consumer
+         * enough data are consumed. Note, however, that binding the channel to a channel consumer
          * will make the option ineffective.
          *
          * @param limit the limit.

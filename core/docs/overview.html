@@ -34,24 +34,23 @@
         public class Main {
 
             public static void main(final String[] args) {
-
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.on(factoryOf(Parse.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(Parse.class)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.on(factoryOf(Square.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(Square.class)).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(factoryOf(SquareRootMean.class)).buildRoutine();
+                        JRoutineCore.with(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .afterMax(seconds(3))
+                                   .after(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.parallelCall(args)
-                //                                .bind(squareRoutine.parallelInvoke())
-                //                                .result()
-                //                                .bind(meanRoutine.asyncInvoke())
-                //                                .result()
-                //                                .afterMax(seconds(3))
+                // final Double rms = parseRoutine.parallel(args)
+                //                                .bind(squareRoutine.parallel())
+                //                                .close()
+                //                                .bind(meanRoutine.async())
+                //                                .close()
+                //                                .after(seconds(3))
                 //                                .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -60,8 +59,7 @@
             private static class Parse extends TemplateInvocation&lt;String, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
-
+                public void onInput(final String s, &commat;NotNull final Channel&lt;Integer, ?&gt; result) {
                     result.pass(Integer.parseInt(s));
                 }
             }
@@ -69,8 +67,7 @@
             private static class Square extends TemplateInvocation&lt;Integer, Integer&gt; {
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
-
+                public void onInput(final Integer integer, &commat;NotNull final Channel&lt;Integer, ?&gt; result) {
                     final int input = integer;
                     result.pass(input * input);
                 }
@@ -83,22 +80,19 @@
                 private int mSum;
 
                 &commat;Override
-                public void onInitialize() {
-
+                public void onRestart() {
                     mCount = 0;
                     mSum = 0;
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
-
+                public void onInput(final Integer integer, &commat;NotNull final Channel&lt;Double, ?&gt; result) {
                     ++mCount;
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
-
+                public void onComplete(&commat;NotNull final Channel&lt;Double, ?&gt; result) {
                     if (mCount > 0) {
                         result.pass(Math.sqrt((double) mSum / mCount));
 
@@ -119,22 +113,21 @@
         public class Main {
 
             public static void main(final String[] args) {
-
-                final Routine&lt;String, Integer&gt; parseRoutine = JRoutineCore.on(new Parse()).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.on(new Square()).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine = JRoutineCore.with(new Parse()).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.with(new Square()).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(new SquareRootMeanFactory()).buildRoutine();
+                        JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .afterMax(seconds(3))
+                                   .after(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.parallelCall(args)
-                //                                .bind(squareRoutine.parallelInvoke())
-                //                                .result()
-                //                                .bind(meanRoutine.asyncInvoke())
-                //                                .result()
-                //                                .afterMax(seconds(3))
+                // final Double rms = parseRoutine.parallel(args)
+                //                                .bind(squareRoutine.parallel())
+                //                                .close()
+                //                                .bind(meanRoutine.async())
+                //                                .close()
+                //                                .after(seconds(3))
                 //                                .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -143,12 +136,10 @@
             private static class Parse extends MappingInvocation&lt;String, Integer&gt; {
 
                 public Parse() {
-
                     super(null);
                 }
 
-                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
-
+                public void onInput(final String s, &commat;NotNull final Channel&lt;Integer, ?&gt; result) {
                     result.pass(Integer.parseInt(s));
                 }
             }
@@ -156,12 +147,10 @@
             private static class Square extends MappingInvocation&lt;Integer, Integer&gt; {
 
                 public Square() {
-
                     super(null);
                 }
 
-                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
-
+                public void onInput(final Integer integer, &commat;NotNull final Channel&lt;Integer, ?&gt; result) {
                     final int input = integer;
                     result.pass(input * input);
                 }
@@ -174,22 +163,19 @@
                 private int mSum;
 
                 &commat;Override
-                public void onInitialize() {
-
+                public void onRestart() {
                     mCount = 0;
                     mSum = 0;
                 }
 
                 &commat;Override
-                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
-
+                public void onInput(final Integer integer, &commat;NotNull final Channel&lt;Double, ?&gt; result) {
                     ++mCount;
                     mSum += integer;
                 }
 
                 &commat;Override
-                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
-
+                public void onResult(&commat;NotNull final Channel&lt;Double, ?&gt; result) {
                     if (mCount > 0) {
                         result.pass(Math.sqrt((double) mSum / mCount));
 
@@ -202,13 +188,11 @@
             private static class SquareRootMeanFactory extends InvocationFactory&lt;Integer, Double&gt; {
 
                 public SquareRootMeanFactory() {
-
                     super(null);
                 }
 
                 &commat;NotNull
                 public Invocation&lt;Integer, Double&gt; newInvocation() {
-
                    return new SquareRootMean();
                 }
             }

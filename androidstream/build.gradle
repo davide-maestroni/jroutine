@@ -83,10 +83,6 @@ findbugs {
     toolVersion project.getProperty('findbugsVersion')
 }
 
-tasks.withType(FindBugs) {
-    excludeFilter = file('findbugs.xml')
-}
-
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")

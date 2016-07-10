@@ -29,13 +29,11 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolution
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
-import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
+import com.github.dm.jrt.android.core.invocation.TypeClashException;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.log.Logger;
@@ -84,11 +82,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private final ContextInvocationFactory<IN, OUT> mFactory;
 
-    private final ClashResolutionType mInputClashResolutionType;
-
     private final int mLoaderId;
 
     private final Logger mLogger;
+
+    private final ClashResolutionType mMatchResolutionType;
 
     private final OrderType mOrderType;
 
@@ -111,9 +109,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
         mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mClashResolutionType =
-                configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_THAT);
-        mInputClashResolutionType =
-                configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
+                configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_OTHER);
+        mMatchResolutionType = configuration.getMatchResolutionTypeOrElse(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
         mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(infinity()).toMillis();
         mOrderType = order;
@@ -126,7 +123,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param context  the context instance.
      * @param loaderId the loader ID.
      */
-    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
+    static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
         sMainRunner.run(new PurgeExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
     }
 
@@ -137,7 +134,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param inputs   the invocation inputs.
      */
-    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
+    static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final List<?> inputs) {
         sMainRunner.run(new PurgeInputsExecution(context, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
@@ -150,7 +147,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
+    static void clearLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory) {
         sMainRunner.run(new PurgeFactoryExecution(context, factory, loaderId), 0,
                 TimeUnit.MILLISECONDS);
@@ -164,7 +161,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param factory  the invocation factory.
      * @param inputs   the invocation inputs.
      */
-    static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
+    static void clearLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
         sMainRunner.run(new PurgeFactoryInputsExecution(context, factory, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
@@ -355,15 +352,15 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
         final Routine<IN, OUT> routine =
-                JRoutineCore.on(fromFactory(loaderContext.getApplicationContext(), factory))
+                JRoutineCore.with(fromFactory(loaderContext.getApplicationContext(), factory))
                             .buildRoutine();
-        routine.syncInvoke().abort(reason);
-        routine.purge();
+        routine.syncCall().abort(reason);
+        routine.clear();
     }
 
     @Override
     protected void onCall(@NotNull final List<? extends IN> inputs,
-            @NotNull final ResultChannel<OUT> result) throws Exception {
+            @NotNull final Channel<OUT, ?> result) throws Exception {
         final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
         final Context loaderContext = context.getLoaderContext();
@@ -406,12 +403,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             throw clashException;
         }
 
-        final boolean isRoutineLoader =
-                (loader != null) && (loader.getClass() == InvocationLoader.class);
+        final boolean isRoutineLoader = InvocationLoader.class.isInstance(loader);
         final boolean isStaleResult =
                 isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
-        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_THAT)
+        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_OTHER)
                 || isStaleResult) {
             final InvocationLoader<IN, OUT> invocationLoader;
             if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
@@ -426,7 +422,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                             loaderId);
             if (callbacks != null) {
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
-                callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
+                callbacks.reset(((clashType == ClashType.ABORT_OTHER) || !isStaleResult)
                         ? new InvocationClashException(loaderId)
                         : new StaleResultException(loaderId));
             }
@@ -439,7 +435,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
         callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel());
-        if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {
+        if ((clashType == ClashType.ABORT_OTHER) || isStaleResult) {
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
@@ -488,33 +484,32 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final Logger logger = mLogger;
         if (loader.getClass() != InvocationLoader.class) {
             logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
-            throw new InvocationTypeException(loaderId);
+            throw new TypeClashException(loaderId);
         }
 
         final ContextInvocationFactory<IN, OUT> factory = mFactory;
-        @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
-                (InvocationLoader<IN, OUT>) loader;
-        if (!(factory instanceof MissingLoaderInvocationFactory)
-                && !invocationLoader.getInvocationFactory().equals(factory)) {
-            logger.wrn("clashing loader ID [%d]: %s", loaderId,
-                    invocationLoader.getInvocationFactory());
-            throw new InvocationTypeException(loaderId);
+        if (factory instanceof MissingLoaderInvocationFactory) {
+            logger.dbg("joining existing invocation [%d]", loaderId);
+            return ClashType.NONE;
         }
 
+        @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
+                (InvocationLoader<IN, OUT>) loader;
         final ClashResolutionType resolution =
-                invocationLoader.areSameInputs(inputs) ? mInputClashResolutionType
+                (invocationLoader.getInvocationFactory().equals(factory)
+                        && invocationLoader.areSameInputs(inputs)) ? mMatchResolutionType
                         : mClashResolutionType;
         if (resolution == ClashResolutionType.JOIN) {
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return ClashType.NONE;
 
-        } else if (resolution == ClashResolutionType.ABORT) {
+        } else if (resolution == ClashResolutionType.ABORT_BOTH) {
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_BOTH;
 
-        } else if (resolution == ClashResolutionType.ABORT_THAT) {
+        } else if (resolution == ClashResolutionType.ABORT_OTHER) {
             logger.dbg("restarting existing invocation [%d]", loaderId);
-            return ClashType.ABORT_THAT;
+            return ClashType.ABORT_OTHER;
 
         } else if (resolution == ClashResolutionType.ABORT_THIS) {
             logger.dbg("aborting invocation [%d]", loaderId);
@@ -529,9 +524,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     private enum ClashType {
 
-        NONE,       // no clash detected
-        ABORT_THAT, // need to abort the running loader
-        ABORT_BOTH  // need to abort both the invocation and the running loader
+        NONE,        // no clash detected
+        ABORT_OTHER, // need to abort the running loader
+        ABORT_BOTH   // need to abort both the invocation and the running loader
     }
 
     /**
@@ -702,9 +697,10 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private static class RoutineLoaderCallbacks<OUT>
             implements LoaderCallbacks<InvocationResult<OUT>> {
 
-        private final ArrayList<IOChannel<OUT>> mAbortedChannels = new ArrayList<IOChannel<OUT>>();
+        private final ArrayList<Channel<OUT, ?>> mAbortedChannels =
+                new ArrayList<Channel<OUT, ?>>();
 
-        private final ArrayList<IOChannel<OUT>> mChannels = new ArrayList<IOChannel<OUT>>();
+        private final ArrayList<Channel<OUT, ?>> mChannels = new ArrayList<Channel<OUT, ?>>();
 
         private final InvocationLoader<?, OUT> mLoader;
 
@@ -712,7 +708,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         private final Logger mLogger;
 
-        private final ArrayList<IOChannel<OUT>> mNewChannels = new ArrayList<IOChannel<OUT>>();
+        private final ArrayList<Channel<OUT, ?>> mNewChannels = new ArrayList<Channel<OUT, ?>>();
 
         private CacheStrategyType mCacheStrategyType;
 
@@ -743,13 +739,13 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 final InvocationResult<OUT> data) {
             final Logger logger = mLogger;
             final InvocationLoader<?, OUT> internalLoader = mLoader;
-            final ArrayList<IOChannel<OUT>> channels = mChannels;
-            final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
-            final ArrayList<IOChannel<OUT>> abortedChannels = mAbortedChannels;
+            final ArrayList<Channel<OUT, ?>> channels = mChannels;
+            final ArrayList<Channel<OUT, ?>> newChannels = mNewChannels;
+            final ArrayList<Channel<OUT, ?>> abortedChannels = mAbortedChannels;
             logger.dbg("dispatching invocation result: %s", data);
             if (data.passTo(newChannels, channels, abortedChannels)) {
-                final ArrayList<IOChannel<OUT>> channelsToClose =
-                        new ArrayList<IOChannel<OUT>>(channels);
+                final ArrayList<Channel<OUT, ?>> channelsToClose =
+                        new ArrayList<Channel<OUT, ?>>(channels);
                 channelsToClose.addAll(newChannels);
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
@@ -770,12 +766,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
                 if (data.isError()) {
                     final RoutineException exception = data.getAbortException();
-                    for (final IOChannel<OUT> channel : channelsToClose) {
+                    for (final Channel<OUT, ?> channel : channelsToClose) {
                         channel.abort(exception);
                     }
 
                 } else {
-                    for (final IOChannel<OUT> channel : channelsToClose) {
+                    for (final Channel<OUT, ?> channel : channelsToClose) {
                         channel.close();
                     }
                 }
@@ -798,17 +794,17 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
 
         @NotNull
-        private OutputChannel<OUT> newChannel() {
+        private Channel<?, OUT> newChannel() {
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
-            final ArrayList<IOChannel<OUT>> channels = mNewChannels;
-            final IOChannel<OUT> channel = JRoutineCore.io()
-                                                       .channelConfiguration()
-                                                       .withLog(logger.getLog())
-                                                       .withLogLevel(logger.getLogLevel())
-                                                       .apply()
-                                                       .buildChannel();
+            final ArrayList<Channel<OUT, ?>> channels = mNewChannels;
+            final Channel<OUT, OUT> channel = JRoutineCore.io()
+                                                          .channelConfiguration()
+                                                          .withLog(logger.getLog())
+                                                          .withLogLevel(logger.getLogLevel())
+                                                          .applied()
+                                                          .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                     internalLoader.getInvocationCount()));
@@ -818,14 +814,14 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         private void reset(@Nullable final Throwable reason) {
             mLogger.dbg("aborting result channels");
             mResultCount = 0;
-            final ArrayList<IOChannel<OUT>> channels = mChannels;
-            final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
-            for (final IOChannel<OUT> channel : channels) {
+            final ArrayList<Channel<OUT, ?>> channels = mChannels;
+            final ArrayList<Channel<OUT, ?>> newChannels = mNewChannels;
+            for (final Channel<OUT, ?> channel : channels) {
                 channel.abort(reason);
             }
 
             channels.clear();
-            for (final IOChannel<OUT> newChannel : newChannels) {
+            for (final Channel<OUT, ?> newChannel : newChannels) {
                 newChannel.abort(reason);
             }
 

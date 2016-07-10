@@ -41,7 +41,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public static ContextBuilder with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
+    public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
         return new ContextBuilder(context);
     }
 
@@ -49,7 +49,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     private static <OUT> com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder<Object, OUT> getBuilder(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.ContextInvocationFactory<Object, OUT> factory) {
-        return com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.with(context).on(factory);
+        return com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.on(context).with(factory);
     }
 
     public static class ContextBuilder {
@@ -61,7 +61,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @org.jetbrains.annotations.NotNull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
             if (!target.isOfType(${classErasure}.class)) {
                 throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                         "${classFullName}");

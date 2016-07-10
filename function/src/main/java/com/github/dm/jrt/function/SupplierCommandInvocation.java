@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -33,19 +33,19 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-    private final SupplierWrapper<? extends OUT> mSupplier;
+    private final SupplierDecorator<? extends OUT> mSupplier;
 
     /**
      * Constructor.
      *
      * @param supplier the supplier instance.
      */
-    public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
+    public SupplierCommandInvocation(@NotNull final SupplierDecorator<? extends OUT> supplier) {
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
         result.pass(mSupplier.get());
     }
 }

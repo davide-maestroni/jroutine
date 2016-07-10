@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.builder;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 05/13/2015.
  */
 public interface ServiceProxyRoutineBuilder
-        extends ProxyRoutineBuilder, ServiceConfigurableBuilder<ServiceProxyRoutineBuilder> {
+        extends ProxyRoutineBuilder, ServiceConfigurable<ServiceProxyRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

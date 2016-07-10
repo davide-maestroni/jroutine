@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.core.runner;
 
-import com.github.dm.jrt.core.util.ConstantConditions;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -37,7 +35,8 @@ public class RunnerDecorator extends Runner {
      * @param wrapped the wrapped instance.
      */
     public RunnerDecorator(@NotNull final Runner wrapped) {
-        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
+        super(wrapped.getThreadManager());
+        mRunner = wrapped;
     }
 
     @Override
@@ -48,11 +47,6 @@ public class RunnerDecorator extends Runner {
     @Override
     public boolean isExecutionThread() {
         return mRunner.isExecutionThread();
-    }
-
-    @Override
-    public boolean isManagedThread(@NotNull final Thread thread) {
-        return mRunner.isManagedThread(thread);
     }
 
     @Override

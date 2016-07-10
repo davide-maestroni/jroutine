@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.operator.Operators;
 
 import org.junit.Test;
 
@@ -39,6 +39,7 @@ import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.function.Functions.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -68,7 +69,7 @@ public class RoutineAdapterFactoryTest {
                         RoutineAdapterFactory.builder()
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -96,7 +97,7 @@ public class RoutineAdapterFactoryTest {
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -124,7 +125,7 @@ public class RoutineAdapterFactoryTest {
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -149,10 +150,10 @@ public class RoutineAdapterFactoryTest {
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -181,7 +182,7 @@ public class RoutineAdapterFactoryTest {
                                              .delegateFactory(factory)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -210,7 +211,7 @@ public class RoutineAdapterFactoryTest {
                                              .delegateFactory(factory)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .apply()
+                                             .applied()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -238,7 +239,7 @@ public class RoutineAdapterFactoryTest {
     }
 
     @Test
-    public void testStreamChannelAdapter() throws IOException {
+    public void testStreamBuilderAdapter() throws IOException {
 
         final MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(BODY));
@@ -259,8 +260,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -269,8 +270,9 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -287,8 +289,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -297,8 +299,9 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -315,8 +318,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -325,15 +328,16 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.SERIAL)
+                                             .invocationMode(InvocationMode.SEQUENTIAL)
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -343,8 +347,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -353,8 +357,9 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -370,8 +375,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -380,8 +385,9 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -397,8 +403,8 @@ public class RoutineAdapterFactoryTest {
                                      .build();
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
-                                  .map(Streams.<Repo>unfold())
-                                  .onOutput(new Consumer<Repo>() {
+                                  .map(Operators.<Repo>unfold())
+                                  .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
 
@@ -407,8 +413,9 @@ public class RoutineAdapterFactoryTest {
                                           assertThat(repo.getName()).isEqualTo("Repo" + id);
                                           assertThat(repo.isPrivate()).isEqualTo(id == 3);
                                       }
-                                  })
-                                  .afterMax(seconds(3))
+                                  }))
+                                  .close()
+                                  .after(seconds(3))
                                   .getError()).isNull();
             }
 
@@ -424,11 +431,11 @@ public class RoutineAdapterFactoryTest {
                 final Retrofit retrofit) {
 
             if (returnType instanceof ParameterizedType) {
-                if (((ParameterizedType) returnType).getRawType() == OutputChannel.class) {
+                if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                     return null;
                 }
 
-            } else if (returnType == OutputChannel.class) {
+            } else if (returnType == Channel.class) {
                 return null;
             }
 

@@ -37,7 +37,6 @@ public class InvocationFactoryTest {
 
     @Test
     public void testDecoratingInvocationFactory() throws Exception {
-
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         assertThat(factory.newInvocation()).isExactlyInstanceOf(IdentityInvocation.class);
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
@@ -47,7 +46,6 @@ public class InvocationFactoryTest {
 
     @Test
     public void testDecoratingInvocationFactoryEquals() {
-
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         assertThat(decoratedFactory).isEqualTo(decoratedFactory);
@@ -63,36 +61,28 @@ public class InvocationFactoryTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testDecoratingInvocationFactoryError() {
-
         try {
-
             new TestInvocationFactory(null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
-
         }
     }
 
     @Test
     public void testInvocationDecoratorAbort() {
-
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
-        routine.purge();
+        final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
+        assertThat(routine.asyncCall().after(millis(100)).pass("test").abort()).isTrue();
     }
 
     @Test
     public void testInvocationDecoratorLifecycle() {
-
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
-        routine.purge();
+        final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
+        assertThat(routine.asyncCall("test").after(seconds(1)).all()).containsExactly("test");
     }
 
     private static class TestInvocationDecorator extends InvocationDecorator<String, String> {
@@ -103,7 +93,6 @@ public class InvocationFactoryTest {
          * @param wrapped the wrapped invocation instance.
          */
         public TestInvocationDecorator(@NotNull final Invocation<String, String> wrapped) {
-
             super(wrapped);
         }
     }
@@ -116,7 +105,6 @@ public class InvocationFactoryTest {
          * @param wrapped the wrapped factory instance.
          */
         public TestInvocationFactory(@NotNull final InvocationFactory<String, String> wrapped) {
-
             super(wrapped);
         }
 
@@ -124,7 +112,6 @@ public class InvocationFactoryTest {
         @Override
         protected Invocation<String, String> decorate(
                 @NotNull final Invocation<String, String> invocation) {
-
             return new TestInvocationDecorator(invocation);
         }
     }

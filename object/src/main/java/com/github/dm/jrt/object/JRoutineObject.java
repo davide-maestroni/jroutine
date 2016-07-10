@@ -49,11 +49,11 @@ import org.jetbrains.annotations.NotNull;
  *         public interface AsyncCallback {
  *
  *             public void onResults(
- *                  &#64;AsyncIn(Result.class) OutputChannel&lt;Result&gt; result1,
- *                  &#64;AsyncIn(Result.class) OutputChannel&lt;Result&gt; result2);
+ *                  &#64;AsyncIn(Result.class) Channel&lt;?, Result&gt; result1,
+ *                  &#64;AsyncIn(Result.class) Channel&lt;?, Result&gt; result2);
  *         }
  *
- *         final AsyncCallback callback = JRoutineObject.on(instance(myCallback))
+ *         final AsyncCallback callback = JRoutineObject.with(instance(myCallback))
  *                                                      .buildProxy(AsyncCallback.class);
  *         callback.onResults(routine1.asyncCall(), routine2.asyncCall());
  *     </code>
@@ -91,7 +91,7 @@ public class JRoutineObject {
      *                                            interface.
      */
     @NotNull
-    public static ObjectRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static ObjectRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
         return new DefaultObjectRoutineBuilder(target);
     }
 }

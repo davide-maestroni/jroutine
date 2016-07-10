@@ -17,14 +17,14 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
-import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.builder.ChannelConfigurable;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a builder of output channels bound to loader invocations.
+ * Interface defining a builder of channels bound to loader invocations.
  * <br>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still be running (or cached) at the time of the channel creation.
@@ -33,51 +33,51 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
-public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderChannelBuilder>,
-        LoaderConfigurableBuilder<LoaderChannelBuilder> {
+public interface LoaderChannelBuilder extends ChannelConfigurable<LoaderChannelBuilder>,
+        LoaderConfigurable<LoaderChannelBuilder> {
 
     /**
-     * Builds and returns an output channel bound to the routine invocation.
+     * Builds and returns a channel bound to the routine invocation.
      *
      * @param <OUT> the output data type.
-     * @return the newly created output channel.
+     * @return the newly created channel.
      * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
      */
     @NotNull
-    <OUT> OutputChannel<OUT> buildChannel();
+    <OUT> Channel<?, OUT> buildChannel();
 
     /**
-     * Note that the clash resolution types will be ignored.
+     * Makes the builder discard all the cached invocation instances.
+     */
+    void clear();
+
+    /**
+     * Makes the builder discard the cached invocation instances with the specified input.
      *
-     * @return the loader configuration builder.
+     * @param input the input.
+     */
+    void clear(@Nullable Object input);
+
+    /**
+     * Makes the builder discard the cached invocation instances with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    void clear(@Nullable Object... inputs);
+
+    /**
+     * Makes the builder discard the cached invocation instances with the specified inputs.
+     *
+     * @param inputs the inputs.
+     */
+    void clear(@Nullable Iterable<?> inputs);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The clash resolution types will be ignored.
      */
     @NotNull
     @Override
     Builder<? extends LoaderChannelBuilder> loaderConfiguration();
-
-    /**
-     * Makes the builder destroy all the cached invocation instances.
-     */
-    void purge();
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified input.
-     *
-     * @param input the input.
-     */
-    void purge(@Nullable Object input);
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void purge(@Nullable Object... inputs);
-
-    /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void purge(@Nullable Iterable<?> inputs);
 }

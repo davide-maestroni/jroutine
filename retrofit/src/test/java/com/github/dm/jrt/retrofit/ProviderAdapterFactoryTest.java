@@ -16,14 +16,16 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.stream.Streams;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
@@ -31,6 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.operator.Operators.instead;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,7 +68,7 @@ public class ProviderAdapterFactoryTest {
             assertThat(factory2.isCalled()).isFalse();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
-            service.streamRepos("octocat");
+            service.streamRepos("octocat").syncCall().close();
             assertThat(factory1.isCalled()).isFalse();
             assertThat(factory2.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
@@ -230,8 +233,13 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final List<Object> result = Collections.emptyList();
-                    return Streams.<List<Object>>streamOf(result);
+                    final StreamBuilder<?, ?> builder = JRoutineStream.withStream().sync();
+                    builder.map(instead((Object) Collections.emptyList()));
+                    if (((ParameterizedType) returnType).getRawType() == Channel.class) {
+                        return builder.syncCall().close();
+                    }
+
+                    return builder;
                 }
             };
         }

@@ -34,7 +34,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<? extends ${classFullName}> target) {
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<? extends ${classFullName}> target) {
         if (!target.isOfType(${classErasure}.class)) {
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");

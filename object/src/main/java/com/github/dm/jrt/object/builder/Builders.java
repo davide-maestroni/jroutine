@@ -16,9 +16,7 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -111,7 +109,7 @@ public class Builders {
      */
     public static void callFromInvocation(@NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final Method targetMethod, @NotNull final List<?> objects,
-            @NotNull final ResultChannel<Object> result, @Nullable final InputMode inputMode,
+            @NotNull final Channel<Object, ?> result, @Nullable final InputMode inputMode,
             @Nullable final OutputMode outputMode) throws Exception {
         Reflection.makeAccessible(targetMethod);
         final Object methodResult;
@@ -151,7 +149,7 @@ public class Builders {
             if (outputMode == OutputMode.ELEMENT) {
                 if (returnType.isArray()) {
                     if (methodResult != null) {
-                        result.orderByCall();
+                        result.sortedByCall();
                         final int length = Array.getLength(methodResult);
                         for (int i = 0; i < length; ++i) {
                             result.pass(Array.get(methodResult, i));
@@ -234,17 +232,17 @@ public class Builders {
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
         if (inputMode == InputMode.VALUE) {
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!Channel.class.isAssignableFrom(parameterType)) {
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.VALUE
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
+                                + " must extends an " + Channel.class.getCanonicalName());
             }
 
         } else { // InputMode.COLLECTION
-            if (!OutputChannel.class.isAssignableFrom(parameterType)) {
+            if (!Channel.class.isAssignableFrom(parameterType)) {
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION
-                                + " must extends an " + OutputChannel.class.getCanonicalName());
+                                + " must extends an " + Channel.class.getCanonicalName());
             }
 
             final Class<?> paramClass = asyncInputAnnotation.value();
@@ -287,7 +285,7 @@ public class Builders {
 
         final InvocationMode invocationMode = invokeAnnotation.value();
         if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (method.getParameterTypes().length > 1)) {
+                == InvocationMode.SEQUENTIAL)) && (method.getParameterTypes().length > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + method);
@@ -318,8 +316,8 @@ public class Builders {
         }
 
         final Class<?> returnType = method.getReturnType();
-        if (!returnType.isAssignableFrom(OutputChannel.class)) {
-            final String channelClassName = OutputChannel.class.getCanonicalName();
+        if (!returnType.isAssignableFrom(Channel.class)) {
+            final String channelClassName = Channel.class.getCanonicalName();
             throw new IllegalArgumentException(
                     "[" + method + "] an async output must be a superclass of " + channelClassName);
         }
@@ -431,8 +429,8 @@ public class Builders {
                     }
 
                     final Class<?> returnType = proxyMethod.getReturnType();
-                    if (!returnType.isAssignableFrom(InvocationChannel.class)
-                            && !returnType.isAssignableFrom(Routine.class)) {
+                    if (!returnType.isAssignableFrom(Channel.class) && !returnType.isAssignableFrom(
+                            Routine.class)) {
                         throw new IllegalArgumentException(
                                 "the proxy method has incompatible return type: " + proxyMethod);
                     }
@@ -460,7 +458,7 @@ public class Builders {
                 }
 
                 if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                        == InvocationMode.SERIAL)) && (targetParameterTypes.length > 1)) {
+                        == InvocationMode.SEQUENTIAL)) && (targetParameterTypes.length > 1)) {
                     throw new IllegalArgumentException(
                             "methods annotated with invocation mode " + invocationMode
                                     + " must have no input parameters: " + proxyMethod);
@@ -508,43 +506,42 @@ public class Builders {
             @Nullable final OutputMode outputMode) {
         final Class<?> returnType = method.getReturnType();
         if (method.isAnnotationPresent(AsyncMethod.class)) {
-            if (returnType.isAssignableFrom(InvocationChannel.class)) {
+            if (returnType.isAssignableFrom(Channel.class)) {
                 return invokeRoutine(routine, invocationMode);
             }
 
             return routine;
         }
 
-        final OutputChannel<Object> outputChannel;
-        final InvocationChannel<Object, Object> invocationChannel =
-                invokeRoutine(routine, invocationMode);
+        final Channel<Object, Object> outputChannel;
+        final Channel<Object, Object> invocationChannel = invokeRoutine(routine, invocationMode);
         if (inputMode == InputMode.VALUE) {
-            invocationChannel.orderByCall();
+            invocationChannel.sortedByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
             for (int i = 0; i < length; ++i) {
                 final Object arg = args[i];
-                if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
-                    invocationChannel.pass((OutputChannel<Object>) arg);
+                if (Channel.class.isAssignableFrom(parameterTypes[i])) {
+                    invocationChannel.pass((Channel<?, Object>) arg);
 
                 } else {
                     invocationChannel.pass(arg);
                 }
             }
 
-            outputChannel = invocationChannel.result();
+            outputChannel = invocationChannel.close();
 
         } else if (inputMode == InputMode.COLLECTION) {
             outputChannel =
-                    invocationChannel.orderByCall().pass((OutputChannel<Object>) args[0]).result();
+                    invocationChannel.sortedByCall().pass((Channel<?, Object>) args[0]).close();
 
         } else {
-            outputChannel = invocationChannel.pass(args).result();
+            outputChannel = invocationChannel.pass(args).close();
         }
 
         if (!Void.class.equals(Reflection.boxingClass(returnType))) {
             if (outputMode != null) {
-                if (OutputChannel.class.isAssignableFrom(returnType)) {
+                if (Channel.class.isAssignableFrom(returnType)) {
                     return outputChannel;
                 }
 
@@ -599,7 +596,7 @@ public class Builders {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.apply();
+            return builder.applied();
         }
 
         for (final Annotation annotation : annotations) {
@@ -651,7 +648,7 @@ public class Builders {
             }
         }
 
-        return builder.apply();
+        return builder.applied();
     }
 
     /**
@@ -697,7 +694,7 @@ public class Builders {
         final ObjectConfiguration.Builder<ObjectConfiguration> builder =
                 ObjectConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.apply();
+            return builder.applied();
         }
 
         for (final Annotation annotation : annotations) {
@@ -707,7 +704,7 @@ public class Builders {
             }
         }
 
-        return builder.apply();
+        return builder.applied();
     }
 
     /**
@@ -769,13 +766,10 @@ public class Builders {
     }
 
     @NotNull
-    private static InvocationChannel<Object, Object> invokeRoutine(
+    private static Channel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
-        return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
-                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
-                        : (invocationMode == InvocationMode.SERIAL) ? routine.serialInvoke()
-                                : routine.asyncInvoke();
+        return ((invocationMode != null) ? invocationMode : InvocationMode.ASYNC).call(routine);
     }
 
     /**

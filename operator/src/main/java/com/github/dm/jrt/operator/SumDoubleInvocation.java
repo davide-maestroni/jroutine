@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -61,17 +61,17 @@ class SumDoubleInvocation extends TemplateInvocation<Number, Double> {
     }
 
     @Override
-    public void onInitialize() {
-        mSum = 0;
+    public void onComplete(@NotNull final Channel<Double, ?> result) {
+        result.pass(mSum);
     }
 
     @Override
-    public void onInput(final Number input, @NotNull final ResultChannel<Double> result) {
+    public void onInput(final Number input, @NotNull final Channel<Double, ?> result) {
         mSum = addOptimistic(mSum, input).doubleValue();
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Double> result) {
-        result.pass(mSum);
+    public void onRestart() {
+        mSum = 0;
     }
 }

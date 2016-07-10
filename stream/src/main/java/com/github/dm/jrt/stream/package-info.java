@@ -15,7 +15,7 @@
  */
 
 /**
- * Streams interfaces and classes.
+ * Core classes related to building and invocation of streams of routines.
  * <p>
  * Created by davide-maestroni on 10/22/2015.
  */

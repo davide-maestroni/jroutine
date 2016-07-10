@@ -60,7 +60,7 @@ public class JRoutineLoaderProxyCompat {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderProxyBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderProxyBuilderCompat on(@NotNull final LoaderContextCompat context) {
         synchronized (sBuilders) {
             final WeakHashMap<LoaderContextCompat, LoaderProxyBuilderCompat> builders = sBuilders;
             LoaderProxyBuilderCompat builder = builders.get(context);
@@ -108,7 +108,7 @@ public class JRoutineLoaderProxyCompat {
          * @return the routine builder instance.
          */
         @NotNull
-        public LoaderProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public LoaderProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
             return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }
     }

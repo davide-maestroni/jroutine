@@ -31,13 +31,11 @@ import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -76,18 +74,18 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final UnitDuration timeout = seconds(10);
         final Data data = new Data();
-        final OutputChannel<Data> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(Delay.class))
+        final Channel<?, Data> channel =
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(Delay.class))
                                .serviceConfiguration()
                                .withRunnerClass(MainRunner.class)
-                               .apply()
+                               .applied()
                                .asyncCall(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
 
-            channel.afterMax(timeout).next();
+            channel.after(timeout).next();
 
             fail();
 
@@ -98,10 +96,11 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(factoryOf(Abort.class))
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(factoryOf(Abort.class))
                            .asyncCall()
-                           .afterMax(timeout)
+                           .close()
+                           .after(timeout)
                            .next();
 
             fail();
@@ -121,7 +120,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(context).on(factoryOf(classToken));
+            JRoutineService.on(context).with(factoryOf(classToken));
 
             fail();
 
@@ -131,8 +130,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(null);
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(null);
 
             fail();
 
@@ -142,8 +141,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                           .on(factoryOf((ClassToken<StringPassingInvocation>) null));
+            JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                           .with(factoryOf((ClassToken<StringPassingInvocation>) null));
 
             fail();
 
@@ -189,43 +188,43 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(new PassingWrapper<String>());
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .apply()
+                               .applied()
                                .serviceConfiguration()
                                .withLogClass(AndroidLog.class)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
+        assertThat(routine.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+                "2", "3", "4", "5");
     }
 
     public void testExecutionTimeout() {
 
-        final OutputChannel<String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+        final Channel<?, String> channel =
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.BREAK)
-                               .apply()
+                               .applied()
                                .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
-        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testExecutionTimeout2() {
 
-        final OutputChannel<String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+        final Channel<?, String> channel =
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
                                .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                               .apply()
+                               .applied()
                                .asyncCall("test2");
 
         try {
@@ -238,18 +237,18 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         }
 
-        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testExecutionTimeout3() {
 
-        final OutputChannel<String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(StringDelay.class))
+        final Channel<?, String> channel =
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(StringDelay.class))
                                .invocationConfiguration()
                                .withOutputTimeout(millis(10))
-                               .withOutputTimeoutAction(TimeoutActionType.THROW)
-                               .apply()
+                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
+                               .applied()
                                .asyncCall("test3");
 
         try {
@@ -262,7 +261,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         }
 
-        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testInvocations() throws InterruptedException {
@@ -271,24 +270,23 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringPassingInvocation.class);
         final Routine<String, String> routine1 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .apply()
+                               .applied()
                                .serviceConfiguration()
                                .withLogClass(AndroidLog.class)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+        assertThat(routine1.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(routine1.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(
-                routine1.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+                routine1.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine1.parallelCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .all()).containsOnly("1", "2", "3", "4", "5");
     }
 
     public void testInvocations2() throws InterruptedException {
@@ -296,25 +294,24 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final UnitDuration timeout = seconds(10);
         final ClassToken<StringCallInvocation> token = tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(factoryOf(token))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(factoryOf(token))
                                .invocationConfiguration()
                                .withOutputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .apply()
+                               .applied()
                                .serviceConfiguration()
                                .withLogClass(AndroidLog.class)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(
-                routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
+        assertThat(routine2.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine2.asyncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .all()).containsExactly("1", "2", "3", "4", "5");
-        assertThat(routine2.parallelCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .all()).containsOnly("1", "2", "3", "4", "5");
+        assertThat(
+                routine2.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+                "1", "2", "3", "4", "5");
+        assertThat(
+                routine2.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
     }
 
     public void testInvocations3() throws InterruptedException {
@@ -323,21 +320,20 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine3 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withOutputOrder(OrderType.BY_CALL)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(
-                routine3.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
+        assertThat(routine3.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine3.asyncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .all()).containsExactly("1", "2", "3", "4", "5");
+        assertThat(
+                routine3.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsExactly(
+                "1", "2", "3", "4", "5");
         assertThat(routine3.parallelCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
+                           .after(timeout)
                            .all()).containsExactly("1", "2", "3", "4", "5");
     }
 
@@ -347,21 +343,20 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine4 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+        assertThat(routine4.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                "1", "2", "3", "4", "5");
+        assertThat(routine4.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(
-                routine4.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+                routine4.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine4.parallelCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .all()).containsOnly("1", "2", "3", "4", "5");
     }
 
     public void testInvocations5() throws InterruptedException {
@@ -370,29 +365,29 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final TargetInvocationFactory<Void, String> targetFactory =
                 factoryOf(TextCommandInvocation.class);
         final Routine<Void, String> routine4 =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                               .on(targetFactory)
+                JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                               .with(targetFactory)
                                .invocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
-                               .apply()
+                               .applied()
                                .buildRoutine();
-        assertThat(routine4.syncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
+        assertThat(routine4.syncCall().close().after(timeout).all()).containsOnly("test1", "test2",
                 "test3");
-        assertThat(routine4.asyncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
+        assertThat(routine4.asyncCall().close().after(timeout).all()).containsOnly("test1", "test2",
                 "test3");
-        assertThat(routine4.parallelCall().afterMax(timeout).all()).containsOnly("test1", "test2",
-                "test3");
+        assertThat(routine4.parallelCall().close().after(timeout).all()).containsOnly("test1",
+                "test2", "test3");
     }
 
     public void testParcelable() {
 
         final UnitDuration timeout = seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
-        assertThat(JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
-                                  .on(factoryOf(MyParcelableInvocation.class))
+        assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
+                                  .with(factoryOf(MyParcelableInvocation.class))
                                   .asyncCall(p)
-                                  .afterMax(timeout)
+                                  .after(timeout)
                                   .next()).isEqualTo(p);
     }
 
@@ -400,46 +395,46 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final UnitDuration timeout = seconds(10);
         final Routine<String, String> routine =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                               .on(factoryOf(StringPassingInvocation.class))
+                JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                               .with(factoryOf(StringPassingInvocation.class))
                                .buildRoutine();
-        assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+        assertThat(routine.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+                "2", "3", "4", "5");
+        assertThat(routine.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
-        assertThat(routine.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
-        assertThat(
-                routine.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
+        assertThat(routine.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
     public void testSize() {
 
-        final InvocationChannel<String, String> channel =
-                JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                               .on(factoryOf(StringPassingInvocation.class))
-                               .asyncInvoke();
-        assertThat(channel.size()).isEqualTo(0);
+        final Channel<String, String> channel =
+                JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                               .with(factoryOf(StringPassingInvocation.class))
+                               .asyncCall();
+        assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
-        assertThat(channel.size()).isEqualTo(1);
-        final OutputChannel<String> result = channel.result();
-        assertThat(result.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.inputCount()).isEqualTo(1);
+        final Channel<?, String> result = channel.close();
+        assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.skipNext(1).size()).isEqualTo(0);
+        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
     }
 
     public void testTransform() {
 
-        assertThat(JRoutineService.with(serviceFrom(getActivity(), RemoteTestService.class))
-                                  .on(factoryOf(TestTransform.class))
+        assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
+                                  .with(factoryOf(TestTransform.class))
                                   .asyncCall("test1", "test2", "test3")
-                                  .afterMax(seconds(10))
+                                  .after(seconds(10))
                                   .all()).containsExactly("TEST1", "TEST2", "TEST3");
     }
 
     private static class Abort extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onResult(@NotNull final ResultChannel<Data> result) {
+        public void onComplete(@NotNull final Channel<Data, ?> result) {
 
             try {
 
@@ -525,7 +520,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     private static class Delay extends TemplateContextInvocation<Data, Data> {
 
         @Override
-        public void onInput(final Data d, @NotNull final ResultChannel<Data> result) {
+        public void onInput(final Data d, @NotNull final Channel<Data, ?> result) {
 
             result.after(UnitDuration.millis(500)).pass(d);
         }
@@ -600,7 +595,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
             extends TemplateContextInvocation<MyParcelable, MyParcelable> {
 
         public void onInput(final MyParcelable myParcelable,
-                @NotNull final ResultChannel<MyParcelable> result) {
+                @NotNull final Channel<MyParcelable, ?> result) {
 
             result.pass(myParcelable);
         }
@@ -618,7 +613,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
         @Override
         protected void onCall(@NotNull final List<? extends String> strings,
-                @NotNull final ResultChannel<String> result) {
+                @NotNull final Channel<String, ?> result) {
 
             result.pass(strings);
         }
@@ -627,7 +622,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     private static class StringDelay extends TemplateContextInvocation<String, String> {
 
         @Override
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final Channel<String, ?> result) {
 
             result.after(UnitDuration.millis(100)).pass(s);
         }
@@ -635,25 +630,26 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     private static class StringPassingInvocation extends TemplateContextInvocation<String, String> {
 
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String s, @NotNull final Channel<String, ?> result) {
 
             result.pass(s);
         }
     }
 
-    private static class TestTransform extends StreamContextInvocation<String, String> {
+    private static class TestTransform extends ChannelContextInvocation<String, String> {
 
         @NotNull
         @Override
-        protected OutputChannel<String> onChannel(@NotNull final OutputChannel<String> channel) {
+        protected Channel<?, String> onChannel(@NotNull final Channel<?, String> channel) {
 
-            return JRoutineCore.on(new UpperCaseInvocation()).asyncCall(channel);
+            return JRoutineCore.with(new UpperCaseInvocation()).asyncCall(channel);
         }
     }
 
     private static class TextCommandInvocation extends TemplateContextInvocation<Void, String> {
 
-        public void onResult(@NotNull final ResultChannel<String> result) {
+        @Override
+        public void onComplete(@NotNull final Channel<String, ?> result) {
 
             result.pass("test1", "test2", "test3");
         }
@@ -670,7 +666,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         }
 
         @Override
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+        public void onInput(final String input, @NotNull final Channel<String, ?> result) {
 
             result.pass(input.toUpperCase());
         }

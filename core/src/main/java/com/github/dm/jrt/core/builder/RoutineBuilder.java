@@ -32,12 +32,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public interface RoutineBuilder<IN, OUT>
-        extends ConfigurableBuilder<RoutineBuilder<IN, OUT>>, Routine<IN, OUT> {
+        extends InvocationConfigurable<RoutineBuilder<IN, OUT>>, Routine<IN, OUT> {
 
     /**
-     * Builds and returns the routine.
+     * Builds a new routine instance.
      *
-     * @return the newly created routine instance.
+     * @return the routine instance.
      */
     @NotNull
     Routine<IN, OUT> buildRoutine();

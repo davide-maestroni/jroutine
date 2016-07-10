@@ -62,13 +62,13 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
     private static final LoaderConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
-    private final int mFactoryId;
+    private final ClashResolutionType mClashResolutionType;
 
-    private final ClashResolutionType mInputResolutionType;
+    private final int mFactoryId;
 
     private final int mLoaderId;
 
-    private final ClashResolutionType mResolutionType;
+    private final ClashResolutionType mMatchResolutionType;
 
     private final UnitDuration mStaleTime;
 
@@ -79,22 +79,22 @@ public final class LoaderConfiguration extends DeepEqualObject {
      *
      * @param loaderId            the loader ID.
      * @param factoryId           the factory ID.
-     * @param resolutionType      the type of resolution.
-     * @param inputResolutionType the type of input resolution.
+     * @param clashResolutionType the type of clash resolution.
+     * @param matchResolutionType the type of match resolution.
      * @param strategyType        the cache strategy type.
      * @param staleTime           the stale time.
      */
     private LoaderConfiguration(final int loaderId, final int factoryId,
-            @Nullable final ClashResolutionType resolutionType,
-            @Nullable final ClashResolutionType inputResolutionType,
+            @Nullable final ClashResolutionType clashResolutionType,
+            @Nullable final ClashResolutionType matchResolutionType,
             @Nullable final CacheStrategyType strategyType,
             @Nullable final UnitDuration staleTime) {
-        super(asArgs(loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
+        super(asArgs(loaderId, factoryId, clashResolutionType, matchResolutionType, strategyType,
                 staleTime));
         mLoaderId = loaderId;
         mFactoryId = factoryId;
-        mResolutionType = resolutionType;
-        mInputResolutionType = inputResolutionType;
+        mClashResolutionType = clashResolutionType;
+        mMatchResolutionType = matchResolutionType;
         mStrategyType = strategyType;
         mStaleTime = staleTime;
     }
@@ -162,7 +162,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      */
     public ClashResolutionType getClashResolutionTypeOrElse(
             @Nullable final ClashResolutionType valueIfNotSet) {
-        final ClashResolutionType resolutionType = mResolutionType;
+        final ClashResolutionType resolutionType = mClashResolutionType;
         return (resolutionType != null) ? resolutionType : valueIfNotSet;
     }
 
@@ -178,18 +178,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the type of input clash resolution (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the clash resolution type.
-     */
-    public ClashResolutionType getInputClashResolutionTypeOrElse(
-            @Nullable final ClashResolutionType valueIfNotSet) {
-        final ClashResolutionType resolutionType = mInputResolutionType;
-        return (resolutionType != null) ? resolutionType : valueIfNotSet;
-    }
-
-    /**
      * Returns the loader ID (AUTO by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -198,6 +186,18 @@ public final class LoaderConfiguration extends DeepEqualObject {
     public int getLoaderIdOrElse(final int valueIfNotSet) {
         final int loaderId = mLoaderId;
         return (loaderId != AUTO) ? loaderId : valueIfNotSet;
+    }
+
+    /**
+     * Returns the type of resolution when invocation types and inputs match (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the clash resolution type.
+     */
+    public ClashResolutionType getMatchResolutionTypeOrElse(
+            @Nullable final ClashResolutionType valueIfNotSet) {
+        final ClashResolutionType resolutionType = mMatchResolutionType;
+        return (resolutionType != null) ? resolutionType : valueIfNotSet;
     }
 
     /**
@@ -261,7 +261,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
         /**
          * The clash is resolved by aborting the running invocation.
          */
-        ABORT_THAT,
+        ABORT_OTHER,
         /**
          * The clash is resolved by aborting the invocation with an
          * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException
@@ -271,7 +271,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
         /**
          * The clash is resolved by aborting both the invocations.
          */
-        ABORT
+        ABORT_BOTH
     }
 
     /**
@@ -300,13 +300,13 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private int mFactoryId;
+        private ClashResolutionType mClashResolutionType;
 
-        private ClashResolutionType mInputResolutionType;
+        private int mFactoryId;
 
         private int mLoaderId;
 
-        private ClashResolutionType mResolutionType;
+        private ClashResolutionType mMatchResolutionType;
 
         private UnitDuration mStaleTime;
 
@@ -341,7 +341,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE apply() {
+        public TYPE applied() {
             return mConfigurable.apply(buildConfiguration());
         }
 
@@ -370,14 +370,14 @@ public final class LoaderConfiguration extends DeepEqualObject {
                 withFactoryId(factoryId);
             }
 
-            final ClashResolutionType resolutionType = configuration.mResolutionType;
-            if (resolutionType != null) {
-                withClashResolution(resolutionType);
+            final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
+            if (clashResolutionType != null) {
+                withClashResolution(clashResolutionType);
             }
 
-            final ClashResolutionType inputResolutionType = configuration.mInputResolutionType;
-            if (inputResolutionType != null) {
-                withInputClashResolution(inputResolutionType);
+            final ClashResolutionType matchResolutionType = configuration.mMatchResolutionType;
+            if (matchResolutionType != null) {
+                withMatchResolution(matchResolutionType);
             }
 
             final CacheStrategyType strategyType = configuration.mStrategyType;
@@ -417,7 +417,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withClashResolution(
                 @Nullable final ClashResolutionType resolutionType) {
-            mResolutionType = resolutionType;
+            mClashResolutionType = resolutionType;
             return this;
         }
 
@@ -434,21 +434,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Tells the builder how to resolve clashes of invocations with same inputs. A clash happens
-         * when a loader with the same ID is still running. A null value means that it is up to the
-         * specific implementation to choose a default resolution type.
-         *
-         * @param resolutionType the type of resolution.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withInputClashResolution(
-                @Nullable final ClashResolutionType resolutionType) {
-            mInputResolutionType = resolutionType;
-            return this;
-        }
-
-        /**
          * Tells the builder to identify the loader with the specified ID.
          *
          * @param loaderId the loader ID.
@@ -457,6 +442,21 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withLoaderId(final int loaderId) {
             mLoaderId = loaderId;
+            return this;
+        }
+
+        /**
+         * Tells the builder how to resolve clashes of invocations with same invocation type and
+         * inputs. A clash happens when a loader with the same ID is still running. A null value
+         * means that it is up to the specific implementation to choose a default resolution type.
+         *
+         * @param resolutionType the type of resolution.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withMatchResolution(
+                @Nullable final ClashResolutionType resolutionType) {
+            mMatchResolutionType = resolutionType;
             return this;
         }
 
@@ -490,15 +490,15 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         @NotNull
         private LoaderConfiguration buildConfiguration() {
-            return new LoaderConfiguration(mLoaderId, mFactoryId, mResolutionType,
-                    mInputResolutionType, mStrategyType, mStaleTime);
+            return new LoaderConfiguration(mLoaderId, mFactoryId, mClashResolutionType,
+                    mMatchResolutionType, mStrategyType, mStaleTime);
         }
 
         private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
             mLoaderId = configuration.mLoaderId;
             mFactoryId = configuration.mFactoryId;
-            mResolutionType = configuration.mResolutionType;
-            mInputResolutionType = configuration.mInputResolutionType;
+            mClashResolutionType = configuration.mClashResolutionType;
+            mMatchResolutionType = configuration.mMatchResolutionType;
             mStrategyType = configuration.mStrategyType;
             mStaleTime = configuration.mStaleTime;
         }

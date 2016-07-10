@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -32,8 +32,10 @@ import java.lang.reflect.Method;
 import retrofit2.CallAdapter;
 
 /**
- * Implementation of a call adapter factory supporting {@code OutputChannel} and
- * {@code StreamChannel} return types.
+ * Abstract implementation of a call adapter factory supporting {@code Channel} and
+ * {@code StreamBuilder} return types.
+ * <br>
+ * Note that the routines generated through the returned builders will ignore any input.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
@@ -85,7 +87,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      */
-    public static class Builder implements ConfigurableBuilder<Builder>, Configurable<Builder> {
+    public static class Builder implements InvocationConfigurable<Builder>, Configurable<Builder> {
 
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();

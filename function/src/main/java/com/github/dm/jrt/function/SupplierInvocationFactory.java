@@ -34,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
+    private final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      * @param supplier the supplier function.
      */
     SupplierInvocationFactory(
-            @NotNull final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>>
+            @NotNull final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>>
                     supplier) {
         super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
         mSupplier = supplier;

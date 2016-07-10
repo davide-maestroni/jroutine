@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,35 +36,32 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
 
     private ArrayList<IN> mInputs;
 
-    @Override
-    public final void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-        if (mInputs == null) {
-            mInputs = new ArrayList<IN>();
-        }
+    /**
+     * Constructor.
+     */
+    public CallInvocation() {
+        mInputs = null;
+    }
 
+    @Override
+    public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+        onCall(mInputs, result);
+        mInputs = null;
+    }
+
+    @Override
+    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
         mInputs.add(input);
     }
 
     @Override
-    public final void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-        final ArrayList<IN> inputs = mInputs;
-        final ArrayList<IN> clone;
-        if (inputs == null) {
-            clone = new ArrayList<IN>(0);
-
-        } else {
-            clone = new ArrayList<IN>(inputs);
-        }
-
-        onCall(clone, result);
+    public void onRecycle(final boolean isReused) throws Exception {
+        mInputs = null;
     }
 
     @Override
-    public final void onTerminate() {
-        final ArrayList<IN> inputs = mInputs;
-        if (inputs != null) {
-            inputs.clear();
-        }
+    public final void onRestart() {
+        mInputs = new ArrayList<IN>();
     }
 
     /**
@@ -75,5 +72,5 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     protected abstract void onCall(@NotNull List<? extends IN> inputs,
-            @NotNull ResultChannel<OUT> result) throws Exception;
+            @NotNull Channel<OUT, ?> result) throws Exception;
 }

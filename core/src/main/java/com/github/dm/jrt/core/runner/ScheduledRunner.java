@@ -22,8 +22,6 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -44,15 +42,13 @@ class ScheduledRunner extends AsyncRunner {
 
     private final ScheduledExecutorService mService;
 
-    private final Map<Thread, Void> mThreads =
-            Collections.synchronizedMap(new WeakIdentityHashMap<Thread, Void>());
-
     /**
      * Constructor.
      *
      * @param service the executor service.
      */
     private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
+        super(new ScheduledThreadManager());
         mService = ConstantConditions.notNull("executor service", service);
     }
 
@@ -94,11 +90,6 @@ class ScheduledRunner extends AsyncRunner {
     }
 
     @Override
-    public boolean isManagedThread(@NotNull final Thread thread) {
-        return mThreads.containsKey(thread);
-    }
-
-    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
         final ScheduledFuture<?> future =
@@ -116,12 +107,35 @@ class ScheduledRunner extends AsyncRunner {
         }
     }
 
+    @NotNull
+    @Override
+    protected ScheduledThreadManager getThreadManager() {
+        return (ScheduledThreadManager) super.getThreadManager();
+    }
+
+    /**
+     * Thread manager implementation.
+     */
+    private static class ScheduledThreadManager implements ThreadManager {
+
+        private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
+        public boolean isManagedThread() {
+            final Boolean isManaged = mIsManaged.get();
+            return (isManaged != null) && isManaged;
+        }
+
+        private void setManaged() {
+            mIsManaged.set(true);
+        }
+    }
+
     /**
      * Class used to keep track of the threads employed by this runner.
      */
     private class ExecutionWrapper implements Runnable {
 
-        private final Thread mCurrentThread;
+        private final long mCurrentThreadId;
 
         private final Execution mExecution;
 
@@ -132,13 +146,13 @@ class ScheduledRunner extends AsyncRunner {
          */
         private ExecutionWrapper(@NotNull final Execution wrapped) {
             mExecution = wrapped;
-            mCurrentThread = Thread.currentThread();
+            mCurrentThreadId = Thread.currentThread().getId();
         }
 
         public void run() {
             final Thread currentThread = Thread.currentThread();
-            if (currentThread != mCurrentThread) {
-                mThreads.put(currentThread, null);
+            if (currentThread.getId() != mCurrentThreadId) {
+                getThreadManager().setManaged();
             }
 
             mExecution.run();

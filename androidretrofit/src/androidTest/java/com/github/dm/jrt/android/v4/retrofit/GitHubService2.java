@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.v4.retrofit;
 
 import com.github.dm.jrt.android.retrofit.Repo;
-import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelCompat;
+import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat;
 
 import java.util.List;
 
@@ -34,5 +34,5 @@ public interface GitHubService2 {
 
     @GET("users/{user}/repos")
     @Headers("Accept: application/json")
-    LoaderStreamChannelCompat<Object, List<Repo>> streamLoaderRepos(@Path("user") String user);
+    LoaderStreamBuilderCompat<Object, List<Repo>> streamLoaderRepos(@Path("user") String user);
 }

@@ -66,9 +66,9 @@ public class ServiceBuilder {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-        return on(factoryOf(invocationClass));
+        return with(factoryOf(invocationClass));
     }
 
     /**
@@ -87,10 +87,10 @@ public class ServiceBuilder {
      *                                            as parameters was found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationClass, args));
+        return with(factoryOf(invocationClass, args));
     }
 
     /**
@@ -107,9 +107,9 @@ public class ServiceBuilder {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-        return on(factoryOf(invocationToken));
+        return with(factoryOf(invocationToken));
     }
 
     /**
@@ -128,10 +128,10 @@ public class ServiceBuilder {
      *                                            as parameters was found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
-        return on(factoryOf(invocationToken, args));
+        return with(factoryOf(invocationToken, args));
     }
 
     /**
@@ -150,8 +150,8 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation) {
-        return on(tokenOf(invocation));
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(@NotNull final Invocation<IN, OUT> invocation) {
+        return with(tokenOf(invocation));
     }
 
     /**
@@ -171,9 +171,9 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation,
+    public <IN, OUT> RoutineBuilder<IN, OUT> with(@NotNull final Invocation<IN, OUT> invocation,
             @Nullable final Object... args) {
-        return on(tokenOf(invocation), args);
+        return with(tokenOf(invocation), args);
     }
 
     /**
@@ -196,7 +196,7 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+    public ServiceAutoProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
         return new DefaultServiceAutoProxyRoutineBuilder(mContext, target);
     }
 
@@ -217,9 +217,9 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
+    public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
-        return JRoutineService.with(mContext).on(target);
+        return JRoutineService.on(mContext).with(target);
     }
 
     /**
@@ -237,8 +237,8 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
-        return on(classOfType(targetClass));
+    public ServiceAutoProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+        return with(classOfType(targetClass));
     }
 
     /**
@@ -256,8 +256,8 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
-        return on(instanceOf(targetClass));
+    public ServiceAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+        return with(instanceOf(targetClass));
     }
 
     /**
@@ -276,8 +276,8 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
+    public ServiceAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
-        return on(instanceOf(targetClass, factoryArgs));
+        return with(instanceOf(targetClass, factoryArgs));
     }
 }

@@ -38,7 +38,6 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Function&lt;URI, Bitmap&gt; loadUri() {
-
                 return uri -> {
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
@@ -57,14 +56,12 @@
             }
             
             private static Consumer&lt;Bitmap&gt; showImage(final ImageView view) {
-            
                 return bitmap -> {
                     view.setImageBitmap(bitmap);
                 };
             }
             
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-            
                 return error -> {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
@@ -74,17 +71,16 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                LoaderStreams.streamOf(IMAGE_URI)
-                             .with(loaderFrom(this))
-                             .factoryId(11)
-                             .map(loadUri())
-                             .onError(showToast(this))
-                             .onOutput(showImage(imageView))
-                             .bind();
+                JRoutineStreamLoader.withStream()
+                                    .on(loaderFrom(this))
+                                    .factoryId(11)
+                                    .map(loadUri())
+                                    .onError(showToast(this))
+                                    .onOutput(showImage(imageView))
+                                    .asyncCall(IMAGE_URI);
             }
         }
     </code>

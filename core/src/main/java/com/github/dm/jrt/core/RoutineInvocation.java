@@ -77,7 +77,7 @@ public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
     @NotNull
     @Override
     protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
-        return mInvocationMode.call(mRoutine).pass(channel).close();
+        return mInvocationMode.invoke(mRoutine).pass(channel).close();
     }
 
     /**

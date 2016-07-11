@@ -52,6 +52,6 @@ class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
     }
 
     public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        return mInvocationMode.call(mRoutine).pass(channel).close();
+        return mInvocationMode.invoke(mRoutine).pass(channel).close();
     }
 }

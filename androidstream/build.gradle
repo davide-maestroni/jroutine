@@ -62,6 +62,7 @@ android {
 }
 
 dependencies {
+    androidTestCompile project(':operator')
     androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
     compile 'com.android.support:support-v4:23.2.1'
 }

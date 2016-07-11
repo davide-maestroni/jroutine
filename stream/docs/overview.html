@@ -44,7 +44,7 @@
                                                  .map(Integer::parseInt)
                                                  .map(i -&gt; i * i)
                                                  .straight()
-                                                 .map(averageFloat())
+                                                 .map(Operators.averageFloat())
                                                  .map(Math::sqrt)
                                                  .asyncCall(args)
                                                  .after(seconds(1))

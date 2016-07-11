@@ -566,7 +566,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     private Channel<IN, OUT> call() {
-        return mStreamConfiguration.getInvocationMode().call(this);
+        return mStreamConfiguration.getInvocationMode().invoke(this);
     }
 
     @NotNull

@@ -93,7 +93,7 @@ public enum InvocationMode {
     }
 
     /**
-     * Calls the specified routine with this mode.
+     * Invokes the specified routine with this mode.
      *
      * @param routine the routine to invoke.
      * @param <IN>    the input data type.
@@ -101,7 +101,7 @@ public enum InvocationMode {
      * @return the invocation channel.
      */
     @NotNull
-    public <IN, OUT> Channel<IN, OUT> call(@NotNull final Routine<IN, OUT> routine) {
+    public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
         return mInvoker.invoke(routine);
     }
 

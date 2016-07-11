@@ -769,7 +769,7 @@ public class Builders {
     private static Channel<Object, Object> invokeRoutine(
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
-        return ((invocationMode != null) ? invocationMode : InvocationMode.ASYNC).call(routine);
+        return ((invocationMode != null) ? invocationMode : InvocationMode.ASYNC).invoke(routine);
     }
 
     /**

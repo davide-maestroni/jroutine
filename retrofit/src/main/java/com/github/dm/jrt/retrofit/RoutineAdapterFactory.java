@@ -59,6 +59,16 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     }
 
     /**
+     * Returns the default factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public static RoutineAdapterFactory buildFactory() {
+        return sFactory;
+    }
+
+    /**
      * Returns an adapter factory builder.
      *
      * @return the builder instance.
@@ -66,16 +76,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     @NotNull
     public static Builder builder() {
         return new Builder();
-    }
-
-    /**
-     * Returns the default factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public static RoutineAdapterFactory defaultFactory() {
-        return sFactory;
     }
 
     /**

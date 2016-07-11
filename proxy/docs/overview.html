@@ -20,9 +20,35 @@
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
-    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">JRoutine</a> library.
+    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">JRoutine-Object</a> library.
 </p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/annotation/Proxy.html">Proxy</a>
+        <p>
+            A Proxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/builder/ProxyRoutineBuilder.html">ProxyRoutineBuilder</a>
+        <p>
+            Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/JRoutineProxy.html">JRoutineProxy</a>
+        <p>
+            Utility class acting as a factory of proxy routine builders.
+        </p>
+    </li>
+</ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.

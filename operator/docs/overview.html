@@ -20,16 +20,28 @@
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
-    Utility classes used to perform operations on a sequence of inputs based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> library.
+    Utility classes used to perform operations on a sequence of inputs based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
 </p>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/operator/com/github/dm/jrt/operator/Operators.html">Operators</a>
+        <p>
+            This utility provides several methods to create invocation factories implementing specific operations to perform on the invocation inputs.
+        </p>
+    </li>
+</ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
 <b>Example 1:</b> via lambda notation.
 <p>
-    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.
+    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
+    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
+    In fact, the interfaces defined in the "function" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
 </p>
 <pre>
     <code>
@@ -37,16 +49,18 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.with(functionMapping(Integer::parseInt)).buildRoutine();
+                        JRoutineCore.with(Functions.&lt;String, Integer&gt;functionMapping(Integer::parseInt))
+                                    .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.with(functionMapping(integer -> {
+                        JRoutineCore.with(Functions.&lt;Integer, Integer&gt;functionMapping(integer -> {
                                 final int input = integer;
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(Operators.&lt;Integer&gt;averageDouble())).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
-                        JRoutineCore.with(functionMapping(Math::sqrt)).buildRoutine();
+                        JRoutineCore.with(Functions.&lt;Double, Double&gt;functionMapping(Math::sqrt))
+                                    .buildRoutine();
                 final Double rms = parseRoutine.parallelCall(args)
                                                .bind(squareRoutine.parallelCall())
                                                .close()

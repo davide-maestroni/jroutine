@@ -176,7 +176,7 @@ public class RoutineAdapterFactoryTest {
             }
 
             {
-                final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
+                final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .delegateFactory(factory)
@@ -251,7 +251,7 @@ public class RoutineAdapterFactoryTest {
         server.start();
         try {
             {
-                final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.defaultFactory();
+                final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -364,7 +364,7 @@ public class RoutineAdapterFactoryTest {
             }
 
             {
-                final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
+                final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
                 final RoutineAdapterFactory adapterFactory =
                         RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();

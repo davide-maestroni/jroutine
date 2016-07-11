@@ -35,12 +35,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Interface defining a builder of routines concatenating map and reduce functions.
+ * Interface defining a builder of routines backing a concatenation of mapping routines and
+ * consumers.
  * <br>
- * Each function in the stream will be backed by a routine instance, which may have its own
- * specific configuration and invocation mode.
+ * Each routine in the stream may have its own specific configuration and invocation mode.
  * <p>
- * Note that, if at least one reduce function is part of the chain, the results will be propagated
+ * Note that, based on the routines which are part of the chain, the results might be propagated
  * only when the built routine invocation completes.
  * <p>
  * Created by davide-maestroni on 07/01/2016.

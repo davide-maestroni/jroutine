@@ -222,7 +222,7 @@ public class ProviderAdapterFactoryTest {
                 final Retrofit retrofit) {
 
             mCalled = true;
-            final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
+            final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
             final Type responseType = factory.get(returnType, annotations, retrofit).responseType();
             return new CallAdapter<Object>() {
 

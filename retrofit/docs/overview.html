@@ -20,9 +20,28 @@
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
     Retrofit integration of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">JRoutine</a> library.
 </p>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit/com/github/dm/jrt/retrofit/RoutineAdapterFactory.html">RoutineAdapterFactory</a>
+        <p>
+            Retrofit adapter factory supporting <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/channel/Channel.html">Channel</a>s and
+            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/StreamBuilder.html">StreamBuilder</a>s.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit/com/github/dm/jrt/retrofit/ProviderAdapterFactory.html">ProviderAdapterFactory</a>
+        <p>
+            Retrofit adapter factory delegating to registered instances the adaptation.
+            The <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit/com/github/dm/jrt/retrofit/annotation/CallAdapterFactory.html">CallAdapterFactory</a> can
+            be employed to optionally indicate a specific factory for a method.
+        </p>
+    </li>
+</ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to configure Retrofit, so to employ routines to execute calls to the network.

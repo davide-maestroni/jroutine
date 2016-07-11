@@ -20,14 +20,40 @@
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
-    Stream-like routine concatenation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">JRoutine</a> library.
+    Stream-like routine concatenation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
 </p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/StreamBuilder.html">StreamBuilder</a>
+        <p>
+            A stream builder allows to concatenate routines and consumers so to create a processing chain backed by a routine.
+            Each routine in the chain may have its own configuration and invocation mode.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/JRoutineStream.html">JRoutineStream</a>
+        <p>
+            Utility class acting as a factory of stream builders.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/processor/Processors.html">Processors</a>
+        <p>
+            This utility provides several methods to create processing functions transforming a routine stream.
+        </p>
+    </li>
+</ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
-<b>Example 1:</b> via stream channel.
+<b>Example 1:</b> via stream builder.
 <p>
     The library provides an additional fluent notation to compose routines.<br>
     Note that the passed instances are expected to behave like functions (that is, no variable state and no side effects).<br>

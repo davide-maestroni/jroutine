@@ -20,10 +20,48 @@
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
-    Android customization of channel utility classes based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/channel" target="_blank">jroutine-channel</a> library.<br>
-    Note that SparseChannels and SparseChannelsCompat utility classes, additionally supporting sparse collections, are also available with the same features as AndroidChannels class.
+    Android customization of channel utility classes based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/channel" target="_blank">JRoutine-Channel</a> library.<br>
 </p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidchannel/com/github/dm/jrt/android/channel/ParcelableSelectable.html">ParcelableSelectable</a>
+        <p>
+            ParcelableSelectable data allow for effective transmission of sub-flows of data through a single channel connected to invocations running in dedicated services.
+            Each selectable is linked to a specific index so that is possible to discriminate between data coming from different logic flows.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidchannel/com/github/dm/jrt/android/channel/AndroidChannels.html">AndroidChannels</a>
+        <p>
+            This utility class exposes several methods to combine and transform channels.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidchannel/com/github/dm/jrt/android/v11/channel/SparseChannels.html">SparseChannels</a>
+        <p>
+            This utility class exposes several methods to combine and transform channels supporting Android sparse arrays.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidchannel/com/github/dm/jrt/android/v4/channel/SparseChannelsCompat.html">SparseChannelsCompat</a>
+        <p>
+            This utility class exposes several methods to combine and transform channels supporting Android sparse arrays.
+            This class is specifically meant to employ the Android Support library for retro-compatibility.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidchannel/com/github/dm/jrt/android/channel/ParcelableByteChannel.html">ParcelableByteChannel</a>
+        <p>
+            A parcelable byte channel allows for efficient transmission of binary data through a service routine channel.
+        </p>
+    </li>
+</ul>
 <h2>Usage examples</h2>
 <b>Example 1:</b> blending the output of two channels.
 <pre>

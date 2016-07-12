@@ -588,12 +588,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testLoaderStreamBuilderAdapter() throws IOException {
-
         testLoaderStreamBuilderAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testLoaderStreamBuilderAdapterFragment() throws IOException {
-
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -601,12 +599,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testOutputChannelAdapter() throws IOException {
-
         testOutputChannelAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testOutputChannelAdapterFragment() throws IOException {
-
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -614,12 +610,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
 
     public void testStreamBuilderAdapter() throws IOException {
-
         testStreamBuilderAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testStreamBuilderAdapterFragment() throws IOException {
-
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);

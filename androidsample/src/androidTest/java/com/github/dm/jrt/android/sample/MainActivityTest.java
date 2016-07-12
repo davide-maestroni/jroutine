@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.sample;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.support.test.espresso.IdlingPolicies;
+import android.support.test.espresso.PerformException;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
@@ -59,27 +60,35 @@ public class MainActivityTest {
     @Test
     public void testRepoList() throws InterruptedException {
 
-        // Wait for the network request to complete
-        UnitDuration.seconds(10).sleepAtLeast();
-        IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
-        onData(anything()).inAdapterView(withId(R.id.repo_list))
-                          .atPosition(0)
-                          .check(matches(isDisplayed()));
+        try {
+            // Wait for the network request to complete
+            UnitDuration.seconds(10).sleepAtLeast();
+            IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
+            onData(anything()).inAdapterView(withId(R.id.repo_list))
+                              .atPosition(0)
+                              .check(matches(isDisplayed()));
+
+        } catch (final PerformException ignored) {
+        }
     }
 
     @Test
     public void testRepoListRotation() throws InterruptedException {
 
-        // Wait for the network request to complete
-        UnitDuration.seconds(10).sleepAtLeast();
-        IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
-        onData(anything()).inAdapterView(withId(R.id.repo_list))
-                          .atPosition(0)
-                          .check(matches(isDisplayed()));
-        onView(isRoot()).perform(new LandscapeOrientationAction());
-        onData(anything()).inAdapterView(withId(R.id.repo_list))
-                          .atPosition(0)
-                          .check(matches(isDisplayed()));
+        try {
+            // Wait for the network request to complete
+            UnitDuration.seconds(10).sleepAtLeast();
+            IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
+            onData(anything()).inAdapterView(withId(R.id.repo_list))
+                              .atPosition(0)
+                              .check(matches(isDisplayed()));
+            onView(isRoot()).perform(new LandscapeOrientationAction());
+            onData(anything()).inAdapterView(withId(R.id.repo_list))
+                              .atPosition(0)
+                              .check(matches(isDisplayed()));
+
+        } catch (final PerformException ignored) {
+        }
     }
 
     private static class LandscapeOrientationAction implements ViewAction {

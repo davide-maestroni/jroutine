@@ -26,6 +26,7 @@ import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.retrofit.ErrorResponseException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -197,8 +198,15 @@ public class ServiceCallInvocation extends
     private void syncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
             Exception {
         final Request request = mRequestData.requestWithBody(null);
-        final ResponseBody responseBody = getClient().newCall(request).execute().body();
-        publishResult(responseBody, result);
+        final Response response = getClient().newCall(request).execute();
+        final ResponseBody responseBody = response.body();
+        if (response.isSuccessful()) {
+            publishResult(responseBody, result);
+
+        } else {
+            result.abort(
+                    new ErrorResponseException(retrofit2.Response.error(responseBody, response)));
+        }
     }
 
     /**

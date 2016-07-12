@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -59,7 +60,13 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
                 public void onInput(final Call<Object> input,
                         @NotNull final Channel<Object, ?> result) throws IOException {
-                    result.pass(input.execute().body());
+                    final Response<Object> response = input.execute();
+                    if (response.isSuccessful()) {
+                        result.pass(response.body());
+
+                    } else {
+                        result.abort(new ErrorResponseException(response));
+                    }
                 }
             };
 

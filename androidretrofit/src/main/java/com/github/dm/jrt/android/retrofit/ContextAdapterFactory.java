@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
+import com.github.dm.jrt.retrofit.ErrorResponseException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,7 @@ import java.lang.reflect.Type;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.CallAdapter.Factory;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -51,7 +53,13 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
 
                 public void onInput(final Call<Object> input,
                         @NotNull final Channel<Object, ?> result) throws IOException {
-                    result.pass(input.execute().body());
+                    final Response<Object> response = input.execute();
+                    if (response.isSuccessful()) {
+                        result.pass(response.body());
+
+                    } else {
+                        result.abort(new ErrorResponseException(response));
+                    }
                 }
             };
 

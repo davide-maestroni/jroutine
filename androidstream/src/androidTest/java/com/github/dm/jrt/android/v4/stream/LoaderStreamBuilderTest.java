@@ -87,13 +87,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     private static void testFlatMap(@NotNull final FragmentActivity activity) {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
-                                             return JRoutineStreamLoaderCompat //
+                                             return JRoutineLoaderStreamCompat //
                                                      .<String>withStream().on(loaderFrom(activity))
                                                                           .sync()
                                                                           .map(filter(
@@ -104,13 +104,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      })
                                      .syncCall("test1", null, "test2", null)
                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
-                                             return JRoutineStreamLoaderCompat //
+                                             return JRoutineLoaderStreamCompat //
                                                      .<String>withStream().on(loaderFrom(activity))
                                                                           .sync()
                                                                           .map(filter(
@@ -122,13 +122,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", null, "test2", null)
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .parallel()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
-                                             return JRoutineStreamLoaderCompat //
+                                             return JRoutineLoaderStreamCompat //
                                                      .<String>withStream().on(loaderFrom(activity))
                                                                           .sync()
                                                                           .map(filter(
@@ -140,13 +140,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", null, "test2", null)
                                      .after(seconds(10))
                                      .all()).containsOnly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sequential()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
-                                             return JRoutineStreamLoaderCompat //
+                                             return JRoutineLoaderStreamCompat //
                                                      .<String>withStream().on(loaderFrom(activity))
                                                                           .sync()
                                                                           .map(filter(
@@ -164,7 +164,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             final Runner runner1 = Runners.poolRunner(1);
             final Runner runner2 = Runners.poolRunner(1);
-            JRoutineStreamLoaderCompat //
+            JRoutineLoaderStreamCompat //
                     .<String>withStream().on(loaderFrom(activity))
                                          .invocationConfiguration()
                                          .withRunner(runner1)
@@ -172,7 +172,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                          .map(new Function<String, Object>() {
 
                                              public Object apply(final String s) {
-                                                 return JRoutineStreamLoaderCompat.withStream()
+                                                 return JRoutineLoaderStreamCompat.withStream()
                                                                                   .on(loaderFrom(
                                                                                           activity))
                                                                                   .invocationConfiguration()
@@ -203,7 +203,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     private static void testMapAllConsumer(@NotNull final FragmentActivity activity) {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
                                      .mapAllAccept(new BiConsumer<List<?
@@ -223,7 +223,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2", "test3")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1test2test3");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
                                      .mapAllAccept(
@@ -248,7 +248,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
     private static void testMapAllFunction(@NotNull final FragmentActivity activity) {
 
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
                                      .mapAll(new Function<List<? extends String>, String>() {
@@ -265,7 +265,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2", "test3")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1test2test3");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
                                      .mapAll(new Function<List<? extends String>, String>() {
@@ -284,7 +284,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     private static void testMapConsumer(@NotNull final FragmentActivity activity) {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
@@ -296,7 +296,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
                                      .parallel()
@@ -310,7 +310,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
@@ -322,7 +322,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      })
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .streamInvocationConfiguration()
                                      .withOutputOrder(OrderType.BY_CALL)
@@ -341,7 +341,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     private static void testMapFunction(@NotNull final FragmentActivity activity) {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .async()
                                      .map(new Function<String, String>() {
@@ -353,7 +353,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
                                      .parallel()
@@ -367,7 +367,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sync()
                                      .map(new Function<String, String>() {
@@ -379,7 +379,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      })
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
                                      .sequential()
@@ -444,7 +444,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testAsync() {
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .mapOn(null)
                                              .asyncCall("test")
@@ -453,7 +453,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testCache() {
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .loaderConfiguration()
                                              .withLoaderId(0)
@@ -467,7 +467,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .buildChannel()
                                        .after(seconds(10))
                                        .next()).isEqualTo("test");
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .streamLoaderConfiguration()
                                              .withLoaderId(0)
@@ -487,7 +487,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     public void testConstructor() {
         boolean failed = false;
         try {
-            new JRoutineStreamLoaderCompat();
+            new JRoutineLoaderStreamCompat();
             failed = true;
 
         } catch (final Throwable ignored) {
@@ -498,7 +498,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
     public void testFactory() {
         final LoaderStreamBuilderCompat<String, String> builder =
-                JRoutineStreamLoaderCompat.<String>withStream().on(loaderFrom(getActivity()))
+                JRoutineLoaderStreamCompat.<String>withStream().on(loaderFrom(getActivity()))
                                                                .map(new UpperCase());
         assertThat(JRoutineCore.with(builder.buildFactory())
                                .asyncCall("test")
@@ -518,7 +518,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testFlatMapNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .flatMap(null);
@@ -528,7 +528,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .flatMap(null);
@@ -538,7 +538,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .flatMap(null);
@@ -548,7 +548,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .flatMap(null);
@@ -567,7 +567,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                     }
                 })).buildRoutine();
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .flatMap(new RetryFunction(getActivity(), routine))
@@ -582,7 +582,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testFlatTransform() {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .let(new Function<StreamBuilder<String, String>,
                                              StreamBuilder<String, String>>() {
@@ -595,7 +595,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .let(new Function<StreamBuilder<String, String>,
                                              LoaderStreamBuilderCompat<String, String>>() {
@@ -610,7 +610,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .letWithConfig(
                                              new BiFunction<LoaderStreamConfigurationCompat,
@@ -628,7 +628,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1")
                                      .after(seconds(10))
                                      .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .letWithConfig(
                                              new BiFunction<LoaderStreamConfigurationCompat,
@@ -656,25 +656,25 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testInvocationMode() {
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .invocationMode(InvocationMode.ASYNC)
                                              .asyncCall("test1", "test2", "test3")
                                              .after(seconds(10))
                                              .all()).containsExactly("test1", "test2", "test3");
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .asyncCall("test1", "test2", "test3")
                                              .after(seconds(10))
                                              .all()).containsExactly("test1", "test2", "test3");
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .invocationMode(InvocationMode.SYNC)
                                              .asyncCall("test1", "test2", "test3")
                                              .after(seconds(10))
                                              .all()).containsExactly("test1", "test2", "test3");
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(getActivity()))
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .asyncCall("test1", "test2", "test3")
@@ -685,7 +685,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testInvocationModeNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream().invocationMode(null);
+            JRoutineLoaderStreamCompat.withStream().invocationMode(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -700,7 +700,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapAllConsumerNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .mapAllAccept(null);
@@ -717,7 +717,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapAllFunctionNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .mapAll(null);
@@ -734,7 +734,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapConsumerNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .mapAccept(null);
@@ -747,14 +747,14 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     public void testMapContextFactory() {
         final ContextInvocationFactory<String, String> factory =
                 ContextInvocationFactory.factoryOf(UpperCase.class);
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .async()
                                      .map(factory)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .parallel()
@@ -762,13 +762,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sync()
                                      .map(factory)
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .sequential()
@@ -782,28 +782,28 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         final ContextInvocationFactory<String, String> factory =
                 ContextInvocationFactory.factoryOf(UpperCase.class);
         try {
-            JRoutineStreamLoaderCompat.<String>withStream().async().map(factory);
+            JRoutineLoaderStreamCompat.<String>withStream().async().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            JRoutineStreamLoaderCompat.<String>withStream().sync().map(factory);
+            JRoutineLoaderStreamCompat.<String>withStream().sync().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            JRoutineStreamLoaderCompat.<String>withStream().parallel().map(factory);
+            JRoutineLoaderStreamCompat.<String>withStream().parallel().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            JRoutineStreamLoaderCompat.<String>withStream().sequential().map(factory);
+            JRoutineLoaderStreamCompat.<String>withStream().sequential().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
@@ -813,7 +813,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapContextFactoryNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .map((ContextInvocationFactory<Object, Object>) null);
@@ -823,7 +823,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .map((ContextInvocationFactory<Object, Object>) null);
@@ -833,7 +833,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .map((ContextInvocationFactory<Object, Object>) null);
@@ -843,7 +843,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .map((ContextInvocationFactory<Object, Object>) null);
@@ -856,14 +856,14 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     public void testMapFactory() {
         final InvocationFactory<String, String> factory =
                 InvocationFactory.factoryOf(UpperCase.class);
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .async()
                                      .map(factory)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .parallel()
@@ -871,13 +871,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sync()
                                      .map(factory)
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .sequential()
@@ -890,7 +890,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapFactoryNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .map((InvocationFactory<Object, Object>) null);
@@ -900,7 +900,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .map((InvocationFactory<Object, Object>) null);
@@ -910,7 +910,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .map((InvocationFactory<Object, Object>) null);
@@ -920,7 +920,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .map((InvocationFactory<Object, Object>) null);
@@ -931,14 +931,14 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testMapFilter() {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .async()
                                      .map(new UpperCase())
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .parallel()
@@ -946,13 +946,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sync()
                                      .map(new UpperCase())
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
                                      .sequential()
@@ -965,7 +965,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapFilterNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .map((MappingInvocation<Object, Object>) null);
@@ -975,7 +975,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .map((MappingInvocation<Object, Object>) null);
@@ -985,7 +985,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .map((MappingInvocation<Object, Object>) null);
@@ -995,7 +995,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .map((MappingInvocation<Object, Object>) null);
@@ -1012,7 +1012,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapFunctionNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .map((Function<Object, Object>) null);
@@ -1022,7 +1022,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .map((Function<Object, Object>) null);
@@ -1032,7 +1032,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .map((Function<Object, Object>) null);
@@ -1042,7 +1042,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .map((Function<Object, Object>) null);
@@ -1058,27 +1058,27 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                             .withOutputOrder(OrderType.BY_CALL)
                                                             .applied()
                                                             .buildRoutine();
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .async()
                                      .map(routine)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .parallel()
                                      .map(routine)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sync()
                                      .map(routine)
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sequential()
                                      .map(routine)
@@ -1089,27 +1089,27 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
     public void testMapRoutineBuilder() {
         final RoutineBuilder<String, String> builder = JRoutineCore.with(new UpperCase());
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .async()
                                      .map(builder)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .parallel()
                                      .map(builder)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsOnly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sync()
                                      .map(builder)
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sequential()
                                      .map(builder)
@@ -1119,24 +1119,24 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         final RoutineBuilder<String, String> loaderBuilder =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(ContextInvocationFactory.factoryOf(UpperCase.class));
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().async()
                                      .map(loaderBuilder)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().parallel()
                                      .map(loaderBuilder)
                                      .asyncCall("test1", "test2")
                                      .after(seconds(10))
                                      .all()).containsOnly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().sync()
                                      .map(loaderBuilder)
                                      .syncCall("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().sequential()
                                      .map(loaderBuilder)
                                      .syncCall("test1", "test2")
@@ -1147,7 +1147,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testMapRoutineNullPointerError() {
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .async()
                                       .map((Routine<Object, Object>) null);
@@ -1157,7 +1157,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .parallel()
                                       .map((Routine<Object, Object>) null);
@@ -1167,7 +1167,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sync()
                                       .map((Routine<Object, Object>) null);
@@ -1177,7 +1177,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineStreamLoaderCompat.withStream()
+            JRoutineLoaderStreamCompat.withStream()
                                       .on(loaderFrom(getActivity()))
                                       .sequential()
                                       .map((Routine<Object, Object>) null);
@@ -1188,7 +1188,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testStraight() {
-        assertThat(JRoutineStreamLoaderCompat.withStream()
+        assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .straight()
                                              .map(insteadAccept(range(1, 1000)))
                                              .streamInvocationConfiguration()
@@ -1203,13 +1203,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testTransform() {
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .liftWithConfig(transformBiFunction())
                                      .asyncCall("test")
                                      .after(seconds(10))
                                      .next()).isEqualTo("TEST");
-        assertThat(JRoutineStreamLoaderCompat //
+        assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .lift(transformFunction())
                                      .asyncCall("test")
@@ -1232,7 +1232,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         private static Channel<Object, String> apply(final Object o,
                 @NotNull final FragmentActivity activity,
                 @NotNull final Routine<Object, String> routine, @NotNull final int[] count) {
-            return JRoutineStreamLoaderCompat.withStream()
+            return JRoutineLoaderStreamCompat.withStream()
                                              .on(loaderFrom(activity))
                                              .map(routine)
                                              .let(tryCatchAccept(
@@ -1243,7 +1243,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                                  final RoutineException e,
                                                                  final Channel<String, ?> channel) {
                                                              if (++count[0] < 3) {
-                                                                 JRoutineStreamLoaderCompat
+                                                                 JRoutineLoaderStreamCompat
                                                                          .withStream()
                                                                                            .on(loaderFrom(
                                                                                                    activity))

@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Routine&lt;Integer, Double&gt; rms =
- *                 JRoutineStreamLoaderCompat.&lt;Integer&gt;withStream()
+ *                 JRoutineLoaderStreamCompat.&lt;Integer&gt;withStream()
  *                                           .on(loaderFrom(activity))
  *                                           .map(i -&gt; i * i)
  *                                           .straight()
@@ -43,12 +43,12 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 07/04/2016.
  */
-public class JRoutineStreamLoaderCompat {
+public class JRoutineLoaderStreamCompat {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected JRoutineStreamLoaderCompat() {
+    protected JRoutineLoaderStreamCompat() {
         ConstantConditions.avoid();
     }
 

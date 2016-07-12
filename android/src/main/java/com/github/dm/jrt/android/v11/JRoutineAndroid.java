@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.stream.JRoutineStreamLoader;
+import com.github.dm.jrt.android.v11.stream.JRoutineLoaderStream;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -176,6 +176,6 @@ public class JRoutineAndroid extends SparseChannels {
      */
     @NotNull
     public static <IN> LoaderStreamBuilder<IN, IN> withStream() {
-        return JRoutineStreamLoader.withStream();
+        return JRoutineLoaderStream.withStream();
     }
 }

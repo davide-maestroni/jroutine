@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.stream.JRoutineStreamLoaderCompat;
+import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -176,6 +176,6 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
      */
     @NotNull
     public static <IN> LoaderStreamBuilderCompat<IN, IN> withStream() {
-        return JRoutineStreamLoaderCompat.withStream();
+        return JRoutineLoaderStreamCompat.withStream();
     }
 }

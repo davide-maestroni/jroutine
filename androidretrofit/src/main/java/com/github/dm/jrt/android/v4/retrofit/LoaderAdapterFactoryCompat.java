@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.stream.JRoutineStreamLoaderCompat;
+import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -273,7 +273,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
         @Override
         public <OUT> LoaderStreamBuilderCompat adapt(final Call<OUT> call) {
-            return JRoutineStreamLoaderCompat.withStream()
+            return JRoutineLoaderStreamCompat.withStream()
                                              .on(mContext)
                                              .lift(outputCall(ComparableCall.of(call)))
                                              .invocationMode(mInvocationMode)

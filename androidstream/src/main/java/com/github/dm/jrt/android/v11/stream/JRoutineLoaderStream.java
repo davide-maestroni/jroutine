@@ -31,24 +31,24 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Routine&lt;Integer, Double&gt; rms =
- *                 JRoutineStreamLoaderCompat.&lt;Integer&gt;withStream()
- *                                           .on(loaderFrom(activity))
- *                                           .map(i -&gt; i * i)
- *                                           .straight()
- *                                           .map(averageFloat())
- *                                           .map(Math::sqrt)
- *                                           .buildRoutine();
+ *                 JRoutineLoaderStream.&lt;Integer&gt;withStream()
+ *                                     .on(loaderFrom(activity))
+ *                                     .map(i -&gt; i * i)
+ *                                     .straight()
+ *                                     .map(averageFloat())
+ *                                     .map(Math::sqrt)
+ *                                     .buildRoutine();
  *     </code>
  * </pre>
  * <p>
  * Created by davide-maestroni on 07/03/2016.
  */
-public class JRoutineStreamLoader {
+public class JRoutineLoaderStream {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected JRoutineStreamLoader() {
+    protected JRoutineLoaderStream() {
         ConstantConditions.avoid();
     }
 

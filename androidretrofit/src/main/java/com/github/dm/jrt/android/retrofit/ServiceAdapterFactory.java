@@ -54,8 +54,8 @@ import static com.github.dm.jrt.function.Functions.decorate;
 import static com.github.dm.jrt.retrofit.AbstractAdapterFactory.outputCall;
 
 /**
- * Implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamBuilder} return types.
+ * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
+ * return types.
  * <br>
  * Note that the routines generated through the returned builders will ignore any input.
  * <p>

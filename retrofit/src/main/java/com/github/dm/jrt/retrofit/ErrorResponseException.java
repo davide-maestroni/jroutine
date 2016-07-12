@@ -20,7 +20,14 @@ import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import okhttp3.Headers;
+import okhttp3.Headers.Builder;
+import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -31,19 +38,33 @@ import retrofit2.Response;
  */
 public class ErrorResponseException extends RoutineException {
 
-    private final Response<?> mResponse;
+    private final int mCode;
+
+    private final byte[] mErrorBody;
+
+    private final Map<String, List<String>> mHeaders;
+
+    private final String mMediaType;
+
+    private final String mMessage;
 
     /**
      * Constructor.
      *
      * @param response the unsuccessful response.
      */
-    public ErrorResponseException(@NotNull final Response<?> response) {
+    public ErrorResponseException(@NotNull final Response<?> response) throws IOException {
         if (response.isSuccessful()) {
             throw new IllegalArgumentException("the response is successful");
         }
 
-        mResponse = response;
+        mCode = response.code();
+        mMessage = response.message();
+        mHeaders = response.headers().toMultimap();
+        final ResponseBody errorBody = response.errorBody();
+        final MediaType contentType = errorBody.contentType();
+        mMediaType = (contentType != null) ? contentType.toString() : null;
+        mErrorBody = errorBody.bytes();
     }
 
     /**
@@ -52,7 +73,7 @@ public class ErrorResponseException extends RoutineException {
      * @return the status code.
      */
     public int code() {
-        return mResponse.code();
+        return mCode;
     }
 
     /**
@@ -61,7 +82,9 @@ public class ErrorResponseException extends RoutineException {
      * @return the response body.
      */
     public ResponseBody errorBody() {
-        return mResponse.errorBody();
+        final String mediaType = mMediaType;
+        return ResponseBody.create((mediaType != null) ? MediaType.parse(mediaType) : null,
+                mErrorBody);
     }
 
     /**
@@ -70,7 +93,15 @@ public class ErrorResponseException extends RoutineException {
      * @return the HTTP headers.
      */
     public Headers headers() {
-        return mResponse.headers();
+        final Builder builder = new Builder();
+        for (final Entry<String, List<String>> entry : mHeaders.entrySet()) {
+            final String name = entry.getKey();
+            for (final String value : entry.getValue()) {
+                builder.add(name, value);
+            }
+        }
+
+        return builder.build();
     }
 
     /**
@@ -79,15 +110,6 @@ public class ErrorResponseException extends RoutineException {
      * @return the status message.
      */
     public String message() {
-        return mResponse.message();
-    }
-
-    /**
-     * Returns the raw response from the HTTP client.
-     *
-     * @return the raw response.
-     */
-    public okhttp3.Response raw() {
-        return mResponse.raw();
+        return mMessage;
     }
 }

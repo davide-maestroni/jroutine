@@ -66,23 +66,25 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
             + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
+    private final MockWebServer mServer;
+
     public LoaderAdapterFactoryTest() {
-
         super(TestActivity.class);
+        final MockWebServer server = new MockWebServer();
+        for (int i = 0; i < 18; i++) {
+            server.enqueue(new MockResponse().setBody(BODY));
+        }
+
+        mServer = server;
     }
 
-    private static void testLoaderStreamBuilderAdapter(
-            @NotNull final LoaderContextCompat context) throws IOException {
-
-        MockWebServer server = null;
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+    private static void testLoaderStreamBuilderAdapter(@NotNull final LoaderContextCompat context,
+            final int port) throws IOException {
+        {
             final LoaderAdapterFactoryCompat adapterFactory =
                     LoaderAdapterFactoryCompat.on(context).buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
@@ -102,448 +104,23 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
-
-        } finally {
-            server.shutdown();
         }
 
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.PARALLEL)
-                                                                                        .loaderConfiguration()
-                                                                                        .withResultStaleTime(
-                                                                                                seconds(3))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService2 service = retrofit.create(GitHubService2.class);
-            assertThat(service.streamLoaderRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.SYNC)
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService2 service = retrofit.create(GitHubService2.class);
-            assertThat(service.streamLoaderRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.SEQUENTIAL)
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService2 service = retrofit.create(GitHubService2.class);
-            assertThat(service.streamLoaderRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                    serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                            TestService.class)).buildFactory();
-            final LoaderAdapterFactoryCompat adapterFactory =
-                    LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService2 service = retrofit.create(GitHubService2.class);
-            assertThat(service.streamLoaderRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final BodyAdapterFactory factory = new BodyAdapterFactory();
-            final LoaderAdapterFactoryCompat adapterFactory =
-                    LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService2 service = retrofit.create(GitHubService2.class);
-            assertThat(service.streamLoaderRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-    }
-
-    private static void testOutputChannelAdapter(@NotNull final LoaderContextCompat context) throws
-            IOException {
-
-        MockWebServer server = null;
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.PARALLEL)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.SYNC)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .invocationMode(
-                                                                                                InvocationMode.SEQUENTIAL)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-                    serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
-                            TestService.class)).buildFactory();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .delegateFactory(
-                                                                                                factory)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final BodyAdapterFactory factory = new BodyAdapterFactory();
-            final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                        .delegateFactory(
-                                                                                                factory)
-                                                                                        .invocationConfiguration()
-                                                                                        .withOutputTimeout(
-                                                                                                seconds(10))
-                                                                                        .applied()
-                                                                                        .buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat").next();
-            assertThat(repos).hasSize(3);
-            assertThat(repos.get(0).getId()).isEqualTo("1");
-            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-            assertThat(repos.get(0).isPrivate()).isFalse();
-            assertThat(repos.get(1).getId()).isEqualTo("2");
-            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-            assertThat(repos.get(1).isPrivate()).isFalse();
-            assertThat(repos.get(2).getId()).isEqualTo("3");
-            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-            assertThat(repos.get(2).isPrivate()).isTrue();
-
-        } finally {
-            server.shutdown();
-        }
-    }
-
-    private static void testStreamBuilderAdapter(@NotNull final LoaderContextCompat context) throws
-            IOException {
-
-        MockWebServer server = null;
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
-            final LoaderAdapterFactoryCompat adapterFactory =
-                    LoaderAdapterFactoryCompat.on(context).buildFactory();
-            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
-                                                   .addCallAdapterFactory(adapterFactory)
-                                                   .addConverterFactory(converterFactory)
-                                                   .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            assertThat(service.streamRepos("octocat")
-                              .map(Operators.<Repo>unfold())
-                              .bind(onOutput(new Consumer<Repo>() {
-
-                                  public void accept(final Repo repo) throws Exception {
-
-                                      final int id = Integer.parseInt(repo.getId());
-                                      assertThat(id).isBetween(1, 3);
-                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                  }
-                              }))
-                              .close()
-                              .after(seconds(10))
-                              .getError()).isNull();
-
-        } finally {
-            server.shutdown();
-        }
-
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+        {
             final LoaderAdapterFactoryCompat adapterFactory = //
                     LoaderAdapterFactoryCompat.on(context)
                                               .invocationMode(InvocationMode.PARALLEL)
+                                              .loaderConfiguration()
+                                              .withResultStaleTime(seconds(3))
+                                              .applied()
                                               .buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            assertThat(service.streamRepos("octocat")
+            final GitHubService2 service = retrofit.create(GitHubService2.class);
+            assertThat(service.streamLoaderRepos("octocat")
                               .map(Operators.<Repo>unfold())
                               .bind(onOutput(new Consumer<Repo>() {
 
@@ -558,26 +135,20 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
-
-        } finally {
-            server.shutdown();
         }
 
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+        {
             final LoaderAdapterFactoryCompat adapterFactory = //
                     LoaderAdapterFactoryCompat.on(context)
                                               .invocationMode(InvocationMode.SYNC)
                                               .buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            assertThat(service.streamRepos("octocat")
+            final GitHubService2 service = retrofit.create(GitHubService2.class);
+            assertThat(service.streamLoaderRepos("octocat")
                               .map(Operators.<Repo>unfold())
                               .bind(onOutput(new Consumer<Repo>() {
 
@@ -592,26 +163,20 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
-
-        } finally {
-            server.shutdown();
         }
 
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+        {
             final LoaderAdapterFactoryCompat adapterFactory = //
                     LoaderAdapterFactoryCompat.on(context)
                                               .invocationMode(InvocationMode.SEQUENTIAL)
                                               .buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            assertThat(service.streamRepos("octocat")
+            final GitHubService2 service = retrofit.create(GitHubService2.class);
+            assertThat(service.streamLoaderRepos("octocat")
                               .map(Operators.<Repo>unfold())
                               .bind(onOutput(new Consumer<Repo>() {
 
@@ -626,27 +191,21 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
-
-        } finally {
-            server.shutdown();
         }
 
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+        {
             final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
                     serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
                             TestService.class)).buildFactory();
             final LoaderAdapterFactoryCompat adapterFactory =
                     LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
-            final GitHubService service = retrofit.create(GitHubService.class);
-            assertThat(service.streamRepos("octocat")
+            final GitHubService2 service = retrofit.create(GitHubService2.class);
+            assertThat(service.streamLoaderRepos("octocat")
                               .map(Operators.<Repo>unfold())
                               .bind(onOutput(new Consumer<Repo>() {
 
@@ -661,20 +220,211 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
-
-        } finally {
-            server.shutdown();
         }
 
-        try {
-            server = new MockWebServer();
-            server.enqueue(new MockResponse().setBody(BODY));
-            server.start();
+        {
             final BodyAdapterFactory factory = new BodyAdapterFactory();
             final LoaderAdapterFactoryCompat adapterFactory =
                     LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
             final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService2 service = retrofit.create(GitHubService2.class);
+            assertThat(service.streamLoaderRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
+        }
+    }
+
+    private static void testOutputChannelAdapter(@NotNull final LoaderContextCompat context,
+            final int port) throws IOException {
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.PARALLEL)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.SYNC)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.SEQUENTIAL)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+
+        {
+            final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
+                    serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                            TestService.class)).buildFactory();
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .delegateFactory(factory)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+
+        {
+            final BodyAdapterFactory factory = new BodyAdapterFactory();
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .delegateFactory(factory)
+                                              .invocationConfiguration()
+                                              .withOutputTimeout(seconds(10))
+                                              .applied()
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            final List<Repo> repos = service.listRepos("octocat").next();
+            assertThat(repos).hasSize(3);
+            assertThat(repos.get(0).getId()).isEqualTo("1");
+            assertThat(repos.get(0).getName()).isEqualTo("Repo1");
+            assertThat(repos.get(0).isPrivate()).isFalse();
+            assertThat(repos.get(1).getId()).isEqualTo("2");
+            assertThat(repos.get(1).getName()).isEqualTo("Repo2");
+            assertThat(repos.get(1).isPrivate()).isFalse();
+            assertThat(repos.get(2).getId()).isEqualTo("3");
+            assertThat(repos.get(2).getName()).isEqualTo("Repo3");
+            assertThat(repos.get(2).isPrivate()).isTrue();
+        }
+    }
+
+    private static void testStreamBuilderAdapter(@NotNull final LoaderContextCompat context,
+            final int port) throws IOException {
+        {
+            final LoaderAdapterFactoryCompat adapterFactory =
+                    LoaderAdapterFactoryCompat.on(context).buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
                                                    .addCallAdapterFactory(adapterFactory)
                                                    .addConverterFactory(converterFactory)
                                                    .build();
@@ -694,15 +444,152 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .close()
                               .after(seconds(10))
                               .getError()).isNull();
+        }
 
-        } finally {
-            server.shutdown();
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.PARALLEL)
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            assertThat(service.streamRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
+        }
+
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.SYNC)
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            assertThat(service.streamRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
+        }
+
+        {
+            final LoaderAdapterFactoryCompat adapterFactory = //
+                    LoaderAdapterFactoryCompat.on(context)
+                                              .invocationMode(InvocationMode.SEQUENTIAL)
+                                              .buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            assertThat(service.streamRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
+        }
+
+        {
+            final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
+                    serviceFrom(ConstantConditions.notNull(context.getLoaderContext()),
+                            TestService.class)).buildFactory();
+            final LoaderAdapterFactoryCompat adapterFactory =
+                    LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            assertThat(service.streamRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
+        }
+
+        {
+            final BodyAdapterFactory factory = new BodyAdapterFactory();
+            final LoaderAdapterFactoryCompat adapterFactory =
+                    LoaderAdapterFactoryCompat.on(context).delegateFactory(factory).buildFactory();
+            final GsonConverterFactory converterFactory = GsonConverterFactory.create();
+            final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + port)
+                                                   .addCallAdapterFactory(adapterFactory)
+                                                   .addConverterFactory(converterFactory)
+                                                   .build();
+            final GitHubService service = retrofit.create(GitHubService.class);
+            assertThat(service.streamRepos("octocat")
+                              .map(Operators.<Repo>unfold())
+                              .bind(onOutput(new Consumer<Repo>() {
+
+                                  public void accept(final Repo repo) throws Exception {
+
+                                      final int id = Integer.parseInt(repo.getId());
+                                      assertThat(id).isBetween(1, 3);
+                                      assertThat(repo.getName()).isEqualTo("Repo" + id);
+                                      assertThat(repo.isPrivate()).isEqualTo(id == 3);
+                                  }
+                              }))
+                              .close()
+                              .after(seconds(10))
+                              .getError()).isNull();
         }
     }
 
     public void testLoaderStreamBuilderAdapter() throws IOException {
 
-        testLoaderStreamBuilderAdapter(loaderFrom(getActivity()));
+        testLoaderStreamBuilderAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testLoaderStreamBuilderAdapterFragment() throws IOException {
@@ -710,12 +597,12 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testLoaderStreamBuilderAdapter(loaderFrom(fragment));
+        testLoaderStreamBuilderAdapter(loaderFrom(fragment), mServer.getPort());
     }
 
     public void testOutputChannelAdapter() throws IOException {
 
-        testOutputChannelAdapter(loaderFrom(getActivity()));
+        testOutputChannelAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testOutputChannelAdapterFragment() throws IOException {
@@ -723,12 +610,12 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testOutputChannelAdapter(loaderFrom(fragment));
+        testOutputChannelAdapter(loaderFrom(fragment), mServer.getPort());
     }
 
     public void testStreamBuilderAdapter() throws IOException {
 
-        testStreamBuilderAdapter(loaderFrom(getActivity()));
+        testStreamBuilderAdapter(loaderFrom(getActivity()), mServer.getPort());
     }
 
     public void testStreamBuilderAdapterFragment() throws IOException {
@@ -736,7 +623,13 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        testStreamBuilderAdapter(loaderFrom(fragment));
+        testStreamBuilderAdapter(loaderFrom(fragment), mServer.getPort());
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mServer.start();
     }
 
     private static class BodyAdapterFactory extends CallAdapter.Factory {
@@ -744,7 +637,6 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         @Override
         public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
                 final Retrofit retrofit) {
-
             if (returnType instanceof ParameterizedType) {
                 if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                     return null;
@@ -757,12 +649,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             return new CallAdapter<Object>() {
 
                 public Type responseType() {
-
                     return returnType;
                 }
 
                 public <T> Object adapt(final Call<T> call) {
-
                     try {
                         return call.execute().body();
 

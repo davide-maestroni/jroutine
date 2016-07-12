@@ -52,6 +52,7 @@ public class ErrorResponseException extends RoutineException {
      * Constructor.
      *
      * @param response the unsuccessful response.
+     * @throws java.io.IOException if an I/O error occurred.
      */
     public ErrorResponseException(@NotNull final Response<?> response) throws IOException {
         if (response.isSuccessful()) {

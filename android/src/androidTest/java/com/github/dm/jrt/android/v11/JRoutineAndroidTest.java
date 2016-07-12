@@ -62,8 +62,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.producer.Producers.range;
+import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -167,7 +167,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     private static void testStream(@NotNull final Activity activity) {
         assertThat(JRoutineAndroid.withStream()
                                   .on(loaderFrom(activity))
-                                  .map(insteadAccept(range(1, 1000)))
+                                  .let(outputAccept(range(1, 1000)))
                                   .map(new Function<Number, Double>() {
 
                                       public Double apply(final Number number) {

@@ -60,8 +60,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
-import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.producer.Producers.range;
+import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
 import static com.github.dm.jrt.stream.processor.Processors.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1190,7 +1190,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     public void testStraight() {
         assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .straight()
-                                             .map(insteadAccept(range(1, 1000)))
+                                             .let(outputAccept(range(1, 1000)))
                                              .streamInvocationConfiguration()
                                              .withInputMaxSize(1)
                                              .withOutputMaxSize(1)

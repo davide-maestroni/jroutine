@@ -41,6 +41,10 @@ public class ErrorResponseExceptionTest {
         assertThat(exception.code()).isEqualTo(response.code());
         assertThat(exception.message()).isEqualTo(response.message());
         assertThat(exception.headers()).isEqualTo(response.headers());
-        assertThat(exception.errorBody()).isEqualTo(response.errorBody());
+        assertThat(exception.errorBody().contentType()).isEqualTo(
+                response.errorBody().contentType());
+        assertThat(exception.errorBody().contentLength()).isEqualTo(
+                response.errorBody().contentLength());
+        assertThat(exception.errorBody().string()).isEqualTo("Error");
     }
 }

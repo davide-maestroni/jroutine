@@ -51,7 +51,7 @@ import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.function.Functions.decorate;
-import static com.github.dm.jrt.retrofit.AbstractAdapterFactory.outputCall;
+import static com.github.dm.jrt.stream.processor.Processors.output;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
@@ -440,7 +440,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .lift(outputCall(call))
+                                 .sync()
+                                 .let(output(call))
                                  .invocationMode(mInvocationMode)
                                  .invocationConfiguration()
                                  .with(mInvocationConfiguration)

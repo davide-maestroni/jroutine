@@ -32,8 +32,10 @@ import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -41,15 +43,18 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.operator.Operators.insteadAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
+import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
+import static com.github.dm.jrt.stream.processor.Processors.outputGet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -75,7 +80,7 @@ public class ProcessorsTest {
     public void testBackoff() {
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(insteadAccept(range(1, 1000)))
+                                 .let(outputAccept(range(1, 1000)))
                                  .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
                                          2, Backoffs.linearDelay(seconds(10))))
                                  .map(Functions.<Number>identity())
@@ -113,7 +118,7 @@ public class ProcessorsTest {
                                  .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(insteadAccept(range(1, 1000)))
+                                 .let(outputAccept(range(1, 1000)))
                                  .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
                                          2, 10, TimeUnit.SECONDS))
                                  .map(Functions.<Number>identity())
@@ -151,7 +156,7 @@ public class ProcessorsTest {
                                  .next()).isCloseTo(21, Offset.offset(0.1));
         assertThat(JRoutineStream.withStream()
                                  .async()
-                                 .map(insteadAccept(range(1, 1000)))
+                                 .let(outputAccept(range(1, 1000)))
                                  .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
                                          2, seconds(10)))
                                  .map(Functions.<Number>identity())
@@ -312,6 +317,283 @@ public class ProcessorsTest {
     }
 
     @Test
+    public void testOutput() {
+        assertThat(
+                JRoutineStream.withStream().sync().let(Processors.outputGet(new Supplier<String>() {
+
+                    public String get() {
+                        return "TEST2";
+                    }
+                })).syncCall("test1").all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+
+                                     public void accept(final Channel<String, ?> resultChannel) {
+                                         resultChannel.pass("TEST2");
+                                     }
+                                 }))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.outputAccept(3,
+                                         new Consumer<Channel<String, ?>>() {
+
+                                             public void accept(
+                                                     final Channel<String, ?> resultChannel) {
+                                                 resultChannel.pass("TEST2");
+                                             }
+                                         }))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream().let(Processors.outputGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+
+                                     public void accept(final Channel<String, ?> resultChannel) {
+                                         resultChannel.pass("TEST2");
+                                     }
+                                 }))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.outputAccept(3,
+                                         new Consumer<Channel<String, ?>>() {
+
+                                             public void accept(
+                                                     final Channel<String, ?> resultChannel) {
+                                                 resultChannel.pass("TEST2");
+                                             }
+                                         }))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream().let(Processors.outputGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+
+                                     public void accept(final Channel<String, ?> resultChannel) {
+                                         resultChannel.pass("TEST2");
+                                     }
+                                 }))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsExactly("TEST2");
+        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.outputAccept(3,
+                                         new Consumer<Channel<String, ?>>() {
+
+                                             public void accept(
+                                                     final Channel<String, ?> resultChannel) {
+                                                 resultChannel.pass("TEST2");
+                                             }
+                                         }))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsExactly("TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testOutput2() {
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output((String) null))
+                                 .syncCall("test1")
+                                 .all()).containsOnly((String) null);
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output((String[]) null))
+                                 .syncCall("test1")
+                                 .all()).isEmpty();
+        assertThat(
+                JRoutineStream.withStream().sync().let(Processors.output()).syncCall("test1").all())
+                .isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output((List<String>) null))
+                                 .syncCall("test1")
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .syncCall("test1")
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output("TEST2"))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .syncCall("test1")
+                                 .all()).containsOnly("TEST2");
+
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((String) null))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly((String) null);
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((String[]) null))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output())
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((List<String>) null))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output("TEST2"))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .asyncCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((String) null))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly((String) null);
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((String[]) null))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output())
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output((List<String>) null))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output("TEST2"))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2", "TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream()
+                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .parallelCall("test1")
+                                 .after(seconds(3))
+                                 .all()).containsOnly("TEST2");
+    }
+
+    @Test
+    public void testOutputNegativeCount() {
+        try {
+            outputGet(-1, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            outputGet(0, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            outputAccept(-1, Functions.sink());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            outputAccept(0, Functions.sink());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
     public void testParallelConfiguration() {
         assertThat(JRoutineStream.<String>withStream().let(Processors.<String, String>parallel(1))
                                                       .map(new Function<String, String>() {
@@ -364,21 +646,21 @@ public class ProcessorsTest {
                     }
                 });
         assertThat(JRoutineStream.withStream()
-                                 .map(insteadAccept(range(1, 3)))
+                                 .let(outputAccept(range(1, 3)))
                                  .let(Processors.parallel(2, sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
-                                 .map(insteadAccept(range(1, 3)))
+                                 .let(outputAccept(range(1, 3)))
                                  .let(Processors.parallelBy(Functions.<Integer>identity(), sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
-                                 .map(insteadAccept(range(1, 3)))
+                                 .let(outputAccept(range(1, 3)))
                                  .let(Processors.parallel(2, JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
@@ -386,7 +668,7 @@ public class ProcessorsTest {
                                  .after(seconds(3))
                                  .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream.withStream()
-                                 .map(insteadAccept(range(1, 3)))
+                                 .let(outputAccept(range(1, 3)))
                                  .let(Processors.parallelBy(Functions.<Integer>identity(),
                                          JRoutineCore.with(
                                                  IdentityInvocation.<Integer>factoryOf())))

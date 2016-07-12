@@ -14,41 +14,36 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.operator;
+package com.github.dm.jrt.stream.processor;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.function.Function;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
-
 /**
- * Invocation implementation appending outputs.
+ * Binding function generating the output returned by a channel.
  * <p>
- * Created by davide-maestroni on 07/06/2016.
+ * Created by davide-maestroni on 07/12/2016.
  *
  * @param <OUT> the output data type.
  */
-class AppendOutputInvocation<OUT> extends GenerateInvocation<OUT, OUT> {
+class BindOutput<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>> {
 
     private final Channel<?, ? extends OUT> mChannel;
 
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param channel the channel instance.
      */
-    AppendOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
-        super(asArgs(channel));
-        mChannel = channel;
+    BindOutput(@Nullable final Channel<?, ? extends OUT> channel) {
+        mChannel = (channel != null) ? channel : JRoutineCore.io().<OUT>of();
     }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) {
-        result.pass(mChannel);
-    }
-
-    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) {
-        result.pass(input);
+    @SuppressWarnings("unchecked")
+    public Channel<?, OUT> apply(final Channel<?, ?> channel) {
+        return (Channel<?, OUT>) mChannel;
     }
 }

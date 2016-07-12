@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -41,7 +42,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
      *
      * @param channel the output channel.
      */
-    PrependOutputInvocationFactory(@NotNull final Channel<?, ? extends OUT> channel) {
+    PrependOutputInvocationFactory(@Nullable final Channel<?, ? extends OUT> channel) {
         super(asArgs(channel));
         mChannel = channel;
     }
@@ -68,7 +69,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
          *
          * @param channel the output channel.
          */
-        private PrependOutputInvocation(@NotNull final Channel<?, ? extends OUT> channel) {
+        private PrependOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
             mChannel = channel;
         }
 

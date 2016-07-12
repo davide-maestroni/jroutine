@@ -45,6 +45,8 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.stream.processor.Processors.output;
+
 /**
  * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamBuilder} and
  * {@code LoaderStreamBuilder} return types.
@@ -274,7 +276,8 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         public <OUT> LoaderStreamBuilder adapt(final Call<OUT> call) {
             return JRoutineLoaderStream.withStream()
                                        .on(mContext)
-                                       .lift(outputCall(ComparableCall.of(call)))
+                                       .sync()
+                                       .let(output(ComparableCall.of(call)))
                                        .invocationMode(mInvocationMode)
                                        .map(getRoutine());
         }

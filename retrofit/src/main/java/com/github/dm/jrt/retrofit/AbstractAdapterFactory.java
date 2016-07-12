@@ -23,7 +23,6 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.stream.JRoutineStream;
@@ -43,7 +42,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.decorate;
+import static com.github.dm.jrt.stream.processor.Processors.output;
 
 /**
  * Abstract implementation of a call adapter factory supporting {@code Channel} and
@@ -89,20 +88,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         mDelegateFactory = delegateFactory;
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-    }
-
-    /**
-     * Returns a lifting function making sure the specified call will the only stream output.
-     *
-     * @param call  the Retrofit call.
-     * @param <OUT> the output data type.
-     * @return the lifting function.
-     */
-    @NotNull
-    public static <OUT> Function<Function<Channel<?, Object>, Channel<?, Object>>,
-            Function<Channel<?, Object>, Channel<?, Call<OUT>>>> outputCall(
-            @NotNull final Call<OUT> call) {
-        return new LiftOutputCall<OUT>(ConstantConditions.notNull("call instance", call));
     }
 
     /**
@@ -288,30 +273,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Binding function making sure the specified call will the only stream output.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class BindOutputCall<OUT>
-            implements Function<Channel<?, Object>, Channel<?, Call<OUT>>> {
-
-        private final Call<OUT> mCall;
-
-        /**
-         * Constructor.
-         *
-         * @param call the Retrofit call.
-         */
-        private BindOutputCall(@NotNull final Call<OUT> call) {
-            mCall = call;
-        }
-
-        public Channel<?, Call<OUT>> apply(final Channel<?, Object> objects) throws Exception {
-            return JRoutineCore.io().of(mCall);
-        }
-    }
-
-    /**
      * Mapping invocation employing a call adapter.
      */
     private static class BodyAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
@@ -422,33 +383,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Lifting function making sure the specified call will the only stream output.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class LiftOutputCall<OUT> implements
-            Function<Function<Channel<?, Object>, Channel<?, Object>>, Function<Channel<?,
-                    Object>, Channel<?, Call<OUT>>>> {
-
-        private final Call<OUT> mCall;
-
-        /**
-         * Constructor.
-         *
-         * @param call the Retrofit call.
-         */
-        private LiftOutputCall(@NotNull final Call<OUT> call) {
-            mCall = call;
-        }
-
-        public Function<Channel<?, Object>, Channel<?, Call<OUT>>> apply(
-                final Function<Channel<?, Object>, Channel<?, Object>> bindingFunction) throws
-                Exception {
-            return decorate(bindingFunction).andThen(new BindOutputCall<OUT>(mCall));
-        }
-    }
-
-    /**
      * Stream builder adapter implementation.
      */
     private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
@@ -471,7 +405,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .lift(outputCall(call))
+                                 .sync()
+                                 .let(output(call))
                                  .invocationMode(mInvocationMode)
                                  .map(getRoutine());
         }

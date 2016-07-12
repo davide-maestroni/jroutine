@@ -32,6 +32,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.PredicateDecorator;
 import com.github.dm.jrt.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
@@ -168,7 +169,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> append(
-            @NotNull final Channel<?, ? extends DATA> channel) {
+            @Nullable final Channel<?, ? extends DATA> channel) {
         return new AppendOutputInvocation<DATA>(channel);
     }
 
@@ -538,169 +539,6 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> identity() {
         return IdentityInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations generating the specified output in place of the invocation
-     * ones.
-     * <br>
-     * The output will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param output the output.
-     * @param <IN>   the input data type.
-     * @param <OUT>  the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(@Nullable final OUT output) {
-        return instead(JRoutineCore.io().of(output));
-    }
-
-    /**
-     * Returns a factory of invocations generating the specified outputs in place of the invocation
-     * ones.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputs the outputs.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
-            @Nullable final OUT... outputs) {
-        return instead(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified iterable in
-     * place of the invocation ones.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
-            @Nullable final Iterable<? extends OUT> outputs) {
-        return instead(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified channel in
-     * place of the invocation ones.
-     * <br>
-     * The outputs will be published only when the invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param channel the output channel.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> instead(
-            @NotNull final Channel<?, ? extends OUT> channel) {
-        return new ThenOutputInvocation<OUT>(channel);
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified consumer in
-     * place of the invocation ones.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param count           the number of generated outputs.
-     * @param outputsConsumer the consumer instance.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadAccept(final long count,
-            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return new ThenConsumerInvocation<OUT>(count, decorate(outputsConsumer));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified consumer in
-     * place of the invocation ones.
-     * <br>
-     * The result channel will be passed to the consumer, so that multiple or no results may be
-     * generated.
-     * <br>
-     * The consumer will be called only when the routine invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputsConsumer the consumer instance.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadAccept(
-            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return insteadAccept(1, outputsConsumer);
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified supplier in
-     * place of the invocation ones.
-     * <br>
-     * The supplier will be called {@code count} number of times only when the routine invocation
-     * completes. The count number must be positive.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param count          the number of generated outputs.
-     * @param outputSupplier the supplier instance.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the invocation factory instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadGet(final long count,
-            @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return new ThenSupplierInvocation<OUT>(count, decorate(outputSupplier));
-    }
-
-    /**
-     * Returns a factory of invocations generating the outputs returned by the specified supplier in
-     * place of the invocation ones.
-     * <br>
-     * The supplier will be called only when the routine invocation completes.
-     * <br>
-     * The invocation inputs will be ignored.
-     *
-     * @param outputSupplier the supplier instance.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<? super IN, OUT> insteadGet(
-            @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return insteadGet(1, outputSupplier);
     }
 
     /**
@@ -1191,7 +1029,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prepend(
-            @NotNull final Channel<?, ? extends DATA> channel) {
+            @Nullable final Channel<?, ? extends DATA> channel) {
         return new PrependOutputInvocationFactory<DATA>(channel);
     }
 
@@ -1329,6 +1167,107 @@ public class Operators {
             @NotNull final Supplier<? extends OUT> seedSupplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> accumulateFunction) {
         return AccumulateFunctionInvocation.functionFactory(seedSupplier, accumulateFunction);
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data equal to the specified target with
+     * the passed replacement.
+     *
+     * @param target      the target instance.
+     * @param replacement the replacement instance.
+     * @param <DATA>      the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replace(@Nullable final DATA target,
+            @Nullable final DATA replacement) {
+        return new ReplaceInvocation<DATA>((target != null) ? PredicateDecorator.isEqualTo(target)
+                : PredicateDecorator.isNull(), replacement);
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data equal to the specified target with
+     * the outputs published by the passed consumer.
+     *
+     * @param target              the target instance.
+     * @param replacementConsumer the replacement consumer instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
+            @NotNull final Consumer<? super Channel<DATA, ?>> replacementConsumer) {
+        return new ReplaceConsumerInvocation<DATA>(
+                (target != null) ? PredicateDecorator.isEqualTo(target)
+                        : PredicateDecorator.isNull(), decorate(replacementConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data equal to the specified target with
+     * the outputs returned by the passed supplier.
+     *
+     * @param target              the target instance.
+     * @param replacementSupplier the replacement supplier instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceGet(@Nullable final DATA target,
+            @NotNull final Supplier<? extends DATA> replacementSupplier) {
+        return new ReplaceSupplierInvocation<DATA>(
+                (target != null) ? PredicateDecorator.isEqualTo(target)
+                        : PredicateDecorator.isNull(), decorate(replacementSupplier));
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data that are the same instance as the
+     * specified target with the passed replacement.
+     *
+     * @param target      the target instance.
+     * @param replacement the replacement instance.
+     * @param <DATA>      the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceSame(@Nullable final DATA target,
+            @Nullable final DATA replacement) {
+        return new ReplaceInvocation<DATA>((target != null) ? PredicateDecorator.isSameAs(target)
+                : PredicateDecorator.isNull(), replacement);
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data that are the same instance as the
+     * specified target with the outputs published by the passed consumer.
+     *
+     * @param target              the target instance.
+     * @param replacementConsumer the replacement consumer instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceSameAccept(
+            @Nullable final DATA target,
+            @NotNull final Consumer<? super Channel<DATA, ?>> replacementConsumer) {
+        return new ReplaceConsumerInvocation<DATA>(
+                (target != null) ? PredicateDecorator.isSameAs(target)
+                        : PredicateDecorator.isNull(), decorate(replacementConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data that are the same instance as the
+     * specified target with the outputs returned by the passed supplier.
+     *
+     * @param target              the target instance.
+     * @param replacementSupplier the replacement supplier instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceSameGet(@Nullable final DATA target,
+            @NotNull final Supplier<? extends DATA> replacementSupplier) {
+        return new ReplaceSupplierInvocation<DATA>(
+                (target != null) ? PredicateDecorator.isSameAs(target)
+                        : PredicateDecorator.isNull(), decorate(replacementSupplier));
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream.processor;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -28,7 +29,9 @@ import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 
@@ -269,6 +272,204 @@ public class Processors {
     }
 
     /**
+     * Returns a function making the stream generate the specified output in place of the invocation
+     * ones.
+     *
+     * @param output the output.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
+            @Nullable final OUT output) {
+        return output(JRoutineCore.io().of(output));
+    }
+
+    /**
+     * Returns a function making the stream generate the specified outputs in place of the
+     * invocation ones.
+     *
+     * @param outputs the outputs.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
+            @Nullable final OUT... outputs) {
+        return output(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified iterable
+     * in place of the invocation ones.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
+            @Nullable final Iterable<? extends OUT> outputs) {
+        return output(JRoutineCore.io().of(outputs));
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified channel
+     * in place of the invocation ones.
+     *
+     * @param channel the output channel.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
+            @Nullable final Channel<?, ? extends OUT> channel) {
+        return new Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>>() {
+
+            @SuppressWarnings("unchecked")
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, ?> builder) {
+                return ((StreamBuilder<IN, Object>) builder).liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, Object>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            Object>> function) {
+                                return decorate(function).andThen(new BindOutput<OUT>(channel));
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified consumer
+     * in place of the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     * <br>
+     * The consumer will be called {@code count} number of times. The count number must be positive.
+     *
+     * @param count           the number of generated outputs.
+     * @param outputsConsumer the consumer instance.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the transformation function.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputAccept(
+            final long count, @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        ConstantConditions.positive("count number", count);
+        ConstantConditions.notNull("consumer instance", outputsConsumer);
+        return new Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>>() {
+
+            @SuppressWarnings("unchecked")
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, ?> builder) {
+                return ((StreamBuilder<IN, Object>) builder).liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, Object>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            Object>> function) {
+                                return decorate(function).andThen(new BindOutputConsumer<OUT>(
+                                        streamConfiguration.asInvocationConfiguration(),
+                                        streamConfiguration.getInvocationMode(), count,
+                                        outputsConsumer));
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified consumer
+     * in place of the invocation ones.
+     * <br>
+     * The result channel will be passed to the consumer, so that multiple or no results may be
+     * generated.
+     *
+     * @param outputsConsumer the consumer instance.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputAccept(
+            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+        return outputAccept(1, outputsConsumer);
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified supplier
+     * in place of the invocation ones.
+     * <br>
+     * The supplier will be called {@code count} number of times. The count number must be positive.
+     *
+     * @param count          the number of generated outputs.
+     * @param outputSupplier the supplier instance.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the transformation function.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputGet(
+            final long count, @NotNull final Supplier<? extends OUT> outputSupplier) {
+        ConstantConditions.positive("count number", count);
+        ConstantConditions.notNull("supplier instance", outputSupplier);
+        return new Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>>() {
+
+            @SuppressWarnings("unchecked")
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, ?> builder) {
+                return ((StreamBuilder<IN, Object>) builder).liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, Object>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            Object>> function) {
+                                return decorate(function).andThen(new BindOutputSupplier<OUT>(
+                                        streamConfiguration.asInvocationConfiguration(),
+                                        streamConfiguration.getInvocationMode(), count,
+                                        outputSupplier));
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
+     * Returns a function making the stream generate the outputs returned by the specified supplier
+     * in place of the invocation ones.
+     *
+     * @param outputSupplier the supplier instance.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputGet(
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
+        return outputGet(1, outputSupplier);
+    }
+
+    /**
      * Returns a function applying the configuration:
      * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).applied()}.
      * <br>
@@ -425,7 +626,7 @@ public class Processors {
     }
 
     /**
-     * Returns a function making the stream retrying the whole flow of data at maximum for the
+     * Returns a function making the stream retry the whole flow of data at maximum for the
      * specified number of times.
      *
      * @param count the maximum number of retries.
@@ -441,7 +642,7 @@ public class Processors {
     }
 
     /**
-     * Returns a function making the stream retrying the whole flow of data at maximum for the
+     * Returns a function making the stream retry the whole flow of data at maximum for the
      * specified number of times.
      * <br>
      * For each retry the specified backoff policy will be applied before re-starting the flow.
@@ -460,7 +661,7 @@ public class Processors {
     }
 
     /**
-     * Returns a function making the stream retrying the whole flow of data until the specified
+     * Returns a function making the stream retry the whole flow of data until the specified
      * function does not return a null value.
      * <br>
      * For each retry the function is called passing the retry count (starting from 1) and the error

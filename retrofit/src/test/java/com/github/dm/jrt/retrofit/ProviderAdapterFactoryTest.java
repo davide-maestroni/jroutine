@@ -33,7 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.operator.Operators.instead;
+import static com.github.dm.jrt.stream.processor.Processors.output;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -233,8 +233,10 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final StreamBuilder<?, ?> builder = JRoutineStream.withStream().sync();
-                    builder.map(instead((Object) Collections.emptyList()));
+                    final StreamBuilder<?, ?> builder = //
+                            JRoutineStream.withStream()
+                                          .sync()
+                                          .let(output((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.syncCall().close();
                     }

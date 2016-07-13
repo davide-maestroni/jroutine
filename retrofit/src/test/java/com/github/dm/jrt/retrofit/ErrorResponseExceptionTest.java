@@ -40,7 +40,7 @@ public class ErrorResponseExceptionTest {
         final ErrorResponseException exception = new ErrorResponseException(response);
         assertThat(exception.code()).isEqualTo(response.code());
         assertThat(exception.message()).isEqualTo(response.message());
-        assertThat(exception.headers()).isEqualTo(response.headers());
+        assertThat(exception.headers().toMultimap()).isEqualTo(response.headers().toMultimap());
         assertThat(exception.errorBody().contentType()).isEqualTo(
                 response.errorBody().contentType());
         assertThat(exception.errorBody().contentLength()).isEqualTo(

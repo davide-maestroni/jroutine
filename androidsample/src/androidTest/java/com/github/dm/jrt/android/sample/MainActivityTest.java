@@ -18,8 +18,6 @@ package com.github.dm.jrt.android.sample;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.support.test.espresso.IdlingPolicies;
 import android.support.test.espresso.PerformException;
 import android.support.test.espresso.UiController;
@@ -61,10 +59,6 @@ public class MainActivityTest {
 
     @Test
     public void testRepoList() throws InterruptedException {
-        if (VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
-            return;
-        }
-
         try {
             // Wait for the network request to complete
             UnitDuration.seconds(10).sleepAtLeast();
@@ -79,10 +73,6 @@ public class MainActivityTest {
 
     @Test
     public void testRepoListRotation() throws InterruptedException {
-        if (VERSION.SDK_INT < VERSION_CODES.ICE_CREAM_SANDWICH) {
-            return;
-        }
-
         try {
             // Wait for the network request to complete
             UnitDuration.seconds(10).sleepAtLeast();
@@ -103,19 +93,16 @@ public class MainActivityTest {
 
         @Override
         public Matcher<View> getConstraints() {
-
             return isRoot();
         }
 
         @Override
         public String getDescription() {
-
             return "change device orientation to landscape";
         }
 
         @Override
         public void perform(final UiController uiController, final View view) {
-
             uiController.loopMainThreadUntilIdle();
             ((Activity) view.getContext()).setRequestedOrientation(
                     ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

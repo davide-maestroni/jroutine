@@ -69,6 +69,9 @@ import static com.github.dm.jrt.operator.Operators.replaceGet;
 import static com.github.dm.jrt.operator.Operators.replaceSame;
 import static com.github.dm.jrt.operator.Operators.replaceSameAccept;
 import static com.github.dm.jrt.operator.Operators.replaceSameGet;
+import static com.github.dm.jrt.operator.Operators.then;
+import static com.github.dm.jrt.operator.Operators.thenAccept;
+import static com.github.dm.jrt.operator.Operators.thenGet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -1705,6 +1708,104 @@ public class OperatorsTest {
                                .asyncCall(1, 2, 3, 4)
                                .after(seconds(3))
                                .next()).isEqualTo((short) 10);
+    }
+
+    @Test
+    public void testThen() {
+        assertThat(JRoutineCore.with(then("test2"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2");
+        assertThat(JRoutineCore.with(then("test2", "test3"))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3");
+        assertThat(JRoutineCore.with(then(Arrays.asList("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3");
+        assertThat(JRoutineCore.with(then(JRoutineCore.io().of("test2", "test3")))
+                               .asyncCall("test1")
+                               .after(seconds(3))
+                               .all()).containsExactly("test2", "test3");
+    }
+
+    @Test
+    public void testThen2() {
+        assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).syncCall("test1").all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
+
+            public String get() {
+                return "TEST2";
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                "TEST2");
+        assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
+
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).parallelCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                "TEST2");
     }
 
     @Test

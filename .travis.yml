@@ -10,10 +10,10 @@ android:
     - platform-tools
 
     # The BuildTools version
-    - build-tools-23.0.2
+    - build-tools-24.0.0
 
     # The SDK version
-    - android-23
+    - android-24
 
     # Extras
     - extra-android-support

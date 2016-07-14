@@ -54,7 +54,7 @@ class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> 
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
-                                                            .applied()
+                                                            .configured()
                                                             .buildChannel();
         channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
         return outputChannel;

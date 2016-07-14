@@ -70,7 +70,7 @@ public class LoaderRoutineRotationTest
                                                                                     .JOIN)
                                                                     .withResultStaleTime(
                                                                             UnitDuration.minutes(1))
-                                                                    .applied()
+                                                                    .configured()
                                                                     .buildRoutine();
         routine.asyncCall("test1");
 
@@ -91,10 +91,10 @@ public class LoaderRoutineRotationTest
                             .with(factoryOf(ToUpperCase.class))
                             .invocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
-                            .applied()
+                            .configured()
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applied()
+                            .configured()
                             .asyncCall("test1", "test2");
 
         simulateRotation();
@@ -177,7 +177,7 @@ public class LoaderRoutineRotationTest
                                                                             ClashResolutionType
                                                                                     .JOIN)
                                                                     .withResultStaleTime(zero())
-                                                                    .applied()
+                                                                    .configured()
                                                                     .buildRoutine();
         routine.asyncCall("test1");
 

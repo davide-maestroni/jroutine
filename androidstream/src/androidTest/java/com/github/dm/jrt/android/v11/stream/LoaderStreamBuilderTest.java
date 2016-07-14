@@ -168,7 +168,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                     .<String>withStream().on(loaderFrom(activity))
                                          .invocationConfiguration()
                                          .withRunner(runner1)
-                                         .applied()
+                                         .configured()
                                          .map(new Function<String, Object>() {
 
                                              public Object apply(final String s) {
@@ -177,12 +177,12 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                                                     activity))
                                                                             .invocationConfiguration()
                                                                             .withRunner(runner1)
-                                                                            .applied()
+                                                                            .configured()
                                                                             .map(Functions
                                                                                     .identity())
                                                                             .invocationConfiguration()
                                                                             .withRunner(runner2)
-                                                                            .applied()
+                                                                            .configured()
                                                                             .map(Functions
                                                                                     .identity())
                                                                             .asyncCall()
@@ -324,7 +324,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                 .<String>withStream().on(loaderFrom(activity))
                                      .streamInvocationConfiguration()
                                      .withOutputOrder(OrderType.BY_CALL)
-                                     .applied()
+                                     .configured()
                                      .sequential()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
@@ -462,7 +462,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .loaderConfiguration()
                                        .withLoaderId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .applied()
+                                       .configured()
                                        .asyncCall("test")
                                        .after(seconds(10))
                                        .hasCompleted()).isTrue();
@@ -476,7 +476,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .streamLoaderConfiguration()
                                        .withLoaderId(0)
                                        .withResultStaleTime(1, TimeUnit.MILLISECONDS)
-                                       .applied()
+                                       .configured()
                                        .asyncCall("test")
                                        .after(seconds(10))
                                        .hasCompleted()).isTrue();
@@ -1142,7 +1142,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .applied()
+                                                            .configured()
                                                             .buildRoutine();
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
@@ -1292,7 +1292,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .streamInvocationConfiguration()
                                        .withInputMaxSize(1)
                                        .withOutputMaxSize(1)
-                                       .applied()
+                                       .configured()
                                        .map(sqrt())
                                        .map(Operators.<Double>averageDouble())
                                        .syncCall()

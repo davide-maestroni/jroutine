@@ -57,8 +57,9 @@ public class Processors {
     }
 
     /**
-     * Returns a function applying the configuration: {@code invocationConfiguration()
-     * .withRunner(runner).withInputLimit(maxInputs).withInputBackoff(backoff).applied()}.
+     * Returns a function applying the configuration:
+     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputBackoff(backoff).configured()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
@@ -86,14 +87,15 @@ public class Processors {
                               .withRunner(runner)
                               .withInputLimit(limit)
                               .withInputBackoff(backoff)
-                              .applied();
+                              .configured();
             }
         };
     }
 
     /**
-     * Returns a function applying the configuration: {@code invocationConfiguration()
-     * .withRunner(runner).withInputLimit(maxInputs).withInputBackoff(delay, timeUnit).applied()}.
+     * Returns a function applying the configuration:
+     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputBackoff(delay, timeUnit).configured()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -124,14 +126,15 @@ public class Processors {
                               .withRunner(runner)
                               .withInputLimit(limit)
                               .withInputBackoff(delay, timeUnit)
-                              .applied();
+                              .configured();
             }
         };
     }
 
     /**
-     * Returns a function applying the configuration: {@code invocationConfiguration()
-     * .withRunner(runner).withInputLimit(maxInputs).withInputBackoff(delay).applied()}.
+     * Returns a function applying the configuration:
+     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputBackoff(delay).configured()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -158,7 +161,7 @@ public class Processors {
                               .withRunner(runner)
                               .withInputLimit(limit)
                               .withInputBackoff(delay)
-                              .applied();
+                              .configured();
             }
         };
     }
@@ -471,7 +474,7 @@ public class Processors {
 
     /**
      * Returns a function applying the configuration:
-     * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).applied()}.
+     * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).configured()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
@@ -491,7 +494,7 @@ public class Processors {
                 return builder.parallel()
                               .invocationConfiguration()
                               .withMaxInstances(maxInvocations)
-                              .applied();
+                              .configured();
             }
         };
     }

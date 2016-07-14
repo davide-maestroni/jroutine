@@ -69,7 +69,7 @@ public class RoutineAdapterFactoryTest {
                         RoutineAdapterFactory.builder()
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -97,7 +97,7 @@ public class RoutineAdapterFactoryTest {
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -125,7 +125,7 @@ public class RoutineAdapterFactoryTest {
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -153,7 +153,7 @@ public class RoutineAdapterFactoryTest {
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -182,7 +182,7 @@ public class RoutineAdapterFactoryTest {
                                              .delegateFactory(factory)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -211,7 +211,7 @@ public class RoutineAdapterFactoryTest {
                                              .delegateFactory(factory)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(3))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

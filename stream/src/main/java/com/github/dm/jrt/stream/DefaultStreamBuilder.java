@@ -117,7 +117,7 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().applied();
+                        asInvocationConfiguration().outputConfigurationBuilder().configured();
             }
 
             return mChannelConfiguration;
@@ -127,7 +127,7 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         public InvocationConfiguration asInvocationConfiguration() {
             if (mInvocationConfiguration == null) {
                 mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mConfiguration).applied();
+                        mStreamConfiguration.builderFrom().with(mConfiguration).configured();
             }
 
             return mInvocationConfiguration;

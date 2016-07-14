@@ -68,10 +68,10 @@
                 final AsyncMain proxy = JRoutineProxy.with(instance(main))
                                                      .objectConfiguration()
                                                      .withSharedFields()
-                                                     .applied()
+                                                     .configured()
                                                      .invocationConfiguration()
                                                      .withReadTimeout(seconds(3))
-                                                     .applied()
+                                                     .configured()
                                                      .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);
@@ -130,10 +130,10 @@
                 final AsyncMain proxy = Proxy_Main_AsyncMain.with(instance(main))
                                                             .objectConfiguration()
                                                             .withSharedFields()
-                                                            .applied()
+                                                            .configured()
                                                             .invocationConfiguration()
                                                             .withReadTimeout(seconds(3))
-                                                            .applied()
+                                                            .configured()
                                                             .buildProxy();
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);

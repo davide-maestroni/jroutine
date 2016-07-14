@@ -67,6 +67,6 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>
                 JRoutineCore.with(Operators.appendAccept(mCount, mOutputConsumer))
                             .invocationConfiguration()
                             .with(mConfiguration)
-                            .applied()).close();
+                            .configured()).close();
     }
 }

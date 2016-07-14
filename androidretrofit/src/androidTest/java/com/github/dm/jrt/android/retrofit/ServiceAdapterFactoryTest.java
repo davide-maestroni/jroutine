@@ -76,7 +76,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                         ServiceAdapterFactory.on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -104,7 +104,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -132,7 +132,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -160,7 +160,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -209,7 +209,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                         ServiceAdapterFactory.on(context)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -230,7 +230,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -251,7 +251,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.SYNC)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -272,7 +272,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.SEQUENTIAL)
                                              .invocationConfiguration()
                                              .withOutputTimeout(seconds(10))
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
@@ -335,7 +335,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .invocationMode(InvocationMode.PARALLEL)
                                              .serviceConfiguration()
                                              .withLogClass(NullLog.class)
-                                             .applied()
+                                             .configured()
                                              .buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =

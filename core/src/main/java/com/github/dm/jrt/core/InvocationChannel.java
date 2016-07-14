@@ -138,26 +138,27 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return (mInputCount <= inputLimit) || (mAbortException != null);
             }
         };
-        mResultChanel = new ResultChannel<OUT>(configuration.outputConfigurationBuilder().applied(),
-                new AbortHandler() {
+        mResultChanel =
+                new ResultChannel<OUT>(configuration.outputConfigurationBuilder().configured(),
+                        new AbortHandler() {
 
-                    public void onAbort(@NotNull final RoutineException reason, final long delay,
-                            @NotNull final TimeUnit timeUnit) {
-                        final Execution execution;
-                        synchronized (mMutex) {
-                            execution = mState.onHandlerAbort(reason);
-                        }
+                            public void onAbort(@NotNull final RoutineException reason,
+                                    final long delay, @NotNull final TimeUnit timeUnit) {
+                                final Execution execution;
+                                synchronized (mMutex) {
+                                    execution = mState.onHandlerAbort(reason);
+                                }
 
-                        if (execution != null) {
-                            runExecution(execution, delay, timeUnit);
+                                if (execution != null) {
+                                    runExecution(execution, delay, timeUnit);
 
-                        } else {
-                            // Make sure the invocation is properly recycled
-                            mExecution.recycle(reason);
-                            mResultChanel.close(reason);
-                        }
-                    }
-                }, runner, logger);
+                                } else {
+                                    // Make sure the invocation is properly recycled
+                                    mExecution.recycle(reason);
+                                    mResultChanel.close(reason);
+                                }
+                            }
+                        }, runner, logger);
         mExecution =
                 new InvocationExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
                         logger);

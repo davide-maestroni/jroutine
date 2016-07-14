@@ -494,11 +494,11 @@ public class StreamBuilderTest {
                 public Object apply(final String s) {
                     return JRoutineStream.<String>withStream().invocationConfiguration()
                                                               .withRunner(runner1)
-                                                              .applied()
+                                                              .configured()
                                                               .map(Functions.identity())
                                                               .invocationConfiguration()
                                                               .withRunner(runner2)
-                                                              .applied()
+                                                              .configured()
                                                               .map(Functions.identity())
                                                               .asyncCall(s)
                                                               .after(minutes(3))
@@ -507,7 +507,7 @@ public class StreamBuilderTest {
             };
             JRoutineStream.<String>withStream().invocationConfiguration()
                                                .withRunner(runner1)
-                                               .applied()
+                                               .configured()
                                                .map(function)
                                                .asyncCall("test")
                                                .after(minutes(3))
@@ -915,7 +915,7 @@ public class StreamBuilderTest {
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .applied()
+                                                            .configured()
                                                             .buildRoutine();
         assertThat(JRoutineStream.<String>withStream().async()
                                                       .map(routine)
@@ -1035,7 +1035,7 @@ public class StreamBuilderTest {
                                      .withInputBackoff(seconds(3))
                                      .withOutputLimit(2)
                                      .withOutputBackoff(seconds(3))
-                                     .applied()
+                                     .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {
 
@@ -1081,7 +1081,7 @@ public class StreamBuilderTest {
                                      .withRunner(getSingleThreadRunner())
                                      .withOutputLimit(2)
                                      .withOutputBackoff(seconds(3))
-                                     .applied()
+                                     .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {
 
@@ -1126,7 +1126,7 @@ public class StreamBuilderTest {
                                      .withRunner(getSingleThreadRunner())
                                      .withInputLimit(2)
                                      .withInputBackoff(seconds(3))
-                                     .applied()
+                                     .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {
 
@@ -1174,7 +1174,7 @@ public class StreamBuilderTest {
                                  .streamInvocationConfiguration()
                                  .withInputMaxSize(1)
                                  .withOutputMaxSize(1)
-                                 .applied()
+                                 .configured()
                                  .map(new Function<Number, Double>() {
 
                                      public Double apply(final Number number) {

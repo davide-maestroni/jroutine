@@ -455,7 +455,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMap() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -467,7 +467,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                                     .with(factoryOf(Sort.class))
                                     .invocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
-                                    .applied()
+                                    .configured()
                                     .asyncCall(channel);
         final SparseArrayCompat<Channel<?, Object>> channelMap =
                 SparseChannelsCompat.selectParcelableOutput(output, Sort.INTEGER, Sort.STRING)
@@ -493,7 +493,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMerge() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
         final SparseArrayCompat<Channel<?, ?>> channelMap = new SparseArrayCompat<Channel<?, ?>>(2);
@@ -512,7 +512,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMergeAbort() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
         final SparseArrayCompat<Channel<?, ?>> channelMap = new SparseArrayCompat<Channel<?, ?>>(2);

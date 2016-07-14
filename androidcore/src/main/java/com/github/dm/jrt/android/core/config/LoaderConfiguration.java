@@ -341,7 +341,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE applied() {
+        public TYPE configured() {
             return mConfigurable.apply(buildConfiguration());
         }
 

@@ -803,7 +803,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                                                           .channelConfiguration()
                                                           .withLog(logger.getLog())
                                                           .withLogLevel(logger.getLogLevel())
-                                                          .applied()
+                                                          .configured()
                                                           .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),

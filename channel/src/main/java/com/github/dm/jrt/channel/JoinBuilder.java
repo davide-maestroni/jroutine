@@ -72,7 +72,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         final Channel<List<? extends OUT>, List<? extends OUT>> outputChannel = JRoutineCore.io()
                                                                                             .channelConfiguration()
                                                                                             .with(configuration)
-                                                                                            .applied()
+                                                                                            .configured()
                                                                                             .buildChannel();
         final Object mutex = new Object();
         final int size = channels.size();

@@ -71,7 +71,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
             final Channel<IN, IN> outputChannel = JRoutineCore.io()
                                                               .channelConfiguration()
                                                               .with(configuration)
-                                                              .applied()
+                                                              .configured()
                                                               .buildChannel();
             outputChannel.bind((Channel<IN, ?>) entry.getValue());
             inputChannelMap.put(entry.getKey(), outputChannel);
@@ -81,7 +81,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
                 JRoutineCore.io()
                             .channelConfiguration()
                             .with(configuration)
-                            .applied()
+                            .configured()
                             .buildChannel();
         return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
     }

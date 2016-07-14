@@ -282,7 +282,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
             @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
     /**
-     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).applied()
+     * Short for {@code async().streamInvocationConfiguration().withRunner(runner).configured()
      * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
      * <br>
      * This method is useful to easily make the stream run on the specified runner.

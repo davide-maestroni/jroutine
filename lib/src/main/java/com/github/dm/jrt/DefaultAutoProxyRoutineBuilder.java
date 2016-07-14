@@ -154,10 +154,10 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
         return JRoutineObject.with(mTarget)
                              .invocationConfiguration()
                              .with(mInvocationConfiguration)
-                             .applied()
+                             .configured()
                              .objectConfiguration()
                              .with(mObjectConfiguration)
-                             .applied();
+                             .configured();
     }
 
     @NotNull
@@ -165,9 +165,9 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
         return JRoutineProxy.with(mTarget)
                             .invocationConfiguration()
                             .with(mInvocationConfiguration)
-                            .applied()
+                            .configured()
                             .objectConfiguration()
                             .with(mObjectConfiguration)
-                            .applied();
+                            .configured();
     }
 }

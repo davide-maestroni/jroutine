@@ -54,7 +54,7 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends 
         final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel = JRoutineCore.io()
                                                                                     .channelConfiguration()
                                                                                     .with(configuration)
-                                                                                    .applied()
+                                                                                    .configured()
                                                                                     .buildChannel();
         mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
         return outputChannel;

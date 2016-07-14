@@ -69,7 +69,7 @@ class MergeMapBuilder<OUT>
                 JRoutineCore.io()
                             .channelConfiguration()
                             .with(configuration)
-                            .applied()
+                            .configured()
                             .buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {

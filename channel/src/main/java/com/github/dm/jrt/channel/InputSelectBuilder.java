@@ -55,7 +55,7 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<
         final Channel<IN, IN> inputChannel = JRoutineCore.io()
                                                          .channelConfiguration()
                                                          .with(configuration)
-                                                         .applied()
+                                                         .configured()
                                                          .buildChannel();
         final Channel<Selectable<DATA>, Selectable<DATA>> selectableChannel =
                 JRoutineCore.io().buildChannel();

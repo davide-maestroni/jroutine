@@ -426,7 +426,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public StreamBuilder<IN, OUT> mapOn(@Nullable final Runner runner) {
         return async().streamInvocationConfiguration()
                       .withRunner(runner)
-                      .applied()
+                      .configured()
                       .map(IdentityInvocation.<OUT>factoryOf());
     }
 
@@ -442,7 +442,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> sorted() {
-        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_CALL).applied();
+        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_CALL).configured();
     }
 
     @NotNull
@@ -465,7 +465,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> unsorted() {
-        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_DELAY).applied();
+        return streamInvocationConfiguration().withOutputOrder(OrderType.BY_DELAY).configured();
     }
 
     @NotNull
@@ -547,7 +547,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         return builder.invocationConfiguration()
                       .with(null)
                       .with(streamConfiguration.asInvocationConfiguration())
-                      .applied()
+                      .configured()
                       .buildRoutine();
     }
 
@@ -583,7 +583,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
                     streamConfiguration.getCurrentInvocationConfiguration()
                                        .builderFrom()
                                        .withRunner(sStraightRunner)
-                                       .applied(), InvocationMode.ASYNC);
+                                       .configured(), InvocationMode.ASYNC);
         }
 
         return streamConfiguration;

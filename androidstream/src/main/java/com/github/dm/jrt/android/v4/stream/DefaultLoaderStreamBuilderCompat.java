@@ -355,7 +355,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
             return JRoutineCore.with(factory)
                                .invocationConfiguration()
                                .with(loaderStreamConfiguration.asInvocationConfiguration())
-                               .applied()
+                               .configured()
                                .buildRoutine();
         }
 
@@ -366,10 +366,10 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
                                    .with(invocationFactory)
                                    .invocationConfiguration()
                                    .with(loaderStreamConfiguration.asInvocationConfiguration())
-                                   .applied()
+                                   .configured()
                                    .loaderConfiguration()
                                    .with(loaderStreamConfiguration.asLoaderConfiguration())
-                                   .applied()
+                                   .configured()
                                    .buildRoutine();
     }
 
@@ -454,11 +454,11 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         return builder.invocationConfiguration()
                       .with(null)
                       .with(streamConfiguration.asInvocationConfiguration())
-                      .applied()
+                      .configured()
                       .loaderConfiguration()
                       .with(null)
                       .with(streamConfiguration.asLoaderConfiguration())
-                      .applied()
+                      .configured()
                       .buildRoutine();
     }
 
@@ -542,7 +542,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
                 mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().applied();
+                        asInvocationConfiguration().outputConfigurationBuilder().configured();
             }
 
             return mChannelConfiguration;
@@ -552,7 +552,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         public InvocationConfiguration asInvocationConfiguration() {
             if (mInvocationConfiguration == null) {
                 mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).applied();
+                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).configured();
             }
 
             return mInvocationConfiguration;
@@ -582,7 +582,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
             if (mLoaderConfiguration == null) {
                 mLoaderConfiguration = mStreamLoaderConfiguration.builderFrom()
                                                                  .with(mCurrentLoaderConfiguration)
-                                                                 .applied();
+                                                                 .configured();
             }
 
             return mLoaderConfiguration;

@@ -70,14 +70,13 @@
             private static final String SQUARE = "square";
 
             public static void main(final String[] args) {
-
                 final ObjectRoutineBuilder builder = JRoutineObject.with(classOfType(Main.class))
                                                                    .objectConfiguration()
                                                                    .withSharedFields()
-                                                                   .applied()
+                                                                   .configured()
                                                                    .invocationConfiguration()
                                                                    .withReadTimeout(seconds(3))
-                                                                   .applied();
+                                                                   .configured();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
@@ -127,10 +126,10 @@
                 final AsyncMain proxy = JRoutineObject.with(instance(main))
                                                       .objectConfiguration()
                                                       .withSharedFields()
-                                                      .applied()
+                                                      .configured()
                                                       .invocationConfiguration()
                                                       .withReadTimeout(seconds(3))
-                                                      .applied()
+                                                      .configured()
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);

@@ -91,7 +91,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -99,7 +98,7 @@
                                     .with(instanceOf(BitmapLoader.class))
                                     .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                                    .applied()
+                                    .configured()
                                     .method(LOAD_BITMAP)
                                     .asyncCall(URI.create(IMAGE_URI))
                                     .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
@@ -156,7 +155,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
@@ -227,7 +225,6 @@
 
             &commat;Override
             protected void onCreate(final Bundle savedInstanceState) {
-
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);

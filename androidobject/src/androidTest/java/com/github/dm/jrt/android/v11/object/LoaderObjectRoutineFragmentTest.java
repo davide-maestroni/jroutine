@@ -113,7 +113,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                             TimeoutActionType.BREAK)
                                                                     .withLogLevel(Level.DEBUG)
                                                                     .withLog(new NullLog())
-                                                                    .applied()
+                                                                    .configured()
                                                                     .method(TestClass.GET);
 
         assertThat(routine.syncCall().close().after(timeout).all()).containsExactly(-77L);
@@ -153,7 +153,7 @@ public class LoaderObjectRoutineFragmentTest
                                                     .with(instanceOf(Sum.class))
                                                     .invocationConfiguration()
                                                     .withOutputTimeout(timeout)
-                                                    .applied()
+                                                    .configured()
                                                     .buildProxy(SumItf.class);
         final Channel<Integer, Integer> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass(7).close();
@@ -191,7 +191,7 @@ public class LoaderObjectRoutineFragmentTest
                                                         .with(instanceOf(Count.class))
                                                         .invocationConfiguration()
                                                         .withOutputTimeout(timeout)
-                                                        .applied()
+                                                        .configured()
                                                         .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -268,15 +268,15 @@ public class LoaderObjectRoutineFragmentTest
                                                                .withOutputMaxSize(33)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
-                                                               .applied();
+                                                               .configured();
         JRoutineLoaderObject.on(loaderFrom(fragment))
                             .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
                             .with(configuration)
-                            .applied()
+                            .configured()
                             .objectConfiguration()
                             .withSharedFields("test")
-                            .applied()
+                            .configured()
                             .method(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
@@ -284,10 +284,10 @@ public class LoaderObjectRoutineFragmentTest
                             .with(instanceOf(Square.class))
                             .invocationConfiguration()
                             .with(configuration)
-                            .applied()
+                            .configured()
                             .objectConfiguration()
                             .withSharedFields("test")
-                            .applied()
+                            .configured()
                             .buildProxy(SquareItf.class)
                             .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(2);
@@ -609,7 +609,7 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
-                                .applied()
+                                .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException(null);
 
@@ -625,7 +625,7 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
-                                .applied()
+                                .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException1(null);
 
@@ -641,7 +641,7 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestClass.class))
                                 .invocationConfiguration()
                                 .withOutputTimeout(infinity())
-                                .applied()
+                                .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException2(null);
 
@@ -734,10 +734,10 @@ public class LoaderObjectRoutineFragmentTest
                                                                      .withRunner(
                                                                              Runners.poolRunner())
                                                                      .withMaxInstances(1)
-                                                                     .applied()
+                                                                     .configured()
                                                                      .objectConfiguration()
                                                                      .withSharedFields("test")
-                                                                     .applied()
+                                                                     .configured()
                                                                      .method(TestClass.class
                                                                              .getMethod(
                                                                              "getLong"));
@@ -763,7 +763,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                      .invocationConfiguration()
                                                                      .withRunner(
                                                                              Runners.poolRunner())
-                                                                     .applied()
+                                                                     .configured()
                                                                      .method("getLong");
 
         assertThat(routine1.syncCall().close().after(timeout).all()).containsExactly(-77L);
@@ -902,7 +902,7 @@ public class LoaderObjectRoutineFragmentTest
                                             .with(instanceOf(Impl.class))
                                             .invocationConfiguration()
                                             .withOutputTimeout(seconds(10))
-                                            .applied()
+                                            .configured()
                                             .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -1156,19 +1156,19 @@ public class LoaderObjectRoutineFragmentTest
                                                                        .invocationConfiguration()
                                                                        .withOutputTimeout(
                                                                                seconds(10))
-                                                                       .applied();
+                                                                       .configured();
 
         long startTime = System.currentTimeMillis();
 
         Channel<?, Object> getOne = builder.objectConfiguration()
                                            .withSharedFields("1")
-                                           .applied()
+                                           .configured()
                                            .method("getOne")
                                            .asyncCall()
                                            .close();
         Channel<?, Object> getTwo = builder.objectConfiguration()
                                            .withSharedFields("2")
-                                           .applied()
+                                           .configured()
                                            .method("getTwo")
                                            .asyncCall()
                                            .close();
@@ -1201,10 +1201,10 @@ public class LoaderObjectRoutineFragmentTest
                                        .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
-                                       .applied()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(0)
-                                       .applied()
+                                       .configured()
                                        .method("test")
                                        .asyncCall()
                                        .close()
@@ -1216,10 +1216,10 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                .applied()
+                                .configured()
                                 .loaderConfiguration()
                                 .withLoaderId(1)
-                                .applied()
+                                .configured()
                                 .method("test")
                                 .asyncCall()
                                 .close()
@@ -1235,10 +1235,10 @@ public class LoaderObjectRoutineFragmentTest
                                        .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
-                                       .applied()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(2)
-                                       .applied()
+                                       .configured()
                                        .method("getInt")
                                        .asyncCall()
                                        .close()
@@ -1250,10 +1250,10 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                .applied()
+                                .configured()
                                 .loaderConfiguration()
                                 .withLoaderId(3)
-                                .applied()
+                                .configured()
                                 .method("getInt")
                                 .asyncCall()
                                 .close()
@@ -1269,10 +1269,10 @@ public class LoaderObjectRoutineFragmentTest
                                        .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
-                                       .applied()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(4)
-                                       .applied()
+                                       .configured()
                                        .method(TestTimeout.class.getMethod("getInt"))
                                        .asyncCall()
                                        .close()
@@ -1284,10 +1284,10 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                .applied()
+                                .configured()
                                 .loaderConfiguration()
                                 .withLoaderId(5)
-                                .applied()
+                                .configured()
                                 .method(TestTimeout.class.getMethod("getInt"))
                                 .asyncCall()
                                 .close()
@@ -1303,10 +1303,10 @@ public class LoaderObjectRoutineFragmentTest
                                        .with(instanceOf(TestTimeout.class))
                                        .invocationConfiguration()
                                        .withOutputTimeout(seconds(10))
-                                       .applied()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(6)
-                                       .applied()
+                                       .configured()
                                        .buildProxy(TestTimeoutItf.class)
                                        .getInt()).isEqualTo(31);
 
@@ -1316,10 +1316,10 @@ public class LoaderObjectRoutineFragmentTest
                                 .with(instanceOf(TestTimeout.class))
                                 .invocationConfiguration()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                .applied()
+                                .configured()
                                 .loaderConfiguration()
                                 .withLoaderId(7)
-                                .applied()
+                                .configured()
                                 .buildProxy(TestTimeoutItf.class)
                                 .getInt();
 

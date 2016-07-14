@@ -153,7 +153,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         return JRoutineCore.with(factory)
                            .invocationConfiguration()
                            .with(invocationConfiguration)
-                           .applied()
+                           .configured()
                            .buildRoutine();
     }
 

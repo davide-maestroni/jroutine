@@ -111,10 +111,10 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
                                    .with(factory)
                                    .invocationConfiguration()
                                    .with(invocationConfiguration)
-                                   .applied()
+                                   .configured()
                                    .loaderConfiguration()
                                    .with(loaderConfiguration)
-                                   .applied()
+                                   .configured()
                                    .buildRoutine();
     }
 

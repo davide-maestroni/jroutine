@@ -904,7 +904,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMap() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -916,7 +916,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                .with(factoryOf(Sort.class))
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
-                               .applied()
+                               .configured()
                                .asyncCall(channel);
         final Map<Integer, Channel<?, Object>> channelMap =
                 AndroidChannels.selectOutput(output, Sort.INTEGER, Sort.STRING).buildChannels();
@@ -941,7 +941,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
@@ -984,7 +984,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge4() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<String, String> channel2 = builder.buildChannel();
         final Channel<String, String> channel3 = builder.buildChannel();
@@ -1018,7 +1018,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMergeAbort() {
 
         final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).applied();
+                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;

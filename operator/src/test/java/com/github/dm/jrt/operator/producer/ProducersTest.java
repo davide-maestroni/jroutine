@@ -334,7 +334,7 @@ public class ProducersTest {
                 })))
                                .invocationConfiguration()
                                .withOutputOrder(OrderType.BY_CALL)
-                               .applied()
+                               .configured()
                                .parallelCall()
                                .close()
                                .after(seconds(3))

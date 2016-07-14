@@ -70,7 +70,7 @@ public class Downloader {
                                       // By setting the maximum number of parallel invocations we
                                       // effectively limit the number of parallel downloads
                                       .withMaxInstances(maxParallelDownloads)
-                                      .applied()
+                                      .configured()
                                       .buildRoutine();
     }
 
@@ -161,7 +161,7 @@ public class Downloader {
                                 .withRunner(sWriteRunner)
                                 .withInputLimit(32)
                                 .withInputBackoff(linearDelay(seconds(3)))
-                                .applied()
+                                .configured()
                                 .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
         }

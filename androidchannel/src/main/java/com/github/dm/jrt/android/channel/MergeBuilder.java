@@ -76,7 +76,7 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends ParcelableS
                 JRoutineCore.io()
                             .channelConfiguration()
                             .with(configuration)
-                            .applied()
+                            .configured()
                             .buildChannel();
         int i = mStartIndex;
         for (final Channel<?, ? extends OUT> channel : mChannels) {

@@ -185,13 +185,13 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                          .with(mTarget)
                                          .invocationConfiguration()
                                          .with(mInvocationConfiguration)
-                                         .applied()
+                                         .configured()
                                          .objectConfiguration()
                                          .with(mObjectConfiguration)
-                                         .applied()
+                                         .configured()
                                          .loaderConfiguration()
                                          .with(mLoaderConfiguration)
-                                         .applied();
+                                         .configured();
     }
 
     @NotNull
@@ -200,12 +200,12 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                         .with(mTarget)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
-                                        .applied()
+                                        .configured()
                                         .objectConfiguration()
                                         .with(mObjectConfiguration)
-                                        .applied()
+                                        .configured()
                                         .loaderConfiguration()
                                         .with(mLoaderConfiguration)
-                                        .applied();
+                                        .configured();
     }
 }

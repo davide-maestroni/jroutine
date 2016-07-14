@@ -44,7 +44,7 @@ import org.jetbrains.annotations.NotNull;
  *                 JRoutineCore.with(myFactory)
  *                             .invocationConfiguration()
  *                             .withLogLevel(Level.WARNING)
- *                             .applied()
+ *                             .configured()
  *                             .buildRoutine();
  *     </code>
  * </pre>

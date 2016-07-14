@@ -187,7 +187,7 @@ public class ChannelTest {
         final Channel<String, String> channel1 = JRoutineCore.io()
                                                              .channelConfiguration()
                                                              .withOrder(OrderType.BY_CALL)
-                                                             .applied()
+                                                             .configured()
                                                              .buildChannel();
         new Thread() {
 
@@ -275,7 +275,7 @@ public class ChannelTest {
             JRoutineCore.io()
                         .channelConfiguration()
                         .withMaxSize(1)
-                        .applied()
+                        .configured()
                         .buildChannel()
                         .pass("test1", "test2");
             fail();
@@ -473,7 +473,7 @@ public class ChannelTest {
                                                             .withBackoff(seconds(1))
                                                             .withLogLevel(Level.DEBUG)
                                                             .withLog(new NullLog())
-                                                            .applied()
+                                                            .configured()
                                                             .buildChannel();
         channel.pass(-77L);
         assertThat(channel.after(timeout).next()).isEqualTo(-77L);
@@ -517,7 +517,7 @@ public class ChannelTest {
                                                              .withOutputTimeout(millis(10))
                                                              .withOutputTimeoutAction(
                                                                      TimeoutActionType.BREAK)
-                                                             .applied()
+                                                             .configured()
                                                              .buildChannel();
         assertThat(channel1.all()).isEmpty();
     }
@@ -529,7 +529,7 @@ public class ChannelTest {
                                                              .withOutputTimeout(millis(10))
                                                              .withOutputTimeoutAction(
                                                                      TimeoutActionType.ABORT)
-                                                             .applied()
+                                                             .configured()
                                                              .buildChannel();
         try {
             channel2.all();
@@ -546,7 +546,7 @@ public class ChannelTest {
                                                              .withOutputTimeout(millis(10))
                                                              .withOutputTimeoutAction(
                                                                      TimeoutActionType.FAIL)
-                                                             .applied()
+                                                             .configured()
                                                              .buildChannel();
         try {
             channel3.all();

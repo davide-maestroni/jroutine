@@ -111,13 +111,13 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
-                      .applied()
+                      .configured()
                       .objectConfiguration()
                       .with(mObjectConfiguration)
-                      .applied()
+                      .configured()
                       .serviceConfiguration()
                       .with(mServiceConfiguration)
-                      .applied()
+                      .configured()
                       .buildProxy();
     }
 

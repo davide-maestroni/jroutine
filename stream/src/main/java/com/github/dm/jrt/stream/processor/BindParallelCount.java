@@ -63,7 +63,7 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
-                                                            .applied()
+                                                            .configured()
                                                             .buildChannel();
         final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
                 new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);

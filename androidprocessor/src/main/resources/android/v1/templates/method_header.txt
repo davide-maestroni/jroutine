@@ -48,10 +48,10 @@
                                            .invocationConfiguration()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .applied()
+                                           .configured()
                                            .loaderConfiguration()
                                            .with(loaderConfiguration)
                                            ${invocationBuilderOptions}
-                                           .applied()
+                                           .configured()
                                            .buildRoutine();
     }

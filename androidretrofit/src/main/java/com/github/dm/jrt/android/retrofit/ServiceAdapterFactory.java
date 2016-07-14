@@ -125,7 +125,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                         .invocationMode(invocationMode)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
-                                        .applied()
+                                        .configured()
                                         .buildFactory()
                                         .get(returnType, annotations, retrofit);
         }
@@ -169,10 +169,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                               .with(factoryOf(ServiceCallInvocation.class))
                               .invocationConfiguration()
                               .with(invocationConfiguration)
-                              .applied()
+                              .configured()
                               .serviceConfiguration()
                               .with(mServiceConfiguration)
-                              .applied()
+                              .configured()
                               .buildRoutine();
     }
 
@@ -331,7 +331,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             final Channel<Object, Object> outputChannel = JRoutineCore.io()
                                                                       .channelConfiguration()
                                                                       .with(mConfiguration)
-                                                                      .applied()
+                                                                      .configured()
                                                                       .buildChannel();
             mRoutine.asyncCall(channel)
                     .bind(new ConverterChannelConsumer(mConverter, outputChannel));
@@ -365,7 +365,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().applied();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
             mConverter = converter;
         }
 
@@ -374,7 +374,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return JRoutineCore.with(sInvocation)
                                .invocationConfiguration()
                                .with(mInvocationConfiguration)
-                               .applied()
+                               .configured()
                                .asyncCall(call);
         }
 
@@ -383,7 +383,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             final Channel<Object, Object> outputChannel = JRoutineCore.io()
                                                                       .channelConfiguration()
                                                                       .with(mChannelConfiguration)
-                                                                      .applied()
+                                                                      .configured()
                                                                       .buildChannel();
             getRoutine().asyncCall(invokeCall(call))
                         .bind(new ConverterChannelConsumer(mConverter, outputChannel));
@@ -424,7 +424,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mInvocationMode = invocationMode;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().applied();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
             mConverter = converter;
         }
 
@@ -445,7 +445,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                                  .invocationMode(mInvocationMode)
                                  .invocationConfiguration()
                                  .with(mInvocationConfiguration)
-                                 .applied()
+                                 .configured()
                                  .map(sInvocation)
                                  .lift(this);
         }

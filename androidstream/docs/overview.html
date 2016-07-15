@@ -112,11 +112,13 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoaderStream.withStream()
                                     .on(loaderFrom(this))
-                                    .factoryId(11)
+                                    .loaderConfiguration()
+                                    .withFactoryId(11)
+                                    .configured()
                                     .map(loadUri())
-                                    .onError(showToast(this))
-                                    .onOutput(showImage(imageView))
-                                    .asyncCall(IMAGE_URI);
+                                    .bind(onError(showToast(this)).andOnOutput(showImage(imageView)))
+                                    .pass(IMAGE_URI)
+                                    .close();
             }
         }
     </code>

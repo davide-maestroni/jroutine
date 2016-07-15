@@ -85,7 +85,7 @@ public class ChannelConsumerBuilderTest {
         channelConsumer.onComplete();
         assertThat(action1.isCalled()).isTrue();
         action1.reset();
-        channelConsumer = channelConsumer.thenComplete(action2);
+        channelConsumer = channelConsumer.andOnComplete(action2);
         channelConsumer.onOutput("test");
         assertThat(action1.isCalled()).isFalse();
         assertThat(action2.isCalled()).isFalse();
@@ -97,7 +97,7 @@ public class ChannelConsumerBuilderTest {
         assertThat(action2.isCalled()).isTrue();
         action1.reset();
         action2.reset();
-        channelConsumer = onComplete(action1).thenComplete(decorate(action2).andThen(action3));
+        channelConsumer = onComplete(action1).andOnComplete(decorate(action2).andThen(action3));
         channelConsumer.onOutput("test");
         assertThat(action1.isCalled()).isFalse();
         assertThat(action2.isCalled()).isFalse();
@@ -113,7 +113,7 @@ public class ChannelConsumerBuilderTest {
         action1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        channelConsumer = onComplete(action1).thenOutput(outConsumer).thenError(errorConsumer);
+        channelConsumer = onComplete(action1).andOnOutput(outConsumer).andOnError(errorConsumer);
         channelConsumer.onOutput("test");
         assertThat(action1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -141,7 +141,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.noOp()).thenComplete(null);
+            onComplete(Functions.noOp()).andOnComplete(null);
 
             fail();
 
@@ -151,7 +151,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.noOp()).thenError(null);
+            onComplete(Functions.noOp()).andOnError(null);
 
             fail();
 
@@ -161,7 +161,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.noOp()).thenOutput(null);
+            onComplete(Functions.noOp()).andOnOutput(null);
 
             fail();
 
@@ -184,7 +184,7 @@ public class ChannelConsumerBuilderTest {
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        channelConsumer = channelConsumer.thenError(consumer2);
+        channelConsumer = channelConsumer.andOnError(consumer2);
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -197,7 +197,7 @@ public class ChannelConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         channelConsumer =
-                onError(consumer1).thenError(Functions.decorate(consumer2).andThen(consumer3));
+                onError(consumer1).andOnError(Functions.decorate(consumer2).andThen(consumer3));
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -213,7 +213,7 @@ public class ChannelConsumerBuilderTest {
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestAction completeAction = new TestAction();
-        channelConsumer = onError(consumer1).thenOutput(outConsumer).thenComplete(completeAction);
+        channelConsumer = onError(consumer1).andOnOutput(outConsumer).andOnComplete(completeAction);
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -241,7 +241,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenComplete(null);
+            onError(Functions.<RoutineException>sink()).andOnComplete(null);
 
             fail();
 
@@ -251,7 +251,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenError(null);
+            onError(Functions.<RoutineException>sink()).andOnError(null);
 
             fail();
 
@@ -261,7 +261,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenOutput(null);
+            onError(Functions.<RoutineException>sink()).andOnOutput(null);
 
             fail();
 
@@ -284,7 +284,7 @@ public class ChannelConsumerBuilderTest {
         channelConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        channelConsumer = channelConsumer.thenOutput(consumer2);
+        channelConsumer = channelConsumer.andOnOutput(consumer2);
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -297,7 +297,7 @@ public class ChannelConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         channelConsumer =
-                onOutput(consumer1).thenOutput(Functions.decorate(consumer2).andThen(consumer3));
+                onOutput(consumer1).andOnOutput(Functions.decorate(consumer2).andThen(consumer3));
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -313,7 +313,8 @@ public class ChannelConsumerBuilderTest {
         consumer1.reset();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
         final TestAction completeAction = new TestAction();
-        channelConsumer = onOutput(consumer1).thenError(errorConsumer).thenComplete(completeAction);
+        channelConsumer =
+                onOutput(consumer1).andOnError(errorConsumer).andOnComplete(completeAction);
         channelConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();
@@ -374,7 +375,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenComplete(null);
+            onOutput(sink()).andOnComplete(null);
 
             fail();
 
@@ -384,7 +385,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenError(null);
+            onOutput(sink()).andOnError(null);
 
             fail();
 
@@ -394,7 +395,7 @@ public class ChannelConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenOutput(null);
+            onOutput(sink()).andOnOutput(null);
 
             fail();
 

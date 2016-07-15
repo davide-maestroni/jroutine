@@ -130,18 +130,6 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
                 ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
     }
 
-    public void onComplete() throws Exception {
-        mOnComplete.perform();
-    }
-
-    public void onError(@NotNull final RoutineException error) throws Exception {
-        mOnError.accept(error);
-    }
-
-    public void onOutput(final OUT output) throws Exception {
-        mOnOutput.accept(output);
-    }
-
     /**
      * Returns a new channel consumer builder employing also the specified consumer function to
      * handle the invocation completion.
@@ -150,7 +138,7 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public ChannelConsumerBuilder<OUT> thenComplete(@NotNull final Action onComplete) {
+    public ChannelConsumerBuilder<OUT> andOnComplete(@NotNull final Action onComplete) {
         return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError,
                 mOnComplete.andThen(onComplete));
     }
@@ -163,7 +151,7 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public ChannelConsumerBuilder<OUT> thenError(
+    public ChannelConsumerBuilder<OUT> andOnError(
             @NotNull final Consumer<? super RoutineException> onError) {
         return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError), mOnComplete);
     }
@@ -176,7 +164,19 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public ChannelConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> onOutput) {
+    public ChannelConsumerBuilder<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
         return new ChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError, mOnComplete);
+    }
+
+    public void onComplete() throws Exception {
+        mOnComplete.perform();
+    }
+
+    public void onError(@NotNull final RoutineException error) throws Exception {
+        mOnError.accept(error);
+    }
+
+    public void onOutput(final OUT output) throws Exception {
+        mOnOutput.accept(output);
     }
 }

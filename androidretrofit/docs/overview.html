@@ -57,7 +57,7 @@
 </p>
 <b>Example 1:</b> via loader stream.
 <p>
-    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+    The lambda notation used in the example is just for demonstration purpose.
 </p>
 <pre>
     <code>
@@ -100,8 +100,7 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .onOutput(addRepoTo(adapter))
-                       .onError(showToast(this))
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
                        .close();
             }
 
@@ -127,7 +126,7 @@
 </pre>
 <b>Example 2:</b> via loader stream (with Support Library).
 <p>
-    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+    The lambda notation used in the example is just for demonstration purpose.
 </p>
 <pre>
     <code>
@@ -170,8 +169,7 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .onOutput(addRepoTo(adapter))
-                       .onError(showToast(this))
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
                        .close();
             }
 
@@ -197,7 +195,7 @@
 </pre>
 <b>Example 3:</b> via service.
 <p>
-    Note that, in order to avoid leaks, the functions are instantiated within a static scope.
+    The lambda notation used in the example is just for demonstration purpose.
 </p>
 <pre>
     <code>
@@ -240,8 +238,7 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .onOutput(addRepoTo(adapter))
-                       .onError(showToast(this))
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
                        .close();
             }
 

@@ -127,7 +127,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      */
     static void clearLoader(@NotNull final LoaderContext context, final int loaderId) {
-        sMainRunner.run(new PurgeExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
+        sMainRunner.run(new ClearExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -139,7 +139,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void clearLoader(@NotNull final LoaderContext context, final int loaderId,
             @NotNull final List<?> inputs) {
-        sMainRunner.run(new PurgeInputsExecution(context, loaderId, inputs), 0,
+        sMainRunner.run(new ClearInputsExecution(context, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -152,7 +152,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void clearLoader(@NotNull final LoaderContext context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory) {
-        sMainRunner.run(new PurgeFactoryExecution(context, factory, loaderId), 0,
+        sMainRunner.run(new ClearFactoryExecution(context, factory, loaderId), 0,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -166,11 +166,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     static void clearLoader(@NotNull final LoaderContext context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
-        sMainRunner.run(new PurgeFactoryInputsExecution(context, factory, loaderId, inputs), 0,
+        sMainRunner.run(new ClearFactoryInputsExecution(context, factory, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);
     }
 
-    private static void purgeLoaderInternal(@NotNull final LoaderContext context,
+    private static void clearLoaderInternal(@NotNull final LoaderContext context,
             final int loaderId) {
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -209,7 +209,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
     }
 
-    private static void purgeLoaderInternal(@NotNull final LoaderContext context,
+    private static void clearLoaderInternal(@NotNull final LoaderContext context,
             final int loaderId, @NotNull final List<?> inputs) {
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -250,7 +250,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
     }
 
-    private static void purgeLoadersInternal(@NotNull final LoaderContext context,
+    private static void clearLoadersInternal(@NotNull final LoaderContext context,
             final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory) {
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -293,7 +293,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
     }
 
-    private static void purgeLoadersInternal(@NotNull final LoaderContext context,
+    private static void clearLoadersInternal(@NotNull final LoaderContext context,
             final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory,
             @NotNull final List<?> inputs) {
         final Object component = context.getComponent();
@@ -528,6 +528,130 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
+     * Execution implementation purging the loader with a specific ID.
+     */
+    private static class ClearExecution implements Execution {
+
+        private final LoaderContext mContext;
+
+        private final int mLoaderId;
+
+        /**
+         * Constructor.
+         *
+         * @param context  the context instance.
+         * @param loaderId the loader ID.
+         */
+        private ClearExecution(@NotNull final LoaderContext context, final int loaderId) {
+            mContext = context;
+            mLoaderId = loaderId;
+        }
+
+        @Override
+        public void run() {
+            clearLoaderInternal(mContext, mLoaderId);
+        }
+    }
+
+    /**
+     * Execution implementation purging all loaders with a specific invocation factory.
+     */
+    private static class ClearFactoryExecution implements Execution {
+
+        private final LoaderContext mContext;
+
+        private final ContextInvocationFactory<?, ?> mFactory;
+
+        private final int mLoaderId;
+
+        /**
+         * Constructor.
+         *
+         * @param context  the context instance.
+         * @param factory  the invocation factory.
+         * @param loaderId the loader ID.
+         */
+        private ClearFactoryExecution(@NotNull final LoaderContext context,
+                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
+            mContext = context;
+            mFactory = factory;
+            mLoaderId = loaderId;
+        }
+
+        @Override
+        public void run() {
+            clearLoadersInternal(mContext, mLoaderId, mFactory);
+        }
+    }
+
+    /**
+     * Execution implementation purging the loader with a specific invocation factory and inputs.
+     */
+    private static class ClearFactoryInputsExecution implements Execution {
+
+        private final LoaderContext mContext;
+
+        private final ContextInvocationFactory<?, ?> mFactory;
+
+        private final List<?> mInputs;
+
+        private final int mLoaderId;
+
+        /**
+         * Constructor.
+         *
+         * @param context  the context instance.
+         * @param factory  the invocation factory.
+         * @param loaderId the loader ID.
+         * @param inputs   the list of inputs.
+         */
+        private ClearFactoryInputsExecution(@NotNull final LoaderContext context,
+                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
+                @NotNull final List<?> inputs) {
+            mContext = context;
+            mFactory = factory;
+            mLoaderId = loaderId;
+            mInputs = new ArrayList<Object>(inputs);
+        }
+
+        @Override
+        public void run() {
+            clearLoadersInternal(mContext, mLoaderId, mFactory, mInputs);
+        }
+    }
+
+    /**
+     * Execution implementation purging the loader with a specific ID and inputs.
+     */
+    private static class ClearInputsExecution implements Execution {
+
+        private final LoaderContext mContext;
+
+        private final List<?> mInputs;
+
+        private final int mLoaderId;
+
+        /**
+         * Constructor.
+         *
+         * @param context  the context instance.
+         * @param loaderId the loader ID.
+         * @param inputs   the list of inputs.
+         */
+        private ClearInputsExecution(@NotNull final LoaderContext context, final int loaderId,
+                @NotNull final List<?> inputs) {
+            mContext = context;
+            mLoaderId = loaderId;
+            mInputs = new ArrayList<Object>(inputs);
+        }
+
+        @Override
+        public void run() {
+            clearLoaderInternal(mContext, mLoaderId, mInputs);
+        }
+    }
+
+    /**
      * Context invocation factory implementation.
      *
      * @param <IN>  the input data type.
@@ -557,130 +681,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         @Override
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
             return mInvocation.createInvocation(mLoaderId);
-        }
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific ID.
-     */
-    private static class PurgeExecution implements Execution {
-
-        private final LoaderContext mContext;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param loaderId the loader ID.
-         */
-        private PurgeExecution(@NotNull final LoaderContext context, final int loaderId) {
-            mContext = context;
-            mLoaderId = loaderId;
-        }
-
-        @Override
-        public void run() {
-            purgeLoaderInternal(mContext, mLoaderId);
-        }
-    }
-
-    /**
-     * Execution implementation purging all loaders with a specific invocation factory.
-     */
-    private static class PurgeFactoryExecution implements Execution {
-
-        private final LoaderContext mContext;
-
-        private final ContextInvocationFactory<?, ?> mFactory;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
-         */
-        private PurgeFactoryExecution(@NotNull final LoaderContext context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
-            mContext = context;
-            mFactory = factory;
-            mLoaderId = loaderId;
-        }
-
-        @Override
-        public void run() {
-            purgeLoadersInternal(mContext, mLoaderId, mFactory);
-        }
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific invocation factory and inputs.
-     */
-    private static class PurgeFactoryInputsExecution implements Execution {
-
-        private final LoaderContext mContext;
-
-        private final ContextInvocationFactory<?, ?> mFactory;
-
-        private final List<?> mInputs;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
-         * @param inputs   the list of inputs.
-         */
-        private PurgeFactoryInputsExecution(@NotNull final LoaderContext context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
-                @NotNull final List<?> inputs) {
-            mContext = context;
-            mFactory = factory;
-            mLoaderId = loaderId;
-            mInputs = new ArrayList<Object>(inputs);
-        }
-
-        @Override
-        public void run() {
-            purgeLoadersInternal(mContext, mLoaderId, mFactory, mInputs);
-        }
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific ID and inputs.
-     */
-    private static class PurgeInputsExecution implements Execution {
-
-        private final LoaderContext mContext;
-
-        private final List<?> mInputs;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param loaderId the loader ID.
-         * @param inputs   the list of inputs.
-         */
-        private PurgeInputsExecution(@NotNull final LoaderContext context, final int loaderId,
-                @NotNull final List<?> inputs) {
-            mContext = context;
-            mLoaderId = loaderId;
-            mInputs = new ArrayList<Object>(inputs);
-        }
-
-        @Override
-        public void run() {
-            purgeLoaderInternal(mContext, mLoaderId, mInputs);
         }
     }
 

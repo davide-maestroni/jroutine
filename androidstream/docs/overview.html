@@ -117,8 +117,7 @@
                                     .configured()
                                     .map(loadUri())
                                     .bind(onError(showToast(this)).andOnOutput(showImage(imageView)))
-                                    .pass(IMAGE_URI)
-                                    .close();
+                                    .pass(IMAGE_URI);
             }
         }
     </code>

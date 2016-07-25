@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
@@ -96,8 +97,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final Backoff mOutputBackoff;
 
-    private final int mOutputLimit;
-
     private final NestedQueue<Object> mOutputQueue;
 
     private final UnitDuration mOutputTimeout;
@@ -121,6 +120,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     private volatile FlushExecution mFlushExecution;
 
     private volatile FlushExecution mForcedFlushExecution;
+
+    private boolean mIWaitingOutput;
 
     private boolean mIsWaitingExecution;
 
@@ -155,8 +156,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
         mTimeoutActionType = new LocalValue<TimeoutActionType>(
                 configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
-        mOutputLimit = configuration.getLimitOrElse(Integer.MAX_VALUE);
-        mOutputBackoff = configuration.getBackoffOrElse(Backoffs.zeroDelay());
+        mOutputBackoff = configuration.getBackoffOrElse(Backoffs.noDelay());
         mMaxOutput = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
         mResultDelay = new ThreadLocal<UnitDuration>();
         mOutputQueue = new NestedQueue<Object>() {
@@ -166,12 +166,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 // Preventing closing
             }
         };
-        final int outputLimit = mOutputLimit;
+        final Backoff backoff = mOutputBackoff;
         mHasOutputs = new Condition() {
 
             public boolean isTrue() {
-                return (mOutputCount <= outputLimit) || mIsWaitingInvocation || (mAbortException
-                        != null);
+                return (backoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
+                        mAbortException != null);
             }
         };
         mState = new OutputChannelState();
@@ -959,9 +959,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             throw ((RoutineExceptionWrapper) result).raise();
         }
 
-        final int outputLimit = mOutputLimit;
-        final int prevOutputCount = mOutputCount;
-        if ((--mOutputCount <= outputLimit) && (prevOutputCount > outputLimit)) {
+        final int outputCount = --mOutputCount;
+        if (mIWaitingOutput && (mOutputBackoff.getDelay(outputCount) == NO_DELAY)) {
             mMutex.notifyAll();
         }
 
@@ -1094,7 +1093,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private void waitOutputs() {
         try {
-            final long delay = mOutputBackoff.getDelay(mOutputCount - mOutputLimit);
+            final long delay = mOutputBackoff.getDelay(mOutputCount);
+            if (delay == NO_DELAY) {
+                return;
+            }
+
+            mIWaitingOutput = true;
             if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasOutputs)) {
                 mLogger.dbg("timeout while waiting for room in the output channel [%s %s]", delay,
                         TimeUnit.MILLISECONDS);
@@ -1102,6 +1106,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         } catch (final InterruptedException e) {
             throw new InvocationInterruptedException(e);
+
+        } finally {
+            mIWaitingOutput = false;
         }
     }
 

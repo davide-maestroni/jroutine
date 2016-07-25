@@ -67,6 +67,7 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -783,7 +784,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
         final ChannelConfiguration configuration = builder.withRunner(AndroidRunners.taskRunner())
                                                           .withMaxSize(3)
-                                                          .withBackoff(seconds(10))
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
                                                           .configured();
@@ -1583,11 +1583,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final CountLog countLog = new CountLog();
         final InvocationConfiguration configuration =
                 builder().withRunner(AndroidRunners.taskRunner())
-                         .withInputLimit(3)
-                         .withInputBackoff(seconds(10))
+                         .withInputBackoff(afterCount(3).constantDelay(seconds(10)))
                          .withInputMaxSize(33)
-                         .withOutputLimit(3)
-                         .withOutputBackoff(seconds(10))
+                         .withOutputBackoff(afterCount(3).constantDelay(seconds(10)))
                          .withOutputMaxSize(33)
                          .withLogLevel(Level.DEBUG)
                          .withLog(countLog)

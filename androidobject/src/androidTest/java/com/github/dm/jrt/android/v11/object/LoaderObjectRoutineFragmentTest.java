@@ -72,6 +72,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -259,12 +260,14 @@ public class LoaderObjectRoutineFragmentTest
                                                                           R.id.test_fragment);
         final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
                                                                .withInputOrder(OrderType.BY_DELAY)
-                                                               .withInputLimit(3)
-                                                               .withInputBackoff(seconds(10))
+                                                               .withInputBackoff(
+                                                                       afterCount(3).constantDelay(
+                                                                               seconds(10)))
                                                                .withInputMaxSize(33)
                                                                .withOutputOrder(OrderType.BY_DELAY)
-                                                               .withOutputLimit(3)
-                                                               .withOutputBackoff(seconds(10))
+                                                               .withOutputBackoff(
+                                                                       afterCount(3).constantDelay(
+                                                                               seconds(10)))
                                                                .withOutputMaxSize(33)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)

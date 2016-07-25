@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.junit.Test;
 
@@ -32,7 +31,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
+import static com.github.dm.jrt.core.util.Backoffs.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -94,9 +96,10 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withMaxSize(100)
                                                             .withLogLevel(Level.SILENT)
-                                                            .withBackoff(UnitDuration.seconds(1))
-                                                            .withOutputTimeout(
-                                                                    UnitDuration.seconds(10))
+                                                            .withBackoff(
+                                                                    afterCount(1).constantDelay(
+                                                                            seconds(1)))
+                                                            .withOutputTimeout(seconds(10))
                                                             .withOutputTimeoutAction(
                                                                     TimeoutActionType.ABORT)
                                                             .configured();
@@ -107,70 +110,22 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    public void testChannelLimitEquals() {
-
-        final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withLog(new NullLog())
-                                                            .withLimit(100)
-                                                            .configured();
-        assertThat(configuration).isNotEqualTo(builder().withLimit(10).configured());
-        assertThat(configuration.builderFrom().withLimit(1).configured()).isNotEqualTo(
-                builder().withLimit(1).configured());
-    }
-
-    @Test
-    public void testChannelLimitError() {
-
-        try {
-
-            builder().withLimit(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testChannelMaxDelayEquals() {
+    public void testChannelBackoffEquals() {
 
         final ChannelConfiguration configuration = builder().withOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withMaxSize(100)
                                                             .configured();
-        assertThat(configuration).isNotEqualTo(builder().withBackoff(zero()).configured());
+        assertThat(configuration).isNotEqualTo(builder().withBackoff(noDelay()).configured());
         assertThat(configuration).isNotEqualTo(
-                builder().withBackoff(1, TimeUnit.MILLISECONDS).configured());
-        assertThat(configuration.builderFrom().withBackoff(millis(1)).configured()).isNotEqualTo(
-                builder().withBackoff(1, TimeUnit.MILLISECONDS).configured());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testChannelMaxDelayError() {
-
-        try {
-
-            builder().withBackoff(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withBackoff(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
+                builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
+        assertThat(configuration.builderFrom()
+                                .withBackoff(afterCount(1).constantDelay(millis(1)))
+                                .configured()).isNotEqualTo(
+                builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
     }
 
     @Test

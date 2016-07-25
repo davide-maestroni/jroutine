@@ -109,7 +109,8 @@ public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRouti
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is not found.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found or its
+     *                                            annotations are invalid.
      * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
      * Annotations</a>
      */
@@ -133,7 +134,8 @@ public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRouti
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the routine.
-     * @throws java.lang.IllegalArgumentException if no matching method is found.
+     * @throws java.lang.IllegalArgumentException if no matching method is found or its annotations
+     *                                            are invalid.
      * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
      * Annotations</a>
      */
@@ -156,6 +158,7 @@ public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRouti
      * @param <IN>   the input data type.
      * @param <OUT>  the output data type.
      * @return the routine.
+     * @throws java.lang.IllegalArgumentException the method annotations are invalid.
      * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
      * Annotations</a>
      */

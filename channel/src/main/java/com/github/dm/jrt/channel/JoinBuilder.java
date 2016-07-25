@@ -85,11 +85,10 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         int i = 0;
         final boolean isFlush = mIsFlush;
         final OUT placeholder = mPlaceholder;
-        final int limit = configuration.getLimitOrElse(Integer.MAX_VALUE);
         final Backoff backoff = configuration.getBackoffOrElse(null);
         final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
         for (final Channel<?, ? extends OUT> channel : channels) {
-            channel.bind(new JoinChannelConsumer<OUT>(limit, backoff, maxSize, mutex, i++, isFlush,
+            channel.bind(new JoinChannelConsumer<OUT>(backoff, maxSize, mutex, i++, isFlush,
                     closed, queues, placeholder, outputChannel));
         }
 
@@ -113,8 +112,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
 
         private final boolean mIsFlush;
 
-        private final int mLimit;
-
         private final int mMaxSize;
 
         private final Object mMutex;
@@ -126,7 +123,6 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         /**
          * Constructor.
          *
-         * @param limit       the channel limit.
          * @param backoff     the channel backoff.
          * @param maxSize     the channel maxSize.
          * @param mutex       the object used to synchronized the shared parameters.
@@ -137,12 +133,11 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
          * @param placeholder the placeholder instance.
          * @param channel     the channel.
          */
-        private JoinChannelConsumer(final int limit, @Nullable final Backoff backoff,
+        private JoinChannelConsumer(@Nullable final Backoff backoff,
                 final int maxSize, @NotNull final Object mutex, final int index,
                 final boolean isFlush, @NotNull final boolean[] closed,
                 @NotNull final SimpleQueue<OUT>[] queues, @Nullable final OUT placeholder,
                 @NotNull final Channel<List<? extends OUT>, List<? extends OUT>> channel) {
-            mLimit = limit;
             mBackoff = backoff;
             mMaxSize = maxSize;
             mMutex = mutex;
@@ -217,9 +212,8 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
                         return;
                     }
 
-                    final int count = size - mLimit;
-                    if (count > 0) {
-                        final long delay = backoff.getDelay(count);
+                    final long delay = backoff.getDelay(size);
+                    if (delay > 0) {
                         UnitDuration.sleepAtLeast(delay, TimeUnit.MILLISECONDS);
                     }
                 }

@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
@@ -1031,10 +1032,8 @@ public class StreamBuilderTest {
                                      .let(outputAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
-                                     .withInputLimit(2)
-                                     .withInputBackoff(seconds(3))
-                                     .withOutputLimit(2)
-                                     .withOutputBackoff(seconds(3))
+                                     .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
+                                     .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {
@@ -1079,8 +1078,7 @@ public class StreamBuilderTest {
                                      .let(outputAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
-                                     .withOutputLimit(2)
-                                     .withOutputBackoff(seconds(3))
+                                     .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {
@@ -1124,8 +1122,7 @@ public class StreamBuilderTest {
                                      .let(outputAccept(range(1, 1000)))
                                      .streamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
-                                     .withInputLimit(2)
-                                     .withInputBackoff(seconds(3))
+                                     .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .configured()
                                      .map(Functions.<Number>identity())
                                      .map(new Function<Number, Double>() {

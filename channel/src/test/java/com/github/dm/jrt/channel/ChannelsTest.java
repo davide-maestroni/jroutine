@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.Backoffs.constantDelay;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1212,8 +1212,7 @@ public class ChannelsTest {
         try {
             routine.asyncCall(Channels.join(channel1, channel2)
                                       .channelConfiguration()
-                                      .withLimit(0)
-                                      .withBackoff(constantDelay(millis(100)))
+                                      .withBackoff(afterCount(0).constantDelay(millis(100)))
                                       .withMaxSize(1)
                                       .configured()
                                       .buildChannels()).after(seconds(100000)).all();

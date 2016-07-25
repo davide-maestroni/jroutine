@@ -32,19 +32,19 @@ import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
-import com.github.dm.jrt.object.annotation.InputLimit;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
+import com.github.dm.jrt.object.annotation.LogType;
 import com.github.dm.jrt.object.annotation.MaxInstances;
 import com.github.dm.jrt.object.annotation.OutputBackoff;
-import com.github.dm.jrt.object.annotation.OutputLimit;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
+import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -65,6 +65,7 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
  * Utility class providing helper methods used to implement a builder of routines.
@@ -574,20 +575,21 @@ public class Builders {
      * @param configuration the initial configuration.
      * @param annotations   the annotations.
      * @return the modified configuration.
+     * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
      * @see com.github.dm.jrt.object.annotation.CoreInstances CoreInstances
      * @see com.github.dm.jrt.object.annotation.InputBackoff InputBackoff
-     * @see com.github.dm.jrt.object.annotation.InputLimit InputLimit
      * @see com.github.dm.jrt.object.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.object.annotation.InputOrder InputOrder
      * @see com.github.dm.jrt.object.annotation.LogLevel LogLevel
+     * @see com.github.dm.jrt.object.annotation.LogType LogType
      * @see com.github.dm.jrt.object.annotation.MaxInstances MaxInstances
      * @see com.github.dm.jrt.object.annotation.OutputBackoff OutputBackoff
-     * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.object.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.object.annotation.OutputTimeoutAction OutputTimeoutAction
      * @see com.github.dm.jrt.object.annotation.Priority Priority
+     * @see com.github.dm.jrt.object.annotation.RunnerType RunnerType
      */
     @NotNull
     public static InvocationConfiguration withAnnotations(
@@ -604,12 +606,8 @@ public class Builders {
             if (annotationType == CoreInstances.class) {
                 builder.withCoreInstances(((CoreInstances) annotation).value());
 
-            } else if (annotationType == InputLimit.class) {
-                builder.withInputLimit(((InputLimit) annotation).value());
-
             } else if (annotationType == InputBackoff.class) {
-                final InputBackoff backoffAnnotation = (InputBackoff) annotation;
-                builder.withInputBackoff(backoffAnnotation.value(), backoffAnnotation.unit());
+                builder.withInputBackoff(newInstanceOf(((InputBackoff) annotation).value()));
 
             } else if (annotationType == InputMaxSize.class) {
                 builder.withInputMaxSize(((InputMaxSize) annotation).value());
@@ -620,15 +618,14 @@ public class Builders {
             } else if (annotationType == LogLevel.class) {
                 builder.withLogLevel(((LogLevel) annotation).value());
 
+            } else if (annotationType == LogType.class) {
+                builder.withLog(newInstanceOf(((LogType) annotation).value()));
+
             } else if (annotationType == MaxInstances.class) {
                 builder.withMaxInstances(((MaxInstances) annotation).value());
 
-            } else if (annotationType == OutputLimit.class) {
-                builder.withOutputLimit(((OutputLimit) annotation).value());
-
             } else if (annotationType == OutputBackoff.class) {
-                final OutputBackoff backoffAnnotation = (OutputBackoff) annotation;
-                builder.withOutputBackoff(backoffAnnotation.value(), backoffAnnotation.unit());
+                builder.withOutputBackoff(newInstanceOf(((OutputBackoff) annotation).value()));
 
             } else if (annotationType == OutputMaxSize.class) {
                 builder.withOutputMaxSize(((OutputMaxSize) annotation).value());
@@ -645,6 +642,9 @@ public class Builders {
 
             } else if (annotationType == Priority.class) {
                 builder.withPriority(((Priority) annotation).value());
+
+            } else if (annotationType == RunnerType.class) {
+                builder.withRunner(newInstanceOf(((RunnerType) annotation).value()));
             }
         }
 
@@ -658,20 +658,21 @@ public class Builders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
+     * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
      * @see com.github.dm.jrt.object.annotation.CoreInstances CoreInstances
      * @see com.github.dm.jrt.object.annotation.InputBackoff InputBackoff
-     * @see com.github.dm.jrt.object.annotation.InputLimit InputLimit
      * @see com.github.dm.jrt.object.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.object.annotation.InputOrder InputOrder
      * @see com.github.dm.jrt.object.annotation.LogLevel LogLevel
+     * @see com.github.dm.jrt.object.annotation.LogType LogType
      * @see com.github.dm.jrt.object.annotation.MaxInstances MaxInstances
      * @see com.github.dm.jrt.object.annotation.OutputBackoff OutputBackoff
-     * @see com.github.dm.jrt.object.annotation.OutputLimit OutputLimit
      * @see com.github.dm.jrt.object.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.object.annotation.OutputOrder OutputOrder
      * @see com.github.dm.jrt.object.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.object.annotation.OutputTimeoutAction OutputTimeoutAction
      * @see com.github.dm.jrt.object.annotation.Priority Priority
+     * @see com.github.dm.jrt.object.annotation.RunnerType RunnerType
      */
     @NotNull
     public static InvocationConfiguration withAnnotations(

@@ -17,21 +17,22 @@
 package com.github.dm.jrt.core.util;
 
 /**
- * Interface defining a backoff policy, returning a delay in milliseconds to apply when a counter
- * exceeds a specified limit.
+ * Interface defining a backoff policy returning a delay in milliseconds.
  * <br>
- * The implementation should be stateless and rely only on the passed excess count to compute the
- * delay. In fact, the implementing class is likely to be called from different threads and with
- * unrelated count numbers.
+ * The implementation should be stateless and rely only on the passed count to compute the delay.
+ * In fact, the implementing class is likely to be called from different threads and with unrelated
+ * count numbers.
  * <p>
  * Created by davide-maestroni on 05/09/2016.
  */
 public interface Backoff {
 
+    int NO_DELAY = -1;
+
     /**
      * Gets the delay for the specified count.
      *
-     * @param count the count exceeding the limit (it must be positive).
+     * @param count the count (it must be positive).
      * @return the delay in milliseconds.
      */
     long getDelay(int count);

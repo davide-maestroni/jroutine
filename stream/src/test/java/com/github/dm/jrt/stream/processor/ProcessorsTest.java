@@ -27,7 +27,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
@@ -82,7 +81,7 @@ public class ProcessorsTest {
                                  .async()
                                  .let(outputAccept(range(1, 1000)))
                                  .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
-                                         2, Backoffs.linearDelay(seconds(10))))
+                                         Backoffs.afterCount(2).linearDelay(seconds(10))))
                                  .map(Functions.<Number>identity())
                                  .map(new Function<Number, Double>() {
 
@@ -199,7 +198,7 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testBackoffNullPointerError() {
         try {
-            Processors.backoffOn(null, 1, (Backoff) null);
+            Processors.backoffOn(null, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -207,6 +206,13 @@ public class ProcessorsTest {
 
         try {
             Processors.backoffOn(null, 1, 0, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            Processors.backoffOn(null, 1, null);
             fail();
 
         } catch (final NullPointerException ignored) {

@@ -21,6 +21,7 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -147,15 +148,17 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             // Use annotations to configure the routine
             final InvocationConfiguration invocationConfiguration =
                     Builders.withAnnotations(mInvocationConfiguration, annotations);
+            final ServiceConfiguration serviceConfiguration =
+                    AndroidBuilders.withAnnotations(mServiceConfiguration, annotations);
             if (Channel.class == rawType) {
                 return new OutputChannelAdapter(invocationConfiguration,
                         retrofit.responseBodyConverter(responseType, annotations),
-                        buildRoutine(invocationConfiguration), responseType);
+                        buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
 
             } else if (StreamBuilder.class == rawType) {
                 return new StreamBuilderAdapter(invocationConfiguration, invocationMode,
                         retrofit.responseBodyConverter(responseType, annotations),
-                        buildRoutine(invocationConfiguration), responseType);
+                        buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
             }
         }
 
@@ -164,14 +167,15 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @NotNull
     private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
-            @NotNull final InvocationConfiguration invocationConfiguration) {
+            @NotNull final InvocationConfiguration invocationConfiguration,
+            @NotNull final ServiceConfiguration serviceConfiguration) {
         return JRoutineService.on(ConstantConditions.notNull("service context", mServiceContext))
                               .with(factoryOf(ServiceCallInvocation.class))
                               .invocationConfiguration()
                               .with(invocationConfiguration)
                               .configured()
                               .serviceConfiguration()
-                              .with(mServiceConfiguration)
+                              .with(serviceConfiguration)
                               .configured()
                               .buildRoutine();
     }
@@ -184,6 +188,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      *
      * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
+     * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
      */
     public static class Builder
             implements ServiceConfigurable<Builder>, InvocationConfiguration.Configurable<Builder>,

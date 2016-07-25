@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
@@ -68,8 +69,6 @@ public class Processors {
      * exceptions.
      *
      * @param runner  the configured runner.
-     * @param limit   the maximum number of buffered inputs before starting to slow down the
-     *                feeding thread.
      * @param backoff the backoff policy to apply to the feeding thread.
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
@@ -78,14 +77,13 @@ public class Processors {
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
-            @Nullable final Runner runner, final int limit, @NotNull final Backoff backoff) {
+            @Nullable final Runner runner, @NotNull final Backoff backoff) {
         ConstantConditions.notNull("backoff instance", backoff);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
                 return builder.invocationConfiguration()
                               .withRunner(runner)
-                              .withInputLimit(limit)
                               .withInputBackoff(backoff)
                               .configured();
             }
@@ -124,8 +122,7 @@ public class Processors {
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
                 return builder.invocationConfiguration()
                               .withRunner(runner)
-                              .withInputLimit(limit)
-                              .withInputBackoff(delay, timeUnit)
+                              .withInputBackoff(afterCount(limit).constantDelay(delay, timeUnit))
                               .configured();
             }
         };
@@ -153,14 +150,14 @@ public class Processors {
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
-            @Nullable final Runner runner, final int limit, @Nullable final UnitDuration delay) {
+            @Nullable final Runner runner, final int limit, @NotNull final UnitDuration delay) {
+        ConstantConditions.notNull("delay value", delay);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
                 return builder.invocationConfiguration()
                               .withRunner(runner)
-                              .withInputLimit(limit)
-                              .withInputBackoff(delay)
+                              .withInputBackoff(afterCount(limit).constantDelay(delay))
                               .configured();
             }
         };
@@ -641,7 +638,7 @@ public class Processors {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
             final int count) {
-        return retry(count, Backoffs.zeroDelay());
+        return retry(count, Backoffs.noDelay());
     }
 
     /**

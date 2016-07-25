@@ -51,7 +51,7 @@
                                            .configured()
                                            .loaderConfiguration()
                                            .with(loaderConfiguration)
-                                           ${invocationBuilderOptions}
+                                           ${loaderBuilderOptions}
                                            .configured()
                                            .buildRoutine();
     }

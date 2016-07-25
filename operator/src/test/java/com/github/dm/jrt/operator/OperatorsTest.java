@@ -1827,14 +1827,14 @@ public class OperatorsTest {
             public Integer apply(final String s) {
                 return s.hashCode();
             }
-        })).asyncCall("test", "test").after(seconds(3)).next()).isEqualTo(
+        })).asyncCall(Arrays.asList("test", "test")).after(seconds(3)).next()).isEqualTo(
                 Collections.singletonMap("test".hashCode(), "test"));
         assertThat(JRoutineCore.with(Operators.toMap(new Function<String, Integer>() {
 
             public Integer apply(final String s) {
                 return s.hashCode();
             }
-        })).asyncCall("test1", "test2").after(seconds(3)).next()).isEqualTo(
+        })).asyncCall(Arrays.asList("test1", "test2")).after(seconds(3)).next()).isEqualTo(
                 new HashMap<Integer, String>() {{
                     put("test1".hashCode(), "test1");
                     put("test2".hashCode(), "test2");

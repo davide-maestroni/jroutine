@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.annotation;
 
-import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.runner.Runner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,8 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to set a specific log class to be used by the service
- * executing the routine invocations.
+ * Through this annotation it is possible to set a specific runner class to be used by the service
+ * executing the routine invocations. The specified class must have a default constructor.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  * routines as well.
  * <p>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
- * means that, in case a {@link SecurityManager} is installed, a security exception might
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.object.annotation.LogClass *;
+ *              &#64;com.github.dm.jrt.android.object.annotation.RunnerClass *;
  *         }
  *     </code>
  * </pre>
@@ -61,9 +61,9 @@ import java.lang.annotation.Target;
 public @interface RunnerClass {
 
     /**
-     * The log class.
+     * The runner class.
      *
-     * @return the log class.
+     * @return the runner class.
      */
-    Class<? extends Log> value();
+    Class<? extends Runner> value();
 }

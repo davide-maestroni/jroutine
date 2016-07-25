@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
@@ -77,8 +78,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     private final LocalValue<UnitDuration> mInputDelay;
 
-    private final int mInputLimit;
-
     private final LocalValue<OrderType> mInputOrder;
 
     private final NestedQueue<IN> mInputQueue;
@@ -101,6 +100,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     private boolean mIsPendingExecution;
 
+    private boolean mIsWaitingInput;
+
     private int mPendingExecutionCount;
 
     private InputChannelState mState;
@@ -120,8 +121,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         mRunner = runner;
         mInputOrder = new LocalValue<OrderType>(
                 configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY));
-        mInputLimit = configuration.getInputLimitOrElse(Integer.MAX_VALUE);
-        mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.zeroDelay());
+        mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.noDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputDelay = new LocalValue<UnitDuration>(zero());
         mInputQueue = new NestedQueue<IN>() {
@@ -131,11 +131,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 // Preventing closing
             }
         };
-        final int inputLimit = mInputLimit;
+        final Backoff backoff = mInputBackoff;
         mHasInputs = new Condition() {
 
             public boolean isTrue() {
-                return (mInputCount <= inputLimit) || (mAbortException != null);
+                return (backoff.getDelay(mInputCount) == NO_DELAY) || (mAbortException != null);
             }
         };
         mResultChanel =
@@ -486,7 +486,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     private void waitInputs() {
-        final long delay = mInputBackoff.getDelay(mInputCount - mInputLimit);
+        final long delay = mInputBackoff.getDelay(mInputCount);
         if ((delay > 0) && mRunner.isExecutionThread()) {
             throw new InputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
@@ -494,6 +494,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         try {
+            mIsWaitingInput = true;
             if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasInputs)) {
                 mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
                         TimeUnit.MILLISECONDS);
@@ -501,6 +502,9 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
         } catch (final InterruptedException e) {
             throw new InvocationInterruptedException(e);
+
+        } finally {
+            mIsWaitingInput = false;
         }
     }
 
@@ -1362,9 +1366,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public IN nextInput() {
             final IN input = mInputQueue.removeFirst();
             mLogger.dbg("reading input [#%d]: %s", mInputCount, input);
-            final int inputLimit = mInputLimit;
-            final int prevInputCount = mInputCount;
-            if ((--mInputCount <= inputLimit) && (prevInputCount > inputLimit)) {
+            final int inputCount = --mInputCount;
+            if (mIsWaitingInput && (mInputBackoff.getDelay(inputCount) == NO_DELAY)) {
                 mMutex.notifyAll();
             }
 

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.object.annotation;
+package com.github.dm.jrt.android.object.annotation;
+
+import com.github.dm.jrt.core.log.Log;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,8 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to indicate the maximum number of data buffered inside
- * the input channel, before starting to slow down the feeding thread.
+ * Through this annotation it is possible to set a specific log class to be used by the service
+ * executing the routine invocations.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -35,7 +37,7 @@ import java.lang.annotation.Target;
  * routines as well.
  * <p>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
- * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * means that, in case a {@link SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
@@ -45,24 +47,23 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.InputLimit *;
+ *              &#64;com.github.dm.jrt.android.object.annotation.LogClass *;
  *         }
  *     </code>
  * </pre>
  * <p>
- * Created by davide-maestroni on 01/08/2016.
+ * Created by davide-maestroni on 07/24/2016.
  *
- * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.android.core.config.ServiceConfiguration ServiceConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InputLimit {
+public @interface RunnerClass {
 
     /**
-     * The maximum number of data that the input channel can retain before slowing down the feeding
-     * thread.
+     * The log class.
      *
-     * @return the maximum number of buffered input data.
+     * @return the log class.
      */
-    int value();
+    Class<? extends Log> value();
 }

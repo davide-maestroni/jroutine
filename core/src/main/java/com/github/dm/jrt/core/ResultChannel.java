@@ -247,9 +247,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull final CHANNEL channel) {
-        channel.pass(this);
-        return channel;
+        return channel.pass(this);
     }
 
     @NotNull

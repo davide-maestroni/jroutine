@@ -146,7 +146,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull final CHANNEL channel) {
+    public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
         return call().bind(channel);
     }
 

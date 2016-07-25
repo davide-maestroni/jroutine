@@ -69,11 +69,12 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
     protected Channel<?, List<? extends OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final ArrayList<Channel<?, ? extends OUT>> channels = mChannels;
-        final Channel<List<? extends OUT>, List<? extends OUT>> outputChannel = JRoutineCore.io()
-                                                                                            .channelConfiguration()
-                                                                                            .with(configuration)
-                                                                                            .configured()
-                                                                                            .buildChannel();
+        final Channel<List<? extends OUT>, List<? extends OUT>> outputChannel = //
+                JRoutineCore.io()
+                            .channelConfiguration()
+                            .with(configuration)
+                            .configured()
+                            .buildChannel();
         final Object mutex = new Object();
         final int size = channels.size();
         final boolean[] closed = new boolean[size];
@@ -88,8 +89,8 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         final Backoff backoff = configuration.getBackoffOrElse(null);
         final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
         for (final Channel<?, ? extends OUT> channel : channels) {
-            channel.bind(new JoinChannelConsumer<OUT>(backoff, maxSize, mutex, i++, isFlush,
-                    closed, queues, placeholder, outputChannel));
+            channel.bind(new JoinChannelConsumer<OUT>(backoff, maxSize, mutex, i++, isFlush, closed,
+                    queues, placeholder, outputChannel));
         }
 
         return outputChannel;
@@ -133,10 +134,10 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
          * @param placeholder the placeholder instance.
          * @param channel     the channel.
          */
-        private JoinChannelConsumer(@Nullable final Backoff backoff,
-                final int maxSize, @NotNull final Object mutex, final int index,
-                final boolean isFlush, @NotNull final boolean[] closed,
-                @NotNull final SimpleQueue<OUT>[] queues, @Nullable final OUT placeholder,
+        private JoinChannelConsumer(@Nullable final Backoff backoff, final int maxSize,
+                @NotNull final Object mutex, final int index, final boolean isFlush,
+                @NotNull final boolean[] closed, @NotNull final SimpleQueue<OUT>[] queues,
+                @Nullable final OUT placeholder,
                 @NotNull final Channel<List<? extends OUT>, List<? extends OUT>> channel) {
             mBackoff = backoff;
             mMaxSize = maxSize;

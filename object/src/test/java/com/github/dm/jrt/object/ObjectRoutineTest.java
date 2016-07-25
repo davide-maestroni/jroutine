@@ -2392,24 +2392,24 @@ public class ObjectRoutineTest {
         public int getErrCount() {
 
             return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
         }        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
 
-        public int getWrnCount() {
 
-            return mWrnCount;
-        }
 
         public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mErrCount;
         }
-
-
 
         public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {

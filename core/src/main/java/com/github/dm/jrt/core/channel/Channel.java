@@ -170,13 +170,12 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * Attempting to read through the dedicated methods will cause an
      * {@link java.lang.IllegalStateException} to be thrown.
      *
-     * @param channel   the input channel
-     * @param <CHANNEL> the input channel type.
+     * @param channel the input channel
      * @return the passed channel.
      * @throws java.lang.IllegalStateException if this channel is already bound.
      */
     @NotNull
-    <CHANNEL extends Channel<? super OUT, ?>> CHANNEL bind(@NotNull CHANNEL channel);
+    Channel<? super OUT, ?> bind(@NotNull Channel<? super OUT, ?> channel);
 
     /**
      * Binds this channel to the specified consumer.

@@ -918,11 +918,6 @@ public class RoutineTest {
         channel.abort();
         assertThat(channel.after(timeout).hasCompleted()).isTrue();
         assertThat(TestDiscard.getInstanceCount()).isZero();
-        channel = routine3.parallelCall().pass("1");
-        channel.abort();
-        assertThat(channel.after(timeout).hasCompleted()).isTrue();
-        routine3.clear();
-        assertThat(TestDiscard.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
                 JRoutineCore.with(factoryOf(TestDiscard.class)).buildRoutine();

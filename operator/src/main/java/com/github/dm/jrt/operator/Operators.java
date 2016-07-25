@@ -1651,4 +1651,6 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> uniqueIdentity() {
         return UniqueIdentityInvocation.factoryOf();
     }
+
+    // TODO: 25/07/16 skipLast, limitLast, timeout, throttle
 }

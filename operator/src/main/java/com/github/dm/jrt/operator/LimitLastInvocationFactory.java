@@ -24,26 +24,28 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
+
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Factory of skip invocations.
+ * Factory of invocations limiting data to last inputs.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 07/26/2016.
  *
  * @param <DATA> the data type.
  */
-class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
     private final int mCount;
 
     /**
      * Constructor.
      *
-     * @param count the number of data to skip.
+     * @param count the number of data to pass.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
-    SkipInvocationFactory(final int count) {
+    LimitLastInvocationFactory(final int count) {
         super(asArgs(ConstantConditions.notNegative("count", count)));
         mCount = count;
     }
@@ -51,42 +53,46 @@ class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     @NotNull
     @Override
     public Invocation<DATA, DATA> newInvocation() {
-        return new SkipInvocation<DATA>(mCount);
+        return new LimitInvocation<DATA>(mCount);
     }
 
     /**
-     * Routine invocation skipping input data.
+     * Routine invocation passing only the last {@code count} input data.
      *
      * @param <DATA> the data type.
      */
-    private static class SkipInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+    private static class LimitInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
         private final int mCount;
 
-        private int mCurrent;
+        private LinkedList<DATA> mData = new LinkedList<DATA>();
 
         /**
          * Constructor.
          *
-         * @param count the number of data to skip.
+         * @param count the number of data to pass.
          */
-        private SkipInvocation(final int count) {
+        private LimitInvocation(final int count) {
             mCount = count;
         }
 
         @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            if (mCurrent < mCount) {
-                ++mCurrent;
+        public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+            result.pass(mData);
+        }
 
-            } else {
-                result.pass(input);
+        @Override
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+            final LinkedList<DATA> data = mData;
+            data.add(input);
+            if (data.size() > mCount) {
+                data.removeFirst();
             }
         }
 
         @Override
-        public void onRestart() {
-            mCurrent = 0;
+        public void onRecycle(final boolean isReused) throws Exception {
+            mData.clear();
         }
     }
 }

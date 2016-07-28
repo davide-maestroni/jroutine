@@ -706,6 +706,65 @@ public class Processors {
         };
     }
 
+    // TODO: 25/07/16 throttle
+
+    /**
+     * Returns a function making the stream abort with a
+     * {@link com.github.dm.jrt.stream.processor.ResultTimeoutException ResultTimeoutException} if
+     * a new result is not produced before the specified timeout elapses.
+     * <br>
+     * Note that the execution will not be aborted if no output is produced.
+     *
+     * @param timeout the timeout.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
+            @NotNull final UnitDuration timeout) {
+        return timeoutAfter(timeout.value, timeout.unit);
+    }
+
+    /**
+     * Returns a function making the stream abort with a
+     * {@link com.github.dm.jrt.stream.processor.ResultTimeoutException ResultTimeoutException} if
+     * a new result is not produced before the specified timeout elapses.
+     * <br>
+     * Note that the execution will not be aborted if no output is produced.
+     *
+     * @param timeout  the timeout value.
+     * @param timeUnit the timeout unit.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
+            final long timeout, @NotNull final TimeUnit timeUnit) {
+        ConstantConditions.notNull("time unit", timeUnit);
+        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
+                return builder.liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            OUT>> function) {
+                                return decorate(function).andThen(new BindTimeout<OUT>(
+                                        streamConfiguration.asChannelConfiguration(), timeout,
+                                        timeUnit));
+                            }
+                        });
+            }
+        };
+    }
+
     /**
      * Returns a function concatenating to the stream a consumer handling invocation exceptions.
      * <br>

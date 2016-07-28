@@ -49,11 +49,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
 import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
 import static com.github.dm.jrt.stream.processor.Processors.outputGet;
+import static com.github.dm.jrt.stream.processor.Processors.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -786,6 +788,19 @@ public class ProcessorsTest {
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    @Test
+    public void testTimeout() {
+        assertThat(JRoutineStream.withStream()
+                                 .let(timeoutAfter(seconds(1)))
+                                 .asyncCall("test")
+                                 .after(seconds(1))
+                                 .all()).containsExactly("test");
+        final Channel<Object, Object> channel =
+                JRoutineStream.withStream().let(timeoutAfter(millis(1))).asyncCall().pass("test");
+        assertThat(channel.after(seconds(1)).getError()).isExactlyInstanceOf(
+                ResultTimeoutException.class);
     }
 
     @Test

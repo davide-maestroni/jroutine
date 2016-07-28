@@ -924,6 +924,43 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testLimitLast() {
+        assertThat(JRoutineCore.with(Operators.limitLast(5))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).containsExactly(6, 7, 8, 9, 10);
+        assertThat(JRoutineCore.with(Operators.limitLast(0))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(Operators.limitLast(15))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    @Test
+    public void testLimitLastEquals() {
+        final InvocationFactory<Object, Object> factory = Operators.limitLast(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Operators.limitLast(3));
+        assertThat(factory).isEqualTo(Operators.limitLast(2));
+        assertThat(factory.hashCode()).isEqualTo(Operators.limitLast(2).hashCode());
+    }
+
+    @Test
+    public void testLimitLastError() {
+        try {
+            Operators.limitLast(-1);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testMax() {
         assertThat(JRoutineCore.with(Operators.<String>max())
@@ -1593,6 +1630,43 @@ public class OperatorsTest {
     public void testSkipError() {
         try {
             Operators.skip(-1);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
+    public void testSkipLast() {
+        assertThat(JRoutineCore.with(Operators.skipLast(5))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(JRoutineCore.with(Operators.skipLast(15))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).isEmpty();
+        assertThat(JRoutineCore.with(Operators.skipLast(0))
+                               .asyncCall(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                               .after(seconds(3))
+                               .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    @Test
+    public void testSkipLastEquals() {
+        final InvocationFactory<Object, Object> factory = Operators.skipLast(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Operators.skipLast(3));
+        assertThat(factory).isEqualTo(Operators.skipLast(2));
+        assertThat(factory.hashCode()).isEqualTo(Operators.skipLast(2).hashCode());
+    }
+
+    @Test
+    public void testSkipLastError() {
+        try {
+            Operators.skipLast(-1);
             fail();
 
         } catch (final IllegalArgumentException ignored) {

@@ -39,7 +39,7 @@ class RetryBackoff implements BiFunction<Integer, RoutineException, Long> {
      *
      * @param count   the retry count.
      * @param backoff the backoff policy
-     * @throws IllegalArgumentException if the specified count number is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     RetryBackoff(final int count, @NotNull final Backoff backoff) {
         mCount = ConstantConditions.positive("max retries", count);

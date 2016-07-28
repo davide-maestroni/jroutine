@@ -48,7 +48,7 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
      * @param count          the channel count.
      * @param routine        the routine instance.
      * @param invocationMode the invocation mode.
-     * @throws IllegalArgumentException if the channel count is not positive.
+     * @throws java.lang.IllegalArgumentException if the channel count is not positive.
      */
     BindParallelCount(@NotNull final ChannelConfiguration configuration, final int count,
             @NotNull final Routine<? super IN, ? extends OUT> routine,

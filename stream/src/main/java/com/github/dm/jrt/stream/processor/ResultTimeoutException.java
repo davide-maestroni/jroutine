@@ -14,34 +14,25 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.error;
+package com.github.dm.jrt.stream.processor;
 
-import org.junit.Test;
+import com.github.dm.jrt.core.error.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception unit tests.
+ * Exception indicating that a timeout elapsed while waiting for new results.
  * <p>
- * Created by davide-maestroni on 01/30/2016.
+ * Created by davide-maestroni on 07/28/2016.
  */
-public class ExceptionTest {
+public class ResultTimeoutException extends TimeoutException {
 
-    @Test
-    public void testDeadlockException() {
-
-        assertThat(new DeadlockException("")).hasNoCause();
-    }
-
-    @Test
-    public void testRoutineException() {
-
-        assertThat(new RoutineException()).hasNoCause();
-    }
-
-    @Test
-    public void testTimeoutException() {
-
-        assertThat(new TimeoutException("")).hasNoCause();
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public ResultTimeoutException(@Nullable final String message) {
+        super(message);
     }
 }

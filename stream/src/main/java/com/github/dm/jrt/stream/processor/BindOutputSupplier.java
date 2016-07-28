@@ -51,7 +51,7 @@ class BindOutputSupplier<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>
      * @param invocationMode the invocation mode.
      * @param count          the loop count.
      * @param outputSupplier the supplier instance.
-     * @throws IllegalArgumentException if the specified count number is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     BindOutputSupplier(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, final long count,

@@ -686,6 +686,29 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations passing at max the specified number of input data and
+     * discarding the previous ones.
+     * <p>
+     * Given a numeric sequence of inputs from 0 to 9, and a limit count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [5, 6, 7, 8, 9]
+     *     </code>
+     * </pre>
+     *
+     * @param count  the maximum number of data to pass.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> limitLast(final int count) {
+        return new LimitLastInvocationFactory<DATA>(count);
+    }
+
+    /**
      * Returns a factory of invocations returning the greater of the inputs as per natural ordering.
      *
      * @param <DATA> the data type.
@@ -1293,6 +1316,28 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations skipping the specified number of last input data.
+     * <p>
+     * Given a numeric sequence of inputs from 0 to 9, and a skip count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [0, 1, 2, 3, 4]
+     *     </code>
+     * </pre>
+     *
+     * @param count  the number of data to skip.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> skipLast(final int count) {
+        return new SkipLastInvocationFactory<DATA>(count);
+    }
+
+    /**
      * Returns a factory of invocations sorting inputs in their natural order.
      *
      * @param <IN> the input data type.
@@ -1651,6 +1696,4 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> uniqueIdentity() {
         return UniqueIdentityInvocation.factoryOf();
     }
-
-    // TODO: 25/07/16 skipLast, limitLast, timeout, throttle
 }

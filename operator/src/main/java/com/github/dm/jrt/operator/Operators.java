@@ -465,6 +465,30 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations filtering out inputs which are not unique (according to the
+     * {@code equals(Object)} method).
+     *
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> distinct() {
+        return DistinctInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations filtering out inputs which are not unique (according to
+     * identity comparison).
+     *
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> distinctIdentity() {
+        return DistinctIdentityInvocation.factoryOf();
+    }
+
+    /**
      * Returns a factory of invocations filtering data based on the values returned by the specified
      * predicate.
      *
@@ -1671,29 +1695,5 @@ public class Operators {
     @SuppressWarnings("unchecked")
     public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
         return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique (according to the
-     * {@code equals(Object)} method).
-     *
-     * @param <DATA> the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> unique() {
-        return UniqueInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique (according to
-     * identity comparison).
-     *
-     * @param <DATA> the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> uniqueIdentity() {
-        return UniqueIdentityInvocation.factoryOf();
     }
 }

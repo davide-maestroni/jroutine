@@ -23,18 +23,17 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.IdentityHashMap;
+import java.util.HashSet;
 
 /**
- * Invocation filtering out inputs which are not unique (according to identity comparison).
+ * Invocation filtering out inputs which are not unique (according to the {@code equals(Object)}
+ * method).
  * <p>
- * Created by davide-maestroni on 07/09/2016.
+ * Created by davide-maestroni on 05/01/2016.
  *
  * @param <DATA> the data type.
  */
-class UniqueIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-    private static final Object PLACEHOLDER = new Object();
+class DistinctInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     private static final InvocationFactory<?, ?> sFactory =
             new InvocationFactory<Object, Object>(null) {
@@ -42,17 +41,17 @@ class UniqueIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
                 @NotNull
                 @Override
                 public Invocation<Object, Object> newInvocation() {
-                    return new UniqueIdentityInvocation<Object>();
+                    return new DistinctInvocation<Object>();
                 }
             };
 
-    private IdentityHashMap<DATA, Object> mMap;
+    private HashSet<DATA> mSet;
 
     /**
      * Constructor.
      */
-    private UniqueIdentityInvocation() {
-        mMap = null;
+    private DistinctInvocation() {
+        mSet = null;
     }
 
     /**
@@ -69,18 +68,18 @@ class UniqueIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
     @Override
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        if (mMap.put(input, PLACEHOLDER) == null) {
+        if (mSet.add(input)) {
             result.pass(input);
         }
     }
 
     @Override
     public void onRecycle(final boolean isReused) {
-        mMap = null;
+        mSet = null;
     }
 
     @Override
     public void onRestart() {
-        mMap = new IdentityHashMap<DATA, Object>();
+        mSet = new HashSet<DATA>();
     }
 }

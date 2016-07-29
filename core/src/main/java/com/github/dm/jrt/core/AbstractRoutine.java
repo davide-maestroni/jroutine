@@ -526,10 +526,10 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                             ++mRunningCount;
                         }
 
-                    } else if (mInvocationType == InvocationType.SYNC) {
+                    } else if (!mRunner.isManagedThread()) {
                         error = new InvocationDeadlockException(
-                                "cannot wait for invocation instances on a synchronous runner "
-                                        + "thread\nTry increasing the max number of instances");
+                                "cannot wait for invocation instances on a non-managed thread\nTry"
+                                        + " increasing the max allowed number");
 
                     } else {
                         observers.add(invocationObserver);

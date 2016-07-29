@@ -1939,19 +1939,19 @@ public class OperatorsTest {
     }
 
     @Test
-    public void testUnique() {
-        assertThat(JRoutineCore.with(Operators.unique())
+    public void testDistinct() {
+        assertThat(JRoutineCore.with(Operators.distinct())
                                .asyncCall("test", "test")
                                .after(seconds(3))
                                .all()).containsExactly("test");
-        assertThat(JRoutineCore.with(Operators.unique())
+        assertThat(JRoutineCore.with(Operators.distinct())
                                .asyncCall("test1", "test2")
                                .after(seconds(3))
                                .all()).containsExactly("test1", "test2");
     }
 
     @Test
-    public void testUniqueIdentity() {
+    public void testDistinctIdentity() {
         final Object o = new Object() {
 
             @Override
@@ -1960,7 +1960,7 @@ public class OperatorsTest {
                 return false;
             }
         };
-        List<Object> objects = JRoutineCore.with(Operators.uniqueIdentity())
+        List<Object> objects = JRoutineCore.with(Operators.distinctIdentity())
                                            .asyncCall(o, o)
                                            .after(seconds(3))
                                            .all();
@@ -1982,7 +1982,7 @@ public class OperatorsTest {
                 return true;
             }
         };
-        objects = JRoutineCore.with(Operators.uniqueIdentity())
+        objects = JRoutineCore.with(Operators.distinctIdentity())
                               .asyncCall(o1, o2)
                               .after(seconds(3))
                               .all();

@@ -713,26 +713,11 @@ public class Processors {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
             final int count) {
-        ConstantConditions.positive("max count", count);
+        final BindThrottle<IN, OUT> throttle = new BindThrottle<IN, OUT>(count);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            @SuppressWarnings("unchecked")
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return new BindThrottle<IN, OUT>(
-                                        streamConfiguration.asChannelConfiguration(), function,
-                                        count);
-                            }
-                        });
+                return builder.liftWithConfig(throttle);
             }
         };
     }
@@ -746,28 +731,12 @@ public class Processors {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
             final int count, final long range, @NotNull final TimeUnit timeUnit) {
-        ConstantConditions.notNull("time unit", timeUnit);
-        ConstantConditions.notNegative("range value", range);
-        ConstantConditions.positive("max count", count);
+        final BindTimeThrottle<IN, OUT> throttle =
+                new BindTimeThrottle<IN, OUT>(count, range, timeUnit);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            @SuppressWarnings("unchecked")
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return new BindTimeThrottle<IN, OUT>(
-                                        streamConfiguration.asChannelConfiguration(), function,
-                                        count, range, timeUnit);
-                            }
-                        });
+                return builder.liftWithConfig(throttle);
             }
         };
     }

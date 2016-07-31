@@ -150,7 +150,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void clearLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void clearLoaders(@NotNull final LoaderContext context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory) {
         sMainRunner.run(new ClearFactoryExecution(context, factory, loaderId), 0,
                 TimeUnit.MILLISECONDS);
@@ -164,7 +164,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param factory  the invocation factory.
      * @param inputs   the invocation inputs.
      */
-    static void clearLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void clearLoaders(@NotNull final LoaderContext context, final int loaderId,
             @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
         sMainRunner.run(new ClearFactoryInputsExecution(context, factory, loaderId, inputs), 0,
                 TimeUnit.MILLISECONDS);

@@ -24,7 +24,9 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
+import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.processor.ThrottleChannelConsumer.CompletionHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +39,9 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindThrottle<IN, OUT>
-        implements Function<Channel<?, IN>, Channel<?, OUT>>, CompletionHandler {
-
-    private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
-
-    private final ChannelConfiguration mConfiguration;
+class BindThrottle<IN, OUT> implements
+        BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
+                super Channel<?, IN>, ? extends Channel<?, OUT>>> {
 
     private final int mMaxCount;
 
@@ -50,80 +49,103 @@ class BindThrottle<IN, OUT>
 
     private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
 
-    private final Runner mRunner;
-
     private int mCount;
 
     /**
      * Constructor.
      *
-     * @param configuration   the channel configuration.
-     * @param bindingFunction the binding function.
-     * @param count           the maximum invocation count.
+     * @param count the maximum invocation count.
      */
-    BindThrottle(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                    bindingFunction,
-            final int count) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+    BindThrottle(final int count) {
         mMaxCount = ConstantConditions.positive("max count", count);
-        mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
-        final ChannelConfiguration configuration = mConfiguration;
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                            .channelConfiguration()
-                                                            .with(configuration)
-                                                            .configured()
-                                                            .buildChannel();
-        final boolean isBind;
-        synchronized (mMutex) {
-            isBind = (++mCount <= mMaxCount);
-            if (!isBind) {
-                if (!mRunner.isManagedThread()) {
-                    throw new InvocationDeadlockException(
-                            "cannot wait for invocation instances on a non-managed thread\nTry "
-                                    + "increasing the max allowed number");
+    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+            final StreamConfiguration streamConfiguration,
+            final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return new BindingFunction(streamConfiguration.asChannelConfiguration(), function);
+    }
+
+    /**
+     * Binding function implementation.
+     */
+    private class BindingFunction
+            implements Function<Channel<?, IN>, Channel<?, OUT>>, CompletionHandler {
+
+        private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final Runner mRunner;
+
+        /**
+         * Constructor.
+         *
+         * @param configuration   the channel configuration.
+         * @param bindingFunction the binding function.
+         */
+        private BindingFunction(@NotNull final ChannelConfiguration configuration,
+                @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                        bindingFunction) {
+            mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+            mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+            mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        }
+
+        public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
+            final ChannelConfiguration configuration = mConfiguration;
+            final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
+                                                                .channelConfiguration()
+                                                                .with(configuration)
+                                                                .configured()
+                                                                .buildChannel();
+            final boolean isBind;
+            synchronized (mMutex) {
+                isBind = (++mCount <= mMaxCount);
+                if (!isBind) {
+                    if (!mRunner.isManagedThread()) {
+                        throw new InvocationDeadlockException(
+                                "cannot wait for invocation instances on a non-managed thread\nTry "
+                                        + "increasing the max allowed number");
+                    }
+
+                    mQueue.add(new Runnable() {
+
+                        public void run() {
+                            try {
+                                mBindingFunction.apply(channel)
+                                                .bind(new ThrottleChannelConsumer<OUT>(
+                                                        BindingFunction.this, outputChannel));
+                            } catch (final Exception e) {
+                                outputChannel.abort(e);
+                                onComplete();
+                            }
+                        }
+                    });
+                }
+            }
+
+            if (isBind) {
+                mBindingFunction.apply(channel)
+                                .bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
+            }
+
+            return outputChannel;
+        }
+
+        public void onComplete() {
+            final Runnable runnable;
+            synchronized (mMutex) {
+                --mCount;
+                final SimpleQueue<Runnable> queue = mQueue;
+                if (queue.isEmpty()) {
+                    return;
                 }
 
-                mQueue.add(new Runnable() {
-
-                    public void run() {
-                        try {
-                            mBindingFunction.apply(channel)
-                                            .bind(new ThrottleChannelConsumer<OUT>(
-                                                    BindThrottle.this, outputChannel));
-                        } catch (final Exception e) {
-                            outputChannel.abort(e);
-                            onComplete();
-                        }
-                    }
-                });
-            }
-        }
-
-        if (isBind) {
-            mBindingFunction.apply(channel)
-                            .bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
-        }
-
-        return outputChannel;
-    }
-
-    public void onComplete() {
-        final Runnable runnable;
-        synchronized (mMutex) {
-            --mCount;
-            final SimpleQueue<Runnable> queue = mQueue;
-            if (queue.isEmpty()) {
-                return;
+                runnable = queue.removeFirst();
             }
 
-            runnable = queue.removeFirst();
+            runnable.run();
         }
-
-        runnable.run();
     }
 }

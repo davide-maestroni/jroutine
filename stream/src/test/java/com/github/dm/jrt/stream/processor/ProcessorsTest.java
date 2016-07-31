@@ -797,8 +797,8 @@ public class ProcessorsTest {
                 JRoutineStream.withStream().let(throttle(1)).buildRoutine();
         final Channel<Object, Object> channel1 = routine.asyncCall("test1");
         final Channel<Object, Object> channel2 = routine.asyncCall("test2");
-        assertThat(channel1.after(seconds(1)).next()).isEqualTo("test1");
-        assertThat(channel2.after(seconds(1)).next()).isEqualTo("test2");
+        assertThat(channel1.after(seconds(1.5)).next()).isEqualTo("test1");
+        assertThat(channel2.after(seconds(1.5)).next()).isEqualTo("test2");
     }
 
     @Test
@@ -807,8 +807,8 @@ public class ProcessorsTest {
                 JRoutineStream.withStream().let(throttle(1, seconds(1))).buildRoutine();
         final Channel<Object, Object> channel1 = routine.asyncCall("test1");
         final Channel<Object, Object> channel2 = routine.asyncCall("test2");
-        assertThat(channel1.after(seconds(1)).next()).isEqualTo("test1");
-        assertThat(channel2.after(seconds(1)).next()).isEqualTo("test2");
+        assertThat(channel1.after(seconds(1.5)).next()).isEqualTo("test1");
+        assertThat(channel2.after(seconds(1.5)).next()).isEqualTo("test2");
     }
 
     @Test

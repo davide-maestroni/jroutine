@@ -55,6 +55,7 @@ import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
 import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
 import static com.github.dm.jrt.stream.processor.Processors.outputGet;
+import static com.github.dm.jrt.stream.processor.Processors.throttle;
 import static com.github.dm.jrt.stream.processor.Processors.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -788,6 +789,26 @@ public class ProcessorsTest {
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    @Test
+    public void testThrottle() {
+        final Routine<Object, Object> routine =
+                JRoutineStream.withStream().let(throttle(1)).buildRoutine();
+        final Channel<Object, Object> channel1 = routine.asyncCall("test1");
+        final Channel<Object, Object> channel2 = routine.asyncCall("test2");
+        assertThat(channel1.after(seconds(1)).next()).isEqualTo("test1");
+        assertThat(channel2.after(seconds(1)).next()).isEqualTo("test2");
+    }
+
+    @Test
+    public void testTimeThrottle() {
+        final Routine<Object, Object> routine =
+                JRoutineStream.withStream().let(throttle(1, seconds(1))).buildRoutine();
+        final Channel<Object, Object> channel1 = routine.asyncCall("test1");
+        final Channel<Object, Object> channel2 = routine.asyncCall("test2");
+        assertThat(channel1.after(seconds(1)).next()).isEqualTo("test1");
+        assertThat(channel2.after(seconds(1)).next()).isEqualTo("test2");
     }
 
     @Test

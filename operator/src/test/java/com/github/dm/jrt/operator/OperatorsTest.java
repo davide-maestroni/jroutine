@@ -723,6 +723,59 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testDistinct() {
+        assertThat(JRoutineCore.with(Operators.distinct())
+                               .asyncCall("test", "test")
+                               .after(seconds(3))
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.with(Operators.distinct())
+                               .asyncCall("test1", "test2")
+                               .after(seconds(3))
+                               .all()).containsExactly("test1", "test2");
+    }
+
+    @Test
+    public void testDistinctIdentity() {
+        final Object o = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return false;
+            }
+        };
+        List<Object> objects = JRoutineCore.with(Operators.distinctIdentity())
+                                           .asyncCall(o, o)
+                                           .after(seconds(3))
+                                           .all();
+        assertThat(objects).hasSize(1);
+        assertThat(objects.get(0)).isSameAs(o);
+        final Object o1 = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return true;
+            }
+        };
+        final Object o2 = new Object() {
+
+            @Override
+            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+            public boolean equals(final Object obj) {
+                return true;
+            }
+        };
+        objects = JRoutineCore.with(Operators.distinctIdentity())
+                              .asyncCall(o1, o2)
+                              .after(seconds(3))
+                              .all();
+        assertThat(objects).hasSize(2);
+        assertThat(objects.get(0)).isSameAs(o1);
+        assertThat(objects.get(1)).isSameAs(o2);
+    }
+
+    @Test
     public void testEqualTo() {
         assertThat(JRoutineCore.with(Operators.isEqualTo("test"))
                                .asyncCall("test", "test1", "test")
@@ -1936,58 +1989,5 @@ public class OperatorsTest {
                                .close()
                                .after(seconds(3))
                                .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    }
-
-    @Test
-    public void testDistinct() {
-        assertThat(JRoutineCore.with(Operators.distinct())
-                               .asyncCall("test", "test")
-                               .after(seconds(3))
-                               .all()).containsExactly("test");
-        assertThat(JRoutineCore.with(Operators.distinct())
-                               .asyncCall("test1", "test2")
-                               .after(seconds(3))
-                               .all()).containsExactly("test1", "test2");
-    }
-
-    @Test
-    public void testDistinctIdentity() {
-        final Object o = new Object() {
-
-            @Override
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-            public boolean equals(final Object obj) {
-                return false;
-            }
-        };
-        List<Object> objects = JRoutineCore.with(Operators.distinctIdentity())
-                                           .asyncCall(o, o)
-                                           .after(seconds(3))
-                                           .all();
-        assertThat(objects).hasSize(1);
-        assertThat(objects.get(0)).isSameAs(o);
-        final Object o1 = new Object() {
-
-            @Override
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-            public boolean equals(final Object obj) {
-                return true;
-            }
-        };
-        final Object o2 = new Object() {
-
-            @Override
-            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-            public boolean equals(final Object obj) {
-                return true;
-            }
-        };
-        objects = JRoutineCore.with(Operators.distinctIdentity())
-                              .asyncCall(o1, o2)
-                              .after(seconds(3))
-                              .all();
-        assertThat(objects).hasSize(2);
-        assertThat(objects.get(0)).isSameAs(o1);
-        assertThat(objects.get(1)).isSameAs(o2);
     }
 }

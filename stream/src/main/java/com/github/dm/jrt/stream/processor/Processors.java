@@ -117,6 +117,7 @@ public class Processors {
             @Nullable final Runner runner, final int limit, final long delay,
             @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
+        ConstantConditions.notNegative("delay value", delay);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -179,6 +180,7 @@ public class Processors {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
             final long delay, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
+        ConstantConditions.notNegative("delay value", delay);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -233,6 +235,7 @@ public class Processors {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
             final long delay, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
+        ConstantConditions.notNegative("delay value", delay);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -368,8 +371,8 @@ public class Processors {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputAccept(
             final long count, @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        ConstantConditions.positive("count number", count);
         ConstantConditions.notNull("consumer instance", outputsConsumer);
+        ConstantConditions.positive("count number", count);
         return new Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>>() {
 
             @SuppressWarnings("unchecked")
@@ -428,8 +431,8 @@ public class Processors {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputGet(
             final long count, @NotNull final Supplier<? extends OUT> outputSupplier) {
-        ConstantConditions.positive("count number", count);
         ConstantConditions.notNull("supplier instance", outputSupplier);
+        ConstantConditions.positive("count number", count);
         return new Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>>() {
 
             @SuppressWarnings("unchecked")
@@ -707,6 +710,67 @@ public class Processors {
     }
 
     // TODO: 25/07/16 throttle
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
+            final int count) {
+        ConstantConditions.positive("max count", count);
+        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
+                return builder.liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            @SuppressWarnings("unchecked")
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            OUT>> function) {
+                                return new BindThrottle<IN, OUT>(
+                                        streamConfiguration.asChannelConfiguration(), function,
+                                        count);
+                            }
+                        });
+            }
+        };
+    }
+
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
+            final int count, @NotNull final UnitDuration range) {
+        return throttle(count, range.value, range.unit);
+    }
+
+    @NotNull
+    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
+            final int count, final long range, @NotNull final TimeUnit timeUnit) {
+        ConstantConditions.notNull("time unit", timeUnit);
+        ConstantConditions.notNegative("range value", range);
+        ConstantConditions.positive("max count", count);
+        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+
+            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
+                return builder.liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>>() {
+
+                            @SuppressWarnings("unchecked")
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            OUT>> function) {
+                                return new BindTimeThrottle<IN, OUT>(
+                                        streamConfiguration.asChannelConfiguration(), function,
+                                        count, range, timeUnit);
+                            }
+                        });
+            }
+        };
+    }
 
     /**
      * Returns a function making the stream abort with a
@@ -743,6 +807,7 @@ public class Processors {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
             final long timeout, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
+        ConstantConditions.notNegative("timeout value", timeout);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {

@@ -35,6 +35,8 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
+import static com.github.dm.jrt.core.util.Backoffs.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -174,8 +176,9 @@ public class InvocationConfigurationTest {
 
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
                                                                        .withOrder(OrderType.BY_CALL)
-                                                                       .withLimit(10)
-                                                                       .withBackoff(millis(33))
+                                                                       .withBackoff(afterCount(
+                                                                               1).constantDelay(
+                                                                               millis(33)))
                                                                        .withMaxSize(100)
                                                                        .withRunner(
                                                                                Runners.syncRunner())
@@ -196,8 +199,7 @@ public class InvocationConfigurationTest {
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
-                       .withInputLimit(10)
-                       .withInputBackoff(millis(33))
+                       .withInputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withInputMaxSize(100)
                        .configured();
         assertThat(builderFromInput(configuration).configured()).isEqualTo(invocationConfiguration);
@@ -208,8 +210,9 @@ public class InvocationConfigurationTest {
 
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
                                                                        .withOrder(OrderType.BY_CALL)
-                                                                       .withLimit(10)
-                                                                       .withBackoff(millis(33))
+                                                                       .withBackoff(afterCount(
+                                                                               1).constantDelay(
+                                                                               millis(33)))
                                                                        .withMaxSize(100)
                                                                        .withRunner(
                                                                                Runners.syncRunner())
@@ -230,12 +233,31 @@ public class InvocationConfigurationTest {
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)
-                       .withOutputLimit(10)
-                       .withOutputBackoff(millis(33))
+                       .withOutputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withOutputMaxSize(100)
                        .configured();
         assertThat(builderFromOutput(configuration).configured()).isEqualTo(
                 invocationConfiguration);
+    }
+
+    @Test
+    public void testInputBackoffEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .configured();
+        assertThat(configuration).isNotEqualTo(builder().withInputBackoff(noDelay()).configured());
+        assertThat(configuration).isNotEqualTo(
+                builder().withInputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
+        assertThat(configuration.builderFrom()
+                                .withInputBackoff(
+                                        afterCount(1).constantDelay(UnitDuration.millis(1)))
+                                .configured()).isNotEqualTo(
+                builder().withInputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
     }
 
     @Test
@@ -250,14 +272,14 @@ public class InvocationConfigurationTest {
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
-                       .withInputLimit(10)
-                       .withInputBackoff(millis(33))
+                       .withInputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withInputMaxSize(100)
                        .configured();
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
                                                                        .withOrder(OrderType.BY_CALL)
-                                                                       .withLimit(10)
-                                                                       .withBackoff(millis(33))
+                                                                       .withBackoff(afterCount(
+                                                                               1).constantDelay(
+                                                                               millis(33)))
                                                                        .withMaxSize(100)
                                                                        .withRunner(
                                                                                Runners.syncRunner())
@@ -271,76 +293,6 @@ public class InvocationConfigurationTest {
                                                                        .configured();
         assertThat(invocationConfiguration.inputConfigurationBuilder().configured()).isEqualTo(
                 configuration);
-    }
-
-    @Test
-    public void testInputLimitEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .configured();
-        assertThat(configuration).isNotEqualTo(builder().withInputLimit(10).configured());
-        assertThat(configuration.builderFrom().withInputLimit(31).configured()).isNotEqualTo(
-                builder().withInputLimit(31).configured());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testInputLimitError() {
-
-        try {
-
-            builder().withInputLimit(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testInputMaxDelayEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .configured();
-        assertThat(configuration).isNotEqualTo(builder().withInputBackoff(zero()).configured());
-        assertThat(configuration).isNotEqualTo(
-                builder().withInputBackoff(1, TimeUnit.MILLISECONDS).configured());
-        assertThat(configuration.builderFrom()
-                                .withInputBackoff(UnitDuration.millis(1))
-                                .configured()).isNotEqualTo(
-                builder().withInputBackoff(1, TimeUnit.MILLISECONDS).configured());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testInputMaxDelayError() {
-
-        try {
-
-            builder().withInputBackoff(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withInputBackoff(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -443,6 +395,26 @@ public class InvocationConfigurationTest {
     }
 
     @Test
+    public void testOutputBackoffEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .configured();
+        assertThat(configuration).isNotEqualTo(builder().withOutputBackoff(noDelay()).configured());
+        assertThat(configuration).isNotEqualTo(
+                builder().withOutputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
+        assertThat(configuration.builderFrom()
+                                .withOutputBackoff(
+                                        afterCount(1).constantDelay(UnitDuration.millis(1)))
+                                .configured()).isNotEqualTo(
+                builder().withOutputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
+                         .configured());
+    }
+
+    @Test
     public void testOutputChannelConfiguration() {
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
@@ -454,14 +426,14 @@ public class InvocationConfigurationTest {
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)
-                       .withOutputLimit(10)
-                       .withOutputBackoff(millis(33))
+                       .withOutputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withOutputMaxSize(100)
                        .configured();
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
                                                                        .withOrder(OrderType.BY_CALL)
-                                                                       .withLimit(10)
-                                                                       .withBackoff(millis(33))
+                                                                       .withBackoff(afterCount(
+                                                                               1).constantDelay(
+                                                                               millis(33)))
                                                                        .withMaxSize(100)
                                                                        .withRunner(
                                                                                Runners.syncRunner())
@@ -475,76 +447,6 @@ public class InvocationConfigurationTest {
                                                                        .configured();
         assertThat(invocationConfiguration.outputConfigurationBuilder().configured()).isEqualTo(
                 configuration);
-    }
-
-    @Test
-    public void testOutputLimitEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .configured();
-        assertThat(configuration).isNotEqualTo(builder().withOutputLimit(10).configured());
-        assertThat(configuration.builderFrom().withOutputLimit(31).configured()).isNotEqualTo(
-                builder().withOutputLimit(31).configured());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testOutputLimitError() {
-
-        try {
-
-            builder().withOutputLimit(-1);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testOutputMaxDelayEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .configured();
-        assertThat(configuration).isNotEqualTo(builder().withOutputBackoff(zero()).configured());
-        assertThat(configuration).isNotEqualTo(
-                builder().withOutputBackoff(1, TimeUnit.MILLISECONDS).configured());
-        assertThat(configuration.builderFrom()
-                                .withOutputBackoff(UnitDuration.millis(1))
-                                .configured()).isNotEqualTo(
-                builder().withOutputBackoff(1, TimeUnit.MILLISECONDS).configured());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testOutputMaxDelayError() {
-
-        try {
-
-            builder().withOutputBackoff(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withOutputBackoff(-1, TimeUnit.MILLISECONDS);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test

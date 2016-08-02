@@ -21,15 +21,20 @@ import android.test.AndroidTestCase;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
+import com.github.dm.jrt.android.object.annotation.ServiceLog;
+import com.github.dm.jrt.android.object.annotation.ServiceRunner;
+import com.github.dm.jrt.core.log.NullLog;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.UnitDuration;
 
-import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
 import static com.github.dm.jrt.android.object.builder.AndroidBuilders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,14 +48,22 @@ public class AndroidBuildersTest extends AndroidTestCase {
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
         assertThat(withAnnotations(LoaderConfiguration.defaultConfiguration(),
-                AnnotationItf.class.getMethod("toString"))).isEqualTo(
-                builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                         .withClashResolution(ClashResolutionType.ABORT_BOTH)
-                         .withFactoryId(13)
-                         .withMatchResolution(ClashResolutionType.ABORT_THIS)
-                         .withLoaderId(-77)
-                         .withResultStaleTime(UnitDuration.millis(333))
-                         .configured());
+                AnnotationItf.class.getMethod("toString"))).isEqualTo( //
+                LoaderConfiguration.builder()
+                                   .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
+                                   .withClashResolution(ClashResolutionType.ABORT_BOTH)
+                                   .withFactoryId(13)
+                                   .withMatchResolution(ClashResolutionType.ABORT_THIS)
+                                   .withLoaderId(-77)
+                                   .withResultStaleTime(UnitDuration.millis(333))
+                                   .configured());
+        assertThat(withAnnotations(
+                ServiceConfiguration.builder().withRunnerArgs(1).withLogArgs(1).configured(),
+                AnnotationItf.class.getMethod("toString"))).isEqualTo( //
+                ServiceConfiguration.builder()
+                                    .withLogClass(NullLog.class)
+                                    .withRunnerClass(MyRunner.class)
+                                    .configured());
     }
 
     public void testConstructor() {
@@ -75,6 +88,15 @@ public class AndroidBuildersTest extends AndroidTestCase {
         @MatchResolution(ClashResolutionType.ABORT_THIS)
         @LoaderId(-77)
         @ResultStaleTime(333)
+        @ServiceLog(NullLog.class)
+        @ServiceRunner(MyRunner.class)
         String toString();
+    }
+
+    public static class MyRunner extends RunnerDecorator {
+
+        public MyRunner() {
+            super(Runners.sharedRunner());
+        }
     }
 }

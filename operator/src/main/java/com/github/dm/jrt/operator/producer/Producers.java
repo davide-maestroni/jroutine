@@ -119,7 +119,7 @@ public class Producers {
      * @param nextFunction the function computing the next element.
      * @param <AFTER>      the concatenation output type.
      * @return the consumer instance.
-     * @throws IllegalArgumentException if the count is not positive.
+     * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
     public static <AFTER> Consumer<Channel<AFTER, ?>> sequence(@NotNull final AFTER start,

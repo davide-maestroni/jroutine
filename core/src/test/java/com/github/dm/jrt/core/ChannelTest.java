@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Backoffs.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -469,8 +470,7 @@ public class ChannelTest {
                                                             .withOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.sharedRunner())
                                                             .withMaxSize(1)
-                                                            .withBackoff(1, TimeUnit.MILLISECONDS)
-                                                            .withBackoff(seconds(1))
+                                                            .withBackoff(noDelay())
                                                             .withLogLevel(Level.DEBUG)
                                                             .withLog(new NullLog())
                                                             .configured()

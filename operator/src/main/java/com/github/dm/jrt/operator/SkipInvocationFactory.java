@@ -41,7 +41,7 @@ class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      * Constructor.
      *
      * @param count the number of data to skip.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     SkipInvocationFactory(final int count) {
         super(asArgs(ConstantConditions.notNegative("count", count)));

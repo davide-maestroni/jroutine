@@ -60,6 +60,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeElement mLoaderProxyElement;
 
+    private TypeMirror mLogClassAnnotationType;
+
     private String mMethodHeader;
 
     private String mMethodHeaderV1;
@@ -67,6 +69,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     private String mMethodInvocationFooter;
 
     private String mMethodInvocationHeader;
+
+    private TypeMirror mRunnerClassAnnotationType;
 
     private TypeElement mServiceProxyElement;
 
@@ -86,6 +90,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         super.init(processingEnv);
         mIdAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
+        mLogClassAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
         mFactoryIdAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
         mClashAnnotationType =
@@ -96,6 +102,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
         mStaleTimeAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
+        mRunnerClassAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
         final Types typeUtils = processingEnv.getTypeUtils();
         mServiceProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
@@ -174,15 +182,16 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
             }
 
-            return mMethodHeaderV1.replace("${invocationBuilderOptions}",
-                    buildInvocationOptions(methodElement));
+            return mMethodHeaderV1.replace("${loaderBuilderOptions}",
+                    buildLoaderOptions(methodElement));
         }
 
         if (mMethodHeader == null) {
             mMethodHeader = parseTemplate("/android/templates/method_header.txt");
         }
 
-        return mMethodHeader;
+        return mMethodHeader.replace("${serviceBuilderOptions}",
+                buildServiceOptions(methodElement));
     }
 
     @NotNull
@@ -212,7 +221,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @NotNull
-    private String buildInvocationOptions(@NotNull final ExecutableElement methodElement) {
+    private String buildLoaderOptions(@NotNull final ExecutableElement methodElement) {
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
         final Integer loaderId =
@@ -265,6 +274,24 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                    .append(".")
                    .append((staleTimeUnit != null) ? staleTimeUnit : TimeUnit.MILLISECONDS)
                    .append(")");
+        }
+
+        return builder.toString();
+    }
+
+    @NotNull
+    private String buildServiceOptions(@NotNull final ExecutableElement methodElement) {
+        // We need to avoid explicit dependency on the android module...
+        final StringBuilder builder = new StringBuilder();
+        final Object logClass = getAnnotationValue(methodElement, mLogClassAnnotationType, "value");
+        if (logClass != null) {
+            builder.append(".withLogClass(").append(logClass).append(")");
+        }
+
+        final Object runnerClass =
+                getAnnotationValue(methodElement, mRunnerClassAnnotationType, "value");
+        if (runnerClass != null) {
+            builder.append(".withRunnerClass(").append(runnerClass).append(")");
         }
 
         return builder.toString();

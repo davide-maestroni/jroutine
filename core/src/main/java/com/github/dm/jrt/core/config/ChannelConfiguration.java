@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.Backoffs.constantDelay;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
@@ -47,11 +46,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as they
  * are passed to the channels, at the cost of a slightly increase in memory usage and computation.
  * </li>
- * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
- * order to avoid excessive memory consumption. In case the maximum number is exceeded when passing
- * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
  * <li>The backoff policy to be applied to the calling thread when the buffered data exceed the
- * channel core limit.</li>
+ * specified limit.</li>
  * <li>The maximum number of input data buffered in the channel.When the number of data exceeds it,
  * a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.</li>
  * <li>The maximum timeout while waiting for a new output to be available before performing the
@@ -77,8 +73,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private final Backoff mChannelBackoff;
 
-    private final int mChannelLimit;
-
     private final int mChannelMaxSize;
 
     private final OrderType mChannelOrderType;
@@ -101,8 +95,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         output is available.
      * @param channelOrderType the order in which data are collected from the output channel.
-     * @param channelLimit     the maximum number of buffered data before applying a delay to the
-     *                         feeding thread. Must not be negative.
      * @param channelBackoff   the backoff policy to apply while waiting for an object to be passed
      *                         to the channel.
      * @param channelMaxSize   the maximum number of buffered data. Must be positive.
@@ -112,16 +104,14 @@ public final class ChannelConfiguration extends DeepEqualObject {
     private ChannelConfiguration(@Nullable final Runner runner,
             @Nullable final UnitDuration outputTimeout,
             @Nullable final TimeoutActionType actionType,
-            @Nullable final OrderType channelOrderType, final int channelLimit,
-            @Nullable final Backoff channelBackoff, final int channelMaxSize,
-            @Nullable final Log log, @Nullable final Level logLevel) {
-        super(asArgs(runner, outputTimeout, actionType, channelOrderType, channelLimit,
-                channelBackoff, channelMaxSize, log, logLevel));
+            @Nullable final OrderType channelOrderType, @Nullable final Backoff channelBackoff,
+            final int channelMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
+        super(asArgs(runner, outputTimeout, actionType, channelOrderType, channelBackoff,
+                channelMaxSize, log, logLevel));
         mRunner = runner;
         mOutputTimeout = outputTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
-        mChannelLimit = channelLimit;
         mChannelBackoff = channelBackoff;
         mChannelMaxSize = channelMaxSize;
         mLog = log;
@@ -181,18 +171,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public Backoff getBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
         final Backoff channelBackoff = mChannelBackoff;
         return (channelBackoff != null) ? channelBackoff : valueIfNotSet;
-    }
-
-    /**
-     * Returns the limit of buffered data (DEFAULT by default) before starting to apply a delay to
-     * the feeding thread.
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the limit.
-     */
-    public int getLimitOrElse(final int valueIfNotSet) {
-        final int limit = mChannelLimit;
-        return (limit != DEFAULT) ? limit : valueIfNotSet;
     }
 
     /**
@@ -361,8 +339,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         private Backoff mChannelBackoff;
 
-        private int mChannelLimit;
-
         private int mChannelMaxSize;
 
         private OrderType mChannelOrderType;
@@ -384,7 +360,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-            mChannelLimit = DEFAULT;
             mChannelMaxSize = DEFAULT;
         }
 
@@ -445,11 +420,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
                 withOrder(orderType);
             }
 
-            final int limit = configuration.mChannelLimit;
-            if (limit != DEFAULT) {
-                withLimit(limit);
-            }
-
             final Backoff channelBackoff = configuration.mChannelBackoff;
             if (channelBackoff != null) {
                 withBackoff(channelBackoff);
@@ -474,23 +444,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the constant delay to apply while waiting for the channel to have room for
-         * additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the channel limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay    the delay.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withBackoff(final long delay, @NotNull final TimeUnit timeUnit) {
-            return withBackoff(constantDelay(delay, timeUnit));
-        }
-
-        /**
          * Sets the backoff policy to apply while waiting for the channel to have room for
          * additional data.
          * <p>
@@ -507,45 +460,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withBackoff(@Nullable final Backoff backoff) {
             mChannelBackoff = backoff;
-            return this;
-        }
-
-        /**
-         * Sets the constant delay to apply while waiting for the channel to have room for
-         * additional data.
-         * <p>
-         * This configuration option should be used on conjunction with the channel limit, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param delay the delay.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withBackoff(@Nullable final UnitDuration delay) {
-            return withBackoff((delay != null) ? constantDelay(delay) : null);
-        }
-
-        /**
-         * Sets the limit of data that the channel can retain before starting to slow down the
-         * feeding thread. A {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is
-         * up to the specific implementation to choose a default one.
-         * <p>
-         * This configuration option is useful when the data coming from the invocation execution
-         * are meant to be explicitly read through this channel. The execution will slow down until
-         * enough data are consumed. Note, however, that binding the channel to a channel consumer
-         * will make the option ineffective.
-         *
-         * @param limit the limit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the limit is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withLimit(final int limit) {
-            if (limit != DEFAULT) {
-                ConstantConditions.notNegative("channel limit", limit);
-            }
-
-            mChannelLimit = limit;
             return this;
         }
 
@@ -676,8 +590,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         @NotNull
         private ChannelConfiguration buildConfiguration() {
             return new ChannelConfiguration(mRunner, mOutputTimeout, mTimeoutActionType,
-                    mChannelOrderType, mChannelLimit, mChannelBackoff, mChannelMaxSize, mLog,
-                    mLogLevel);
+                    mChannelOrderType, mChannelBackoff, mChannelMaxSize, mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
@@ -685,7 +598,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
             mOutputTimeout = configuration.mOutputTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
-            mChannelLimit = configuration.mChannelLimit;
             mChannelBackoff = configuration.mChannelBackoff;
             mChannelMaxSize = configuration.mChannelMaxSize;
             mLog = configuration.mLog;

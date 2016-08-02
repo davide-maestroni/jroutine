@@ -205,6 +205,25 @@ public class Reflection {
         return method;
     }
 
+    /**
+     * Creates a new instance of the specified class by invoking its default constructor.
+     *
+     * @param type   the target class.
+     * @param <TYPE> the target type.
+     * @return the new instance.
+     * @throws java.lang.IllegalArgumentException if no default constructor was found or an error
+     *                                            occurred during the instantiation.
+     */
+    @NotNull
+    public static <TYPE> TYPE newInstanceOf(@NotNull final Class<TYPE> type) {
+        try {
+            return findConstructor(type, NO_ARGS).newInstance(NO_ARGS);
+
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     @Nullable
     private static Constructor<?> findBestMatchingConstructor(
             @NotNull final Constructor<?>[] constructors, @NotNull final Object[] args) {

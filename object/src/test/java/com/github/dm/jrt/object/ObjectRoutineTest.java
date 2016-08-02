@@ -30,9 +30,13 @@ import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
+import com.github.dm.jrt.core.util.BackoffDecorator;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
@@ -42,19 +46,19 @@ import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
-import com.github.dm.jrt.object.annotation.InputLimit;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
+import com.github.dm.jrt.object.annotation.LogType;
 import com.github.dm.jrt.object.annotation.MaxInstances;
 import com.github.dm.jrt.object.annotation.OutputBackoff;
-import com.github.dm.jrt.object.annotation.OutputLimit;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
+import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -232,18 +236,18 @@ public class ObjectRoutineTest {
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(//
                 builder().withCoreInstances(3)
                          .withInputOrder(OrderType.BY_DELAY)
-                         .withInputLimit(71)
-                         .withInputBackoff(7777, TimeUnit.MICROSECONDS)
+                         .withInputBackoff(new InBackoff())
                          .withInputMaxSize(33)
+                         .withLog(new MyLog())
                          .withLogLevel(Level.WARNING)
                          .withMaxInstances(17)
                          .withOutputOrder(OrderType.BY_CALL)
-                         .withOutputLimit(31)
-                         .withOutputBackoff(3333, TimeUnit.NANOSECONDS)
+                         .withOutputBackoff(new OutBackoff())
                          .withOutputMaxSize(77)
-                         .withPriority(41)
                          .withOutputTimeout(1111, TimeUnit.MICROSECONDS)
                          .withOutputTimeoutAction(TimeoutActionType.ABORT)
+                         .withPriority(41)
+                         .withRunner(new MyRunner())
                          .configured());
     }
 
@@ -1656,19 +1660,19 @@ public class ObjectRoutineTest {
     public interface AnnotationItf {
 
         @CoreInstances(3)
-        @InputBackoff(value = 7777, unit = TimeUnit.MICROSECONDS)
-        @InputLimit(71)
+        @InputBackoff(InBackoff.class)
         @InputMaxSize(33)
         @InputOrder(OrderType.BY_DELAY)
         @LogLevel(Level.WARNING)
+        @LogType(MyLog.class)
         @MaxInstances(17)
-        @OutputBackoff(value = 3333, unit = TimeUnit.NANOSECONDS)
-        @OutputLimit(31)
+        @OutputBackoff(OutBackoff.class)
         @OutputMaxSize(77)
         @OutputOrder(OrderType.BY_CALL)
-        @Priority(41)
         @OutputTimeout(value = 1111, unit = TimeUnit.MICROSECONDS)
         @OutputTimeoutAction(TimeoutActionType.ABORT)
+        @Priority(41)
+        @RunnerType(MyRunner.class)
         String toString();
     }
 
@@ -2287,6 +2291,57 @@ public class ObjectRoutineTest {
         }
     }
 
+    public static class InBackoff extends BackoffDecorator {
+
+        public InBackoff() {
+            super(Backoffs.afterCount(71).linearDelay(7777, TimeUnit.MICROSECONDS));
+        }
+    }
+
+    public static class MyLog extends DeepEqualObject implements Log {
+
+        public MyLog() {
+            super(null);
+        }
+
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+        }
+
+        public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+        }
+
+        public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+                @Nullable final Throwable throwable) {
+        }
+    }
+
+    public static class MyRunner extends RunnerDecorator {
+
+        public MyRunner() {
+            super(Runners.syncRunner());
+        }
+
+        @Override
+        public int hashCode() {
+            return MyRunner.class.hashCode();
+        }
+
+        @Override
+        @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+        public boolean equals(final Object obj) {
+            return (obj instanceof MyRunner);
+        }
+    }
+
+    public static class OutBackoff extends BackoffDecorator {
+
+        public OutBackoff() {
+            super(Backoffs.afterCount(31).linearDelay(3333, TimeUnit.NANOSECONDS));
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class Count {
 
@@ -2329,6 +2384,21 @@ public class ObjectRoutineTest {
 
         private int mWrnCount;
 
+        public int getDgbCount() {
+
+            return mDgbCount;
+        }
+
+        public int getErrCount() {
+
+            return mErrCount;
+        }
+
+        public int getWrnCount() {
+
+            return mWrnCount;
+        }
+
         public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
@@ -2347,20 +2417,6 @@ public class ObjectRoutineTest {
             ++mWrnCount;
         }
 
-        public int getDgbCount() {
-
-            return mDgbCount;
-        }
-
-        public int getErrCount() {
-
-            return mErrCount;
-        }
-
-        public int getWrnCount() {
-
-            return mWrnCount;
-        }
     }
 
     @SuppressWarnings("unused")

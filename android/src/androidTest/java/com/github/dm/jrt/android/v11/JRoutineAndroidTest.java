@@ -63,7 +63,7 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

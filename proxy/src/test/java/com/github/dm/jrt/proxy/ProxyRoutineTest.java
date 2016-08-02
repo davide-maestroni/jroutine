@@ -30,8 +30,11 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
+import com.github.dm.jrt.core.util.BackoffDecorator;
+import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.JRoutineObject;
@@ -41,10 +44,14 @@ import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncMethod;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.Invoke;
+import com.github.dm.jrt.object.annotation.LogType;
+import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
+import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -110,6 +117,9 @@ public class ProxyRoutineTest {
         assertThat(proxy.getSize()
                         .pass(Arrays.asList("test1", "test2", "test3"))
                         .close()
+                        .after(seconds(3))
+                        .next()).isEqualTo(3);
+        assertThat(proxy.getSize(new String[]{"test1", "test2", "test3"})
                         .after(seconds(3))
                         .next()).isEqualTo(3);
     }
@@ -1001,6 +1011,13 @@ public class ProxyRoutineTest {
 
         @AsyncOut
         Channel<?, Integer> getSize(List<String> l);
+
+        @LogType(NullLog.class)
+        @InputBackoff(MyBackoff.class)
+        @OutputBackoff(MyBackoff.class)
+        @RunnerType(MyRunner.class)
+        @AsyncOut
+        Channel<?, Integer> getSize(String[] a);
     }
 
     @Proxy(TestClass2.class)
@@ -1158,6 +1175,20 @@ public class ProxyRoutineTest {
         }
     }
 
+    public static class MyBackoff extends BackoffDecorator {
+
+        public MyBackoff() {
+            super(Backoffs.afterCount(3).linearDelay(1, TimeUnit.SECONDS));
+        }
+    }
+
+    public static class MyRunner extends RunnerDecorator {
+
+        public MyRunner() {
+            super(Runners.syncRunner());
+        }
+    }
+
     @SuppressWarnings("unused")
     public static class Pass {
 
@@ -1178,6 +1209,11 @@ public class ProxyRoutineTest {
         public int getSize(final String s) {
 
             return s.length();
+        }
+
+        public int getSize(final String[] a) {
+
+            return a.length;
         }
     }
 

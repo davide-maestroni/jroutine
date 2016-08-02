@@ -17,12 +17,15 @@
 package com.github.dm.jrt.android.object.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
+import com.github.dm.jrt.android.object.annotation.ServiceLog;
+import com.github.dm.jrt.android.object.annotation.ServiceRunner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -115,6 +118,57 @@ public class AndroidBuilders {
     @NotNull
     public static LoaderConfiguration withAnnotations(
             @Nullable final LoaderConfiguration configuration, @NotNull final Method method) {
+        return withAnnotations(configuration, method.getDeclaredAnnotations());
+    }
+
+    /**
+     * Returns a service configuration properly modified by taking into account the annotations
+     * added to the specified method.
+     *
+     * @param configuration the initial configuration.
+     * @param annotations   the annotations.
+     * @return the modified configuration.
+     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
+     */
+    @NotNull
+    public static ServiceConfiguration withAnnotations(
+            @Nullable final ServiceConfiguration configuration,
+            @Nullable final Annotation... annotations) {
+        final ServiceConfiguration.Builder<ServiceConfiguration> builder =
+                ServiceConfiguration.builderFrom(configuration);
+        if (annotations == null) {
+            return builder.configured();
+        }
+
+        for (final Annotation annotation : annotations) {
+            final Class<? extends Annotation> annotationType = annotation.annotationType();
+            if (annotationType == ServiceLog.class) {
+                builder.withLogClass(((ServiceLog) annotation).value())
+                       .withLogArgs((Object[]) null);
+
+            } else if (annotationType == ServiceRunner.class) {
+                builder.withRunnerClass(((ServiceRunner) annotation).value())
+                       .withRunnerArgs((Object[]) null);
+            }
+        }
+
+        return builder.configured();
+    }
+
+    /**
+     * Returns a service configuration properly modified by taking into account the annotations
+     * added to the specified method.
+     *
+     * @param configuration the initial configuration.
+     * @param method        the target method.
+     * @return the modified configuration.
+     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
+     */
+    @NotNull
+    public static ServiceConfiguration withAnnotations(
+            @Nullable final ServiceConfiguration configuration, @NotNull final Method method) {
         return withAnnotations(configuration, method.getDeclaredAnnotations());
     }
 }

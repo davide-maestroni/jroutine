@@ -41,7 +41,7 @@ class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      * Constructor.
      *
      * @param count the number of data to pass.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     LimitInvocationFactory(final int count) {
         super(asArgs(ConstantConditions.notNegative("count", count)));

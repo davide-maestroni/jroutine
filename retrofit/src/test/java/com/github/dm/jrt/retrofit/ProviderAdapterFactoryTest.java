@@ -33,7 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.stream.processor.Processors.output;
+import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 

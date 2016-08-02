@@ -18,6 +18,7 @@ package com.github.dm.jrt.core.util;
 
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -110,6 +111,24 @@ public class ReflectionTest {
 
         } catch (final IllegalArgumentException ignored) {
 
+        }
+    }
+
+    @Test
+    public void testNewInstance() {
+        assertThat(Reflection.newInstanceOf(String.class)).isExactlyInstanceOf(String.class);
+        try {
+            Reflection.newInstanceOf(Integer.class);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            Reflection.newInstanceOf(InputStream.class);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
         }
     }
 

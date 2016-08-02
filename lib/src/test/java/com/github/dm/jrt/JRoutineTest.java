@@ -57,7 +57,7 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

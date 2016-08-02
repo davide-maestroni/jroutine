@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.android.v11.core.LoaderInvocation.clearLoader;
+import static com.github.dm.jrt.android.v11.core.LoaderInvocation.clearLoaders;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -90,7 +90,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         super.clear();
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
-            clearLoader(context, mLoaderId, mFactory);
+            clearLoaders(context, mLoaderId, mFactory);
         }
     }
 
@@ -120,7 +120,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
     public void clear(@Nullable final IN input) {
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
-            clearLoader(context, mLoaderId, mFactory, Collections.singletonList(input));
+            clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
         }
     }
 
@@ -135,7 +135,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
                 inputList = Arrays.asList(inputs);
             }
 
-            clearLoader(context, mLoaderId, mFactory, inputList);
+            clearLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 
@@ -154,7 +154,7 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
                 }
             }
 
-            clearLoader(context, mLoaderId, mFactory, inputList);
+            clearLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 

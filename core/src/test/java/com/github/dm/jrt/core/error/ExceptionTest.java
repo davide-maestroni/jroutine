@@ -36,12 +36,12 @@ public class ExceptionTest {
     @Test
     public void testRoutineException() {
 
-        assertThat(new com.github.dm.jrt.core.error.RoutineException()).hasNoCause();
+        assertThat(new RoutineException()).hasNoCause();
     }
 
     @Test
     public void testTimeoutException() {
 
-        assertThat(new com.github.dm.jrt.core.error.TimeoutException("")).hasNoCause();
+        assertThat(new TimeoutException("")).hasNoCause();
     }
 }

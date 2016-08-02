@@ -51,11 +51,12 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends 
     @Override
     protected Channel<?, ? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel = JRoutineCore.io()
-                                                                                    .channelConfiguration()
-                                                                                    .with(configuration)
-                                                                                    .configured()
-                                                                                    .buildChannel();
+        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel = //
+                JRoutineCore.io()
+                            .channelConfiguration()
+                            .with(configuration)
+                            .configured()
+                            .buildChannel();
         mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
         return outputChannel;
     }

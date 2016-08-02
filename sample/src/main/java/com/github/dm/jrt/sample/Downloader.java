@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.Backoffs.linearDelay;
+import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
@@ -159,8 +159,7 @@ public class Downloader {
                                 // make the writing happen in a dedicated runner, so that waiting
                                 // for available space becomes allowed
                                 .withRunner(sWriteRunner)
-                                .withInputLimit(32)
-                                .withInputBackoff(linearDelay(seconds(3)))
+                                .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
                                 .configured()
                                 .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));

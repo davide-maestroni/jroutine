@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
@@ -30,19 +31,19 @@ import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
-import com.github.dm.jrt.object.annotation.InputLimit;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
+import com.github.dm.jrt.object.annotation.LogType;
 import com.github.dm.jrt.object.annotation.MaxInstances;
 import com.github.dm.jrt.object.annotation.OutputBackoff;
-import com.github.dm.jrt.object.annotation.OutputLimit;
 import com.github.dm.jrt.object.annotation.OutputMaxSize;
 import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
+import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.object.annotation.SharedFields;
 
 import org.jetbrains.annotations.NotNull;
@@ -495,20 +496,14 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
-        final InputLimit inputLimitAnnotation = methodElement.getAnnotation(InputLimit.class);
-        if (inputLimitAnnotation != null) {
-            builder.append(".withInputLimit(").append(inputLimitAnnotation.value()).append(")");
-        }
-
         final InputBackoff inputBackoffAnnotation = methodElement.getAnnotation(InputBackoff.class);
         if (inputBackoffAnnotation != null) {
             builder.append(".withInputBackoff(")
-                   .append(inputBackoffAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(inputBackoffAnnotation.unit())
-                   .append(")");
+                   .append(Reflection.class.getCanonicalName())
+                   .append(".newInstanceOf(")
+                   .append(getAnnotationValue(methodElement,
+                           getMirrorFromName(InputBackoff.class.getCanonicalName()), "value"))
+                   .append(".class))");
         }
 
         final InputMaxSize inputSizeAnnotation = methodElement.getAnnotation(InputMaxSize.class);
@@ -525,6 +520,16 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
+        final LogType logTypeAnnotation = methodElement.getAnnotation(LogType.class);
+        if (logTypeAnnotation != null) {
+            builder.append(".withLog(")
+                   .append(Reflection.class.getCanonicalName())
+                   .append(".newInstanceOf(")
+                   .append(getAnnotationValue(methodElement,
+                           getMirrorFromName(LogType.class.getCanonicalName()), "value"))
+                   .append(".class))");
+        }
+
         final LogLevel logLevelAnnotation = methodElement.getAnnotation(LogLevel.class);
         if (logLevelAnnotation != null) {
             builder.append(".withLogLevel(")
@@ -539,21 +544,15 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withMaxInstances(").append(maxInstancesAnnotation.value()).append(")");
         }
 
-        final OutputLimit outputLimitAnnotation = methodElement.getAnnotation(OutputLimit.class);
-        if (outputLimitAnnotation != null) {
-            builder.append(".withOutputLimit(").append(outputLimitAnnotation.value()).append(")");
-        }
-
         final OutputBackoff outputBackoffAnnotation =
                 methodElement.getAnnotation(OutputBackoff.class);
         if (outputBackoffAnnotation != null) {
             builder.append(".withOutputBackoff(")
-                   .append(outputBackoffAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(outputBackoffAnnotation.unit())
-                   .append(")");
+                   .append(Reflection.class.getCanonicalName())
+                   .append(".newInstanceOf(")
+                   .append(getAnnotationValue(methodElement,
+                           getMirrorFromName(OutputBackoff.class.getCanonicalName()), "value"))
+                   .append(".class))");
         }
 
         final OutputMaxSize outputSizeAnnotation = methodElement.getAnnotation(OutputMaxSize.class);
@@ -568,11 +567,6 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(".")
                    .append(outputOrderAnnotation.value())
                    .append(")");
-        }
-
-        final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
-        if (priorityAnnotation != null) {
-            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
         }
 
         final OutputTimeout outputTimeoutAnnotation =
@@ -595,6 +589,21 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(".")
                    .append(actionAnnotation.value())
                    .append(")");
+        }
+
+        final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
+        if (priorityAnnotation != null) {
+            builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
+        }
+
+        final RunnerType runnerTypeAnnotation = methodElement.getAnnotation(RunnerType.class);
+        if (runnerTypeAnnotation != null) {
+            builder.append(".withRunner(")
+                   .append(Reflection.class.getCanonicalName())
+                   .append(".newInstanceOf(")
+                   .append(getAnnotationValue(methodElement,
+                           getMirrorFromName(RunnerType.class.getCanonicalName()), "value"))
+                   .append(".class))");
         }
 
         return builder.toString();

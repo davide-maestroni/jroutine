@@ -465,6 +465,30 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations filtering out inputs which are not unique (according to the
+     * {@code equals(Object)} method).
+     *
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> distinct() {
+        return DistinctInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations filtering out inputs which are not unique (according to
+     * identity comparison).
+     *
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> distinctIdentity() {
+        return DistinctIdentityInvocation.factoryOf();
+    }
+
+    /**
      * Returns a factory of invocations filtering data based on the values returned by the specified
      * predicate.
      *
@@ -683,6 +707,29 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
         return new LimitInvocationFactory<DATA>(count);
+    }
+
+    /**
+     * Returns a factory of invocations passing at max the specified number of input data and
+     * discarding the previous ones.
+     * <p>
+     * Given a numeric sequence of inputs from 0 to 9, and a limit count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [5, 6, 7, 8, 9]
+     *     </code>
+     * </pre>
+     *
+     * @param count  the maximum number of data to pass.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> limitLast(final int count) {
+        return new LimitLastInvocationFactory<DATA>(count);
     }
 
     /**
@@ -1293,6 +1340,28 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations skipping the specified number of last input data.
+     * <p>
+     * Given a numeric sequence of inputs from 0 to 9, and a skip count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [0, 1, 2, 3, 4]
+     *     </code>
+     * </pre>
+     *
+     * @param count  the number of data to skip.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> skipLast(final int count) {
+        return new SkipLastInvocationFactory<DATA>(count);
+    }
+
+    /**
      * Returns a factory of invocations sorting inputs in their natural order.
      *
      * @param <IN> the input data type.
@@ -1626,29 +1695,5 @@ public class Operators {
     @SuppressWarnings("unchecked")
     public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
         return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique (according to the
-     * {@code equals(Object)} method).
-     *
-     * @param <DATA> the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> unique() {
-        return UniqueInvocation.factoryOf();
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique (according to
-     * identity comparison).
-     *
-     * @param <DATA> the data type.
-     * @return the invocation factory instance.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> uniqueIdentity() {
-        return UniqueIdentityInvocation.factoryOf();
     }
 }

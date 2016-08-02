@@ -16,15 +16,17 @@
 
 package com.github.dm.jrt.object.annotation;
 
+import com.github.dm.jrt.core.util.Backoff;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Through this annotation it is possible to indicate the constant delay to apply while waiting for
- * an input channel to have room for additional data.
+ * Through this annotation it is possible to indicate the backoff to apply while waiting for an
+ * input channel to have room for additional data. The specified class must have a default
+ * constructor.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -60,17 +62,9 @@ import java.util.concurrent.TimeUnit;
 public @interface InputBackoff {
 
     /**
-     * The time unit of the delay to apply while waiting for an input channel to have room for
-     * additional data.
+     * The backoff to apply while waiting for an input channel to have room for additional data.
      *
-     * @return the time unit.
+     * @return the backoff type.
      */
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The delay to apply while waiting for an input channel to have room for additional data.
-     *
-     * @return the delay.
-     */
-    long value();
+    Class<? extends Backoff> value();
 }

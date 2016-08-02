@@ -14,49 +14,57 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
+
 /**
- * Try/finally binding function.
+ * Timeout binding function.
  * <p>
- * Created by davide-maestroni on 05/07/2016.
+ * Created by davide-maestroni on 07/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
+class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
-    private final Action mFinally;
+    private final long mTimeout;
+
+    private final TimeUnit mTimeoutUnit;
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param finallyAction the finally action.
+     * @param timeout       the timeout value.
+     * @param timeUnit      the timeout unit.
      */
-    BindTryFinally(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Action finallyAction) {
+    BindTimeout(@NotNull final ChannelConfiguration configuration, final long timeout,
+            @NotNull final TimeUnit timeUnit) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mFinally = ConstantConditions.notNull("action instance", finallyAction);
+        mTimeout = ConstantConditions.notNegative("timeout value", timeout);
+        mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+        final ChannelConfiguration configuration = mConfiguration;
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
-                                                            .with(mConfiguration)
+                                                            .with(configuration)
                                                             .configured()
                                                             .buildChannel();
-        channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
+        channel.bind(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
+                configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
         return outputChannel;
     }
 }

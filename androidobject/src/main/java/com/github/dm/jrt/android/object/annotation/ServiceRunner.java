@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.object.annotation.RunnerClass *;
+ *              &#64;com.github.dm.jrt.android.object.annotation.ServiceRunner *;
  *         }
  *     </code>
  * </pre>
@@ -58,7 +58,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RunnerClass {
+public @interface ServiceRunner {
 
     /**
      * The runner class.

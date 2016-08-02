@@ -22,10 +22,10 @@ import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
-import com.github.dm.jrt.android.object.annotation.LogClass;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
-import com.github.dm.jrt.android.object.annotation.RunnerClass;
+import com.github.dm.jrt.android.object.annotation.ServiceLog;
+import com.github.dm.jrt.android.object.annotation.ServiceRunner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -128,8 +128,8 @@ public class AndroidBuilders {
      * @param configuration the initial configuration.
      * @param annotations   the annotations.
      * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.LogClass LogClass
-     * @see com.github.dm.jrt.android.object.annotation.RunnerClass RunnerClass
+     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
      */
     @NotNull
     public static ServiceConfiguration withAnnotations(
@@ -143,11 +143,12 @@ public class AndroidBuilders {
 
         for (final Annotation annotation : annotations) {
             final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType == LogClass.class) {
-                builder.withLogClass(((LogClass) annotation).value()).withLogArgs((Object[]) null);
+            if (annotationType == ServiceLog.class) {
+                builder.withLogClass(((ServiceLog) annotation).value())
+                       .withLogArgs((Object[]) null);
 
-            } else if (annotationType == RunnerClass.class) {
-                builder.withRunnerClass(((RunnerClass) annotation).value())
+            } else if (annotationType == ServiceRunner.class) {
+                builder.withRunnerClass(((ServiceRunner) annotation).value())
                        .withRunnerArgs((Object[]) null);
             }
         }
@@ -162,8 +163,8 @@ public class AndroidBuilders {
      * @param configuration the initial configuration.
      * @param method        the target method.
      * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.LogClass LogClass
-     * @see com.github.dm.jrt.android.object.annotation.RunnerClass RunnerClass
+     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
      */
     @NotNull
     public static ServiceConfiguration withAnnotations(

@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
@@ -38,6 +40,7 @@ import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -53,10 +56,10 @@ import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
-import static com.github.dm.jrt.stream.processor.Processors.outputGet;
-import static com.github.dm.jrt.stream.processor.Processors.throttle;
-import static com.github.dm.jrt.stream.processor.Processors.timeoutAfter;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputGet;
+import static com.github.dm.jrt.stream.modifier.Modifiers.throttle;
+import static com.github.dm.jrt.stream.modifier.Modifiers.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -65,7 +68,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class ProcessorsTest {
+public class ModifiersTest {
 
     private static Runner sSingleThreadRunner;
 
@@ -80,153 +83,99 @@ public class ProcessorsTest {
 
     @Test
     public void testBackoff() {
-        assertThat(JRoutineStream.withStream()
-                                 .async()
-                                 .let(outputAccept(range(1, 1000)))
-                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
-                                         Backoffs.afterCount(2).linearDelay(seconds(10))))
-                                 .map(Functions.<Number>identity())
-                                 .map(new Function<Number, Double>() {
+        Assertions.assertThat(JRoutineStream.withStream()
+                                            .async()
+                                            .let(outputAccept(range(1, 1000)))
+                                            .invocationConfiguration()
+                                            .withRunner(getSingleThreadRunner())
+                                            .withInputBackoff(
+                                                    Backoffs.afterCount(2).linearDelay(seconds(10)))
+                                            .configured()
+                                            .map(Functions.<Number>identity())
+                                            .map(new Function<Number, Double>() {
 
-                                     public Double apply(final Number number) {
-                                         final double value = number.doubleValue();
-                                         return Math.sqrt(value);
-                                     }
-                                 })
-                                 .sync()
-                                 .map(new Function<Double, SumData>() {
+                                                public Double apply(final Number number) {
+                                                    final double value = number.doubleValue();
+                                                    return Math.sqrt(value);
+                                                }
+                                            })
+                                            .sync()
+                                            .map(new Function<Double, SumData>() {
 
-                                     public SumData apply(final Double aDouble) {
-                                         return new SumData(aDouble, 1);
-                                     }
-                                 })
-                                 .map(reduce(new BiFunction<SumData, SumData, SumData>() {
+                                                public SumData apply(final Double aDouble) {
+                                                    return new SumData(aDouble, 1);
+                                                }
+                                            })
+                                            .map(reduce(
+                                                    new BiFunction<SumData, SumData, SumData>() {
 
-                                     public SumData apply(final SumData data1,
-                                             final SumData data2) {
-                                         return new SumData(data1.sum + data2.sum,
-                                                 data1.count + data2.count);
-                                     }
-                                 }))
-                                 .map(new Function<SumData, Double>() {
+                                                        public SumData apply(final SumData data1,
+                                                                final SumData data2) {
+                                                            return new SumData(
+                                                                    data1.sum + data2.sum,
+                                                                    data1.count + data2.count);
+                                                        }
+                                                    }))
+                                            .map(new Function<SumData, Double>() {
 
-                                     public Double apply(final SumData data) {
-                                         return data.sum / data.count;
-                                     }
-                                 })
-                                 .asyncCall()
-                                 .close()
-                                 .after(seconds(3))
-                                 .next()).isCloseTo(21, Offset.offset(0.1));
-        assertThat(JRoutineStream.withStream()
-                                 .async()
-                                 .let(outputAccept(range(1, 1000)))
-                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
-                                         2, 10, TimeUnit.SECONDS))
-                                 .map(Functions.<Number>identity())
-                                 .map(new Function<Number, Double>() {
+                                                public Double apply(final SumData data) {
+                                                    return data.sum / data.count;
+                                                }
+                                            })
+                                            .asyncCall()
+                                            .close()
+                                            .after(seconds(3))
+                                            .next()).isCloseTo(21, Offset.offset(0.1));
+        Assertions.assertThat(JRoutineStream.withStream()
+                                            .async()
+                                            .let(outputAccept(range(1, 1000)))
+                                            .invocationConfiguration()
+                                            .withRunner(getSingleThreadRunner())
+                                            .withInputBackoff(Backoffs.afterCount(2)
+                                                                      .constantDelay(seconds(10)))
+                                            .configured()
+                                            .map(Functions.<Number>identity())
+                                            .map(new Function<Number, Double>() {
 
-                                     public Double apply(final Number number) {
-                                         final double value = number.doubleValue();
-                                         return Math.sqrt(value);
-                                     }
-                                 })
-                                 .sync()
-                                 .map(new Function<Double, SumData>() {
+                                                public Double apply(final Number number) {
+                                                    final double value = number.doubleValue();
+                                                    return Math.sqrt(value);
+                                                }
+                                            })
+                                            .sync()
+                                            .map(new Function<Double, SumData>() {
 
-                                     public SumData apply(final Double aDouble) {
-                                         return new SumData(aDouble, 1);
-                                     }
-                                 })
-                                 .map(reduce(new BiFunction<SumData, SumData, SumData>() {
+                                                public SumData apply(final Double aDouble) {
+                                                    return new SumData(aDouble, 1);
+                                                }
+                                            })
+                                            .map(reduce(
+                                                    new BiFunction<SumData, SumData, SumData>() {
 
-                                     public SumData apply(final SumData data1,
-                                             final SumData data2) {
-                                         return new SumData(data1.sum + data2.sum,
-                                                 data1.count + data2.count);
-                                     }
-                                 }))
-                                 .map(new Function<SumData, Double>() {
+                                                        public SumData apply(final SumData data1,
+                                                                final SumData data2) {
+                                                            return new SumData(
+                                                                    data1.sum + data2.sum,
+                                                                    data1.count + data2.count);
+                                                        }
+                                                    }))
+                                            .map(new Function<SumData, Double>() {
 
-                                     public Double apply(final SumData data) {
-                                         return data.sum / data.count;
-                                     }
-                                 })
-                                 .asyncCall()
-                                 .close()
-                                 .after(seconds(3))
-                                 .next()).isCloseTo(21, Offset.offset(0.1));
-        assertThat(JRoutineStream.withStream()
-                                 .async()
-                                 .let(outputAccept(range(1, 1000)))
-                                 .let(Processors.<Object, Integer>backoffOn(getSingleThreadRunner(),
-                                         2, seconds(10)))
-                                 .map(Functions.<Number>identity())
-                                 .map(new Function<Number, Double>() {
-
-                                     public Double apply(final Number number) {
-                                         final double value = number.doubleValue();
-                                         return Math.sqrt(value);
-                                     }
-                                 })
-                                 .sync()
-                                 .map(new Function<Double, SumData>() {
-
-                                     public SumData apply(final Double aDouble) {
-                                         return new SumData(aDouble, 1);
-                                     }
-                                 })
-                                 .map(reduce(new BiFunction<SumData, SumData, SumData>() {
-
-                                     public SumData apply(final SumData data1,
-                                             final SumData data2) {
-                                         return new SumData(data1.sum + data2.sum,
-                                                 data1.count + data2.count);
-                                     }
-                                 }))
-                                 .map(new Function<SumData, Double>() {
-
-                                     public Double apply(final SumData data) {
-                                         return data.sum / data.count;
-                                     }
-                                 })
-                                 .mapOn(null)
-                                 .asyncCall()
-                                 .close()
-                                 .after(seconds(3))
-                                 .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBackoffNullPointerError() {
-        try {
-            Processors.backoffOn(null, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-
-        try {
-            Processors.backoffOn(null, 1, 0, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-
-        try {
-            Processors.backoffOn(null, 1, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
+                                                public Double apply(final SumData data) {
+                                                    return data.sum / data.count;
+                                                }
+                                            })
+                                            .asyncCall()
+                                            .close()
+                                            .after(seconds(3))
+                                            .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test
     public void testConstructor() {
         boolean failed = false;
         try {
-            new Processors();
+            new Modifiers();
             failed = true;
 
         } catch (final Throwable ignored) {
@@ -239,21 +188,21 @@ public class ProcessorsTest {
     public void testDelay() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.delay(1, TimeUnit.SECONDS))
+                                 .let(Modifiers.delay(1, TimeUnit.SECONDS))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.delay(seconds(1)))
+                                 .let(Modifiers.delay(seconds(1)))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.delay(1, TimeUnit.SECONDS))
+                                 .let(Modifiers.delay(1, TimeUnit.SECONDS))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -261,7 +210,7 @@ public class ProcessorsTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.delay(seconds(1)))
+                                 .let(Modifiers.delay(seconds(1)))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -273,7 +222,7 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testDelayNullPointerError() {
         try {
-            Processors.delay(1, null);
+            Modifiers.delay(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -284,21 +233,21 @@ public class ProcessorsTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.lag(1, TimeUnit.SECONDS))
+                                 .let(Modifiers.lag(1, TimeUnit.SECONDS))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.lag(seconds(1)))
+                                 .let(Modifiers.lag(seconds(1)))
                                  .asyncCall("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.lag(1, TimeUnit.SECONDS))
+                                 .let(Modifiers.lag(1, TimeUnit.SECONDS))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -306,7 +255,7 @@ public class ProcessorsTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.lag(seconds(1)))
+                                 .let(Modifiers.lag(seconds(1)))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
@@ -318,7 +267,7 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testLagNullPointerError() {
         try {
-            Processors.lag(1, null);
+            Modifiers.lag(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -327,16 +276,15 @@ public class ProcessorsTest {
 
     @Test
     public void testOutput() {
-        assertThat(
-                JRoutineStream.withStream().sync().let(Processors.outputGet(new Supplier<String>() {
+        assertThat(JRoutineStream.withStream().sync().let(outputGet(new Supplier<String>() {
 
-                    public String get() {
-                        return "TEST2";
-                    }
-                })).syncCall("test1").all()).containsOnly("TEST2");
+            public String get() {
+                return "TEST2";
+            }
+        })).syncCall("test1").all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+                                 .let(outputAccept(new Consumer<Channel<String, ?>>() {
 
                                      public void accept(final Channel<String, ?> resultChannel) {
                                          resultChannel.pass("TEST2");
@@ -344,7 +292,7 @@ public class ProcessorsTest {
                                  }))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
@@ -352,220 +300,204 @@ public class ProcessorsTest {
         })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.outputAccept(3,
-                                         new Consumer<Channel<String, ?>>() {
+                                 .let(outputAccept(3, new Consumer<Channel<String, ?>>() {
 
-                                             public void accept(
-                                                     final Channel<String, ?> resultChannel) {
-                                                 resultChannel.pass("TEST2");
-                                             }
-                                         }))
+                                     public void accept(final Channel<String, ?> resultChannel) {
+                                         resultChannel.pass("TEST2");
+                                     }
+                                 }))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream().let(Processors.outputGet(new Supplier<String>() {
+        assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
 
-                                     public void accept(final Channel<String, ?> resultChannel) {
-                                         resultChannel.pass("TEST2");
-                                     }
-                                 }))
-                                 .asyncCall("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Processors.outputAccept(3,
-                                         new Consumer<Channel<String, ?>>() {
+        assertThat(
+                JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
 
-                                             public void accept(
-                                                     final Channel<String, ?> resultChannel) {
-                                                 resultChannel.pass("TEST2");
-                                             }
-                                         }))
-                                 .asyncCall("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream().let(Processors.outputGet(new Supplier<String>() {
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2",
+                "TEST2");
+        assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Processors.outputAccept(new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
 
-                                     public void accept(final Channel<String, ?> resultChannel) {
-                                         resultChannel.pass("TEST2");
-                                     }
-                                 }))
-                                 .asyncCall("test1")
-                                 .after(seconds(3))
-                                 .all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.withStream().let(Processors.outputGet(3, new Supplier<String>() {
+            public void accept(final Channel<String, ?> resultChannel) {
+                resultChannel.pass("TEST2");
+            }
+        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
         })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Processors.outputAccept(3,
-                                         new Consumer<Channel<String, ?>>() {
+        assertThat(
+                JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
 
-                                             public void accept(
-                                                     final Channel<String, ?> resultChannel) {
-                                                 resultChannel.pass("TEST2");
-                                             }
-                                         }))
-                                 .asyncCall("test1")
-                                 .after(seconds(3))
-                                 .all()).containsExactly("TEST2", "TEST2", "TEST2");
+                    public void accept(final Channel<String, ?> resultChannel) {
+                        resultChannel.pass("TEST2");
+                    }
+                })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                "TEST2");
     }
 
     @Test
     public void testOutput2() {
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output((String) null))
+                                 .let(Modifiers.output((String) null))
                                  .syncCall("test1")
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output((String[]) null))
-                                 .syncCall("test1")
-                                 .all()).isEmpty();
-        assertThat(
-                JRoutineStream.withStream().sync().let(Processors.output()).syncCall("test1").all())
-                .isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Processors.output((List<String>) null))
+                                 .let(Modifiers.output((String[]) null))
                                  .syncCall("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .let(Modifiers.output())
                                  .syncCall("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output("TEST2"))
+                                 .let(Modifiers.output((List<String>) null))
+                                 .syncCall("test1")
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Modifiers.output(Collections.<String>emptyList()))
+                                 .syncCall("test1")
+                                 .all()).isEmpty();
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .let(Modifiers.output("TEST2"))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .let(Modifiers.output("TEST2", "TEST2"))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
                                  .syncCall("test1")
                                  .all()).containsOnly("TEST2");
 
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((String) null))
+                                 .let(Modifiers.output((String) null))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((String[]) null))
+                                 .let(Modifiers.output((String[]) null))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output())
+                                 .let(Modifiers.output())
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((List<String>) null))
+                                 .let(Modifiers.output((List<String>) null))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .let(Modifiers.output(Collections.<String>emptyList()))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output("TEST2"))
+                                 .let(Modifiers.output("TEST2"))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .let(Modifiers.output("TEST2", "TEST2"))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
                                  .asyncCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
 
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((String) null))
+                                 .let(Modifiers.output((String) null))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((String[]) null))
+                                 .let(Modifiers.output((String[]) null))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output())
+                                 .let(Modifiers.output())
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output((List<String>) null))
+                                 .let(Modifiers.output((List<String>) null))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(Collections.<String>emptyList()))
+                                 .let(Modifiers.output(Collections.<String>emptyList()))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output("TEST2"))
+                                 .let(Modifiers.output("TEST2"))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output("TEST2", "TEST2"))
+                                 .let(Modifiers.output("TEST2", "TEST2"))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(Collections.singletonList("TEST2")))
+                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
-                                 .let(Processors.output(JRoutineCore.io().of("TEST2", "TEST2")))
+                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
                                  .parallelCall("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
@@ -603,48 +535,6 @@ public class ProcessorsTest {
     }
 
     @Test
-    public void testParallelConfiguration() {
-        assertThat(JRoutineStream.<String>withStream().let(Processors.<String, String>parallel(1))
-                                                      .map(new Function<String, String>() {
-
-                                                          public String apply(final String s) {
-                                                              return s.toUpperCase();
-                                                          }
-                                                      })
-                                                      .asyncCall("test1", "test2")
-                                                      .after(seconds(3))
-                                                      .all()).containsOnly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .let(Processors.<String, String>parallel(1))
-                                                      .map(new Function<String, String>() {
-
-                                                          public String apply(final String s) {
-                                                              return s.toUpperCase();
-                                                          }
-                                                      })
-                                                      .asyncCall("test1", "test2")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .let(Processors.<String, String>parallel(1))
-                                                      .map(new Function<String, String>() {
-
-                                                          public String apply(final String s) {
-                                                              return s.toUpperCase();
-                                                          }
-                                                      })
-                                                      .map(new Function<String, String>() {
-
-                                                          public String apply(final String s) {
-                                                              return s.toLowerCase();
-                                                          }
-                                                      })
-                                                      .asyncCall("test1", "test2")
-                                                      .after(seconds(3))
-                                                      .all()).containsExactly("test1", "test2");
-    }
-
-    @Test
     public void testParallelSplit() {
         final StreamBuilder<Integer, Long> sqr =
                 JRoutineStream.<Integer>withStream().map(new Function<Integer, Long>() {
@@ -656,21 +546,21 @@ public class ProcessorsTest {
                 });
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
-                                 .let(Processors.parallel(2, sqr))
+                                 .let(Modifiers.parallel(2, sqr.buildFactory()))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
-                                 .let(Processors.parallelBy(Functions.<Integer>identity(), sqr))
+                                 .let(Modifiers.parallel(2, sqr))
                                  .asyncCall()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
-                                 .let(Processors.parallel(2, JRoutineCore.with(
+                                 .let(Modifiers.parallel(2, JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
                                  .close()
@@ -678,7 +568,22 @@ public class ProcessorsTest {
                                  .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
-                                 .let(Processors.parallelBy(Functions.<Integer>identity(),
+                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(),
+                                         sqr.buildFactory()))
+                                 .asyncCall()
+                                 .close()
+                                 .after(seconds(3))
+                                 .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream.withStream()
+                                 .let(outputAccept(range(1, 3)))
+                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(), sqr))
+                                 .asyncCall()
+                                 .close()
+                                 .after(seconds(3))
+                                 .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream.withStream()
+                                 .let(outputAccept(range(1, 3)))
+                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(),
                                          JRoutineCore.with(
                                                  IdentityInvocation.<Integer>factoryOf())))
                                  .asyncCall()
@@ -691,42 +596,56 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testParallelSplitNullPointerError() {
         try {
-            Processors.parallel(1, (Routine<Object, ?>) null);
+            Modifiers.parallel(1, (InvocationFactory<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.parallel(1, null);
+            Modifiers.parallel(1, (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.parallelBy(null, JRoutineStream.withStream().buildRoutine());
+            Modifiers.parallel(1, (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.parallelBy(null, JRoutineStream.withStream());
+            Modifiers.parallelBy(null, JRoutineStream.withStream().buildRoutine());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
+            Modifiers.parallelBy(null, JRoutineStream.withStream());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.parallelBy(Functions.identity(), null);
+            Modifiers.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            Modifiers.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            Modifiers.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -739,7 +658,7 @@ public class ProcessorsTest {
         try {
             JRoutineStream.<String>withStream().map(new UpperCase())
                                                .map(factoryOf(ThrowException.class, count1))
-                                               .let(Processors.<String, Object>retry(2))
+                                               .let(Modifiers.<String, Object>retry(2))
                                                .asyncCall("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -753,7 +672,7 @@ public class ProcessorsTest {
         assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                       .map(factoryOf(ThrowException.class, count2,
                                                               1))
-                                                      .let(Processors.<String, Object>retry(1))
+                                                      .let(Modifiers.<String, Object>retry(1))
                                                       .asyncCall("test")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST");
@@ -762,7 +681,7 @@ public class ProcessorsTest {
         try {
             JRoutineStream.<String>withStream().map(new AbortInvocation())
                                                .map(factoryOf(ThrowException.class, count3))
-                                               .let(Processors.<String, Object>retry(2))
+                                               .let(Modifiers.<String, Object>retry(2))
                                                .asyncCall("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -777,14 +696,14 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testRetryNullPointerError() {
         try {
-            Processors.retry(1, null);
+            Modifiers.retry(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.retry(null);
+            Modifiers.retry(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -833,8 +752,7 @@ public class ProcessorsTest {
                                                               throw new NullPointerException();
                                                           }
                                                       })
-                                                      .let(Processors.<String,
-                                                              Object>tryCatchAccept(
+                                                      .let(Modifiers.<String, Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -854,8 +772,7 @@ public class ProcessorsTest {
                                                               return o;
                                                           }
                                                       })
-                                                      .let(Processors.<String,
-                                                              Object>tryCatchAccept(
+                                                      .let(Modifiers.<String, Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -873,7 +790,7 @@ public class ProcessorsTest {
             public Object apply(final Object o) {
                 throw new NullPointerException();
             }
-        }).let(Processors.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+        }).let(Modifiers.<String, Object>tryCatch(new Function<RoutineException, Object>() {
 
             public Object apply(final RoutineException e) {
                 return "exception";
@@ -885,14 +802,14 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryCatchNullPointerError() {
         try {
-            Processors.tryCatchAccept(null);
+            Modifiers.tryCatchAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Processors.tryCatch(null);
+            Modifiers.tryCatch(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -908,7 +825,7 @@ public class ProcessorsTest {
                 public Object apply(final Object o) {
                     throw new NullPointerException();
                 }
-            }).let(Processors.<String, Object>tryFinally(new Action() {
+            }).let(Modifiers.<String, Object>tryFinally(new Action() {
 
                 public void perform() {
                     isRun.set(true);
@@ -924,7 +841,7 @@ public class ProcessorsTest {
             public Object apply(final Object o) {
                 return o;
             }
-        }).let(Processors.<String, Object>tryFinally(new Action() {
+        }).let(Modifiers.<String, Object>tryFinally(new Action() {
 
             public void perform() {
                 isRun.set(true);
@@ -937,7 +854,7 @@ public class ProcessorsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryFinallyNullPointerError() {
         try {
-            Processors.tryFinally(null);
+            Modifiers.tryFinally(null);
             fail();
 
         } catch (final NullPointerException ignored) {

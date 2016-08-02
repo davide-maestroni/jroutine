@@ -14,62 +14,61 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.BiConsumer;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Invocation throttle channel consumer.
+ * Try/catch channel consumer implementation.
  * <p>
- * Created by davide-maestroni on 07/29/2016.
+ * Created by davide-maestroni on 04/19/2016.
  *
  * @param <OUT> the output data type.
  */
-class ThrottleChannelConsumer<OUT> implements ChannelConsumer<OUT> {
+class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final CompletionHandler mHandler;
+    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
     private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param handler       the completion handler.
+     * @param catchConsumer the consumer instance.
      * @param outputChannel the output channel.
      */
-    ThrottleChannelConsumer(@NotNull final CompletionHandler handler,
+    TryCatchChannelConsumer(
+            @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
+                    catchConsumer,
             @NotNull final Channel<OUT, ?> outputChannel) {
-        mHandler = ConstantConditions.notNull("completion handler", handler);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+        mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
     public void onComplete() {
         mOutputChannel.close();
-        mHandler.onComplete();
     }
 
     public void onError(@NotNull final RoutineException error) {
-        mOutputChannel.abort(error);
-        mHandler.onComplete();
+        final Channel<OUT, ?> channel = mOutputChannel;
+        try {
+            mCatchConsumer.accept(error, channel);
+            channel.close();
+
+        } catch (final Throwable t) {
+            InvocationInterruptedException.throwIfInterrupt(t);
+            channel.abort(t);
+        }
     }
 
     public void onOutput(final OUT output) {
         mOutputChannel.pass(output);
-    }
-
-    /**
-     * Interface defining an invocation completion handler.
-     */
-    interface CompletionHandler {
-
-        /**
-         * Notifies the handler that the invocation has completed.
-         */
-        void onComplete();
     }
 }

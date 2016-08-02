@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
-import com.github.dm.jrt.stream.processor.ThrottleChannelConsumer.CompletionHandler;
+import com.github.dm.jrt.stream.modifier.ThrottleChannelConsumer.CompletionHandler;
 
 import org.jetbrains.annotations.NotNull;
 

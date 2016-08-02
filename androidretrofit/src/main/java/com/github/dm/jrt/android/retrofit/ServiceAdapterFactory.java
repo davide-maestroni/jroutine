@@ -52,7 +52,7 @@ import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.function.Functions.decorate;
-import static com.github.dm.jrt.stream.processor.Processors.output;
+import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}

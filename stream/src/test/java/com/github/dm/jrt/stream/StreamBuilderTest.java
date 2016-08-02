@@ -44,7 +44,7 @@ import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
-import com.github.dm.jrt.stream.processor.Processors;
+import com.github.dm.jrt.stream.modifier.Modifiers;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -65,9 +65,9 @@ import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.processor.Processors.output;
-import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
-import static com.github.dm.jrt.stream.processor.Processors.tryCatchAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.output;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -556,21 +556,21 @@ public class StreamBuilderTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Processors.<String, String>lag(1, TimeUnit.SECONDS))
+                Modifiers.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .asyncCall("test")
                                                       .after(seconds(3))
                                                       .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(
-                JRoutineStream.<String>withStream().let(Processors.<String, String>lag(seconds(1)))
+                JRoutineStream.<String>withStream().let(Modifiers.<String, String>lag(seconds(1)))
                                                    .asyncCall("test")
                                                    .after(seconds(3))
                                                    .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Processors.<String, String>lag(1, TimeUnit.SECONDS))
+                Modifiers.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .asyncCall()
                                                       .close()
                                                       .after(seconds(3))
@@ -578,7 +578,7 @@ public class StreamBuilderTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(
-                JRoutineStream.<String>withStream().let(Processors.<String, String>lag(seconds(1)))
+                JRoutineStream.<String>withStream().let(Modifiers.<String, String>lag(seconds(1)))
                                                    .asyncCall()
                                                    .close()
                                                    .after(seconds(3))

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -40,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
@@ -48,120 +47,13 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Created by davide-maestroni on 07/06/2016.
  */
-public class Processors {
+public class Modifiers {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Processors() {
+    protected Modifiers() {
         ConstantConditions.avoid();
-    }
-
-    /**
-     * Returns a function applying the configuration:
-     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(backoff).configured()}.
-     * <br>
-     * This method is useful to easily apply a configuration which will slow down the thread
-     * feeding the next routine concatenated to the stream, when the number of buffered inputs
-     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
-     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
-     * exceptions.
-     *
-     * @param runner  the configured runner.
-     * @param backoff the backoff policy to apply to the feeding thread.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the transformation function.
-     * @throws java.lang.IllegalArgumentException if the specified limit is negative.
-     */
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
-            @Nullable final Runner runner, @NotNull final Backoff backoff) {
-        ConstantConditions.notNull("backoff instance", backoff);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
-
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.invocationConfiguration()
-                              .withRunner(runner)
-                              .withInputBackoff(backoff)
-                              .configured();
-            }
-        };
-    }
-
-    /**
-     * Returns a function applying the configuration:
-     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(delay, timeUnit).configured()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will slow down the thread feeding it, when the number of buffered inputs
-     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
-     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
-     * exceptions.
-     *
-     * @param runner   the configured runner.
-     * @param limit    the maximum number of buffered inputs before starting to slow down the
-     *                 feeding thread.
-     * @param delay    the constant delay to apply to the feeding thread.
-     * @param timeUnit the delay time unit.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the transformation function.
-     * @throws java.lang.IllegalArgumentException if the specified limit or the specified delay are
-     *                                            negative.
-     */
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
-            @Nullable final Runner runner, final int limit, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        ConstantConditions.notNull("time unit", timeUnit);
-        ConstantConditions.notNegative("delay value", delay);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
-
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.invocationConfiguration()
-                              .withRunner(runner)
-                              .withInputBackoff(afterCount(limit).constantDelay(delay, timeUnit))
-                              .configured();
-            }
-        };
-    }
-
-    /**
-     * Returns a function applying the configuration:
-     * {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputBackoff(delay).configured()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will slow down the thread feeding it, when the number of buffered inputs
-     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
-     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
-     * exceptions.
-     *
-     * @param runner the configured runner.
-     * @param limit  the maximum number of buffered inputs before starting to slow down the
-     *               feeding thread.
-     * @param delay  the constant delay to apply to the feeding thread.
-     * @param <IN>   the input data type.
-     * @param <OUT>  the output data type.
-     * @return the transformation function.
-     * @throws java.lang.IllegalArgumentException if the specified limit is negative.
-     */
-    @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> backoffOn(
-            @Nullable final Runner runner, final int limit, @NotNull final UnitDuration delay) {
-        ConstantConditions.notNull("delay value", delay);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
-
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.invocationConfiguration()
-                              .withRunner(runner)
-                              .withInputBackoff(afterCount(limit).constantDelay(delay))
-                              .configured();
-            }
-        };
     }
 
     /**
@@ -473,28 +365,49 @@ public class Processors {
     }
 
     /**
-     * Returns a function applying the configuration:
-     * {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations).configured()}.
+     * Returns a function splitting the outputs produced by the stream, so that each group will be
+     * processed by a different routine invocation.
      * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will limit the maximum number of concurrent invocations to the specified value.
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
      *
-     * @param maxInvocations the maximum number of concurrent invocations.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
+     * @param groupCount the number of groups.
+     * @param factory    the invocation factory.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
+     * @param <AFTER>    the new output type.
      * @return the transformation function.
-     * @throws java.lang.IllegalArgumentException if the specified number is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> parallel(
-            final int maxInvocations) {
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+    public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
+    parallel(
+            final int groupCount,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+        ConstantConditions.notNull("invocation factory", factory);
+        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.parallel()
-                              .invocationConfiguration()
-                              .withMaxInstances(maxInvocations)
-                              .configured();
+            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
+                return builder.liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, AFTER>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            OUT>> function) {
+                                return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
+                                        streamConfiguration.asChannelConfiguration(), groupCount,
+                                        JRoutineCore.with(factory)
+                                                    .invocationConfiguration()
+                                                    .with(streamConfiguration
+                                                            .asInvocationConfiguration())
+                                                    .configured(),
+                                        streamConfiguration.getInvocationMode()));
+                            }
+                        });
             }
         };
     }
@@ -506,18 +419,18 @@ public class Processors {
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      *
-     * @param count   the number of groups.
-     * @param routine the processing routine instance.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @param <AFTER> the new output type.
+     * @param groupCount the number of groups.
+     * @param routine    the processing routine instance.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
+     * @param <AFTER>    the new output type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
     parallel(
-            final int count, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+            final int groupCount, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         ConstantConditions.notNull("routine instance", routine);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
 
@@ -533,7 +446,7 @@ public class Processors {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
-                                        streamConfiguration.asChannelConfiguration(), count,
+                                        streamConfiguration.asChannelConfiguration(), groupCount,
                                         routine, streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -548,19 +461,68 @@ public class Processors {
      * Each output will be assigned to a specific group based on the load of the available
      * invocations.
      *
-     * @param count   the number of groups.
-     * @param builder the builder of processing routine instances.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @param <AFTER> the new output type.
+     * @param groupCount the number of groups.
+     * @param builder    the builder of processing routine instances.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
+     * @param <AFTER>    the new output type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
     parallel(
-            final int count, @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return parallel(count, builder.buildRoutine());
+            final int groupCount,
+            @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        return parallel(groupCount, builder.buildRoutine());
+    }
+
+    /**
+     * Returns a function splitting the outputs produced by the stream, so that each group will be
+     * processed by a different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param factory     the invocation factory.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @param <AFTER>     the new output type.
+     * @return the transformation function.
+     */
+    @NotNull
+    public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
+    parallelBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+        ConstantConditions.notNull("function instance", keyFunction);
+        ConstantConditions.notNull("invocation factory", factory);
+        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
+
+            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
+                return builder.liftWithConfig(
+                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                                extends Channel<?, AFTER>>>() {
+
+                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
+                            apply(
+                                    final StreamConfiguration streamConfiguration,
+                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
+                                            OUT>> function) {
+                                return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
+                                        streamConfiguration.asChannelConfiguration(), keyFunction,
+                                        JRoutineCore.with(factory)
+                                                    .invocationConfiguration()
+                                                    .with(streamConfiguration
+                                                            .asInvocationConfiguration())
+                                                    .configured(),
+                                        streamConfiguration.getInvocationMode()));
+                            }
+                        });
+            }
+        };
     }
 
     /**
@@ -632,16 +594,16 @@ public class Processors {
      * Returns a function making the stream retry the whole flow of data at maximum for the
      * specified number of times.
      *
-     * @param count the maximum number of retries.
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
+     * @param maxCount the maximum number of retries.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
-            final int count) {
-        return retry(count, Backoffs.noDelay());
+            final int maxCount) {
+        return retry(maxCount, Backoffs.noDelay());
     }
 
     /**
@@ -650,17 +612,17 @@ public class Processors {
      * <br>
      * For each retry the specified backoff policy will be applied before re-starting the flow.
      *
-     * @param count   the maximum number of retries.
-     * @param backoff the backoff policy.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
+     * @param maxCount the maximum number of retries.
+     * @param backoff  the backoff policy.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
-            final int count, @NotNull final Backoff backoff) {
-        return retry(new RetryBackoff(count, backoff));
+            final int maxCount, @NotNull final Backoff backoff) {
+        return retry(new RetryBackoff(maxCount, backoff));
     }
 
     /**
@@ -709,11 +671,22 @@ public class Processors {
         };
     }
 
-    // TODO: 25/07/16 throttle
+    /**
+     * Returns a function making the stream throttle the invocation instances so that only the
+     * specified maximum number are concurrently running at any given time.
+     * <br>
+     * Note that the same function instance can be used with several streams, so that the total
+     * number of invocations will not exceed the specified limit.
+     *
+     * @param maxInvocations the maximum number of invocations.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the transformation function.
+     */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-            final int count) {
-        final BindThrottle<IN, OUT> throttle = new BindThrottle<IN, OUT>(count);
+            final int maxInvocations) {
+        final BindThrottle<IN, OUT> throttle = new BindThrottle<IN, OUT>(maxInvocations);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -722,17 +695,44 @@ public class Processors {
         };
     }
 
+    /**
+     * Returns a function making the stream throttle the invocation instances so that only the
+     * specified maximum number are started in the passed time range.
+     * <br>
+     * Note that the same function instance can be used with several streams, so that the total
+     * number of started invocations will not exceed the specified limit.
+     *
+     * @param maxInvocations the maximum number of invocations.
+     * @param range          the time range.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the transformation function.
+     */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-            final int count, @NotNull final UnitDuration range) {
-        return throttle(count, range.value, range.unit);
+            final int maxInvocations, @NotNull final UnitDuration range) {
+        return throttle(maxInvocations, range.value, range.unit);
     }
 
+    /**
+     * Returns a function making the stream throttle the invocation instances so that only the
+     * specified maximum number are started in the passed time range.
+     * <br>
+     * Note that the same function instance can be used with several streams, so that the total
+     * number of started invocations will not exceed the specified limit.
+     *
+     * @param maxInvocations the maximum number.
+     * @param range          the time range value.
+     * @param timeUnit       the time range unit.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
+     * @return the transformation function.
+     */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-            final int count, final long range, @NotNull final TimeUnit timeUnit) {
+            final int maxInvocations, final long range, @NotNull final TimeUnit timeUnit) {
         final BindTimeThrottle<IN, OUT> throttle =
-                new BindTimeThrottle<IN, OUT>(count, range, timeUnit);
+                new BindTimeThrottle<IN, OUT>(maxInvocations, range, timeUnit);
         return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
 
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
@@ -743,7 +743,7 @@ public class Processors {
 
     /**
      * Returns a function making the stream abort with a
-     * {@link com.github.dm.jrt.stream.processor.ResultTimeoutException ResultTimeoutException} if
+     * {@link ResultTimeoutException ResultTimeoutException} if
      * a new result is not produced before the specified timeout elapses.
      * <br>
      * Note that the execution will not be aborted if no output is produced.
@@ -761,7 +761,7 @@ public class Processors {
 
     /**
      * Returns a function making the stream abort with a
-     * {@link com.github.dm.jrt.stream.processor.ResultTimeoutException ResultTimeoutException} if
+     * {@link ResultTimeoutException ResultTimeoutException} if
      * a new result is not produced before the specified timeout elapses.
      * <br>
      * Note that the execution will not be aborted if no output is produced.

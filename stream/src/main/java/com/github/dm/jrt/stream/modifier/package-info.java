@@ -15,8 +15,8 @@
  */
 
 /**
- * Stream processing utility classes.
+ * Stream transformation utility classes.
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;

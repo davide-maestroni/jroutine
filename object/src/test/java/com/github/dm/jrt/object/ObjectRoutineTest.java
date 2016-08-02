@@ -2397,13 +2397,13 @@ public class ObjectRoutineTest {
         public int getWrnCount() {
 
             return mWrnCount;
-        }        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+        }
+
+        public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {
 
             ++mDgbCount;
         }
-
-
 
         public void err(@NotNull final List<Object> contexts, @Nullable final String message,
                 @Nullable final Throwable throwable) {

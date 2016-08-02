@@ -91,7 +91,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         mIdAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
         mLogClassAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.LogClass");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
         mFactoryIdAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
         mClashAnnotationType =
@@ -103,7 +103,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         mStaleTimeAnnotationType =
                 getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
         mRunnerClassAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.RunnerClass");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
         final Types typeUtils = processingEnv.getTypeUtils();
         mServiceProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));

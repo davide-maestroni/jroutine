@@ -14,57 +14,56 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.Action;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/catch channel consumer implementation.
+ * Try/finally channel consumer implementation.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/21/2016.
  *
  * @param <OUT> the output data type.
  */
-class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
+class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
+    private final Action mFinallyAction;
 
     private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param catchConsumer the consumer instance.
+     * @param finallyAction the action instance.
      * @param outputChannel the output channel.
      */
-    TryCatchChannelConsumer(
-            @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
-                    catchConsumer,
+    TryFinallyChannelConsumer(@NotNull final Action finallyAction,
             @NotNull final Channel<OUT, ?> outputChannel) {
-        mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
+        mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
         mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     }
 
-    public void onComplete() {
-        mOutputChannel.close();
+    public void onComplete() throws Exception {
+        try {
+            mFinallyAction.perform();
+
+        } finally {
+            mOutputChannel.close();
+        }
     }
 
-    public void onError(@NotNull final RoutineException error) {
-        final Channel<OUT, ?> channel = mOutputChannel;
+    public void onError(@NotNull final RoutineException error) throws Exception {
         try {
-            mCatchConsumer.accept(error, channel);
-            channel.close();
+            mFinallyAction.perform();
 
-        } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
-            channel.abort(t);
+        } finally {
+            mOutputChannel.abort(error);
         }
     }
 

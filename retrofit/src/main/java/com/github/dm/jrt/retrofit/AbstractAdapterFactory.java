@@ -42,7 +42,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.stream.processor.Processors.output;
+import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Abstract implementation of a call adapter factory supporting {@code Channel} and

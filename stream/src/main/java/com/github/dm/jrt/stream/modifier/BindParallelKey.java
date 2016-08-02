@@ -14,51 +14,62 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.routine.InvocationMode;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/catch binding function.
+ * Parallel by key binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
-
-    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
+class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
     private final ChannelConfiguration mConfiguration;
+
+    private final InvocationMode mInvocationMode;
+
+    private final Function<? super IN, ?> mKeyFunction;
+
+    private final Routine<? super IN, ? extends OUT> mRoutine;
 
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param catchConsumer the error consumer instance.
+     * @param configuration  the channel configuration.
+     * @param keyFunction    the key function.
+     * @param routine        the routine instance.
+     * @param invocationMode the invocation mode.
      */
-    BindTryCatch(@NotNull final ChannelConfiguration configuration,
-            @NotNull final BiConsumer<? super RoutineException, ? super
-                    Channel<OUT, ?>> catchConsumer) {
+    BindParallelKey(@NotNull final ChannelConfiguration configuration,
+            @NotNull final Function<? super IN, ?> keyFunction,
+            @NotNull final Routine<? super IN, ? extends OUT> routine,
+            @NotNull final InvocationMode invocationMode) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
+        mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
+        mRoutine = ConstantConditions.notNull("routine instance", routine);
+        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
                                                             .channelConfiguration()
                                                             .with(mConfiguration)
                                                             .configured()
                                                             .buildChannel();
-        channel.bind(new TryCatchChannelConsumer<OUT>(mCatchConsumer, outputChannel));
+        channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
+                mInvocationMode));
         return outputChannel;
     }
 }

@@ -26,10 +26,10 @@ import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
-import com.github.dm.jrt.android.object.annotation.LogClass;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
-import com.github.dm.jrt.android.object.annotation.RunnerClass;
+import com.github.dm.jrt.android.object.annotation.ServiceLog;
+import com.github.dm.jrt.android.object.annotation.ServiceRunner;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
@@ -88,8 +88,8 @@ public class AndroidBuildersTest extends AndroidTestCase {
         @MatchResolution(ClashResolutionType.ABORT_THIS)
         @LoaderId(-77)
         @ResultStaleTime(333)
-        @LogClass(NullLog.class)
-        @RunnerClass(MyRunner.class)
+        @ServiceLog(NullLog.class)
+        @ServiceRunner(MyRunner.class)
         String toString();
     }
 

@@ -14,60 +14,62 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Action;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/finally channel consumer implementation.
+ * Invocation throttle channel consumer.
  * <p>
- * Created by davide-maestroni on 04/21/2016.
+ * Created by davide-maestroni on 07/29/2016.
  *
  * @param <OUT> the output data type.
  */
-class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
+class ThrottleChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final Action mFinallyAction;
+    private final CompletionHandler mHandler;
 
     private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param finallyAction the action instance.
+     * @param handler       the completion handler.
      * @param outputChannel the output channel.
      */
-    TryFinallyChannelConsumer(@NotNull final Action finallyAction,
+    ThrottleChannelConsumer(@NotNull final CompletionHandler handler,
             @NotNull final Channel<OUT, ?> outputChannel) {
-        mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
-        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+        mHandler = ConstantConditions.notNull("completion handler", handler);
+        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
-    public void onComplete() throws Exception {
-        try {
-            mFinallyAction.perform();
-
-        } finally {
-            mOutputChannel.close();
-        }
+    public void onComplete() {
+        mOutputChannel.close();
+        mHandler.onComplete();
     }
 
-    public void onError(@NotNull final RoutineException error) throws Exception {
-        try {
-            mFinallyAction.perform();
-
-        } finally {
-            mOutputChannel.abort(error);
-        }
+    public void onError(@NotNull final RoutineException error) {
+        mOutputChannel.abort(error);
+        mHandler.onComplete();
     }
 
     public void onOutput(final OUT output) {
         mOutputChannel.pass(output);
+    }
+
+    /**
+     * Interface defining an invocation completion handler.
+     */
+    interface CompletionHandler {
+
+        /**
+         * Notifies the handler that the invocation has completed.
+         */
+        void onComplete();
     }
 }

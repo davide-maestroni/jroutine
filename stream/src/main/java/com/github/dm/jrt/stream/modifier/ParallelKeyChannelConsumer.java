@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -26,50 +27,63 @@ import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+
 /**
- * Parallel by key binding function.
+ * Parallel by key channel consumer.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
+class ParallelKeyChannelConsumer<IN, OUT> extends BindMap<IN, OUT> implements ChannelConsumer<IN> {
 
-    private final ChannelConfiguration mConfiguration;
-
-    private final InvocationMode mInvocationMode;
+    private final HashMap<Object, Channel<IN, IN>> mInputChannels =
+            new HashMap<Object, Channel<IN, IN>>();
 
     private final Function<? super IN, ?> mKeyFunction;
 
-    private final Routine<? super IN, ? extends OUT> mRoutine;
+    private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param configuration  the channel configuration.
+     * @param outputChannel  the output channel instance.
      * @param keyFunction    the key function.
      * @param routine        the routine instance.
      * @param invocationMode the invocation mode.
      */
-    BindParallelKey(@NotNull final ChannelConfiguration configuration,
+    ParallelKeyChannelConsumer(@NotNull final Channel<OUT, ?> outputChannel,
             @NotNull final Function<? super IN, ?> keyFunction,
             @NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        super(routine, invocationMode);
+        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
         mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
-        mRoutine = ConstantConditions.notNull("routine instance", routine);
-        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                            .channelConfiguration()
-                                                            .with(mConfiguration)
-                                                            .configured()
-                                                            .buildChannel();
-        channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
-                mInvocationMode));
-        return outputChannel;
+    public void onComplete() {
+        mOutputChannel.close();
+        for (final Channel<IN, ?> channel : mInputChannels.values()) {
+            channel.close();
+        }
+    }
+
+    public void onError(@NotNull final RoutineException error) {
+        mOutputChannel.abort(error);
+    }
+
+    public void onOutput(final IN output) throws Exception {
+        final HashMap<Object, Channel<IN, IN>> channels = mInputChannels;
+        final Object key = mKeyFunction.apply(output);
+        Channel<IN, IN> inputChannel = channels.get(key);
+        if (inputChannel == null) {
+            inputChannel = JRoutineCore.io().buildChannel();
+            mOutputChannel.pass(super.apply(inputChannel));
+            channels.put(key, inputChannel);
+        }
+
+        inputChannel.pass(output);
     }
 }

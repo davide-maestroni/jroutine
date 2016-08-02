@@ -61,8 +61,8 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.processor.Processors.outputAccept;
-import static com.github.dm.jrt.stream.processor.Processors.tryCatchAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
+import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

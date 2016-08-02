@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.processor;
+package com.github.dm.jrt.stream.modifier;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.operator.Operators;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Binding function generating the output returned by the specified consumer.
+ * Binding function generating the output returned by the specified supplier.
  * <p>
  * Created by davide-maestroni on 07/12/2016.
  *
  * @param <OUT> the output data type.
  */
-class BindOutputConsumer<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>> {
+class BindOutputSupplier<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>> {
 
     private final InvocationConfiguration mConfiguration;
 
@@ -42,29 +42,29 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>
 
     private final InvocationMode mInvocationMode;
 
-    private final Consumer<? super Channel<OUT, ?>> mOutputConsumer;
+    private final Supplier<? extends OUT> mOutputSupplier;
 
     /**
      * Constructor.
      *
-     * @param configuration   the invocation configuration.
-     * @param invocationMode  the invocation mode.
-     * @param count           the loop count.
-     * @param outputsConsumer the consumer instance.
+     * @param configuration  the invocation configuration.
+     * @param invocationMode the invocation mode.
+     * @param count          the loop count.
+     * @param outputSupplier the supplier instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
-    BindOutputConsumer(@NotNull final InvocationConfiguration configuration,
+    BindOutputSupplier(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, final long count,
-            @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+            @NotNull final Supplier<? extends OUT> outputSupplier) {
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         mCount = ConstantConditions.positive("count number", count);
-        mOutputConsumer = ConstantConditions.notNull("consumer instance", outputsConsumer);
+        mOutputSupplier = ConstantConditions.notNull("supplier instance", outputSupplier);
     }
 
     public Channel<?, OUT> apply(final Channel<?, ?> channel) {
         return mInvocationMode.invoke(
-                JRoutineCore.with(Operators.appendAccept(mCount, mOutputConsumer))
+                JRoutineCore.with(Operators.appendGet(mCount, mOutputSupplier))
                             .invocationConfiguration()
                             .with(mConfiguration)
                             .configured()).close();

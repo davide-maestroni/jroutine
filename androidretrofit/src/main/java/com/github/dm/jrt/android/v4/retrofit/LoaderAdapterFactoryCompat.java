@@ -45,7 +45,7 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
-import static com.github.dm.jrt.stream.processor.Processors.output;
+import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamBuilder} and

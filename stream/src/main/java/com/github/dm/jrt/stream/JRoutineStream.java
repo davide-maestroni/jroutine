@@ -17,6 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final Routine&lt;Integer, Double&gt; rms =
  *                 JRoutineStream.&lt;Integer&gt;withStream()
+ *                               .parallel()
  *                               .map(i -&gt; i * i)
  *                               .straight()
  *                               .map(averageFloat())
@@ -58,7 +60,7 @@ public class JRoutineStream {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN> com.github.dm.jrt.stream.builder.StreamBuilder<IN, IN> withStream() {
+    public static <IN> StreamBuilder<IN, IN> withStream() {
         return new DefaultStreamBuilder<IN, IN>();
     }
 }

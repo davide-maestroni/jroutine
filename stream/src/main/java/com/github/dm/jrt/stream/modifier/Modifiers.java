@@ -113,7 +113,7 @@ public class Modifiers {
 
     /**
      * Returns a function adding a delay at the beginning of the stream, so that any data, exception
-     * or completion notification coming from the source will be dispatched to this stream after the
+     * or completion notification coming from the source will be dispatched to the stream after the
      * specified time.
      *
      * @param delay    the delay value.
@@ -152,7 +152,7 @@ public class Modifiers {
 
     /**
      * Returns a function adding a delay at the beginning of the stream, so that any data, exception
-     * or completion notification coming from the source will be dispatched to this stream after the
+     * or completion notification coming from the source will be dispatched to the stream after the
      * specified time.
      *
      * @param delay the delay.

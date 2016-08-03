@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream.modifier;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.function.Function;
@@ -39,7 +40,8 @@ class BindOutput<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>> {
      * @param channel the channel instance.
      */
     BindOutput(@Nullable final Channel<?, ? extends OUT> channel) {
-        mChannel = (channel != null) ? channel : JRoutineCore.io().<OUT>of();
+        mChannel = Channels.replay((channel != null) ? channel : JRoutineCore.io().<OUT>of())
+                           .buildChannels();
     }
 
     @SuppressWarnings("unchecked")

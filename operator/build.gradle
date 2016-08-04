@@ -34,6 +34,7 @@ dependencies {
 
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
@@ -56,5 +57,6 @@ javadoc {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links("${prefix}/core/",
+            "${prefix}/channel/",
             "${prefix}/function/")
 }

@@ -195,7 +195,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                             annotations, retrofit), responseType);
 
         } else if (StreamBuilder.class == returnRawType) {
-            return new StreamBuilderAdapter(invocationMode,
+            return new StreamBuilderAdapter(configuration, invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -387,27 +387,35 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      */
     private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
 
+        private final InvocationConfiguration mInvocationConfiguration;
+
         private final InvocationMode mInvocationMode;
 
         /**
          * Constructor.
          *
+         * @param configuration  the invocation configuration.
          * @param invocationMode the invocation mode.
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private StreamBuilderAdapter(@NotNull final InvocationMode invocationMode,
+        private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
+                @NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
+            mInvocationConfiguration =
+                    ConstantConditions.notNull("invocation configuration", configuration);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .sync()
                                  .let(output(call))
                                  .invocationMode(mInvocationMode)
+                                 .invocationConfiguration()
+                                 .with(mInvocationConfiguration)
+                                 .configured()
                                  .map(getRoutine());
         }
     }

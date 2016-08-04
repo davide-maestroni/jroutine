@@ -227,14 +227,13 @@ public class Modifiers {
 
             @SuppressWarnings("unchecked")
             public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, ?> builder) {
-                return ((StreamBuilder<IN, Object>) builder).liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                return ((StreamBuilder<IN, Object>) builder).lift(
+                        new Function<Function<? super Channel<?, IN>, ?
                                 extends Channel<?, Object>>, Function<? super Channel<?, IN>, ?
                                 extends Channel<?, OUT>>>() {
 
                             public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
                             apply(
-                                    final StreamConfiguration streamConfiguration,
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             Object>> function) {
                                 return decorate(function).andThen(new BindOutput<OUT>(channel));

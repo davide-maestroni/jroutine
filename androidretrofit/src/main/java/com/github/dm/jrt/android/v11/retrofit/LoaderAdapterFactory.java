@@ -135,7 +135,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
         if (LoaderStreamBuilder.class == returnRawType) {
-            return new LoaderStreamBuilderAdapter(mLoaderContext, invocationMode,
+            return new LoaderStreamBuilderAdapter(mLoaderContext, configuration, invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -253,32 +253,40 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
         private final LoaderContext mContext;
 
+        private final InvocationConfiguration mInvocationConfiguration;
+
         private final InvocationMode mInvocationMode;
 
         /**
          * Constructor.
          *
          * @param context        the loader context.
+         * @param configuration  the invocation configuration.
          * @param invocationMode the invocation mode.
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
         private LoaderStreamBuilderAdapter(@Nullable final LoaderContext context,
+                @NotNull final InvocationConfiguration configuration,
                 @NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mContext = context;
-            mInvocationMode = invocationMode;
+            mInvocationConfiguration =
+                    ConstantConditions.notNull("invocation configuration", configuration);
+            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         @Override
         public <OUT> LoaderStreamBuilder adapt(final Call<OUT> call) {
             return JRoutineLoaderStream.withStream()
                                        .on(mContext)
-                                       .sync()
                                        .let(output(ComparableCall.of(call)))
                                        .invocationMode(mInvocationMode)
+                                       .invocationConfiguration()
+                                       .with(mInvocationConfiguration)
+                                       .configured()
                                        .map(getRoutine());
         }
     }

@@ -29,12 +29,14 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -400,10 +402,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * Stream routine builder adapter implementation.
      */
     private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
-            Function<Function<Channel<?, Object>, Channel<?, ParcelableSelectable<Object>>>,
-                    Function<Channel<?, Object>, Channel<?, Object>>> {
-
-        private final ChannelConfiguration mChannelConfiguration;
+            BiFunction<StreamConfiguration, Function<Channel<?, Object>, Channel<?,
+                    ParcelableSelectable<Object>>>, Function<Channel<?, Object>, Channel<?,
+                    Object>>> {
 
         private final Converter<ResponseBody, ?> mConverter;
 
@@ -429,30 +430,30 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
             mInvocationMode = invocationMode;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
             mConverter = converter;
         }
 
         @Override
         public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                final StreamConfiguration streamConfiguration,
                 final Function<Channel<?, Object>, Channel<?, ParcelableSelectable<Object>>>
                         function) throws
                 Exception {
             return decorate(function).andThen(
-                    new BindService(mChannelConfiguration, mConverter, getRoutine()));
+                    new BindService(streamConfiguration.asChannelConfiguration(), mConverter,
+                            getRoutine()));
         }
 
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.withStream()
-                                 .sync()
                                  .let(output(call))
                                  .invocationMode(mInvocationMode)
                                  .invocationConfiguration()
                                  .with(mInvocationConfiguration)
                                  .configured()
                                  .map(sInvocation)
-                                 .lift(this);
+                                 .liftWithConfig(this);
         }
     }
 }

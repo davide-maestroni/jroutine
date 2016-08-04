@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +42,7 @@ class AppendOutputInvocation<OUT> extends GenerateInvocation<OUT, OUT> {
      */
     AppendOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
         super(asArgs(channel));
-        mChannel = channel;
+        mChannel = (channel != null) ? Channels.replay(channel).buildChannels() : null;
     }
 
     public void onComplete(@NotNull final Channel<OUT, ?> result) {

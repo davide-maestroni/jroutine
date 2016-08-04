@@ -100,6 +100,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      * @return the invocation factory.
      */
     @NotNull
+    @SuppressWarnings("UnusedParameters")
     protected ContextInvocationFactory<Call<Object>, Object> getFactory(
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
@@ -114,15 +115,13 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
                         annotations, retrofit);
         if (channelAdapter != null) {
             return new ChannelAdapterInvocationFactory(
-                    asArgs(delegateFactory, configuration, invocationMode, responseType,
-                            annotations, retrofit), channelAdapter);
+                    asArgs(delegateFactory, responseType, annotations, retrofit), channelAdapter);
         }
 
         final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
         if (bodyAdapter != null) {
             return new BodyAdapterInvocationFactory(
-                    asArgs(delegateFactory, configuration, invocationMode, responseType,
-                            annotations, retrofit), bodyAdapter);
+                    asArgs(delegateFactory, responseType, annotations, retrofit), bodyAdapter);
         }
 
         throw new IllegalArgumentException(

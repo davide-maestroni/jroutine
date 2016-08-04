@@ -135,8 +135,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
         if (LoaderStreamBuilderCompat.class == returnRawType) {
-            return new LoaderStreamBuilderCompatAdapter(mLoaderContext, configuration,
-                    invocationMode,
+            return new LoaderStreamBuilderCompatAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -253,42 +252,27 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     private static class LoaderStreamBuilderCompatAdapter
             extends BaseAdapter<LoaderStreamBuilderCompat> {
 
-        private final LoaderContextCompat mContext;
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
         private final InvocationMode mInvocationMode;
 
         /**
          * Constructor.
          *
-         * @param context        the loader context.
-         * @param configuration  the invocation configuration.
          * @param invocationMode the invocation mode.
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private LoaderStreamBuilderCompatAdapter(@Nullable final LoaderContextCompat context,
-                @NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
+        private LoaderStreamBuilderCompatAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
-            mContext = context;
-            mInvocationConfiguration =
-                    ConstantConditions.notNull("invocation configuration", configuration);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         @Override
         public <OUT> LoaderStreamBuilderCompat adapt(final Call<OUT> call) {
             return JRoutineLoaderStreamCompat.withStream()
-                                             .on(mContext)
                                              .let(output(ComparableCall.of(call)))
                                              .invocationMode(mInvocationMode)
-                                             .invocationConfiguration()
-                                             .with(mInvocationConfiguration)
-                                             .configured()
                                              .map(getRoutine());
         }
     }

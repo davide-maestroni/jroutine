@@ -407,8 +407,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final boolean isStaleResult =
                 isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
-        if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_OTHER)
-                || isStaleResult) {
+        final boolean isRestart = (clashType == ClashType.ABORT_OTHER) || isStaleResult;
+        if ((callbacks == null) || (loader == null) || isRestart) {
             final InvocationLoader<IN, OUT> invocationLoader;
             if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
                 invocationLoader = (InvocationLoader<IN, OUT>) loader;
@@ -435,7 +435,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
         callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel());
-        if ((clashType == ClashType.ABORT_OTHER) || isStaleResult) {
+        if (isRestart) {
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 

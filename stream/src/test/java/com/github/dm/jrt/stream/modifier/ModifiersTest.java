@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.UnitDuration.days;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.reduce;
@@ -712,12 +713,16 @@ public class ModifiersTest {
 
     @Test
     public void testThrottle() {
-        final Routine<Object, Object> routine =
-                JRoutineStream.withStream().let(throttle(1)).buildRoutine();
+        final Routine<Object, Object> routine = JRoutineStream.withStream()
+                                                              .let(throttle(1))
+                                                              .invocationConfiguration()
+                                                              .withRunner(Runners.poolRunner(1))
+                                                              .configured()
+                                                              .buildRoutine();
         final Channel<Object, Object> channel1 = routine.asyncCall().pass("test1");
         final Channel<Object, Object> channel2 = routine.asyncCall().pass("test2");
-        assertThat(channel1.close().after(seconds(1.5)).next()).isEqualTo("test1");
-        assertThat(channel2.close().after(seconds(1.5)).next()).isEqualTo("test2");
+        assertThat(channel1.close().after(days(1.5)).next()).isEqualTo("test1");
+        assertThat(channel2.close().after(days(1.5)).next()).isEqualTo("test2");
     }
 
     @Test

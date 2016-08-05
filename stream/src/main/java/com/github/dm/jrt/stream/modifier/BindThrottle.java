@@ -103,10 +103,11 @@ class BindThrottle<IN, OUT> implements
             synchronized (mMutex) {
                 isBind = (++mCount <= mMaxCount);
                 if (!isBind) {
-                    if (!mRunner.isManagedThread()) {
+                    final Runner runner = mRunner;
+                    if (runner.isExecutionThread() && !runner.isManagedThread()) {
                         throw new InvocationDeadlockException(
                                 "cannot wait for invocation instances on a non-managed thread\nTry "
-                                        + "increasing the max allowed number");
+                                        + "employing a different runner");
                     }
 
                     mQueue.add(new Runnable() {

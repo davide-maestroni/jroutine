@@ -77,14 +77,14 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  */
 public class Builders {
 
-    private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
-            new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
+    private static final HashMap<Class<?>, HashMap<String, Method>> sAliasMethods =
+            new HashMap<Class<?>, HashMap<String, Method>>();
 
-    private static final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> sLocks =
-            new WeakIdentityHashMap<Object, Map<String, ReentrantLock>>();
+    private static final WeakIdentityHashMap<Object, HashMap<String, ReentrantLock>> sLocks =
+            new WeakIdentityHashMap<Object, HashMap<String, ReentrantLock>>();
 
-    private static final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> sMethods =
-            new WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>>();
+    private static final HashMap<Class<?>, HashMap<Method, MethodInfo>> sMethods =
+            new HashMap<Class<?>, HashMap<Method, MethodInfo>>();
 
     private static final WeakIdentityHashMap<Object, ExchangeMutex> sMutexes =
             new WeakIdentityHashMap<Object, ExchangeMutex>();
@@ -180,8 +180,8 @@ public class Builders {
     public static Method getAnnotatedMethod(@NotNull final Class<?> targetClass,
             @NotNull final String name) {
         synchronized (sAliasMethods) {
-            final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasMethods = sAliasMethods;
-            Map<String, Method> methodMap = aliasMethods.get(targetClass);
+            final HashMap<Class<?>, HashMap<String, Method>> aliasMethods = sAliasMethods;
+            HashMap<String, Method> methodMap = aliasMethods.get(targetClass);
             if (methodMap == null) {
                 methodMap = new HashMap<String, Method>();
                 fillMap(methodMap, targetClass.getMethods());
@@ -369,8 +369,8 @@ public class Builders {
         }
 
         synchronized (sLocks) {
-            final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> locksCache = sLocks;
-            Map<String, ReentrantLock> lockMap = locksCache.get(target);
+            final WeakIdentityHashMap<Object, HashMap<String, ReentrantLock>> locksCache = sLocks;
+            HashMap<String, ReentrantLock> lockMap = locksCache.get(target);
             if (lockMap == null) {
                 lockMap = new HashMap<String, ReentrantLock>();
                 locksCache.put(target, lockMap);
@@ -407,8 +407,8 @@ public class Builders {
             @NotNull final Method proxyMethod) {
         MethodInfo methodInfo;
         synchronized (sMethods) {
-            final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethods;
-            Map<Method, MethodInfo> methodMap = methodCache.get(targetClass);
+            final HashMap<Class<?>, HashMap<Method, MethodInfo>> methodCache = sMethods;
+            HashMap<Method, MethodInfo> methodMap = methodCache.get(targetClass);
             if (methodMap == null) {
                 methodMap = new HashMap<Method, MethodInfo>();
                 methodCache.put(targetClass, methodMap);

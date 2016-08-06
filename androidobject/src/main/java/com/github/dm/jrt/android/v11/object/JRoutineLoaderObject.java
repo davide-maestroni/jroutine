@@ -23,8 +23,6 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
-
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.
@@ -77,9 +75,6 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderObject {
 
-    private static final WeakHashMap<LoaderContext, LoaderObjectBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, LoaderObjectBuilder>();
-
     /**
      * Avoid explicit instantiation.
      */
@@ -95,16 +90,7 @@ public class JRoutineLoaderObject {
      */
     @NotNull
     public static LoaderObjectBuilder on(@NotNull final LoaderContext context) {
-        synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, LoaderObjectBuilder> builders = sBuilders;
-            LoaderObjectBuilder builder = builders.get(context);
-            if (builder == null) {
-                builder = new LoaderObjectBuilder(context);
-                builders.put(context, builder);
-            }
-
-            return builder;
-        }
+        return new LoaderObjectBuilder(context);
     }
 
     /**

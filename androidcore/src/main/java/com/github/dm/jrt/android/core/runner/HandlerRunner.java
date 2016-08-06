@@ -26,6 +26,7 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,8 +37,8 @@ import java.util.concurrent.TimeUnit;
  */
 class HandlerRunner extends AsyncRunner {
 
-    private final WeakIdentityHashMap<Execution, ExecutionDecorator> mExecutions =
-            new WeakIdentityHashMap<Execution, ExecutionDecorator>();
+    private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
+            new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
 
     private final Handler mHandler;
 
@@ -55,7 +56,8 @@ class HandlerRunner extends AsyncRunner {
     public void cancel(@NotNull final Execution execution) {
         final ExecutionDecorator decorator;
         synchronized (mExecutions) {
-            decorator = mExecutions.remove(execution);
+            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+            decorator = (reference != null) ? reference.get() : null;
         }
 
         mHandler.removeCallbacks(decorator);
@@ -66,11 +68,13 @@ class HandlerRunner extends AsyncRunner {
             @NotNull final TimeUnit timeUnit) {
         ExecutionDecorator decorator;
         synchronized (mExecutions) {
-            final WeakIdentityHashMap<Execution, ExecutionDecorator> executions = mExecutions;
-            decorator = executions.get(execution);
+            final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
+                    mExecutions;
+            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+            decorator = (reference != null) ? reference.get() : null;
             if (decorator == null) {
                 decorator = new ExecutionDecorator(execution);
-                executions.put(execution, decorator);
+                executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
             }
         }
 

@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,8 +54,8 @@ public class PriorityRunner {
     private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
             new PriorityExecutionComparator();
 
-    private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunners =
-            new WeakIdentityHashMap<Runner, PriorityRunner>();
+    private static final WeakIdentityHashMap<Runner, WeakReference<PriorityRunner>> sRunners =
+            new WeakIdentityHashMap<Runner, WeakReference<PriorityRunner>>();
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
@@ -99,11 +100,12 @@ public class PriorityRunner {
         }
 
         synchronized (sRunners) {
-            final WeakIdentityHashMap<Runner, PriorityRunner> runners = sRunners;
-            PriorityRunner runner = runners.get(wrapped);
+            final WeakIdentityHashMap<Runner, WeakReference<PriorityRunner>> runners = sRunners;
+            final WeakReference<PriorityRunner> reference = runners.get(wrapped);
+            PriorityRunner runner = (reference != null) ? reference.get() : null;
             if (runner == null) {
                 runner = new PriorityRunner(wrapped);
-                runners.put(wrapped, runner);
+                runners.put(wrapped, new WeakReference<PriorityRunner>(runner));
             }
 
             return runner;

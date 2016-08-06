@@ -31,7 +31,6 @@ import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.ConverterRoutine;
@@ -49,6 +48,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
 import static com.github.dm.jrt.android.core.service.InvocationService.putError;
@@ -270,13 +271,13 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             }
 
             mIsUnbound = true;
-            // Unbind on main thread to avoid crashing the IPC
-            AndroidRunners.mainRunner().run(new Execution() {
+            final Context serviceContext = mContext.getServiceContext();
+            if (serviceContext != null) {
+                // Unbind on main thread to avoid crashing the IPC
+                Runners.zeroDelayRunner(mainRunner()).run(new Execution() {
 
-                @Override
-                public void run() {
-                    final Context serviceContext = mContext.getServiceContext();
-                    if (serviceContext != null) {
+                    @Override
+                    public void run() {
                         // Unfortunately there is no way to know if the context is still valid
                         try {
                             serviceContext.unbindService(mConnection);
@@ -286,8 +287,8 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
                             mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
                         }
                     }
-                }
-            }, 0, TimeUnit.MILLISECONDS);
+                }, 0, TimeUnit.MILLISECONDS);
+            }
         }
     }
 

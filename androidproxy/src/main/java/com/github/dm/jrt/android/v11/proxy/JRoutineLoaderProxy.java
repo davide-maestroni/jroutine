@@ -23,8 +23,6 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
-
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods, bound to a context lifecycle.
@@ -47,9 +45,6 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderProxy {
 
-    private static final WeakHashMap<LoaderContext, LoaderProxyBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, LoaderProxyBuilder>();
-
     /**
      * Avoid explicit instantiation.
      */
@@ -65,16 +60,7 @@ public class JRoutineLoaderProxy {
      */
     @NotNull
     public static LoaderProxyBuilder on(@NotNull final LoaderContext context) {
-        synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, LoaderProxyBuilder> builders = sBuilders;
-            LoaderProxyBuilder builder = builders.get(context);
-            if (builder == null) {
-                builder = new LoaderProxyBuilder(context);
-                builders.put(context, builder);
-            }
-
-            return builder;
-        }
+        return new LoaderProxyBuilder(context);
     }
 
     /**

@@ -22,8 +22,6 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
-
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.
@@ -69,9 +67,6 @@ import java.util.WeakHashMap;
  */
 public class JRoutineServiceObject {
 
-    private static final WeakHashMap<ServiceContext, ServiceObjectBuilder> sBuilders =
-            new WeakHashMap<ServiceContext, ServiceObjectBuilder>();
-
     /**
      * Avoid explicit instantiation.
      */
@@ -87,16 +82,7 @@ public class JRoutineServiceObject {
      */
     @NotNull
     public static ServiceObjectBuilder on(@NotNull final ServiceContext context) {
-        synchronized (sBuilders) {
-            final WeakHashMap<ServiceContext, ServiceObjectBuilder> builders = sBuilders;
-            ServiceObjectBuilder builder = builders.get(context);
-            if (builder == null) {
-                builder = new ServiceObjectBuilder(context);
-                builders.put(context, builder);
-            }
-
-            return builder;
-        }
+        return new ServiceObjectBuilder(context);
     }
 
     /**

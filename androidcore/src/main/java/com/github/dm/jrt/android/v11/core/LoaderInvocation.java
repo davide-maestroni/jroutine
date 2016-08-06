@@ -176,7 +176,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -215,7 +215,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -256,7 +256,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -300,7 +300,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }

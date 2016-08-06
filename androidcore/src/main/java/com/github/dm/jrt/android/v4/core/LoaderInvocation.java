@@ -174,7 +174,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -214,7 +214,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -256,7 +256,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }
@@ -301,7 +301,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
-                callbackMap.get(component);
+                callbackMap.prune().get(component);
         if (callbackArray == null) {
             return;
         }

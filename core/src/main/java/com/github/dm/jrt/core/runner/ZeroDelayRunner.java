@@ -36,8 +36,8 @@ class ZeroDelayRunner extends RunnerDecorator {
 
     private static final QueuedRunner sSyncRunner = new QueuedRunner();
 
-    private final WeakIdentityHashMap<Execution, ExecutionDecorator> mExecutions =
-            new WeakIdentityHashMap<Execution, ExecutionDecorator>();
+    private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
+            new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
 
     /**
      * Constructor.
@@ -78,7 +78,8 @@ class ZeroDelayRunner extends RunnerDecorator {
     public void cancel(@NotNull final Execution execution) {
         final ExecutionDecorator decorator;
         synchronized (mExecutions) {
-            decorator = mExecutions.remove(execution);
+            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+            decorator = (reference != null) ? reference.get() : null;
         }
 
         if (decorator != null) {
@@ -94,11 +95,13 @@ class ZeroDelayRunner extends RunnerDecorator {
         if ((delay == 0) && getThreadManager().isManagedThread()) {
             ExecutionDecorator decorator;
             synchronized (mExecutions) {
-                final WeakIdentityHashMap<Execution, ExecutionDecorator> executions = mExecutions;
-                decorator = executions.get(execution);
+                final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
+                        mExecutions;
+                final WeakReference<ExecutionDecorator> reference = mExecutions.get(execution);
+                decorator = (reference != null) ? reference.get() : null;
                 if (decorator == null) {
                     decorator = new ExecutionDecorator(execution);
-                    executions.put(execution, decorator);
+                    executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
                 }
             }
 

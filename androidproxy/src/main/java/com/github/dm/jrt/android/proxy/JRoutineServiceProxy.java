@@ -23,8 +23,6 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
-
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods in a dedicated service.
@@ -42,9 +40,6 @@ import java.util.WeakHashMap;
  */
 public class JRoutineServiceProxy {
 
-    private static final WeakHashMap<ServiceContext, ServiceProxyBuilder> sBuilders =
-            new WeakHashMap<ServiceContext, ServiceProxyBuilder>();
-
     /**
      * Avoid explicit instantiation.
      */
@@ -60,16 +55,7 @@ public class JRoutineServiceProxy {
      */
     @NotNull
     public static ServiceProxyBuilder on(@NotNull final ServiceContext context) {
-        synchronized (sBuilders) {
-            final WeakHashMap<ServiceContext, ServiceProxyBuilder> builders = sBuilders;
-            ServiceProxyBuilder builder = builders.get(context);
-            if (builder == null) {
-                builder = new ServiceProxyBuilder(context);
-                builders.put(context, builder);
-            }
-
-            return builder;
-        }
+        return new ServiceProxyBuilder(context);
     }
 
     /**

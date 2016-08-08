@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.LRUHashMap;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.annotation.Alias;
@@ -77,14 +78,18 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  */
 public class Builders {
 
-    private static final HashMap<Class<?>, HashMap<String, Method>> sAliasMethods =
-            new HashMap<Class<?>, HashMap<String, Method>>();
+    private static final int DEFAULT_CAPACITY = 16;
+
+    private static final int DOUBLE_CAPACITY = DEFAULT_CAPACITY << 1;
+
+    private static final LRUHashMap<Class<?>, HashMap<String, Method>> sAliasMethods =
+            new LRUHashMap<Class<?>, HashMap<String, Method>>(DEFAULT_CAPACITY);
 
     private static final WeakIdentityHashMap<Object, HashMap<String, ReentrantLock>> sLocks =
             new WeakIdentityHashMap<Object, HashMap<String, ReentrantLock>>();
 
-    private static final HashMap<Class<?>, HashMap<Method, MethodInfo>> sMethods =
-            new HashMap<Class<?>, HashMap<Method, MethodInfo>>();
+    private static final LRUHashMap<Class<?>, LRUHashMap<Method, MethodInfo>> sMethods =
+            new LRUHashMap<Class<?>, LRUHashMap<Method, MethodInfo>>(DEFAULT_CAPACITY);
 
     private static final WeakIdentityHashMap<Object, ExchangeMutex> sMutexes =
             new WeakIdentityHashMap<Object, ExchangeMutex>();
@@ -180,7 +185,7 @@ public class Builders {
     public static Method getAnnotatedMethod(@NotNull final Class<?> targetClass,
             @NotNull final String name) {
         synchronized (sAliasMethods) {
-            final HashMap<Class<?>, HashMap<String, Method>> aliasMethods = sAliasMethods;
+            final LRUHashMap<Class<?>, HashMap<String, Method>> aliasMethods = sAliasMethods;
             HashMap<String, Method> methodMap = aliasMethods.get(targetClass);
             if (methodMap == null) {
                 methodMap = new HashMap<String, Method>();
@@ -400,17 +405,17 @@ public class Builders {
      * @param targetClass the target class.
      * @param proxyMethod the proxy method.
      * @return the method info.
-     * @throws java.lang.IllegalArgumentException if no target method was found.
+     * @throws java.lang.IllegalArgumentException if the same alias is used more than once.
      */
     @NotNull
     public static MethodInfo getTargetMethodInfo(@NotNull final Class<?> targetClass,
             @NotNull final Method proxyMethod) {
         MethodInfo methodInfo;
         synchronized (sMethods) {
-            final HashMap<Class<?>, HashMap<Method, MethodInfo>> methodCache = sMethods;
-            HashMap<Method, MethodInfo> methodMap = methodCache.get(targetClass);
+            final LRUHashMap<Class<?>, LRUHashMap<Method, MethodInfo>> methodCache = sMethods;
+            LRUHashMap<Method, MethodInfo> methodMap = methodCache.get(targetClass);
             if (methodMap == null) {
-                methodMap = new HashMap<Method, MethodInfo>();
+                methodMap = new LRUHashMap<Method, MethodInfo>(DOUBLE_CAPACITY);
                 methodCache.put(targetClass, methodMap);
             }
 

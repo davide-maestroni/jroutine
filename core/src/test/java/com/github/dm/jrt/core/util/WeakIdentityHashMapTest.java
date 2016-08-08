@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Cache hash map unit tests.
+ * Weak identity hash map unit tests.
  * <p>
  * Created by davide-maestroni on 11/18/2014.
  */

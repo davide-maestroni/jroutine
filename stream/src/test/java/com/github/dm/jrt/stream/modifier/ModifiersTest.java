@@ -712,7 +712,7 @@ public class ModifiersTest {
     }
 
     @Test
-    public void testThrottle() {
+    public void testThrottle() throws InterruptedException {
         final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                               .let(throttle(1))
                                                               .invocationConfiguration()
@@ -721,6 +721,7 @@ public class ModifiersTest {
                                                               .buildRoutine();
         final Channel<Object, Object> channel1 = routine.asyncCall().pass("test1");
         final Channel<Object, Object> channel2 = routine.asyncCall().pass("test2");
+        seconds(0.5).sleepAtLeast();
         assertThat(channel1.close().after(days(1.5)).next()).isEqualTo("test1");
         assertThat(channel2.close().after(days(1.5)).next()).isEqualTo("test2");
     }

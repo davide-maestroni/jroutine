@@ -39,11 +39,11 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncIn;
-import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.object.annotation.AsyncInput;
+import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
+import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogType;
@@ -641,7 +641,7 @@ public class ProxyRoutineTest {
         int add0(char c);
 
         @Alias("a")
-        int add1(@AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+        int add1(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @AsyncMethod(char.class)
@@ -654,22 +654,22 @@ public class ProxyRoutineTest {
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        int add2(@AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+        int add2(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add3(char c);
 
         @Alias("a")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add4(
-                @AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+                @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add5(
-                @AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+                @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @AsyncMethod(char.class)
@@ -684,56 +684,56 @@ public class ProxyRoutineTest {
         int[] addA00(char[] c);
 
         @Alias("aa")
-        int[] addA01(@AsyncIn(value = char[].class,
+        int[] addA01(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        int[] addA02(@AsyncIn(value = char[].class,
+        int[] addA02(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        int[] addA03(@AsyncIn(value = char[].class,
+        int[] addA03(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, int[]> addA04(char[] c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, int[]> addA05(
-                @AsyncIn(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+                @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, int[]> addA06(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, int[]> addA06(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, int[]> addA07(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, int[]> addA07(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addA08(char[] c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addA09(
-                @AsyncIn(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+                @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addA10(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addA10(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addA11(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addA11(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
@@ -776,56 +776,56 @@ public class ProxyRoutineTest {
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
-        List<Integer> addL01(@AsyncIn(value = List.class,
+        List<Integer> addL01(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        List<Integer> addL02(@AsyncIn(value = List.class,
+        List<Integer> addL02(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        List<Integer> addL03(@AsyncIn(value = List.class,
+        List<Integer> addL03(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL05(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL05(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL06(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL06(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL07(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL07(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addL08(List<Character> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL09(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL09(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL10(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL10(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL11(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL11(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
@@ -871,11 +871,11 @@ public class ProxyRoutineTest {
         void set0(int i);
 
         @Alias("g")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> get1();
 
         @Alias("s")
-        void set1(@AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+        void set1(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
         @Alias("g")
         @AsyncMethod({})
@@ -883,7 +883,7 @@ public class ProxyRoutineTest {
 
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
-        void set2(@AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+        void set2(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
         @Alias("g")
         @AsyncMethod({})
@@ -896,18 +896,18 @@ public class ProxyRoutineTest {
         void setA0(int[] i);
 
         @Alias("ga")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> getA1();
 
         @Alias("sa")
-        void setA1(@AsyncIn(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
+        void setA1(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
         @Alias("ga")
         @AsyncMethod({})
         Channel<Void, int[]> getA2();
 
         @Alias("sa")
-        void setA2(@AsyncIn(value = int[].class,
+        void setA2(@AsyncInput(value = int[].class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
         @Alias("ga")
@@ -916,7 +916,7 @@ public class ProxyRoutineTest {
 
         @Alias("sa")
         @Invoke(InvocationMode.PARALLEL)
-        void setA3(@AsyncIn(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
+        void setA3(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
         @Alias("ga")
         @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -933,11 +933,11 @@ public class ProxyRoutineTest {
         void setL0(List<Integer> i);
 
         @Alias("gl")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> getL1();
 
         @Alias("sl")
-        void setL1(@AsyncIn(value = List.class,
+        void setL1(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
         @Alias("gl")
@@ -945,7 +945,8 @@ public class ProxyRoutineTest {
         Channel<Void, List<Integer>> getL2();
 
         @Alias("sl")
-        void setL2(@AsyncIn(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
+        void setL2(
+                @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
         @Alias("gl")
         @AsyncMethod({})
@@ -953,7 +954,7 @@ public class ProxyRoutineTest {
 
         @Alias("sl")
         @Invoke(InvocationMode.PARALLEL)
-        void setL3(@AsyncIn(value = List.class,
+        void setL3(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
         @Alias("gl")
@@ -992,12 +993,12 @@ public class ProxyRoutineTest {
     @Proxy(Pass.class)
     public interface PriorityPass {
 
-        @AsyncOut
+        @AsyncOutput
         @Alias("pass")
         @Priority(AgingPriority.HIGH_PRIORITY)
         Channel<?, String> passHigh(String s);
 
-        @AsyncOut
+        @AsyncOutput
         @Alias("pass")
         @Priority(AgingPriority.NORMAL_PRIORITY)
         Channel<?, String> passNormal(String s);
@@ -1009,24 +1010,24 @@ public class ProxyRoutineTest {
         @AsyncMethod(List.class)
         Channel<List<String>, Integer> getSize();
 
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getSize(List<String> l);
 
         @LogType(NullLog.class)
         @InputBackoff(MyBackoff.class)
         @OutputBackoff(MyBackoff.class)
         @RunnerType(MyRunner.class)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getSize(String[] a);
     }
 
     @Proxy(TestClass2.class)
     public interface TestClassAsync {
 
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
 
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getTwo();
     }
 
@@ -1040,7 +1041,7 @@ public class ProxyRoutineTest {
     public interface TestInterfaceProxy {
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
     }
 
@@ -1052,7 +1053,7 @@ public class ProxyRoutineTest {
         TYPE get(int i);
 
         @Alias("get")
-        @AsyncOut
+        @AsyncOutput
         Channel<?, TYPE> getAsync(int i);
     }
 
@@ -1062,37 +1063,37 @@ public class ProxyRoutineTest {
 
         @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut
-        Iterable<Iterable> getList(@AsyncIn(List.class) Channel<?, List<String>> i);
+        @AsyncOutput
+        Iterable<Iterable> getList(@AsyncInput(List.class) Channel<?, List<String>> i);
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
 
         @OutputTimeout(300)
-        String getString(@AsyncIn(int.class) Channel<?, Integer> i);
+        String getString(@AsyncInput(int.class) Channel<?, Integer> i);
 
         @Alias("getString")
         @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
-        String getStringParallel1(@AsyncIn(int.class) Channel<?, Integer> i);
+        String getStringParallel1(@AsyncInput(int.class) Channel<?, Integer> i);
 
         @Alias("getString")
         @OutputTimeout(300)
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut
-        Channel<?, String> getStringParallel2(@AsyncIn(int.class) Channel<?, Integer> i);
+        @AsyncOutput
+        Channel<?, String> getStringParallel2(@AsyncInput(int.class) Channel<?, Integer> i);
     }
 
     @Proxy(TestClass.class)
     public interface TestStatic {
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getTwo();
     }
 

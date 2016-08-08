@@ -193,7 +193,7 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream().sync().let(output("test")).close().next()).isEqualTo(
                 "test");
         try {
-            JRoutineStream.withStream().sync().let(output("test")).eventualIterator().next();
+            JRoutineStream.withStream().sync().let(output("test")).expiringIterator().next();
             fail();
 
         } catch (final TimeoutException ignored) {

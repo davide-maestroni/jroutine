@@ -67,6 +67,7 @@ public class Modifiers {
      * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
@@ -104,6 +105,7 @@ public class Modifiers {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
@@ -122,6 +124,7 @@ public class Modifiers {
      * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
@@ -159,6 +162,7 @@ public class Modifiers {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
@@ -169,11 +173,15 @@ public class Modifiers {
     /**
      * Returns a function making the stream generate the specified output in place of the invocation
      * ones.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param output the output.
      * @param <IN>   the input data type.
      * @param <OUT>  the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
@@ -184,11 +192,15 @@ public class Modifiers {
     /**
      * Returns a function making the stream generate the specified outputs in place of the
      * invocation ones.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param outputs the outputs.
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
@@ -199,11 +211,15 @@ public class Modifiers {
     /**
      * Returns a function making the stream generate the outputs returned by the specified iterable
      * in place of the invocation ones.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
@@ -214,11 +230,15 @@ public class Modifiers {
     /**
      * Returns a function making the stream generate the outputs returned by the specified channel
      * in place of the invocation ones.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param channel the output channel.
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> output(
@@ -251,6 +271,9 @@ public class Modifiers {
      * generated.
      * <br>
      * The consumer will be called {@code count} number of times. The count number must be positive.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param count           the number of generated outputs.
      * @param outputsConsumer the consumer instance.
@@ -258,6 +281,7 @@ public class Modifiers {
      * @param <OUT>           the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputAccept(
@@ -294,11 +318,15 @@ public class Modifiers {
      * <br>
      * The result channel will be passed to the consumer, so that multiple or no results may be
      * generated.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param outputsConsumer the consumer instance.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputAccept(
@@ -311,6 +339,9 @@ public class Modifiers {
      * in place of the invocation ones.
      * <br>
      * The supplier will be called {@code count} number of times. The count number must be positive.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param count          the number of generated outputs.
      * @param outputSupplier the supplier instance.
@@ -318,6 +349,7 @@ public class Modifiers {
      * @param <OUT>          the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputGet(
@@ -351,11 +383,15 @@ public class Modifiers {
     /**
      * Returns a function making the stream generate the outputs returned by the specified supplier
      * in place of the invocation ones.
+     * <p>
+     * Note that no one of the routines composing the stream at the time of the call will be
+     * invoked.
      *
      * @param outputSupplier the supplier instance.
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, ?>, StreamBuilder<IN, OUT>> outputGet(
@@ -377,6 +413,7 @@ public class Modifiers {
      * @param <AFTER>    the new output type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -425,6 +462,7 @@ public class Modifiers {
      * @param <AFTER>    the new output type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -467,6 +505,7 @@ public class Modifiers {
      * @param <AFTER>    the new output type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -489,6 +528,7 @@ public class Modifiers {
      * @param <OUT>       the output data type.
      * @param <AFTER>     the new output type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -537,6 +577,7 @@ public class Modifiers {
      * @param <OUT>       the output data type.
      * @param <AFTER>     the new output type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -580,6 +621,7 @@ public class Modifiers {
      * @param <OUT>       the output data type.
      * @param <AFTER>     the new output type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -598,6 +640,7 @@ public class Modifiers {
      * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -617,6 +660,7 @@ public class Modifiers {
      * @param <OUT>    the output data type.
      * @return the transformation function.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -640,6 +684,7 @@ public class Modifiers {
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -681,6 +726,7 @@ public class Modifiers {
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -706,6 +752,7 @@ public class Modifiers {
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -726,6 +773,7 @@ public class Modifiers {
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -751,6 +799,7 @@ public class Modifiers {
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
@@ -770,6 +819,7 @@ public class Modifiers {
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
@@ -807,6 +857,7 @@ public class Modifiers {
      * @param <IN>          the input data type.
      * @param <OUT>         the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatch(
@@ -826,6 +877,7 @@ public class Modifiers {
      * @param <IN>          the input data type.
      * @param <OUT>         the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchAccept(
@@ -865,6 +917,7 @@ public class Modifiers {
      * @param <IN>          the input data type.
      * @param <OUT>         the output data type.
      * @return the transformation function.
+     * @see StreamBuilder#let(Function)
      */
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryFinally(

@@ -27,7 +27,7 @@
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.core.ResultChannel$EventualIterator"/>
+        <Class name="com.github.dm.jrt.core.ResultChannel$ExpiringIterator"/>
         <Method name="next"/>
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>

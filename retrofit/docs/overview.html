@@ -61,7 +61,7 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.defaultFactory();
+                final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.buildFactory();
                 final GsonConverterFactory converterFactory = GsonConverterFactory.create();
                 final Retrofit retrofit =
                         new Builder().baseUrl("https://api.github.com")

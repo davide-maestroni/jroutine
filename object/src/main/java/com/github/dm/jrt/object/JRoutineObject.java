@@ -49,8 +49,8 @@ import org.jetbrains.annotations.NotNull;
  *         public interface AsyncCallback {
  *
  *             public void onResults(
- *                  &#64;AsyncIn(Result.class) Channel&lt;?, Result&gt; result1,
- *                  &#64;AsyncIn(Result.class) Channel&lt;?, Result&gt; result2);
+ *                  &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result1,
+ *                  &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result2);
  *         }
  *
  *         final AsyncCallback callback = JRoutineObject.with(instance(myCallback))

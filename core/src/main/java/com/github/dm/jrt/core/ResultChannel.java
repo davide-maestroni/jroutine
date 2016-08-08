@@ -238,7 +238,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> allInto(@NotNull final Collection<? super OUT> results) {
         ConstantConditions.notNull("results collection", results);
-        final Iterator<OUT> iterator = eventualIterator();
+        final Iterator<OUT> iterator = expiringIterator();
         while (iterator.hasNext()) {
             results.add(iterator.next());
         }
@@ -279,17 +279,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Iterator<OUT> eventualIterator() {
-        synchronized (mMutex) {
-            verifyBound();
-        }
-
-        final UnitDuration outputTimeout = getTimeout();
-        return new EventualIterator(outputTimeout.value, outputTimeout.unit,
-                mTimeoutActionType.get(), mTimeoutException.get());
-    }
-
-    @NotNull
     public Channel<OUT, OUT> eventuallyAbort() {
         return eventuallyAbort(null);
     }
@@ -313,6 +302,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         mTimeoutActionType.set(TimeoutActionType.FAIL);
         mTimeoutException.set(null);
         return this;
+    }
+
+    @NotNull
+    public Iterator<OUT> expiringIterator() {
+        synchronized (mMutex) {
+            verifyBound();
+        }
+
+        final UnitDuration outputTimeout = getTimeout();
+        return new ExpiringIterator(outputTimeout.value, outputTimeout.unit,
+                mTimeoutActionType.get(), mTimeoutException.get());
     }
 
     @Nullable
@@ -436,7 +436,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         final ArrayList<OUT> results = new ArrayList<OUT>(count);
-        final Iterator<OUT> iterator = eventualIterator();
+        final Iterator<OUT> iterator = expiringIterator();
         for (int i = 0; i < count && iterator.hasNext(); ++i) {
             results.add(iterator.next());
         }
@@ -560,7 +560,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final TimeUnit timeoutUnit = outputTimeout.unit;
             final TimeoutActionType timeoutAction = mTimeoutActionType.get();
             final Throwable timeoutException = mTimeoutException.get();
-            final Iterator<OUT> iterator = eventualIterator();
+            final Iterator<OUT> iterator = expiringIterator();
             try {
                 for (int i = 0; i < count; ++i) {
                     iterator.next();
@@ -1450,62 +1450,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
-     * Default implementation of a channel eventual iterator.
-     */
-    private class EventualIterator implements Iterator<OUT> {
-
-        private final TimeoutActionType mAction;
-
-        private final Throwable mException;
-
-        private final Object mMutex = new Object();
-
-        private final long mTimeout;
-
-        private final TimeUnit mTimeoutUnit;
-
-        private long mEndTime = Long.MIN_VALUE;
-
-        /**
-         * Constructor.
-         *
-         * @param timeout   the output timeout.
-         * @param timeUnit  the output timeout unit.
-         * @param action    the timeout action.
-         * @param exception the timeout exception.
-         */
-        private EventualIterator(final long timeout, @NotNull final TimeUnit timeUnit,
-                @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
-            mTimeout = timeout;
-            mTimeoutUnit = timeUnit;
-            mAction = action;
-            mException = exception;
-        }
-
-        private long getTimeoutMillis() {
-            synchronized (mMutex) {
-                if (mEndTime == Long.MIN_VALUE) {
-                    mEndTime = System.currentTimeMillis() + mTimeoutUnit.toMillis(mTimeout);
-                }
-
-                return Math.max(0, mEndTime - System.currentTimeMillis());
-            }
-        }
-
-        public boolean hasNext() {
-            return isNextAvailable(getTimeoutMillis(), TimeUnit.MILLISECONDS, mAction, mException);
-        }
-
-        public OUT next() {
-            return readNext(getTimeoutMillis(), TimeUnit.MILLISECONDS, mAction, mException);
-        }
-
-        public void remove() {
-            ConstantConditions.unsupported();
-        }
-    }
-
-    /**
      * The invocation has been aborted with an exception.
      */
     private class ExceptionChannelState extends FlushChannelState {
@@ -1582,6 +1526,62 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         OutputChannelState toDoneState() {
             return new AbortedChannelState();
+        }
+    }
+
+    /**
+     * Default implementation of a channel eventual iterator.
+     */
+    private class ExpiringIterator implements Iterator<OUT> {
+
+        private final TimeoutActionType mAction;
+
+        private final Throwable mException;
+
+        private final Object mMutex = new Object();
+
+        private final long mTimeout;
+
+        private final TimeUnit mTimeoutUnit;
+
+        private long mEndTime = Long.MIN_VALUE;
+
+        /**
+         * Constructor.
+         *
+         * @param timeout   the output timeout.
+         * @param timeUnit  the output timeout unit.
+         * @param action    the timeout action.
+         * @param exception the timeout exception.
+         */
+        private ExpiringIterator(final long timeout, @NotNull final TimeUnit timeUnit,
+                @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
+            mTimeout = timeout;
+            mTimeoutUnit = timeUnit;
+            mAction = action;
+            mException = exception;
+        }
+
+        private long getTimeoutMillis() {
+            synchronized (mMutex) {
+                if (mEndTime == Long.MIN_VALUE) {
+                    mEndTime = System.currentTimeMillis() + mTimeoutUnit.toMillis(mTimeout);
+                }
+
+                return Math.max(0, mEndTime - System.currentTimeMillis());
+            }
+        }
+
+        public boolean hasNext() {
+            return isNextAvailable(getTimeoutMillis(), TimeUnit.MILLISECONDS, mAction, mException);
+        }
+
+        public OUT next() {
+            return readNext(getTimeoutMillis(), TimeUnit.MILLISECONDS, mAction, mException);
+        }
+
+        public void remove() {
+            ConstantConditions.unsupported();
         }
     }
 

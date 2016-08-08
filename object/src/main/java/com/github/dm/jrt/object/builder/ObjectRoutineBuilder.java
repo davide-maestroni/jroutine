@@ -45,9 +45,9 @@ public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRouti
      * present, the method name will be used instead.
      * <br>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
+     * {@link com.github.dm.jrt.object.annotation.AsyncInput AsyncInput},
      * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
-     * {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut} and
+     * {@link com.github.dm.jrt.object.annotation.AsyncOutput AsyncOutput} and
      * {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotations will be honored.
      *
      * @param itf    the interface implemented by the returned object.
@@ -74,9 +74,9 @@ public interface ObjectRoutineBuilder extends InvocationConfigurable<ObjectRouti
      * present, the method name will be used instead.
      * <br>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
+     * {@link com.github.dm.jrt.object.annotation.AsyncInput AsyncInput},
      * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
-     * {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut} and
+     * {@link com.github.dm.jrt.object.annotation.AsyncOutput AsyncOutput} and
      * {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the returned object.

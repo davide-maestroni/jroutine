@@ -91,7 +91,7 @@ public class ReplayChannelTest {
 
         iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
                            .buildChannels()
-                           .eventualIterator();
+                           .expiringIterator();
         assertThat(iterator.hasNext()).isTrue();
         assertThat(iterator.next()).isEqualTo("test1");
 

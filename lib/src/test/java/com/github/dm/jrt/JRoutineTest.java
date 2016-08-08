@@ -37,7 +37,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncOut;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
@@ -538,7 +538,7 @@ public class JRoutineTest {
     public interface TestItf {
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
     }
 
@@ -546,11 +546,11 @@ public class JRoutineTest {
     public interface TestStatic {
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getOne();
 
         @OutputTimeout(300)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> getTwo();
     }
 

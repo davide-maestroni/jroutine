@@ -236,11 +236,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Iterator<OUT> eventualIterator() {
-        return mResultChanel.eventualIterator();
-    }
-
-    @NotNull
     public Channel<IN, OUT> eventuallyAbort() {
         mResultChanel.eventuallyAbort();
         return this;
@@ -262,6 +257,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     public Channel<IN, OUT> eventuallyFail() {
         mResultChanel.eventuallyFail();
         return this;
+    }
+
+    @NotNull
+    public Iterator<OUT> expiringIterator() {
+        return mResultChanel.expiringIterator();
     }
 
     @Nullable

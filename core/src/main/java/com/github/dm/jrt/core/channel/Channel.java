@@ -200,26 +200,13 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * will cause an {@link java.lang.IllegalStateException} to be thrown.
      * <p>
      * Note that, even if calling this method is not strictly mandatory, some invocation
-     * implementations may rely on the completion notification to produce their results.
+     * implementations may rely on the completion notification to produce their results. So, it's
+     * always advisable the close the channel as soon as all the input data has been passed.
      *
      * @return this channel.
      */
     @NotNull
     Channel<IN, OUT> close();
-
-    /**
-     * Returns an iterator whose lifetime cannot exceed the set delay.
-     *
-     * @return the iterator instance.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #immediately()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Iterator<OUT> eventualIterator();
 
     /**
      * Tells the channel to abort the invocation execution in case, after a read method is invoked,
@@ -308,6 +295,20 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      */
     @NotNull
     Channel<IN, OUT> eventuallyFail();
+
+    /**
+     * Returns an iterator whose lifetime cannot exceed the set delay.
+     *
+     * @return the iterator instance.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyAbort(Throwable)
+     * @see #eventuallyBreak()
+     * @see #eventuallyFail()
+     */
+    @NotNull
+    Iterator<OUT> expiringIterator();
 
     /**
      * Gets the invocation error or abort exception, if the invocation is aborted, waiting at the

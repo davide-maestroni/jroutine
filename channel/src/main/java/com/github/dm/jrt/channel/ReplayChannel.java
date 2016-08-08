@@ -175,11 +175,6 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     }
 
     @NotNull
-    public Iterator<OUT> eventualIterator() {
-        return mOutputChannel.eventualIterator();
-    }
-
-    @NotNull
     public Channel<OUT, OUT> eventuallyAbort() {
         mOutputChannel.eventuallyAbort();
         return this;
@@ -201,6 +196,11 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     public Channel<OUT, OUT> eventuallyFail() {
         mOutputChannel.eventuallyFail();
         return this;
+    }
+
+    @NotNull
+    public Iterator<OUT> expiringIterator() {
+        return mOutputChannel.expiringIterator();
     }
 
     @Nullable

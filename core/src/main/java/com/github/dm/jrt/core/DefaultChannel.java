@@ -130,11 +130,6 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Iterator<DATA> eventualIterator() {
-        return mChannel.eventualIterator();
-    }
-
-    @NotNull
     public Channel<DATA, DATA> eventuallyAbort() {
         mChannel.eventuallyAbort();
         return this;
@@ -156,6 +151,11 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     public Channel<DATA, DATA> eventuallyFail() {
         mChannel.eventuallyFail();
         return this;
+    }
+
+    @NotNull
+    public Iterator<DATA> expiringIterator() {
+        return mChannel.expiringIterator();
     }
 
     @Nullable

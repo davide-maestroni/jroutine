@@ -26,11 +26,11 @@ import com.github.dm.jrt.core.util.LRUHashMap;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncIn;
-import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.object.annotation.AsyncInput;
+import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
+import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
@@ -208,7 +208,7 @@ public class Builders {
 
     /**
      * Gets the input transfer mode associated to the specified method parameter, while also
-     * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn}
+     * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncInput AsyncInput}
      * annotation.
      * <br>
      * In case no annotation is present, the function will return with null.
@@ -217,15 +217,15 @@ public class Builders {
      * @param index  the index of the parameter.
      * @return the input mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.github.dm.jrt.object.annotation.AsyncIn AsyncIn
+     * @see com.github.dm.jrt.object.annotation.AsyncInput AsyncInput
      */
     @Nullable
     public static InputMode getInputMode(@NotNull final Method method, final int index) {
-        AsyncIn asyncInputAnnotation = null;
+        AsyncInput asyncInputAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
         for (final Annotation annotation : annotations[index]) {
-            if (annotation.annotationType() == AsyncIn.class) {
-                asyncInputAnnotation = (AsyncIn) annotation;
+            if (annotation.annotationType() == AsyncInput.class) {
+                asyncInputAnnotation = (AsyncInput) annotation;
                 break;
             }
         }
@@ -302,7 +302,7 @@ public class Builders {
 
     /**
      * Gets the output transfer mode of the return type of the specified method, while also
-     * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut}
+     * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncOutput AsyncOutput}
      * annotation.
      * <br>
      * In case no annotation is present, the function will return with null.
@@ -311,12 +311,12 @@ public class Builders {
      * @param targetReturnType the target return type.
      * @return the output mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.github.dm.jrt.object.annotation.AsyncOut AsyncOut
+     * @see com.github.dm.jrt.object.annotation.AsyncOutput AsyncOutput
      */
     @Nullable
     public static OutputMode getOutputMode(@NotNull final Method method,
             @NotNull final Class<?> targetReturnType) {
-        final AsyncOut asyncOutputAnnotation = method.getAnnotation(AsyncOut.class);
+        final AsyncOutput asyncOutputAnnotation = method.getAnnotation(AsyncOutput.class);
         if (asyncOutputAnnotation == null) {
             return null;
         }
@@ -454,8 +454,9 @@ public class Builders {
                         if (paramMode != null) {
                             inputMode = paramMode;
                             for (final Annotation paramAnnotation : annotations[i]) {
-                                if (paramAnnotation.annotationType() == AsyncIn.class) {
-                                    targetParameterTypes[i] = ((AsyncIn) paramAnnotation).value();
+                                if (paramAnnotation.annotationType() == AsyncInput.class) {
+                                    targetParameterTypes[i] =
+                                            ((AsyncInput) paramAnnotation).value();
                                     break;
                                 }
                             }
@@ -474,8 +475,9 @@ public class Builders {
                         getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
-                final AsyncOut asyncOutAnnotation = proxyMethod.getAnnotation(AsyncOut.class);
-                if (asyncOutAnnotation != null) {
+                final AsyncOutput asyncOutputAnnotation =
+                        proxyMethod.getAnnotation(AsyncOutput.class);
+                if (asyncOutputAnnotation != null) {
                     outputMode = getOutputMode(proxyMethod, targetReturnType);
 
                 } else if ((asyncMethodAnnotation == null) && !returnType.isAssignableFrom(

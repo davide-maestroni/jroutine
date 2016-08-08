@@ -42,11 +42,11 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;AsyncIn(int.class) Channel&lt;?, Integer&gt; i1, int i2);
+ *         public int sum(&#64;AsyncInput(int.class) Channel&lt;?, Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link AsyncIn.InputMode#VALUE VALUE} by default).
+ * (it's {@link AsyncInput.InputMode#VALUE VALUE} by default).
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -63,7 +63,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.AsyncIn *;
+ *              &#64;com.github.dm.jrt.object.annotation.AsyncInput *;
  *         }
  *     </code>
  * </pre>
@@ -72,7 +72,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncIn {
+public @interface AsyncInput {
 
     /**
      * The input transfer mode.

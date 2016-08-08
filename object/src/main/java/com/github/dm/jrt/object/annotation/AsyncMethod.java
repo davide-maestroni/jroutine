@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -45,11 +45,11 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncIn;
-import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.object.annotation.AsyncInput;
+import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
+import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
@@ -1270,7 +1270,7 @@ public class LoaderObjectRoutineActivityTest
         int add0(char c);
 
         @Alias("a")
-        int add1(@AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+        int add1(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @AsyncMethod(char.class)
@@ -1283,22 +1283,22 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        int add2(@AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+        int add2(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add3(char c);
 
         @Alias("a")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add4(
-                @AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+                @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> add5(
-                @AsyncIn(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+                @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
         @Alias("a")
         @AsyncMethod(char.class)
@@ -1313,56 +1313,56 @@ public class LoaderObjectRoutineActivityTest
         int[] addA00(char[] c);
 
         @Alias("aa")
-        int[] addA01(@AsyncIn(value = char[].class,
+        int[] addA01(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        int[] addA02(@AsyncIn(value = char[].class,
+        int[] addA02(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        int[] addA03(@AsyncIn(value = char[].class,
+        int[] addA03(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, int[]> addA04(char[] c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, int[]> addA05(
-                @AsyncIn(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+                @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, int[]> addA06(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, int[]> addA06(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, int[]> addA07(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, int[]> addA07(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addA08(char[] c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addA09(
-                @AsyncIn(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+                @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addA10(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addA10(@AsyncInput(value = char[].class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addA11(@AsyncIn(value = char[].class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addA11(@AsyncInput(value = char[].class,
                 mode = InputMode.VALUE) Channel<?, char[]> c);
 
         @Alias("aa")
@@ -1405,56 +1405,56 @@ public class LoaderObjectRoutineActivityTest
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
-        List<Integer> addL01(@AsyncIn(value = List.class,
+        List<Integer> addL01(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        List<Integer> addL02(@AsyncIn(value = List.class,
+        List<Integer> addL02(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        List<Integer> addL03(@AsyncIn(value = List.class,
+        List<Integer> addL03(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL05(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL05(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL06(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL06(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.VALUE)
-        Channel<?, List<Integer>> addL07(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.VALUE)
+        Channel<?, List<Integer>> addL07(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> addL08(List<Character> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL09(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL09(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL10(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL10(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut(OutputMode.ELEMENT)
-        Channel<?, Integer> addL11(@AsyncIn(value = List.class,
+        @AsyncOutput(OutputMode.ELEMENT)
+        Channel<?, Integer> addL11(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
         @Alias("al")
@@ -1500,11 +1500,11 @@ public class LoaderObjectRoutineActivityTest
         void set0(int i);
 
         @Alias("g")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, Integer> get1();
 
         @Alias("s")
-        void set1(@AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+        void set1(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
         @Alias("g")
         @AsyncMethod({})
@@ -1512,7 +1512,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
-        void set2(@AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+        void set2(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
         @Alias("g")
         @AsyncMethod({})
@@ -1525,18 +1525,18 @@ public class LoaderObjectRoutineActivityTest
         void setA0(int[] i);
 
         @Alias("ga")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> getA1();
 
         @Alias("sa")
-        void setA1(@AsyncIn(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
+        void setA1(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
         @Alias("ga")
         @AsyncMethod({})
         Channel<Void, int[]> getA2();
 
         @Alias("sa")
-        void setA2(@AsyncIn(value = int[].class,
+        void setA2(@AsyncInput(value = int[].class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
         @Alias("ga")
@@ -1545,7 +1545,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("sa")
         @Invoke(InvocationMode.PARALLEL)
-        void setA3(@AsyncIn(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
+        void setA3(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
         @Alias("ga")
         @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -1562,11 +1562,11 @@ public class LoaderObjectRoutineActivityTest
         void setL0(List<Integer> i);
 
         @Alias("gl")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> getL1();
 
         @Alias("sl")
-        void setL1(@AsyncIn(value = List.class,
+        void setL1(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
         @Alias("gl")
@@ -1574,7 +1574,8 @@ public class LoaderObjectRoutineActivityTest
         Channel<Void, List<Integer>> getL2();
 
         @Alias("sl")
-        void setL2(@AsyncIn(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
+        void setL2(
+                @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
         @Alias("gl")
         @AsyncMethod({})
@@ -1582,7 +1583,7 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("sl")
         @Invoke(InvocationMode.PARALLEL)
-        void setL3(@AsyncIn(value = List.class,
+        void setL3(@AsyncInput(value = List.class,
                 mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
         @Alias("gl")
@@ -1620,39 +1621,39 @@ public class LoaderObjectRoutineActivityTest
 
     private interface CountError {
 
-        @AsyncOut
+        @AsyncOutput
         String[] count(int length);
 
         @Alias("count")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         String[] count1(int length);
 
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         List<Integer> countList(int length);
 
         @Alias("countList")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         List<Integer> countList1(int length);
     }
 
     private interface CountItf {
 
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> count(int length);
 
         @Alias("count")
-        @AsyncOut(OutputMode.VALUE)
+        @AsyncOutput(OutputMode.VALUE)
         Channel<?, int[]> count1(int length);
 
         @Alias("count")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> count2(int length);
 
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> countList(int length);
 
         @Alias("countList")
-        @AsyncOut(OutputMode.ELEMENT)
+        @AsyncOutput(OutputMode.ELEMENT)
         Channel<?, Integer> countList1(int length);
     }
 
@@ -1663,64 +1664,64 @@ public class LoaderObjectRoutineActivityTest
 
         @Alias("compute")
         @OutputTimeout(10000)
-        int computeAsync(@AsyncIn(int.class) Channel<?, Integer> i);
+        int computeAsync(@AsyncInput(int.class) Channel<?, Integer> i);
 
         @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
-        @AsyncOut
+        @AsyncOutput
         Channel<?, Integer> computeParallel(
-                @AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+                @AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
     }
 
     private interface SumError {
 
-        int compute(int a, @AsyncIn(int.class) int[] b);
+        int compute(int a, @AsyncInput(int.class) int[] b);
 
-        int compute(@AsyncIn(int.class) String[] ints);
+        int compute(@AsyncInput(int.class) String[] ints);
 
-        int compute(@AsyncIn(value = int.class, mode = InputMode.VALUE) int[] ints);
+        int compute(@AsyncInput(value = int.class, mode = InputMode.VALUE) int[] ints);
 
         int compute(
-                @AsyncIn(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
+                @AsyncInput(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 
-        int compute(@AsyncIn(value = int.class,
+        int compute(@AsyncInput(value = int.class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
-        int compute(int a, @AsyncIn(value = int[].class,
+        int compute(int a, @AsyncInput(value = int[].class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> b);
 
         @Invoke(InvocationMode.PARALLEL)
         int compute(String text,
-                @AsyncIn(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> ints);
+                @AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> ints);
     }
 
     private interface SumItf {
 
-        int compute(int a, @AsyncIn(int.class) Channel<?, Integer> b);
+        int compute(int a, @AsyncInput(int.class) Channel<?, Integer> b);
 
-        int compute(@AsyncIn(value = int[].class,
+        int compute(@AsyncInput(value = int[].class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
         @Alias("compute")
-        int compute1(@AsyncIn(int[].class) Channel<?, int[]> ints);
+        int compute1(@AsyncInput(int[].class) Channel<?, int[]> ints);
 
         @Alias("compute")
-        int computeList(@AsyncIn(value = List.class,
+        int computeList(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
         @Alias("compute")
-        int computeList1(@AsyncIn(value = List.class,
+        int computeList1(@AsyncInput(value = List.class,
                 mode = InputMode.COLLECTION) Channel<?, Integer> ints);
     }
 
     @SuppressWarnings("unused")
     private interface TestItf {
 
-        void throwException(@AsyncIn(int.class) RuntimeException ex);
+        void throwException(@AsyncInput(int.class) RuntimeException ex);
 
         @Alias(TestClass.THROW)
-        @AsyncOut
+        @AsyncOutput
         void throwException1(RuntimeException ex);
 
         @Alias(TestClass.THROW)

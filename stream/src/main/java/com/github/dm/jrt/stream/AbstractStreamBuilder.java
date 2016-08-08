@@ -161,11 +161,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public Iterator<OUT> eventualIterator() {
-        return call().eventualIterator();
-    }
-
-    @NotNull
     public Channel<IN, OUT> eventuallyAbort() {
         return call().eventuallyAbort();
     }
@@ -183,6 +178,11 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public Channel<IN, OUT> eventuallyFail() {
         return call().eventuallyFail();
+    }
+
+    @NotNull
+    public Iterator<OUT> expiringIterator() {
+        return call().expiringIterator();
     }
 
     @Nullable

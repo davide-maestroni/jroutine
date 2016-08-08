@@ -24,11 +24,11 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncIn;
-import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.object.annotation.AsyncInput;
+import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOut;
-import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
+import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
@@ -346,7 +346,7 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".pass(");
             if (typeUtils.isAssignable(outputChannelType,
                     typeUtils.erasure(variableElement.asType())) && (
-                    variableElement.getAnnotation(AsyncIn.class) != null)) {
+                    variableElement.getAnnotation(AsyncInput.class) != null)) {
                 builder.append("(").append(typeUtils.erasure(outputChannelType)).append("<?, ?>)");
 
             } else {
@@ -895,14 +895,14 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @NotNull
     protected InputMode getInputMode(@NotNull final ExecutableElement methodElement,
-            @NotNull final AsyncIn annotation, @NotNull final VariableElement targetParameter,
+            @NotNull final AsyncInput annotation, @NotNull final VariableElement targetParameter,
             final int length) {
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.channelType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
         final Element annotationElement =
-                typeUtils.asElement(getMirrorFromName(AsyncIn.class.getCanonicalName()));
+                typeUtils.asElement(getMirrorFromName(AsyncInput.class.getCanonicalName()));
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
@@ -1330,7 +1330,7 @@ public class RoutineProcessor extends AbstractProcessor {
                             + "] an async output must be a superclass of " + outputChannelType);
         }
 
-        OutputMode outputMode = methodElement.getAnnotation(AsyncOut.class).value();
+        OutputMode outputMode = methodElement.getAnnotation(AsyncOutput.class).value();
         if ((outputMode == OutputMode.ELEMENT) && (targetMirror != null) && (targetMirror.getKind()
                 != TypeKind.ARRAY) && !typeUtils.isAssignable(targetMirror, iterableType)) {
             throw new IllegalArgumentException(
@@ -1567,7 +1567,8 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror inputAnnotationType = getMirrorFromName(AsyncIn.class.getCanonicalName());
+        final TypeMirror inputAnnotationType =
+                getMirrorFromName(AsyncInput.class.getCanonicalName());
         final TypeMirror methodAnnotationType =
                 getMirrorFromName(AsyncMethod.class.getCanonicalName());
         if (targetMethod == null) {
@@ -1623,7 +1624,7 @@ public class RoutineProcessor extends AbstractProcessor {
                         for (int i = 0; i < length; ++i) {
                             Object value = null;
                             final VariableElement variableElement = interfaceTypeParameters.get(i);
-                            if (variableElement.getAnnotation(AsyncIn.class) != null) {
+                            if (variableElement.getAnnotation(AsyncInput.class) != null) {
                                 value = getAnnotationValue(variableElement, inputAnnotationType,
                                         "value");
                             }
@@ -1692,7 +1693,7 @@ public class RoutineProcessor extends AbstractProcessor {
                 for (int i = 0; i < length; ++i) {
                     Object value = null;
                     final VariableElement variableElement = interfaceTypeParameters.get(i);
-                    if (variableElement.getAnnotation(AsyncIn.class) != null) {
+                    if (variableElement.getAnnotation(AsyncInput.class) != null) {
                         value = getAnnotationValue(variableElement, inputAnnotationType, "value");
                     }
 
@@ -1750,14 +1751,14 @@ public class RoutineProcessor extends AbstractProcessor {
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
         final Invoke invokeAnnotation = methodElement.getAnnotation(Invoke.class);
         final AsyncMethod asyncMethodAnnotation = methodElement.getAnnotation(AsyncMethod.class);
-        final AsyncOut asyncOutputAnnotation = methodElement.getAnnotation(AsyncOut.class);
+        final AsyncOutput asyncOutputAnnotation = methodElement.getAnnotation(AsyncOutput.class);
         final InvocationMode invocationMode =
                 (invokeAnnotation != null) ? getInvocationMode(methodElement, invokeAnnotation)
                         : null;
         InputMode inputMode = null;
         final List<? extends VariableElement> parameters = methodElement.getParameters();
         for (final VariableElement parameter : parameters) {
-            final AsyncIn annotation = parameter.getAnnotation(AsyncIn.class);
+            final AsyncInput annotation = parameter.getAnnotation(AsyncInput.class);
             if (annotation == null) {
                 continue;
             }

@@ -45,7 +45,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncOut;
+import com.github.dm.jrt.object.annotation.AsyncOutput;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.operator.Operators;
 
@@ -790,7 +790,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     public interface TestProxy {
 
-        @AsyncOut
+        @AsyncOutput
         @OutputTimeout(value = 10, unit = TimeUnit.SECONDS)
         Channel<?, String> getStringLow();
     }

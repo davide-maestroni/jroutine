@@ -37,6 +37,8 @@ public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
 
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
+    private static final long serialVersionUID = 3190208293198477083L;
+
     private final int mMaxCapacity;
 
     /**

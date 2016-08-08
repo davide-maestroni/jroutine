@@ -50,6 +50,7 @@ class StraightRunner extends SyncRunner {
         if (delay > 0) {
             try {
                 UnitDuration.sleepAtLeast(delay, timeUnit);
+
             } catch (final InterruptedException e) {
                 throw new InvocationInterruptedException(e);
             }

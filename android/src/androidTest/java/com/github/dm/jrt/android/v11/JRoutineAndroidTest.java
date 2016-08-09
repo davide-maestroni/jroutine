@@ -95,13 +95,21 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     private static void testConsumerCommand(@NotNull final Activity activity) {
-        final Routine<Void, String> routine =
-                JRoutineAndroid.on(activity).withCommandMore(new Consumer<Channel<String, ?>>() {
+        final Routine<Void, String> routine = JRoutineAndroid.on(activity)
+                                                             .withCommandConsumer(
+                                                                     new Consumer<Channel<String,
+                                                                             ?>>() {
 
-                    public void accept(final Channel<String, ?> result) {
-                        result.pass("test", "1");
-                    }
-                }).buildRoutine();
+                                                                         public void accept(
+                                                                                 final
+                                                                                 Channel<String,
+                                                                                         ?>
+                                                                                         result) {
+                                                                             result.pass("test",
+                                                                                     "1");
+                                                                         }
+                                                                     })
+                                                             .buildRoutine();
         assertThat(routine.asyncCall().close().after(seconds(10)).all()).containsOnly("test", "1");
     }
 
@@ -127,7 +135,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     private static void testConsumerMapping(@NotNull final Activity activity) {
         final Routine<Object, String> routine = //
                 JRoutineAndroid.on(activity)
-                               .withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
+                               .withMappingConsumer(new BiConsumer<Object, Channel<String, ?>>() {
 
                                    public void accept(final Object o,
                                            final Channel<String, ?> result) {

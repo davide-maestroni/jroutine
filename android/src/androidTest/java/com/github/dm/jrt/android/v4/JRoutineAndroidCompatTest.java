@@ -100,7 +100,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
         final Routine<Void, String> routine = //
                 JRoutineAndroidCompat.on(activity)
-                                     .withCommandMore(new Consumer<Channel<String, ?>>() {
+                                     .withCommandConsumer(new Consumer<Channel<String, ?>>() {
 
                                          public void accept(final Channel<String, ?> result) {
 
@@ -136,14 +136,15 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
         final Routine<Object, String> routine = //
                 JRoutineAndroidCompat.on(activity)
-                                     .withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
+                                     .withMappingConsumer(
+                                             new BiConsumer<Object, Channel<String, ?>>() {
 
-                                         public void accept(final Object o,
-                                                 final Channel<String, ?> result) {
+                                                 public void accept(final Object o,
+                                                         final Channel<String, ?> result) {
 
-                                             result.pass(o.toString());
-                                         }
-                                     })
+                                                     result.pass(o.toString());
+                                                 }
+                                             })
                                      .buildRoutine();
         assertThat(routine.asyncCall("test", 1).after(seconds(10)).all()).containsOnly("test", "1");
     }

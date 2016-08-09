@@ -201,7 +201,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * <p>
      * Note that, even if calling this method is not strictly mandatory, some invocation
      * implementations may rely on the completion notification to produce their results. So, it's
-     * always advisable the close the channel as soon as all the input data has been passed.
+     * always advisable to close the channel as soon as all the input data has been passed.
      *
      * @return this channel.
      */

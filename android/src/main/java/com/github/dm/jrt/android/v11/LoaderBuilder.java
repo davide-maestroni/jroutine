@@ -424,7 +424,7 @@ public class LoaderBuilder {
      *                                            static scope.
      */
     @NotNull
-    public <OUT> LoaderRoutineBuilder<Void, OUT> withCommandMore(
+    public <OUT> LoaderRoutineBuilder<Void, OUT> withCommandConsumer(
             @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         checkStatic(decorate(consumer), consumer);
         return with(consumerCommand(consumer));
@@ -573,7 +573,7 @@ public class LoaderBuilder {
      *                                            static scope.
      */
     @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMappingMore(
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withMappingConsumer(
             @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         checkStatic(decorate(consumer), consumer);
         return with(consumerMapping(consumer));

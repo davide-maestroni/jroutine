@@ -198,7 +198,7 @@ public class JRoutineTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutine.withCommandMore(new Consumer<Channel<String, ?>>() {
+                JRoutine.withCommandConsumer(new Consumer<Channel<String, ?>>() {
 
                     public void accept(final Channel<String, ?> result) {
 
@@ -232,7 +232,7 @@ public class JRoutineTest {
     public void testConsumerMapping() {
 
         final Routine<Object, String> routine =
-                JRoutine.withMappingMore(new BiConsumer<Object, Channel<String, ?>>() {
+                JRoutine.withMappingConsumer(new BiConsumer<Object, Channel<String, ?>>() {
 
                     public void accept(final Object o, final Channel<String, ?> result) {
 

@@ -357,7 +357,7 @@ public class JRoutine extends Channels {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> withCommandMore(
+    public static <OUT> RoutineBuilder<Void, OUT> withCommandConsumer(
             @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.with(consumerCommand(consumer));
     }
@@ -430,7 +430,7 @@ public class JRoutine extends Channels {
      * @return the routine builder instance.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingMore(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
             @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
         return JRoutineCore.with(consumerMapping(consumer));
     }

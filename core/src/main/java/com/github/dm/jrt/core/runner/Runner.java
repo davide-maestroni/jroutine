@@ -73,7 +73,7 @@ public abstract class Runner {
      * @return whether the calling thread is managed by a runner.
      */
     public static boolean isCurrentThreadManaged() {
-        for (final ThreadManager manager : sManagers.prune().keySet()) {
+        for (final ThreadManager manager : sManagers.keySet()) {
             if ((manager != null) && manager.isManagedThread()) {
                 return true;
             }

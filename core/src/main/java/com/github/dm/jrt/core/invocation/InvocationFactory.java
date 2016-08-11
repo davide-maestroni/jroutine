@@ -18,7 +18,6 @@ package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +27,7 @@ import java.lang.reflect.Constructor;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
+import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 
 /**
  * Abstract class defining an invocation factory.
@@ -239,7 +239,7 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
                 @Nullable final Object[] args) {
             super(asArgs(invocationClass, cloneArgs(args)));
             final Object[] invocationArgs = (mArgs = cloneArgs(args));
-            mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);
+            mConstructor = findBestMatchingConstructor(invocationClass, invocationArgs);
         }
 
         @NotNull

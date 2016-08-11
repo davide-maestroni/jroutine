@@ -52,7 +52,7 @@ import java.util.HashMap;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
  * Basic implementation of a service running routine invocations.
@@ -374,7 +374,7 @@ public class InvocationService extends Service {
                             ((runnerValue != null) && (runnerValue.getValue() != null))
                                     ? (Object[]) runnerValue.getValue() : Reflection.NO_ARGS;
                     try {
-                        builder.withRunner(findConstructor(runnerClass, runnerArgs).newInstance());
+                        builder.withRunner(newInstanceOf(runnerClass, runnerArgs));
 
                     } catch (final Exception e) {
                         mLogger.err(e, "error creating the runner instance");
@@ -387,7 +387,7 @@ public class InvocationService extends Service {
                     final Object[] logArgs = ((logValue != null) && (logValue.getValue() != null))
                             ? (Object[]) logValue.getValue() : Reflection.NO_ARGS;
                     try {
-                        builder.withLog(findConstructor(logClass, logArgs).newInstance());
+                        builder.withLog(newInstanceOf(logClass, logArgs));
 
                     } catch (final Exception e) {
                         mLogger.err(e, "error creating the log instance");

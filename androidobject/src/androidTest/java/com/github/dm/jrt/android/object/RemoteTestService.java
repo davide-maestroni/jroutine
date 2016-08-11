@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
  * Test service.
@@ -40,13 +40,13 @@ public class RemoteTestService extends InvocationService implements FactoryConte
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-            @NotNull final Object[] args) throws Exception {
+            @NotNull final Object[] args) {
 
         final HashMap<InstanceInfo, Object> instances = mInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
         Object instance = instances.get(instanceInfo);
         if (instance == null) {
-            instance = findConstructor(type, args).newInstance(args);
+            instance = newInstanceOf(type, args);
             instances.put(instanceInfo, instance);
         }
 

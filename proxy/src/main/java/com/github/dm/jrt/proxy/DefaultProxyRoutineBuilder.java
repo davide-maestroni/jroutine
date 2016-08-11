@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 
-import static com.github.dm.jrt.core.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 
 /**
  * Default implementation of a proxy builder.
@@ -185,8 +185,8 @@ class DefaultProxyRoutineBuilder
             final String fullClassName =
                     packageName + annotation.classPrefix() + className + annotation.classSuffix();
             final Constructor<?> constructor =
-                    findConstructor(Class.forName(fullClassName), target, invocationConfiguration,
-                            objectConfiguration);
+                    findBestMatchingConstructor(Class.forName(fullClassName), target,
+                            invocationConfiguration, objectConfiguration);
             return (TYPE) constructor.newInstance(target, invocationConfiguration,
                     objectConfiguration);
         }

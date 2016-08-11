@@ -23,7 +23,6 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
+import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
  * Class representing a context invocation factory target.
@@ -319,11 +319,9 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
          * Constructor.
          *
          * @param invocationClass the wrapped invocation class.
-         * @throws java.lang.Exception if the invocation instantiation failed.
          */
         public TargetInvocationWrapper(
-                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) throws
-                Exception {
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
             this(invocationClass, (Object[]) null);
         }
 
@@ -332,20 +330,11 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
          *
          * @param invocationClass the wrapped invocation class.
          * @param invocationArgs  the invocation constructor arguments
-         * @throws java.lang.Exception if the invocation instantiation failed.
          */
         public TargetInvocationWrapper(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-                @Nullable final Object... invocationArgs) throws Exception {
-            super(newInvocation(invocationClass, invocationArgs));
-        }
-
-        @NotNull
-        private static <IN, OUT> Invocation<IN, OUT> newInvocation(
-                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-                @Nullable final Object... invocationArgs) throws Exception {
-            final Object[] args = (invocationArgs != null) ? invocationArgs : Reflection.NO_ARGS;
-            return Reflection.findConstructor(invocationClass, args).newInstance(args);
+                @Nullable final Object... invocationArgs) {
+            super(newInstanceOf(invocationClass, asArgs(invocationArgs)));
         }
     }
 }

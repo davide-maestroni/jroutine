@@ -35,7 +35,6 @@ public class ReflectionTest {
 
     @Test
     public void testBoxingClass() {
-
         assertThat(Void.class.equals(Reflection.boxingClass(void.class))).isTrue();
         assertThat(Integer.class.equals(Reflection.boxingClass(int.class))).isTrue();
         assertThat(Byte.class.equals(Reflection.boxingClass(byte.class))).isTrue();
@@ -50,14 +49,12 @@ public class ReflectionTest {
 
     @Test
     public void testConstructor() {
-
         boolean failed = false;
         try {
             new Reflection();
             failed = true;
 
         } catch (final Throwable ignored) {
-
         }
 
         assertThat(failed).isFalse();
@@ -65,52 +62,77 @@ public class ReflectionTest {
 
     @Test
     public void testFindConstructor() {
-
-        assertThat(Reflection.findConstructor(TestClass.class)).isNotNull();
-        assertThat(Reflection.findConstructor(TestClass.class, "test")).isNotNull();
-        assertThat(
-                Reflection.findConstructor(TestClass.class, new ArrayList<String>())).isNotNull();
+        assertThat(Reflection.findBestMatchingConstructor(TestClass.class)).isNotNull();
+        assertThat(Reflection.findBestMatchingConstructor(TestClass.class, "test")).isNotNull();
+        assertThat(Reflection.findBestMatchingConstructor(TestClass.class, new ArrayList<String>()))
+                .isNotNull();
     }
 
     @Test
     public void testFindConstructorError() {
-
         try {
-
-            Reflection.findConstructor(TestClass.class, 4);
-
+            Reflection.findBestMatchingConstructor(TestClass.class, 4);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
-
         }
     }
 
     @Test
     public void testFindConstructorNullParamError() {
-
         try {
-
-            Reflection.findConstructor(TestClass.class, (Object) null);
-
+            Reflection.findBestMatchingConstructor(TestClass.class, (Object) null);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
-
         }
     }
 
     @Test
     public void testFindConstructorParamNumberError() {
-
         try {
-
-            Reflection.findConstructor(TestClass.class, "test", 4);
-
+            Reflection.findBestMatchingConstructor(TestClass.class, "test", 4);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+        }
+    }
 
+    @Test
+    public void testFindMethod() {
+        assertThat(Reflection.findBestMatchingMethod(TestClass.class)).isNotNull();
+        assertThat(Reflection.findBestMatchingMethod(TestClass.class, "test")).isNotNull();
+        assertThat(Reflection.findBestMatchingMethod(TestClass.class,
+                new ArrayList<String>())).isNotNull();
+    }
+
+    @Test
+    public void testFindMethodError() {
+        try {
+            Reflection.findBestMatchingMethod(TestClass.class, 4);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
+    public void testFindMethodNullParamError() {
+        try {
+            Reflection.findBestMatchingMethod(TestClass.class, (Object) null);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    @Test
+    public void testFindMethodParamNumberError() {
+        try {
+            Reflection.findBestMatchingMethod(TestClass.class, "test", 4);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
         }
     }
 
@@ -136,31 +158,45 @@ public class ReflectionTest {
     public static class TestClass {
 
         public TestClass() {
-
         }
 
         public TestClass(final String ignored) {
-
         }
 
         public TestClass(final int ignored) {
-
         }
 
         public TestClass(final Integer ignored) {
-
         }
 
         private TestClass(final LinkedList<String> ignored) {
-
         }
 
         private TestClass(final ArrayList<String> ignored) {
-
         }
 
         private TestClass(final List<String> ignored) {
+        }
 
+        public void run() {
+        }
+
+        public void run(final String ignored) {
+        }
+
+        public void run(final int ignore) {
+        }
+
+        public void run(final Integer ignored) {
+        }
+
+        public void run(final LinkedList<String> ignored) {
+        }
+
+        public void run(final ArrayList<String> ignored) {
+        }
+
+        public void run(final List<String> ignored) {
         }
     }
 }

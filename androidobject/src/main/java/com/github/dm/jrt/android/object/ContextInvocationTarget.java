@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
-import static com.github.dm.jrt.core.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
  * Class representing a context invocation target.
@@ -272,7 +272,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
             }
 
             if (target == null) {
-                target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
+                target = newInstanceOf(targetClass, factoryArgs);
 
             } else if (!targetClass.isInstance(target)) {
                 throw new RoutineException(

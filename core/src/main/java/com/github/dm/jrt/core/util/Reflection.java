@@ -110,8 +110,8 @@ public class Reflection {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <TYPE> Constructor<TYPE> findConstructor(@NotNull final Class<TYPE> type,
-            @NotNull final Object... args) {
+    public static <TYPE> Constructor<TYPE> findBestMatchingConstructor(
+            @NotNull final Class<TYPE> type, @NotNull final Object... args) {
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), args);
         if (constructor == null) {
             constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), args);
@@ -122,6 +122,29 @@ public class Reflection {
         }
 
         return (Constructor<TYPE>) makeAccessible(constructor);
+    }
+
+    /**
+     * Finds the method of the specified class best matching the passed arguments.
+     * <p>
+     * Note that the method is searched only among the ones explicitly declared by the target class.
+     *
+     * @param type the target class.
+     * @param args the constructor arguments.
+     * @return the best matching method.
+     * @throws java.lang.IllegalArgumentException if no method or more than ones, taking the
+     *                                            specified objects as parameters, were found.
+     */
+    @NotNull
+    public static Method findBestMatchingMethod(@NotNull final Class<?> type,
+            @NotNull final Object... args) {
+        Method method = findBestMatchingMethod(type.getDeclaredMethods(), args);
+        if (method == null) {
+            throw new IllegalArgumentException(
+                    "no suitable method found for type: " + type.getName());
+        }
+
+        return makeAccessible(method);
     }
 
     /**
@@ -206,71 +229,116 @@ public class Reflection {
     }
 
     /**
-     * Creates a new instance of the specified class by invoking its default constructor.
+     * Creates a new instance of the specified class by invoking its constructor best matching the
+     * specified arguments.
      *
      * @param type   the target class.
+     * @param args   the constructor arguments.
      * @param <TYPE> the target type.
      * @return the new instance.
-     * @throws java.lang.IllegalArgumentException if no default constructor was found or an error
+     * @throws java.lang.IllegalArgumentException if no matching constructor was found or an error
      *                                            occurred during the instantiation.
      */
     @NotNull
-    public static <TYPE> TYPE newInstanceOf(@NotNull final Class<TYPE> type) {
+    public static <TYPE> TYPE newInstanceOf(@NotNull final Class<TYPE> type,
+            @NotNull final Object... args) {
         try {
-            return findConstructor(type, NO_ARGS).newInstance(NO_ARGS);
+            return findBestMatchingConstructor(type, args).newInstance(args);
 
         } catch (final Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
+    private static int computeConfidence(@NotNull final Class<?>[] params,
+            @NotNull final Object[] args) {
+        final int length = params.length;
+        final int argsLength = args.length;
+        if (length != argsLength) {
+            return -1;
+        }
+
+        int confidence = 0;
+        for (int i = 0; i < argsLength; ++i) {
+            final Object contextArg = args[i];
+            final Class<?> param = params[i];
+            if (contextArg != null) {
+                final Class<?> boxingClass = boxingClass(param);
+                if (!boxingClass.isInstance(contextArg)) {
+                    confidence = -1;
+                    break;
+                }
+
+                if (contextArg.getClass().equals(boxingClass)) {
+                    ++confidence;
+                }
+
+            } else if (param.isPrimitive()) {
+                confidence = -1;
+                break;
+            }
+        }
+
+        return confidence;
+    }
+
     @Nullable
     private static Constructor<?> findBestMatchingConstructor(
             @NotNull final Constructor<?>[] constructors, @NotNull final Object[] args) {
-        final int argsLength = args.length;
         Constructor<?> bestMatch = null;
-        int maxConfidence = 0;
+        boolean isClash = false;
+        int maxConfidence = -1;
         for (final Constructor<?> constructor : constructors) {
             final Class<?>[] params = constructor.getParameterTypes();
-            final int length = params.length;
-            if (length != argsLength) {
-                continue;
-            }
-
-            boolean isValid = true;
-            int confidence = 0;
-            for (int i = 0; i < argsLength; ++i) {
-                final Object contextArg = args[i];
-                final Class<?> param = params[i];
-                if (contextArg != null) {
-                    final Class<?> boxingClass = boxingClass(param);
-                    if (!boxingClass.isInstance(contextArg)) {
-                        isValid = false;
-                        break;
-                    }
-
-                    if (contextArg.getClass().equals(boxingClass)) {
-                        ++confidence;
-                    }
-
-                } else if (param.isPrimitive()) {
-                    isValid = false;
-                    break;
-                }
-            }
-
-            if (!isValid) {
+            final int confidence = computeConfidence(params, args);
+            if (confidence < 0) {
                 continue;
             }
 
             if ((bestMatch == null) || (confidence > maxConfidence)) {
+                isClash = false;
                 bestMatch = constructor;
                 maxConfidence = confidence;
 
             } else if (confidence == maxConfidence) {
-                throw new IllegalArgumentException(
-                        "more than one constructor found for arguments: " + Arrays.toString(args));
+                isClash = true;
             }
+        }
+
+        if (isClash) {
+            throw new IllegalArgumentException(
+                    "more than one constructor found for arguments: " + Arrays.toString(args));
+        }
+
+        return bestMatch;
+    }
+
+    @Nullable
+    private static Method findBestMatchingMethod(@NotNull final Method[] methods,
+            @NotNull final Object[] args) {
+        Method bestMatch = null;
+        boolean isClash = false;
+        int maxConfidence = -1;
+        for (final Method method : methods) {
+            final Class<?>[] params = method.getParameterTypes();
+            final int confidence = computeConfidence(params, args);
+            if (confidence < 0) {
+                continue;
+            }
+
+            if ((bestMatch == null) || (confidence > maxConfidence)) {
+                isClash = false;
+                bestMatch = method;
+                maxConfidence = confidence;
+
+            } else if (confidence == maxConfidence) {
+                isClash = true;
+            }
+        }
+
+        if (isClash) {
+            throw new IllegalArgumentException(
+                    "more than one method found for arguments: " + Arrays.toString(args));
         }
 
         return bestMatch;

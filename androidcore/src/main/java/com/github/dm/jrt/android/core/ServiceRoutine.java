@@ -64,7 +64,7 @@ import static com.github.dm.jrt.android.core.service.InvocationService.putInvoca
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
 import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
 import static com.github.dm.jrt.core.util.Reflection.NO_ARGS;
-import static com.github.dm.jrt.core.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -111,12 +111,13 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
         final Class<? extends Runner> runnerClass = serviceConfiguration.getRunnerClassOrElse(null);
         if (runnerClass != null) {
-            findConstructor(runnerClass, serviceConfiguration.getRunnerArgsOrElse(NO_ARGS));
+            findBestMatchingConstructor(runnerClass,
+                    serviceConfiguration.getRunnerArgsOrElse(NO_ARGS));
         }
 
         final Class<? extends Log> logClass = serviceConfiguration.getLogClassOrElse(null);
         if (logClass != null) {
-            findConstructor(logClass, serviceConfiguration.getLogArgsOrElse(NO_ARGS));
+            findBestMatchingConstructor(logClass, serviceConfiguration.getLogArgsOrElse(NO_ARGS));
         }
 
         mContext = context;

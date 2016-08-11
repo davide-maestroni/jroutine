@@ -116,8 +116,8 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         @NotNull
         public ChannelConfiguration asChannelConfiguration() {
             if (mChannelConfiguration == null) {
-                mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().configured();
+                mChannelConfiguration = asInvocationConfiguration().outputConfigurationBuilder()
+                                                                   .buildConfiguration();
             }
 
             return mChannelConfiguration;

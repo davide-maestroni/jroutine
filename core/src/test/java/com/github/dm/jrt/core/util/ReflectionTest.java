@@ -104,6 +104,7 @@ public class ReflectionTest {
         assertThat(Reflection.findBestMatchingMethod(TestClass.class, "test")).isNotNull();
         assertThat(Reflection.findBestMatchingMethod(TestClass.class,
                 new ArrayList<String>())).isNotNull();
+        assertThat(Reflection.findBestMatchingMethod(TestClass.class, new Exception())).isNotNull();
     }
 
     @Test
@@ -178,25 +179,28 @@ public class ReflectionTest {
         private TestClass(final List<String> ignored) {
         }
 
-        public void run() {
-        }
-
-        public void run(final String ignored) {
-        }
-
         public void run(final int ignore) {
         }
 
         public void run(final Integer ignored) {
         }
 
-        public void run(final LinkedList<String> ignored) {
+        public void run(final String ignored) {
         }
 
-        public void run(final ArrayList<String> ignored) {
+        protected void run() {
         }
 
-        public void run(final List<String> ignored) {
+        void run(final Exception ignored) {
+        }
+
+        private void run(final LinkedList<String> ignored) {
+        }
+
+        private void run(final ArrayList<String> ignored) {
+        }
+
+        private void run(final List<String> ignored) {
         }
     }
 }

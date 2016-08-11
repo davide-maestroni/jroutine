@@ -335,11 +335,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
-            final Channel<Object, Object> outputChannel = JRoutineCore.io()
-                                                                      .channelConfiguration()
-                                                                      .with(mConfiguration)
-                                                                      .configured()
-                                                                      .buildChannel();
+            final Channel<Object, Object> outputChannel =
+                    JRoutineCore.io().apply(mConfiguration).buildChannel();
             mRoutine.asyncCall(channel)
                     .bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;
@@ -372,7 +369,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().buildConfiguration();
             mConverter = converter;
         }
 
@@ -387,11 +384,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> Channel adapt(final Call<OUT> call) {
-            final Channel<Object, Object> outputChannel = JRoutineCore.io()
-                                                                      .channelConfiguration()
-                                                                      .with(mChannelConfiguration)
-                                                                      .configured()
-                                                                      .buildChannel();
+            final Channel<Object, Object> outputChannel =
+                    JRoutineCore.io().apply(mChannelConfiguration).buildChannel();
             getRoutine().asyncCall(invokeCall(call))
                         .bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;

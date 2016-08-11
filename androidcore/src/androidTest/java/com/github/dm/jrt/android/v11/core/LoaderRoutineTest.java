@@ -885,29 +885,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final CountLog countLog = new CountLog();
-        final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
+        final Builder builder = ChannelConfiguration.builder();
         final ChannelConfiguration configuration = builder.withRunner(AndroidRunners.taskRunner())
                                                           .withMaxSize(3)
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
-                                                          .configured();
-        JRoutineLoader.on(loaderFrom(getActivity()))
-                      .withId(0)
-                      .channelConfiguration()
-                      .with(configuration)
-                      .configured()
-                      .buildChannel();
+                                                          .buildConfiguration();
+        JRoutineLoader.on(loaderFrom(getActivity())).withId(0).apply(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
-        JRoutineLoader.on(loaderFrom(fragment))
-                      .withId(0)
-                      .channelConfiguration()
-                      .with(configuration)
-                      .configured()
-                      .buildChannel();
+        JRoutineLoader.on(loaderFrom(fragment)).withId(0).apply(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 

@@ -66,8 +66,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
      */
     public static final int DEFAULT = Integer.MIN_VALUE;
 
-    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
-
     private static final ChannelConfiguration sDefaultConfiguration =
             builder().buildConfiguration();
 
@@ -124,8 +122,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the builder.
      */
     @NotNull
-    public static Builder<ChannelConfiguration> builder() {
-        return new Builder<ChannelConfiguration>(sDefaultConfigurable);
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -135,10 +133,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the builder.
      */
     @NotNull
-    public static Builder<ChannelConfiguration> builderFrom(
-            @Nullable final ChannelConfiguration initialConfiguration) {
-        return (initialConfiguration == null) ? builder()
-                : new Builder<ChannelConfiguration>(sDefaultConfigurable, initialConfiguration);
+    public static Builder builderFrom(@Nullable final ChannelConfiguration initialConfiguration) {
+        return (initialConfiguration == null) ? builder() : new Builder(initialConfiguration);
     }
 
     /**
@@ -157,7 +153,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the builder.
      */
     @NotNull
-    public Builder<ChannelConfiguration> builderFrom() {
+    public Builder builderFrom() {
         return builderFrom(this);
     }
 
@@ -312,30 +308,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Interface defining a configurable object.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public interface Configurable<TYPE> {
-
-        /**
-         * Sets the specified configuration and returns the configurable instance.
-         *
-         * @param configuration the configuration.
-         * @return the configurable instance.
-         */
-        @NotNull
-        TYPE apply(@NotNull ChannelConfiguration configuration);
-    }
-
-    /**
      * Builder of channel configurations.
-     *
-     * @param <TYPE> the configurable object type.
      */
-    public static final class Builder<TYPE> {
-
-        private final Configurable<? extends TYPE> mConfigurable;
+    public static final class Builder {
 
         private Backoff mChannelBackoff;
 
@@ -355,23 +330,17 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         /**
          * Constructor.
-         *
-         * @param configurable the configurable instance.
          */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+        public Builder() {
             mChannelMaxSize = DEFAULT;
         }
 
         /**
          * Constructor.
          *
-         * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
          */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-                @NotNull final ChannelConfiguration initialConfiguration) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+        public Builder(@NotNull final ChannelConfiguration initialConfiguration) {
             setConfiguration(initialConfiguration);
         }
 
@@ -381,8 +350,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE configured() {
-            return mConfigurable.apply(buildConfiguration());
+        public ChannelConfiguration buildConfiguration() {
+            return new ChannelConfiguration(mRunner, mOutputTimeout, mTimeoutActionType,
+                    mChannelOrderType, mChannelBackoff, mChannelMaxSize, mLog, mLogLevel);
         }
 
         /**
@@ -394,7 +364,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> with(@Nullable final ChannelConfiguration configuration) {
+        public Builder with(@Nullable final ChannelConfiguration configuration) {
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
@@ -458,7 +428,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withBackoff(@Nullable final Backoff backoff) {
+        public Builder withBackoff(@Nullable final Backoff backoff) {
             mChannelBackoff = backoff;
             return this;
         }
@@ -471,7 +441,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withLog(@Nullable final Log log) {
+        public Builder withLog(@Nullable final Log log) {
             mLog = log;
             return this;
         }
@@ -484,7 +454,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withLogLevel(@Nullable final Level level) {
+        public Builder withLogLevel(@Nullable final Level level) {
             mLogLevel = level;
             return this;
         }
@@ -499,7 +469,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
         @NotNull
-        public Builder<TYPE> withMaxSize(final int maxSize) {
+        public Builder withMaxSize(final int maxSize) {
             if (maxSize != DEFAULT) {
                 ConstantConditions.positive("channel buffer size", maxSize);
             }
@@ -519,7 +489,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withOrder(@Nullable final OrderType orderType) {
+        public Builder withOrder(@Nullable final OrderType orderType) {
             mChannelOrderType = orderType;
             return this;
         }
@@ -536,8 +506,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
         @NotNull
-        public Builder<TYPE> withOutputTimeout(final long timeout,
-                @NotNull final TimeUnit timeUnit) {
+        public Builder withOutputTimeout(final long timeout, @NotNull final TimeUnit timeUnit) {
             return withOutputTimeout(fromUnit(timeout, timeUnit));
         }
 
@@ -552,7 +521,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
+        public Builder withOutputTimeout(@Nullable final UnitDuration timeout) {
             mOutputTimeout = timeout;
             return this;
         }
@@ -569,7 +538,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
+        public Builder withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
             mTimeoutActionType = actionType;
             return this;
         }
@@ -582,15 +551,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withRunner(@Nullable final Runner runner) {
+        public Builder withRunner(@Nullable final Runner runner) {
             mRunner = runner;
             return this;
-        }
-
-        @NotNull
-        private ChannelConfiguration buildConfiguration() {
-            return new ChannelConfiguration(mRunner, mOutputTimeout, mTimeoutActionType,
-                    mChannelOrderType, mChannelBackoff, mChannelMaxSize, mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
@@ -602,17 +565,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
             mChannelMaxSize = configuration.mChannelMaxSize;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;
-        }
-    }
-
-    /**
-     * Default configurable implementation.
-     */
-    private static class DefaultConfigurable implements Configurable<ChannelConfiguration> {
-
-        @NotNull
-        public ChannelConfiguration apply(@NotNull final ChannelConfiguration configuration) {
-            return configuration;
         }
     }
 }

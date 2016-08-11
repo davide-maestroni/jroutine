@@ -17,8 +17,6 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the built object type.
  */
-public abstract class AbstractBuilder<TYPE>
-        implements ChannelsBuilder<TYPE>, Configurable<ChannelsBuilder<TYPE>> {
+public abstract class AbstractBuilder<TYPE> implements ChannelsBuilder<TYPE> {
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -42,13 +39,15 @@ public abstract class AbstractBuilder<TYPE>
     }
 
     @NotNull
-    public TYPE buildChannels() {
-        return build(mConfiguration);
+    public ChannelsBuilder<TYPE> patch(@NotNull final ChannelConfiguration configuration) {
+        ConstantConditions.notNull("channel configuration", configuration);
+        mConfiguration = mConfiguration.builderFrom().with(configuration).buildConfiguration();
+        return this;
     }
 
     @NotNull
-    public Builder<ChannelsBuilder<TYPE>> channelConfiguration() {
-        return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
+    public TYPE buildChannels() {
+        return build(mConfiguration);
     }
 
     /**

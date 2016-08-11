@@ -47,19 +47,13 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectab
     @Override
     protected Channel<?, ? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel = //
-                JRoutineCore.io()
-                            .channelConfiguration()
-                            .with(configuration)
-                            .configured()
-                            .buildChannel();
+        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
+                JRoutineCore.io().apply(configuration).buildChannel();
         for (final Entry<Integer, ? extends Channel<?, ? extends OUT>> entry : mChannelMap
                 .entrySet()) {
-            outputChannel.pass(new SelectableOutputBuilder<OUT>(entry.getValue(),
-                    entry.getKey()).channelConfiguration()
-                                   .with(configuration)
-                                   .configured()
-                                   .buildChannels());
+            outputChannel.pass(
+                    new SelectableOutputBuilder<OUT>(entry.getValue(), entry.getKey()).apply(
+                            configuration).buildChannels());
         }
 
         return outputChannel.close();

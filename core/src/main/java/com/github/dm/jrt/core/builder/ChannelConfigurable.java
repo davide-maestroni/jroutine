@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,19 +25,26 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 08/18/2015.
  *
- * @param <TYPE> the builder type.
+ * @param <TYPE> the object type.
  */
 public interface ChannelConfigurable<TYPE> {
 
     /**
-     * Gets the channel configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
+     * Applies the specified configuration effectively replacing any previous set option.
      *
-     * @return the channel configuration builder.
+     * @param configuration the configuration.
+     * @return the configured object.
      */
     @NotNull
-    Builder<? extends TYPE> channelConfiguration();
+    TYPE apply(@NotNull ChannelConfiguration configuration);
+
+    /**
+     * Modifies the object configuration by applying only the options set in the specified
+     * configuration.
+     *
+     * @param configuration the configuration.
+     * @return the configured object.
+     */
+    @NotNull
+    TYPE patch(@NotNull ChannelConfiguration configuration);
 }

@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -138,10 +139,40 @@ public class Reflection {
     @NotNull
     public static Method findBestMatchingMethod(@NotNull final Class<?> type,
             @NotNull final Object... args) {
-        Method method = findBestMatchingMethod(type.getDeclaredMethods(), args);
+        final Method[] declaredMethods = type.getDeclaredMethods();
+        final ArrayList<Method> publicMethods = new ArrayList<Method>();
+        final ArrayList<Method> protectedMethods = new ArrayList<Method>();
+        final ArrayList<Method> defaultMethods = new ArrayList<Method>();
+        final ArrayList<Method> privateMethods = new ArrayList<Method>();
+        for (final Method declaredMethod : declaredMethods) {
+            final int modifiers = declaredMethod.getModifiers();
+            if (Modifier.isPublic(modifiers)) {
+                publicMethods.add(declaredMethod);
+
+            } else if (Modifier.isProtected(modifiers)) {
+                protectedMethods.add(declaredMethod);
+
+            } else if (Modifier.isPrivate(modifiers)) {
+                privateMethods.add(declaredMethod);
+
+            } else {
+                defaultMethods.add(declaredMethod);
+            }
+        }
+
+        Method method = findBestMatchingMethod(publicMethods, args);
         if (method == null) {
-            throw new IllegalArgumentException(
-                    "no suitable method found for type: " + type.getName());
+            method = findBestMatchingMethod(protectedMethods, args);
+            if (method == null) {
+                method = findBestMatchingMethod(defaultMethods, args);
+                if (method == null) {
+                    method = findBestMatchingMethod(privateMethods, args);
+                    if (method == null) {
+                        throw new IllegalArgumentException(
+                                "no suitable method found for type: " + type.getName());
+                    }
+                }
+            }
         }
 
         return makeAccessible(method);
@@ -314,7 +345,7 @@ public class Reflection {
     }
 
     @Nullable
-    private static Method findBestMatchingMethod(@NotNull final Method[] methods,
+    private static Method findBestMatchingMethod(@NotNull final ArrayList<Method> methods,
             @NotNull final Object[] args) {
         Method bestMatch = null;
         boolean isClash = false;

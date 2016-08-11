@@ -43,8 +43,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromO
  * Created by davide-maestroni on 01/14/2015.
  */
 class DefaultLoaderChannelBuilder
-        implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
-        ChannelConfiguration.Configurable<LoaderChannelBuilder> {
+        implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder> {
 
     private final LoaderContext mContext;
 
@@ -73,6 +72,15 @@ class DefaultLoaderChannelBuilder
     @Override
     public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
         mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public LoaderChannelBuilder patch(@NotNull final ChannelConfiguration configuration) {
+        ConstantConditions.notNull("channel configuration", configuration);
+        mChannelConfiguration =
+                mChannelConfiguration.builderFrom().with(configuration).buildConfiguration();
         return this;
     }
 
@@ -170,12 +178,5 @@ class DefaultLoaderChannelBuilder
     public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
-
-    @NotNull
-    @Override
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
-        final ChannelConfiguration config = mChannelConfiguration;
-        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 }

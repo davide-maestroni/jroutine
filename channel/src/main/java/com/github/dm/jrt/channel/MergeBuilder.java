@@ -55,17 +55,11 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectable<
     @Override
     protected Channel<?, ? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
-        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel = //
-                JRoutineCore.io()
-                            .channelConfiguration()
-                            .with(configuration)
-                            .configured()
-                            .buildChannel();
+        final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
+                JRoutineCore.io().apply(configuration).buildChannel();
         int i = mStartIndex;
         for (final Channel<?, ? extends OUT> channel : mChannels) {
-            outputChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).channelConfiguration()
-                                                                             .with(configuration)
-                                                                             .configured()
+            outputChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).apply(configuration)
                                                                              .buildChannels());
         }
 

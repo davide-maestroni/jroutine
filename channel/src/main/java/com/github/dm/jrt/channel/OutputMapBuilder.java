@@ -105,11 +105,8 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, Channel<?, OUT>
                         new HashMap<Integer, Channel<OUT, ?>>(size);
                 channels = new HashMap<Integer, Channel<?, ?>>(size);
                 for (final Integer index : indexes) {
-                    final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                                        .channelConfiguration()
-                                                                        .with(configuration)
-                                                                        .configured()
-                                                                        .buildChannel();
+                    final Channel<OUT, OUT> outputChannel =
+                            JRoutineCore.io().apply(configuration).buildChannel();
                     inputMap.put(index, outputChannel);
                     channelMap.put(index, outputChannel);
                     channels.put(index, outputChannel);

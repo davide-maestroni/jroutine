@@ -55,9 +55,7 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
                 new HashMap<Integer, Channel<IN, ?>>(indexes.size());
         for (final Integer index : indexes) {
             final Channel<IN, ?> inputChannel =
-                    new InputSelectBuilder<DATA, IN>(channel, index).channelConfiguration()
-                                                                    .with(configuration)
-                                                                    .configured()
+                    new InputSelectBuilder<DATA, IN>(channel, index).apply(configuration)
                                                                     .buildChannels();
             channelMap.put(index, inputChannel);
         }

@@ -189,7 +189,7 @@ public class InvocationConfigurationTest {
                                                                                        .ABORT)
                                                                        .withLog(Logs.nullLog())
                                                                        .withLogLevel(Level.SILENT)
-                                                                       .configured();
+                                                                       .buildConfiguration();
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
@@ -223,7 +223,7 @@ public class InvocationConfigurationTest {
                                                                                        .ABORT)
                                                                        .withLog(Logs.nullLog())
                                                                        .withLogLevel(Level.SILENT)
-                                                                       .configured();
+                                                                       .buildConfiguration();
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
@@ -290,8 +290,9 @@ public class InvocationConfigurationTest {
                                                                                        .ABORT)
                                                                        .withLog(Logs.nullLog())
                                                                        .withLogLevel(Level.SILENT)
-                                                                       .configured();
-        assertThat(invocationConfiguration.inputConfigurationBuilder().configured()).isEqualTo(
+                                                                       .buildConfiguration();
+        assertThat(
+                invocationConfiguration.inputConfigurationBuilder().buildConfiguration()).isEqualTo(
                 configuration);
     }
 
@@ -444,9 +445,9 @@ public class InvocationConfigurationTest {
                                                                                        .ABORT)
                                                                        .withLog(Logs.nullLog())
                                                                        .withLogLevel(Level.SILENT)
-                                                                       .configured();
-        assertThat(invocationConfiguration.outputConfigurationBuilder().configured()).isEqualTo(
-                configuration);
+                                                                       .buildConfiguration();
+        assertThat(invocationConfiguration.outputConfigurationBuilder()
+                                          .buildConfiguration()).isEqualTo(configuration);
     }
 
     @Test

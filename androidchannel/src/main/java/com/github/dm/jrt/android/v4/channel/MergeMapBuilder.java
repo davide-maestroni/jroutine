@@ -67,11 +67,7 @@ class MergeMapBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
         final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
         final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-                JRoutineCore.io()
-                            .channelConfiguration()
-                            .with(configuration)
-                            .configured()
-                            .buildChannel();
+                JRoutineCore.io().apply(configuration).buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
             outputChannel.pass(

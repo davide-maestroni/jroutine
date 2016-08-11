@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Backoffs.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
@@ -1211,10 +1212,10 @@ public class ChannelsTest {
         channel1.after(millis(100)).pass("test").pass("test").close();
         try {
             routine.asyncCall(Channels.join(channel1, channel2)
-                                      .channelConfiguration()
-                                      .withBackoff(afterCount(0).constantDelay(millis(100)))
-                                      .withMaxSize(1)
-                                      .configured()
+                                      .apply(builder().withBackoff(
+                                              afterCount(0).constantDelay(millis(100)))
+                                                      .withMaxSize(1)
+                                                      .buildConfiguration())
                                       .buildChannels()).after(seconds(100000)).all();
             fail();
 
@@ -1401,8 +1402,9 @@ public class ChannelsTest {
     @Test
     public void testMap() {
 
-        final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
+        final ChannelBuilder builder = JRoutineCore.io()
+                                                   .apply(builder().withOrder(OrderType.BY_CALL)
+                                                                   .buildConfiguration());
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -1435,8 +1437,9 @@ public class ChannelsTest {
     @Test
     public void testMerge() {
 
-        final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
+        final ChannelBuilder builder = JRoutineCore.io()
+                                                   .apply(builder().withOrder(OrderType.BY_CALL)
+                                                                   .buildConfiguration());
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends Selectable<?>> outputChannel;
@@ -1486,8 +1489,9 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
+        final ChannelBuilder builder = JRoutineCore.io()
+                                                   .apply(builder().withOrder(OrderType.BY_CALL)
+                                                                   .buildConfiguration());
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<String, String> channel2 = builder.buildChannel();
         final Channel<String, String> channel3 = builder.buildChannel();
@@ -1519,8 +1523,9 @@ public class ChannelsTest {
     @Test
     public void testMergeAbort() {
 
-        final ChannelBuilder builder =
-                JRoutineCore.io().channelConfiguration().withOrder(OrderType.BY_CALL).configured();
+        final ChannelBuilder builder = JRoutineCore.io()
+                                                   .apply(builder().withOrder(OrderType.BY_CALL)
+                                                                   .buildConfiguration());
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends Selectable<?>> outputChannel;
@@ -1978,16 +1983,12 @@ public class ChannelsTest {
         final Channel<?, Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         final Channel<?, Object> intChannel =
                 Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
-                        .channelConfiguration()
-                        .withLogLevel(Level.WARNING)
-                        .configured()
+                        .apply(builder().withLogLevel(Level.WARNING).buildConfiguration())
                         .buildChannels()
                         .get(Sort.INTEGER);
         final Channel<?, Object> strChannel =
                 Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
-                        .channelConfiguration()
-                        .withLogLevel(Level.WARNING)
-                        .configured()
+                        .apply(builder().withLogLevel(Level.WARNING).buildConfiguration())
                         .buildChannels()
                         .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
@@ -2193,8 +2194,7 @@ public class ChannelsTest {
 
                 case STRING:
                     Channels.<Object, String>selectInput(result, STRING).buildChannels()
-                                                                        .pass(selectable
-                                                                                .<String>data())
+                                                                        .pass(selectable.<String>data())
                                                                         .close();
                     break;
             }

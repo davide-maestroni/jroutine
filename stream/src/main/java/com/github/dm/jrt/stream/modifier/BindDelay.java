@@ -58,11 +58,8 @@ class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
     public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
         final ChannelConfiguration configuration = mConfiguration;
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                            .channelConfiguration()
-                                                            .with(configuration)
-                                                            .configured()
-                                                            .buildChannel();
+        final Channel<OUT, OUT> outputChannel =
+                JRoutineCore.io().apply(configuration).buildChannel();
         channel.bind(new DelayChannelConsumer<OUT>(mDelay, mDelayUnit,
                 configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
         return outputChannel;

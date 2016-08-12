@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -105,25 +106,17 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     public LoaderStreamBuilderCompat<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
-        return DefaultLoaderStreamBuilderCompat.this.apply(
-                newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                        configuration, streamConfiguration.getInvocationMode()));
+        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
+                configuration, streamConfiguration.getInvocationMode()));
     }
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
     applyInvocationConfiguration() {
-        return new InvocationConfiguration.Builder<LoaderStreamBuilderCompat<IN, OUT>>(
-                new InvocationConfiguration.Configurable<LoaderStreamBuilderCompat<IN, OUT>>() {
-
-                    @NotNull
-                    @Override
-                    public LoaderStreamBuilderCompat<IN, OUT> apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultLoaderStreamBuilderCompat.this.apply(configuration);
-                    }
-                }, mStreamConfiguration.getCurrentInvocationConfiguration());
+        return (Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>) super
+                .applyInvocationConfiguration();
     }
 
     @NotNull
@@ -131,7 +124,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     public LoaderStreamBuilderCompat<IN, OUT> applyStream(
             @NotNull final InvocationConfiguration configuration) {
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
-        return DefaultLoaderStreamBuilderCompat.this.apply(newConfiguration(configuration,
+        return apply(newConfiguration(configuration,
                 streamConfiguration.getCurrentInvocationConfiguration(),
                 streamConfiguration.getInvocationMode()));
     }
@@ -361,9 +354,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     @Override
     public LoaderStreamBuilderCompat<IN, OUT> apply(
             @NotNull final LoaderConfiguration configuration) {
-        return DefaultLoaderStreamBuilderCompat.this.apply(
-                newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
-                        configuration));
+        return apply(newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
+                configuration));
     }
 
     @NotNull
@@ -386,7 +378,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     @Override
     public LoaderStreamBuilderCompat<IN, OUT> applyStream(
             @NotNull final LoaderConfiguration configuration) {
-        return DefaultLoaderStreamBuilderCompat.this.apply(newConfiguration(configuration,
+        return apply(newConfiguration(configuration,
                 mStreamConfiguration.getCurrentLoaderConfiguration()));
     }
 

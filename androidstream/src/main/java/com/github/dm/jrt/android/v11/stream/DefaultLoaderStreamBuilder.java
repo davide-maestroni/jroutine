@@ -104,25 +104,17 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     public LoaderStreamBuilder<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
         final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        return DefaultLoaderStreamBuilder.this.apply(
-                newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                        configuration, streamConfiguration.getInvocationMode()));
+        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
+                configuration, streamConfiguration.getInvocationMode()));
     }
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     applyInvocationConfiguration() {
-        return new InvocationConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
-                new InvocationConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
-
-                    @NotNull
-                    @Override
-                    public LoaderStreamBuilder<IN, OUT> apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultLoaderStreamBuilder.this.apply(configuration);
-                    }
-                }, mStreamConfiguration.getCurrentInvocationConfiguration());
+        return (InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>) super
+                .applyInvocationConfiguration();
     }
 
     @NotNull
@@ -130,7 +122,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     public LoaderStreamBuilder<IN, OUT> applyStream(
             @NotNull final InvocationConfiguration configuration) {
         final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
-        return DefaultLoaderStreamBuilder.this.apply(newConfiguration(configuration,
+        return apply(newConfiguration(configuration,
                 streamConfiguration.getCurrentInvocationConfiguration(),
                 streamConfiguration.getInvocationMode()));
     }
@@ -357,7 +349,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @NotNull
     @Override
     public LoaderStreamBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
-        return DefaultLoaderStreamBuilder.this.apply(mStreamConfiguration =
+        return apply(mStreamConfiguration =
                 newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
                         configuration));
     }
@@ -382,7 +374,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> applyStream(
             @NotNull final LoaderConfiguration configuration) {
-        return DefaultLoaderStreamBuilder.this.apply(newConfiguration(configuration,
+        return apply(newConfiguration(configuration,
                 mStreamConfiguration.getCurrentLoaderConfiguration()));
     }
 

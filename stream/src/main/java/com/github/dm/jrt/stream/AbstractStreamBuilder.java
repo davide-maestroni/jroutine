@@ -257,29 +257,22 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @Override
     public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return AbstractStreamBuilder.this.apply(
-                newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                        configuration, streamConfiguration.getInvocationMode()));
+        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
+                configuration, streamConfiguration.getInvocationMode()));
     }
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public Builder<? extends StreamBuilder<IN, OUT>> applyInvocationConfiguration() {
-        return new Builder<StreamBuilder<IN, OUT>>(new Configurable<StreamBuilder<IN, OUT>>() {
-
-            @NotNull
-            public StreamBuilder<IN, OUT> apply(
-                    @NotNull final InvocationConfiguration configuration) {
-                return AbstractStreamBuilder.this.apply(configuration);
-            }
-        }, mStreamConfiguration.getCurrentInvocationConfiguration());
+        return (Builder<? extends StreamBuilder<IN, OUT>>) super.applyInvocationConfiguration();
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> applyStream(
             @NotNull final InvocationConfiguration configuration) {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return AbstractStreamBuilder.this.apply(newConfiguration(configuration,
+        return apply(newConfiguration(configuration,
                 streamConfiguration.getCurrentInvocationConfiguration(),
                 streamConfiguration.getInvocationMode()));
     }

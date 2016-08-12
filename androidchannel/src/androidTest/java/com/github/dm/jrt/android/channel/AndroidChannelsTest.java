@@ -42,7 +42,6 @@ import java.util.Map;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -905,8 +904,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMap() {
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -943,8 +943,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge() {
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
@@ -987,8 +988,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge4() {
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<String, String> channel2 = builder.buildChannel();
         final Channel<String, String> channel3 = builder.buildChannel();
@@ -1022,8 +1024,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMergeAbort() {
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         Channel<String, String> channel1;
         Channel<Integer, Integer> channel2;
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;

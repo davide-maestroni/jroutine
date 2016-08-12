@@ -63,7 +63,6 @@ import static com.github.dm.jrt.android.core.service.InvocationService.putError;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
 import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.util.Reflection.NO_ARGS;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 import static java.util.UUID.randomUUID;
@@ -462,14 +461,16 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         public void onRestart() {
             final Logger logger = mLogger;
             mInputChannel = JRoutineCore.io()
-                                        .apply(builder().withLog(logger.getLog())
-                                                        .withLogLevel(logger.getLogLevel())
-                                                        .buildConfiguration())
+                                        .applyChannelConfiguration()
+                                        .withLog(logger.getLog())
+                                        .withLogLevel(logger.getLogLevel())
+                                        .configured()
                                         .buildChannel();
             mOutputChannel = JRoutineCore.io()
-                                         .apply(builder().withLog(logger.getLog())
-                                                         .withLogLevel(logger.getLogLevel())
-                                                         .buildConfiguration())
+                                         .applyChannelConfiguration()
+                                         .withLog(logger.getLog())
+                                         .withLogLevel(logger.getLogLevel())
+                                         .configured()
                                          .buildChannel();
             final Looper looper =
                     mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());

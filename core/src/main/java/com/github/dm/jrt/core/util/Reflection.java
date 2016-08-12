@@ -106,8 +106,8 @@ public class Reflection {
      * @param args   the constructor arguments.
      * @param <TYPE> the target type.
      * @return the best matching constructor.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
+     * @throws IllegalArgumentException if no constructor taking the specified objects as
+     *                                  parameters was found.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -133,8 +133,8 @@ public class Reflection {
      * @param type the target class.
      * @param args the constructor arguments.
      * @return the best matching method.
-     * @throws java.lang.IllegalArgumentException if no method or more than ones, taking the
-     *                                            specified objects as parameters, were found.
+     * @throws IllegalArgumentException if no method or more than ones, taking the
+     *                                  specified objects as parameters, were found.
      */
     @NotNull
     public static Method findBestMatchingMethod(@NotNull final Class<?> type,
@@ -187,8 +187,8 @@ public class Reflection {
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the matching method.
-     * @throws java.lang.IllegalArgumentException if no method matching the specified parameters was
-     *                                            found.
+     * @throws IllegalArgumentException if no method matching the specified parameters was
+     *                                  found.
      */
     @NotNull
     public static Method findMethod(@NotNull final Class<?> type, @NotNull final String name,
@@ -267,8 +267,8 @@ public class Reflection {
      * @param args   the constructor arguments.
      * @param <TYPE> the target type.
      * @return the new instance.
-     * @throws java.lang.IllegalArgumentException if no matching constructor was found or an error
-     *                                            occurred during the instantiation.
+     * @throws IllegalArgumentException if no matching constructor was found or an error
+     *                                  occurred during the instantiation.
      */
     @NotNull
     public static <TYPE> TYPE newInstanceOf(@NotNull final Class<TYPE> type,

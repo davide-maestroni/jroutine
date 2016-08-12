@@ -54,7 +54,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
@@ -801,10 +800,10 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<Channel<OUT, ?>> channels = mNewChannels;
             final Channel<OUT, OUT> channel = JRoutineCore.io()
-                                                          .apply(builder().withLog(logger.getLog())
-                                                                          .withLogLevel(
-                                                                                  logger.getLogLevel())
-                                                                          .buildConfiguration())
+                                                          .applyChannelConfiguration()
+                                                          .withLog(logger.getLog())
+                                                          .withLogLevel(logger.getLogLevel())
+                                                          .configured()
                                                           .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),

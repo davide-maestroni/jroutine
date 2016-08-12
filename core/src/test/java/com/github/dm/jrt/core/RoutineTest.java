@@ -1588,13 +1588,13 @@ public class RoutineTest {
                 routine.asyncCall("test1", "test2").after(seconds(1));
         outputChannel.hasCompleted();
         assertThat(outputChannel.all()).containsExactly("test1", "test2");
-        final ChannelConfiguration configuration = ChannelConfiguration.builder()
-                                                                       .withBackoff(afterCount(
-                                                                               1).constantDelay(
-                                                                               millis(1000)))
-                                                                       .buildConfiguration();
-        final Channel<String, String> channel1 =
-                JRoutineCore.io().apply(configuration).buildChannel();
+        final Channel<String, String> channel1 = JRoutineCore.io()
+                                                             .applyChannelConfiguration()
+                                                             .withBackoff(
+                                                                     afterCount(1).constantDelay(
+                                                                             millis(1000)))
+                                                             .configured()
+                                                             .buildChannel();
         new Thread() {
 
             @Override
@@ -1605,8 +1605,13 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel1.after(seconds(10)).all()).containsOnly("test1", "test2");
 
-        final Channel<String, String> channel2 =
-                JRoutineCore.io().apply(configuration).buildChannel();
+        final Channel<String, String> channel2 = JRoutineCore.io()
+                                                             .applyChannelConfiguration()
+                                                             .withBackoff(
+                                                                     afterCount(1).constantDelay(
+                                                                             millis(1000)))
+                                                             .configured()
+                                                             .buildChannel();
         new Thread() {
 
             @Override
@@ -1617,8 +1622,13 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel2.after(seconds(10)).all()).containsOnly("test1", "test2");
 
-        final Channel<String, String> channel3 =
-                JRoutineCore.io().apply(configuration).buildChannel();
+        final Channel<String, String> channel3 = JRoutineCore.io()
+                                                             .applyChannelConfiguration()
+                                                             .withBackoff(
+                                                                     afterCount(1).constantDelay(
+                                                                             millis(1000)))
+                                                             .configured()
+                                                             .buildChannel();
         new Thread() {
 
             @Override
@@ -1629,8 +1639,13 @@ public class RoutineTest {
         millis(100).sleepAtLeast();
         assertThat(channel3.after(seconds(10)).all()).containsOnly("test1", "test2");
 
-        final Channel<String, String> channel4 =
-                JRoutineCore.io().apply(configuration).buildChannel();
+        final Channel<String, String> channel4 = JRoutineCore.io()
+                                                             .applyChannelConfiguration()
+                                                             .withBackoff(
+                                                                     afterCount(1).constantDelay(
+                                                                             millis(1000)))
+                                                             .configured()
+                                                             .buildChannel();
         new Thread() {
 
             @Override

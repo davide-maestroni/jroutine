@@ -885,12 +885,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final CountLog countLog = new CountLog();
-        final Builder builder = ChannelConfiguration.builder();
+        final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
         final ChannelConfiguration configuration = builder.withRunner(AndroidRunners.taskRunner())
                                                           .withMaxSize(3)
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
-                                                          .buildConfiguration();
+                                                          .configured();
         JRoutineLoader.on(loaderFrom(getActivity())).withId(0).apply(configuration).buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 

@@ -19,6 +19,8 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 10/25/2014.
  */
-class DefaultChannelBuilder implements ChannelBuilder {
+class DefaultChannelBuilder implements ChannelBuilder, Configurable<ChannelBuilder> {
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -46,10 +48,8 @@ class DefaultChannelBuilder implements ChannelBuilder {
     }
 
     @NotNull
-    public ChannelBuilder patch(@NotNull final ChannelConfiguration configuration) {
-        ConstantConditions.notNull("channel configuration", configuration);
-        mConfiguration = mConfiguration.builderFrom().with(configuration).buildConfiguration();
-        return this;
+    public Builder<? extends ChannelBuilder> applyChannelConfiguration() {
+        return new Builder<ChannelBuilder>(this, mConfiguration);
     }
 
     @NotNull

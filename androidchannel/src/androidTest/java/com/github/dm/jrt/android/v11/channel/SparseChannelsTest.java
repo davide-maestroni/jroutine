@@ -42,7 +42,6 @@ import java.util.Map;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -488,8 +487,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
@@ -532,8 +532,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
         final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
@@ -557,8 +558,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final ChannelBuilder builder = JRoutineCore.io()
-                                                   .apply(builder().withOrder(OrderType.BY_CALL)
-                                                                   .buildConfiguration());
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured();
         final Channel<String, String> channel1 = builder.buildChannel();
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
         final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);

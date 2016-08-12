@@ -19,12 +19,11 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-
-import static com.github.dm.jrt.core.config.ChannelConfiguration.OrderType.BY_CALL;
 
 /**
  * Builder implementation returning a channel concatenating data from a set of channels.
@@ -68,9 +67,10 @@ class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
     @Override
     protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                            .apply(configuration.builderFrom()
-                                                                                .withOrder(BY_CALL)
-                                                                                .buildConfiguration())
+                                                            .applyChannelConfiguration()
+                                                            .with(configuration)
+                                                            .withOrder(OrderType.BY_CALL)
+                                                            .configured()
                                                             .buildChannel();
         for (final Channel<?, ? extends OUT> channel : mChannels) {
             channel.bind(outputChannel);

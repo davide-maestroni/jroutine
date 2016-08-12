@@ -916,7 +916,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final Channel<?, ParcelableSelectable<Object>> output =
                 JRoutineService.on(serviceFrom(getActivity()))
                                .with(factoryOf(Sort.class))
-                               .invocationConfiguration()
+                               .applyInvocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .configured()
                                .asyncCall(channel);

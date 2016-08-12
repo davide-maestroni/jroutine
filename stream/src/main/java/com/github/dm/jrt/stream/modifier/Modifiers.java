@@ -437,10 +437,8 @@ public class Modifiers {
                                 return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
                                         streamConfiguration.asChannelConfiguration(), groupCount,
                                         JRoutineCore.with(factory)
-                                                    .invocationConfiguration()
-                                                    .with(streamConfiguration
-                                                            .asInvocationConfiguration())
-                                                    .configured(),
+                                                    .apply(streamConfiguration
+                                                            .asInvocationConfiguration()),
                                         streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -553,10 +551,8 @@ public class Modifiers {
                                 return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
                                         streamConfiguration.asChannelConfiguration(), keyFunction,
                                         JRoutineCore.with(factory)
-                                                    .invocationConfiguration()
-                                                    .with(streamConfiguration
-                                                            .asInvocationConfiguration())
-                                                    .configured(),
+                                                    .apply(streamConfiguration
+                                                            .asInvocationConfiguration()),
                                         streamConfiguration.getInvocationMode()));
                             }
                         });

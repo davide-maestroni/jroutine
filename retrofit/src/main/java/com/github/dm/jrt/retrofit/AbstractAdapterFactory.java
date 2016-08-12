@@ -150,11 +150,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                 Builders.withAnnotations(configuration, annotations);
         final MappingInvocation<Call<Object>, Object> factory =
                 getFactory(configuration, invocationMode, responseType, annotations, retrofit);
-        return JRoutineCore.with(factory)
-                           .invocationConfiguration()
-                           .with(invocationConfiguration)
-                           .configured()
-                           .buildRoutine();
+        return JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
     }
 
     /**
@@ -413,9 +409,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             return JRoutineStream.withStream()
                                  .let(output(call))
                                  .invocationMode(mInvocationMode)
-                                 .invocationConfiguration()
-                                 .with(mInvocationConfiguration)
-                                 .configured()
+                                 .apply(mInvocationConfiguration)
                                  .map(getRoutine());
         }
     }

@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -105,11 +104,7 @@ class DefaultLoaderChannelBuilder
                 new MissingLoaderInvocationFactory<OUT>(loaderId);
         final DefaultLoaderRoutineBuilder<Void, OUT> builder =
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
-        final InvocationConfiguration invocationConfiguration =
-                builderFromOutput(mChannelConfiguration).configured();
-        return builder.invocationConfiguration()
-                      .with(invocationConfiguration)
-                      .configured()
+        return builder.apply(builderFromOutput(mChannelConfiguration).configured())
                       .loaderConfiguration()
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withMatchResolution(ClashResolutionType.JOIN)

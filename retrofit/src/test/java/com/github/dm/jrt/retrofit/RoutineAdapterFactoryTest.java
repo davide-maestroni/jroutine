@@ -67,7 +67,7 @@ public class RoutineAdapterFactoryTest {
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();
@@ -95,7 +95,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.PARALLEL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();
@@ -123,7 +123,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.SYNC)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();
@@ -151,7 +151,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .invocationMode(InvocationMode.SEQUENTIAL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();
@@ -180,7 +180,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .delegateFactory(factory)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();
@@ -209,7 +209,7 @@ public class RoutineAdapterFactoryTest {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
                                              .delegateFactory(factory)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
                                              .buildFactory();

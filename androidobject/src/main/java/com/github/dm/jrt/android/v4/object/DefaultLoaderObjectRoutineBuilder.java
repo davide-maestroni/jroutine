@@ -66,8 +66,7 @@ import static com.github.dm.jrt.object.builder.Builders.getAnnotatedMethod;
  */
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
-        ObjectConfiguration.Configurable<LoaderObjectRoutineBuilder>,
-        InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
+        ObjectConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
     private final LoaderContextCompat mContext;
 
@@ -151,15 +150,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.withAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(mLoaderConfiguration, targetMethod);
-        final LoaderRoutineBuilder<IN, OUT> builder =
-                JRoutineLoaderCompat.on(mContext).with(factory);
-        return builder.invocationConfiguration()
-                      .with(invocationConfiguration)
-                      .configured()
-                      .loaderConfiguration()
-                      .with(loaderConfiguration)
-                      .configured()
-                      .buildRoutine();
+        return JRoutineLoaderCompat.on(mContext)
+                                   .with(factory)
+                                   .apply(invocationConfiguration)
+                                   .loaderConfiguration()
+                                   .with(loaderConfiguration)
+                                   .configured()
+                                   .buildRoutine();
     }
 
     @NotNull
@@ -181,23 +178,31 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.withAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(mLoaderConfiguration, method);
-        final LoaderRoutineBuilder<IN, OUT> builder =
-                JRoutineLoaderCompat.on(mContext).with(factory);
-        return builder.invocationConfiguration()
-                      .with(invocationConfiguration)
-                      .configured()
-                      .loaderConfiguration()
-                      .with(loaderConfiguration)
-                      .configured()
-                      .buildRoutine();
+        return JRoutineLoaderCompat.on(mContext)
+                                   .with(factory)
+                                   .apply(invocationConfiguration)
+                                   .loaderConfiguration()
+                                   .with(loaderConfiguration)
+                                   .configured()
+                                   .buildRoutine();
     }
 
     @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
-    invocationConfiguration() {
+    applyInvocationConfiguration() {
+
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
+        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(
+                new InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderObjectRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultLoaderObjectRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
@@ -614,9 +619,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                             outputMode);
             final LoaderRoutineBuilder<Object, Object> builder =
                     JRoutineLoaderCompat.on(mContext).with(factory);
-            final LoaderRoutine<Object, Object> routine = builder.invocationConfiguration()
-                                                                 .with(invocationConfiguration)
-                                                                 .configured()
+            final LoaderRoutine<Object, Object> routine = builder.apply(invocationConfiguration)
                                                                  .loaderConfiguration()
                                                                  .with(loaderConfiguration)
                                                                  .configured()

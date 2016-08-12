@@ -431,7 +431,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the builder.
      */
     @NotNull
-    public ChannelConfiguration.Builder inputConfigurationBuilder() {
+    public ChannelConfiguration.Builder<ChannelConfiguration> inputConfigurationBuilder() {
         return ChannelConfiguration.builder()
                                    .withRunner(getRunnerOrElse(null))
                                    .withBackoff(getInputBackoffOrElse(null))
@@ -461,7 +461,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the builder.
      */
     @NotNull
-    public ChannelConfiguration.Builder outputConfigurationBuilder() {
+    public ChannelConfiguration.Builder<ChannelConfiguration> outputConfigurationBuilder() {
         return ChannelConfiguration.builder()
                                    .withRunner(getRunnerOrElse(null))
                                    .withBackoff(getOutputBackoffOrElse(null))

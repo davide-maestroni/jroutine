@@ -48,6 +48,11 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
+    public Builder<? extends RoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
+        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
+    }
+
+    @NotNull
     public Channel<IN, OUT> asyncCall() {
         return buildRoutine().asyncCall();
     }
@@ -65,11 +70,6 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     @NotNull
     public Channel<IN, OUT> syncCall() {
         return buildRoutine().syncCall();
-    }
-
-    @NotNull
-    public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
-        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
     /**

@@ -42,7 +42,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public abstract class AbstractServiceProxyObjectBuilder<TYPE>
         implements ServiceProxyObjectBuilder<TYPE>,
-        InvocationConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>,
         ObjectConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>,
         ServiceConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>> {
 
@@ -80,6 +79,24 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    applyInvocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
+                new InvocationConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceProxyObjectBuilder<TYPE> apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return AbstractServiceProxyObjectBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
@@ -128,14 +145,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
                 throw new IllegalArgumentException(t);
             }
         }
-    }
-
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    invocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull

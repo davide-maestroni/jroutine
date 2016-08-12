@@ -34,6 +34,25 @@ public interface LoaderProxyRoutineBuilder
         extends ProxyRoutineBuilder, LoaderConfigurable<LoaderProxyRoutineBuilder> {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
+     */
+    @NotNull
+    @Override
+    LoaderProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
+     */
+    @NotNull
+    @Override
+    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
+    applyInvocationConfiguration();
+
+    /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
@@ -96,15 +115,6 @@ public interface LoaderProxyRoutineBuilder
     @NotNull
     @Override
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}

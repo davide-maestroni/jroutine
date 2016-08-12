@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
@@ -47,5 +48,12 @@ public interface ServiceRoutineBuilder<IN, OUT>
      */
     @NotNull
     @Override
-    Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocationConfiguration();
+    ServiceRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    Builder<? extends ServiceRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
 }

@@ -74,7 +74,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -102,7 +102,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -130,7 +130,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SYNC)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -158,7 +158,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -207,7 +207,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
             {
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -228,7 +228,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -249,7 +249,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SYNC)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();
@@ -270,7 +270,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.SEQUENTIAL)
-                                             .invocationConfiguration()
+                                             .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(10))
                                              .configured()
                                              .buildFactory();

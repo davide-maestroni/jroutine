@@ -74,7 +74,7 @@
                                                                    .objectConfiguration()
                                                                    .withSharedFields()
                                                                    .configured()
-                                                                   .invocationConfiguration()
+                                                                   .applyInvocationConfiguration()
                                                                    .withReadTimeout(seconds(3))
                                                                    .configured();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
@@ -127,7 +127,7 @@
                                                       .objectConfiguration()
                                                       .withSharedFields()
                                                       .configured()
-                                                      .invocationConfiguration()
+                                                      .applyInvocationConfiguration()
                                                       .withReadTimeout(seconds(3))
                                                       .configured()
                                                       .buildProxy(AsyncMain.class);

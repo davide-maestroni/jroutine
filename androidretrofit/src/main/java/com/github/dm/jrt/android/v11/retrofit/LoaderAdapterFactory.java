@@ -109,9 +109,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
                 getFactory(configuration, invocationMode, responseType, annotations, retrofit);
         return JRoutineLoader.on(mLoaderContext)
                              .with(factory)
-                             .invocationConfiguration()
-                             .with(invocationConfiguration)
-                             .configured()
+                             .apply(invocationConfiguration)
                              .loaderConfiguration()
                              .with(loaderConfiguration)
                              .configured()
@@ -198,6 +196,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             return this;
         }
 
+        @NotNull
+        @Override
+        public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
+            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+        }
+
         /**
          * Builds and return a new factory instance.
          *
@@ -219,12 +223,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
             mDelegateFactory = factory;
             return this;
-        }
-
-        @NotNull
-        @Override
-        public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
-            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
         }
 
         /**

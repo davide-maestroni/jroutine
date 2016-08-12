@@ -84,7 +84,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final Routine<Object, Object> routine =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestClass.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withMaxInstances(1)
                                      .withCoreInstances(1)
@@ -114,7 +114,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final SumItf sumAsync =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(Sum.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(timeout)
                                      .configured()
                                      .buildProxy(ClassToken.tokenOf(SumItf.class));
@@ -145,7 +145,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final CountItf countAsync =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(Count.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(timeout)
                                      .configured()
                                      .buildProxy(CountItf.class);
@@ -361,7 +361,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(infinity())
                                  .configured()
                                  .buildProxy(TestItf.class)
@@ -377,7 +377,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(infinity())
                                  .configured()
                                  .buildProxy(TestItf.class)
@@ -393,7 +393,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(infinity())
                                  .configured()
                                  .buildProxy(TestItf.class)
@@ -467,7 +467,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final Routine<Object, Object> routine2 =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestClass.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withMaxInstances(1)
                                      .configured()
@@ -485,7 +485,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final Routine<Object, Object> routine1 =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestClass.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .configured()
                                      .method("getLong");
@@ -583,7 +583,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         final Itf itf =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(Impl.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(infinity())
                                      .configured()
                                      .buildProxy(Itf.class);
@@ -825,7 +825,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
                                      .serviceConfiguration()
                                      .withRunnerClass(SharedFieldRunner.class)
                                      .configured()
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .configured();
 
@@ -863,7 +863,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         assertThat(
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestTimeout.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .configured()
                                      .method("test")
@@ -875,7 +875,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestTimeout.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                  .configured()
                                  .method("test")
@@ -892,7 +892,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         assertThat(
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestTimeout.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .configured()
                                      .method("getInt")
@@ -904,7 +904,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestTimeout.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                  .configured()
                                  .method("getInt")
@@ -921,7 +921,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         assertThat(
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestTimeout.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .configured()
                                      .method(TestTimeout.class.getMethod("getInt"))
@@ -933,7 +933,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestTimeout.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                  .configured()
                                  .method(TestTimeout.class.getMethod("getInt"))
@@ -950,7 +950,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
         assertThat(
                 JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                      .with(instanceOf(TestTimeout.class))
-                                     .invocationConfiguration()
+                                     .applyInvocationConfiguration()
                                      .withOutputTimeout(seconds(10))
                                      .configured()
                                      .buildProxy(TestTimeoutItf.class)
@@ -960,7 +960,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
             JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestTimeout.class))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                  .configured()
                                  .buildProxy(TestTimeoutItf.class)

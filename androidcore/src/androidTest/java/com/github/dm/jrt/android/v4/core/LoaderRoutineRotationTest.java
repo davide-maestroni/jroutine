@@ -89,7 +89,7 @@ public class LoaderRoutineRotationTest
         final UnitDuration timeout = UnitDuration.seconds(10);
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                             .with(factoryOf(ToUpperCase.class))
-                            .invocationConfiguration()
+                            .applyInvocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
                             .configured()
                             .loaderConfiguration()

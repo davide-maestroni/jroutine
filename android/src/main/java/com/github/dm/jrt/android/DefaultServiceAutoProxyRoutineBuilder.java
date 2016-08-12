@@ -51,18 +51,6 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private final InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>
-            mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
-
-                @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder apply(
-                        @NotNull final InvocationConfiguration configuration) {
-                    mInvocationConfiguration = configuration;
-                    return DefaultServiceAutoProxyRoutineBuilder.this;
-                }
-            };
-
     private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     private final ObjectConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>
@@ -102,6 +90,55 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             @NotNull final ContextInvocationTarget<?> target) {
         mContext = ConstantConditions.notNull("service context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
+    }
+
+    @NotNull
+    @Override
+    public ServiceAutoProxyRoutineBuilder apply(
+            @NotNull final InvocationConfiguration configuration) {
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
+    applyInvocationConfiguration() {
+
+        return new InvocationConfiguration.Builder<ServiceAutoProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<ServiceAutoProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceAutoProxyRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultServiceAutoProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, mInvocationConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public ObjectConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
+    objectConfiguration() {
+        return new ObjectConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
+                mProxyConfigurable, mObjectConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public ServiceAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+        mBuilderType = builderType;
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
+    serviceConfiguration() {
+        return new ServiceConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
+                mServiceConfigurable, mServiceConfiguration);
     }
 
     @NotNull
@@ -149,43 +186,10 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     }
 
     @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    invocationConfiguration() {
-        return new InvocationConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
-                mInvocationConfigurable, mInvocationConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public ObjectConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    objectConfiguration() {
-        return new ObjectConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
-                mProxyConfigurable, mObjectConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public ServiceAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-        mBuilderType = builderType;
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    serviceConfiguration() {
-        return new ServiceConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
-                mServiceConfigurable, mServiceConfiguration);
-    }
-
-    @NotNull
     private ServiceObjectRoutineBuilder newObjectBuilder() {
         return JRoutineServiceObject.on(mContext)
                                     .with(mTarget)
-                                    .invocationConfiguration()
-                                    .with(mInvocationConfiguration)
-                                    .configured()
+                                    .apply(mInvocationConfiguration)
                                     .objectConfiguration()
                                     .with(mObjectConfiguration)
                                     .configured()
@@ -198,9 +202,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     private ServiceProxyRoutineBuilder newProxyBuilder() {
         return JRoutineServiceProxy.on(mContext)
                                    .with(mTarget)
-                                   .invocationConfiguration()
-                                   .with(mInvocationConfiguration)
-                                   .configured()
+                                   .apply(mInvocationConfiguration)
                                    .objectConfiguration()
                                    .with(mObjectConfiguration)
                                    .configured()

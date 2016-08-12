@@ -69,7 +69,7 @@
                                                      .objectConfiguration()
                                                      .withSharedFields()
                                                      .configured()
-                                                     .invocationConfiguration()
+                                                     .applyInvocationConfiguration()
                                                      .withReadTimeout(seconds(3))
                                                      .configured()
                                                      .buildProxy(AsyncMain.class);
@@ -131,7 +131,7 @@
                                                             .objectConfiguration()
                                                             .withSharedFields()
                                                             .configured()
-                                                            .invocationConfiguration()
+                                                            .applyInvocationConfiguration()
                                                             .withReadTimeout(seconds(3))
                                                             .configured()
                                                             .buildProxy();

@@ -41,7 +41,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  * Created by davide-maestroni on 05/06/2015.
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
-        InvocationConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         ObjectConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
@@ -106,9 +105,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         final TargetLoaderProxyObjectBuilder<TYPE> builder =
                 new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
-        return builder.invocationConfiguration()
-                      .with(mInvocationConfiguration)
-                      .configured()
+        return builder.apply(mInvocationConfiguration)
                       .objectConfiguration()
                       .with(mObjectConfiguration)
                       .configured()
@@ -127,9 +124,19 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-    invocationConfiguration() {
+    applyInvocationConfiguration() {
+
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
+        return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<LoaderProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderProxyRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultLoaderProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull

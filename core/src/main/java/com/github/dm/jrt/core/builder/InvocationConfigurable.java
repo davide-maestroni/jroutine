@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the object type.
  */
-public interface InvocationConfigurable<TYPE> {
+public interface InvocationConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
      * Gets the invocation configuration builder related to the instance.
@@ -39,5 +40,5 @@ public interface InvocationConfigurable<TYPE> {
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> invocationConfiguration();
+    Builder<? extends TYPE> applyInvocationConfiguration();
 }

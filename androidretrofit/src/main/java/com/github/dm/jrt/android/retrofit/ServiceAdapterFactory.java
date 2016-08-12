@@ -126,9 +126,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 == InvocationMode.SEQUENTIAL)) {
             return RoutineAdapterFactory.builder()
                                         .invocationMode(invocationMode)
-                                        .invocationConfiguration()
-                                        .with(mInvocationConfiguration)
-                                        .configured()
+                                        .apply(mInvocationConfiguration)
                                         .buildFactory()
                                         .get(returnType, annotations, retrofit);
         }
@@ -173,9 +171,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             @NotNull final ServiceConfiguration serviceConfiguration) {
         return JRoutineService.on(ConstantConditions.notNull("service context", mServiceContext))
                               .with(factoryOf(ServiceCallInvocation.class))
-                              .invocationConfiguration()
-                              .with(invocationConfiguration)
-                              .configured()
+                              .apply(invocationConfiguration)
                               .serviceConfiguration()
                               .with(serviceConfiguration)
                               .configured()
@@ -231,6 +227,11 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return this;
         }
 
+        @NotNull
+        public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
+            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+        }
+
         /**
          * Builds and return a new factory instance.
          *
@@ -240,11 +241,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         public ServiceAdapterFactory buildFactory() {
             return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
                     mServiceConfiguration, mInvocationMode);
-        }
-
-        @NotNull
-        public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
-            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
         }
 
         /**
@@ -369,17 +365,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().buildConfiguration();
+            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
             mConverter = converter;
         }
 
         @NotNull
         private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
-            return JRoutineCore.with(sInvocation)
-                               .invocationConfiguration()
-                               .with(mInvocationConfiguration)
-                               .configured()
-                               .asyncCall(call);
+            return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).asyncCall(call);
         }
 
         @Override
@@ -443,9 +435,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return JRoutineStream.withStream()
                                  .let(output(call))
                                  .invocationMode(mInvocationMode)
-                                 .invocationConfiguration()
-                                 .with(mInvocationConfiguration)
-                                 .configured()
+                                 .apply(mInvocationConfiguration)
                                  .map(sInvocation)
                                  .liftWithConfig(this);
         }

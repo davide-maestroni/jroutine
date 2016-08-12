@@ -65,8 +65,6 @@ class BindOutputConsumer<OUT> implements Function<Channel<?, ?>, Channel<?, OUT>
     public Channel<?, OUT> apply(final Channel<?, ?> channel) {
         return mInvocationMode.invoke(
                 JRoutineCore.with(Operators.appendAccept(mCount, mOutputConsumer))
-                            .invocationConfiguration()
-                            .with(mConfiguration)
-                            .configured()).close();
+                            .apply(mConfiguration)).close();
     }
 }

@@ -79,6 +79,13 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder>
+    applyInvocationConfiguration() {
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
+    }
+
+    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
@@ -93,9 +100,7 @@ class DefaultProxyRoutineBuilder
 
         final TargetProxyObjectBuilder<TYPE> builder =
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-        return builder.invocationConfiguration()
-                      .with(mInvocationConfiguration)
-                      .configured()
+        return builder.apply(mInvocationConfiguration)
                       .objectConfiguration()
                       .with(mObjectConfiguration)
                       .configured()
@@ -105,13 +110,6 @@ class DefaultProxyRoutineBuilder
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
         return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration
-            () {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     @NotNull

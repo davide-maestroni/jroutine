@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final Routine&lt;Input, Result&gt; routine =
  *                 JRoutineCore.with(myFactory)
- *                             .invocationConfiguration()
+ *                             .applyInvocationConfiguration()
  *                             .withLogLevel(Level.WARNING)
  *                             .configured()
  *                             .buildRoutine();

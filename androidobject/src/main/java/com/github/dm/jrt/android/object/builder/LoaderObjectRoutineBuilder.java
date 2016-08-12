@@ -39,6 +39,25 @@ public interface LoaderObjectRoutineBuilder
         extends ObjectRoutineBuilder, LoaderConfigurable<LoaderObjectRoutineBuilder> {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
+     */
+    @NotNull
+    @Override
+    LoaderObjectRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
+     */
+    @NotNull
+    @Override
+    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    applyInvocationConfiguration();
+
+    /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
@@ -156,15 +175,6 @@ public interface LoaderObjectRoutineBuilder
     @NotNull
     @Override
     <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);
-
-    /**
-     * Note that the configured asynchronous runner will be ignored.
-     *
-     * @return the invocation configuration builder.
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}

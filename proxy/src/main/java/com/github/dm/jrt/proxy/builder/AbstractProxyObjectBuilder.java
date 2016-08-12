@@ -62,6 +62,14 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     @NotNull
+    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+    applyInvocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
         final Object target = getTarget();
@@ -91,13 +99,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
                 throw new IllegalArgumentException(t);
             }
         }
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
-    invocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull

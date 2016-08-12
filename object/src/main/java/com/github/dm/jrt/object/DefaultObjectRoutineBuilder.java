@@ -104,6 +104,14 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
+    applyInvocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
@@ -143,13 +151,6 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
-    invocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
-    }
-
-    @NotNull
     public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> objectConfiguration() {
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
@@ -184,11 +185,7 @@ class DefaultObjectRoutineBuilder
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(objectConfiguration, target, method, inputMode,
                                 outputMode);
-                routine = JRoutineCore.with(factory)
-                                      .invocationConfiguration()
-                                      .with(invocationConfiguration)
-                                      .configured()
-                                      .buildRoutine();
+                routine = JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
                 routineMap.put(routineInfo, routine);
             }
 

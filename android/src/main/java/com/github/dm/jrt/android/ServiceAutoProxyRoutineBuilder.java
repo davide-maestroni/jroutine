@@ -45,8 +45,15 @@ public interface ServiceAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
+    ServiceAutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    invocationConfiguration();
+    applyInvocationConfiguration();
 
     /**
      * {@inheritDoc}

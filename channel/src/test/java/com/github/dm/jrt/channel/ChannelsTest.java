@@ -1411,7 +1411,7 @@ public class ChannelsTest {
         final Channel<?, ? extends Selectable<Object>> channel =
                 Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels();
         final Channel<?, Selectable<Object>> output = JRoutineCore.with(new Sort())
-                                                                  .invocationConfiguration()
+                                                                  .applyInvocationConfiguration()
                                                                   .withInputOrder(OrderType.BY_CALL)
                                                                   .configured()
                                                                   .asyncCall(channel);
@@ -2201,7 +2201,8 @@ public class ChannelsTest {
 
                 case STRING:
                     Channels.<Object, String>selectInput(result, STRING).buildChannels()
-                                                                        .pass(selectable.<String>data())
+                                                                        .pass(selectable
+                                                                                .<String>data())
                                                                         .close();
                     break;
             }

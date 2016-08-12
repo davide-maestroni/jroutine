@@ -332,7 +332,7 @@ public class ProducersTest {
                         return (char) (character + 1);
                     }
                 })))
-                               .invocationConfiguration()
+                               .applyInvocationConfiguration()
                                .withOutputOrder(OrderType.BY_CALL)
                                .configured()
                                .parallelCall()

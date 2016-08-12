@@ -166,7 +166,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             final Runner runner2 = Runners.poolRunner(1);
             JRoutineLoaderStreamCompat //
                     .<String>withStream().on(loaderFrom(activity))
-                                         .invocationConfiguration()
+                                         .applyInvocationConfiguration()
                                          .withRunner(runner1)
                                          .configured()
                                          .map(new Function<String, Object>() {
@@ -175,13 +175,13 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                  return JRoutineLoaderStreamCompat.withStream()
                                                                                   .on(loaderFrom(
                                                                                           activity))
-                                                                                  .invocationConfiguration()
+                                                                                  .applyInvocationConfiguration()
                                                                                   .withRunner(
                                                                                           runner1)
                                                                                   .configured()
                                                                                   .map(Functions
                                                                                           .identity())
-                                                                                  .invocationConfiguration()
+                                                                                  .applyInvocationConfiguration()
                                                                                   .withRunner(
                                                                                           runner2)
                                                                                   .configured()
@@ -324,7 +324,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineLoaderStreamCompat //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .streamInvocationConfiguration()
+                                     .applyStreamInvocationConfiguration()
                                      .withOutputOrder(OrderType.BY_CALL)
                                      .configured()
                                      .sequential()
@@ -1054,7 +1054,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
     public void testMapRoutine() {
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
-                                                            .invocationConfiguration()
+                                                            .applyInvocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
                                                             .configured()
                                                             .buildRoutine();
@@ -1191,7 +1191,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStreamCompat.withStream()
                                              .straight()
                                              .let(outputAccept(range(1, 1000)))
-                                             .streamInvocationConfiguration()
+                                             .applyStreamInvocationConfiguration()
                                              .withInputMaxSize(1)
                                              .withOutputMaxSize(1)
                                              .configured()

@@ -45,8 +45,15 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
+    LoaderAutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
-    invocationConfiguration();
+    applyInvocationConfiguration();
 
     /**
      * {@inheritDoc}

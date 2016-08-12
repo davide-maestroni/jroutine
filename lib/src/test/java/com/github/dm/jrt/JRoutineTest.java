@@ -74,7 +74,7 @@ public class JRoutineTest {
         final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.with(instance(test))
-                                                        .invocationConfiguration()
+                                                        .applyInvocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
@@ -155,7 +155,7 @@ public class JRoutineTest {
     public void testClassStaticMethod() {
 
         final TestStatic testStatic = JRoutine.with(classOfType(TestClass.class))
-                                              .invocationConfiguration()
+                                              .applyInvocationConfiguration()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
                                               .withLog(new NullLog())
@@ -321,7 +321,7 @@ public class JRoutineTest {
         final TestClass test = new TestClass();
         final TestStatic testStatic = JRoutine.with(instance(test))
                                               .withType(BuilderType.OBJECT)
-                                              .invocationConfiguration()
+                                              .applyInvocationConfiguration()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
                                               .withLog(new NullLog())
@@ -336,7 +336,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.with(test)
-                                                        .invocationConfiguration()
+                                                        .applyInvocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
@@ -351,7 +351,7 @@ public class JRoutineTest {
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutine.with(test)
                                          .withType(BuilderType.PROXY)
-                                         .invocationConfiguration()
+                                         .applyInvocationConfiguration()
                                          .withRunner(Runners.poolRunner())
                                          .withLogLevel(Level.DEBUG)
                                          .withLog(new NullLog())
@@ -365,7 +365,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutine.with(test)
-                                         .invocationConfiguration()
+                                         .applyInvocationConfiguration()
                                          .withRunner(Runners.poolRunner())
                                          .withLogLevel(Level.DEBUG)
                                          .withLog(new NullLog())
@@ -392,7 +392,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.with(test)
-                                                        .invocationConfiguration()
+                                                        .applyInvocationConfiguration()
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
@@ -406,7 +406,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutine.with(test)
-                                      .invocationConfiguration()
+                                      .applyInvocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
@@ -420,7 +420,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutine.with(test)
-                                      .invocationConfiguration()
+                                      .applyInvocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
@@ -466,7 +466,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutine.with(test)
-                                      .invocationConfiguration()
+                                      .applyInvocationConfiguration()
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())

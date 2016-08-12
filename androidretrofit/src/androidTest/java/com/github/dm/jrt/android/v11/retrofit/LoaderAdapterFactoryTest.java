@@ -84,7 +84,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             final LoaderAdapterFactory adapterFactory = //
                     LoaderAdapterFactory.on(context)
                                         .delegateFactory(factory)
-                                        .invocationConfiguration()
+                                        .applyInvocationConfiguration()
                                         .withOutputTimeout(seconds(10))
                                         .configured()
                                         .loaderConfiguration()
@@ -296,7 +296,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         try {
             {
                 final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
-                                                                                .invocationConfiguration()
+                                                                                .applyInvocationConfiguration()
                                                                                 .withOutputTimeout(
                                                                                         seconds(10))
                                                                                 .configured()
@@ -325,7 +325,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
                                                                                 .invocationMode(
                                                                                         InvocationMode.PARALLEL)
-                                                                                .invocationConfiguration()
+                                                                                .applyInvocationConfiguration()
                                                                                 .withOutputTimeout(
                                                                                         seconds(10))
                                                                                 .configured()
@@ -354,7 +354,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
                                                                                 .invocationMode(
                                                                                         InvocationMode.SYNC)
-                                                                                .invocationConfiguration()
+                                                                                .applyInvocationConfiguration()
                                                                                 .withOutputTimeout(
                                                                                         seconds(10))
                                                                                 .configured()
@@ -383,7 +383,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
                                                                                 .invocationMode(
                                                                                         InvocationMode.SEQUENTIAL)
-                                                                                .invocationConfiguration()
+                                                                                .applyInvocationConfiguration()
                                                                                 .withOutputTimeout(
                                                                                         seconds(10))
                                                                                 .configured()
@@ -427,7 +427,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
             final LoaderAdapterFactory adapterFactory = //
                     LoaderAdapterFactory.on(context)
                                         .delegateFactory(factory)
-                                        .invocationConfiguration()
+                                        .applyInvocationConfiguration()
                                         .withOutputTimeout(seconds(10))
                                         .configured()
                                         .loaderConfiguration()

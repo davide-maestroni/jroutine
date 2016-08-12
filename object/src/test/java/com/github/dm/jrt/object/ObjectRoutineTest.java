@@ -96,7 +96,7 @@ public class ObjectRoutineTest {
         final Pass pass = new Pass();
         final TestRunner runner = new TestRunner();
         final PriorityPass priorityPass = JRoutineObject.with(instance(pass))
-                                                        .invocationConfiguration()
+                                                        .applyInvocationConfiguration()
                                                         .withRunner(runner)
                                                         .configured()
                                                         .buildProxy(PriorityPass.class);
@@ -122,7 +122,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutineObject.with(instance(test))
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withMaxInstances(1)
                                                               .withCoreInstances(1)
@@ -141,7 +141,7 @@ public class ObjectRoutineTest {
 
         final UnitDuration timeout = seconds(1);
         final Routine<Object, Object> routine = JRoutineObject.with(classOfType(TestStatic.class))
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
@@ -185,7 +185,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final Sum sum = new Sum();
         final SumItf sumAsync = JRoutineObject.with(instance(sum))
-                                              .invocationConfiguration()
+                                              .applyInvocationConfiguration()
                                               .withOutputTimeout(timeout)
                                               .configured()
                                               .buildProxy(SumItf.class);
@@ -218,7 +218,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final Count count = new Count();
         final CountItf countAsync = JRoutineObject.with(instance(count))
-                                                  .invocationConfiguration()
+                                                  .applyInvocationConfiguration()
                                                   .withOutputTimeout(timeout)
                                                   .configured()
                                                   .buildProxy(CountItf.class);
@@ -545,7 +545,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(test))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeout(infinity())
                           .configured()
                           .buildProxy(TestItf.class)
@@ -560,7 +560,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(test))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeout(infinity())
                           .configured()
                           .buildProxy(TestItf.class)
@@ -645,7 +645,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine2 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .configured()
@@ -664,7 +664,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine1 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.poolRunner())
                                                                .configured()
                                                                .method("getLong");
@@ -741,7 +741,7 @@ public class ObjectRoutineTest {
         }
 
         assertThat(JRoutineObject.with(instance(test))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(timeout)
                                  .configured()
                                  .buildProxy(TestInterfaceAsync.class)
@@ -753,7 +753,7 @@ public class ObjectRoutineTest {
                                  .next()).isEqualTo(1);
 
         final TestInterfaceAsync testInterfaceAsync = JRoutineObject.with(instance(test))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withOutputTimeout(1,
                                                                             TimeUnit.SECONDS)
                                                                     .configured()
@@ -863,7 +863,7 @@ public class ObjectRoutineTest {
         final UnitDuration timeout = seconds(1);
         final TestStatic test = new TestStatic();
         final Routine<Object, Object> routine = JRoutineObject.with(instance(test))
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
@@ -879,7 +879,7 @@ public class ObjectRoutineTest {
 
         final Impl impl = new Impl();
         final Itf itf = JRoutineObject.with(instance(impl))
-                                      .invocationConfiguration()
+                                      .applyInvocationConfiguration()
                                       .withOutputTimeout(seconds(10))
                                       .configured()
                                       .buildProxy(Itf.class);
@@ -1119,7 +1119,7 @@ public class ObjectRoutineTest {
         final TestClass test = new TestClass();
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(16)
                                                                .withLogLevel(Level.DEBUG)
@@ -1130,7 +1130,7 @@ public class ObjectRoutineTest {
         assertThat(routine1.syncCall().close().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(16)
                                                                .withLogLevel(Level.DEBUG)
@@ -1142,7 +1142,7 @@ public class ObjectRoutineTest {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.DEBUG)
@@ -1155,7 +1155,7 @@ public class ObjectRoutineTest {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.WARNING)
@@ -1167,7 +1167,7 @@ public class ObjectRoutineTest {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutineObject.with(instance(test))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.WARNING)
@@ -1184,7 +1184,7 @@ public class ObjectRoutineTest {
 
         final NullLog nullLog = new NullLog();
         final Routine<Object, Object> routine1 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(16)
                                                                .withLogLevel(Level.DEBUG)
@@ -1195,7 +1195,7 @@ public class ObjectRoutineTest {
         assertThat(routine1.syncCall().close().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(16)
                                                                .withLogLevel(Level.DEBUG)
@@ -1207,7 +1207,7 @@ public class ObjectRoutineTest {
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.DEBUG)
@@ -1220,7 +1220,7 @@ public class ObjectRoutineTest {
         assertThat(routine2).isNotEqualTo(routine3);
 
         final Routine<Object, Object> routine4 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.WARNING)
@@ -1232,7 +1232,7 @@ public class ObjectRoutineTest {
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.sharedRunner())
                                                                .withCoreInstances(32)
                                                                .withLogLevel(Level.WARNING)
@@ -1249,7 +1249,7 @@ public class ObjectRoutineTest {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder = JRoutineObject.with(instance(test2))
-                                                           .invocationConfiguration()
+                                                           .applyInvocationConfiguration()
                                                            .withOutputTimeout(seconds(2))
                                                            .configured();
         long startTime = System.currentTimeMillis();
@@ -1305,7 +1305,7 @@ public class ObjectRoutineTest {
 
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder = JRoutineObject.with(instance(test2))
-                                                           .invocationConfiguration()
+                                                           .applyInvocationConfiguration()
                                                            .withOutputTimeout(seconds(2))
                                                            .configured();
         long startTime = System.currentTimeMillis();
@@ -1379,7 +1379,7 @@ public class ObjectRoutineTest {
     public void testSharedFieldsStatic() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutineObject.with(classOfType(TestStatic2.class))
-                                                           .invocationConfiguration()
+                                                           .applyInvocationConfiguration()
                                                            .withOutputTimeout(seconds(2))
                                                            .configured();
         long startTime = System.currentTimeMillis();
@@ -1434,7 +1434,7 @@ public class ObjectRoutineTest {
     public void testSharedFieldsStatic2() throws NoSuchMethodException {
 
         final ObjectRoutineBuilder builder = JRoutineObject.with(classOfType(TestStatic2.class))
-                                                           .invocationConfiguration()
+                                                           .applyInvocationConfiguration()
                                                            .withOutputTimeout(seconds(2))
                                                            .configured();
         long startTime = System.currentTimeMillis();
@@ -1509,7 +1509,7 @@ public class ObjectRoutineTest {
 
         final UnitDuration timeout = seconds(1);
         final Routine<Object, Object> routine2 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .withCoreInstances(0)
@@ -1528,7 +1528,7 @@ public class ObjectRoutineTest {
 
         final UnitDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 = JRoutineObject.with(classOfType(TestStatic.class))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .configured()
@@ -1557,7 +1557,7 @@ public class ObjectRoutineTest {
 
         final TestTimeout testTimeout = new TestTimeout();
         assertThat(JRoutineObject.with(instance(testTimeout))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method("test")
@@ -1568,7 +1568,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(testTimeout))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method("test")
@@ -1583,7 +1583,7 @@ public class ObjectRoutineTest {
         }
 
         assertThat(JRoutineObject.with(instance(testTimeout))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method("getInt")
@@ -1594,7 +1594,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(testTimeout))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method("getInt")
@@ -1609,7 +1609,7 @@ public class ObjectRoutineTest {
         }
 
         assertThat(JRoutineObject.with(instance(testTimeout))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method(TestTimeout.class.getMethod("getInt"))
@@ -1620,7 +1620,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(testTimeout))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method(TestTimeout.class.getMethod("getInt"))
@@ -1635,7 +1635,7 @@ public class ObjectRoutineTest {
         }
 
         assertThat(JRoutineObject.with(instance(testTimeout))
-                                 .invocationConfiguration()
+                                 .applyInvocationConfiguration()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .buildProxy(TestTimeoutItf.class)
@@ -1644,7 +1644,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.with(instance(testTimeout))
-                          .invocationConfiguration()
+                          .applyInvocationConfiguration()
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .buildProxy(TestTimeoutItf.class)

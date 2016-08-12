@@ -21,6 +21,7 @@ import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -37,17 +38,6 @@ import org.jetbrains.annotations.NotNull;
 class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
         implements ServiceRoutineBuilder<IN, OUT>,
         ServiceConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>> {
-
-    private final InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>
-            mConfigurable =
-            new InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>() {
-
-                @NotNull
-                public ServiceRoutineBuilder<IN, OUT> apply(
-                        @NotNull final InvocationConfiguration configuration) {
-                    return DefaultServiceRoutineBuilder.this.apply(configuration);
-                }
-            };
 
     private final ServiceContext mContext;
 
@@ -78,11 +68,12 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    invocationConfiguration() {
-        final InvocationConfiguration config = getConfiguration();
-        return new InvocationConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(mConfigurable,
-                config);
+    applyInvocationConfiguration() {
+
+        return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super
+                .applyInvocationConfiguration();
     }
 
     @NotNull

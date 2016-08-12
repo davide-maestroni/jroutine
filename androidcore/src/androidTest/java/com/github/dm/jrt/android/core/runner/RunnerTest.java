@@ -185,7 +185,7 @@ public class RunnerTest extends AndroidTestCase {
             }
         };
         final Channel<?, Handler> channel = JRoutineCore.with(factoryOf(invocation, this, null))
-                                                        .invocationConfiguration()
+                                                        .applyInvocationConfiguration()
                                                         .withRunner(AndroidRunners.handlerRunner(
                                                                 new HandlerThread("test")))
                                                         .configured()
@@ -209,7 +209,7 @@ public class RunnerTest extends AndroidTestCase {
                     }
                 };
         final Channel<?, Object> channel = JRoutineCore.with(factoryOf(invocation, this))
-                                                       .invocationConfiguration()
+                                                       .applyInvocationConfiguration()
                                                        .withRunner(AndroidRunners.handlerRunner(
                                                                new HandlerThread("test")))
                                                        .configured()

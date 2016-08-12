@@ -43,7 +43,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  * Created by davide-maestroni on 05/13/2015.
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
-        InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ObjectConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
@@ -109,9 +108,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         final TargetServiceProxyObjectBuilder<TYPE> builder =
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
-        return builder.invocationConfiguration()
-                      .with(mInvocationConfiguration)
-                      .configured()
+        return builder.apply(mInvocationConfiguration)
                       .objectConfiguration()
                       .with(mObjectConfiguration)
                       .configured()
@@ -130,9 +127,19 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
-    invocationConfiguration() {
+    applyInvocationConfiguration() {
+
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
+        return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceProxyRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultServiceProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull

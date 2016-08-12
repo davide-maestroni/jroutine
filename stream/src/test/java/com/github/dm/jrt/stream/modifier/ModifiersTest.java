@@ -86,7 +86,7 @@ public class ModifiersTest {
         Assertions.assertThat(JRoutineStream.withStream()
                                             .async()
                                             .let(outputAccept(range(1, 1000)))
-                                            .invocationConfiguration()
+                                            .applyInvocationConfiguration()
                                             .withRunner(getSingleThreadRunner())
                                             .withInputBackoff(
                                                     Backoffs.afterCount(2).linearDelay(seconds(10)))
@@ -129,7 +129,7 @@ public class ModifiersTest {
         Assertions.assertThat(JRoutineStream.withStream()
                                             .async()
                                             .let(outputAccept(range(1, 1000)))
-                                            .invocationConfiguration()
+                                            .applyInvocationConfiguration()
                                             .withRunner(getSingleThreadRunner())
                                             .withInputBackoff(Backoffs.afterCount(2)
                                                                       .constantDelay(seconds(10)))
@@ -714,7 +714,7 @@ public class ModifiersTest {
     public void testThrottle() throws InterruptedException {
         final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                               .let(throttle(1))
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(Runners.poolRunner(1))
                                                               .configured()
                                                               .buildRoutine();
@@ -729,7 +729,7 @@ public class ModifiersTest {
     public void testThrottleAbort() throws InterruptedException {
         final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                               .let(throttle(1))
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(Runners.poolRunner(1))
                                                               .configured()
                                                               .buildRoutine();

@@ -22,6 +22,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -47,17 +48,6 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     private final LoaderContextCompat mContext;
 
     private final ContextInvocationFactory<IN, OUT> mFactory;
-
-    private final InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>
-            mRoutineConfigurable =
-            new InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>() {
-
-                @NotNull
-                public LoaderRoutineBuilder<IN, OUT> apply(
-                        @NotNull final InvocationConfiguration configuration) {
-                    return DefaultLoaderRoutineBuilder.this.apply(configuration);
-                }
-            };
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
@@ -91,10 +81,11 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends
-            LoaderRoutineBuilder<IN, OUT>> invocationConfiguration() {
-        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(
-                mRoutineConfigurable, getConfiguration());
+            LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
+        return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super
+                .applyInvocationConfiguration();
     }
 
     @NotNull

@@ -19,6 +19,7 @@ package com.github.dm.jrt;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
@@ -45,18 +46,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
-
-    private final InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
-            mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
-
-                @NotNull
-                public DefaultAutoProxyRoutineBuilder apply(
-                        @NotNull final InvocationConfiguration configuration) {
-                    mInvocationConfiguration = configuration;
-                    return DefaultAutoProxyRoutineBuilder.this;
-                }
-            };
 
     private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
@@ -87,6 +76,42 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
         }
 
         mTarget = target;
+    }
+
+    @NotNull
+    public AutoProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    applyInvocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<AutoProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<AutoProxyRoutineBuilder>() {
+
+                    @NotNull
+                    public AutoProxyRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultAutoProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
+    }
+
+    @NotNull
+    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
+                config);
+    }
+
+    @NotNull
+    public AutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+        mBuilderType = builderType;
+        return this;
     }
 
     @NotNull
@@ -129,32 +154,9 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
-    invocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(
-                mInvocationConfigurable, config);
-    }
-
-    @NotNull
-    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
-                config);
-    }
-
-    @NotNull
-    public AutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-        mBuilderType = builderType;
-        return this;
-    }
-
-    @NotNull
     private ObjectRoutineBuilder newObjectBuilder() {
         return JRoutineObject.with(mTarget)
-                             .invocationConfiguration()
-                             .with(mInvocationConfiguration)
-                             .configured()
+                             .apply(mInvocationConfiguration)
                              .objectConfiguration()
                              .with(mObjectConfiguration)
                              .configured();
@@ -163,9 +165,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     @NotNull
     private ProxyRoutineBuilder newProxyBuilder() {
         return JRoutineProxy.with(mTarget)
-                            .invocationConfiguration()
-                            .with(mInvocationConfiguration)
-                            .configured()
+                            .apply(mInvocationConfiguration)
                             .objectConfiguration()
                             .with(mObjectConfiguration)
                             .configured();

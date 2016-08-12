@@ -493,11 +493,11 @@ public class StreamBuilderTest {
             final Function<String, Object> function = new Function<String, Object>() {
 
                 public Object apply(final String s) {
-                    return JRoutineStream.<String>withStream().invocationConfiguration()
+                    return JRoutineStream.<String>withStream().applyInvocationConfiguration()
                                                               .withRunner(runner1)
                                                               .configured()
                                                               .map(Functions.identity())
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withRunner(runner2)
                                                               .configured()
                                                               .map(Functions.identity())
@@ -506,7 +506,7 @@ public class StreamBuilderTest {
                                                               .next();
                 }
             };
-            JRoutineStream.<String>withStream().invocationConfiguration()
+            JRoutineStream.<String>withStream().applyInvocationConfiguration()
                                                .withRunner(runner1)
                                                .configured()
                                                .map(function)
@@ -914,7 +914,7 @@ public class StreamBuilderTest {
     @Test
     public void testMapRoutine() {
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
-                                                            .invocationConfiguration()
+                                                            .applyInvocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
                                                             .configured()
                                                             .buildRoutine();
@@ -1030,7 +1030,7 @@ public class StreamBuilderTest {
         try {
             assertThat(JRoutineStream.withStream()
                                      .let(outputAccept(range(1, 1000)))
-                                     .streamInvocationConfiguration()
+                                     .applyStreamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
@@ -1076,7 +1076,7 @@ public class StreamBuilderTest {
         try {
             assertThat(JRoutineStream.withStream()
                                      .let(outputAccept(range(1, 1000)))
-                                     .streamInvocationConfiguration()
+                                     .applyStreamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .configured()
@@ -1120,7 +1120,7 @@ public class StreamBuilderTest {
         try {
             assertThat(JRoutineStream.withStream()
                                      .let(outputAccept(range(1, 1000)))
-                                     .streamInvocationConfiguration()
+                                     .applyStreamInvocationConfiguration()
                                      .withRunner(getSingleThreadRunner())
                                      .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                      .configured()
@@ -1168,7 +1168,7 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream()
                                  .straight()
                                  .let(outputAccept(range(1, 1000)))
-                                 .streamInvocationConfiguration()
+                                 .applyStreamInvocationConfiguration()
                                  .withInputMaxSize(1)
                                  .withOutputMaxSize(1)
                                  .configured()

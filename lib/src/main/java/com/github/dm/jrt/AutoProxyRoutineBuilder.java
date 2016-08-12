@@ -41,7 +41,14 @@ public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder> invocationConfiguration();
+    AutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    applyInvocationConfiguration();
 
     /**
      * {@inheritDoc}

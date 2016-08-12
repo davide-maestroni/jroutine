@@ -168,7 +168,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .with(invocationConfiguration)
                                                                     .withOutputTimeout(seconds(10))
                                                                     .configured()
@@ -209,7 +209,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .with(invocationConfiguration)
                                                                     .withOutputTimeout(seconds(10))
                                                                     .configured()
@@ -799,7 +799,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .with(invocationConfiguration)
                                                                     .withOutputTimeout(seconds(10))
                                                                     .configured()
@@ -826,7 +826,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withInputOrder(
                                                                             OrderType.BY_CALL)
                                                                     .withOutputOrder(
@@ -1093,7 +1093,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(fragment))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withInputOrder(
                                                                             OrderType.BY_CALL)
                                                                     .withOutputOrder(
@@ -1136,7 +1136,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(fragment))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withInputOrder(
                                                                             OrderType.BY_CALL)
                                                                     .withOutputOrder(
@@ -1219,7 +1219,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .loaderConfiguration()
                                                               .withLoaderId(0)
                                                               .configured()
-                                                              .invocationConfiguration()
+                                                              .applyInvocationConfiguration()
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .configured()
                                                               .buildRoutine();
@@ -1583,7 +1583,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(fragment))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withInputOrder(
                                                                             OrderType.BY_CALL)
                                                                     .withOutputOrder(
@@ -1616,7 +1616,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutineLoader.on(loaderFrom(fragment))
                                                                     .with(factoryOf(
                                                                             ClearContextInvocation.class))
-                                                                    .invocationConfiguration()
+                                                                    .applyInvocationConfiguration()
                                                                     .withInputOrder(
                                                                             OrderType.BY_CALL)
                                                                     .withOutputOrder(
@@ -1680,7 +1680,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<String, String> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                .with(IdentityContextInvocation
                                                                        .<String>factoryOf())
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withLog(AndroidLogs.androidLog())
                                                                .withLogLevel(Level.WARNING)
                                                                .configured()
@@ -1697,7 +1697,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 ClassToken.tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                .with(factoryOf(token2))
-                                                               .invocationConfiguration()
+                                                               .applyInvocationConfiguration()
                                                                .withLog(AndroidLogs.androidLog())
                                                                .withLogLevel(Level.WARNING)
                                                                .configured()
@@ -1786,7 +1786,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                          .configured();
         JRoutineLoader.on(loaderFrom(getActivity()))
                       .with(factoryOf(ToUpperCase.class))
-                      .invocationConfiguration()
+                      .applyInvocationConfiguration()
                       .with(configuration)
                       .configured()
                       .loaderConfiguration()
@@ -1801,7 +1801,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         JRoutineLoader.on(loaderFrom(fragment))
                       .with(factoryOf(ToUpperCase.class))
-                      .invocationConfiguration()
+                      .applyInvocationConfiguration()
                       .with(configuration)
                       .configured()
                       .loaderConfiguration()

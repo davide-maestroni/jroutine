@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,10 +51,12 @@ public interface LoaderRoutineBuilder<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * The configured asynchronous runner will be ignored.
      */
     @NotNull
     @Override
-    LoaderRoutine<IN, OUT> buildRoutine();
+    LoaderRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
@@ -62,5 +65,12 @@ public interface LoaderRoutineBuilder<IN, OUT>
      */
     @NotNull
     @Override
-    Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocationConfiguration();
+    Builder<? extends LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    LoaderRoutine<IN, OUT> buildRoutine();
 }

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android.v4.stream;
 
+import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
@@ -54,7 +55,38 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface LoaderStreamBuilderCompat<IN, OUT> extends StreamBuilder<IN, OUT> {
+public interface LoaderStreamBuilderCompat<IN, OUT>
+        extends StreamBuilder<IN, OUT>, LoaderConfigurable<LoaderStreamBuilderCompat<IN, OUT>> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
+    applyInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> applyStream(@NotNull InvocationConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
+    applyStreamInvocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -77,14 +109,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT> extends StreamBuilder<IN, OU
     @Override
     <AFTER> LoaderStreamBuilderCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
-    invocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -239,14 +263,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT> extends StreamBuilder<IN, OU
      */
     @NotNull
     @Override
-    InvocationConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>>
-    streamInvocationConfiguration();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
     LoaderStreamBuilderCompat<IN, OUT> sync();
 
     /**
@@ -265,13 +281,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT> extends StreamBuilder<IN, OU
     ContextInvocationFactory<IN, OUT> buildContextFactory();
 
     /**
-     * Gets the loader configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
-     *
-     * @return the loader configuration builder.
+     * {@inheritDoc}
      */
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderStreamBuilderCompat<IN, OUT>> loaderConfiguration();

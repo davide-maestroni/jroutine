@@ -467,7 +467,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         final Channel<?, ParcelableSelectable<Object>> output =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(factoryOf(Sort.class))
-                                    .invocationConfiguration()
+                                    .applyInvocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
                                     .configured()
                                     .asyncCall(channel);

@@ -144,7 +144,7 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoader.on(loaderFrom(this))
                               .with(factoryOf(LoadBitmap.class))
-                              .loaderConfiguration()
+                              .applyLoaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .configured()
                               .asyncCall(URI.create(IMAGE_URI))
@@ -207,7 +207,7 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoader.on(loaderFrom(this))
                               .with(factoryOf(LoadBitmapFromService.class))
-                              .loaderConfiguration()
+                              .applyLoaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .configured()
                               .asyncCall(URI.create(IMAGE_URI))

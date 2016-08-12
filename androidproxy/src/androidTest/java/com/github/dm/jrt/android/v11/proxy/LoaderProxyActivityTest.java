@@ -371,12 +371,12 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Integer> getOne = builder.objectConfiguration()
+        Channel<?, Integer> getOne = builder.applyObjectConfiguration()
                                             .withSharedFields("1")
                                             .configured()
                                             .buildProxy(TestClassAsync.class)
                                             .getOne();
-        Channel<?, Integer> getTwo = builder.objectConfiguration()
+        Channel<?, Integer> getTwo = builder.applyObjectConfiguration()
                                             .withSharedFields("2")
                                             .configured()
                                             .buildProxy(TestClassAsync.class)

@@ -271,6 +271,36 @@ public interface LoaderStreamBuilder<IN, OUT>
     LoaderStreamBuilder<IN, OUT> unsorted();
 
     /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> applyLoaderConfiguration();
+
+    /**
+     * Sets the specified configuration as the stream one.
+     *
+     * @param configuration the configuration.
+     * @return this builder.
+     */
+    @NotNull
+    LoaderStreamBuilder<IN, OUT> applyStream(@NotNull LoaderConfiguration configuration);
+
+    /**
+     * Gets the loader configuration builder related to the whole stream.
+     * <br>
+     * The configuration options will be applied to all the next concatenated routines unless
+     * overwritten by specific ones.
+     * <p>
+     * Note that the configuration builder will be initialized with the current stream
+     * configuration.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
+    applyStreamLoaderConfiguration();
+
+    /**
      * Builds a new context invocation factory instance.
      *
      * @return the factory instance.
@@ -279,10 +309,17 @@ public interface LoaderStreamBuilder<IN, OUT>
     ContextInvocationFactory<IN, OUT> buildContextFactory();
 
     /**
-     * {@inheritDoc}
+     * Concatenates a routine mapping this stream outputs through the specified routine builder.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     *
+     * @param builder the routine builder instance.
+     * @param <AFTER> the concatenation output type.
+     * @return this builder.
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> loaderConfiguration();
+    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
+            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
@@ -301,19 +338,6 @@ public interface LoaderStreamBuilder<IN, OUT>
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Concatenates a routine mapping this stream outputs through the specified routine builder.
-     * <p>
-     * Note that the created routine will be initialized with the current configuration.
-     *
-     * @param builder the routine builder instance.
-     * @param <AFTER> the concatenation output type.
-     * @return this builder.
-     */
-    @NotNull
-    <AFTER> LoaderStreamBuilder<IN, AFTER> map(
-            @NotNull LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder);
-
-    /**
      * Sets the stream loader context.
      * <br>
      * The context will be used by all the concatenated routines until changed.
@@ -326,20 +350,6 @@ public interface LoaderStreamBuilder<IN, OUT>
      */
     @NotNull
     LoaderStreamBuilder<IN, OUT> on(@Nullable LoaderContext context);
-
-    /**
-     * Gets the loader configuration builder related to the whole stream.
-     * <br>
-     * The configuration options will be applied to all the next concatenated routines unless
-     * overwritten by specific ones.
-     * <p>
-     * Note that the configuration builder will be initialized with the current stream
-     * configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @NotNull
-    LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>> streamLoaderConfiguration();
 
     /**
      * Interface defining a loader stream configuration.

@@ -55,31 +55,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    private final LoaderConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilder>
-            mLoaderConfigurable =
-            new LoaderConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilder>() {
-
-                @NotNull
-                public DefaultLoaderAutoProxyRoutineBuilder apply(
-                        @NotNull final LoaderConfiguration configuration) {
-                    mLoaderConfiguration = configuration;
-                    return DefaultLoaderAutoProxyRoutineBuilder.this;
-                }
-            };
-
     private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
-
-    private final ObjectConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilder>
-            mProxyConfigurable =
-            new ObjectConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilder>() {
-
-                @NotNull
-                public DefaultLoaderAutoProxyRoutineBuilder apply(
-                        @NotNull final ObjectConfiguration configuration) {
-                    mObjectConfiguration = configuration;
-                    return DefaultLoaderAutoProxyRoutineBuilder.this;
-                }
-            };
 
     /**
      * Constructor.
@@ -98,7 +74,14 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     public LoaderAutoProxyRoutineBuilder apply(
             @NotNull final InvocationConfiguration configuration) {
         mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", mInvocationConfiguration);
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public LoaderAutoProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -120,9 +103,17 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
     @NotNull
     @Override
     public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
-    objectConfiguration() {
-        return new ObjectConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mProxyConfigurable,
-                mObjectConfiguration);
+    applyObjectConfiguration() {
+        return new ObjectConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(
+                new ObjectConfiguration.Configurable<LoaderAutoProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderAutoProxyRoutineBuilder apply(
+                            @NotNull final ObjectConfiguration configuration) {
+                        return DefaultLoaderAutoProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, mObjectConfiguration);
     }
 
     @NotNull
@@ -134,10 +125,25 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
 
     @NotNull
     @Override
+    public LoaderAutoProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
     public LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
-    loaderConfiguration() {
-        return new LoaderConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mLoaderConfigurable,
-                mLoaderConfiguration);
+    applyLoaderConfiguration() {
+        return new LoaderConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(
+                new LoaderConfiguration.Configurable<LoaderAutoProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderAutoProxyRoutineBuilder apply(
+                            @NotNull final LoaderConfiguration configuration) {
+                        return DefaultLoaderAutoProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, mLoaderConfiguration);
     }
 
     @NotNull
@@ -189,12 +195,8 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
         return JRoutineLoaderObject.on(mContext)
                                    .with(mTarget)
                                    .apply(mInvocationConfiguration)
-                                   .objectConfiguration()
-                                   .with(mObjectConfiguration)
-                                   .configured()
-                                   .loaderConfiguration()
-                                   .with(mLoaderConfiguration)
-                                   .configured();
+                                   .apply(mObjectConfiguration)
+                                   .apply(mLoaderConfiguration);
     }
 
     @NotNull
@@ -202,11 +204,7 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
         return JRoutineLoaderProxy.on(mContext)
                                   .with(mTarget)
                                   .apply(mInvocationConfiguration)
-                                  .objectConfiguration()
-                                  .with(mObjectConfiguration)
-                                  .configured()
-                                  .loaderConfiguration()
-                                  .with(mLoaderConfiguration)
-                                  .configured();
+                                  .apply(mObjectConfiguration)
+                                  .apply(mLoaderConfiguration);
     }
 }

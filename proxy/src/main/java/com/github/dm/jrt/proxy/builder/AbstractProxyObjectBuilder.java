@@ -36,9 +36,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <TYPE> the interface type.
  */
-public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBuilder<TYPE>,
-        InvocationConfiguration.Configurable<ProxyObjectBuilder<TYPE>>,
-        ObjectConfiguration.Configurable<ProxyObjectBuilder<TYPE>> {
+public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBuilder<TYPE> {
 
     private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
@@ -64,9 +62,15 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+    }
+
+    @NotNull
+    public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+    applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
@@ -99,12 +103,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
                 throw new IllegalArgumentException(t);
             }
         }
-    }
-
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

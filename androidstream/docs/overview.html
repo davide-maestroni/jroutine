@@ -112,7 +112,7 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoaderStream.withStream()
                                     .on(loaderFrom(this))
-                                    .loaderConfiguration()
+                                    .applyLoaderConfiguration()
                                     .withFactoryId(11)
                                     .configured()
                                     .map(loadUri())

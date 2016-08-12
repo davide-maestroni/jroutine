@@ -42,9 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  * <p>
  * Created by davide-maestroni on 05/13/2015.
  */
-class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
-        ObjectConfiguration.Configurable<ServiceProxyRoutineBuilder>,
-        ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
+class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
     private final ServiceContext mContext;
 
@@ -72,13 +70,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
     @NotNull
     @Override
-    public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
@@ -90,6 +81,47 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
+    }
+
+    @NotNull
+    @Override
+    public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    applyInvocationConfiguration() {
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceProxyRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultServiceProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
+    }
+
+    @NotNull
+    @Override
+    public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ServiceProxyRoutineBuilder>(
+                new ObjectConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceProxyRoutineBuilder apply(
+                            @NotNull final ObjectConfiguration configuration) {
+                        return DefaultServiceProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
@@ -109,12 +141,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         final TargetServiceProxyObjectBuilder<TYPE> builder =
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.apply(mInvocationConfiguration)
-                      .objectConfiguration()
-                      .with(mObjectConfiguration)
-                      .configured()
-                      .serviceConfiguration()
-                      .with(mServiceConfiguration)
-                      .configured()
+                      .apply(mObjectConfiguration)
+                      .apply(mServiceConfiguration)
                       .buildProxy();
     }
 
@@ -126,33 +154,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
-    applyInvocationConfiguration() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(
-                new InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
-
-                    @NotNull
-                    @Override
-                    public ServiceProxyRoutineBuilder apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultServiceProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, config);
-    }
-
-    @NotNull
-    @Override
-    public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
-    serviceConfiguration() {
+    applyServiceConfiguration() {
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }

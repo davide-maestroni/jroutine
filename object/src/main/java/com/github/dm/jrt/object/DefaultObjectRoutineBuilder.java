@@ -19,7 +19,6 @@ package com.github.dm.jrt.object;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -59,9 +58,7 @@ import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
  * <p>
  * Created by davide-maestroni on 09/21/2014.
  */
-class DefaultObjectRoutineBuilder
-        implements ObjectRoutineBuilder, Configurable<ObjectRoutineBuilder>,
-        ObjectConfiguration.Configurable<ObjectRoutineBuilder> {
+class DefaultObjectRoutineBuilder implements ObjectRoutineBuilder {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutines = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
@@ -106,9 +103,14 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
+    public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -148,12 +150,6 @@ class DefaultObjectRoutineBuilder
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
         return getRoutine(withAnnotations(mInvocationConfiguration, method),
                 withAnnotations(mObjectConfiguration, method), method, null, null);
-    }
-
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull

@@ -244,7 +244,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestProxy testProxy = builder.applyInvocationConfiguration()
                                            .with(configuration)
                                            .configured()
-                                           .serviceConfiguration()
+                                           .applyServiceConfiguration()
                                            .withRunnerClass(MyRunner.class)
                                            .configured()
                                            .buildProxy();
@@ -267,7 +267,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                        .applyInvocationConfiguration()
                                        .with(configuration)
                                        .configured()
-                                       .serviceConfiguration()
+                                       .applyServiceConfiguration()
                                        .withRunnerClass(MyRunner.class)
                                        .configured()
                                        .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -329,7 +329,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                                     .with(instanceOf(TestClass2.class))
-                                    .serviceConfiguration()
+                                    .applyServiceConfiguration()
                                     .withRunnerClass(SharedFieldRunner.class)
                                     .configured()
                                     .applyInvocationConfiguration()
@@ -338,12 +338,12 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Integer> getOne = builder.objectConfiguration()
+        Channel<?, Integer> getOne = builder.applyObjectConfiguration()
                                             .withSharedFields("1")
                                             .configured()
                                             .buildProxy(TestClassAsync.class)
                                             .getOne();
-        Channel<?, Integer> getTwo = builder.objectConfiguration()
+        Channel<?, Integer> getTwo = builder.applyObjectConfiguration()
                                             .withSharedFields("2")
                                             .configured()
                                             .buildProxy(TestClassAsync.class)

@@ -76,7 +76,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Data data = new Data();
         final Channel<?, Data> channel = JRoutineService.on(serviceFrom(getActivity()))
                                                         .with(factoryOf(Delay.class))
-                                                        .serviceConfiguration()
+                                                        .applyServiceConfiguration()
                                                         .withRunnerClass(MainRunner.class)
                                                         .configured()
                                                         .asyncCall(data);
@@ -203,7 +203,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                .withInputOrder(OrderType.BY_DELAY)
                                                                .withLogLevel(Level.DEBUG)
                                                                .configured()
-                                                               .serviceConfiguration()
+                                                               .applyServiceConfiguration()
                                                                .withLogClass(AndroidLog.class)
                                                                .configured()
                                                                .buildRoutine();
@@ -284,7 +284,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withInputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
                                                                 .configured()
-                                                                .serviceConfiguration()
+                                                                .applyServiceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
                                                                 .configured()
                                                                 .buildRoutine();
@@ -307,7 +307,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                                 .withOutputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
                                                                 .configured()
-                                                                .serviceConfiguration()
+                                                                .applyServiceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
                                                                 .configured()
                                                                 .buildRoutine();

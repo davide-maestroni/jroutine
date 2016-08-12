@@ -482,7 +482,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                      .withRunner(Runners.poolRunner())
                                      .withMaxInstances(1)
                                      .configured()
-                                     .objectConfiguration()
+                                     .applyObjectConfiguration()
                                      .withSharedFields("test")
                                      .configured()
                                      .method(TestClass.class.getMethod("getLong"));
@@ -829,7 +829,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final ServiceObjectRoutineBuilder builder =
                 JRoutineServiceObject.on(serviceFrom(getActivity(), TestService.class))
                                      .with(instanceOf(TestClass2.class))
-                                     .serviceConfiguration()
+                                     .applyServiceConfiguration()
                                      .withRunnerClass(SharedFieldRunner.class)
                                      .configured()
                                      .applyInvocationConfiguration()
@@ -838,13 +838,13 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Object> getOne = builder.objectConfiguration()
+        Channel<?, Object> getOne = builder.applyObjectConfiguration()
                                            .withSharedFields("1")
                                            .configured()
                                            .method("getOne")
                                            .asyncCall()
                                            .close();
-        Channel<?, Object> getTwo = builder.objectConfiguration()
+        Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields("2")
                                            .configured()
                                            .method("getTwo")

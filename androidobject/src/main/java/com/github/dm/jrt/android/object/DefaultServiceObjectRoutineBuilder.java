@@ -70,9 +70,7 @@ import static com.github.dm.jrt.object.builder.Builders.invokeRoutine;
  * <p>
  * Created by davide-maestroni on 03/29/2015.
  */
-class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
-        ObjectConfiguration.Configurable<ServiceObjectRoutineBuilder>,
-        ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
+class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder {
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
@@ -163,9 +161,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     @NotNull
     @Override
+    public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(
                 new InvocationConfiguration.Configurable<ServiceObjectRoutineBuilder>() {
@@ -181,17 +185,27 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     @NotNull
     @Override
-    public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration
-            () {
+    public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    applyObjectConfiguration() {
         final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+        return new ObjectConfiguration.Builder<ServiceObjectRoutineBuilder>(
+                new ObjectConfiguration.Configurable<ServiceObjectRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceObjectRoutineBuilder apply(
+                            @NotNull final ObjectConfiguration configuration) {
+                        return DefaultServiceObjectRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
     @Override
-    public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
+    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    applyServiceConfiguration() {
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -235,9 +249,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) JRoutineService.on(mContext)
                                                  .with(factory)
                                                  .apply(invocationConfiguration)
-                                                 .serviceConfiguration()
-                                                 .with(serviceConfiguration)
-                                                 .configured()
+                                                 .apply(serviceConfiguration)
                                                  .buildRoutine();
     }
 
@@ -260,9 +272,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) JRoutineService.on(mContext)
                                                  .with(factory)
                                                  .apply(invocationConfiguration)
-                                                 .serviceConfiguration()
-                                                 .with(serviceConfiguration)
-                                                 .configured()
+                                                 .apply(serviceConfiguration)
                                                  .buildRoutine();
     }
 
@@ -270,14 +280,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @Override
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
         return method(method.getName(), method.getParameterTypes());
-    }
-
-    @NotNull
-    @Override
-    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
-    serviceConfiguration() {
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     /**
@@ -322,7 +324,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.with(target)
-                                     .objectConfiguration()
+                                     .applyObjectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .configured()
                                      .method(mAliasName);
@@ -427,7 +429,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.with(target)
-                                     .objectConfiguration()
+                                     .applyObjectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .configured()
                                      .method(mMethodName, mParameterTypes);
@@ -548,9 +550,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final Routine<Object, Object> routine = JRoutineService.on(mContext)
                                                                    .with(factory)
                                                                    .apply(invocationConfiguration)
-                                                                   .serviceConfiguration()
-                                                                   .with(serviceConfiguration)
-                                                                   .configured()
+                                                                   .apply(serviceConfiguration)
                                                                    .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

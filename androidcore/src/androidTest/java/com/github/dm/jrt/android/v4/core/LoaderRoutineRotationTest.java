@@ -63,7 +63,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .loaderConfiguration()
+                                                                    .applyLoaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType
@@ -92,7 +92,7 @@ public class LoaderRoutineRotationTest
                             .applyInvocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
                             .configured()
-                            .loaderConfiguration()
+                            .applyLoaderConfiguration()
                             .withLoaderId(0)
                             .configured()
                             .asyncCall("test1", "test2");
@@ -171,7 +171,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .loaderConfiguration()
+                                                                    .applyLoaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType

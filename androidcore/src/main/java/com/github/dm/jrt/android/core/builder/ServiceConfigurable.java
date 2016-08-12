@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,9 +26,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
- * @param <TYPE> the builder type.
+ * @param <TYPE> the object type.
  */
-public interface ServiceConfigurable<TYPE> {
+public interface ServiceConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
      * Gets the service configuration builder related to the instance.
@@ -39,5 +40,5 @@ public interface ServiceConfigurable<TYPE> {
      * @return the service configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> serviceConfiguration();
+    Builder<? extends TYPE> applyServiceConfiguration();
 }

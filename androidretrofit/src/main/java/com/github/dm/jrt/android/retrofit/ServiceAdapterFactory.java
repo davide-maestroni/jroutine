@@ -23,6 +23,7 @@ import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -172,9 +173,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         return JRoutineService.on(ConstantConditions.notNull("service context", mServiceContext))
                               .with(factoryOf(ServiceCallInvocation.class))
                               .apply(invocationConfiguration)
-                              .serviceConfiguration()
-                              .with(serviceConfiguration)
-                              .configured()
+                              .apply(serviceConfiguration)
                               .buildRoutine();
     }
 
@@ -189,8 +188,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
      */
     public static class Builder
-            implements ServiceConfigurable<Builder>, InvocationConfiguration.Configurable<Builder>,
-            ServiceConfiguration.Configurable<Builder> {
+            implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {
 
         private final ServiceContext mServiceContext;
 
@@ -228,8 +226,15 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         @NotNull
+        @Override
         public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
             return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+        }
+
+        @NotNull
+        @Override
+        public ServiceConfiguration.Builder<? extends Builder> applyServiceConfiguration() {
+            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
         }
 
         /**
@@ -253,12 +258,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
-        }
-
-        @NotNull
-        @Override
-        public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
-            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
         }
     }
 

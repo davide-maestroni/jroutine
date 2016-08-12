@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 10/25/2014.
  */
-class DefaultChannelBuilder implements ChannelBuilder, Configurable<ChannelBuilder> {
+class DefaultChannelBuilder implements ChannelBuilder {
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 

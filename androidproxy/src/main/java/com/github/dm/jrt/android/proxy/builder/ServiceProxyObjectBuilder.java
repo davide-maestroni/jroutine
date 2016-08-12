@@ -46,8 +46,23 @@ public interface ServiceProxyObjectBuilder<TYPE>
      */
     @NotNull
     @Override
+    ServiceProxyObjectBuilder<TYPE> apply(@NotNull ObjectConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     applyInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    applyObjectConfiguration();
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -69,11 +84,4 @@ public interface ServiceProxyObjectBuilder<TYPE>
     @NotNull
     @Override
     TYPE buildProxy();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> objectConfiguration();
 }

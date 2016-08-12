@@ -49,18 +49,6 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    private final ObjectConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
-            mProxyConfigurable =
-            new ObjectConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
-
-                @NotNull
-                public DefaultAutoProxyRoutineBuilder apply(
-                        @NotNull final ObjectConfiguration configuration) {
-                    mObjectConfiguration = configuration;
-                    return DefaultAutoProxyRoutineBuilder.this;
-                }
-            };
-
     /**
      * Constructor.
      *
@@ -86,9 +74,14 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
+    public AutoProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<AutoProxyRoutineBuilder>(
                 new InvocationConfiguration.Configurable<AutoProxyRoutineBuilder>() {
@@ -102,10 +95,18 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration() {
+    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    applyObjectConfiguration() {
         final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
-                config);
+        return new ObjectConfiguration.Builder<AutoProxyRoutineBuilder>(
+                new ObjectConfiguration.Configurable<AutoProxyRoutineBuilder>() {
+
+                    @NotNull
+                    public AutoProxyRoutineBuilder apply(
+                            @NotNull final ObjectConfiguration configuration) {
+                        return DefaultAutoProxyRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
@@ -157,17 +158,13 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     private ObjectRoutineBuilder newObjectBuilder() {
         return JRoutineObject.with(mTarget)
                              .apply(mInvocationConfiguration)
-                             .objectConfiguration()
-                             .with(mObjectConfiguration)
-                             .configured();
+                             .apply(mObjectConfiguration);
     }
 
     @NotNull
     private ProxyRoutineBuilder newProxyBuilder() {
         return JRoutineProxy.with(mTarget)
                             .apply(mInvocationConfiguration)
-                            .objectConfiguration()
-                            .with(mObjectConfiguration)
-                            .configured();
+                            .apply(mObjectConfiguration);
     }
 }

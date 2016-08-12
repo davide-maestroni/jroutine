@@ -41,9 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <TYPE> the interface type.
  */
 public abstract class AbstractServiceProxyObjectBuilder<TYPE>
-        implements ServiceProxyObjectBuilder<TYPE>,
-        ObjectConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>,
-        ServiceConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>> {
+        implements ServiceProxyObjectBuilder<TYPE> {
 
     private static final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
             sContextProxies =
@@ -56,13 +54,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     private ServiceConfiguration mServiceConfiguration =
             ServiceConfiguration.defaultConfiguration();
-
-    @NotNull
-    @Override
-    public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
 
     @NotNull
     @Override
@@ -83,9 +74,15 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     @Override
+    public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
                 new InvocationConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
@@ -94,6 +91,23 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
                     @Override
                     public ServiceProxyObjectBuilder<TYPE> apply(
                             @NotNull final InvocationConfiguration configuration) {
+                        return AbstractServiceProxyObjectBuilder.this.apply(configuration);
+                    }
+                }, config);
+    }
+
+    @NotNull
+    @Override
+    public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
+                new ObjectConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
+
+                    @NotNull
+                    @Override
+                    public ServiceProxyObjectBuilder<TYPE> apply(
+                            @NotNull final ObjectConfiguration configuration) {
                         return AbstractServiceProxyObjectBuilder.this.apply(configuration);
                     }
                 }, config);
@@ -149,16 +163,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     @Override
-    public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    @Override
     public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    serviceConfiguration() {
+    applyServiceConfiguration() {
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }

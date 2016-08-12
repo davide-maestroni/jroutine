@@ -17,6 +17,7 @@
 package com.github.dm.jrt.object.builder;
 
 import com.github.dm.jrt.object.config.ObjectConfiguration.Builder;
+import com.github.dm.jrt.object.config.ObjectConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,9 +26,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
- * @param <TYPE> the builder type.
+ * @param <TYPE> the object type.
  */
-public interface ObjectConfigurable<TYPE> {
+public interface ObjectConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
      * Gets the object configuration builder related to the instance.
@@ -39,5 +40,5 @@ public interface ObjectConfigurable<TYPE> {
      * @return the object configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> objectConfiguration();
+    Builder<? extends TYPE> applyObjectConfiguration();
 }

@@ -333,7 +333,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                 final ServiceAdapterFactory adapterFactory = //
                         ServiceAdapterFactory.on(context)
                                              .invocationMode(InvocationMode.PARALLEL)
-                                             .serviceConfiguration()
+                                             .applyServiceConfiguration()
                                              .withLogClass(NullLog.class)
                                              .configured()
                                              .buildFactory();

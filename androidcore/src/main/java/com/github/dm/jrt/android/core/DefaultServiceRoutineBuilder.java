@@ -36,8 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
-        implements ServiceRoutineBuilder<IN, OUT>,
-        ServiceConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>> {
+        implements ServiceRoutineBuilder<IN, OUT> {
 
     private final ServiceContext mContext;
 
@@ -71,7 +70,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
     applyInvocationConfiguration() {
-
         return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super
                 .applyInvocationConfiguration();
     }
@@ -85,16 +83,16 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
     @NotNull
     @Override
-    public Routine<IN, OUT> buildRoutine() {
-        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
-                mServiceConfiguration);
+    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
+    applyServiceConfiguration() {
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
     }
 
     @NotNull
     @Override
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    serviceConfiguration() {
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
+    public Routine<IN, OUT> buildRoutine() {
+        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
+                mServiceConfiguration);
     }
 }

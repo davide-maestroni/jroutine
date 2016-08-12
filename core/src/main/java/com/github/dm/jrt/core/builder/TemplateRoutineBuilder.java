@@ -19,7 +19,6 @@ package com.github.dm.jrt.core.builder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -37,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
-        implements RoutineBuilder<IN, OUT>, Configurable<RoutineBuilder<IN, OUT>> {
+        implements RoutineBuilder<IN, OUT> {
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 

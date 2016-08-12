@@ -47,6 +47,12 @@ public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
+    AutoProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
     applyInvocationConfiguration();
 
@@ -54,7 +60,7 @@ public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration();
+    ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> applyObjectConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.

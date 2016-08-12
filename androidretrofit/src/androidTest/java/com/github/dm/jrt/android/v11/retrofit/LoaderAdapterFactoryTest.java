@@ -87,7 +87,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                         .applyInvocationConfiguration()
                                         .withOutputTimeout(seconds(10))
                                         .configured()
-                                        .loaderConfiguration()
+                                        .applyLoaderConfiguration()
                                         .withCacheStrategy(CacheStrategyType.CLEAR)
                                         .configured()
                                         .buildFactory();
@@ -194,7 +194,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                 final LoaderAdapterFactory adapterFactory = //
                         LoaderAdapterFactory.on(context)
                                             .invocationMode(InvocationMode.PARALLEL)
-                                            .loaderConfiguration()
+                                            .applyLoaderConfiguration()
                                             .withResultStaleTime(days(1))
                                             .configured()
                                             .buildFactory();
@@ -430,7 +430,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                         .applyInvocationConfiguration()
                                         .withOutputTimeout(seconds(10))
                                         .configured()
-                                        .loaderConfiguration()
+                                        .applyLoaderConfiguration()
                                         .withCacheStrategy(CacheStrategyType.CLEAR)
                                         .configured()
                                         .buildFactory();

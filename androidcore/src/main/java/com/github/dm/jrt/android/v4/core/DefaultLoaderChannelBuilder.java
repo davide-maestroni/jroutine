@@ -41,9 +41,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromO
  * <p>
  * Created by davide-maestroni on 01/14/2015.
  */
-class DefaultLoaderChannelBuilder
-        implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
-        ChannelConfiguration.Configurable<LoaderChannelBuilder> {
+class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
     private final LoaderContextCompat mContext;
 
@@ -70,17 +68,9 @@ class DefaultLoaderChannelBuilder
 
     @NotNull
     @Override
-    public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
-        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> applyChannelConfiguration
-            () {
-        final ChannelConfiguration config = mChannelConfiguration;
-        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration() {
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @NotNull
@@ -105,30 +95,13 @@ class DefaultLoaderChannelBuilder
         final DefaultLoaderRoutineBuilder<Void, OUT> builder =
                 new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         return builder.apply(builderFromOutput(mChannelConfiguration).configured())
-                      .loaderConfiguration()
+                      .applyLoaderConfiguration()
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withMatchResolution(ClashResolutionType.JOIN)
                       .with(loaderConfiguration)
                       .configured()
                       .asyncCall()
                       .close();
-    }
-
-    @Override
-    public void clear() {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
-        }
-    }
-
-    @Override
-    public void clear(@Nullable final Object input) {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
-                    Collections.singletonList(input));
-        }
     }
 
     @Override
@@ -168,10 +141,35 @@ class DefaultLoaderChannelBuilder
         }
     }
 
+    @Override
+    public void clear() {
+        final LoaderContextCompat context = mContext;
+        if (context.getComponent() != null) {
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
+        }
+    }
+
+    @Override
+    public void clear(@Nullable final Object input) {
+        final LoaderContextCompat context = mContext;
+        if (context.getComponent() != null) {
+            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+                    Collections.singletonList(input));
+        }
+    }
+
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
+    public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
+        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> applyChannelConfiguration
+            () {
+        final ChannelConfiguration config = mChannelConfiguration;
+        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 }

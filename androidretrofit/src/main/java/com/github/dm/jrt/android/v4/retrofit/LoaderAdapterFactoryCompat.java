@@ -110,9 +110,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         return JRoutineLoaderCompat.on(mLoaderContext)
                                    .with(factory)
                                    .apply(invocationConfiguration)
-                                   .loaderConfiguration()
-                                   .with(loaderConfiguration)
-                                   .configured()
+                                   .apply(loaderConfiguration)
                                    .buildRoutine();
     }
 
@@ -155,9 +153,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
      * @see AndroidBuilders#withAnnotations(LoaderConfiguration, Annotation...)
      */
     public static class Builder
-            implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder>,
-            InvocationConfiguration.Configurable<Builder>,
-            LoaderConfiguration.Configurable<Builder> {
+            implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder> {
 
         private final LoaderContextCompat mLoaderContext;
 
@@ -202,6 +198,12 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
             return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
         }
 
+        @NotNull
+        @Override
+        public LoaderConfiguration.Builder<? extends Builder> applyLoaderConfiguration() {
+            return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
+        }
+
         /**
          * Builds and return a new factory instance.
          *
@@ -235,12 +237,6 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
             mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
-        }
-
-        @NotNull
-        @Override
-        public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
-            return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
         }
     }
 

@@ -42,8 +42,7 @@ import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
  * @param <OUT> the output data type.
  */
 class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
-        implements LoaderRoutineBuilder<IN, OUT>,
-        LoaderConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>> {
+        implements LoaderRoutineBuilder<IN, OUT> {
 
     private final LoaderContext mContext;
 
@@ -97,6 +96,14 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
     @NotNull
     @Override
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
+    applyLoaderConfiguration() {
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
+    }
+
+    @NotNull
+    @Override
     public LoaderRoutine<IN, OUT> buildRoutine() {
         final InvocationConfiguration configuration = getConfiguration();
         final Runner asyncRunner = configuration.getRunnerOrElse(null);
@@ -112,6 +119,11 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @Override
+    public void clear() {
+        buildRoutine().clear();
+    }
+
+    @Override
     public void clear(@Nullable final IN input) {
         buildRoutine().clear(input);
     }
@@ -123,18 +135,5 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     @Override
     public void clear(@Nullable final Iterable<? extends IN> inputs) {
         buildRoutine().clear(inputs);
-    }
-
-    @Override
-    public void clear() {
-        buildRoutine().clear();
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-    loaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
     }
 }

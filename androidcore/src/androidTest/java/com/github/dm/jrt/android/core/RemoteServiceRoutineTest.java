@@ -77,7 +77,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Channel<?, Data> channel =
                 JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .with(factoryOf(Delay.class))
-                               .serviceConfiguration()
+                               .applyServiceConfiguration()
                                .withRunnerClass(MainRunner.class)
                                .configured()
                                .asyncCall(data);
@@ -194,7 +194,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .configured()
-                               .serviceConfiguration()
+                               .applyServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .configured()
                                .buildRoutine();
@@ -276,7 +276,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .configured()
-                               .serviceConfiguration()
+                               .applyServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .configured()
                                .buildRoutine();
@@ -300,7 +300,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withOutputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .configured()
-                               .serviceConfiguration()
+                               .applyServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .configured()
                                .buildRoutine();

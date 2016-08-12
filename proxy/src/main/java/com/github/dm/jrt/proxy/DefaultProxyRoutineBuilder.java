@@ -37,9 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  * <p>
  * Created by davide-maestroni on 03/23/2015.
  */
-class DefaultProxyRoutineBuilder
-        implements ProxyRoutineBuilder, InvocationConfiguration.Configurable<ProxyRoutineBuilder>,
-        ObjectConfiguration.Configurable<ProxyRoutineBuilder> {
+class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
 
     private final InvocationTarget<?> mTarget;
 
@@ -86,6 +84,12 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
+    public ObjectConfiguration.Builder<? extends ProxyRoutineBuilder> applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ProxyRoutineBuilder>(this, config);
+    }
+
+    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
         if (!itf.isInterface()) {
             throw new IllegalArgumentException(
@@ -100,22 +104,12 @@ class DefaultProxyRoutineBuilder
 
         final TargetProxyObjectBuilder<TYPE> builder =
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-        return builder.apply(mInvocationConfiguration)
-                      .objectConfiguration()
-                      .with(mObjectConfiguration)
-                      .configured()
-                      .buildProxy();
+        return builder.apply(mInvocationConfiguration).apply(mObjectConfiguration).buildProxy();
     }
 
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
         return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ProxyRoutineBuilder> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     /**

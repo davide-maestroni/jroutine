@@ -64,9 +64,7 @@ import static com.github.dm.jrt.object.builder.Builders.getAnnotatedMethod;
  * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
-class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
-        LoaderConfiguration.Configurable<LoaderObjectRoutineBuilder>,
-        ObjectConfiguration.Configurable<LoaderObjectRoutineBuilder> {
+class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder {
 
     private final LoaderContextCompat mContext;
 
@@ -98,6 +96,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return this;
     }
 
+    @NotNull
+    @Override
+    public LoaderObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
     @Override
     @NotNull
     public LoaderObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
@@ -107,10 +113,36 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
     @NotNull
     @Override
-    public LoaderObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    applyInvocationConfiguration() {
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(
+                new InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderObjectRoutineBuilder apply(
+                            @NotNull final InvocationConfiguration configuration) {
+                        return DefaultLoaderObjectRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
+    }
+
+    @NotNull
+    @Override
+    public ObjectConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<LoaderObjectRoutineBuilder>(
+                new ObjectConfiguration.Configurable<LoaderObjectRoutineBuilder>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderObjectRoutineBuilder apply(
+                            @NotNull final ObjectConfiguration configuration) {
+                        return DefaultLoaderObjectRoutineBuilder.this.apply(configuration);
+                    }
+                }, config);
     }
 
     @NotNull
@@ -153,9 +185,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return JRoutineLoaderCompat.on(mContext)
                                    .with(factory)
                                    .apply(invocationConfiguration)
-                                   .loaderConfiguration()
-                                   .with(loaderConfiguration)
-                                   .configured()
+                                   .apply(loaderConfiguration)
                                    .buildRoutine();
     }
 
@@ -181,40 +211,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         return JRoutineLoaderCompat.on(mContext)
                                    .with(factory)
                                    .apply(invocationConfiguration)
-                                   .loaderConfiguration()
-                                   .with(loaderConfiguration)
-                                   .configured()
+                                   .apply(loaderConfiguration)
                                    .buildRoutine();
     }
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
-    applyInvocationConfiguration() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(
-                new InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder>() {
-
-                    @NotNull
-                    @Override
-                    public LoaderObjectRoutineBuilder apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultLoaderObjectRoutineBuilder.this.apply(configuration);
-                    }
-                }, config);
-    }
-
-    @NotNull
-    @Override
-    public ObjectConfiguration.Builder<? extends LoaderObjectRoutineBuilder> objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    applyLoaderConfiguration() {
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
@@ -267,11 +271,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.with(target)
-                                     .objectConfiguration()
-                                     .with(mObjectConfiguration)
-                                     .configured()
-                                     .method(mAliasName);
+            mRoutine = JRoutineObject.with(target).apply(mObjectConfiguration).method(mAliasName);
         }
 
         @Override
@@ -410,11 +410,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.with(target)
-                                     .objectConfiguration()
-                                     .with(mObjectConfiguration)
-                                     .configured()
-                                     .method(mMethod);
+            mRoutine = JRoutineObject.with(target).apply(mObjectConfiguration).method(mMethod);
         }
     }
 
@@ -620,9 +616,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final LoaderRoutineBuilder<Object, Object> builder =
                     JRoutineLoaderCompat.on(mContext).with(factory);
             final LoaderRoutine<Object, Object> routine = builder.apply(invocationConfiguration)
-                                                                 .loaderConfiguration()
-                                                                 .with(loaderConfiguration)
-                                                                 .configured()
+                                                                 .apply(loaderConfiguration)
                                                                  .buildRoutine();
             return Builders.invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

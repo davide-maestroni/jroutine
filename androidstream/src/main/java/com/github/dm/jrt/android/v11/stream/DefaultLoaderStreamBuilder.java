@@ -62,31 +62,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     private LoaderStreamConfiguration mStreamConfiguration;
 
-    private final LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>
-            mLoaderConfigurable =
-            new LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
-
-                @NotNull
-                public LoaderStreamBuilder<IN, OUT> apply(
-                        @NotNull final LoaderConfiguration configuration) {
-                    return DefaultLoaderStreamBuilder.this.apply(mStreamConfiguration =
-                            newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
-                                    configuration));
-                }
-            };
-
-    private final LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>
-            mStreamLoaderConfigurable =
-            new LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
-
-                @NotNull
-                public LoaderStreamBuilder<IN, OUT> apply(
-                        @NotNull final LoaderConfiguration configuration) {
-                    return DefaultLoaderStreamBuilder.this.apply(newConfiguration(configuration,
-                            mStreamConfiguration.getCurrentLoaderConfiguration()));
-                }
-            };
-
     /**
      * Constructor.
      */
@@ -138,7 +113,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     applyInvocationConfiguration() {
-
         return new InvocationConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
                 new InvocationConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
 
@@ -165,7 +139,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
     applyStreamInvocationConfiguration() {
-
         return new InvocationConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
                 new InvocationConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
 
@@ -365,9 +338,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
         return JRoutineLoader.on(loaderContext)
                              .with(invocationFactory)
                              .apply(loaderStreamConfiguration.asInvocationConfiguration())
-                             .loaderConfiguration()
-                             .with(loaderStreamConfiguration.asLoaderConfiguration())
-                             .configured()
+                             .apply(loaderStreamConfiguration.asLoaderConfiguration())
                              .buildRoutine();
     }
 
@@ -385,6 +356,53 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
+        return DefaultLoaderStreamBuilder.this.apply(mStreamConfiguration =
+                newConfiguration(mStreamConfiguration.getStreamLoaderConfiguration(),
+                        configuration));
+    }
+
+    @NotNull
+    @Override
+    public LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
+    applyLoaderConfiguration() {
+        return new LoaderConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
+                new LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderStreamBuilder<IN, OUT> apply(
+                            @NotNull final LoaderConfiguration configuration) {
+                        return DefaultLoaderStreamBuilder.this.apply(configuration);
+                    }
+                }, mStreamConfiguration.getCurrentLoaderConfiguration());
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilder<IN, OUT> applyStream(
+            @NotNull final LoaderConfiguration configuration) {
+        return DefaultLoaderStreamBuilder.this.apply(newConfiguration(configuration,
+                mStreamConfiguration.getCurrentLoaderConfiguration()));
+    }
+
+    @NotNull
+    @Override
+    public Builder<? extends LoaderStreamBuilder<IN, OUT>> applyStreamLoaderConfiguration() {
+        return new LoaderConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
+                new LoaderConfiguration.Configurable<LoaderStreamBuilder<IN, OUT>>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderStreamBuilder<IN, OUT> apply(
+                            @NotNull final LoaderConfiguration configuration) {
+                        return DefaultLoaderStreamBuilder.this.applyStream(configuration);
+                    }
+                }, mStreamConfiguration.getStreamLoaderConfiguration());
+    }
+
+    @NotNull
+    @Override
     public ContextInvocationFactory<IN, OUT> buildContextFactory() {
         final InvocationFactory<IN, OUT> factory = buildFactory();
         return factoryFrom(JRoutineCore.with(factory).buildRoutine(), factory.hashCode(),
@@ -393,10 +411,9 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends LoaderStreamBuilder<IN, OUT>>
-    loaderConfiguration() {
-        return new LoaderConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(mLoaderConfigurable,
-                mStreamConfiguration.getCurrentLoaderConfiguration());
+    public <AFTER> LoaderStreamBuilder<IN, AFTER> map(
+            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
+        return map(buildRoutine(builder));
     }
 
     @NotNull
@@ -413,22 +430,8 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamBuilder<IN, AFTER> map(
-            @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        return map(buildRoutine(builder));
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamBuilder<IN, OUT> on(@Nullable final LoaderContext context) {
         return apply(newConfiguration(context));
-    }
-
-    @NotNull
-    @Override
-    public Builder<? extends LoaderStreamBuilder<IN, OUT>> streamLoaderConfiguration() {
-        return new LoaderConfiguration.Builder<LoaderStreamBuilder<IN, OUT>>(
-                mStreamLoaderConfigurable, mStreamConfiguration.getStreamLoaderConfiguration());
     }
 
     /**
@@ -450,10 +453,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
         final LoaderStreamConfiguration streamConfiguration = mStreamConfiguration;
         return builder.apply(streamConfiguration.asInvocationConfiguration())
-                      .loaderConfiguration()
-                      .with(null)
-                      .with(streamConfiguration.asLoaderConfiguration())
-                      .configured()
+                      .apply(streamConfiguration.asLoaderConfiguration())
                       .buildRoutine();
     }
 

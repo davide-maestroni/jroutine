@@ -39,9 +39,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <TYPE> the interface type.
  */
 public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
-        implements LoaderProxyObjectBuilder<TYPE>,
-        ObjectConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>,
-        LoaderConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>> {
+        implements LoaderProxyObjectBuilder<TYPE> {
 
     private static final WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
             sContextProxies =
@@ -63,13 +61,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     @Override
-    public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
     public LoaderProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
         mInvocationConfiguration =
@@ -79,9 +70,15 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     @Override
+    public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
     applyInvocationConfiguration() {
-
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
                 new InvocationConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
@@ -90,6 +87,23 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
                     @Override
                     public LoaderProxyObjectBuilder<TYPE> apply(
                             @NotNull final InvocationConfiguration configuration) {
+                        return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
+                    }
+                }, config);
+    }
+
+    @NotNull
+    @Override
+    public ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+    applyObjectConfiguration() {
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
+                new ObjectConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
+
+                    @NotNull
+                    @Override
+                    public LoaderProxyObjectBuilder<TYPE> apply(
+                            @NotNull final ObjectConfiguration configuration) {
                         return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
                     }
                 }, config);
@@ -152,16 +166,8 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     @Override
-    public ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    objectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    @Override
     public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    loaderConfiguration() {
+    applyLoaderConfiguration() {
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }

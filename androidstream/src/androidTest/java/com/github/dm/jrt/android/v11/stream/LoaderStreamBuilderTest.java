@@ -459,7 +459,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineLoaderStream.withStream()
                                        .on(loaderFrom(getActivity()))
-                                       .loaderConfiguration()
+                                       .applyLoaderConfiguration()
                                        .withLoaderId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                        .configured()
@@ -473,7 +473,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                  .next()).isEqualTo("test");
         assertThat(JRoutineLoaderStream.withStream()
                                        .on(loaderFrom(getActivity()))
-                                       .streamLoaderConfiguration()
+                                       .applyStreamLoaderConfiguration()
                                        .withLoaderId(0)
                                        .withResultStaleTime(1, TimeUnit.MILLISECONDS)
                                        .configured()

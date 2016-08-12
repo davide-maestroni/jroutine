@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,9 +26,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
- * @param <TYPE> the builder type.
+ * @param <TYPE> the object type.
  */
-public interface LoaderConfigurable<TYPE> {
+public interface LoaderConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
      * Gets the loader configuration builder related to the instance.
@@ -39,5 +40,5 @@ public interface LoaderConfigurable<TYPE> {
      * @return the loader configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> loaderConfiguration();
+    Builder<? extends TYPE> applyLoaderConfiguration();
 }

@@ -18,7 +18,6 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
@@ -87,7 +86,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
      * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      */
-    public static class Builder implements InvocationConfigurable<Builder>, Configurable<Builder> {
+    public static class Builder implements InvocationConfigurable<Builder> {
 
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.defaultConfiguration();

@@ -33,7 +33,7 @@
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
                                                   .configured()
-                                                  .serviceConfiguration()
+                                                  .applyServiceConfiguration()
                                                   .with(serviceConfiguration)
                                                   ${serviceBuilderOptions}
                                                   .configured()

@@ -52,6 +52,13 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
+    LoaderAutoProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
     InvocationConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     applyInvocationConfiguration();
 
@@ -60,7 +67,7 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
-    ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> objectConfiguration();
+    ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> applyObjectConfiguration();
 
     /**
      * {@inheritDoc}
@@ -74,5 +81,12 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
-    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> loaderConfiguration();
+    LoaderAutoProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> applyLoaderConfiguration();
 }

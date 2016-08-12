@@ -49,7 +49,7 @@
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
                                            .configured()
-                                           .loaderConfiguration()
+                                           .applyLoaderConfiguration()
                                            .with(loaderConfiguration)
                                            ${loaderBuilderOptions}
                                            .configured()

@@ -649,7 +649,7 @@ public class ObjectRoutineTest {
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .configured()
-                                                               .objectConfiguration()
+                                                               .applyObjectConfiguration()
                                                                .withSharedFields("test")
                                                                .configured()
                                                                .method(TestClass.class.getMethod(
@@ -1254,13 +1254,13 @@ public class ObjectRoutineTest {
                                                            .configured();
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Object> getOne = builder.objectConfiguration()
+        Channel<?, Object> getOne = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getOne")
                                            .asyncCall()
                                            .close();
-        Channel<?, Object> getTwo = builder.objectConfiguration()
+        Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
@@ -1273,13 +1273,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
@@ -1311,7 +1311,7 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         Channel<?, Object> getOne = builder.method("getOne").asyncCall().close();
-        Channel<?, Object> getTwo = builder.objectConfiguration()
+        Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
@@ -1324,13 +1324,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields()
                         .configured()
                         .method("getTwo")
@@ -1343,7 +1343,7 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
@@ -1357,13 +1357,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
@@ -1384,13 +1384,13 @@ public class ObjectRoutineTest {
                                                            .configured();
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Object> getOne = builder.objectConfiguration()
+        Channel<?, Object> getOne = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getOne")
                                            .asyncCall()
                                            .close();
-        Channel<?, Object> getTwo = builder.objectConfiguration()
+        Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
@@ -1403,13 +1403,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
@@ -1440,7 +1440,7 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         Channel<?, Object> getOne = builder.method("getOne").asyncCall().close();
-        Channel<?, Object> getTwo = builder.objectConfiguration()
+        Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
@@ -1453,13 +1453,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields()
                         .configured()
                         .method("getTwo")
@@ -1472,7 +1472,7 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
@@ -1486,13 +1486,13 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.objectConfiguration()
+        getOne = builder.applyObjectConfiguration()
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
                         .asyncCall()
                         .close();
-        getTwo = builder.objectConfiguration()
+        getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
@@ -1514,7 +1514,7 @@ public class ObjectRoutineTest {
                                                                .withMaxInstances(1)
                                                                .withCoreInstances(0)
                                                                .configured()
-                                                               .objectConfiguration()
+                                                               .applyObjectConfiguration()
                                                                .withSharedFields("test")
                                                                .configured()
                                                                .method(TestStatic.class.getMethod(

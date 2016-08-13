@@ -36,6 +36,8 @@ public class Runners {
 
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
 
+    private static final StraightRunner sStraightRunner = new StraightRunner();
+
     private static Runner sSharedRunner;
 
     /**
@@ -164,7 +166,23 @@ public class Runners {
     }
 
     /**
+     * Returns the shared instance of a straight runner.
+     * <p>
+     * The returned runner will immediately run any passed execution.
+     *
+     * @return the runner instance.
+     */
+    @NotNull
+    public static Runner straightRunner() {
+        return sStraightRunner;
+    }
+
+    /**
      * Returns the shared instance of a synchronous runner.
+     * <p>
+     * The returned runner maintains an internal buffer of executions that are consumed only when
+     * the last one completes, thus avoiding overflowing the call stack because of nested calls to
+     * other routines.
      *
      * @return the runner instance.
      */

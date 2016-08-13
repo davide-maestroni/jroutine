@@ -147,7 +147,7 @@
                               .applyLoaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .configured()
-                              .asyncCall(URI.create(IMAGE_URI))
+                              .call(URI.create(IMAGE_URI))
                               .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                   &commat;Override
@@ -210,7 +210,7 @@
                               .applyLoaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .configured()
-                              .asyncCall(URI.create(IMAGE_URI))
+                              .call(URI.create(IMAGE_URI))
                               .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                   &commat;Override
@@ -264,7 +264,7 @@
 
                 &commat;Override
                 public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) {
-                    result.pass(mRoutine.asyncCall(uri));
+                    result.pass(mRoutine.call(uri));
                 }
             }
         }

@@ -100,8 +100,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_THIS)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test1").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test1").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
 
@@ -129,8 +129,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_THIS)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
 
@@ -163,12 +163,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                     .configured()
                                     .buildRoutine();
-        final Channel<?, String> channel4 = routine.asyncCall("test");
+        final Channel<?, String> channel4 = routine.call("test");
         assertThat(channel4.next()).isEqualTo("test");
         assertThat(channel4.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).clear();
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
-        final Channel<?, String> channel5 = routine.asyncCall("test");
+        final Channel<?, String> channel5 = routine.call("test");
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -198,19 +198,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                     .configured()
                                     .buildRoutine();
-        final Channel<?, String> channel5 = routine.asyncCall("test");
+        final Channel<?, String> channel5 = routine.call("test");
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel6 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel6 = routine.call("test1", "test2");
         assertThat(channel6.all()).containsExactly("test1", "test2");
         assertThat(channel6.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel7 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel7 = routine.call("test1", "test2");
         assertThat(channel7.all()).containsExactly("test1", "test2");
         assertThat(channel7.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -218,7 +218,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear(Arrays.asList((Object) "test1", "test2"));
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel8 = routine.asyncCall("test");
+        final Channel<?, String> channel8 = routine.call("test");
         assertThat(channel8.next()).isEqualTo("test");
         assertThat(channel8.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -229,7 +229,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel9 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel9 = routine.call("test1", "test2");
         assertThat(channel9.all()).containsExactly("test1", "test2");
         assertThat(channel9.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -240,7 +240,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel10 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel10 = routine.call("test1", "test2");
         assertThat(channel10.all()).containsExactly("test1", "test2");
         assertThat(channel10.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -264,7 +264,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      CacheStrategyType
                                                                              .CACHE_IF_SUCCESS)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -287,7 +287,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      CacheStrategyType
                                                                              .CACHE_IF_SUCCESS)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         assertThat(result2.next()).isSameAs(data1);
@@ -298,7 +298,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .applyLoaderConfiguration()
                                                              .withLoaderId(0)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         assertThat(result3.next()).isSameAs(data1);
@@ -317,7 +317,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      CacheStrategyType
                                                                              .CACHE_IF_ERROR)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
@@ -332,7 +332,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      CacheStrategyType
                                                                              .CACHE_IF_ERROR)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -353,7 +353,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .applyLoaderConfiguration()
                                                              .withLoaderId(0)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -376,14 +376,16 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 new ClassToken<GetContextInvocation<String>>() {};
         assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                        .with(factoryOf(classToken))
-                                       .syncCall()
+                                       .call()
                                        .close()
+                                       .after(seconds(10))
                                        .next()).isSameAs(getActivity().getApplicationContext());
         final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
         assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), contextWrapper))
                                        .with(factoryOf(classToken, (Object[]) null))
-                                       .syncCall()
+                                       .call()
                                        .close()
+                                       .after(seconds(10))
                                        .next()).isSameAs(getActivity().getApplicationContext());
     }
 
@@ -395,8 +397,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom((FragmentActivity) null))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -407,8 +410,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), null))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -420,8 +424,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), contextWrapper))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -440,12 +445,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Object, Object> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                      .with(factoryFrom(routine1,
                                                                              TEST_ROUTINE_ID,
-                                                                             InvocationMode.SYNC))
+                                                                             InvocationMode.ASYNC))
                                                                      .buildRoutine();
 
-        assertThat(routine2.asyncCall("test1").after(timeout).all()).containsExactly("test1");
+        assertThat(routine2.call("test1").after(timeout).all()).containsExactly("test1");
 
-        final Channel<Object, Object> channel = routine2.asyncCall().after(timeout).pass("test2");
+        final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
         channel.immediately().abort(new IllegalArgumentException());
 
         try {
@@ -465,8 +470,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .with(factoryOf(
                                                                             ToUpperCase.class))
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -514,8 +519,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .JOIN)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST1");
@@ -586,8 +591,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_OTHER)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test1").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test1").after(timeout);
 
         try {
 
@@ -615,8 +620,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_OTHER)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         try {
 
@@ -642,7 +647,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .withCacheStrategy(
                                                                      CacheStrategyType.CACHE)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
@@ -653,7 +658,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .applyLoaderConfiguration()
                                                              .withLoaderId(0)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         assertThat(result2.next()).isSameAs(data1);
@@ -667,7 +672,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .withCacheStrategy(
                                                                      CacheStrategyType.CACHE)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -688,7 +693,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .applyLoaderConfiguration()
                                                              .withLoaderId(0)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -723,7 +728,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                     .configured()
                                     .buildRoutine();
-        final Channel<?, String> channel = routine.asyncCall("test");
+        final Channel<?, String> channel = routine.call("test");
         assertThat(channel.next()).isEqualTo("test");
         assertThat(channel.hasCompleted());
         routine.clear();
@@ -745,19 +750,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                     .configured()
                                     .buildRoutine();
-        final Channel<?, String> channel1 = routine.asyncCall("test");
+        final Channel<?, String> channel1 = routine.call("test");
         assertThat(channel1.next()).isEqualTo("test");
         assertThat(channel1.hasCompleted());
         routine.clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel2 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel2 = routine.call("test1", "test2");
         assertThat(channel2.all()).containsExactly("test1", "test2");
         assertThat(channel2.hasCompleted());
         routine.clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel3 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel3 = routine.call("test1", "test2");
         assertThat(channel3.all()).containsExactly("test1", "test2");
         assertThat(channel3.hasCompleted());
         routine.clear(Arrays.asList("test1", "test2"));
@@ -771,8 +776,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Data, Data> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(Delay.class))
                                                                 .buildRoutine();
-        final Channel<?, Data> result1 = routine.asyncCall(data1).after(timeout);
-        final Channel<?, Data> result2 = routine.asyncCall(data1).after(timeout);
+        final Channel<?, Data> result1 = routine.call(data1).after(timeout);
+        final Channel<?, Data> result2 = routine.call(data1).after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
@@ -826,7 +831,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                              .applyLoaderConfiguration()
                                                              .withLoaderId(0)
                                                              .configured()
-                                                             .asyncCall(data1)
+                                                             .call(data1)
                                                              .after(timeout);
 
         try {
@@ -894,7 +899,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                        .configured()
-                                       .asyncCall("test")
+                                       .call("test")
                                        .after(seconds(10))
                                        .all()).containsExactly("test");
         assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -903,7 +908,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                        .configured()
-                                       .asyncCall("test")
+                                       .call("test")
                                        .after(seconds(10))
                                        .all()).containsExactly("test");
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
@@ -915,7 +920,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                        .configured()
-                                       .asyncCall("test")
+                                       .call("test")
                                        .after(seconds(10))
                                        .all()).containsExactly("TEST");
         assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -924,7 +929,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                        .configured()
-                                       .asyncCall("test")
+                                       .call("test")
                                        .after(seconds(10))
                                        .all()).containsExactly("TEST");
     }
@@ -945,8 +950,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_THIS)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
 
@@ -983,12 +988,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   CacheStrategyType.CACHE)
                                                                           .configured()
                                                                           .buildRoutine();
-        final Channel<?, String> channel4 = routine.asyncCall("test");
+        final Channel<?, String> channel4 = routine.call("test");
         assertThat(channel4.next()).isEqualTo("test");
         assertThat(channel4.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment)).withId(0).clear();
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
-        final Channel<?, String> channel5 = routine.asyncCall("test");
+        final Channel<?, String> channel5 = routine.call("test");
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1022,19 +1027,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   CacheStrategyType.CACHE)
                                                                           .configured()
                                                                           .buildRoutine();
-        final Channel<?, String> channel5 = routine.asyncCall("test");
+        final Channel<?, String> channel5 = routine.call("test");
         assertThat(channel5.next()).isEqualTo("test");
         assertThat(channel5.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment)).withId(0).clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel6 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel6 = routine.call("test1", "test2");
         assertThat(channel6.all()).containsExactly("test1", "test2");
         assertThat(channel6.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment)).withId(0).clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel7 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel7 = routine.call("test1", "test2");
         assertThat(channel7.all()).containsExactly("test1", "test2");
         assertThat(channel7.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1042,7 +1047,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear(Arrays.asList((Object) "test1", "test2"));
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel8 = routine.asyncCall("test");
+        final Channel<?, String> channel8 = routine.call("test");
         assertThat(channel8.next()).isEqualTo("test");
         assertThat(channel8.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1053,7 +1058,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel9 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel9 = routine.call("test1", "test2");
         assertThat(channel9.all()).containsExactly("test1", "test2");
         assertThat(channel9.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1064,7 +1069,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel10 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel10 = routine.call("test1", "test2");
         assertThat(channel10.all()).containsExactly("test1", "test2");
         assertThat(channel10.hasCompleted());
         JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1093,7 +1098,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                             OrderType.BY_CALL)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> channel1 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel1 = routine.call("test1", "test2");
         final Channel<?, String> channel2 =
                 JRoutineLoaderCompat.on(loaderFrom(fragment)).withId(0).buildChannel();
 
@@ -1110,14 +1115,16 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 new ClassToken<GetContextInvocation<String>>() {};
         assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment))
                                        .with(factoryOf(classToken))
-                                       .syncCall()
+                                       .call()
                                        .close()
+                                       .after(seconds(10))
                                        .next()).isSameAs(getActivity().getApplicationContext());
         final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
         assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, contextWrapper))
                                        .with(factoryOf(classToken))
-                                       .syncCall()
+                                       .call()
                                        .close()
+                                       .after(seconds(10))
                                        .next()).isSameAs(getActivity().getApplicationContext());
     }
 
@@ -1132,8 +1139,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom((Fragment) null))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -1144,8 +1152,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, null))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -1157,8 +1166,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, contextWrapper))
                                            .with(factoryOf(classToken))
-                                           .syncCall()
+                                           .call()
                                            .close()
+                                           .after(seconds(10))
                                            .next()).isSameAs(getActivity().getApplicationContext());
             fail();
 
@@ -1183,9 +1193,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                              InvocationMode.ASYNC))
                                                                      .buildRoutine();
 
-        assertThat(routine2.asyncCall("test1").after(timeout).all()).containsExactly("test1");
+        assertThat(routine2.call("test1").after(timeout).all()).containsExactly("test1");
 
-        final Channel<Object, Object> channel = routine2.asyncCall().after(timeout).pass("test2");
+        final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
         channel.immediately().abort(new IllegalArgumentException());
 
         try {
@@ -1208,8 +1218,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .with(factoryOf(
                                                                             ToUpperCase.class))
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -1263,8 +1273,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .JOIN)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST1");
@@ -1345,8 +1355,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_OTHER)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test1").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test1").after(timeout);
 
         try {
 
@@ -1377,8 +1387,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                     .ABORT_OTHER)
                                                                     .configured()
                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine.call("test2").after(timeout);
 
         try {
 
@@ -1415,7 +1425,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   CacheStrategyType.CACHE)
                                                                           .configured()
                                                                           .buildRoutine();
-        final Channel<?, String> channel = routine.asyncCall("test");
+        final Channel<?, String> channel = routine.call("test");
         assertThat(channel.next()).isEqualTo("test");
         assertThat(channel.hasCompleted());
         routine.clear();
@@ -1444,19 +1454,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   CacheStrategyType.CACHE)
                                                                           .configured()
                                                                           .buildRoutine();
-        final Channel<?, String> channel1 = routine.asyncCall("test");
+        final Channel<?, String> channel1 = routine.call("test");
         assertThat(channel1.next()).isEqualTo("test");
         assertThat(channel1.hasCompleted());
         routine.clear("test");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel2 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel2 = routine.call("test1", "test2");
         assertThat(channel2.all()).containsExactly("test1", "test2");
         assertThat(channel2.hasCompleted());
         routine.clear("test1", "test2");
         assertThat(ClearContextInvocation.waitDestroy(1, 1000)).isTrue();
 
-        final Channel<?, String> channel3 = routine.asyncCall("test1", "test2");
+        final Channel<?, String> channel3 = routine.call("test1", "test2");
         assertThat(channel3.all()).containsExactly("test1", "test2");
         assertThat(channel3.hasCompleted());
         routine.clear(Arrays.asList("test1", "test2"));
@@ -1473,8 +1483,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Data, Data> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
                                                                 .with(factoryOf(Delay.class))
                                                                 .buildRoutine();
-        final Channel<?, Data> result1 = routine.asyncCall(data1).after(timeout);
-        final Channel<?, Data> result2 = routine.asyncCall(data1).after(timeout);
+        final Channel<?, Data> result1 = routine.call(data1).after(timeout);
+        final Channel<?, Data> result2 = routine.call(data1).after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
@@ -1492,12 +1502,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      .withLogLevel(Level.WARNING)
                                                                      .configured()
                                                                      .buildRoutine();
-        assertThat(routine1.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
-        assertThat(routine1.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
+        assertThat(routine1.call("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+                "2", "3", "4", "5");
         assertThat(
-                routine1.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                routine1.callParallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
 
         final ClassToken<StringCallInvocation> token2 =
@@ -1511,12 +1519,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      .withLogLevel(Level.WARNING)
                                                                      .configured()
                                                                      .buildRoutine();
-        assertThat(routine2.syncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
-        assertThat(routine2.asyncCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
-                "1", "2", "3", "4", "5");
+        assertThat(routine2.call("1", "2", "3", "4", "5").after(timeout).all()).containsOnly("1",
+                "2", "3", "4", "5");
         assertThat(
-                routine2.parallelCall("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
+                routine2.callParallel("1", "2", "3", "4", "5").after(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
@@ -1666,7 +1672,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Channel<Object, Object> channel = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                     .with(IdentityContextInvocation.factoryOf())
-                                                                    .asyncCall();
+                                                                    .call();
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);

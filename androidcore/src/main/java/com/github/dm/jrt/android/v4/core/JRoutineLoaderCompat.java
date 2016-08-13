@@ -75,7 +75,7 @@ import org.jetbrains.annotations.NotNull;
  *                         JRoutineLoaderCompat.on(loaderFrom(this))
  *                                             .with(factoryOf(LoadResource.class))
  *                                             .buildRoutine();
- *                 routine.asyncCall(RESOURCE_URI)
+ *                 routine.call(RESOURCE_URI)
  *                        .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                            &#64;Override
@@ -121,7 +121,7 @@ import org.jetbrains.annotations.NotNull;
  *             &#64;Override
  *             protected void onCall(final List&lt;? extends URI&gt; uris,
  *                     &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
- *                 result.pass(mRoutine.asyncCall(uris));
+ *                 result.pass(mRoutine.call(uris));
  *             }
  *         }
  *     </code>

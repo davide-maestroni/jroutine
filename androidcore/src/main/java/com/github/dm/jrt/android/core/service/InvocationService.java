@@ -439,8 +439,7 @@ public class InvocationService extends Service {
         @NotNull
         @Override
         @SuppressWarnings("unchecked")
-        protected Invocation<Object, Object> newInvocation(
-                @NotNull final InvocationType type) throws Exception {
+        protected Invocation<Object, Object> newInvocation() throws Exception {
             final ContextInvocationFactory<?, ?> factory = mFactory;
             getLogger().dbg("creating a new instance");
             final ContextInvocation<?, ?> invocation = factory.newInvocation();
@@ -594,7 +593,7 @@ public class InvocationService extends Service {
         @NotNull
         Channel<Object, Object> invoke() {
             ++mInvocationCount;
-            return mRoutine.asyncCall();
+            return mRoutine.call();
         }
 
         /**

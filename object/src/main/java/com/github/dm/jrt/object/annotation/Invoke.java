@@ -31,9 +31,8 @@ import java.lang.annotation.Target;
  * of another class methods. The annotation will indicate the type of invocation to be applied to
  * the wrapping routine.
  * <p>
- * Note that, unless the {@link InvocationMode#PARALLEL} or  {@link InvocationMode#SEQUENTIAL} is
- * specified, to each call to a method of the proxy interface will correspond a single invocation of
- * the wrapping routine.
+ * Note that, unless the {@link InvocationMode#PARALLEL} is specified, to each call to a method of
+ * the proxy interface will correspond a single invocation of the wrapping routine.
  * <br>
  * In case this annotation is absent, the asynchronous invocation mode will be employed.
  * <p>

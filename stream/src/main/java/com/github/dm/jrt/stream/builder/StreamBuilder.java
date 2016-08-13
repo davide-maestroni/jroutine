@@ -336,11 +336,11 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     StreamBuilder<IN, OUT> parallel();
 
     /**
-     * Makes the stream sequential, that is, the concatenated routines will be invoked in sequential
-     * mode.
+     * Makes the stream sequential, that is, the concatenated routines will be invoked sequentially,
+     * that is, each input will be processed by a new invocation instance employing a synchronous
+     * runner.
      *
      * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     StreamBuilder<IN, OUT> sequential();
@@ -365,17 +365,17 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
      * processed by the next routine invocation.
      *
      * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
+     * @see com.github.dm.jrt.core.runner.Runners#straightRunner() Runners.straightRunner()
      */
     @NotNull
     StreamBuilder<IN, OUT> straight();
 
     /**
-     * Makes the stream synchronous, that is, the concatenated routines will be invoked in
-     * synchronous mode.
+     * Makes the stream synchronous, that is, the concatenated routines will be invoked
+     * synchronously.
      *
      * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
+     * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
      */
     @NotNull
     StreamBuilder<IN, OUT> sync();

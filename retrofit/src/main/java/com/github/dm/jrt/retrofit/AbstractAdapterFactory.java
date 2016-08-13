@@ -186,7 +186,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
         if (Channel.class == returnRawType) {
-            return new ChannelAdapter(invocationMode,
+            return new ChannelAdapter(
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
 
@@ -297,31 +297,19 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      */
     private static class ChannelAdapter extends BaseAdapter<Channel> {
 
-        private final InvocationMode mInvocationMode;
-
         /**
          * Constructor.
          *
-         * @param invocationMode the invocation mode.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
+         * @param routine      the routine instance.
+         * @param responseType the response type.
          */
-        private ChannelAdapter(@NotNull final InvocationMode invocationMode,
-                @NotNull final Routine<? extends Call<?>, ?> routine,
+        private ChannelAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
-            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         public <OUT> Channel adapt(final Call<OUT> call) {
-            final InvocationMode invocationMode = mInvocationMode;
-            final Routine<Call<?>, ?> routine = getRoutine();
-            if ((invocationMode == InvocationMode.ASYNC) || (invocationMode
-                    == InvocationMode.PARALLEL)) {
-                return routine.asyncCall(call);
-            }
-
-            return routine.syncCall(call);
+            return getRoutine().call(call);
         }
     }
 

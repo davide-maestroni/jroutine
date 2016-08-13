@@ -954,8 +954,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected InvocationMode getInvocationMode(@NotNull final ExecutableElement methodElement,
             @NotNull final Invoke annotation) {
         final InvocationMode invocationMode = annotation.value();
-        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SEQUENTIAL)) && (methodElement.getParameters().size() > 1)) {
+        if ((invocationMode == InvocationMode.PARALLEL) && (methodElement.getParameters().size()
+                > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1754,7 +1754,7 @@ public class RoutineProcessor extends AbstractProcessor {
         final AsyncOutput asyncOutputAnnotation = methodElement.getAnnotation(AsyncOutput.class);
         final InvocationMode invocationMode =
                 (invokeAnnotation != null) ? getInvocationMode(methodElement, invokeAnnotation)
-                        : null;
+                        : InvocationMode.ASYNC;
         InputMode inputMode = null;
         final List<? extends VariableElement> parameters = methodElement.getParameters();
         for (final VariableElement parameter : parameters) {
@@ -1838,8 +1838,8 @@ public class RoutineProcessor extends AbstractProcessor {
             outputMode = getOutputMode(methodElement, targetMethod);
         }
 
-        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SEQUENTIAL)) && (targetMethod.getParameters().size() > 1)) {
+        if ((invocationMode == InvocationMode.PARALLEL) && (targetMethod.getParameters().size()
+                > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
@@ -1895,11 +1895,8 @@ public class RoutineProcessor extends AbstractProcessor {
                         inputMode));
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
-        method = method.replace("${invokeMethod}",
-                (invocationMode == InvocationMode.SYNC) ? "syncCall"
-                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelCall"
-                                : (invocationMode == InvocationMode.SEQUENTIAL) ? "sequentialCall"
-                                        : "asyncCall");
+        method = method.replace("${invokeMode}",
+                InvocationMode.class.getCanonicalName() + "." + invocationMode);
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader =

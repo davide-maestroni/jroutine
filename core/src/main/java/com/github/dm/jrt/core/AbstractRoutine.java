@@ -56,14 +56,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private static final int DEFAULT_MAX_INVOCATIONS = Integer.MAX_VALUE;
 
-    private final LinkedList<Invocation<IN, OUT>> mAsyncInvocations =
-            new LinkedList<Invocation<IN, OUT>>();
-
-    private final Runner mAsyncRunner;
-
     private final InvocationConfiguration mConfiguration;
 
     private final int mCoreInvocations;
+
+    private final LinkedList<Invocation<IN, OUT>> mInvocations =
+            new LinkedList<Invocation<IN, OUT>>();
 
     private final Logger mLogger;
 
@@ -74,18 +72,13 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
             new SimpleQueue<InvocationObserver<IN, OUT>>();
 
-    private final LinkedList<Invocation<IN, OUT>> mSyncInvocations =
-            new LinkedList<Invocation<IN, OUT>>();
-
-    private final Runner mSyncRunner;
-
-    private volatile DefaultInvocationManager mAsyncManager;
+    private final Runner mRunner;
 
     private volatile AbstractRoutine<IN, OUT> mElementRoutine;
 
-    private int mRunningCount;
+    private volatile DefaultInvocationManager mInvocationManager;
 
-    private volatile DefaultInvocationManager mSyncManager;
+    private int mRunningCount;
 
     /**
      * Constructor.
@@ -94,14 +87,13 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      */
     protected AbstractRoutine(@NotNull final InvocationConfiguration configuration) {
         mConfiguration = configuration;
-        mSyncRunner = Runners.syncRunner();
         final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
-        final Runner asyncRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
         if (priority != InvocationConfiguration.DEFAULT) {
-            mAsyncRunner = Runners.priorityRunner(asyncRunner).getRunner(priority);
+            mRunner = Runners.priorityRunner(runner).getRunner(priority);
 
         } else {
-            mAsyncRunner = asyncRunner;
+            mRunner = runner;
         }
 
         mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
@@ -114,76 +106,40 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      * Constructor.
      *
      * @param configuration the invocation configuration.
-     * @param syncRunner    the runner used for synchronous invocation.
-     * @param asyncRunner   the runner used for asynchronous invocation.
+     * @param runner        the runner used for asynchronous invocation.
      * @param logger        the logger instance.
      */
     private AbstractRoutine(@NotNull final InvocationConfiguration configuration,
-            @NotNull final Runner syncRunner, @NotNull final Runner asyncRunner,
-            @NotNull final Logger logger) {
+            @NotNull final Runner runner, @NotNull final Logger logger) {
         mConfiguration = configuration;
-        mSyncRunner = syncRunner;
-        mAsyncRunner = asyncRunner;
+        mRunner = runner;
         mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
         mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
         mLogger = logger.subContextLogger(this);
     }
 
     @NotNull
-    public Channel<IN, OUT> asyncCall() {
+    public Channel<IN, OUT> call() {
         mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
-        return invoke(InvocationType.ASYNC);
+        return invoke();
     }
 
     @NotNull
-    public Channel<IN, OUT> parallelCall() {
+    public Channel<IN, OUT> callParallel() {
         mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
-        return getElementRoutine().asyncCall();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> sequentialCall() {
-        mLogger.dbg("invoking routine: %s", InvocationMode.SEQUENTIAL);
-        return getElementRoutine().syncCall();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> syncCall() {
-        mLogger.dbg("invoking routine: %s", InvocationMode.SYNC);
-        return invoke(InvocationType.SYNC);
+        return getElementRoutine().call();
     }
 
     @Override
     public void clear() {
         synchronized (mMutex) {
-            final LinkedList<Invocation<IN, OUT>> syncInvocations = mSyncInvocations;
-            for (final Invocation<IN, OUT> invocation : syncInvocations) {
-                discard(invocation);
-            }
-
-            syncInvocations.clear();
-            final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
+            final LinkedList<Invocation<IN, OUT>> asyncInvocations = mInvocations;
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {
                 discard(invocation);
             }
 
             asyncInvocations.clear();
         }
-    }
-
-    /**
-     * Converts an invocation instance to the specified type.
-     *
-     * @param invocation the invocation to convert.
-     * @param type       the type of the invocation after the conversion.
-     * @return the converted invocation.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
-            @NotNull final InvocationType type) throws Exception {
-        return invocation;
     }
 
     /**
@@ -209,13 +165,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     /**
      * Creates a new invocation instance.
      *
-     * @param type the invocation type.
      * @return the invocation instance.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract Invocation<IN, OUT> newInvocation(@NotNull InvocationType type) throws
-            Exception;
+    protected abstract Invocation<IN, OUT> newInvocation() throws Exception;
 
     private void discard(final @NotNull Invocation<IN, OUT> invocation) {
         try {
@@ -230,67 +184,32 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @NotNull
     private Routine<IN, OUT> getElementRoutine() {
         if (mElementRoutine == null) {
-            mElementRoutine =
-                    new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                            mLogger) {
+            mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mLogger) {
 
-                        @NotNull
-                        @Override
-                        protected Invocation<IN, OUT> convertInvocation(
-                                @NotNull final Invocation<IN, OUT> invocation,
-                                @NotNull final InvocationType type) throws Exception {
-                            return newInvocation(type);
-                        }
-
-                        @NotNull
-                        @Override
-                        protected Invocation<IN, OUT> newInvocation(
-                                @NotNull final InvocationType type) {
-                            return (type == InvocationType.ASYNC) ? new ParallelInvocation<IN, OUT>(
-                                    AbstractRoutine.this)
-                                    : new SequentialInvocation<IN, OUT>(AbstractRoutine.this);
-                        }
-                    };
+                @NotNull
+                @Override
+                protected Invocation<IN, OUT> newInvocation() {
+                    return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
+                }
+            };
         }
 
         return mElementRoutine;
     }
 
     @NotNull
-    private DefaultInvocationManager getInvocationManager(@NotNull final InvocationType type) {
-        if (type == InvocationType.ASYNC) {
-            if (mAsyncManager == null) {
-                mAsyncManager = new DefaultInvocationManager(type, mAsyncRunner, mAsyncInvocations,
-                        mSyncInvocations);
-            }
-
-            return mAsyncManager;
+    private DefaultInvocationManager getInvocationManager() {
+        if (mInvocationManager == null) {
+            mInvocationManager = new DefaultInvocationManager();
         }
 
-        if (mSyncManager == null) {
-            mSyncManager = new DefaultInvocationManager(type, mSyncRunner, mSyncInvocations,
-                    mAsyncInvocations);
-        }
-
-        return mSyncManager;
+        return mInvocationManager;
     }
 
     @NotNull
-    private Channel<IN, OUT> invoke(@NotNull final InvocationType type) {
-        final Logger logger = mLogger;
-        logger.dbg("invoking routine: %s", type);
-        final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
-        return new InvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(type), runner,
-                logger);
-    }
-
-    /**
-     * Invocation type enumeration.
-     */
-    protected enum InvocationType {
-
-        SYNC,   // synchronous
-        ASYNC   // asynchronous
+    private Channel<IN, OUT> invoke() {
+        return new InvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(), mRunner,
+                mLogger);
     }
 
     /**
@@ -317,54 +236,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.asyncCall().close());
+                result.pass(mRoutine.call().close());
             }
         }
 
         @Override
         public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
             mHasInputs = true;
-            result.pass(mRoutine.asyncCall(input));
-        }
-
-        @Override
-        public void onRestart() {
-            mHasInputs = false;
-        }
-    }
-
-    /**
-     * Implementation of an invocation handling sequential mode.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class SequentialInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
-
-        private final Routine<IN, OUT> mRoutine;
-
-        private boolean mHasInputs;
-
-        /**
-         * Constructor.
-         *
-         * @param routine the routine to invoke in sequential mode.
-         */
-        private SequentialInvocation(@NotNull final Routine<IN, OUT> routine) {
-            mRoutine = routine;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<OUT, ?> result) {
-            if (!mHasInputs) {
-                result.pass(mRoutine.syncCall().close());
-            }
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-            mHasInputs = true;
-            result.pass(mRoutine.syncCall(input));
+            result.pass(mRoutine.call(input));
         }
 
         @Override
@@ -401,30 +280,10 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         private final CreateExecution mCreateExecution;
 
-        private final LinkedList<Invocation<IN, OUT>> mFallbackInvocations;
-
-        private final InvocationType mInvocationType;
-
-        private final LinkedList<Invocation<IN, OUT>> mPrimaryInvocations;
-
-        private final Runner mRunner;
-
         /**
          * Constructor.
-         *
-         * @param type                the invocation type.
-         * @param runner              the invocation runner.
-         * @param primaryInvocations  the primary pool of invocations.
-         * @param fallbackInvocations the fallback pool of invocations.
          */
-        private DefaultInvocationManager(@NotNull final InvocationType type,
-                @NotNull final Runner runner,
-                @NotNull final LinkedList<Invocation<IN, OUT>> primaryInvocations,
-                @NotNull final LinkedList<Invocation<IN, OUT>> fallbackInvocations) {
-            mInvocationType = type;
-            mRunner = runner;
-            mPrimaryInvocations = primaryInvocations;
-            mFallbackInvocations = fallbackInvocations;
+        private DefaultInvocationManager() {
             mCreateExecution = new CreateExecution(this);
         }
 
@@ -452,16 +311,15 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             synchronized (mMutex) {
                 final Logger logger = mLogger;
                 final int coreInvocations = mCoreInvocations;
-                final LinkedList<Invocation<IN, OUT>> primaryInvocations = mPrimaryInvocations;
-                final LinkedList<Invocation<IN, OUT>> fallbackInvocations = mFallbackInvocations;
-                if ((primaryInvocations.size() + fallbackInvocations.size()) < coreInvocations) {
-                    logger.dbg("recycling %s invocation instance [%d/%d]: %s", mInvocationType,
-                            primaryInvocations.size() + 1, coreInvocations, invocation);
-                    primaryInvocations.add(invocation);
+                final LinkedList<Invocation<IN, OUT>> invocations = mInvocations;
+                if (invocations.size() < coreInvocations) {
+                    logger.dbg("recycling invocation instance [%d/%d]: %s", invocations.size() + 1,
+                            coreInvocations, invocation);
+                    invocations.add(invocation);
 
                 } else {
-                    logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
-                            coreInvocations, coreInvocations, invocation);
+                    logger.wrn("discarding invocation instance [%d/%d]: %s", coreInvocations,
+                            coreInvocations, invocation);
                     AbstractRoutine.this.discard(invocation);
                 }
 
@@ -492,34 +350,16 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                     }
 
                     if (isDelayed || (mRunningCount < (mMaxInvocations + observers.size()))) {
-                        final InvocationType invocationType = mInvocationType;
                         final int coreInvocations = mCoreInvocations;
-                        final LinkedList<Invocation<IN, OUT>> invocations = mPrimaryInvocations;
+                        final LinkedList<Invocation<IN, OUT>> invocations = mInvocations;
                         if (!invocations.isEmpty()) {
                             invocation = invocations.removeFirst();
-                            mLogger.dbg("reusing %s invocation instance [%d/%d]: %s",
-                                    invocationType, invocations.size() + 1, coreInvocations,
-                                    invocation);
+                            mLogger.dbg("reusing invocation instance [%d/%d]: %s",
+                                    invocations.size() + 1, coreInvocations, invocation);
 
                         } else {
-                            final LinkedList<Invocation<IN, OUT>> fallbackInvocations =
-                                    mFallbackInvocations;
-                            if (!fallbackInvocations.isEmpty()) {
-                                final Invocation<IN, OUT> convertInvocation =
-                                        fallbackInvocations.removeFirst();
-                                mLogger.dbg("converting %s invocation instance [%d/%d]: %s",
-                                        invocationType, invocations.size() + 1, coreInvocations,
-                                        convertInvocation);
-                                invocation = convertInvocation(convertInvocation, invocationType);
-                                if (invocation != convertInvocation) {
-                                    discard(convertInvocation);
-                                }
-
-                            } else {
-                                mLogger.dbg("creating %s invocation instance [1/%d]",
-                                        invocationType, coreInvocations);
-                                invocation = newInvocation(invocationType);
-                            }
+                            mLogger.dbg("creating invocation instance [1/%d]", coreInvocations);
+                            invocation = newInvocation();
                         }
 
                         if (invocation != null) {

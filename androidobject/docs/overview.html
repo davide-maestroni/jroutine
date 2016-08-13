@@ -100,7 +100,7 @@
                                     .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                                     .configured()
                                     .method(LOAD_BITMAP)
-                                    .asyncCall(URI.create(IMAGE_URI))
+                                    .call(URI.create(IMAGE_URI))
                                     .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                         &commat;Override

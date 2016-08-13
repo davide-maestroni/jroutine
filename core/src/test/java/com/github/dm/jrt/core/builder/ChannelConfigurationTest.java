@@ -69,7 +69,7 @@ public class ChannelConfigurationTest {
 
         try {
 
-            new Builder(null);
+            new Builder<Object>(null);
 
             fail();
 

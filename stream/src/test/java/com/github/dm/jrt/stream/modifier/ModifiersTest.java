@@ -122,7 +122,7 @@ public class ModifiersTest {
                                                     return data.sum / data.count;
                                                 }
                                             })
-                                            .asyncCall()
+                                            .call()
                                             .close()
                                             .after(seconds(3))
                                             .next()).isCloseTo(21, Offset.offset(0.1));
@@ -165,7 +165,7 @@ public class ModifiersTest {
                                                     return data.sum / data.count;
                                                 }
                                             })
-                                            .asyncCall()
+                                            .call()
                                             .close()
                                             .after(seconds(3))
                                             .next()).isCloseTo(21, Offset.offset(0.1));
@@ -189,21 +189,21 @@ public class ModifiersTest {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(1, TimeUnit.SECONDS))
-                                 .asyncCall("test")
+                                 .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(seconds(1)))
-                                 .asyncCall("test")
+                                 .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(1, TimeUnit.SECONDS))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -211,7 +211,7 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(seconds(1)))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -234,21 +234,21 @@ public class ModifiersTest {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(1, TimeUnit.SECONDS))
-                                 .asyncCall("test")
+                                 .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(seconds(1)))
-                                 .asyncCall("test")
+                                 .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(1, TimeUnit.SECONDS))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -256,7 +256,7 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(seconds(1)))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -281,7 +281,7 @@ public class ModifiersTest {
             public String get() {
                 return "TEST2";
             }
-        })).syncCall("test1").all()).containsOnly("TEST2");
+        })).call("test1").all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(outputAccept(new Consumer<Channel<String, ?>>() {
@@ -290,14 +290,14 @@ public class ModifiersTest {
                                          resultChannel.pass("TEST2");
                                      }
                                  }))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(outputAccept(3, new Consumer<Channel<String, ?>>() {
@@ -306,59 +306,58 @@ public class ModifiersTest {
                                          resultChannel.pass("TEST2");
                                      }
                                  }))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        })).call("test1").after(seconds(3)).all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
 
             public void accept(final Channel<String, ?> resultChannel) {
                 resultChannel.pass("TEST2");
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2");
+        })).call("test1").after(seconds(3)).all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(
                 JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
 
                     public void accept(final Channel<String, ?> resultChannel) {
                         resultChannel.pass("TEST2");
                     }
-                })).asyncCall("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2",
-                "TEST2");
+                })).call("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
         assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
 
             public void accept(final Channel<String, ?> resultChannel) {
                 resultChannel.pass("TEST2");
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2");
+        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
         assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
 
             public String get() {
                 return "TEST2";
             }
-        })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(
                 JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
 
                     public void accept(final Channel<String, ?> resultChannel) {
                         resultChannel.pass("TEST2");
                     }
-                })).asyncCall("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
                 "TEST2");
     }
 
@@ -367,138 +366,138 @@ public class ModifiersTest {
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output((String) null))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output((String[]) null))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output())
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output((List<String>) null))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output("TEST2"))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output("TEST2", "TEST2"))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .syncCall("test1")
+                                 .call("test1")
                                  .all()).containsOnly("TEST2");
 
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((String) null))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((String[]) null))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output())
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((List<String>) null))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output("TEST2"))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output("TEST2", "TEST2"))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .asyncCall("test1")
+                                 .call("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
 
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((String) null))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly((String) null);
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((String[]) null))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output())
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output((List<String>) null))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output("TEST2"))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output("TEST2", "TEST2"))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2", "TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .parallelCall("test1")
+                                 .callParallel("test1")
                                  .after(seconds(3))
                                  .all()).containsOnly("TEST2");
     }
@@ -547,14 +546,14 @@ public class ModifiersTest {
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
                                  .let(Modifiers.parallel(2, sqr.buildFactory()))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
                                  .let(Modifiers.parallel(2, sqr))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
@@ -562,7 +561,7 @@ public class ModifiersTest {
                                  .let(outputAccept(range(1, 3)))
                                  .let(Modifiers.parallel(2, JRoutineCore.with(
                                          IdentityInvocation.<Integer>factoryOf())))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1, 2, 3);
@@ -570,14 +569,14 @@ public class ModifiersTest {
                                  .let(outputAccept(range(1, 3)))
                                  .let(Modifiers.parallelBy(Functions.<Integer>identity(),
                                          sqr.buildFactory()))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream.withStream()
                                  .let(outputAccept(range(1, 3)))
                                  .let(Modifiers.parallelBy(Functions.<Integer>identity(), sqr))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1L, 4L, 9L);
@@ -586,7 +585,7 @@ public class ModifiersTest {
                                  .let(Modifiers.parallelBy(Functions.<Integer>identity(),
                                          JRoutineCore.with(
                                                  IdentityInvocation.<Integer>factoryOf())))
-                                 .asyncCall()
+                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).containsOnly(1, 2, 3);
@@ -659,7 +658,7 @@ public class ModifiersTest {
             JRoutineStream.<String>withStream().map(new UpperCase())
                                                .map(factoryOf(ThrowException.class, count1))
                                                .let(Modifiers.<String, Object>retry(2))
-                                               .asyncCall("test")
+                                               .call("test")
                                                .after(seconds(3))
                                                .throwError();
             fail();
@@ -673,7 +672,7 @@ public class ModifiersTest {
                                                       .map(factoryOf(ThrowException.class, count2,
                                                               1))
                                                       .let(Modifiers.<String, Object>retry(1))
-                                                      .asyncCall("test")
+                                                      .call("test")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST");
 
@@ -682,7 +681,7 @@ public class ModifiersTest {
             JRoutineStream.<String>withStream().map(new AbortInvocation())
                                                .map(factoryOf(ThrowException.class, count3))
                                                .let(Modifiers.<String, Object>retry(2))
-                                               .asyncCall("test")
+                                               .call("test")
                                                .after(seconds(3))
                                                .throwError();
             fail();
@@ -718,8 +717,8 @@ public class ModifiersTest {
                                                               .withRunner(Runners.poolRunner(1))
                                                               .configured()
                                                               .buildRoutine();
-        final Channel<Object, Object> channel1 = routine.asyncCall().pass("test1");
-        final Channel<Object, Object> channel2 = routine.asyncCall().pass("test2");
+        final Channel<Object, Object> channel1 = routine.call().pass("test1");
+        final Channel<Object, Object> channel2 = routine.call().pass("test2");
         seconds(0.5).sleepAtLeast();
         assertThat(channel1.close().after(seconds(1.5)).next()).isEqualTo("test1");
         assertThat(channel2.close().after(seconds(1.5)).next()).isEqualTo("test2");
@@ -733,8 +732,8 @@ public class ModifiersTest {
                                                               .withRunner(Runners.poolRunner(1))
                                                               .configured()
                                                               .buildRoutine();
-        final Channel<Object, Object> channel1 = routine.asyncCall().pass("test1");
-        final Channel<Object, Object> channel2 = routine.asyncCall().pass("test2");
+        final Channel<Object, Object> channel1 = routine.call().pass("test1");
+        final Channel<Object, Object> channel2 = routine.call().pass("test2");
         seconds(0.5).sleepAtLeast();
         assertThat(channel1.abort()).isTrue();
         assertThat(channel2.close().after(seconds(1.5)).next()).isEqualTo("test2");
@@ -744,8 +743,8 @@ public class ModifiersTest {
     public void testTimeThrottle() {
         final Routine<Object, Object> routine =
                 JRoutineStream.withStream().let(throttle(1, seconds(1))).buildRoutine();
-        final Channel<Object, Object> channel1 = routine.asyncCall("test1");
-        final Channel<Object, Object> channel2 = routine.asyncCall("test2");
+        final Channel<Object, Object> channel1 = routine.call("test1");
+        final Channel<Object, Object> channel2 = routine.call("test2");
         assertThat(channel1.after(seconds(1.5)).next()).isEqualTo("test1");
         assertThat(channel2.after(seconds(1.5)).next()).isEqualTo("test2");
     }
@@ -754,11 +753,11 @@ public class ModifiersTest {
     public void testTimeout() {
         assertThat(JRoutineStream.withStream()
                                  .let(timeoutAfter(seconds(1)))
-                                 .asyncCall("test")
+                                 .call("test")
                                  .after(seconds(1))
                                  .all()).containsExactly("test");
         final Channel<Object, Object> channel =
-                JRoutineStream.withStream().let(timeoutAfter(millis(1))).asyncCall().pass("test");
+                JRoutineStream.withStream().let(timeoutAfter(millis(1))).call().pass("test");
         assertThat(channel.after(seconds(1)).getError()).isExactlyInstanceOf(
                 ResultTimeoutException.class);
     }
@@ -783,7 +782,7 @@ public class ModifiersTest {
                                                                       channel.pass("exception");
                                                                   }
                                                               }))
-                                                      .syncCall("test")
+                                                      .call("test")
                                                       .next()).isEqualTo("exception");
         assertThat(JRoutineStream.<String>withStream().sync()
                                                       .map(new Function<Object, Object>() {
@@ -803,7 +802,7 @@ public class ModifiersTest {
                                                                       channel.pass("exception");
                                                                   }
                                                               }))
-                                                      .syncCall("test")
+                                                      .call("test")
                                                       .next()).isEqualTo("test");
         assertThat(JRoutineStream.<String>withStream().sync().map(new Function<Object, Object>() {
 
@@ -815,7 +814,7 @@ public class ModifiersTest {
             public Object apply(final RoutineException e) {
                 return "exception";
             }
-        })).syncCall("test").next()).isEqualTo("exception");
+        })).call("test").next()).isEqualTo("exception");
     }
 
     @Test
@@ -850,7 +849,7 @@ public class ModifiersTest {
                 public void perform() {
                     isRun.set(true);
                 }
-            })).syncCall("test").next();
+            })).call("test").next();
 
         } catch (final RoutineException ignored) {
         }
@@ -866,7 +865,7 @@ public class ModifiersTest {
             public void perform() {
                 isRun.set(true);
             }
-        })).syncCall("test").next()).isEqualTo("test");
+        })).call("test").next()).isEqualTo("test");
         assertThat(isRun.getAndSet(false)).isTrue();
     }
 

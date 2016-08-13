@@ -29,11 +29,10 @@ import android.os.RemoteException;
 
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
-import com.github.dm.jrt.core.ConverterRoutine;
+import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
@@ -41,7 +40,6 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log;
@@ -54,8 +52,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
@@ -75,11 +71,9 @@ import static java.util.UUID.randomUUID;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
+class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
-
-    private final InvocationFactory<IN, OUT> mFactory;
 
     private final InvocationConfiguration mInvocationConfiguration;
 
@@ -126,21 +120,13 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
         mServiceConfiguration = serviceConfiguration;
         final Class<? extends ContextInvocation<IN, OUT>> invocationClass =
                 target.getInvocationClass();
-        final ContextInvocationFactory<IN, OUT> factory =
-                factoryOf(invocationClass, target.getFactoryArgs());
-        mFactory = fromFactory(serviceContext.getApplicationContext(), factory);
         getLogger().dbg("building service routine on invocation %s with configurations: %s - %s",
                 invocationClass.getName(), invocationConfiguration, serviceConfiguration);
     }
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
-            Exception {
-        if (type == InvocationType.SYNC) {
-            return mFactory.newInvocation();
-        }
-
+    protected Invocation<IN, OUT> newInvocation() throws Exception {
         return new ServiceInvocation<IN, OUT>(mContext, mTargetFactory, mInvocationConfiguration,
                 mServiceConfiguration, getLogger());
     }

@@ -68,7 +68,7 @@ public class ProviderAdapterFactoryTest {
             assertThat(factory2.isCalled()).isFalse();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
-            service.streamRepos("octocat").syncCall().close();
+            service.streamRepos("octocat").close();
             assertThat(factory1.isCalled()).isFalse();
             assertThat(factory2.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
@@ -238,7 +238,7 @@ public class ProviderAdapterFactoryTest {
                                           .sync()
                                           .let(output((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
-                        return builder.syncCall().close();
+                        return builder.call().close();
                     }
 
                     return builder;

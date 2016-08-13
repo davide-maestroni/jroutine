@@ -120,14 +120,14 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(InvocationFactory.factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
-                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
+                        meanRoutine.call(squareRoutine.callParallel(parseRoutine.parallelCall(args)))
                                    .after(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.parallelCall(args)
-                //                                .bind(squareRoutine.parallelCall())
+                // final Double rms = parseRoutine.callParallel(args)
+                //                                .bind(squareRoutine.callParallel())
                 //                                .close()
-                //                                .bind(meanRoutine.asyncCall())
+                //                                .bind(meanRoutine.call())
                 //                                .close()
                 //                                .after(seconds(3))
                 //                                .next();
@@ -197,14 +197,14 @@
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
-                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
+                        meanRoutine.call(squareRoutine.callParallel(parseRoutine.parallelCall(args)))
                                    .after(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.parallelCall(args)
-                //                                .bind(squareRoutine.parallelCall())
+                // final Double rms = parseRoutine.callParallel(args)
+                //                                .bind(squareRoutine.callParallel())
                 //                                .close()
-                //                                .bind(meanRoutine.asyncCall())
+                //                                .bind(meanRoutine.call())
                 //                                .close()
                 //                                .after(seconds(3))
                 //                                .next();

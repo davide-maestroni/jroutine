@@ -18,6 +18,7 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Supplier;
 
@@ -50,7 +51,10 @@ public class AccumulateFunctionInvocationTest {
 
         final BiFunction<String, String, String> function = createFunction();
         assertThat(JRoutineCore.with(functionFactory(function))
-                               .syncCall("test1", "test2", "test3")
+                               .applyInvocationConfiguration()
+                               .withRunner(Runners.syncRunner())
+                               .configured()
+                               .call("test1", "test2", "test3")
                                .next()).isEqualTo("test1test2test3");
         assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
 
@@ -58,7 +62,12 @@ public class AccumulateFunctionInvocationTest {
 
                 return "test0";
             }
-        }, function)).syncCall("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
+        }, function))
+                               .applyInvocationConfiguration()
+                               .withRunner(Runners.syncRunner())
+                               .configured()
+                               .call("test1", "test2", "test3")
+                               .next()).isEqualTo("test0test1test2test3");
     }
 
     @Test

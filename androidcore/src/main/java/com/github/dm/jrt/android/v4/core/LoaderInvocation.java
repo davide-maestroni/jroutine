@@ -353,8 +353,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
         final Routine<IN, OUT> routine =
                 JRoutineCore.with(fromFactory(loaderContext.getApplicationContext(), factory))
+                            .applyInvocationConfiguration()
+                            .withRunner(Runners.syncRunner())
+                            .configured()
                             .buildRoutine();
-        routine.syncCall().abort(reason);
+        routine.call().abort(reason);
         routine.clear();
     }
 

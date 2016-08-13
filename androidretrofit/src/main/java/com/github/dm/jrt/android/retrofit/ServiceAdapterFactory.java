@@ -34,7 +34,6 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -121,15 +120,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             if (annotation.annotationType() == Invoke.class) {
                 invocationMode = ((Invoke) annotation).value();
             }
-        }
-
-        if ((invocationMode == InvocationMode.SYNC) || (invocationMode
-                == InvocationMode.SEQUENTIAL)) {
-            return RoutineAdapterFactory.builder()
-                                        .invocationMode(invocationMode)
-                                        .apply(mInvocationConfiguration)
-                                        .buildFactory()
-                                        .get(returnType, annotations, retrofit);
         }
 
         Type rawType = null;
@@ -332,8 +322,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
             final Channel<Object, Object> outputChannel =
                     JRoutineCore.io().apply(mConfiguration).buildChannel();
-            mRoutine.asyncCall(channel)
-                    .bind(new ConverterChannelConsumer(mConverter, outputChannel));
+            mRoutine.call(channel).bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;
         }
     }
@@ -370,14 +359,14 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @NotNull
         private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
-            return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).asyncCall(call);
+            return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).call(call);
         }
 
         @Override
         public <OUT> Channel adapt(final Call<OUT> call) {
             final Channel<Object, Object> outputChannel =
                     JRoutineCore.io().apply(mChannelConfiguration).buildChannel();
-            getRoutine().asyncCall(invokeCall(call))
+            getRoutine().call(invokeCall(call))
                         .bind(new ConverterChannelConsumer(mConverter, outputChannel));
             return outputChannel;
         }

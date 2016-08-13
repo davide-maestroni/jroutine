@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -71,11 +72,9 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
         implements StreamBuilder<IN, OUT> {
 
-    private static final StraightRunner sStraightRunner = new StraightRunner();
-
     private FunctionDecorator<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;
 
-    private boolean mIsStraight;
+    private Runner mRunner;
 
     private StreamConfiguration mStreamConfiguration;
 
@@ -92,165 +91,165 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     public boolean abort() {
-        return call().abort();
+        return invoke().abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-        return call().abort(reason);
+        return invoke().abort(reason);
     }
 
     @NotNull
     public Channel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        return call().after(delay, timeUnit);
+        return invoke().after(delay, timeUnit);
     }
 
     @NotNull
     public Channel<IN, OUT> after(@NotNull final UnitDuration delay) {
-        return call().after(delay);
+        return invoke().after(delay);
     }
 
     @NotNull
     public List<OUT> all() {
-        return call().all();
+        return invoke().all();
     }
 
     @NotNull
     public Channel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
-        return call().allInto(results);
+        return invoke().allInto(results);
     }
 
     @NotNull
     public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
-        return call().bind(channel);
+        return invoke().bind(channel);
     }
 
     @NotNull
     public Channel<IN, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-        return call().bind(consumer);
+        return invoke().bind(consumer);
     }
 
     @NotNull
     public Channel<IN, OUT> close() {
-        return call().close();
+        return invoke().close();
     }
 
     @NotNull
     public Channel<IN, OUT> eventuallyAbort() {
-        return call().eventuallyAbort();
+        return invoke().eventuallyAbort();
     }
 
     @NotNull
     public Channel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        return call().eventuallyAbort(reason);
+        return invoke().eventuallyAbort(reason);
     }
 
     @NotNull
     public Channel<IN, OUT> eventuallyBreak() {
-        return call().eventuallyBreak();
+        return invoke().eventuallyBreak();
     }
 
     @NotNull
     public Channel<IN, OUT> eventuallyFail() {
-        return call().eventuallyFail();
+        return invoke().eventuallyFail();
     }
 
     @NotNull
     public Iterator<OUT> expiringIterator() {
-        return call().expiringIterator();
+        return invoke().expiringIterator();
     }
 
     @Nullable
     public RoutineException getError() {
-        return call().getError();
+        return invoke().getError();
     }
 
     public boolean hasCompleted() {
-        return call().hasCompleted();
+        return invoke().hasCompleted();
     }
 
     public boolean hasNext() {
-        return call().hasNext();
+        return invoke().hasNext();
     }
 
     public OUT next() {
-        return call().next();
+        return invoke().next();
     }
 
     @NotNull
     public Channel<IN, OUT> immediately() {
-        return call().immediately();
+        return invoke().immediately();
     }
 
     public int inputCount() {
-        return call().inputCount();
+        return invoke().inputCount();
     }
 
     public boolean isBound() {
-        return call().isBound();
+        return invoke().isBound();
     }
 
     public boolean isEmpty() {
-        return call().isEmpty();
+        return invoke().isEmpty();
     }
 
     public boolean isOpen() {
-        return call().isOpen();
+        return invoke().isOpen();
     }
 
     @NotNull
     public List<OUT> next(final int count) {
-        return call().next(count);
+        return invoke().next(count);
     }
 
     public OUT nextOrElse(final OUT output) {
-        return call().nextOrElse(output);
+        return invoke().nextOrElse(output);
     }
 
     public int outputCount() {
-        return call().outputCount();
+        return invoke().outputCount();
     }
 
     @NotNull
     public Channel<IN, OUT> pass(@Nullable final Channel<?, ? extends IN> channel) {
-        return call().pass(channel);
+        return invoke().pass(channel);
     }
 
     @NotNull
     public Channel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
-        return call().pass(inputs);
+        return invoke().pass(inputs);
     }
 
     @NotNull
     public Channel<IN, OUT> pass(@Nullable final IN input) {
-        return call().pass(input);
+        return invoke().pass(input);
     }
 
     @NotNull
     public Channel<IN, OUT> pass(@Nullable final IN... inputs) {
-        return call().pass(inputs);
+        return invoke().pass(inputs);
     }
 
     public int size() {
-        return call().size();
+        return invoke().size();
     }
 
     @NotNull
     public Channel<IN, OUT> skipNext(final int count) {
-        return call().skipNext(count);
+        return invoke().skipNext(count);
     }
 
     @NotNull
     public Channel<IN, OUT> sortedByCall() {
-        return call().sortedByCall();
+        return invoke().sortedByCall();
     }
 
     @NotNull
     public Channel<IN, OUT> sortedByDelay() {
-        return call().sortedByDelay();
+        return invoke().sortedByDelay();
     }
 
     public void throwError() {
-        call().throwError();
+        invoke().throwError();
     }
 
     @NotNull
@@ -291,6 +290,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> async() {
+        mRunner = null;
         return invocationMode(InvocationMode.ASYNC);
     }
 
@@ -308,7 +308,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
-        mIsStraight = false;
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
                 streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
@@ -394,7 +393,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        final StreamConfiguration streamConfiguration = buildConfiguration();
         return map(newRoutine(streamConfiguration, factory),
                 streamConfiguration.getInvocationMode());
     }
@@ -408,7 +407,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        final StreamConfiguration streamConfiguration = getStraightConfiguration();
+        final StreamConfiguration streamConfiguration = buildConfiguration();
         return map(newRoutine(streamConfiguration, builder),
                 streamConfiguration.getInvocationMode());
     }
@@ -442,12 +441,14 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> parallel() {
+        mRunner = null;
         return invocationMode(InvocationMode.PARALLEL);
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> sequential() {
-        return invocationMode(InvocationMode.SEQUENTIAL);
+        mRunner = Runners.syncRunner();
+        return invocationMode(InvocationMode.PARALLEL);
     }
 
     @NotNull
@@ -457,14 +458,14 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> straight() {
-        sync();
-        mIsStraight = true;
-        return this;
+        mRunner = Runners.straightRunner();
+        return invocationMode(InvocationMode.ASYNC);
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> sync() {
-        return invocationMode(InvocationMode.SYNC);
+        mRunner = Runners.syncRunner();
+        return invocationMode(InvocationMode.ASYNC);
     }
 
     @NotNull
@@ -478,17 +479,17 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public Routine<IN, OUT> buildRoutine() {
         final Routine<? super IN, ? extends OUT> routine =
                 ConstantConditions.notNull("routine instance",
-                        newRoutine(mStreamConfiguration, buildFactory()));
+                        newRoutine(buildConfiguration(), buildFactory()));
         resetConfiguration();
         return (Routine<IN, OUT>) routine;
     }
 
     public Iterator<OUT> iterator() {
-        return call().iterator();
+        return invoke().iterator();
     }
 
     public void remove() {
-        call().remove();
+        invoke().remove();
     }
 
     /**
@@ -563,8 +564,19 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull InvocationMode invocationMode);
 
     @NotNull
-    private Channel<IN, OUT> call() {
-        return mStreamConfiguration.getInvocationMode().invoke(this);
+    private StreamConfiguration buildConfiguration() {
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        final Runner runner = mRunner;
+        if (runner != null) {
+            return newConfiguration(streamConfiguration.getStreamInvocationConfiguration()
+                                                       .builderFrom()
+                                                       .withRunner(runner)
+                                                       .configured(),
+                    streamConfiguration.getCurrentInvocationConfiguration(),
+                    streamConfiguration.getInvocationMode());
+        }
+
+        return streamConfiguration;
     }
 
     @NotNull
@@ -574,17 +586,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    private StreamConfiguration getStraightConfiguration() {
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        if (mIsStraight) {
-            return newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                    streamConfiguration.getCurrentInvocationConfiguration()
-                                       .builderFrom()
-                                       .withRunner(sStraightRunner)
-                                       .configured(), InvocationMode.ASYNC);
-        }
-
-        return streamConfiguration;
+    private Channel<IN, OUT> invoke() {
+        return mStreamConfiguration.getInvocationMode().invoke(this);
     }
 
     @SuppressWarnings("unchecked")

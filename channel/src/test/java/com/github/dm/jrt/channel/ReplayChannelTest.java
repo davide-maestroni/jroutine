@@ -55,7 +55,7 @@ public class ReplayChannelTest {
         assertThat(channel.abort(null)).isFalse();
         assertThat(channel.close().isOpen()).isFalse();
         assertThat(channel.isEmpty()).isFalse();
-        assertThat(channel.hasCompleted()).isTrue();
+        assertThat(channel.getComplete()).isTrue();
         assertThat(channel.isBound()).isFalse();
         final ArrayList<String> results = new ArrayList<String>();
         assertThat(channel.after(1, TimeUnit.SECONDS).hasNext()).isTrue();
@@ -72,8 +72,8 @@ public class ReplayChannelTest {
         }
 
         assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
-        assertThat(channel.eventuallyBreak().next(4)).containsExactly("test3");
-        assertThat(channel.eventuallyBreak().nextOrElse("test4")).isEqualTo("test4");
+        assertThat(channel.eventuallyContinue().next(4)).containsExactly("test3");
+        assertThat(channel.eventuallyContinue().nextOrElse("test4")).isEqualTo("test4");
 
         Iterator<String> iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
                                             .buildChannels()
@@ -116,7 +116,7 @@ public class ReplayChannelTest {
         }
 
         try {
-            channel.eventuallyBreak().next();
+            channel.eventuallyContinue().next();
             fail();
 
         } catch (final NoSuchElementException ignored) {
@@ -205,7 +205,7 @@ public class ReplayChannelTest {
         assertThat(channel.isOpen()).isFalse();
         inputChannel.pass("test3").close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasCompleted()).isTrue();
+        assertThat(channel.getComplete()).isTrue();
         channel.bind(output1);
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
         assertThat(output1.all()).containsExactly("test2", "test3");
@@ -332,7 +332,7 @@ public class ReplayChannelTest {
         assertThat(channel.isOpen()).isFalse();
         inputChannel.pass("test3").close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.hasCompleted()).isTrue();
+        assertThat(channel.getComplete()).isTrue();
         channel.bind(consumer);
         assertThat(outputs).containsExactly("test1", "test2", "test3");
         assertThat(channel.isEmpty()).isFalse();
@@ -343,7 +343,7 @@ public class ReplayChannelTest {
 
         final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
         final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.eventuallyBreak();
+        channel.eventuallyContinue();
         try {
             channel.remove();
             fail();
@@ -469,7 +469,7 @@ public class ReplayChannelTest {
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
         final Channel<?, Object> result = Channels.replay(channel.close()).buildChannels();
-        assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.inputCount()).isEqualTo(0);
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);

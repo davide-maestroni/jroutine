@@ -77,11 +77,11 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test");
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         final ArrayList<String> results = new ArrayList<String>();
         channel.after(10, TimeUnit.MILLISECONDS).allInto(results);
         assertThat(results).isEmpty();
-        assertThat(channel.immediately().eventuallyBreak().hasCompleted()).isFalse();
+        assertThat(channel.immediately().eventuallyContinue().getComplete()).isFalse();
         assertThat(channel.immediately().abort()).isTrue();
         try {
             channel.next();
@@ -98,7 +98,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyAbort().eventuallyFail();
         try {
             channel.allInto(new ArrayList<String>());
@@ -107,7 +107,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.allInto(new ArrayList<String>());
@@ -124,7 +124,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.all();
@@ -141,7 +141,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -149,7 +149,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.all();
@@ -158,7 +158,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -183,7 +183,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> outputChannel =
                 JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
         assertThat(outputChannel.after(timeout).next()).isEqualTo("test");
-        assertThat(outputChannel.hasCompleted()).isTrue();
+        assertThat(outputChannel.getComplete()).isTrue();
     }
 
     @Test
@@ -230,7 +230,7 @@ public class ChannelDecoratorTest {
         channel.after(seconds(1)).next();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.after(millis(100)).pass("test").isEmpty()).isFalse();
-        assertThat(channel.close().after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.close().after(seconds(10)).getComplete()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
     }
 
@@ -249,7 +249,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.iterator().hasNext();
@@ -258,7 +258,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -266,7 +266,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().hasNext();
@@ -275,7 +275,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -298,7 +298,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.iterator().next();
@@ -307,7 +307,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -315,7 +315,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().next();
@@ -324,7 +324,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -341,7 +341,7 @@ public class ChannelDecoratorTest {
         assertThat(
                 new ChannelDecorator<Object, Object>(JRoutineCore.io().buildChannel()).pass("test1")
                                                                                       .close()
-                                                                                      .eventuallyBreak()
+                                                                                      .eventuallyContinue()
                                                                                       .after(seconds(
                                                                                               1))
                                                                                       .next(2))
@@ -391,8 +391,9 @@ public class ChannelDecoratorTest {
                 .isEqualTo(
                 "test1");
         assertThat(new ChannelDecorator<Object, Object>(
-                JRoutineCore.io().buildChannel()).eventuallyBreak().after(seconds(1)).nextOrElse(2))
-                .isEqualTo(2);
+                JRoutineCore.io().buildChannel()).eventuallyContinue()
+                                                 .after(seconds(1))
+                                                 .nextOrElse(2)).isEqualTo(2);
         try {
             new ChannelDecorator<Object, Object>(JRoutineCore.io().buildChannel()).eventuallyAbort()
                                                                                   .after(millis(
@@ -430,7 +431,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.next();
@@ -439,7 +440,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -447,7 +448,7 @@ public class ChannelDecoratorTest {
         final Channel<String, String> channel =
                 new ChannelDecorator<String, String>(JRoutineCore.io().<String>buildChannel());
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyBreak().all()).isEmpty();
+        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.next();
@@ -456,7 +457,7 @@ public class ChannelDecoratorTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel.hasCompleted()).isFalse();
+        assertThat(channel.getComplete()).isFalse();
     }
 
     @Test
@@ -515,13 +516,13 @@ public class ChannelDecoratorTest {
         final Channel<String, String> outputChannel =
                 JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                             .call(channel)
-                            .eventuallyBreak();
+                            .eventuallyContinue();
         assertThat(outputChannel.after(millis(500)).all()).containsExactly("test");
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
-        assertThat(outputChannel.immediately().hasCompleted()).isFalse();
+        assertThat(outputChannel.immediately().getComplete()).isFalse();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
-        assertThat(outputChannel.after(millis(500)).hasCompleted()).isTrue();
+        assertThat(outputChannel.after(millis(500)).getComplete()).isTrue();
     }
 
     @Test
@@ -530,7 +531,7 @@ public class ChannelDecoratorTest {
                 JRoutineCore.io()
                             .applyChannelConfiguration()
                             .withOutputTimeout(millis(10))
-                            .withOutputTimeoutAction(TimeoutActionType.BREAK)
+                            .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
                             .configured()
                             .buildChannel());
         assertThat(channel1.all()).isEmpty();
@@ -627,7 +628,7 @@ public class ChannelDecoratorTest {
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
         channel.close();
-        assertThat(channel.after(seconds(1)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(1);
         assertThat(channel.size()).isEqualTo(1);
@@ -641,7 +642,7 @@ public class ChannelDecoratorTest {
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);
         channel1.close();
-        assertThat(channel1.after(seconds(1)).hasCompleted()).isTrue();
+        assertThat(channel1.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);
         assertThat(channel1.size()).isEqualTo(1);
@@ -663,7 +664,7 @@ public class ChannelDecoratorTest {
         assertThat(
                 new ChannelDecorator<Object, Object>(JRoutineCore.io().buildChannel()).pass("test1")
                                                                                       .close()
-                                                                                      .eventuallyBreak()
+                                                                                      .eventuallyContinue()
                                                                                       .after(seconds(
                                                                                               1))
                                                                                       .skipNext(2)

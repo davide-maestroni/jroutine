@@ -454,7 +454,7 @@ public class ByteChannelTest {
         final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
         final BufferOutputStream stream = ByteChannel.byteChannel().bindDeep(channel);
         stream.close();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
         final byte[] b = new byte[16];
 
         try {
@@ -498,9 +498,9 @@ public class ByteChannelTest {
         }
 
         stream.flush();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
         stream.close();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
     }
 
     @Test
@@ -1038,16 +1038,16 @@ public class ByteChannelTest {
 
         stream.write(new byte[0]);
         stream.flush();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
         stream.write(b, 8, 0);
         stream.flush();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
         stream.write(new ByteArrayInputStream(new byte[0]));
         stream.flush();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
         stream.writeAll(new ByteArrayInputStream(new byte[0]));
         stream.flush();
-        assertThat(channel.eventuallyBreak().all()).isEmpty();
+        assertThat(channel.eventuallyContinue().all()).isEmpty();
     }
 
     @Test

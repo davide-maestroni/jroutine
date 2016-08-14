@@ -291,8 +291,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> eventuallyBreak() {
-        mTimeoutActionType.set(TimeoutActionType.BREAK);
+    public Channel<OUT, OUT> eventuallyContinue() {
+        mTimeoutActionType.set(TimeoutActionType.CONTINUE);
         mTimeoutException.set(null);
         return this;
     }
@@ -313,6 +313,44 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         final UnitDuration outputTimeout = getTimeout();
         return new ExpiringIterator(outputTimeout.value, outputTimeout.unit,
                 mTimeoutActionType.get(), mTimeoutException.get());
+    }
+
+    public boolean getComplete() {
+        synchronized (mMutex) {
+            if (mState.isDone()) {
+                return true;
+            }
+
+            final UnitDuration outputTimeout = getTimeout();
+            final long timeout = outputTimeout.value;
+            if (timeout > 0) {
+                checkCanWait();
+            }
+
+            final TimeUnit timeoutUnit = outputTimeout.unit;
+            final boolean isDone;
+            try {
+                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
+
+                    public boolean isTrue() {
+                        return mState.isDone() || mIsWaitingInvocation;
+                    }
+                });
+
+            } catch (final InterruptedException e) {
+                throw new InvocationInterruptedException(e);
+            }
+
+            if (!mState.isDone() && mIsWaitingInvocation) {
+                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+            }
+
+            if (!isDone) {
+                mLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
+            }
+
+            return isDone;
+        }
     }
 
     @Nullable
@@ -351,44 +389,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
 
             return mAbortException;
-        }
-    }
-
-    public boolean hasCompleted() {
-        synchronized (mMutex) {
-            if (mState.isDone()) {
-                return true;
-            }
-
-            final UnitDuration outputTimeout = getTimeout();
-            final long timeout = outputTimeout.value;
-            if (timeout > 0) {
-                checkCanWait();
-            }
-
-            final TimeUnit timeoutUnit = outputTimeout.unit;
-            final boolean isDone;
-            try {
-                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
-
-                    public boolean isTrue() {
-                        return mState.isDone() || mIsWaitingInvocation;
-                    }
-                });
-
-            } catch (final InterruptedException e) {
-                throw new InvocationInterruptedException(e);
-            }
-
-            if (!mState.isDone() && mIsWaitingInvocation) {
-                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-            }
-
-            if (!isDone) {
-                mLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
-            }
-
-            return isDone;
         }
     }
 

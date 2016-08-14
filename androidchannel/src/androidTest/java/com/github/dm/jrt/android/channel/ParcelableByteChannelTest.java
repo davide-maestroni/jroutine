@@ -506,7 +506,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         final BufferOutputStream stream = ParcelableByteChannel.byteChannel().bindDeep(channel);
         stream.close();
         final Channel<?, ParcelableByteBuffer> result =
-                channel.close().after(3, TimeUnit.SECONDS).eventuallyBreak();
+                channel.close().after(3, TimeUnit.SECONDS).eventuallyContinue();
         assertThat(result.all()).isEmpty();
         final byte[] b = new byte[16];
 
@@ -1146,10 +1146,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         stream.write(new byte[0]);
         stream.flush();
         final Channel<?, ParcelableByteBuffer> result = channel.close();
-        assertThat(result.after(seconds(10)).eventuallyBreak().all()).isEmpty();
+        assertThat(result.after(seconds(10)).eventuallyContinue().all()).isEmpty();
         stream.write(b, 8, 0);
         stream.flush();
-        assertThat(result.after(seconds(10)).eventuallyBreak().all()).isEmpty();
+        assertThat(result.after(seconds(10)).eventuallyContinue().all()).isEmpty();
     }
 
     public void testWriteInput() throws IOException {

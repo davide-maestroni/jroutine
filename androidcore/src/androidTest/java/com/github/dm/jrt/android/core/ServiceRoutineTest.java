@@ -220,11 +220,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .applyInvocationConfiguration()
                                                           .withOutputTimeout(millis(10))
                                                           .withOutputTimeoutAction(
-                                                                  TimeoutActionType.BREAK)
+                                                                  TimeoutActionType.CONTINUE)
                                                           .configured()
                                                           .call("test1");
         assertThat(channel.all()).isEmpty();
-        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).getComplete()).isTrue();
     }
 
     public void testExecutionTimeout2() {
@@ -248,7 +248,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).getComplete()).isTrue();
     }
 
     public void testExecutionTimeout3() {
@@ -272,7 +272,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        assertThat(channel.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(channel.after(seconds(10)).getComplete()).isTrue();
     }
 
     public void testInvocations() throws InterruptedException {
@@ -409,7 +409,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<?, String> result = channel.close();
-        assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).outputCount()).isEqualTo(0);

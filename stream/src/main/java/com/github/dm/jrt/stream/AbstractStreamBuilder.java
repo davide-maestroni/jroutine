@@ -144,8 +144,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public Channel<IN, OUT> eventuallyBreak() {
-        return invoke().eventuallyBreak();
+    public Channel<IN, OUT> eventuallyContinue() {
+        return invoke().eventuallyContinue();
     }
 
     @NotNull
@@ -158,13 +158,13 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         return invoke().expiringIterator();
     }
 
+    public boolean getComplete() {
+        return invoke().getComplete();
+    }
+
     @Nullable
     public RoutineException getError() {
         return invoke().getError();
-    }
-
-    public boolean hasCompleted() {
-        return invoke().hasCompleted();
     }
 
     public boolean hasNext() {

@@ -74,7 +74,7 @@
                        .bind(onOutput(System.out::println))
                        .close()
                        .afterMax(seconds(3))
-                       .hasCompleted();
+                       .getComplete();
                 System.exit(0);
             }
 

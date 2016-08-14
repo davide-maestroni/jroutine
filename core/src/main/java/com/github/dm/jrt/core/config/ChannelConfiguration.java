@@ -296,12 +296,12 @@ public final class ChannelConfiguration extends DeepEqualObject {
          */
         FAIL,
         /**
-         * Break execution.
+         * Continue execution.
          * <br>
-         * If no result is available after the specified timeout, the called method will stop its
-         * execution and exit immediately.
+         * If no result is available after the specified timeout, the called method will continue
+         * its execution and eventually exit.
          */
-        BREAK,
+        CONTINUE,
         /**
          * Abort invocation.
          * <br>

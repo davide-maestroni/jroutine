@@ -107,8 +107,8 @@ public class ChannelDecorator<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> eventuallyBreak() {
-        mChannel.eventuallyBreak();
+    public Channel<IN, OUT> eventuallyContinue() {
+        mChannel.eventuallyContinue();
         return this;
     }
 
@@ -123,13 +123,13 @@ public class ChannelDecorator<IN, OUT> implements Channel<IN, OUT> {
         return mChannel.expiringIterator();
     }
 
+    public boolean getComplete() {
+        return mChannel.getComplete();
+    }
+
     @Nullable
     public RoutineException getError() {
         return mChannel.getError();
-    }
-
-    public boolean hasCompleted() {
-        return mChannel.hasCompleted();
     }
 
     public boolean hasNext() {

@@ -455,7 +455,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .configured()
                                        .call("test")
                                        .after(seconds(10))
-                                       .hasCompleted()).isTrue();
+                                       .getComplete()).isTrue();
         assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
                                  .withId(0)
                                  .buildChannel()
@@ -469,7 +469,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                        .configured()
                                        .call("test")
                                        .after(seconds(10))
-                                       .hasCompleted()).isTrue();
+                                       .getComplete()).isTrue();
         assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
                                  .withId(0)
                                  .buildChannel()

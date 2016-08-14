@@ -572,7 +572,7 @@ public class Builders {
             return outputChannel.all().iterator().next();
         }
 
-        outputChannel.hasCompleted();
+        outputChannel.getComplete();
         return null;
     }
 

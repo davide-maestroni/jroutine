@@ -101,7 +101,7 @@ public class RoutineTest {
         final Channel<String, String> channel1 =
                 routine.call().after(millis(10)).pass("test1").close();
         assertThat(channel1.isOpen()).isFalse();
-        assertThat(channel1.after(timeout).hasCompleted()).isTrue();
+        assertThat(channel1.after(timeout).getComplete()).isTrue();
         assertThat(channel1.abort()).isFalse();
         assertThat(channel1.isOpen()).isFalse();
         assertThat(channel1.after(timeout).hasNext()).isTrue();
@@ -111,7 +111,7 @@ public class RoutineTest {
         final Channel<String, String> channel2 = routine.call().after(millis(10)).pass("test2");
         assertThat(channel2.isOpen()).isTrue();
         assertThat(channel2.abort(new IllegalArgumentException("test2"))).isTrue();
-        assertThat(channel2.after(timeout).hasCompleted()).isTrue();
+        assertThat(channel2.after(timeout).getComplete()).isTrue();
         assertThat(channel2.abort()).isFalse();
         assertThat(channel2.isOpen()).isFalse();
         try {
@@ -134,7 +134,7 @@ public class RoutineTest {
         final RoutineException error = channel2.getError();
         assertThat(error.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(error.getCause().getMessage()).isEqualTo("test2");
-        assertThat(channel2.hasCompleted()).isTrue();
+        assertThat(channel2.getComplete()).isTrue();
         assertThat(channel2.isOpen()).isFalse();
         final Channel<String, String> channel3 =
                 routine.call().after(millis(1000000)).pass("test2");
@@ -150,7 +150,7 @@ public class RoutineTest {
             assertThat(ex.getCause()).isNull();
         }
 
-        assertThat(channel3.hasCompleted()).isTrue();
+        assertThat(channel3.getComplete()).isTrue();
         assertThat(channel3.isOpen()).isFalse();
         try {
             JRoutineCore.with(new AbortInvocation())
@@ -248,7 +248,7 @@ public class RoutineTest {
                                                                      AgingPriority.HIGH_PRIORITY)
                                                              .configured()
                                                              .buildRoutine();
-        final Channel<Object, Object> output1 = routine1.call("test1").eventuallyBreak();
+        final Channel<Object, Object> output1 = routine1.call("test1").eventuallyContinue();
         final Channel<Object, Object> input2 = routine2.call();
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
             input2.pass("test2");
@@ -840,10 +840,10 @@ public class RoutineTest {
                 JRoutineCore.with(factoryOf(TestDiscardOnAbort.class)).buildRoutine();
         Channel<String, String> channel = routine3.call().pass("1");
         channel.abort();
-        assertThat(channel.after(timeout).hasCompleted()).isTrue();
+        assertThat(channel.after(timeout).getComplete()).isTrue();
         channel = routine3.call().pass("1");
         channel.abort();
-        assertThat(channel.after(timeout).hasCompleted()).isTrue();
+        assertThat(channel.after(timeout).getComplete()).isTrue();
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
@@ -881,7 +881,7 @@ public class RoutineTest {
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
         final Channel<Object, Object> result = channel.close();
         assertThat(result.outputCount()).isZero();
-        assertThat(result.after(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
         assertThat(result.isEmpty()).isFalse();
     }
@@ -1302,7 +1302,7 @@ public class RoutineTest {
                 JRoutineCore.with(factoryOf(TestLifecycle.class)).call("test");
         Thread.sleep(500);
         outputChannel.abort();
-        outputChannel.after(infinity()).hasCompleted();
+        outputChannel.after(infinity()).getComplete();
         assertThat(TestLifecycle.sIsError).isFalse();
     }
 
@@ -1331,7 +1331,7 @@ public class RoutineTest {
                                .next(2)).containsExactly("test1", "test2");
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .call("test1")
-                               .eventuallyBreak()
+                               .eventuallyContinue()
                                .after(seconds(1))
                                .next(2)).containsExactly("test1");
         try {
@@ -1389,7 +1389,7 @@ public class RoutineTest {
                                .nextOrElse(2)).isEqualTo("test1");
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .call()
-                               .eventuallyBreak()
+                               .eventuallyContinue()
                                .after(seconds(1))
                                .nextOrElse(2)).isEqualTo(2);
         try {
@@ -1498,7 +1498,7 @@ public class RoutineTest {
                             .buildRoutine();
         final Channel<String, String> outputChannel =
                 routine.call("test1", "test2").after(seconds(1));
-        outputChannel.hasCompleted();
+        outputChannel.getComplete();
         assertThat(outputChannel.all()).containsExactly("test1", "test2");
         final Channel<String, String> channel1 = JRoutineCore.io()
                                                              .applyChannelConfiguration()
@@ -1747,7 +1747,7 @@ public class RoutineTest {
                             .configured()
                             .buildRoutine();
         final Iterator<String> iterator =
-                routine1.call("test").after(millis(500)).eventuallyBreak().iterator();
+                routine1.call("test").after(millis(500)).eventuallyContinue().iterator();
         assertThat(iterator.next()).isEqualTo("test");
         try {
             iterator.remove();
@@ -1764,7 +1764,7 @@ public class RoutineTest {
         }
 
         try {
-            routine1.call().immediately().eventuallyBreak().iterator().next();
+            routine1.call().immediately().eventuallyContinue().iterator().next();
             fail();
 
         } catch (final NoSuchElementException ignored) {
@@ -1921,7 +1921,7 @@ public class RoutineTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         final Channel<Object, Object> result = channel.close();
-        assertThat(result.after(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
@@ -1936,7 +1936,7 @@ public class RoutineTest {
                                .all()).containsExactly("test3", "test4");
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .call("test1")
-                               .eventuallyBreak()
+                               .eventuallyContinue()
                                .after(seconds(1))
                                .skipNext(2)
                                .all()).isEmpty();
@@ -2019,7 +2019,7 @@ public class RoutineTest {
         } catch (final AbortException ignored) {
         }
 
-        assertThat(routine1.call("test1").hasCompleted()).isFalse();
+        assertThat(routine1.call("test1").getComplete()).isFalse();
         final Routine<String, String> routine2 =
                 JRoutineCore.with(factoryOf(DelayedInvocation.class, seconds(1)))
                             .applyInvocationConfiguration()
@@ -2063,7 +2063,7 @@ public class RoutineTest {
         } catch (final AbortException ignored) {
         }
 
-        assertThat(routine2.call("test1").hasCompleted()).isFalse();
+        assertThat(routine2.call("test1").getComplete()).isFalse();
         final Routine<String, String> routine3 =
                 JRoutineCore.with(factoryOf(DelayedInvocation.class, seconds(1)))
                             .applyInvocationConfiguration()
@@ -2107,7 +2107,7 @@ public class RoutineTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel3.hasCompleted()).isFalse();
+        assertThat(channel3.getComplete()).isFalse();
         channel3.after(millis(10));
         try {
             channel3.next();
@@ -2145,11 +2145,11 @@ public class RoutineTest {
         } catch (final OutputTimeoutException ignored) {
         }
 
-        assertThat(channel3.hasCompleted()).isFalse();
+        assertThat(channel3.getComplete()).isFalse();
         final Routine<String, String> routine4 =
                 JRoutineCore.with(factoryOf(DelayedInvocation.class, seconds(1)))
                             .applyInvocationConfiguration()
-                            .withOutputTimeoutAction(TimeoutActionType.BREAK)
+                            .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
                             .configured()
                             .buildRoutine();
         final Channel<String, String> channel4 = routine4.call("test1");
@@ -2172,7 +2172,7 @@ public class RoutineTest {
         } catch (final NoSuchElementException ignored) {
         }
 
-        assertThat(channel4.hasCompleted()).isFalse();
+        assertThat(channel4.getComplete()).isFalse();
         channel4.after(millis(10));
         try {
             channel4.next();
@@ -2193,7 +2193,7 @@ public class RoutineTest {
         } catch (final NoSuchElementException ignored) {
         }
 
-        assertThat(channel4.hasCompleted()).isFalse();
+        assertThat(channel4.getComplete()).isFalse();
     }
 
     private void testChained(final Routine<String, String> before,
@@ -2317,21 +2317,21 @@ public class RoutineTest {
         final String input = "test";
         final Routine<String, String> routine =
                 JRoutineCore.with(factoryOf(DelayedInvocation.class, zero())).buildRoutine();
-        assertThat(routine.call(input).bind(consumer).after(timeout).hasCompleted()).isTrue();
+        assertThat(routine.call(input).bind(consumer).after(timeout).getComplete()).isTrue();
         assertThat(
-                routine.callParallel(input).bind(consumer).after(timeout).hasCompleted()).isTrue();
+                routine.callParallel(input).bind(consumer).after(timeout).getComplete()).isTrue();
         assertThat(routine.call()
                           .pass(input)
                           .close()
                           .bind(consumer)
                           .after(timeout)
-                          .hasCompleted()).isTrue();
+                          .getComplete()).isTrue();
         assertThat(routine.callParallel()
                           .pass(input)
                           .close()
                           .bind(consumer)
                           .after(timeout)
-                          .hasCompleted()).isTrue();
+                          .getComplete()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -2511,7 +2511,7 @@ public class RoutineTest {
             JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
                         .call("test")
                         .after(seconds(1))
-                        .hasCompleted();
+                        .getComplete();
         }
     }
 

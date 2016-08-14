@@ -131,7 +131,7 @@ public class Downloader {
      */
     public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
         final Channel<?, Boolean> channel = mDownloads.remove(uri);
-        return (channel != null) && channel.abort() && channel.after(timeout).hasCompleted();
+        return (channel != null) && channel.abort() && channel.after(timeout).getComplete();
     }
 
     /**
@@ -198,7 +198,7 @@ public class Downloader {
         final Channel<?, Boolean> channel = downloads.get(uri);
         // Check if the output channel is in the map, that is, the resource is currently
         // downloading, wait for the routine to complete
-        if ((channel != null) && channel.after(timeout).hasCompleted()) {
+        if ((channel != null) && channel.after(timeout).getComplete()) {
             // If complete, remove the resource from the download map
             downloads.remove(uri);
             // Read the result and, if successful, add the resource to the downloaded set

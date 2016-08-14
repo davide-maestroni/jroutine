@@ -100,7 +100,7 @@ public class ObjectRoutineTest {
                                                         .withRunner(runner)
                                                         .configured()
                                                         .buildProxy(PriorityPass.class);
-        final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyBreak();
+        final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyContinue();
 
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
 
@@ -127,7 +127,7 @@ public class ObjectRoutineTest {
                                                               .withMaxInstances(1)
                                                               .withCoreInstances(1)
                                                               .withOutputTimeoutAction(
-                                                                      TimeoutActionType.BREAK)
+                                                                      TimeoutActionType.CONTINUE)
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .configured()
@@ -1063,8 +1063,8 @@ public class ObjectRoutineTest {
         final Channel<Integer, Integer> channel36 = JRoutineCore.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
-        itf.set3().pass(-17).close().hasCompleted();
-        itf.set5().call(-17).hasCompleted();
+        itf.set3().pass(-17).close().getComplete();
+        itf.set5().call(-17).getComplete();
         itf.setA0(new int[]{1, 2, 3});
         final Channel<int[], int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -1075,8 +1075,8 @@ public class ObjectRoutineTest {
         final Channel<int[], int[]> channel39 = JRoutineCore.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
-        itf.setA4().pass(new int[]{1, 2, 3}).close().hasCompleted();
-        itf.setA6().call(new int[]{1, 2, 3}).hasCompleted();
+        itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
+        itf.setA6().call(new int[]{1, 2, 3}).getComplete();
         itf.setL0(Arrays.asList(1, 2, 3));
         final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -1087,8 +1087,8 @@ public class ObjectRoutineTest {
         final Channel<List<Integer>, List<Integer>> channel42 = JRoutineCore.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
-        itf.setL4().pass(Arrays.asList(1, 2, 3)).close().hasCompleted();
-        itf.setL6().call(Arrays.asList(1, 2, 3)).hasCompleted();
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
+        itf.setL6().call(Arrays.asList(1, 2, 3)).getComplete();
     }
 
     @Test
@@ -1266,8 +1266,8 @@ public class ObjectRoutineTest {
                                            .call()
                                            .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1285,8 +1285,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1294,8 +1294,8 @@ public class ObjectRoutineTest {
         getOne = builder.method("getOne").call().close();
         getTwo = builder.method("getTwo").call().close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -1317,8 +1317,8 @@ public class ObjectRoutineTest {
                                            .call()
                                            .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1336,8 +1336,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1350,8 +1350,8 @@ public class ObjectRoutineTest {
                         .close();
         getTwo = builder.method("getTwo").call().close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
 
         startTime = System.currentTimeMillis();
@@ -1369,8 +1369,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -1396,8 +1396,8 @@ public class ObjectRoutineTest {
                                            .call()
                                            .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1415,8 +1415,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1424,8 +1424,8 @@ public class ObjectRoutineTest {
         getOne = builder.method("getOne").call().close();
         getTwo = builder.method("getTwo").call().close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -1446,8 +1446,8 @@ public class ObjectRoutineTest {
                                            .call()
                                            .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1465,8 +1465,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
 
         startTime = System.currentTimeMillis();
@@ -1479,8 +1479,8 @@ public class ObjectRoutineTest {
                         .close();
         getTwo = builder.method("getTwo").call().close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
 
         startTime = System.currentTimeMillis();
@@ -1498,8 +1498,8 @@ public class ObjectRoutineTest {
                         .call()
                         .close();
 
-        assertThat(getOne.hasCompleted()).isTrue();
-        assertThat(getTwo.hasCompleted()).isTrue();
+        assertThat(getOne.getComplete()).isTrue();
+        assertThat(getTwo.getComplete()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -2661,7 +2661,7 @@ public class ObjectRoutineTest {
     private static class TestTimeout {
 
         @Alias("test")
-        @OutputTimeoutAction(TimeoutActionType.BREAK)
+        @OutputTimeoutAction(TimeoutActionType.CONTINUE)
         public int getInt() throws InterruptedException {
 
             Thread.sleep(100);

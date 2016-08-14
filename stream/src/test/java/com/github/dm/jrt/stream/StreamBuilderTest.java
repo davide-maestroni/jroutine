@@ -163,7 +163,7 @@ public class StreamBuilderTest {
             JRoutineStream.<String>withStream().sync()
                                                .map(append("test"))
                                                .allInto(results)
-                                               .hasCompleted();
+                                               .getComplete();
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -228,7 +228,7 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .map(append((Object) "test"))
-                                 .eventuallyBreak()
+                                 .eventuallyContinue()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
@@ -238,7 +238,7 @@ public class StreamBuilderTest {
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream().sync().getError()).isNull();
-        assertThat(JRoutineStream.withStream().sync().hasCompleted()).isFalse();
+        assertThat(JRoutineStream.withStream().sync().getComplete()).isFalse();
         try {
             JRoutineStream.withStream().sync().hasNext();
             fail();

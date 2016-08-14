@@ -129,7 +129,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
@@ -157,7 +157,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
@@ -224,7 +224,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #after(long, TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
@@ -247,7 +247,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #after(long, TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
@@ -273,7 +273,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #eventuallyFail()
      */
     @NotNull
-    Channel<IN, OUT> eventuallyBreak();
+    Channel<IN, OUT> eventuallyContinue();
 
     /**
      * Tells the channel to throw an
@@ -291,7 +291,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      */
     @NotNull
     Channel<IN, OUT> eventuallyFail();
@@ -304,11 +304,24 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #after(long, TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
     Iterator<OUT> expiringIterator();
+
+    /**
+     * Checks if the invocation has completed, waiting at the maximum for the set delay.
+     * <p>
+     * Note that this method invocation will block the calling thread until the routine invocation
+     * completes or is aborted, or the timeout elapses.
+     *
+     * @return whether the routine execution has completed.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #immediately()
+     */
+    boolean getComplete();
 
     /**
      * Gets the invocation error or abort exception, if the invocation is aborted, waiting at the
@@ -324,19 +337,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      */
     @Nullable
     RoutineException getError();
-
-    /**
-     * Checks if the invocation has completed, waiting at the maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @return whether the routine execution has completed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #immediately()
-     */
-    boolean hasCompleted();
 
     /**
      * Checks if more results are available by waiting at the maximum for the set timeout.
@@ -358,7 +358,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     boolean hasNext();
@@ -388,7 +388,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     OUT next();
@@ -459,7 +459,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull
@@ -494,7 +494,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     OUT nextOrElse(OUT output);
@@ -582,7 +582,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @see #immediately()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyBreak()
+     * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     @NotNull

@@ -33,10 +33,8 @@ import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -45,8 +43,6 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,10 +50,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
-import static com.github.dm.jrt.stream.modifier.Modifiers.outputGet;
 import static com.github.dm.jrt.stream.modifier.Modifiers.throttle;
 import static com.github.dm.jrt.stream.modifier.Modifiers.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,92 +78,86 @@ public class ModifiersTest {
 
     @Test
     public void testBackoff() {
-        Assertions.assertThat(JRoutineStream.withStream()
-                                            .async()
-                                            .let(outputAccept(range(1, 1000)))
-                                            .applyInvocationConfiguration()
-                                            .withRunner(getSingleThreadRunner())
-                                            .withInputBackoff(
-                                                    Backoffs.afterCount(2).linearDelay(seconds(10)))
-                                            .configured()
-                                            .map(Functions.<Number>identity())
-                                            .map(new Function<Number, Double>() {
+        Assertions.assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                      .applyInvocationConfiguration()
+                                      .withRunner(getSingleThreadRunner())
+                                      .withInputBackoff(
+                                              Backoffs.afterCount(2).linearDelay(seconds(10)))
+                                      .configured()
+                                      .map(Functions.<Number>identity())
+                                      .map(new Function<Number, Double>() {
 
-                                                public Double apply(final Number number) {
-                                                    final double value = number.doubleValue();
-                                                    return Math.sqrt(value);
-                                                }
-                                            })
-                                            .sync()
-                                            .map(new Function<Double, SumData>() {
+                                          public Double apply(final Number number) {
+                                              final double value = number.doubleValue();
+                                              return Math.sqrt(value);
+                                          }
+                                      })
+                                      .sync()
+                                      .map(new Function<Double, SumData>() {
 
-                                                public SumData apply(final Double aDouble) {
-                                                    return new SumData(aDouble, 1);
-                                                }
-                                            })
-                                            .map(reduce(
-                                                    new BiFunction<SumData, SumData, SumData>() {
+                                          public SumData apply(final Double aDouble) {
+                                              return new SumData(aDouble, 1);
+                                          }
+                                      })
+                                      .map(reduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                                        public SumData apply(final SumData data1,
-                                                                final SumData data2) {
-                                                            return new SumData(
-                                                                    data1.sum + data2.sum,
-                                                                    data1.count + data2.count);
-                                                        }
-                                                    }))
-                                            .map(new Function<SumData, Double>() {
+                                          public SumData apply(final SumData data1,
+                                                  final SumData data2) {
+                                              return new SumData(data1.sum + data2.sum,
+                                                      data1.count + data2.count);
+                                          }
+                                      }))
+                                      .map(new Function<SumData, Double>() {
 
-                                                public Double apply(final SumData data) {
-                                                    return data.sum / data.count;
-                                                }
-                                            })
-                                            .call()
-                                            .close()
-                                            .after(seconds(3))
-                                            .next()).isCloseTo(21, Offset.offset(0.1));
-        Assertions.assertThat(JRoutineStream.withStream()
-                                            .async()
-                                            .let(outputAccept(range(1, 1000)))
-                                            .applyInvocationConfiguration()
-                                            .withRunner(getSingleThreadRunner())
-                                            .withInputBackoff(Backoffs.afterCount(2)
-                                                                      .constantDelay(seconds(10)))
-                                            .configured()
-                                            .map(Functions.<Number>identity())
-                                            .map(new Function<Number, Double>() {
+                                          public Double apply(final SumData data) {
+                                              return data.sum / data.count;
+                                          }
+                                      })
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+        Assertions.assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                      .applyInvocationConfiguration()
+                                      .withRunner(getSingleThreadRunner())
+                                      .withInputBackoff(
+                                              Backoffs.afterCount(2).constantDelay(seconds(10)))
+                                      .configured()
+                                      .map(Functions.<Number>identity())
+                                      .map(new Function<Number, Double>() {
 
-                                                public Double apply(final Number number) {
-                                                    final double value = number.doubleValue();
-                                                    return Math.sqrt(value);
-                                                }
-                                            })
-                                            .sync()
-                                            .map(new Function<Double, SumData>() {
+                                          public Double apply(final Number number) {
+                                              final double value = number.doubleValue();
+                                              return Math.sqrt(value);
+                                          }
+                                      })
+                                      .sync()
+                                      .map(new Function<Double, SumData>() {
 
-                                                public SumData apply(final Double aDouble) {
-                                                    return new SumData(aDouble, 1);
-                                                }
-                                            })
-                                            .map(reduce(
-                                                    new BiFunction<SumData, SumData, SumData>() {
+                                          public SumData apply(final Double aDouble) {
+                                              return new SumData(aDouble, 1);
+                                          }
+                                      })
+                                      .map(reduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                                        public SumData apply(final SumData data1,
-                                                                final SumData data2) {
-                                                            return new SumData(
-                                                                    data1.sum + data2.sum,
-                                                                    data1.count + data2.count);
-                                                        }
-                                                    }))
-                                            .map(new Function<SumData, Double>() {
+                                          public SumData apply(final SumData data1,
+                                                  final SumData data2) {
+                                              return new SumData(data1.sum + data2.sum,
+                                                      data1.count + data2.count);
+                                          }
+                                      }))
+                                      .map(new Function<SumData, Double>() {
 
-                                                public Double apply(final SumData data) {
-                                                    return data.sum / data.count;
-                                                }
-                                            })
-                                            .call()
-                                            .close()
-                                            .after(seconds(3))
-                                            .next()).isCloseTo(21, Offset.offset(0.1));
+                                          public Double apply(final SumData data) {
+                                              return data.sum / data.count;
+                                          }
+                                      })
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test
@@ -275,265 +264,6 @@ public class ModifiersTest {
     }
 
     @Test
-    public void testOutput() {
-        assertThat(JRoutineStream.withStream().sync().let(outputGet(new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(outputAccept(new Consumer<Channel<String, ?>>() {
-
-                                     public void accept(final Channel<String, ?> resultChannel) {
-                                         resultChannel.pass("TEST2");
-                                     }
-                                 }))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(outputAccept(3, new Consumer<Channel<String, ?>>() {
-
-                                     public void accept(final Channel<String, ?> resultChannel) {
-                                         resultChannel.pass("TEST2");
-                                     }
-                                 }))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").after(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
-
-            public void accept(final Channel<String, ?> resultChannel) {
-                resultChannel.pass("TEST2");
-            }
-        })).call("test1").after(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(
-                JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
-
-                    public void accept(final Channel<String, ?> resultChannel) {
-                        resultChannel.pass("TEST2");
-                    }
-                })).call("test1").after(seconds(3)).all()).containsOnly("TEST2", "TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream().let(outputGet(new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.withStream().let(outputAccept(new Consumer<Channel<String, ?>>() {
-
-            public void accept(final Channel<String, ?> resultChannel) {
-                resultChannel.pass("TEST2");
-            }
-        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
-        assertThat(JRoutineStream.withStream().let(outputGet(3, new Supplier<String>() {
-
-            public String get() {
-                return "TEST2";
-            }
-        })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(
-                JRoutineStream.withStream().let(outputAccept(3, new Consumer<Channel<String, ?>>() {
-
-                    public void accept(final Channel<String, ?> resultChannel) {
-                        resultChannel.pass("TEST2");
-                    }
-                })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2",
-                "TEST2");
-    }
-
-    @Test
-    public void testOutput2() {
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output((String) null))
-                                 .call("test1")
-                                 .all()).containsOnly((String) null);
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output((String[]) null))
-                                 .call("test1")
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output())
-                                 .call("test1")
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output((List<String>) null))
-                                 .call("test1")
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .call("test1")
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output("TEST2"))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output("TEST2", "TEST2"))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .call("test1")
-                                 .all()).containsOnly("TEST2");
-
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((String) null))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly((String) null);
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((String[]) null))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output())
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((List<String>) null))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output("TEST2"))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output("TEST2", "TEST2"))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .call("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((String) null))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly((String) null);
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((String[]) null))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output())
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output((List<String>) null))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(Collections.<String>emptyList()))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).isEmpty();
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output("TEST2"))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output("TEST2", "TEST2"))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2", "TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(Collections.singletonList("TEST2")))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-        assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.output(JRoutineCore.io().of("TEST2", "TEST2")))
-                                 .callParallel("test1")
-                                 .after(seconds(3))
-                                 .all()).containsOnly("TEST2");
-    }
-
-    @Test
-    public void testOutputNegativeCount() {
-        try {
-            outputGet(-1, Functions.constant(null));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            outputGet(0, Functions.constant(null));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            outputAccept(-1, Functions.sink());
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            outputAccept(0, Functions.sink());
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-    }
-
-    @Test
     public void testParallelSplit() {
         final StreamBuilder<Integer, Long> sqr =
                 JRoutineStream.<Integer>withStream().map(new Function<Integer, Long>() {
@@ -543,52 +273,55 @@ public class ModifiersTest {
                         return value * value;
                     }
                 });
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallel(2, sqr.buildFactory()))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1L, 4L, 9L);
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallel(2, sqr))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1L, 4L, 9L);
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallel(2, JRoutineCore.with(
-                                         IdentityInvocation.<Integer>factoryOf())))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1, 2, 3);
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(),
-                                         sqr.buildFactory()))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1L, 4L, 9L);
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(), sqr))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1L, 4L, 9L);
-        assertThat(JRoutineStream.withStream()
-                                 .let(outputAccept(range(1, 3)))
-                                 .let(Modifiers.parallelBy(Functions.<Integer>identity(),
-                                         JRoutineCore.with(
-                                                 IdentityInvocation.<Integer>factoryOf())))
-                                 .call()
-                                 .close()
-                                 .after(seconds(3))
-                                 .all()).containsOnly(1, 2, 3);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Long>parallel(2,
+                                              sqr.buildFactory()))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Long>parallel(2, sqr))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Integer>parallel(2,
+                                              JRoutineCore.with(
+                                                      IdentityInvocation.<Integer>factoryOf())))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1, 2, 3);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Long>parallelBy(
+                                              Functions.<Integer>identity(), sqr.buildFactory()))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Long>parallelBy(
+                                              Functions.<Integer>identity(), sqr))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1L, 4L, 9L);
+        assertThat(JRoutineStream //
+                .<Integer>withStream().map(appendAccept(range(1, 3)))
+                                      .let(Modifiers.<Integer, Integer, Integer>parallelBy(
+                                              Functions.<Integer>identity(), JRoutineCore.with(
+                                                      IdentityInvocation.<Integer>factoryOf())))
+                                      .call()
+                                      .close()
+                                      .after(seconds(3))
+                                      .all()).containsOnly(1, 2, 3);
     }
 
     @Test

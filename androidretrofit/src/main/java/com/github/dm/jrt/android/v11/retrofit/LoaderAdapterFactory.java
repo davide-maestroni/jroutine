@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.operator.Operators;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +45,6 @@ import java.lang.reflect.Type;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
-
-import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamBuilder} and
@@ -263,10 +262,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
         @Override
         public <OUT> LoaderStreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineLoaderStream.withStream()
-                                       .let(output(ComparableCall.of(call)))
-                                       .invocationMode(mInvocationMode)
-                                       .map(getRoutine());
+            return JRoutineLoaderStream.<Call<?>>withStream().straight()
+                                                             .map(Operators.<Call<?>>prepend(
+                                                                     ComparableCall.of(call)))
+                                                             .async()
+                                                             .invocationMode(mInvocationMode)
+                                                             .map(getRoutine());
         }
     }
 }

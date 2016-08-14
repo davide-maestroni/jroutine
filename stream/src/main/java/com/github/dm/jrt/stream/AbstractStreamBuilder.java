@@ -334,7 +334,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         try {
             return ConstantConditions.notNull("transformed stream",
                     ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration,
+                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(buildConfiguration(),
                             this));
 
         } catch (final Exception e) {
@@ -373,7 +373,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             mBindingFunction = decorate(
                     ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
                             Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
-                            .apply(mStreamConfiguration, getBindingFunction()));
+                            .apply(buildConfiguration(), getBindingFunction()));
             return (StreamBuilder<BEFORE, AFTER>) this;
 
         } catch (final Exception e) {
@@ -543,11 +543,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
             @NotNull StreamConfiguration streamConfiguration,
             @NotNull RoutineBuilder<? super BEFORE, ? extends AFTER> builder) {
-        return builder.applyInvocationConfiguration()
-                      .with(null)
-                      .with(streamConfiguration.asInvocationConfiguration())
-                      .configured()
-                      .buildRoutine();
+        return builder.apply(streamConfiguration.asInvocationConfiguration()).buildRoutine();
     }
 
     /**

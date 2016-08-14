@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -42,7 +43,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Abstract implementation of a call adapter factory supporting {@code Channel} and
@@ -191,7 +191,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
                             annotations, retrofit), responseType);
 
         } else if (StreamBuilder.class == returnRawType) {
-            return new StreamBuilderAdapter(configuration, invocationMode,
+            return new StreamBuilderAdapter(invocationMode,
                     buildRoutine(configuration, invocationMode, returnRawType, responseType,
                             annotations, retrofit), responseType);
         }
@@ -371,34 +371,28 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      */
     private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
 
-        private final InvocationConfiguration mInvocationConfiguration;
-
         private final InvocationMode mInvocationMode;
 
         /**
          * Constructor.
          *
-         * @param configuration  the invocation configuration.
          * @param invocationMode the invocation mode.
          * @param routine        the routine instance.
          * @param responseType   the response type.
          */
-        private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
+        private StreamBuilderAdapter(@NotNull final InvocationMode invocationMode,
                 @NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
-            mInvocationConfiguration =
-                    ConstantConditions.notNull("invocation configuration", configuration);
             mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.withStream()
-                                 .let(output(call))
-                                 .invocationMode(mInvocationMode)
-                                 .apply(mInvocationConfiguration)
-                                 .map(getRoutine());
+            return JRoutineStream.<Call<?>>withStream().straight()
+                                                       .map(Operators.<Call<?>>prepend(call))
+                                                       .async()
+                                                       .invocationMode(mInvocationMode)
+                                                       .map(getRoutine());
         }
     }
 }

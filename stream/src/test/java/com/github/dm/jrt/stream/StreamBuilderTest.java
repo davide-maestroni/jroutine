@@ -62,11 +62,10 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
+import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.output;
-import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
 import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -147,21 +146,24 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream().sync().abort(new IllegalStateException())).isTrue();
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .after(seconds(3))
                                  .immediately()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .after(3, TimeUnit.SECONDS)
                                  .immediately()
                                  .close()
                                  .next()).isEqualTo("test");
         try {
             final ArrayList<String> results = new ArrayList<String>();
-            JRoutineStream.withStream().sync().let(output("test")).allInto(results).hasCompleted();
+            JRoutineStream.<String>withStream().sync()
+                                               .map(append("test"))
+                                               .allInto(results)
+                                               .hasCompleted();
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -170,7 +172,7 @@ public class StreamBuilderTest {
         try {
             JRoutineStream.withStream()
                           .sync()
-                          .let(output("test"))
+                          .map(append((Object) "test"))
                           .bind(JRoutineCore.io().buildChannel())
                           .next();
             fail();
@@ -178,28 +180,34 @@ public class StreamBuilderTest {
         } catch (final TimeoutException ignored) {
         }
 
+        assertThat(JRoutineStream.<String>withStream().sync()
+                                                      .map(append("test"))
+                                                      .bind(onOutput(new Consumer<String>() {
+
+                                                          public void accept(final String s) {
+                                                              assertThat(s).isEqualTo("test");
+                                                          }
+                                                      }))
+                                                      .close()
+                                                      .getError()).isNull();
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
-                                 .bind(onOutput(new Consumer<String>() {
-
-                                     public void accept(final String s) {
-                                         assertThat(s).isEqualTo("test");
-                                     }
-                                 }))
+                                 .map(append((Object) "test"))
                                  .close()
-                                 .getError()).isNull();
-        assertThat(JRoutineStream.withStream().sync().let(output("test")).close().next()).isEqualTo(
-                "test");
+                                 .next()).isEqualTo("test");
         try {
-            JRoutineStream.withStream().sync().let(output("test")).expiringIterator().next();
+            JRoutineStream.withStream()
+                          .sync()
+                          .map(append((Object) "test"))
+                          .expiringIterator()
+                          .next();
             fail();
 
         } catch (final TimeoutException ignored) {
         }
 
         try {
-            JRoutineStream.withStream().sync().let(output("test")).iterator().next();
+            JRoutineStream.withStream().sync().map(append((Object) "test")).iterator().next();
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -207,25 +215,25 @@ public class StreamBuilderTest {
 
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .eventuallyAbort()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .eventuallyAbort(new IllegalStateException())
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .eventuallyBreak()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
                                  .sync()
-                                 .let(output("test"))
+                                 .map(append((Object) "test"))
                                  .eventuallyFail()
                                  .close()
                                  .next()).isEqualTo("test");
@@ -238,9 +246,12 @@ public class StreamBuilderTest {
         } catch (final TimeoutException ignored) {
         }
 
-        assertThat(
-                JRoutineStream.withStream().sync().let(output("test")).immediately().close().next())
-                .isEqualTo("test");
+        assertThat(JRoutineStream.withStream()
+                                 .sync()
+                                 .map(append((Object) "test"))
+                                 .immediately()
+                                 .close()
+                                 .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream().sync().inputCount()).isZero();
         assertThat(JRoutineStream.withStream().sync().outputCount()).isZero();
         assertThat(JRoutineStream.withStream().sync().size()).isZero();
@@ -1021,135 +1032,135 @@ public class StreamBuilderTest {
     @Test
     public void testMaxSizeDeadlock() {
         try {
-            assertThat(JRoutineStream.withStream()
-                                     .let(outputAccept(range(1, 1000)))
-                                     .applyStreamInvocationConfiguration()
-                                     .withRunner(getSingleThreadRunner())
-                                     .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                     .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                     .configured()
-                                     .map(Functions.<Number>identity())
-                                     .map(new Function<Number, Double>() {
+            assertThat(JRoutineStream //
+                    .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                          .applyStreamInvocationConfiguration()
+                                          .withRunner(getSingleThreadRunner())
+                                          .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
+                                          .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
+                                          .configured()
+                                          .map(Functions.<Number>identity())
+                                          .map(new Function<Number, Double>() {
 
-                                         public Double apply(final Number number) {
-                                             final double value = number.doubleValue();
-                                             return Math.sqrt(value);
-                                         }
-                                     })
-                                     .sync()
-                                     .map(new Function<Double, SumData>() {
+                                              public Double apply(final Number number) {
+                                                  final double value = number.doubleValue();
+                                                  return Math.sqrt(value);
+                                              }
+                                          })
+                                          .sync()
+                                          .map(new Function<Double, SumData>() {
 
-                                         public SumData apply(final Double aDouble) {
-                                             return new SumData(aDouble, 1);
-                                         }
-                                     })
-                                     .map(reduce(new BiFunction<SumData, SumData, SumData>() {
+                                              public SumData apply(final Double aDouble) {
+                                                  return new SumData(aDouble, 1);
+                                              }
+                                          })
+                                          .map(reduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                         public SumData apply(final SumData data1,
-                                                 final SumData data2) {
-                                             return new SumData(data1.sum + data2.sum,
-                                                     data1.count + data2.count);
-                                         }
-                                     }))
-                                     .map(new Function<SumData, Double>() {
+                                              public SumData apply(final SumData data1,
+                                                      final SumData data2) {
+                                                  return new SumData(data1.sum + data2.sum,
+                                                          data1.count + data2.count);
+                                              }
+                                          }))
+                                          .map(new Function<SumData, Double>() {
 
-                                         public Double apply(final SumData data) {
-                                             return data.sum / data.count;
-                                         }
-                                     })
-                                     .call()
-                                     .close()
-                                     .after(minutes(3))
-                                     .next()).isCloseTo(21, Offset.offset(0.1));
+                                              public Double apply(final SumData data) {
+                                                  return data.sum / data.count;
+                                              }
+                                          })
+                                          .call()
+                                          .close()
+                                          .after(minutes(3))
+                                          .next()).isCloseTo(21, Offset.offset(0.1));
             fail();
 
         } catch (final InputDeadlockException ignored) {
         }
 
         try {
-            assertThat(JRoutineStream.withStream()
-                                     .let(outputAccept(range(1, 1000)))
-                                     .applyStreamInvocationConfiguration()
-                                     .withRunner(getSingleThreadRunner())
-                                     .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                     .configured()
-                                     .map(Functions.<Number>identity())
-                                     .map(new Function<Number, Double>() {
+            assertThat(JRoutineStream //
+                    .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                          .applyStreamInvocationConfiguration()
+                                          .withRunner(getSingleThreadRunner())
+                                          .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
+                                          .configured()
+                                          .map(Functions.<Number>identity())
+                                          .map(new Function<Number, Double>() {
 
-                                         public Double apply(final Number number) {
-                                             final double value = number.doubleValue();
-                                             return Math.sqrt(value);
-                                         }
-                                     })
-                                     .sync()
-                                     .map(new Function<Double, SumData>() {
+                                              public Double apply(final Number number) {
+                                                  final double value = number.doubleValue();
+                                                  return Math.sqrt(value);
+                                              }
+                                          })
+                                          .sync()
+                                          .map(new Function<Double, SumData>() {
 
-                                         public SumData apply(final Double aDouble) {
-                                             return new SumData(aDouble, 1);
-                                         }
-                                     })
-                                     .map(reduce(new BiFunction<SumData, SumData, SumData>() {
+                                              public SumData apply(final Double aDouble) {
+                                                  return new SumData(aDouble, 1);
+                                              }
+                                          })
+                                          .map(reduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                         public SumData apply(final SumData data1,
-                                                 final SumData data2) {
-                                             return new SumData(data1.sum + data2.sum,
-                                                     data1.count + data2.count);
-                                         }
-                                     }))
-                                     .map(new Function<SumData, Double>() {
+                                              public SumData apply(final SumData data1,
+                                                      final SumData data2) {
+                                                  return new SumData(data1.sum + data2.sum,
+                                                          data1.count + data2.count);
+                                              }
+                                          }))
+                                          .map(new Function<SumData, Double>() {
 
-                                         public Double apply(final SumData data) {
-                                             return data.sum / data.count;
-                                         }
-                                     })
-                                     .call()
-                                     .close()
-                                     .after(minutes(3))
-                                     .next()).isCloseTo(21, Offset.offset(0.1));
+                                              public Double apply(final SumData data) {
+                                                  return data.sum / data.count;
+                                              }
+                                          })
+                                          .call()
+                                          .close()
+                                          .after(minutes(3))
+                                          .next()).isCloseTo(21, Offset.offset(0.1));
 
         } catch (final OutputDeadlockException ignored) {
         }
 
         try {
-            assertThat(JRoutineStream.withStream()
-                                     .let(outputAccept(range(1, 1000)))
-                                     .applyStreamInvocationConfiguration()
-                                     .withRunner(getSingleThreadRunner())
-                                     .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                     .configured()
-                                     .map(Functions.<Number>identity())
-                                     .map(new Function<Number, Double>() {
+            assertThat(JRoutineStream //
+                    .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                          .applyStreamInvocationConfiguration()
+                                          .withRunner(getSingleThreadRunner())
+                                          .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
+                                          .configured()
+                                          .map(Functions.<Number>identity())
+                                          .map(new Function<Number, Double>() {
 
-                                         public Double apply(final Number number) {
-                                             final double value = number.doubleValue();
-                                             return Math.sqrt(value);
-                                         }
-                                     })
-                                     .sync()
-                                     .map(new Function<Double, SumData>() {
+                                              public Double apply(final Number number) {
+                                                  final double value = number.doubleValue();
+                                                  return Math.sqrt(value);
+                                              }
+                                          })
+                                          .sync()
+                                          .map(new Function<Double, SumData>() {
 
-                                         public SumData apply(final Double aDouble) {
-                                             return new SumData(aDouble, 1);
-                                         }
-                                     })
-                                     .map(reduce(new BiFunction<SumData, SumData, SumData>() {
+                                              public SumData apply(final Double aDouble) {
+                                                  return new SumData(aDouble, 1);
+                                              }
+                                          })
+                                          .map(reduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                         public SumData apply(final SumData data1,
-                                                 final SumData data2) {
-                                             return new SumData(data1.sum + data2.sum,
-                                                     data1.count + data2.count);
-                                         }
-                                     }))
-                                     .map(new Function<SumData, Double>() {
+                                              public SumData apply(final SumData data1,
+                                                      final SumData data2) {
+                                                  return new SumData(data1.sum + data2.sum,
+                                                          data1.count + data2.count);
+                                              }
+                                          }))
+                                          .map(new Function<SumData, Double>() {
 
-                                         public Double apply(final SumData data) {
-                                             return data.sum / data.count;
-                                         }
-                                     })
-                                     .call()
-                                     .close()
-                                     .after(minutes(3))
-                                     .next()).isCloseTo(21, Offset.offset(0.1));
+                                              public Double apply(final SumData data) {
+                                                  return data.sum / data.count;
+                                              }
+                                          })
+                                          .call()
+                                          .close()
+                                          .after(minutes(3))
+                                          .next()).isCloseTo(21, Offset.offset(0.1));
             fail();
 
         } catch (final InputDeadlockException ignored) {
@@ -1158,23 +1169,24 @@ public class StreamBuilderTest {
 
     @Test
     public void testStraight() {
-        assertThat(JRoutineStream.withStream()
-                                 .straight()
-                                 .let(outputAccept(range(1, 1000)))
-                                 .applyStreamInvocationConfiguration()
-                                 .withInputMaxSize(1)
-                                 .withOutputMaxSize(1)
-                                 .configured()
-                                 .map(new Function<Number, Double>() {
+        assertThat(JRoutineStream.<Integer>withStream().straight()
+                                                       .map(appendAccept(range(1, 1000)))
+                                                       .applyStreamInvocationConfiguration()
+                                                       .withInputMaxSize(1)
+                                                       .withOutputMaxSize(1)
+                                                       .configured()
+                                                       .map(new Function<Number, Double>() {
 
-                                     public Double apply(final Number number) {
-                                         return Math.sqrt(number.doubleValue());
-                                     }
-                                 })
-                                 .map(Operators.averageDouble())
-                                 .call()
-                                 .close()
-                                 .next()).isCloseTo(21, Offset.offset(0.1));
+                                                           public Double apply(
+                                                                   final Number number) {
+                                                               return Math.sqrt(
+                                                                       number.doubleValue());
+                                                           }
+                                                       })
+                                                       .map(Operators.averageDouble())
+                                                       .call()
+                                                       .close()
+                                                       .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test

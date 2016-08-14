@@ -419,21 +419,13 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
-            final Channel<OUT, OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
+            bind(result);
             mInputChannel.close();
         }
 
         @Override
         public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-            final Channel<OUT, OUT> outputChannel = mOutputChannel;
-            if (!outputChannel.isBound()) {
-                outputChannel.bind(result);
-            }
-
+            bind(result);
             mInputChannel.pass(input);
         }
 
@@ -463,6 +455,13 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
             final IncomingHandler<OUT> handler =
                     new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
             handler.setConnection(bindService(handler));
+        }
+
+        private void bind(@NotNull final Channel<OUT, ?> result) {
+            final Channel<?, OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
+            }
         }
 
         @NotNull

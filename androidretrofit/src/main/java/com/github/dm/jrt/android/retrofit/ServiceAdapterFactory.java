@@ -34,6 +34,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -54,7 +55,6 @@ import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.function.Functions.decorate;
-import static com.github.dm.jrt.stream.modifier.Modifiers.output;
 
 /**
  * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
@@ -376,8 +376,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * Stream routine builder adapter implementation.
      */
     private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
-            BiFunction<StreamConfiguration, Function<Channel<?, Object>, Channel<?,
-                    ParcelableSelectable<Object>>>, Function<Channel<?, Object>, Channel<?,
+            BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?,
+                    ParcelableSelectable<Object>>>, Function<Channel<?, Call<?>>, Channel<?,
                     Object>>> {
 
         private final Converter<ResponseBody, ?> mConverter;
@@ -408,9 +408,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         }
 
         @Override
-        public Function<Channel<?, Object>, Channel<?, Object>> apply(
+        public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
                 final StreamConfiguration streamConfiguration,
-                final Function<Channel<?, Object>, Channel<?, ParcelableSelectable<Object>>>
+                final Function<Channel<?, Call<?>>, Channel<?, ParcelableSelectable<Object>>>
                         function) throws
                 Exception {
             return decorate(function).andThen(
@@ -420,12 +420,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.withStream()
-                                 .let(output(call))
-                                 .invocationMode(mInvocationMode)
-                                 .apply(mInvocationConfiguration)
-                                 .map(sInvocation)
-                                 .liftWithConfig(this);
+            return JRoutineStream.<Call<?>>withStream().straight()
+                                                       .map(Operators.<Call<?>>prepend(call))
+                                                       .async()
+                                                       .invocationMode(mInvocationMode)
+                                                       .apply(mInvocationConfiguration)
+                                                       .map(sInvocation)
+                                                       .liftWithConfig(this);
         }
     }
 }

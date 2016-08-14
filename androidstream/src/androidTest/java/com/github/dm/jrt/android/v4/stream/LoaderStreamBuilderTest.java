@@ -59,9 +59,9 @@ import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.operator.Operators.append;
+import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.outputAccept;
 import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1173,18 +1173,18 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
     }
 
     public void testStraight() {
-        assertThat(JRoutineLoaderStreamCompat.withStream()
-                                             .straight()
-                                             .let(outputAccept(range(1, 1000)))
-                                             .applyStreamInvocationConfiguration()
-                                             .withInputMaxSize(1)
-                                             .withOutputMaxSize(1)
-                                             .configured()
-                                             .map(sqrt())
-                                             .map(Operators.<Double>averageDouble())
-                                             .call()
-                                             .close()
-                                             .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(JRoutineLoaderStreamCompat //
+                .<Integer>withStream().straight()
+                                      .map(appendAccept(range(1, 1000)))
+                                      .applyStreamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .configured()
+                                      .map(sqrt())
+                                      .map(Operators.<Double>averageDouble())
+                                      .call()
+                                      .close()
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     public void testTransform() {

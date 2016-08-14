@@ -47,15 +47,11 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
 
     public final void onAbort(@NotNull final RoutineException reason) {
         mInputChannel.abort(reason);
-        mInputChannel = null;
-        mOutputChannel = null;
     }
 
     public final void onComplete(@NotNull final Channel<OUT, ?> result) {
         bind(result);
         mInputChannel.close();
-        mInputChannel = null;
-        mOutputChannel = null;
     }
 
     public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
@@ -64,6 +60,8 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
     }
 
     public void onRecycle(final boolean isReused) throws Exception {
+        mInputChannel = null;
+        mOutputChannel = null;
     }
 
     public final void onRestart() throws Exception {

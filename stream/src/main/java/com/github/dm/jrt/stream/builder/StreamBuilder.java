@@ -48,7 +48,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel<IN, OUT> {
+public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
     /**
      * {@inheritDoc}
@@ -124,16 +124,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>, Channel
     @NotNull
     <AFTER> StreamBuilder<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * Makes the stream invoke concatenated routines with the specified mode.
-     *
-     * @param invocationMode the invocation mode.
-     * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    @NotNull
-    StreamBuilder<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * Transforms this stream by applying the specified function.

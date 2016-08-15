@@ -27,12 +27,10 @@ import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
@@ -40,10 +38,8 @@ import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -77,8 +73,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     private final InvocationConfiguration mInvocationConfiguration;
 
-    private final InvocationMode mInvocationMode;
-
     private final ServiceConfiguration mServiceConfiguration;
 
     private final ServiceContext mServiceContext;
@@ -89,16 +83,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @param context                 the service context.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the service configuration.
-     * @param invocationMode          the invocation mode.
      */
     private ServiceAdapterFactory(@NotNull final ServiceContext context,
             @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final ServiceConfiguration serviceConfiguration,
-            @NotNull final InvocationMode invocationMode) {
+            @NotNull final ServiceConfiguration serviceConfiguration) {
         mServiceContext = context;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
-        mInvocationMode = invocationMode;
     }
 
     /**
@@ -115,13 +106,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
             final Retrofit retrofit) {
-        InvocationMode invocationMode = mInvocationMode;
-        for (final Annotation annotation : annotations) {
-            if (annotation.annotationType() == Invoke.class) {
-                invocationMode = ((Invoke) annotation).value();
-            }
-        }
-
         Type rawType = null;
         Type responseType = Object.class;
         if (returnType instanceof ParameterizedType) {
@@ -147,7 +131,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                         buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
 
             } else if (StreamBuilder.class == rawType) {
-                return new StreamBuilderAdapter(invocationConfiguration, invocationMode,
+                return new StreamBuilderAdapter(invocationConfiguration,
                         retrofit.responseBodyConverter(responseType, annotations),
                         buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
             }
@@ -173,7 +157,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * The options set through the builder configuration will be applied to all the routine handling
      * the Retrofit calls, unless they are overwritten by specific annotations.
      *
-     * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
      */
@@ -184,8 +167,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         private InvocationConfiguration mInvocationConfiguration =
                 InvocationConfiguration.defaultConfiguration();
-
-        private InvocationMode mInvocationMode = InvocationMode.ASYNC;
 
         private ServiceConfiguration mServiceConfiguration =
                 ServiceConfiguration.defaultConfiguration();
@@ -235,19 +216,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull
         public ServiceAdapterFactory buildFactory() {
             return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
-                    mServiceConfiguration, mInvocationMode);
-        }
-
-        /**
-         * Sets the invocation mode to be used with the adapting routines (asynchronous by default).
-         *
-         * @param invocationMode the invocation mode.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-            mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
-            return this;
+                    mServiceConfiguration);
         }
     }
 
@@ -384,26 +353,21 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final InvocationMode mInvocationMode;
-
         /**
          * Constructor.
          *
-         * @param configuration  the invocation configuration.
-         * @param invocationMode the invocation mode.
-         * @param converter      the body converter.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
+         * @param configuration the invocation configuration.
+         * @param converter     the body converter.
+         * @param routine       the routine instance.
+         * @param responseType  the response type.
          */
         private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode,
                 @NotNull final Converter<ResponseBody, ?> converter,
                 @NotNull final Routine<ParcelableSelectable<Object>,
                         ParcelableSelectable<Object>> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
             mInvocationConfiguration = configuration;
-            mInvocationMode = invocationMode;
             mConverter = converter;
         }
 
@@ -423,7 +387,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
             return JRoutineStream.<Call<?>>withStream().straight()
                                                        .map(Operators.<Call<?>>prepend(call))
                                                        .async()
-                                                       .invocationMode(mInvocationMode)
                                                        .apply(mInvocationConfiguration)
                                                        .map(sInvocation)
                                                        .liftWithConfig(this);

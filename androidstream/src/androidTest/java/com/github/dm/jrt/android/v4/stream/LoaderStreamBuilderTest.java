@@ -37,7 +37,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -641,32 +640,6 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
     public void testInvocationDeadlock() {
         testInvocationDeadlock(getActivity());
-    }
-
-    public void testInvocationMode() {
-        assertThat(JRoutineLoaderStreamCompat.withStream()
-                                             .on(loaderFrom(getActivity()))
-                                             .invocationMode(InvocationMode.ASYNC)
-                                             .call("test1", "test2", "test3")
-                                             .after(seconds(10))
-                                             .all()).containsExactly("test1", "test2", "test3");
-        assertThat(JRoutineLoaderStreamCompat.withStream()
-                                             .on(loaderFrom(getActivity()))
-                                             .invocationMode(InvocationMode.PARALLEL)
-                                             .call("test1", "test2", "test3")
-                                             .after(seconds(10))
-                                             .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testInvocationModeNullPointerError() {
-        try {
-            JRoutineLoaderStreamCompat.withStream().invocationMode(null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     public void testMapAllConsumer() {

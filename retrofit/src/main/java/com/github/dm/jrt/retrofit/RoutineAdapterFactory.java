@@ -18,7 +18,6 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
 
@@ -41,20 +40,17 @@ import retrofit2.CallAdapter;
 public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
     private static final RoutineAdapterFactory sFactory =
-            new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC);
+            new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration());
 
     /**
      * Constructor.
      *
      * @param delegateFactory the delegate factory.
      * @param configuration   the invocation configuration.
-     * @param invocationMode  the invocation mode.
      */
     private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode) {
-        super(delegateFactory, configuration, invocationMode);
+            @NotNull final InvocationConfiguration configuration) {
+        super(delegateFactory, configuration);
     }
 
     /**
@@ -93,8 +89,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
         private CallAdapter.Factory mDelegateFactory;
 
-        private InvocationMode mInvocationMode = InvocationMode.ASYNC;
-
         /**
          * Constructor.
          */
@@ -119,7 +113,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
          */
         @NotNull
         public RoutineAdapterFactory buildFactory() {
-            return new RoutineAdapterFactory(mDelegateFactory, mConfiguration, mInvocationMode);
+            return new RoutineAdapterFactory(mDelegateFactory, mConfiguration);
         }
 
         /**
@@ -131,18 +125,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
         @NotNull
         public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
             mDelegateFactory = factory;
-            return this;
-        }
-
-        /**
-         * Sets the invocation mode to be used with the adapting routines (asynchronous by default).
-         *
-         * @param invocationMode the invocation mode.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-            mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
             return this;
         }
     }

@@ -28,7 +28,6 @@ import com.github.dm.jrt.android.v11.stream.JRoutineLoaderStream;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;
@@ -38,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -69,14 +67,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      * @param delegateFactory         the delegate factory.
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the service configuration.
-     * @param invocationMode          the invocation mode.
      */
     private LoaderAdapterFactory(@NotNull final LoaderContext context,
             @Nullable final CallAdapter.Factory delegateFactory,
             @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final InvocationMode invocationMode) {
-        super(delegateFactory, invocationConfiguration, invocationMode);
+            @NotNull final LoaderConfiguration loaderConfiguration) {
+        super(delegateFactory, invocationConfiguration);
         mLoaderContext = context;
         mLoaderConfiguration = loaderConfiguration;
     }
@@ -95,8 +91,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     @NotNull
     @Override
     protected Routine<? extends Call<?>, ?> buildRoutine(
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
+            @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
             @NotNull final Type responseType, @NotNull final Annotation[] annotations,
             @NotNull final Retrofit retrofit) {
         // Use annotations to configure the routine
@@ -105,7 +100,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
         final ContextInvocationFactory<Call<Object>, Object> factory =
-                getFactory(configuration, invocationMode, responseType, annotations, retrofit);
+                getFactory(configuration, responseType, annotations, retrofit);
         return JRoutineLoader.on(mLoaderContext)
                              .with(factory)
                              .apply(invocationConfiguration)
@@ -126,18 +121,16 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     @Nullable
     @Override
     protected CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @NotNull final Type returnRawType,
-            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
-            @NotNull final Retrofit retrofit) {
+            @NotNull final Type returnRawType, @NotNull final Type responseType,
+            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
         if (LoaderStreamBuilder.class == returnRawType) {
-            return new LoaderStreamBuilderAdapter(invocationMode,
-                    buildRoutine(configuration, invocationMode, returnRawType, responseType,
-                            annotations, retrofit), responseType);
+            return new LoaderStreamBuilderAdapter(
+                    buildRoutine(configuration, returnRawType, responseType, annotations, retrofit),
+                    responseType);
         }
 
         final CallAdapter<?> callAdapter =
-                super.get(configuration, invocationMode, returnRawType, responseType, annotations,
-                        retrofit);
+                super.get(configuration, returnRawType, responseType, annotations, retrofit);
         return (callAdapter != null) ? ComparableCall.wrap(callAdapter) : null;
     }
 
@@ -147,7 +140,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      * The options set through the builder configuration will be applied to all the routine handling
      * the Retrofit calls, unless they are overwritten by specific annotations.
      *
-     * @see Builders#getInvocationMode(Method)
      * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
      * @see AndroidBuilders#withAnnotations(LoaderConfiguration, Annotation...)
      */
@@ -160,8 +152,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
         private InvocationConfiguration mInvocationConfiguration =
                 InvocationConfiguration.defaultConfiguration();
-
-        private InvocationMode mInvocationMode = InvocationMode.ASYNC;
 
         private LoaderConfiguration mLoaderConfiguration =
                 LoaderConfiguration.defaultConfiguration();
@@ -211,7 +201,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @NotNull
         public LoaderAdapterFactory buildFactory() {
             return new LoaderAdapterFactory(mLoaderContext, mDelegateFactory,
-                    mInvocationConfiguration, mLoaderConfiguration, mInvocationMode);
+                    mInvocationConfiguration, mLoaderConfiguration);
         }
 
         /**
@@ -225,18 +215,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
             mDelegateFactory = factory;
             return this;
         }
-
-        /**
-         * Sets the invocation mode to be used with the adapting routines (asynchronous by default).
-         *
-         * @param invocationMode the invocation mode.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder invocationMode(@Nullable final InvocationMode invocationMode) {
-            mInvocationMode = (invocationMode != null) ? invocationMode : InvocationMode.ASYNC;
-            return this;
-        }
     }
 
     /**
@@ -244,20 +222,15 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      */
     private static class LoaderStreamBuilderAdapter extends BaseAdapter<LoaderStreamBuilder> {
 
-        private final InvocationMode mInvocationMode;
-
         /**
          * Constructor.
          *
-         * @param invocationMode the invocation mode.
-         * @param routine        the routine instance.
-         * @param responseType   the response type.
+         * @param routine      the routine instance.
+         * @param responseType the response type.
          */
-        private LoaderStreamBuilderAdapter(@NotNull final InvocationMode invocationMode,
-                @NotNull final Routine<? extends Call<?>, ?> routine,
+        private LoaderStreamBuilderAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
                 @NotNull final Type responseType) {
             super(routine, responseType);
-            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         @Override
@@ -266,7 +239,6 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
                                                              .map(Operators.<Call<?>>prepend(
                                                                      ComparableCall.of(call)))
                                                              .async()
-                                                             .invocationMode(mInvocationMode)
                                                              .map(getRoutine());
         }
     }

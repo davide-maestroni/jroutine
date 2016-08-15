@@ -20,12 +20,10 @@ import com.github.dm.jrt.core.ChannelInvocation;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -34,7 +32,6 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
@@ -46,10 +43,7 @@ import com.github.dm.jrt.stream.builder.StreamBuildingException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.consumerCall;
@@ -88,168 +82,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         mStreamConfiguration =
                 ConstantConditions.notNull("stream configuration", streamConfiguration);
         mBindingFunction = Functions.identity();
-    }
-
-    public boolean abort() {
-        return invoke().abort();
-    }
-
-    public boolean abort(@Nullable final Throwable reason) {
-        return invoke().abort(reason);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        return invoke().after(delay, timeUnit);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> after(@NotNull final UnitDuration delay) {
-        return invoke().after(delay);
-    }
-
-    @NotNull
-    public List<OUT> all() {
-        return invoke().all();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
-        return invoke().allInto(results);
-    }
-
-    @NotNull
-    public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
-        return invoke().bind(channel);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-        return invoke().bind(consumer);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> close() {
-        return invoke().close();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> eventuallyAbort() {
-        return invoke().eventuallyAbort();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        return invoke().eventuallyAbort(reason);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> eventuallyContinue() {
-        return invoke().eventuallyContinue();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> eventuallyFail() {
-        return invoke().eventuallyFail();
-    }
-
-    @NotNull
-    public Iterator<OUT> expiringIterator() {
-        return invoke().expiringIterator();
-    }
-
-    public boolean getComplete() {
-        return invoke().getComplete();
-    }
-
-    @Nullable
-    public RoutineException getError() {
-        return invoke().getError();
-    }
-
-    public boolean hasNext() {
-        return invoke().hasNext();
-    }
-
-    public OUT next() {
-        return invoke().next();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> immediately() {
-        return invoke().immediately();
-    }
-
-    public int inputCount() {
-        return invoke().inputCount();
-    }
-
-    public boolean isBound() {
-        return invoke().isBound();
-    }
-
-    public boolean isEmpty() {
-        return invoke().isEmpty();
-    }
-
-    public boolean isOpen() {
-        return invoke().isOpen();
-    }
-
-    @NotNull
-    public List<OUT> next(final int count) {
-        return invoke().next(count);
-    }
-
-    public OUT nextOrElse(final OUT output) {
-        return invoke().nextOrElse(output);
-    }
-
-    public int outputCount() {
-        return invoke().outputCount();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> pass(@Nullable final Channel<?, ? extends IN> channel) {
-        return invoke().pass(channel);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
-        return invoke().pass(inputs);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> pass(@Nullable final IN input) {
-        return invoke().pass(input);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> pass(@Nullable final IN... inputs) {
-        return invoke().pass(inputs);
-    }
-
-    public int size() {
-        return invoke().size();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> skipNext(final int count) {
-        return invoke().skipNext(count);
-    }
-
-    @NotNull
-    public Channel<IN, OUT> sortedByCall() {
-        return invoke().sortedByCall();
-    }
-
-    @NotNull
-    public Channel<IN, OUT> sortedByDelay() {
-        return invoke().sortedByDelay();
-    }
-
-    public void throwError() {
-        invoke().throwError();
     }
 
     @NotNull
@@ -304,13 +136,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
         return map(new MapInvocation<OUT, AFTER>(decorate(mappingFunction)));
-    }
-
-    @NotNull
-    public StreamBuilder<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
     }
 
     @NotNull
@@ -484,14 +309,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         return (Routine<IN, OUT>) routine;
     }
 
-    public Iterator<OUT> iterator() {
-        return invoke().iterator();
-    }
-
-    public void remove() {
-        invoke().remove();
-    }
-
     /**
      * Applies the specified stream configuration.
      *
@@ -582,8 +399,10 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    private Channel<IN, OUT> invoke() {
-        return mStreamConfiguration.getInvocationMode().invoke(this);
+    private StreamBuilder<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
+        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
+                streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
     }
 
     @SuppressWarnings("unchecked")

@@ -21,7 +21,6 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
 import com.github.dm.jrt.retrofit.ErrorResponseException;
 
@@ -80,30 +79,26 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      *
      * @param delegateFactory the delegate factory.
      * @param configuration   the invocation configuration.
-     * @param invocationMode  the invocation mode.
      */
     protected ContextAdapterFactory(@Nullable final Factory delegateFactory,
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode) {
-        super(delegateFactory, configuration, invocationMode);
+            @NotNull final InvocationConfiguration configuration) {
+        super(delegateFactory, configuration);
         mDelegateFactory = delegateFactory;
     }
 
     /**
      * Gets the context invocation factory to handle the call execution.
      *
-     * @param configuration  the invocation configuration.
-     * @param invocationMode the invocation mode.
-     * @param responseType   the response type.
-     * @param annotations    the method annotations.
-     * @param retrofit       the Retrofit instance.
+     * @param configuration the invocation configuration.
+     * @param responseType  the response type.
+     * @param annotations   the method annotations.
+     * @param retrofit      the Retrofit instance.
      * @return the invocation factory.
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
     protected ContextInvocationFactory<Call<Object>, Object> getFactory(
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @NotNull final Type responseType,
+            @NotNull final InvocationConfiguration configuration, @NotNull final Type responseType,
             @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
         final CallAdapter.Factory delegateFactory = mDelegateFactory;
         if (delegateFactory == null) {

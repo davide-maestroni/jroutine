@@ -161,13 +161,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamBuilder<IN, OUT> invocationMode(
-            @NotNull final InvocationMode invocationMode) {
-        return (LoaderStreamBuilder<IN, OUT>) super.invocationMode(invocationMode);
-    }
-
-    @NotNull
-    @Override
     public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {

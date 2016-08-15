@@ -163,13 +163,6 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
     @NotNull
     @Override
-    public LoaderStreamBuilderCompat<IN, OUT> invocationMode(
-            @NotNull final InvocationMode invocationMode) {
-        return (LoaderStreamBuilderCompat<IN, OUT>) super.invocationMode(invocationMode);
-    }
-
-    @NotNull
-    @Override
     public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {

@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.function.BiConsumer;
@@ -109,13 +108,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     @Override
     <AFTER> LoaderStreamBuilderCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderStreamBuilderCompat<IN, OUT> invocationMode(@NotNull InvocationMode invocationMode);
 
     /**
      * {@inheritDoc}

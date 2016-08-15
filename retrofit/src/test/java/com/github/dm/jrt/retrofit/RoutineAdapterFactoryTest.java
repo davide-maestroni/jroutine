@@ -18,7 +18,6 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.operator.Operators;
 
@@ -59,42 +58,11 @@ public class RoutineAdapterFactoryTest {
         server.enqueue(new MockResponse().setBody(BODY));
         server.enqueue(new MockResponse().setBody(BODY));
         server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
         server.start();
         try {
             {
                 final RoutineAdapterFactory adapterFactory = //
                         RoutineAdapterFactory.builder()
-                                             .applyInvocationConfiguration()
-                                             .withOutputTimeout(seconds(3))
-                                             .configured()
-                                             .buildFactory();
-                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit =
-                        new Builder().baseUrl("http://localhost:" + server.getPort())
-                                     .addCallAdapterFactory(adapterFactory)
-                                     .addConverterFactory(converterFactory)
-                                     .build();
-                final GitHubService service = retrofit.create(GitHubService.class);
-                final List<Repo> repos = service.listRepos("octocat").next();
-                assertThat(repos).hasSize(3);
-                assertThat(repos.get(0).getId()).isEqualTo("1");
-                assertThat(repos.get(0).getName()).isEqualTo("Repo1");
-                assertThat(repos.get(0).isPrivate()).isFalse();
-                assertThat(repos.get(1).getId()).isEqualTo("2");
-                assertThat(repos.get(1).getName()).isEqualTo("Repo2");
-                assertThat(repos.get(1).isPrivate()).isFalse();
-                assertThat(repos.get(2).getId()).isEqualTo("3");
-                assertThat(repos.get(2).getName()).isEqualTo("Repo3");
-                assertThat(repos.get(2).isPrivate()).isTrue();
-            }
-
-            {
-                final RoutineAdapterFactory adapterFactory = //
-                        RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.PARALLEL)
                                              .applyInvocationConfiguration()
                                              .withOutputTimeout(seconds(3))
                                              .configured()
@@ -189,9 +157,6 @@ public class RoutineAdapterFactoryTest {
         server.enqueue(new MockResponse().setBody(BODY));
         server.enqueue(new MockResponse().setBody(BODY));
         server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
-        server.enqueue(new MockResponse().setBody(BODY));
         server.start();
         try {
             {
@@ -205,35 +170,7 @@ public class RoutineAdapterFactoryTest {
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
                                   .map(Operators.<Repo>unfold())
-                                  .bind(onOutput(new Consumer<Repo>() {
-
-                                      public void accept(final Repo repo) throws Exception {
-
-                                          final int id = Integer.parseInt(repo.getId());
-                                          assertThat(id).isBetween(1, 3);
-                                          assertThat(repo.getName()).isEqualTo("Repo" + id);
-                                          assertThat(repo.isPrivate()).isEqualTo(id == 3);
-                                      }
-                                  }))
-                                  .close()
-                                  .after(seconds(3))
-                                  .getError()).isNull();
-            }
-
-            {
-                final RoutineAdapterFactory adapterFactory = //
-                        RoutineAdapterFactory.builder()
-                                             .invocationMode(InvocationMode.PARALLEL)
-                                             .buildFactory();
-                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit =
-                        new Builder().baseUrl("http://localhost:" + server.getPort())
-                                     .addCallAdapterFactory(adapterFactory)
-                                     .addConverterFactory(converterFactory)
-                                     .build();
-                final GitHubService service = retrofit.create(GitHubService.class);
-                assertThat(service.streamRepos("octocat")
-                                  .map(Operators.<Repo>unfold())
+                                  .call()
                                   .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -262,6 +199,7 @@ public class RoutineAdapterFactoryTest {
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
                                   .map(Operators.<Repo>unfold())
+                                  .call()
                                   .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {
@@ -290,6 +228,7 @@ public class RoutineAdapterFactoryTest {
                 final GitHubService service = retrofit.create(GitHubService.class);
                 assertThat(service.streamRepos("octocat")
                                   .map(Operators.<Repo>unfold())
+                                  .call()
                                   .bind(onOutput(new Consumer<Repo>() {
 
                                       public void accept(final Repo repo) throws Exception {

@@ -376,12 +376,10 @@ public class RoutineMethodTest {
                 return (isUpper) ? str.toUpperCase() : str.toLowerCase();
             }
         };
-        assertThat(method.call(RoutineMethod.inputOf("test"), true)
-                         .after(seconds(1))
-                         .next()).isEqualTo("TEST");
-        assertThat(method.call(RoutineMethod.inputOf("TEST"), false)
-                         .after(seconds(1))
-                         .next()).isEqualTo("test");
+        InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
+        assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
+        inputChannel = RoutineMethod.inputChannel().pass("TEST");
+        assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
     }
 
     @Test

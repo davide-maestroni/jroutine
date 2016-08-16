@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -529,7 +530,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             localChannel.set((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
             try {
                 if (!mIsComplete) {
-                    invokeMethod();
+                    internalInvoke();
                 }
 
             } finally {
@@ -555,7 +556,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 localChannel.set((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
                 final List<OutputChannel<?>> outputChannels = getOutputChannels();
                 try {
-                    final Object methodResult = invokeMethod();
+                    final Object methodResult = internalInvoke();
                     if (mReturnResults) {
                         result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
                     }
@@ -580,7 +581,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             final ThreadLocal<InputChannel<?>> localChannel = mLocalChannel;
             localChannel.set(inputChannel);
             try {
-                final Object methodResult = invokeMethod();
+                final Object methodResult = internalInvoke();
                 if (mReturnResults) {
                     result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
                 }
@@ -621,6 +622,15 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 if (!outputChannels.isEmpty()) {
                     result.pass(Channels.merge(outputChannels).buildChannels());
                 }
+            }
+        }
+
+        private Object internalInvoke() throws Exception {
+            try {
+                return invokeMethod();
+
+            } catch (final InvocationTargetException e) {
+                throw InvocationException.wrapIfNeeded(e.getTargetException());
             }
         }
 

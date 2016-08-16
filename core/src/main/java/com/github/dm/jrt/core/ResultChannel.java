@@ -648,27 +648,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param throwable the exception.
      */
     void close(@Nullable final Throwable throwable) {
-        final ArrayList<Channel<?, ? extends OUT>> channels;
-        final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
+        final ArrayList<Channel<?, ? extends OUT>> channels =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        final RoutineException abortException;
         synchronized (mMutex) {
-            mLogger.dbg(throwable, "aborting result channel");
-            channels = new ArrayList<Channel<?, ? extends OUT>>(mBoundChannels);
-            mBoundChannels.clear();
-            mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
-            mPendingOutputCount = 0;
-            if (mAbortException == null) {
-                mAbortException = abortException;
+            abortException = mState.closeInvocation(throwable, channels);
+        }
+
+        if (abortException != null) {
+            for (final Channel<?, ? extends OUT> channel : channels) {
+                channel.abort(abortException);
             }
 
-            mState = new AbortChannelState();
-            mMutex.notifyAll();
+            runFlush(false);
         }
-
-        for (final Channel<?, ? extends OUT> channel : channels) {
-            channel.abort(abortException);
-        }
-
-        runFlush(false);
     }
 
     /**
@@ -1143,6 +1136,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         boolean isReadyToComplete() {
             return true;
+        }
+
+        @Nullable
+        @Override
+        RoutineException closeInvocation(final @Nullable Throwable throwable,
+                @NotNull final ArrayList<Channel<?, ? extends OUT>> channels) {
+            mLogger.dbg("avoid aborting result channel since already aborted");
+            return null;
         }
 
         @Override
@@ -1721,6 +1722,31 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 InvocationInterruptedException.throwIfInterrupt(t);
                 logger.err(t, "ignoring consumer exception (%s)", consumer);
             }
+        }
+
+        /**
+         * Called after invocation has been aborted.
+         *
+         * @param throwable the abortion error.
+         * @param channels  the channels to close.
+         * @return the abortion reason.
+         */
+        @Nullable
+        RoutineException closeInvocation(final @Nullable Throwable throwable,
+                @NotNull final ArrayList<Channel<?, ? extends OUT>> channels) {
+            mLogger.dbg(throwable, "aborting result channel");
+            channels.addAll(mBoundChannels);
+            mBoundChannels.clear();
+            mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+            mPendingOutputCount = 0;
+            final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
+            if (mAbortException == null) {
+                mAbortException = abortException;
+            }
+
+            mState = new AbortChannelState();
+            mMutex.notifyAll();
+            return abortException;
         }
 
         /**

@@ -244,7 +244,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         inputInts.pass(1, 2, 3);
  *         outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
  *
- *             &commat;Override
+ *             &#64;Override
  *             public void onOutput(final String out) {
  *                 System.out.println(out);
  *             }
@@ -737,7 +737,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     /**
-     * Implementation of routine method wrapping an object method.
+     * Implementation of a routine method wrapping an object method.
      */
     public static class ObjectRoutineMethod extends RoutineMethod
             implements ObjectConfigurable<ObjectRoutineMethod> {

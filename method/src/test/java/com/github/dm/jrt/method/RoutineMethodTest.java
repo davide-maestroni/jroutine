@@ -65,11 +65,9 @@ public class RoutineMethodTest {
             }
         };
         InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
-        assertThat(method.call(inputChannel, true).after(seconds(1000000)).next()).isEqualTo(
-                "TEST");
+        assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
         inputChannel = RoutineMethod.inputChannel().pass("TEST");
-        assertThat(method.call(inputChannel, false).after(seconds(10000000)).next()).isEqualTo(
-                "test");
+        assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
     }
 
     @Test
@@ -143,7 +141,7 @@ public class RoutineMethodTest {
         }.call(inputChannel1, inputChannel2, outputChannel);
         inputChannel1.pass(1, 2, 3, 4);
         inputChannel2.abort();
-        assertThat(outputChannel.after(seconds(100000)).getError()).isExactlyInstanceOf(
+        assertThat(outputChannel.after(seconds(1)).getError()).isExactlyInstanceOf(
                 AbortException.class);
     }
 
@@ -484,11 +482,9 @@ public class RoutineMethodTest {
             }
         };
         InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
-        assertThat(method.call(inputChannel, true).after(seconds(1000000)).next()).isEqualTo(
-                "TEST");
+        assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
         inputChannel = RoutineMethod.inputChannel().pass("TEST");
-        assertThat(method.call(inputChannel, false).after(seconds(10000000)).next()).isEqualTo(
-                "test");
+        assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
     }
 
     @Test
@@ -559,7 +555,7 @@ public class RoutineMethodTest {
 
     private static class SumRoutine extends RoutineMethod {
 
-        public int mSum;
+        private int mSum;
 
         public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
             if (input.hasNext()) {
@@ -573,7 +569,7 @@ public class RoutineMethodTest {
 
     private class SumRoutineInner extends RoutineMethod {
 
-        public int mSum;
+        private int mSum;
 
         private SumRoutineInner(final int i) {
             super(RoutineMethodTest.this, i);

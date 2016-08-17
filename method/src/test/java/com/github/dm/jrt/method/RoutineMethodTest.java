@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.object.InvocationTarget.classOfType;
+import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -236,17 +238,17 @@ public class RoutineMethodTest {
 
     @Test
     public void testFromClass2() throws NoSuchMethodException {
-        assertThat(RoutineMethod.from(RoutineMethodTest.class, "length", String.class)
+        assertThat(RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                                 .call("test")
                                 .after(seconds(1))
                                 .next()).isEqualTo(4);
-        assertThat(RoutineMethod.from(RoutineMethodTest.class, "length", String.class)
+        assertThat(RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                                 .call(RoutineMethod.inputOf("test"))
                                 .after(seconds(1))
                                 .next()).isEqualTo(4);
         final InputChannel<String> inputChannel = RoutineMethod.inputChannel();
         final OutputChannel<Object> outputChannel =
-                RoutineMethod.from(RoutineMethodTest.class, "length", String.class)
+                RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                              .call(inputChannel);
         inputChannel.pass("test").close();
         assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(4);
@@ -262,7 +264,8 @@ public class RoutineMethodTest {
         }
 
         try {
-            RoutineMethod.from("test", RoutineMethodTest.class.getMethod("length", String.class));
+            RoutineMethod.from(instance("test"),
+                    RoutineMethodTest.class.getMethod("length", String.class));
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -272,11 +275,11 @@ public class RoutineMethodTest {
     @Test
     public void testFromInstance() throws NoSuchMethodException {
         final String test = "test";
-        assertThat(RoutineMethod.from(test, String.class.getMethod("toString"))
+        assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
                                 .call()
                                 .after(seconds(1))
                                 .next()).isEqualTo("test");
-        assertThat(RoutineMethod.from(test, String.class.getMethod("toString"))
+        assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
                                 .applyInvocationConfiguration()
                                 .withRunner(Runners.syncRunner())
                                 .configured()
@@ -290,9 +293,11 @@ public class RoutineMethodTest {
     @Test
     public void testFromInstance2() throws NoSuchMethodException {
         final String test = "test";
-        assertThat(RoutineMethod.from(test, "toString").call().after(seconds(1)).next()).isEqualTo(
-                "test");
-        assertThat(RoutineMethod.from(test, "toString")
+        assertThat(RoutineMethod.from(instance(test), "toString")
+                                .call()
+                                .after(seconds(1))
+                                .next()).isEqualTo("test");
+        assertThat(RoutineMethod.from(instance(test), "toString")
                                 .applyInvocationConfiguration()
                                 .withRunner(Runners.syncRunner())
                                 .configured()
@@ -551,6 +556,22 @@ public class RoutineMethodTest {
         inputStrings.pass("test1", "test2");
         inputInts.pass(1, 2, 3);
         assertThat(outputChannel.after(seconds(1)).next(2)).containsExactly("test1", "test2");
+    }
+
+    @Test
+    public void testWrap() {
+        final SumRoutineInner routine = new SumRoutineInner(0);
+        final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
+        final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+        new RoutineMethod() {
+
+            void run(final SumRoutineInner routine, final InputChannel<Integer> input,
+                    final OutputChannel<Integer> output) {
+                routine.sum(input, output);
+            }
+        }.call(routine, inputChannel, outputChannel);
+        inputChannel.pass(1, 2, 3, 4, 5).close();
+        assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(15);
     }
 
     private static class SumRoutine extends RoutineMethod {

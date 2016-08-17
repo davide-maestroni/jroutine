@@ -421,21 +421,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     /**
-     * Builds an object routine method by wrapping one static method of the specified class.
-     *
-     * @param type           the class type.
-     * @param name           the method name.
-     * @param parameterTypes the method parameter types.
-     * @return the routine method instance.
-     * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
-     */
-    @NotNull
-    public static ObjectRoutineMethod from(@NotNull final Class<?> type, @NotNull final String name,
-            @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-        return from(type.getMethod(name, parameterTypes));
-    }
-
-    /**
      * Builds an object routine method by wrapping the specified static method.
      *
      * @param method the method.
@@ -447,41 +432,42 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             throw new IllegalArgumentException("the method is not static: " + method);
         }
 
-        return new ObjectRoutineMethod(InvocationTarget.classOfType(method.getDeclaringClass()),
-                method);
+        return from(InvocationTarget.classOfType(method.getDeclaringClass()), method);
     }
 
     /**
-     * Builds an object routine method by wrapping one method of the specified object.
+     * Builds an object routine method by wrapping a method of the specified target.
      *
-     * @param target the target object.
+     * @param target the invocation target.
      * @param method the method.
      * @return the routine method instance.
      */
     @NotNull
-    public static ObjectRoutineMethod from(@NotNull final Object target,
+    public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
             @NotNull final Method method) {
-        if (!method.getDeclaringClass().isInstance(target)) {
+        if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
             throw new IllegalArgumentException(
-                    "the method is not applicable to the specified object: " + method);
+                    "the method is not applicable to the specified target class: "
+                            + target.getTargetClass());
         }
 
-        return new ObjectRoutineMethod(InvocationTarget.instance(target), method);
+        return new ObjectRoutineMethod(target, method);
     }
 
     /**
-     * Builds an object routine method by wrapping one method of the specified object.
+     * Builds an object routine method by wrapping a method of the specified target.
      *
-     * @param target         the target object.
+     * @param target         the invocation target.
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
      * @return the routine method instance.
      * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
      */
     @NotNull
-    public static ObjectRoutineMethod from(@NotNull final Object target, @NotNull final String name,
-            @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-        return from(target, target.getClass().getMethod(name, parameterTypes));
+    public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
+            @NotNull final String name, @Nullable final Class<?>... parameterTypes) throws
+            NoSuchMethodException {
+        return from(target, target.getTargetClass().getMethod(name, parameterTypes));
     }
 
     /**

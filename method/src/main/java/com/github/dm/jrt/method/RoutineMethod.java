@@ -56,6 +56,147 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
 /**
+ * This class provides an easy way to implement a routine which can be combined in complex ways
+ * with other ones.
+ * <p>
+ * <h2>How to implement a routine</h2>
+ * A routine is implemented by extending the class and defining a method taking input and output
+ * channels as parameters. The number of input and output channels can be arbitrarily chosen,
+ * moreover, any other type of parameters can be passed in any order.
+ * <br>
+ * The method will be called each time a new input is passed to one of the input channels.
+ * Additionally, the method is called once when the invocation is aborted and when it completes.
+ * <br>
+ * In the former case every input channel will behave as an aborted one (see {@link Channel}),
+ * while, in the latter, no data will be available. So, it is always advisable to verify that an
+ * input is ready before reading it.
+ * <p>
+ * For example, a routine computing the square of integers can be implemented as follows:
+ * <pre>
+ *     <code>
+ *
+ *         final InputChannel&lt;Integer&gt; inputChannel = RoutineMethod.inputChannel();
+ *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
+ *         new RoutineMethod() {
+ *
+ *             public void square(final InputChannel&lt;Integer&gt; input,
+ *                     final OutputChannel&lt;Integer&gt; output) {
+ *                 if (input.hasNext()) {
+ *                     final int i = input.next();
+ *                     output.pass(i * i);
+ *                 }
+ *             }
+ *         }.call(inputChannel, outputChannel);
+ *         inputChannel.pass(1, 2, 3);
+ *         outputChannel.after(seconds(1)).all(); // expected values: 1, 4, 9
+ *     </code>
+ * </pre>
+ * The {@code call()} method returns an output channel producing the outputs returned by the method.
+ * In the above case no output is returned (in fact, the return type is {@code void}), still the
+ * channel will be notified of the invocation abortion and completion.
+ * <p>
+ * Several methods can be defined, though, be aware that the number and type of parameters are
+ * employed to identify the method to call. Any clashing will raise an exception.
+ * <h2>Channels vs static parameters</h2>
+ * When parameters other than {@code InputChannel}s and {@code OutputChannel}s are passed to the
+ * method, the very same value are passed each time a new input is available.
+ * <p>
+ * For example, a routine transforming the case of a string can be implemented as follows:
+ * <pre>
+ *     <code>
+ *
+ *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
+ *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod() {
+ *
+ *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *                 final String str = input.next();
+ *                 return (isUpper) ? str.toUpperCase() : str.toLowerCase();
+ *             }
+ *         }.call(inputChannel, true);
+ *         inputChannel.pass("Hello", "World", "!");
+ *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "WORLD", "!"
+ *     </code>
+ * </pre>
+ * Note that no check is done before reading the next available input, in such case the invocation
+ * is expected to never complete, that is, the input channel will have to never be closed in order
+ * to avoid exceptions.
+ * <br>
+ * Note also that outputs will be collected through the channel returned by the {@code call()}
+ * method.
+ * <p>
+ * <h2>Parallel invocation</h2>
+ * In order to enable parallel invocation of the routine it is necessary to provide the proper
+ * parameters to the routine method non-default constructor. In fact, parallel invocations will
+ * employ several instance of the implementing class.
+ * <br>
+ * Note that, for anonymous and inner classes, synthetic constructors will be created by the
+ * compiler, hence the enclosing class along with any variable captured inside the method must be
+ * explicitly pass to the constructor.
+ * <br>
+ * Like, for example:
+ * <pre>
+ *     <code>
+ *
+ *         final Locale locale = Locale.getDefault();
+ *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
+ *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod(this, locale) {
+ *
+ *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *                 final String str = input.next();
+ *                 return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
+ *             }
+ *         }.callParallel(inputChannel, true);
+ *         inputChannel.pass("Hello", "World", "!");
+ *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "WORLD", "!"
+ *     </code>
+ * </pre>
+ * Or, for an inner class:
+ * <pre>
+ *     <code>
+ *
+ *         class MyMethod extends RoutineMethod {
+ *
+ *             private final Locale mLocale;
+ *
+ *             MyMethod(final Locale locale) {
+ *                 super(OuterClass.this, locale);
+ *                 mLocale = locale;
+ *             }
+ *
+ *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *                 final String str = input.next();
+ *                 return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * The same holds true for static class, with the only difference that only the declared parameters
+ * have to be passed:
+ * <pre>
+ *     <code>
+ *
+ *         static class MyMethod extends RoutineMethod {
+ *
+ *             private final Locale mLocale;
+ *
+ *             MyMethod(final Locale locale) {
+ *                 super(locale);
+ *                 mLocale = locale;
+ *             }
+ *
+ *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *                 final String str = input.next();
+ *                 return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * <p>
+ * <h2>Multiple inputs</h2>
+ * <p>
+ * <h2>Output concatenation</h2>
+ * <p>
+ * <h2>Wrapping existing method</h2>
  * TODO
  * <p>
  * Created by davide-maestroni on 08/10/2016.
@@ -86,11 +227,23 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     public RoutineMethod(@Nullable final Object... args) {
         final Class<? extends RoutineMethod> type = getClass();
-        if (type.isAnonymousClass() && !Reflection.hasStaticScope(type)) {
+        final boolean hasStaticScope = Reflection.hasStaticScope(type);
+        if (type.isAnonymousClass()) {
             final Object[] safeArgs = Reflection.asArgs(args);
-            final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
-            System.arraycopy(safeArgs, 0, syntheticArgs, 0, safeArgs.length);
-            syntheticArgs[safeArgs.length] = Reflection.NO_ARGS;
+            if (safeArgs.length > 0) {
+                final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
+                System.arraycopy(safeArgs, 0, syntheticArgs, 1, safeArgs.length);
+                if (hasStaticScope) {
+                    syntheticArgs[0] = Reflection.NO_ARGS;
+
+                } else {
+                    syntheticArgs[0] = safeArgs[0];
+                    syntheticArgs[1] = Reflection.NO_ARGS;
+                }
+
+            } else {
+                mArgs = safeArgs;
+            }
 
         } else {
             mArgs = Reflection.cloneArgs(args);
@@ -269,6 +422,32 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     @NotNull
     public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, OUT> channel) {
         return new OutputChannel<OUT>(channel);
+    }
+
+    @NotNull
+    private static Object[] replaceChannels(@NotNull final Object[] params,
+            @NotNull final ArrayList<InputChannel<?>> inputChannels,
+            @NotNull final ArrayList<OutputChannel<?>> outputChannels) {
+        final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
+        for (final Object param : params) {
+            if (param instanceof InputChannel) {
+                final InputChannel<Object> inputChannel =
+                        inputFrom(JRoutineCore.io().buildChannel());
+                inputChannels.add(inputChannel);
+                parameters.add(inputChannel);
+
+            } else if (param instanceof OutputChannel) {
+                final OutputChannel<Object> outputChannel =
+                        outputFrom(JRoutineCore.io().buildChannel());
+                outputChannels.add(outputChannel);
+                parameters.add(outputChannel);
+
+            } else {
+                parameters.add(param);
+            }
+        }
+
+        return parameters.toArray();
     }
 
     @NotNull
@@ -692,28 +871,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         public void onRestart() throws Exception {
             super.onRestart();
             mInstance = mConstructor.newInstance(mConstructorArgs);
-            final ArrayList<Object> parameters = new ArrayList<Object>();
             final ArrayList<InputChannel<?>> inputChannels = mInputChannels;
             final ArrayList<OutputChannel<?>> outputChannels = mOutputChannels;
-            for (final Object param : mOrigParams) {
-                if (param instanceof InputChannel) {
-                    final InputChannel<Object> inputChannel =
-                            inputFrom(JRoutineCore.io().buildChannel());
-                    inputChannels.add(inputChannel);
-                    parameters.add(inputChannel);
-
-                } else if (param instanceof OutputChannel) {
-                    final OutputChannel<Object> outputChannel =
-                            outputFrom(JRoutineCore.io().buildChannel());
-                    outputChannels.add(outputChannel);
-                    parameters.add(outputChannel);
-
-                } else {
-                    parameters.add(param);
-                }
-            }
-
-            mParams = parameters.toArray();
+            mParams = replaceChannels(mOrigParams, inputChannels, outputChannels);
         }
 
         @Override
@@ -849,30 +1009,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 @NotNull final Object... params) {
             super(asArgs(RoutineMethod.this.getClass(), method, cloneArgs(params)));
             mMethod = method;
-            final ArrayList<Object> parameters = new ArrayList<Object>();
-            final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-            final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
-            for (final Object param : params) {
-                if (param instanceof InputChannel) {
-                    final InputChannel<Object> inputChannel =
-                            inputFrom(JRoutineCore.io().buildChannel());
-                    inputChannels.add(inputChannel);
-                    parameters.add(inputChannel);
-
-                } else if (param instanceof OutputChannel) {
-                    final OutputChannel<Object> outputChannel =
-                            outputFrom(JRoutineCore.io().buildChannel());
-                    outputChannels.add(outputChannel);
-                    parameters.add(outputChannel);
-
-                } else {
-                    parameters.add(param);
-                }
-            }
-
-            mParams = parameters.toArray();
-            mInputChannels = inputChannels;
-            mOutputChannels = outputChannels;
+            final ArrayList<InputChannel<?>> inputChannels =
+                    (mInputChannels = new ArrayList<InputChannel<?>>());
+            final ArrayList<OutputChannel<?>> outputChannels =
+                    (mOutputChannels = new ArrayList<OutputChannel<?>>());
+            mParams = replaceChannels(params, inputChannels, outputChannels);
         }
 
         @NotNull

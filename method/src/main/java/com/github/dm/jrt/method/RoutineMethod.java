@@ -702,6 +702,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     /**
      * Returns the input channel which is ready to produce data. If the method takes no input
      * channel as parameter, null will be returned.
+     * <p>
+     * Note this method will return null if called outside the routine method invocation or from
+     * a different thread.
      *
      * @param <IN> the input data type.
      * @return the input channel producing data or null.
@@ -956,6 +959,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          * @return the method result.
          * @throws java.lang.Exception if an error occurred during the invocation.
          */
+        @Nullable
         protected abstract Object invokeMethod() throws Exception;
 
         private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
@@ -968,6 +972,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             }
         }
 
+        @Nullable
         private Object internalInvoke() throws Exception {
             try {
                 return invokeMethod();

@@ -62,6 +62,38 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
 /**
+ * This class provides an easy way to implement a routine running in a dedicated Android service,
+ * which can be combined in complex ways with other ones.
+ * <h2>How to implement a routine</h2>
+ * The class behaves like a {@link RoutineMethod} with a few differences. In order to run in a
+ * service, the implementing class must be static. Moreover, each constructor must have the service
+ * context as first argument and all the other arguments must be among the ones supported by the
+ * {@link android.os.Parcel#writeValue(Object)} method.
+ * <br>
+ * In case a remote service is employed (that is, a service running in a different process), the
+ * same restriction applies to the method parameters (other than input and output channels) and
+ * to the input and output data.
+ * <h2>How to access the Android context</h2>
+ * It is possible to get access to the Android context (that is the service instance) from inside
+ * the routine by calling the {@code getContext()} method. Like, for instance:
+ * <pre>
+ *     <code>
+ *
+ *         public static class MyMethod extends ServiceRoutineMethod {
+ *
+ *             public MyMethod(final ServiceContext context) {
+ *                 super(context);
+ *             }
+ *
+ *             void run(final InputChannel&lt;String&gt; input,
+ *                     final OutputChannel&lt;String&gt; output) {
+ *                 final MyService service = getContext();
+ *                 // do it
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * <p>
  * Created by davide-maestroni on 08/18/2016.
  */
 public class ServiceRoutineMethod extends RoutineMethod
@@ -239,6 +271,9 @@ public class ServiceRoutineMethod extends RoutineMethod
     /**
      * Returns the input channel which is ready to produce data. If the method takes no input
      * channel as parameter, null will be returned.
+     * <p>
+     * Note this method will return null if called outside the routine method invocation or from
+     * a different thread.
      *
      * @param <IN> the input data type.
      * @return the input channel producing data or null.
@@ -263,6 +298,9 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     /**
      * Returns the Android context (that is, the service instance).
+     * <p>
+     * Note this method will return null if called outside the routine method invocation or from
+     * a different thread.
      *
      * @return the context.
      */
@@ -447,8 +485,14 @@ public class ServiceRoutineMethod extends RoutineMethod
         }
     }
 
+    /**
+     * Input channel placeholder class used to make the method parameters parcelable.
+     */
     private static class InputChannelPlaceHolder {}
 
+    /**
+     * Output channel placeholder class used to make the method parameters parcelable.
+     */
     private static class OutputChannelPlaceHolder {}
 
     /**
@@ -624,6 +668,7 @@ public class ServiceRoutineMethod extends RoutineMethod
             }
         }
 
+        @Nullable
         private Object invokeMethod() throws Exception {
             final ServiceRoutineMethod routine = mInstance;
             routine.setLocalContext(mContext);

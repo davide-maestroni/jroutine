@@ -388,18 +388,17 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     public RoutineMethod(@Nullable final Object... args) {
         final Class<? extends RoutineMethod> type = getClass();
-        final boolean hasStaticScope = Reflection.hasStaticScope(type);
         if (type.isAnonymousClass()) {
-            final Object[] safeArgs = Reflection.asArgs(args);
+            final Object[] safeArgs = asArgs(args);
             if (safeArgs.length > 0) {
                 final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
                 System.arraycopy(safeArgs, 0, syntheticArgs, 1, safeArgs.length);
-                if (hasStaticScope) {
-                    syntheticArgs[0] = Reflection.NO_ARGS;
+                if (Reflection.hasStaticScope(type)) {
+                    syntheticArgs[0] = safeArgs;
 
                 } else {
                     syntheticArgs[0] = safeArgs[0];
-                    syntheticArgs[1] = Reflection.NO_ARGS;
+                    syntheticArgs[1] = safeArgs;
                 }
 
             } else {
@@ -407,7 +406,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             }
 
         } else {
-            mArgs = Reflection.cloneArgs(args);
+            mArgs = cloneArgs(args);
         }
 
         Constructor<? extends RoutineMethod> constructor = null;
@@ -425,6 +424,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      *
      * @param method the method.
      * @return the routine method instance.
+     * @throws java.lang.IllegalArgumentException if the specified method is not static.
      */
     @NotNull
     public static ObjectRoutineMethod from(@NotNull final Method method) {
@@ -441,6 +441,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @param target the invocation target.
      * @param method the method.
      * @return the routine method instance.
+     * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
+     *                                            target instance.
      */
     @NotNull
     public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
@@ -571,8 +573,17 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         return new OutputChannel<OUT>(channel);
     }
 
+    /**
+     * Replaces all the input and output channels in the specified parameters with newly created
+     * instances.
+     *
+     * @param params         the original method parameters.
+     * @param inputChannels  the list to fill with the newly created input channels.
+     * @param outputChannels the list to fill with the newly created output channels.
+     * @return the replaced parameters.
+     */
     @NotNull
-    private static Object[] replaceChannels(@NotNull final Object[] params,
+    protected static Object[] replaceChannels(@NotNull final Object[] params,
             @NotNull final ArrayList<InputChannel<?>> inputChannels,
             @NotNull final ArrayList<OutputChannel<?>> outputChannels) {
         final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
@@ -757,13 +768,19 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         private ObjectRoutineMethod(@NotNull final InvocationTarget<?> target,
                 @NotNull final Method method) {
             mTarget = target;
-            mMethod = ConstantConditions.notNull("target method", method);
+            mMethod = method;
         }
 
         @NotNull
         public ObjectRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
             mConfiguration = ConstantConditions.notNull("object configuration", configuration);
             return this;
+        }
+
+        @NotNull
+        @Override
+        public ObjectRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+            return (ObjectRoutineMethod) super.apply(configuration);
         }
 
         @NotNull
@@ -794,7 +811,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @NotNull
         @SuppressWarnings("unchecked")
         private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
-                @Nullable final Object... params) {
+                @Nullable final Object[] params) {
             final Object[] safeParams = asArgs(params);
             final Method method = mMethod;
             if (method.getParameterTypes().length != safeParams.length) {
@@ -973,9 +990,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     private class MultiInvocation extends AbstractInvocation {
 
-        private final Constructor<?> mConstructor;
+        private final Object[] mArgs;
 
-        private final Object[] mConstructorArgs;
+        private final Constructor<?> mConstructor;
 
         private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
 
@@ -1000,10 +1017,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          */
         public MultiInvocation(@NotNull final Constructor<?> constructor,
                 @NotNull final Object[] args, @NotNull final Method method,
-                @NotNull final Object... params) {
+                @NotNull final Object[] params) {
             super(method);
             mConstructor = constructor;
-            mConstructorArgs = args;
+            mArgs = args;
             mMethod = method;
             mOrigParams = params;
         }
@@ -1017,10 +1034,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @Override
         public void onRestart() throws Exception {
             super.onRestart();
-            mInstance = mConstructor.newInstance(mConstructorArgs);
-            final ArrayList<InputChannel<?>> inputChannels = mInputChannels;
-            final ArrayList<OutputChannel<?>> outputChannels = mOutputChannels;
-            mParams = replaceChannels(mOrigParams, inputChannels, outputChannels);
+            mInstance = mConstructor.newInstance(mArgs);
+            mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
         }
 
         @Override
@@ -1063,7 +1078,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          */
         private MultiInvocationFactory(
                 @NotNull final Constructor<? extends RoutineMethod> constructor,
-                @NotNull final Method method, @NotNull final Object... params) {
+                @NotNull final Method method, @NotNull final Object[] params) {
             super(asArgs(RoutineMethod.this.getClass(), mArgs, method, cloneArgs(params)));
             mConstructor = constructor;
             mMethod = method;
@@ -1072,8 +1087,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
         @NotNull
         @Override
-        public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() throws
-                IllegalAccessException, InvocationTargetException, InstantiationException {
+        public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
             return new MultiInvocation(mConstructor, mArgs, mMethod, mParams);
         }
     }
@@ -1105,7 +1119,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
                 @NotNull final ArrayList<OutputChannel<?>> outputChannels,
                 @NotNull final Object instance, @NotNull final Method method,
-                @NotNull final Object... params) {
+                @NotNull final Object[] params) {
             super(method);
             mInputChannels = inputChannels;
             mOutputChannels = outputChannels;
@@ -1153,7 +1167,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          * @param params the method parameters.
          */
         private SingleInvocationFactory(@NotNull final Method method,
-                @NotNull final Object... params) {
+                @NotNull final Object[] params) {
             super(asArgs(RoutineMethod.this.getClass(), method, cloneArgs(params)));
             mMethod = method;
             final ArrayList<InputChannel<?>> inputChannels =

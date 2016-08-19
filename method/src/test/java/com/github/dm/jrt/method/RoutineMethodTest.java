@@ -78,7 +78,7 @@ public class RoutineMethodTest {
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new RoutineMethod() {
 
-            public int mSum;
+            private int mSum;
 
             void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
                 if (input.hasNext()) {
@@ -101,7 +101,7 @@ public class RoutineMethodTest {
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new RoutineMethod() {
 
-            public int mSum;
+            private int mSum;
 
             void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
                     final OutputChannel<Integer> output) {
@@ -127,7 +127,7 @@ public class RoutineMethodTest {
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new RoutineMethod() {
 
-            public int mSum;
+            private int mSum;
 
             void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
                     final OutputChannel<Integer> output) {
@@ -173,7 +173,7 @@ public class RoutineMethodTest {
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new RoutineMethod() {
 
-            public int mSum;
+            private int mSum;
 
             public void sum(final InputChannel<Integer> input,
                     final OutputChannel<Integer> output) {
@@ -328,7 +328,7 @@ public class RoutineMethodTest {
     public void testLocal() {
         class SumRoutine extends RoutineMethod {
 
-            public int mSum;
+            private int mSum;
 
             private SumRoutine(final int i) {
                 super(RoutineMethodTest.this, i);
@@ -360,7 +360,7 @@ public class RoutineMethodTest {
         final int[] i = new int[1];
         class SumRoutine extends RoutineMethod {
 
-            public int mSum;
+            private int mSum;
 
             private SumRoutine() {
                 super(RoutineMethodTest.this, i);
@@ -529,7 +529,6 @@ public class RoutineMethodTest {
                     final OutputChannel<String> output) {
                 output.pass(switchInput().next().toString());
             }
-
         }.call(inputInts, inputStrings, outputChannel);
         inputStrings.pass("test1", "test2");
         inputInts.pass(1, 2, 3);
@@ -551,7 +550,6 @@ public class RoutineMethodTest {
                     output.pass(inputStrings.next());
                 }
             }
-
         }.call(inputInts, inputStrings, outputChannel);
         inputStrings.pass("test1", "test2");
         inputInts.pass(1, 2, 3);

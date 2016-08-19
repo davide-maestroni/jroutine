@@ -18,6 +18,7 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Supplier;
 
@@ -54,13 +55,18 @@ public class AccumulateConsumerInvocationTest {
     public void testFactory() {
 
         final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-        assertThat(JRoutineCore.with(consumerFactory(consumer)).syncCall(new ArrayList<String>() {{
-            add("test1");
-        }}, new ArrayList<String>() {{
-            add("test2");
-        }}, new ArrayList<String>() {{
-            add("test3");
-        }}).next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
+        assertThat(JRoutineCore.with(consumerFactory(consumer))
+                               .applyInvocationConfiguration()
+                               .withRunner(Runners.syncRunner())
+                               .configured()
+                               .call(new ArrayList<String>() {{
+                                   add("test1");
+                               }}, new ArrayList<String>() {{
+                                   add("test2");
+                               }}, new ArrayList<String>() {{
+                                   add("test3");
+                               }})
+                               .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
         assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
 
             public List<String> get() {
@@ -69,13 +75,19 @@ public class AccumulateConsumerInvocationTest {
                     add("test0");
                 }};
             }
-        }, consumer)).syncCall(new ArrayList<String>() {{
-            add("test1");
-        }}, new ArrayList<String>() {{
-            add("test2");
-        }}, new ArrayList<String>() {{
-            add("test3");
-        }}).next()).isEqualTo(Arrays.asList("test0", "test1", "test2", "test3"));
+        }, consumer))
+                               .applyInvocationConfiguration()
+                               .withRunner(Runners.syncRunner())
+                               .configured()
+                               .call(new ArrayList<String>() {{
+                                   add("test1");
+                               }}, new ArrayList<String>() {{
+                                   add("test2");
+                               }}, new ArrayList<String>() {{
+                                   add("test3");
+                               }})
+                               .next()).isEqualTo(
+                Arrays.asList("test0", "test1", "test2", "test3"));
     }
 
     @Test

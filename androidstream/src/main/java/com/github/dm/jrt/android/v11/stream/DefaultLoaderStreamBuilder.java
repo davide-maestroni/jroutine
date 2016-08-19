@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.function.BiConsumer;
@@ -156,13 +157,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
                     mappingFunction) {
         checkStatic(decorate(mappingFunction), mappingFunction);
         return (LoaderStreamBuilder<IN, AFTER>) super.flatMap(mappingFunction);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilder<IN, OUT> invocationMode(
-            @NotNull final InvocationMode invocationMode) {
-        return (LoaderStreamBuilder<IN, OUT>) super.invocationMode(invocationMode);
     }
 
     @NotNull
@@ -325,8 +319,11 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
         }
 
         final ContextInvocationFactory<? super BEFORE, ? extends AFTER> invocationFactory =
-                factoryFrom(JRoutineCore.with(factory).buildRoutine(), factory.hashCode(),
-                        InvocationMode.SYNC);
+                factoryFrom(JRoutineCore.with(factory)
+                                        .applyInvocationConfiguration()
+                                        .withRunner(Runners.syncRunner())
+                                        .configured()
+                                        .buildRoutine(), factory.hashCode(), InvocationMode.ASYNC);
         return JRoutineLoader.on(loaderContext)
                              .with(invocationFactory)
                              .apply(loaderStreamConfiguration.asInvocationConfiguration())
@@ -397,8 +394,11 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public ContextInvocationFactory<IN, OUT> buildContextFactory() {
         final InvocationFactory<IN, OUT> factory = buildFactory();
-        return factoryFrom(JRoutineCore.with(factory).buildRoutine(), factory.hashCode(),
-                InvocationMode.SYNC);
+        return factoryFrom(JRoutineCore.with(factory)
+                                       .applyInvocationConfiguration()
+                                       .withRunner(Runners.syncRunner())
+                                       .configured()
+                                       .buildRoutine(), factory.hashCode(), InvocationMode.ASYNC);
     }
 
     @NotNull

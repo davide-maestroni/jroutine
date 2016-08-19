@@ -72,7 +72,7 @@
                                                  .straight()
                                                  .map(Operators.averageFloat())
                                                  .map(Math::sqrt)
-                                                 .asyncCall(args)
+                                                 .call(args)
                                                  .after(seconds(1))
                                                  .next();
                 System.out.println(rms);

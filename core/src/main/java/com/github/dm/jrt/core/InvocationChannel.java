@@ -248,8 +248,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> eventuallyBreak() {
-        mResultChanel.eventuallyBreak();
+    public Channel<IN, OUT> eventuallyContinue() {
+        mResultChanel.eventuallyContinue();
         return this;
     }
 
@@ -264,13 +264,13 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         return mResultChanel.expiringIterator();
     }
 
+    public boolean getComplete() {
+        return mResultChanel.getComplete();
+    }
+
     @Nullable
     public RoutineException getError() {
         return mResultChanel.getError();
-    }
-
-    public boolean hasCompleted() {
-        return mResultChanel.hasCompleted();
     }
 
     public boolean hasNext() {

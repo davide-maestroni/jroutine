@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -324,6 +325,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.with(target)
+                                     .applyInvocationConfiguration()
+                                     .withRunner(Runners.syncRunner())
+                                     .configured()
                                      .applyObjectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .configured()
@@ -352,7 +356,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.syncCall();
+            mChannel = mRoutine.call();
         }
     }
 
@@ -421,7 +425,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.syncCall();
+            mChannel = mRoutine.call();
         }
 
         @Override
@@ -429,6 +433,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.with(target)
+                                     .applyInvocationConfiguration()
+                                     .withRunner(Runners.syncRunner())
+                                     .configured()
                                      .applyObjectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .configured()

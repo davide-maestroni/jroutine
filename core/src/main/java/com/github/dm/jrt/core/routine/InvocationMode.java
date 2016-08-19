@@ -30,19 +30,6 @@ import org.jetbrains.annotations.NotNull;
 public enum InvocationMode {
 
     /**
-     * Synchronous mode.
-     *
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    SYNC(new Invoker() {
-
-        @NotNull
-        public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.syncCall();
-        }
-    }),
-
-    /**
      * Asynchronous mode.
      *
      * @see com.github.dm.jrt.core.routine.Routine Routine
@@ -51,7 +38,7 @@ public enum InvocationMode {
 
         @NotNull
         public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.asyncCall();
+            return routine.call();
         }
     }),
 
@@ -64,20 +51,7 @@ public enum InvocationMode {
 
         @NotNull
         public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.parallelCall();
-        }
-    }),
-
-    /**
-     * Sequential mode.
-     *
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    SEQUENTIAL(new Invoker() {
-
-        @NotNull
-        public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.sequentialCall();
+            return routine.callParallel();
         }
     });
 

@@ -291,8 +291,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> eventuallyBreak() {
-        mTimeoutActionType.set(TimeoutActionType.BREAK);
+    public Channel<OUT, OUT> eventuallyContinue() {
+        mTimeoutActionType.set(TimeoutActionType.CONTINUE);
         mTimeoutException.set(null);
         return this;
     }
@@ -313,6 +313,44 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         final UnitDuration outputTimeout = getTimeout();
         return new ExpiringIterator(outputTimeout.value, outputTimeout.unit,
                 mTimeoutActionType.get(), mTimeoutException.get());
+    }
+
+    public boolean getComplete() {
+        synchronized (mMutex) {
+            if (mState.isDone()) {
+                return true;
+            }
+
+            final UnitDuration outputTimeout = getTimeout();
+            final long timeout = outputTimeout.value;
+            if (timeout > 0) {
+                checkCanWait();
+            }
+
+            final TimeUnit timeoutUnit = outputTimeout.unit;
+            final boolean isDone;
+            try {
+                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
+
+                    public boolean isTrue() {
+                        return mState.isDone() || mIsWaitingInvocation;
+                    }
+                });
+
+            } catch (final InterruptedException e) {
+                throw new InvocationInterruptedException(e);
+            }
+
+            if (!mState.isDone() && mIsWaitingInvocation) {
+                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+            }
+
+            if (!isDone) {
+                mLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
+            }
+
+            return isDone;
+        }
     }
 
     @Nullable
@@ -351,44 +389,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
 
             return mAbortException;
-        }
-    }
-
-    public boolean hasCompleted() {
-        synchronized (mMutex) {
-            if (mState.isDone()) {
-                return true;
-            }
-
-            final UnitDuration outputTimeout = getTimeout();
-            final long timeout = outputTimeout.value;
-            if (timeout > 0) {
-                checkCanWait();
-            }
-
-            final TimeUnit timeoutUnit = outputTimeout.unit;
-            final boolean isDone;
-            try {
-                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
-
-                    public boolean isTrue() {
-                        return mState.isDone() || mIsWaitingInvocation;
-                    }
-                });
-
-            } catch (final InterruptedException e) {
-                throw new InvocationInterruptedException(e);
-            }
-
-            if (!mState.isDone() && mIsWaitingInvocation) {
-                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-            }
-
-            if (!isDone) {
-                mLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
-            }
-
-            return isDone;
         }
     }
 
@@ -648,27 +648,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param throwable the exception.
      */
     void close(@Nullable final Throwable throwable) {
-        final ArrayList<Channel<?, ? extends OUT>> channels;
-        final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
+        final ArrayList<Channel<?, ? extends OUT>> channels =
+                new ArrayList<Channel<?, ? extends OUT>>();
+        final RoutineException abortException;
         synchronized (mMutex) {
-            mLogger.dbg(throwable, "aborting result channel");
-            channels = new ArrayList<Channel<?, ? extends OUT>>(mBoundChannels);
-            mBoundChannels.clear();
-            mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
-            mPendingOutputCount = 0;
-            if (mAbortException == null) {
-                mAbortException = abortException;
+            abortException = mState.closeInvocation(throwable, channels);
+        }
+
+        if (abortException != null) {
+            for (final Channel<?, ? extends OUT> channel : channels) {
+                channel.abort(abortException);
             }
 
-            mState = new AbortChannelState();
-            mMutex.notifyAll();
+            runFlush(false);
         }
-
-        for (final Channel<?, ? extends OUT> channel : channels) {
-            channel.abort(abortException);
-        }
-
-        runFlush(false);
     }
 
     /**
@@ -1143,6 +1136,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         boolean isReadyToComplete() {
             return true;
+        }
+
+        @Nullable
+        @Override
+        RoutineException closeInvocation(final @Nullable Throwable throwable,
+                @NotNull final ArrayList<Channel<?, ? extends OUT>> channels) {
+            mLogger.dbg("avoid aborting result channel since already aborted");
+            return null;
         }
 
         @Override
@@ -1721,6 +1722,31 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 InvocationInterruptedException.throwIfInterrupt(t);
                 logger.err(t, "ignoring consumer exception (%s)", consumer);
             }
+        }
+
+        /**
+         * Called after invocation has been aborted.
+         *
+         * @param throwable the abortion error.
+         * @param channels  the channels to close.
+         * @return the abortion reason.
+         */
+        @Nullable
+        RoutineException closeInvocation(final @Nullable Throwable throwable,
+                @NotNull final ArrayList<Channel<?, ? extends OUT>> channels) {
+            mLogger.dbg(throwable, "aborting result channel");
+            channels.addAll(mBoundChannels);
+            mBoundChannels.clear();
+            mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+            mPendingOutputCount = 0;
+            final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
+            if (mAbortException == null) {
+                mAbortException = abortException;
+            }
+
+            mState = new AbortChannelState();
+            mMutex.notifyAll();
+            return abortException;
         }
 
         /**

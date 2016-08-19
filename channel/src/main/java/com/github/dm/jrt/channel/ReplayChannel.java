@@ -187,8 +187,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> eventuallyBreak() {
-        mOutputChannel.eventuallyBreak();
+    public Channel<OUT, OUT> eventuallyContinue() {
+        mOutputChannel.eventuallyContinue();
         return this;
     }
 
@@ -203,13 +203,13 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
         return mOutputChannel.expiringIterator();
     }
 
+    public boolean getComplete() {
+        return mOutputChannel.getComplete();
+    }
+
     @Nullable
     public RoutineException getError() {
         return mOutputChannel.getError();
-    }
-
-    public boolean hasCompleted() {
-        return mOutputChannel.hasCompleted();
     }
 
     public boolean hasNext() {

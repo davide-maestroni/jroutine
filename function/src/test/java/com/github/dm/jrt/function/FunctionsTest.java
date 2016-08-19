@@ -618,14 +618,14 @@ public class FunctionsTest {
     public void testCommand() {
 
         final Routine<Void, String> routine = JRoutineCore.with(createCommand()).buildRoutine();
-        assertThat(routine.asyncCall().close().after(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.call().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testCommand2() {
 
         final Routine<Void, String> routine = JRoutineCore.with(createCommand2()).buildRoutine();
-        assertThat(routine.asyncCall().close().after(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.call().close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -849,7 +849,7 @@ public class FunctionsTest {
     public void testFactory() {
 
         final Routine<Object, String> routine = JRoutineCore.with(createFactory()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -1042,14 +1042,14 @@ public class FunctionsTest {
     public void testFunctionFactory() {
 
         final Routine<Object, String> routine = JRoutineCore.with(createFunction()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
     public void testFunctionFactory2() {
 
         final Routine<Object, String> routine = JRoutineCore.with(createFunction2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).after(seconds(1)).all()).containsOnly("test1");
+        assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test1");
     }
 
     @Test
@@ -1159,14 +1159,14 @@ public class FunctionsTest {
     public void testMapping() {
 
         final Routine<Object, String> routine = JRoutineCore.with(createMapping()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
     public void testMapping2() {
 
         final Routine<Object, String> routine = JRoutineCore.with(createMapping2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -1203,7 +1203,7 @@ public class FunctionsTest {
     public void testMapping3() {
 
         final Routine<String, String> routine = JRoutineCore.with(createMapping3()).buildRoutine();
-        assertThat(routine.asyncCall("test", "").after(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.call("test", "").after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test

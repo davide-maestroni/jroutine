@@ -80,8 +80,8 @@
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
-                final Double rms = meanRoutine.asyncCall(
-                        squareRoutine.parallelCall(parseRoutine.parallelCall(args)).all()).next();
+                final Double rms = meanRoutine.call(
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
                 System.out.println(rms);
                 System.exit(0);
             }

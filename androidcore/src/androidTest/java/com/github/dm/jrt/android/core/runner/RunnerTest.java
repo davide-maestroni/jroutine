@@ -189,10 +189,10 @@ public class RunnerTest extends AndroidTestCase {
                                                         .withRunner(AndroidRunners.handlerRunner(
                                                                 new HandlerThread("test")))
                                                         .configured()
-                                                        .asyncCall()
+                                                        .call()
                                                         .close();
         assertThat(JRoutineCore.with(new HandlerInvocationFactory())
-                               .asyncCall(channel)
+                               .call(channel)
                                .after(seconds(30))
                                .next()).isEqualTo(true);
     }
@@ -213,10 +213,10 @@ public class RunnerTest extends AndroidTestCase {
                                                        .withRunner(AndroidRunners.handlerRunner(
                                                                new HandlerThread("test")))
                                                        .configured()
-                                                       .asyncCall()
+                                                       .call()
                                                        .close();
         assertThat(JRoutineCore.with(new LooperInvocationFactory())
-                               .asyncCall(channel)
+                               .call(channel)
                                .after(seconds(30))
                                .next()).isEqualTo(true);
     }

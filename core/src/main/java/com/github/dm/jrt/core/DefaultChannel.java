@@ -142,8 +142,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<DATA, DATA> eventuallyBreak() {
-        mChannel.eventuallyBreak();
+    public Channel<DATA, DATA> eventuallyContinue() {
+        mChannel.eventuallyContinue();
         return this;
     }
 
@@ -158,13 +158,13 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
         return mChannel.expiringIterator();
     }
 
+    public boolean getComplete() {
+        return mChannel.getComplete();
+    }
+
     @Nullable
     public RoutineException getError() {
         return mChannel.getError();
-    }
-
-    public boolean hasCompleted() {
-        return mChannel.hasCompleted();
     }
 
     public boolean hasNext() {

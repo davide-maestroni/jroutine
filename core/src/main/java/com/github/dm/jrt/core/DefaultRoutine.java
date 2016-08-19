@@ -50,8 +50,7 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
-            Exception {
+    protected Invocation<IN, OUT> newInvocation() throws Exception {
         final Logger logger = getLogger();
         final InvocationFactory<IN, OUT> factory = mFactory;
         logger.dbg("creating a new invocation instance with factory: %s", factory);

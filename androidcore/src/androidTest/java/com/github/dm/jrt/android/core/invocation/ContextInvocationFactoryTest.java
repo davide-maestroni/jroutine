@@ -24,7 +24,9 @@ import com.github.dm.jrt.android.core.ChannelContextInvocation;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -49,12 +51,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     public void testClass() {
-
+        final InvocationConfiguration configuration =
+                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
-                               .syncCall("TEST")
+                               .apply(configuration)
+                               .call("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
-                               .syncCall("test")
+                               .apply(configuration)
+                               .call("test")
                                .all()).containsExactly("TEST");
     }
 
@@ -83,7 +88,10 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         final InvocationFactory<String, String> factory =
                 fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
-                               .syncCall("TEST")
+                               .applyInvocationConfiguration()
+                               .withRunner(Runners.syncRunner())
+                               .configured()
+                               .call("TEST")
                                .all()).containsExactly("test");
     }
 
@@ -100,25 +108,32 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     public void testTemplateInvocation() {
+        final InvocationConfiguration configuration =
+                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
-                               .syncCall()
+                               .apply(configuration)
+                               .call()
                                .close()
                                .getError()).isNull();
         assertThat(
                 JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
-                            .syncCall()
+                            .apply(configuration)
+                            .call()
                             .close()
                             .getError()).isNull();
     }
 
     public void testToken() {
-
+        final InvocationConfiguration configuration =
+                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
-                               .syncCall("TEST")
+                               .apply(configuration)
+                               .call("TEST")
                                .all()).containsExactly("test");
         assertThat(
                 JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                            .syncCall("test")
+                            .apply(configuration)
+                            .call("test")
                             .all()).containsExactly("TEST");
     }
 
@@ -143,12 +158,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     public void testWrapper() {
-
+        final InvocationConfiguration configuration =
+                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
-                               .syncCall("TEST")
+                               .apply(configuration)
+                               .call("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
-                               .syncCall("test")
+                               .apply(configuration)
+                               .call("test")
                                .all()).containsExactly("TEST");
     }
 

@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -140,11 +141,12 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
         JRoutineCore.with(fromFactory(getContext(), factory))
                     .applyInvocationConfiguration()
+                    .withRunner(Runners.syncRunner())
                     .withOutputOrder(mOrderType)
                     .withLog(logger.getLog())
                     .withLogLevel(logger.getLogLevel())
                     .configured()
-                    .syncCall(mInputs)
+                    .call(mInputs)
                     .bind(consumer);
         return consumer.createResult();
     }

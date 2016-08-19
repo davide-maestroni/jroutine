@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -271,7 +272,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder {
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.with(target).apply(mObjectConfiguration).method(mAliasName);
+            mRoutine = JRoutineObject.with(target)
+                                     .applyInvocationConfiguration()
+                                     .withRunner(Runners.syncRunner())
+                                     .configured()
+                                     .apply(mObjectConfiguration)
+                                     .method(mAliasName);
         }
 
         @Override
@@ -285,7 +291,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder {
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.syncCall();
+            mChannel = mRoutine.call();
         }
 
         @Override
@@ -388,7 +394,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder {
 
         @Override
         public void onRestart() {
-            mChannel = mRoutine.syncCall();
+            mChannel = mRoutine.call();
         }
 
         @Override
@@ -410,7 +416,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder {
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            mRoutine = JRoutineObject.with(target).apply(mObjectConfiguration).method(mMethod);
+            mRoutine = JRoutineObject.with(target)
+                                     .applyInvocationConfiguration()
+                                     .withRunner(Runners.syncRunner())
+                                     .configured()
+                                     .apply(mObjectConfiguration)
+                                     .method(mMethod);
         }
     }
 

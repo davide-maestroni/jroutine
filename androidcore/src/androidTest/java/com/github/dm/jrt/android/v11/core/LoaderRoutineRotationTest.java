@@ -70,11 +70,11 @@ public class LoaderRoutineRotationTest
                                                                       UnitDuration.minutes(1))
                                                               .configured()
                                                               .buildRoutine();
-        routine.asyncCall("test1");
+        routine.call("test1");
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.asyncCall("test2").after(timeout).next()).isEqualTo("TEST1");
+        assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST1");
     }
 
     public void testActivityRotationChannel() throws InterruptedException {
@@ -93,7 +93,7 @@ public class LoaderRoutineRotationTest
                       .applyLoaderConfiguration()
                       .withLoaderId(0)
                       .configured()
-                      .asyncCall("test1", "test2");
+                      .call("test1", "test2");
 
         simulateRotation();
 
@@ -114,16 +114,16 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                .with(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
-        routine1.asyncCall("test1");
-        routine1.asyncCall("test2");
+        routine1.call("test1");
+        routine1.call("test2");
 
         simulateRotation();
 
         final Routine<String, String> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                .with(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
-        final Channel<?, String> result1 = routine2.asyncCall("test1").after(timeout);
-        final Channel<?, String> result2 = routine2.asyncCall("test2").after(timeout);
+        final Channel<?, String> result1 = routine2.call("test1").after(timeout);
+        final Channel<?, String> result2 = routine2.call("test2").after(timeout);
 
         assertThat(result1.next()).isEqualTo("TEST1");
         assertThat(result2.next()).isEqualTo("TEST2");
@@ -141,16 +141,16 @@ public class LoaderRoutineRotationTest
         final Routine<Data, Data> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                            .with(factoryOf(Delay.class))
                                                            .buildRoutine();
-        routine1.asyncCall(data1);
-        routine1.asyncCall(data1);
+        routine1.call(data1);
+        routine1.call(data1);
 
         simulateRotation();
 
         final Routine<Data, Data> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                            .with(factoryOf(Delay.class))
                                                            .buildRoutine();
-        final Channel<?, Data> result1 = routine2.asyncCall(data1).after(timeout);
-        final Channel<?, Data> result2 = routine2.asyncCall(data1).after(timeout);
+        final Channel<?, Data> result1 = routine2.call(data1).after(timeout);
+        final Channel<?, Data> result2 = routine2.call(data1).after(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
         assertThat(result2.next()).isSameAs(data1);
@@ -173,11 +173,11 @@ public class LoaderRoutineRotationTest
                                                               .withResultStaleTime(zero())
                                                               .configured()
                                                               .buildRoutine();
-        routine.asyncCall("test1");
+        routine.call("test1");
 
         simulateRotation();
         UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.asyncCall("test2").after(timeout).next()).isEqualTo("TEST2");
+        assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST2");
     }
 
     private void simulateRotation() throws InterruptedException {

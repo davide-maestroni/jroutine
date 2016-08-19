@@ -33,7 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.stream.modifier.Modifiers.output;
+import static com.github.dm.jrt.operator.Operators.prepend;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,7 +68,7 @@ public class ProviderAdapterFactoryTest {
             assertThat(factory2.isCalled()).isFalse();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
-            service.streamRepos("octocat").syncCall().close();
+            service.streamRepos("octocat").call().close();
             assertThat(factory1.isCalled()).isFalse();
             assertThat(factory2.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
@@ -235,10 +235,10 @@ public class ProviderAdapterFactoryTest {
 
                     final StreamBuilder<?, ?> builder = //
                             JRoutineStream.withStream()
-                                          .sync()
-                                          .let(output((Object) Collections.emptyList()));
+                                          .straight()
+                                          .map(prepend((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
-                        return builder.syncCall().close();
+                        return builder.call().close();
                     }
 
                     return builder;

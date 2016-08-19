@@ -301,9 +301,16 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                             }
 
                             if (mIsInitialized) {
-                                invocation.onAbort(exception);
-                                invocation.onRecycle(true);
                                 mIsTerminated = true;
+                                try {
+                                    invocation.onAbort(exception);
+                                    invocation.onRecycle(true);
+
+                                } catch (final Throwable t) {
+                                    manager.discard(invocation);
+                                    throw t;
+                                }
+
                                 manager.recycle(invocation);
 
                             } else {

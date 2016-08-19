@@ -74,7 +74,7 @@ public class InvocationFactoryTest {
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncCall().after(millis(100)).pass("test").abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").abort()).isTrue();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class InvocationFactoryTest {
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-        assertThat(routine.asyncCall("test").after(seconds(1)).all()).containsExactly("test");
+        assertThat(routine.call("test").after(seconds(1)).all()).containsExactly("test");
     }
 
     private static class TestInvocationDecorator extends InvocationDecorator<String, String> {

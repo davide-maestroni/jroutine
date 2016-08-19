@@ -57,7 +57,7 @@ import org.jetbrains.annotations.NotNull;
  *                     JRoutineService.on(serviceFrom(this))
  *                                    .with(factoryOf(LoadResourceUri.class))
  *                                    .buildRoutine();
- *             routine.asyncCall(RESOURCE_URI)
+ *             routine.call(RESOURCE_URI)
  *                    .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                        &#64;Override

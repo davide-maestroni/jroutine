@@ -16,17 +16,14 @@
 
 package com.github.dm.jrt.android.v11.core;
 
-import android.content.Context;
-
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.ConverterRoutine;
+import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +45,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
+class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         implements LoaderRoutine<IN, OUT> {
 
     private final LoaderConfiguration mConfiguration;
@@ -96,24 +93,9 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
-            Exception {
-        final Logger logger = getLogger();
-        if (type == InvocationType.ASYNC) {
-            return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
-                    logger);
-        }
-
-        final Context loaderContext = mContext.getLoaderContext();
-        if (loaderContext == null) {
-            throw new IllegalStateException("the routine context has been destroyed");
-        }
-
-        final ContextInvocationFactory<IN, OUT> factory = mFactory;
-        logger.dbg("creating a new invocation instance");
-        final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
-        invocation.onContext(loaderContext.getApplicationContext());
-        return invocation;
+    protected Invocation<IN, OUT> newInvocation() {
+        return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
+                getLogger());
     }
 
     @Override

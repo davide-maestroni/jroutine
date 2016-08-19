@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.core.runner;
 
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +35,6 @@ import java.util.concurrent.TimeUnit;
  * Created by davide-maestroni on 05/13/2016.
  */
 class StraightRunner extends SyncRunner {
-
-    /**
-     * Constructor.
-     */
-    StraightRunner() {
-    }
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,

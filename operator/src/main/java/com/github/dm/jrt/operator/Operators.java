@@ -1631,6 +1631,8 @@ public class Operators {
         return new ThenSupplierInvocation<IN, OUT>(count, decorate(outputSupplier));
     }
 
+    // TODO: 17/08/16 toArray()
+
     /**
      * Returns a factory of invocations collecting inputs into a list.
      *

@@ -147,7 +147,7 @@ public class InvocationConfigurationTest {
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputTimeoutAction(TimeoutActionType.ABORT).configured());
         assertThat(configuration).isNotEqualTo(
-                builder().withOutputTimeoutAction(TimeoutActionType.BREAK).configured());
+                builder().withOutputTimeoutAction(TimeoutActionType.CONTINUE).configured());
         assertThat(configuration.builderFrom()
                                 .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                 .configured()).isNotEqualTo(

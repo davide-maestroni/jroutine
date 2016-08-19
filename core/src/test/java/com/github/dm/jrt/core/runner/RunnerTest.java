@@ -246,6 +246,23 @@ public class RunnerTest {
     }
 
     @Test
+    public void testStraightRunner() throws InterruptedException {
+
+        final TestExecution testExecution = new TestExecution();
+        final Runner runner = Runners.straightRunner();
+        runner.run(testExecution, 0, TimeUnit.MILLISECONDS);
+        assertThat(testExecution.isRun()).isTrue();
+        testExecution.reset();
+        final long start = System.currentTimeMillis();
+        runner.run(testExecution, 1, TimeUnit.SECONDS);
+        assertThat(testExecution.isRun()).isTrue();
+        assertThat(System.currentTimeMillis()).isGreaterThanOrEqualTo(start + 1000);
+        testRunner(new StraightRunner());
+        testRunner(Runners.straightRunner());
+        testRunner(new RunnerDecorator(new StraightRunner()));
+    }
+
+    @Test
     public void testThrottlingRunner() throws InterruptedException {
 
         testRunner(new ThrottlingRunner(Runners.sharedRunner(), 5));

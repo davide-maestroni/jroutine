@@ -36,6 +36,7 @@ conditionalDependencies {
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'method', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'operator', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
@@ -63,6 +64,7 @@ javadoc {
     options.links("${prefix}/channel/",
             "${prefix}/core/",
             "${prefix}/function/",
+            "${prefix}/method/",
             "${prefix}/object/",
             "${prefix}/operator/",
             "${prefix}/proxy/",

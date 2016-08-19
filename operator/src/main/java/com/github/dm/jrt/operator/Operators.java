@@ -1631,7 +1631,31 @@ public class Operators {
         return new ThenSupplierInvocation<IN, OUT>(count, decorate(outputSupplier));
     }
 
-    // TODO: 17/08/16 toArray()
+    /**
+     * Returns a factory of invocations collecting inputs into an array.
+     *
+     * @param componentType the array component type.
+     * @param <IN>          the input data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<? super IN, IN[]> toArray(
+            @NotNull final Class<? extends IN> componentType) {
+        return new ToArrayInvocationFactory<IN>(componentType);
+    }
+
+    /**
+     * Returns a factory of invocations collecting inputs into an array.
+     *
+     * @param componentType the array component type.
+     * @param <IN>          the input data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<? super IN, IN[]> toArray(
+            @NotNull final ClassToken<? extends IN> componentType) {
+        return toArray(componentType.getRawClass());
+    }
 
     /**
      * Returns a factory of invocations collecting inputs into a list.

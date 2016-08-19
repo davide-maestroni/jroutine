@@ -2056,6 +2056,38 @@ public class OperatorsTest {
     }
 
     @Test
+    public void testToArray() {
+        assertThat(JRoutineCore.with(Operators.toArray(String.class))
+                               .call("test", "test")
+                               .after(seconds(3))
+                               .next()).containsExactly("test", "test");
+        assertThat(JRoutineCore.with(Operators.toArray(String.class))
+                               .call("test1", "test2")
+                               .after(seconds(3))
+                               .next()).containsExactly("test1", "test2");
+        assertThat(JRoutineCore.with(Operators.toArray(Number.class))
+                               .call(1, 2)
+                               .after(seconds(3))
+                               .next()).containsExactly(1, 2);
+    }
+
+    @Test
+    public void testToArray2() {
+        assertThat(JRoutineCore.with(Operators.toArray(tokenOf(String.class)))
+                               .call("test", "test")
+                               .after(seconds(3))
+                               .next()).containsExactly("test", "test");
+        assertThat(JRoutineCore.with(Operators.toArray(tokenOf(String.class)))
+                               .call("test1", "test2")
+                               .after(seconds(3))
+                               .next()).containsExactly("test1", "test2");
+        assertThat(JRoutineCore.with(Operators.toArray(tokenOf(Number.class)))
+                               .call(1, 2)
+                               .after(seconds(3))
+                               .next()).containsExactly(1, 2);
+    }
+
+    @Test
     public void testToList() {
         assertThat(
                 JRoutineCore.with(Operators.toList()).call("test", "test").after(seconds(3)).next())

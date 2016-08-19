@@ -73,6 +73,7 @@ dependencies {
 conditionalDependencies {
     compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidmethod', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
@@ -92,6 +93,7 @@ tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links("${prefix}/androidchannel/",
             "${prefix}/androidcore/",
+            "${prefix}/androidmethod/",
             "${prefix}/androidobject/",
             "${prefix}/androidproxy/",
             "${prefix}/androidstream/",

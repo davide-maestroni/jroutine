@@ -87,7 +87,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  *             void run(final InputChannel&lt;String&gt; input,
  *                     final OutputChannel&lt;String&gt; output) {
- *                 final MyService service = getContext();
+ *                 final MyService service = (MyService) getContext();
  *                 // do it
  *             }
  *         }
@@ -241,6 +241,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      * @return the output channel instance.
      */
     @NotNull
+    @Override
     public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
         final Object[] safeParams = asArgs(params);
         findBestMatchingMethod(getClass(), safeParams);
@@ -262,6 +263,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
+    @Override
     public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
         final Object[] safeParams = asArgs(params);
         findBestMatchingMethod(getClass(), safeParams);
@@ -278,6 +280,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      * @param <IN> the input data type.
      * @return the input channel producing data or null.
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected <IN> InputChannel<IN> switchInput() {
         return (InputChannel<IN>) mLocalChannel.get();
@@ -346,7 +349,9 @@ public class ServiceRoutineMethod extends RoutineMethod
                                            .with(factoryOf(ServiceInvocation.class, getClass(),
                                                    mArgs, params))
                                            .apply(getConfiguration())
-                                           .apply(mConfiguration)).pass(inputChannel).close();
+                                           .apply(getServiceConfiguration()))
+                    .pass(inputChannel)
+                    .close();
         final Map<Integer, Channel<?, Object>> channelMap =
                 AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel)
                                .buildChannels();

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> {
+class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
 
     private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -66,10 +66,9 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
 
     @NotNull
     @Override
-    protected Channel<?, List<? extends OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
+    protected Channel<?, List<OUT>> build(@NotNull final ChannelConfiguration configuration) {
         final ArrayList<Channel<?, ? extends OUT>> channels = mChannels;
-        final Channel<List<? extends OUT>, List<? extends OUT>> outputChannel =
+        final Channel<List<OUT>, List<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();
         final Object mutex = new Object();
         final int size = channels.size();
@@ -101,7 +100,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
 
         private final Backoff mBackoff;
 
-        private final Channel<List<? extends OUT>, List<? extends OUT>> mChannel;
+        private final Channel<List<OUT>, List<OUT>> mChannel;
 
         private final boolean[] mClosed;
 
@@ -134,7 +133,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
                 @NotNull final Object mutex, final int index, final boolean isFlush,
                 @NotNull final boolean[] closed, @NotNull final SimpleQueue<OUT>[] queues,
                 @Nullable final OUT placeholder,
-                @NotNull final Channel<List<? extends OUT>, List<? extends OUT>> channel) {
+                @NotNull final Channel<List<OUT>, List<OUT>> channel) {
             mBackoff = backoff;
             mMaxSize = maxSize;
             mMutex = mutex;
@@ -218,7 +217,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<? extends OUT>>> 
         }
 
         private void flush() {
-            final Channel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
+            final Channel<List<OUT>, List<OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
             final OUT placeholder = mPlaceholder;

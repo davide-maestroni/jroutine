@@ -484,7 +484,7 @@ public class Channels {
      *                                            null object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return join(false, null, channels);
     }
@@ -515,7 +515,7 @@ public class Channels {
      *                                            object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             @NotNull final Channel<?, ?>... channels) {
         return join(false, null, channels);
     }
@@ -550,7 +550,7 @@ public class Channels {
      *                                            null object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             @Nullable final OUT placeholder,
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return join(true, placeholder, channels);
@@ -586,7 +586,7 @@ public class Channels {
      *                                            object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
         return join(true, placeholder, channels);
     }
@@ -1117,7 +1117,7 @@ public class Channels {
     }
 
     @NotNull
-    private static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    private static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             final boolean isFlush, @Nullable final OUT placeholder,
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return new JoinBuilder<OUT>(isFlush, placeholder, channels);
@@ -1125,7 +1125,7 @@ public class Channels {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static <OUT> ChannelsBuilder<? extends Channel<?, List<? extends OUT>>> join(
+    private static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
             final boolean isFlush, @Nullable final OUT placeholder,
             @NotNull final Channel<?, ?>... channels) {
         final int length = channels.length;

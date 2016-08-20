@@ -27,7 +27,6 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -638,11 +637,12 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     @NotNull
     public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
         final Object[] safeParams = asArgs(params);
-        final Method method = findBestMatchingMethod(getClass(), safeParams);
+        final Class<? extends RoutineMethod> type = getClass();
+        final Method method = findBestMatchingMethod(type, safeParams);
         final InvocationFactory<Selectable<Object>, Selectable<Object>> factory;
         final Constructor<? extends RoutineMethod> constructor = mConstructor;
         if (constructor != null) {
-            factory = new MultiInvocationFactory(constructor, method, safeParams);
+            factory = new MultiInvocationFactory(type, constructor, mArgs, method, safeParams);
 
         } else {
             if (!mIsFirstCall.getAndSet(false)) {
@@ -651,7 +651,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                                 + "constructor arguments");
             }
 
-            factory = new SingleInvocationFactory(method, safeParams);
+            factory = new SingleInvocationFactory(this, method, safeParams);
         }
 
         return call(factory, InvocationMode.ASYNC, safeParams);
@@ -684,8 +684,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         }
 
         final Object[] safeParams = asArgs(params);
-        final Method method = findBestMatchingMethod(getClass(), safeParams);
-        return call(new MultiInvocationFactory(constructor, method, safeParams),
+        final Class<? extends RoutineMethod> type = getClass();
+        final Method method = findBestMatchingMethod(type, safeParams);
+        return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
                 InvocationMode.PARALLEL, safeParams);
     }
 
@@ -748,6 +749,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         }
 
         return resultChannel;
+    }
+
+    private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+        mLocalChannel.set(inputChannel);
     }
 
     /**
@@ -844,8 +849,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     /**
      * Base invocation implementation.
      */
-    private abstract class AbstractInvocation
-            extends TemplateInvocation<Selectable<Object>, Selectable<Object>> {
+    private static abstract class AbstractInvocation
+            implements Invocation<Selectable<Object>, Selectable<Object>> {
 
         private final boolean mReturnResults;
 
@@ -864,7 +869,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             mReturnResults = (boxingClass(method.getReturnType()) != Void.class);
         }
 
-        @Override
         public void onAbort(@NotNull final RoutineException reason) throws Exception {
             mIsAborted = true;
             final List<InputChannel<?>> inputChannels = getInputChannels();
@@ -872,22 +876,18 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 inputChannel.abort(reason);
             }
 
-            final ThreadLocal<InputChannel<?>> localChannel = mLocalChannel;
-            localChannel.set((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
             try {
                 if (!mIsComplete) {
-                    internalInvoke();
+                    internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
                 }
 
             } finally {
-                localChannel.set(null);
                 for (final OutputChannel<?> outputChannel : getOutputChannels()) {
                     outputChannel.abort(reason);
                 }
             }
         }
 
-        @Override
         public void onComplete(@NotNull final Channel<Selectable<Object>, ?> result) throws
                 Exception {
             bind(result);
@@ -898,17 +898,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                     inputChannel.close();
                 }
 
-                final ThreadLocal<InputChannel<?>> localChannel = mLocalChannel;
-                localChannel.set((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
                 final List<OutputChannel<?>> outputChannels = getOutputChannels();
-                try {
-                    final Object methodResult = internalInvoke();
-                    if (mReturnResults) {
-                        result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
-                    }
-
-                } finally {
-                    localChannel.set(null);
+                final Object methodResult =
+                        internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+                if (mReturnResults) {
+                    result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
                 }
 
                 for (final OutputChannel<?> outputChannel : outputChannels) {
@@ -917,23 +911,15 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             }
         }
 
-        @Override
         public void onInput(final Selectable<Object> input,
                 @NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
             bind(result);
             @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
                     (InputChannel<Object>) getInputChannels().get(input.index);
             inputChannel.pass(input.data);
-            final ThreadLocal<InputChannel<?>> localChannel = mLocalChannel;
-            localChannel.set(inputChannel);
-            try {
-                final Object methodResult = internalInvoke();
-                if (mReturnResults) {
-                    result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
-                }
-
-            } finally {
-                localChannel.set(null);
+            final Object methodResult = internalInvoke(inputChannel);
+            if (mReturnResults) {
+                result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
             }
         }
 
@@ -956,11 +942,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         /**
          * Invokes the method.
          *
+         * @param inputChannel the ready input channel.
          * @return the method result.
          * @throws java.lang.Exception if an error occurred during the invocation.
          */
         @Nullable
-        protected abstract Object invokeMethod() throws Exception;
+        protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws
+                Exception;
 
         private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
             if (!mIsBound) {
@@ -973,16 +961,16 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         }
 
         @Nullable
-        private Object internalInvoke() throws Exception {
+        private Object internalInvoke(@Nullable final InputChannel<?> inputChannel) throws
+                Exception {
             try {
-                return invokeMethod();
+                return invokeMethod(inputChannel);
 
             } catch (final InvocationTargetException e) {
                 throw InvocationException.wrapIfNeeded(e.getTargetException());
             }
         }
 
-        @Override
         public void onRestart() throws Exception {
             mIsBound = false;
             mIsAborted = false;
@@ -993,11 +981,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     /**
      * Invocation implementation supporting multiple invocation of the routine method.
      */
-    private class MultiInvocation extends AbstractInvocation {
+    private static class MultiInvocation extends AbstractInvocation {
 
         private final Object[] mArgs;
 
-        private final Constructor<?> mConstructor;
+        private final Constructor<? extends RoutineMethod> mConstructor;
 
         private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
 
@@ -1008,7 +996,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         private final ArrayList<OutputChannel<?>> mOutputChannels =
                 new ArrayList<OutputChannel<?>>();
 
-        private Object mInstance;
+        private RoutineMethod mInstance;
 
         private Object[] mParams;
 
@@ -1020,7 +1008,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          * @param method      the method instance.
          * @param params      the method parameters.
          */
-        public MultiInvocation(@NotNull final Constructor<?> constructor,
+        public MultiInvocation(@NotNull final Constructor<? extends RoutineMethod> constructor,
                 @NotNull final Object[] args, @NotNull final Method method,
                 @NotNull final Object[] params) {
             super(method);
@@ -1043,9 +1031,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
         }
 
-        @Override
         public void onRecycle(final boolean isReused) throws Exception {
-            super.onRecycle(isReused);
             mInputChannels.clear();
             mOutputChannels.clear();
         }
@@ -1057,16 +1043,26 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         }
 
         @Override
-        protected Object invokeMethod() throws InvocationTargetException, IllegalAccessException {
-            return mMethod.invoke(mInstance, mParams);
+        protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+                InvocationTargetException, IllegalAccessException {
+            final RoutineMethod routine = mInstance;
+            routine.setLocalInput(inputChannel);
+            try {
+                return mMethod.invoke(routine, mParams);
+
+            } finally {
+                routine.setLocalInput(null);
+            }
         }
     }
 
     /**
      * Invocation factory supporting multiple invocation of the routine method.
      */
-    private class MultiInvocationFactory
+    private static class MultiInvocationFactory
             extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
+
+        private final Object[] mArgs;
 
         private final Constructor<? extends RoutineMethod> mConstructor;
 
@@ -1077,15 +1073,19 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         /**
          * Constructor.
          *
+         * @param type        the routine method type.
          * @param constructor the routine method constructor.
+         * @param args        the constructor arguments.
          * @param method      the method instance.
          * @param params      the method parameters.
          */
-        private MultiInvocationFactory(
+        private MultiInvocationFactory(@NotNull final Class<? extends RoutineMethod> type,
                 @NotNull final Constructor<? extends RoutineMethod> constructor,
-                @NotNull final Method method, @NotNull final Object[] params) {
-            super(asArgs(RoutineMethod.this.getClass(), mArgs, method, cloneArgs(params)));
+                @NotNull final Object[] args, @NotNull final Method method,
+                @NotNull final Object[] params) {
+            super(asArgs(type, args, method, cloneArgs(params)));
             mConstructor = constructor;
+            mArgs = args;
             mMethod = method;
             mParams = cloneArgs(params);
         }
@@ -1100,11 +1100,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     /**
      * Invocation implementation supporting single invocation of the routine method.
      */
-    private class SingleInvocation extends AbstractInvocation {
+    private static class SingleInvocation extends AbstractInvocation {
 
         private final ArrayList<InputChannel<?>> mInputChannels;
 
-        private final Object mInstance;
+        private final RoutineMethod mInstance;
 
         private final Method mMethod;
 
@@ -1123,7 +1123,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
          */
         private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
                 @NotNull final ArrayList<OutputChannel<?>> outputChannels,
-                @NotNull final Object instance, @NotNull final Method method,
+                @NotNull final RoutineMethod instance, @NotNull final Method method,
                 @NotNull final Object[] params) {
             super(method);
             mInputChannels = inputChannels;
@@ -1131,6 +1131,22 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             mInstance = instance;
             mMethod = method;
             mParams = params;
+        }
+
+        @Override
+        protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+                InvocationTargetException, IllegalAccessException {
+            final RoutineMethod routine = mInstance;
+            routine.setLocalInput(inputChannel);
+            try {
+                return mMethod.invoke(routine, mParams);
+
+            } finally {
+                routine.setLocalInput(null);
+            }
+        }
+
+        public void onRecycle(final boolean isReused) {
         }
 
         @NotNull
@@ -1145,16 +1161,12 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             return mOutputChannels;
         }
 
-        @Override
-        protected Object invokeMethod() throws InvocationTargetException, IllegalAccessException {
-            return mMethod.invoke(mInstance, mParams);
-        }
     }
 
     /**
      * Invocation factory supporting single invocation of the routine method.
      */
-    private class SingleInvocationFactory
+    private static class SingleInvocationFactory
             extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
 
         private final ArrayList<InputChannel<?>> mInputChannels;
@@ -1165,15 +1177,19 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
         private final Object[] mParams;
 
+        private final RoutineMethod mRoutine;
+
         /**
          * Constructor.
          *
-         * @param method the method instance.
-         * @param params the method parameters.
+         * @param routine the routine method instance.
+         * @param method  the method instance.
+         * @param params  the method parameters.
          */
-        private SingleInvocationFactory(@NotNull final Method method,
-                @NotNull final Object[] params) {
-            super(asArgs(RoutineMethod.this.getClass(), method, cloneArgs(params)));
+        private SingleInvocationFactory(@NotNull final RoutineMethod routine,
+                @NotNull final Method method, @NotNull final Object[] params) {
+            super(asArgs(routine.getClass(), method, cloneArgs(params)));
+            mRoutine = routine;
             mMethod = method;
             final ArrayList<InputChannel<?>> inputChannels =
                     (mInputChannels = new ArrayList<InputChannel<?>>());
@@ -1185,8 +1201,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @NotNull
         @Override
         public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
-            return new SingleInvocation(mInputChannels, mOutputChannels, RoutineMethod.this,
-                    mMethod, mParams);
+            return new SingleInvocation(mInputChannels, mOutputChannels, mRoutine, mMethod,
+                    mParams);
         }
     }
 }

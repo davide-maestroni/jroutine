@@ -19,8 +19,6 @@ package com.github.dm.jrt.core.log;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -45,19 +43,6 @@ public abstract class TemplateLog implements Log {
     private static final String EXCEPTION_FORMAT = " caused by:%n%s";
 
     private static final String LOG_FORMAT = "%s\t%s\t%s\t%s<%s>";
-
-    /**
-     * Prints the stack trace of the specified throwable into a string.
-     *
-     * @param throwable the throwable instance.
-     * @return the printed stack trace.
-     */
-    @NotNull
-    public static String printStackTrace(@NotNull final Throwable throwable) {
-        final StringWriter writer = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
-    }
 
     private static String format(@NotNull final Level level, @NotNull final List<Object> contexts,
             @Nullable final String message) {
@@ -93,7 +78,7 @@ public abstract class TemplateLog implements Log {
             @Nullable final String message, @Nullable final Throwable throwable) {
         String formatted = format(level, contexts, message);
         if (throwable != null) {
-            formatted += String.format(EXCEPTION_FORMAT, printStackTrace(throwable));
+            formatted += String.format(EXCEPTION_FORMAT, Logger.printStackTrace(throwable));
         }
 
         log(formatted);

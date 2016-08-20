@@ -22,6 +22,8 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -122,6 +124,19 @@ public class Logger {
             @NotNull final Object context) {
         return new Logger(asArgs(ConstantConditions.notNull("logger context", context)), log,
                 level);
+    }
+
+    /**
+     * Prints the stack trace of the specified throwable into a string.
+     *
+     * @param throwable the throwable instance.
+     * @return the printed stack trace.
+     */
+    @NotNull
+    public static String printStackTrace(@NotNull final Throwable throwable) {
+        final StringWriter writer = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(writer));
+        return writer.toString();
     }
 
     /**

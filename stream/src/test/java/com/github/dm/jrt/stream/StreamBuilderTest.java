@@ -591,6 +591,118 @@ public class StreamBuilderTest {
     }
 
     @Test
+    public void testLift() {
+        assertThat(JRoutineStream.<String>withStream().liftWithConfig(
+                new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?,
+                        String>>, Function<Channel<?, String>, Channel<?, String>>>() {
+
+                    public Function<Channel<?, String>, Channel<?, String>> apply(
+                            final StreamConfiguration configuration,
+                            final Function<Channel<?, String>, Channel<?, String>> function) {
+                        assertThat(configuration.asChannelConfiguration()).isEqualTo(
+                                ChannelConfiguration.defaultConfiguration());
+                        assertThat(configuration.asInvocationConfiguration()).isEqualTo(
+                                InvocationConfiguration.defaultConfiguration());
+                        assertThat(configuration.getInvocationMode()).isEqualTo(
+                                InvocationMode.ASYNC);
+                        return Functions.decorate(function)
+                                        .andThen(
+                                                new Function<Channel<?, String>, Channel<?,
+                                                        String>>() {
+
+                                                    public Channel<?, String> apply(
+                                                            final Channel<?, String> channel) {
+                                                        return JRoutineCore.with(new UpperCase())
+                                                                           .call(channel);
+                                                    }
+                                                });
+                    }
+                }).call("test").after(seconds(3)).next()).isEqualTo("TEST");
+        assertThat(JRoutineStream.<String>withStream().lift(
+                new Function<Function<Channel<?, String>, Channel<?, String>>,
+                        Function<Channel<?, String>, Channel<?, String>>>() {
+
+                    public Function<Channel<?, String>, Channel<?, String>> apply(
+                            final Function<Channel<?, String>, Channel<?, String>> function) {
+                        return Functions.decorate(function)
+                                        .andThen(
+                                                new Function<Channel<?, String>, Channel<?,
+                                                        String>>() {
+
+                                                    public Channel<?, String> apply(
+                                                            final Channel<?, String> channel) {
+                                                        return JRoutineCore.with(new UpperCase())
+                                                                           .call(channel);
+                                                    }
+                                                });
+                    }
+                }).call("test").after(seconds(3)).next()).isEqualTo("TEST");
+        try {
+            JRoutineStream.withStream()
+                          .liftWithConfig(
+                                  new BiFunction<StreamConfiguration, Function<Channel<?,
+                                          Object>, Channel<?, Object>>, Function<Channel<?,
+                                          Object>, Channel<?, Object>>>() {
+
+                                      public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                                              final StreamConfiguration configuration,
+                                              final Function<Channel<?, Object>, Channel<?,
+                                                      Object>> function) {
+                                          throw new NullPointerException();
+                                      }
+                                  });
+            fail();
+
+        } catch (final StreamBuildingException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+
+        try {
+            JRoutineStream.withStream()
+                          .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>,
+                                  Function<Channel<?, Object>, Channel<?, Object>>>() {
+
+                              public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                                      final Function<Channel<?, Object>, Channel<?, Object>>
+                                              function) {
+                                  throw new NullPointerException();
+                              }
+                          });
+            fail();
+
+        } catch (final StreamBuildingException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+
+        final StreamBuilder<Object, Object> builder = //
+                JRoutineStream.withStream()
+                              .lift(new Function<Function<Channel<?, Object>, Channel<?,
+                                      Object>>, Function<Channel<?, Object>, Channel<?, Object>>>
+                                      () {
+
+                                  public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                                          final Function<Channel<?, Object>, Channel<?, Object>>
+                                                  function) {
+                                      return new Function<Channel<?, Object>, Channel<?, Object>>
+                                              () {
+
+                                          public Channel<?, Object> apply(
+                                                  final Channel<?, Object> objects) {
+                                              throw new NullPointerException();
+                                          }
+                                      };
+                                  }
+                              });
+        try {
+            builder.sync().call().close().throwError();
+            fail();
+
+        } catch (final InvocationException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
     public void testMapAllConsumer() {
         assertThat(JRoutineStream.<String>withStream().async().mapAllAccept(new BiConsumer<List<?
                 extends String>, Channel<String, ?>>() {
@@ -1189,118 +1301,6 @@ public class StreamBuilderTest {
                                                        .call()
                                                        .close()
                                                        .next()).isCloseTo(21, Offset.offset(0.1));
-    }
-
-    @Test
-    public void testTransform() {
-        assertThat(JRoutineStream.<String>withStream().liftWithConfig(
-                new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?,
-                        String>>, Function<Channel<?, String>, Channel<?, String>>>() {
-
-                    public Function<Channel<?, String>, Channel<?, String>> apply(
-                            final StreamConfiguration configuration,
-                            final Function<Channel<?, String>, Channel<?, String>> function) {
-                        assertThat(configuration.asChannelConfiguration()).isEqualTo(
-                                ChannelConfiguration.defaultConfiguration());
-                        assertThat(configuration.asInvocationConfiguration()).isEqualTo(
-                                InvocationConfiguration.defaultConfiguration());
-                        assertThat(configuration.getInvocationMode()).isEqualTo(
-                                InvocationMode.ASYNC);
-                        return Functions.decorate(function)
-                                        .andThen(
-                                                new Function<Channel<?, String>, Channel<?,
-                                                        String>>() {
-
-                                                    public Channel<?, String> apply(
-                                                            final Channel<?, String> channel) {
-                                                        return JRoutineCore.with(new UpperCase())
-                                                                           .call(channel);
-                                                    }
-                                                });
-                    }
-                }).call("test").after(seconds(3)).next()).isEqualTo("TEST");
-        assertThat(JRoutineStream.<String>withStream().lift(
-                new Function<Function<Channel<?, String>, Channel<?, String>>,
-                        Function<Channel<?, String>, Channel<?, String>>>() {
-
-                    public Function<Channel<?, String>, Channel<?, String>> apply(
-                            final Function<Channel<?, String>, Channel<?, String>> function) {
-                        return Functions.decorate(function)
-                                        .andThen(
-                                                new Function<Channel<?, String>, Channel<?,
-                                                        String>>() {
-
-                                                    public Channel<?, String> apply(
-                                                            final Channel<?, String> channel) {
-                                                        return JRoutineCore.with(new UpperCase())
-                                                                           .call(channel);
-                                                    }
-                                                });
-                    }
-                }).call("test").after(seconds(3)).next()).isEqualTo("TEST");
-        try {
-            JRoutineStream.withStream()
-                          .liftWithConfig(
-                                  new BiFunction<StreamConfiguration, Function<Channel<?,
-                                          Object>, Channel<?, Object>>, Function<Channel<?,
-                                          Object>, Channel<?, Object>>>() {
-
-                                      public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                              final StreamConfiguration configuration,
-                                              final Function<Channel<?, Object>, Channel<?,
-                                                      Object>> function) {
-                                          throw new NullPointerException();
-                                      }
-                                  });
-            fail();
-
-        } catch (final StreamBuildingException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-        }
-
-        try {
-            JRoutineStream.withStream()
-                          .lift(new Function<Function<Channel<?, Object>, Channel<?, Object>>,
-                                  Function<Channel<?, Object>, Channel<?, Object>>>() {
-
-                              public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                      final Function<Channel<?, Object>, Channel<?, Object>>
-                                              function) {
-                                  throw new NullPointerException();
-                              }
-                          });
-            fail();
-
-        } catch (final StreamBuildingException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-        }
-
-        final StreamBuilder<Object, Object> builder = //
-                JRoutineStream.withStream()
-                              .lift(new Function<Function<Channel<?, Object>, Channel<?,
-                                      Object>>, Function<Channel<?, Object>, Channel<?, Object>>>
-                                      () {
-
-                                  public Function<Channel<?, Object>, Channel<?, Object>> apply(
-                                          final Function<Channel<?, Object>, Channel<?, Object>>
-                                                  function) {
-                                      return new Function<Channel<?, Object>, Channel<?, Object>>
-                                              () {
-
-                                          public Channel<?, Object> apply(
-                                                  final Channel<?, Object> objects) {
-                                              throw new NullPointerException();
-                                          }
-                                      };
-                                  }
-                              });
-        try {
-            builder.sync().call().close().throwError();
-            fail();
-
-        } catch (final InvocationException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-        }
     }
 
     private static class SumData {

@@ -70,6 +70,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to avoid
  * undesired leaks, the implementing class must be static. Moreover, each constructor must have the
  * loader context as first argument.
+ * <br>
+ * Moreover, for the method to be executed inside the loader, all the input channels must be closed.
  * <h2>How to access the Android context</h2>
  * It is possible to get access to the Android context (that is the application instance) from
  * inside the routine by calling the {@code getContext()} method. Like, for instance:

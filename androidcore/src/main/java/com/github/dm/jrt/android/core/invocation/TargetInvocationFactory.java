@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
+import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,6 +88,8 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>        the input data type.
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
@@ -108,12 +111,19 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>        the input data type.
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     @SuppressWarnings("unchecked")
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
             @Nullable final Object... factoryArgs) {
+        if (!Reflection.hasStaticScope(targetClass)) {
+            throw new IllegalArgumentException(
+                    "the invocation class must have a static scope: " + targetClass.getName());
+        }
+
         if (ContextInvocation.class.isAssignableFrom(targetClass)) {
             return new DefaultTargetInvocationFactory<IN, OUT>(
                     (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
@@ -138,6 +148,8 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>        the input data type.
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
@@ -159,6 +171,8 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>        the input data type.
      * @param <OUT>       the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
@@ -180,6 +194,8 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>             the input data type.
      * @param <OUT>            the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
@@ -201,6 +217,8 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param <IN>             the input data type.
      * @param <OUT>            the output data type.
      * @return the invocation factory target.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+     *                                            not a static scope.
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(

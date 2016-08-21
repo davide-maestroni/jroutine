@@ -279,6 +279,27 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
     }
 
+    public void testInvocationFactoryStaticScope() {
+        try {
+            factoryOf(new TemplateInvocation<Object, Object>() {});
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
+    public void testInvocationInstance() {
+        final PassingStringInvocation invocation = new PassingStringInvocation();
+        final Routine<String, String> routine1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(invocation))
+                                                                .buildRoutine();
+        assertThat(routine1.call("test").after(seconds(10)).all()).containsExactly("test");
+        final Routine<String, String> routine2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                                .with(factoryOf(invocation, 2))
+                                                                .buildRoutine();
+        assertThat(routine2.call("test").after(seconds(10)).all()).containsExactly("test", "test");
+    }
+
     public void testParcelable() {
 
         final Parcel parcel = Parcel.obtain();

@@ -101,6 +101,7 @@ tasks.withType(Javadoc) {
             "${prefix}/core/",
             "${prefix}/function/",
             "${prefix}/lib/",
+            "${prefix}/method/",
             "${prefix}/object/",
             "${prefix}/operator/",
             "${prefix}/proxy/",

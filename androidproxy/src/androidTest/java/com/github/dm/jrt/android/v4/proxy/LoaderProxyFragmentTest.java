@@ -246,6 +246,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final TestProxy testProxy = builder.applyInvocationConfiguration()
                                            .with(configuration)
                                            .configured()
+                                           .applyObjectConfiguration()
+                                           .withSharedFields()
+                                           .configured()
+                                           .applyLoaderConfiguration()
+                                           .withFactoryId(11)
+                                           .configured()
                                            .buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -265,6 +271,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                             .with(instanceOf(TestClass.class))
                                             .applyInvocationConfiguration()
                                             .with(configuration)
+                                            .configured()
+                                            .applyObjectConfiguration()
+                                            .withSharedFields()
+                                            .configured()
+                                            .applyLoaderConfiguration()
+                                            .withFactoryId(11)
                                             .configured()
                                             .buildProxy(
                                                     ClassToken.tokenOf(TestProxy.class))).isSameAs(

@@ -1229,8 +1229,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .configured()
                                                               .buildRoutine();
         final Channel<?, String> channel1 = routine.call("test1", "test2");
-        final Channel<?, String> channel2 =
-                JRoutineLoader.on(loaderFrom(fragment)).withId(0).buildChannel();
+        final Channel<?, String> channel2 = JRoutineLoader.on(loaderFrom(fragment))
+                                                          .withId(0)
+                                                          .applyChannelConfiguration()
+                                                          .withRunner(AndroidRunners.mainRunner())
+                                                          .configured()
+                                                          .buildChannel();
 
         assertThat(channel1.after(timeout).all()).containsExactly("TEST1", "TEST2");
         assertThat(channel2.after(timeout).all()).containsExactly("TEST1", "TEST2");

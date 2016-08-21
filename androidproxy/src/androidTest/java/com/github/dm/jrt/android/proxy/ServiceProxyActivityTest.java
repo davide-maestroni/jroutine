@@ -247,6 +247,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                            .applyServiceConfiguration()
                                            .withRunnerClass(MyRunner.class)
                                            .configured()
+                                           .applyObjectConfiguration()
+                                           .withSharedFields()
+                                           .configured()
                                            .buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -269,6 +272,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                        .configured()
                                        .applyServiceConfiguration()
                                        .withRunnerClass(MyRunner.class)
+                                       .configured()
+                                       .applyObjectConfiguration()
+                                       .withSharedFields()
                                        .configured()
                                        .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
                 testProxy);

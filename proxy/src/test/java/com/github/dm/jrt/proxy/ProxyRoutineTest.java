@@ -285,6 +285,9 @@ public class ProxyRoutineTest {
         final TestProxy testProxy = builder.applyInvocationConfiguration()
                                            .with(configuration)
                                            .configured()
+                                           .applyObjectConfiguration()
+                                           .withSharedFields()
+                                           .configured()
                                            .buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -303,6 +306,9 @@ public class ProxyRoutineTest {
         assertThat(JRoutineProxy.with(instance(test))
                                 .applyInvocationConfiguration()
                                 .with(configuration)
+                                .configured()
+                                .applyObjectConfiguration()
+                                .withSharedFields()
                                 .configured()
                                 .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
     }

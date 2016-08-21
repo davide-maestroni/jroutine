@@ -2056,6 +2056,7 @@ public class OperatorsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testToArray() {
         assertThat(JRoutineCore.with(Operators.toArray(String.class))
                                .call("test", "test")
@@ -2072,6 +2073,7 @@ public class OperatorsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testToArray2() {
         assertThat(JRoutineCore.with(Operators.toArray(tokenOf(String.class)))
                                .call("test", "test")

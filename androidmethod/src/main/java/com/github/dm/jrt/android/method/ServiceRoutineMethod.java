@@ -129,7 +129,8 @@ public class ServiceRoutineMethod extends RoutineMethod
         mContext = ConstantConditions.notNull("service context", context);
         final Class<? extends RoutineMethod> type = getClass();
         if (!Reflection.hasStaticScope(type)) {
-            throw new IllegalStateException("the method class must have a static scope");
+            throw new IllegalStateException(
+                    "the method class must have a static scope: " + type.getName());
         }
 
         final Object[] safeArgs = Reflection.asArgs(args);

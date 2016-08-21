@@ -54,7 +54,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.producer.Producers.range;
@@ -146,7 +145,7 @@ public class JRoutineTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutine.with(classOfType(TestClass.class))
+        final TestStatic testStatic = JRoutine.withClassOfType(TestClass.class)
                                               .applyInvocationConfiguration()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
@@ -246,6 +245,16 @@ public class JRoutineTest {
                     }
                 }).buildRoutine();
         assertThat(routine.call("test", 1).after(seconds(1)).all()).containsOnly("test", "1");
+    }
+
+    @Test
+    public void testInstance() {
+        assertThat(JRoutine.withInstance("test")
+                           .method("toString")
+                           .call()
+                           .close()
+                           .after(seconds(1))
+                           .all()).containsExactly("test");
     }
 
     @Test

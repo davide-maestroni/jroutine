@@ -22,10 +22,29 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Java functional programming based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
+    Routine method implementation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> and <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">JRoutine-Object</a> libraries.
 </p>
 <h2>Main concepts</h2>
 <ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a>
+        <p>
+            Channel implementation identifying a method input.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a>
+        <p>
+            Channel implementation identifying a method output.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/RoutineMethod.html">RoutineMethod</a>
+        <p>
+            Base class providing a simple way to implement a routine as an object method.
+            The method will receive input through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a> instances and produce outputs through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a> instances passed as parameters.
+        </p>
+    </li>
 </ul>
 <h2>Main classes</h2>
 <ul>

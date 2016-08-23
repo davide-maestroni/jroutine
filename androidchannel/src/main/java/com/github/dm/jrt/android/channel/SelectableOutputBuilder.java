@@ -31,8 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT>
-        extends AbstractBuilder<Channel<?, ? extends ParcelableSelectable<OUT>>> {
+class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
 
     private final Channel<?, ? extends OUT> mChannel;
 
@@ -51,7 +50,7 @@ class SelectableOutputBuilder<OUT>
 
     @NotNull
     @Override
-    protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
+    protected Channel<?, ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();

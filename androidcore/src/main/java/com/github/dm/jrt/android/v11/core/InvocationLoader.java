@@ -65,7 +65,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     /**
      * Constructor.
      *
-     * @param context    used to retrieve the application context.
+     * @param context    used to retrieve the application Context.
      * @param invocation the invocation instance.
      * @param factory    the invocation factory.
      * @param inputs     the input data.
@@ -79,14 +79,14 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             @NotNull final Logger logger) {
         super(context);
         mInvocation = ConstantConditions.notNull("invocation instance", invocation);
-        mFactory = ConstantConditions.notNull("context invocation factory", factory);
+        mFactory = ConstantConditions.notNull("Context invocation factory", factory);
         mInputs = ConstantConditions.notNull("list of input data", inputs);
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }
 
     /**
-     * Checks if the loader inputs are equal to the specified ones.
+     * Checks if the Loader inputs are equal to the specified ones.
      *
      * @param inputs the input data.
      * @return whether the inputs are equal.
@@ -152,7 +152,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     }
 
     /**
-     * Gets this loader invocation count.
+     * Gets this Loader invocation count.
      *
      * @return the invocation count.
      */
@@ -206,7 +206,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         /**
          * Constructor.
          *
-         * @param invocation the loader invocation instance.
+         * @param invocation the Loader invocation instance.
          */
         private LoaderContextInvocationFactory(
                 @NotNull final ContextInvocation<IN, OUT> invocation) {

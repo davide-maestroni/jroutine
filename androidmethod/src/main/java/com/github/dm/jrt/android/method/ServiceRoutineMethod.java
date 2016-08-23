@@ -62,19 +62,19 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
 /**
- * This class provides an easy way to implement a routine running in a dedicated Android service,
+ * This class provides an easy way to implement a routine running in a dedicated Android Service,
  * which can be combined in complex ways with other ones.
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to run in a
- * service, the implementing class must be static. Moreover, each constructor must have the service
+ * Service, the implementing class must be static. Moreover, each constructor must have the Service
  * context as first argument and all the other arguments must be among the ones supported by the
  * {@link android.os.Parcel#writeValue(Object)} method.
  * <br>
- * In case a remote service is employed (that is, a service running in a different process), the
+ * In case a remote Service is employed (that is, a Service running in a different process), the
  * same restriction applies to the method parameters (other than input and output channels) and
  * to the input and output data.
- * <h2>How to access the Android context</h2>
- * It is possible to get access to the Android context (that is the service instance) from inside
+ * <h2>How to access the Android Context</h2>
+ * It is possible to get access to the Android Context (that is the Service instance) from inside
  * the routine by calling the {@code getContext()} method. Like, for instance:
  * <pre>
  *     <code>
@@ -112,7 +112,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Service context.
      */
     public ServiceRoutineMethod(@NotNull final ServiceContext context) {
         this(context, (Object[]) null);
@@ -121,12 +121,12 @@ public class ServiceRoutineMethod extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @param args    the constructor arguments.
      */
     public ServiceRoutineMethod(@NotNull final ServiceContext context,
             @Nullable final Object... args) {
-        mContext = ConstantConditions.notNull("service context", context);
+        mContext = ConstantConditions.notNull("Service context", context);
         final Class<? extends RoutineMethod> type = getClass();
         if (!Reflection.hasStaticScope(type)) {
             throw new IllegalStateException(
@@ -156,9 +156,9 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a service object routine method by wrapping the specified static method.
+     * Builds a Service object routine method by wrapping the specified static method.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @param method  the method.
      * @return the routine method instance.
      * @throws java.lang.IllegalArgumentException if the specified method is not static.
@@ -175,9 +175,9 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a service object routine method by wrapping a method of the specified target.
+     * Builds a Service object routine method by wrapping a method of the specified target.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @param target  the invocation target.
      * @param method  the method.
      * @return the routine method instance.
@@ -197,9 +197,9 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a service object routine method by wrapping a method of the specified target.
+     * Builds a Service object routine method by wrapping a method of the specified target.
      *
-     * @param context        the service context.
+     * @param context        the Service context.
      * @param target         the invocation target.
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -290,7 +290,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     @NotNull
     @Override
     public ServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        mConfiguration = ConstantConditions.notNull("Service configuration", configuration);
         return this;
     }
 
@@ -301,21 +301,21 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Returns the Android context (that is, the service instance).
+     * Returns the Android Context (that is, the Service instance).
      * <p>
      * Note this method will return null if called outside the routine method invocation or from
      * a different thread.
      *
-     * @return the context.
+     * @return the Context.
      */
     protected Context getContext() {
         return mLocalContext.get();
     }
 
     /**
-     * Returns the service configuration.
+     * Returns the Service configuration.
      *
-     * @return the service configuration.
+     * @return the Service configuration.
      */
     @NotNull
     protected ServiceConfiguration getServiceConfiguration() {
@@ -343,7 +343,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         final OutputChannel<OUT> resultChannel = outputChannel();
         outputChannels.add(resultChannel);
         final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
-                (!inputChannels.isEmpty()) ? AndroidChannels.merge(inputChannels).buildChannels()
+                (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
                         : JRoutineCore.io().<ParcelableSelectable<Object>>of();
         final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
                 mode.invoke(JRoutineService.on(mContext)
@@ -374,7 +374,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Implementation of a service routine method wrapping an object method.
+     * Implementation of a Service routine method wrapping an object method.
      */
     public static class ObjectServiceRoutineMethod extends ServiceRoutineMethod
             implements ObjectConfigurable<ObjectServiceRoutineMethod> {
@@ -390,7 +390,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         /**
          * Constructor.
          *
-         * @param context the service context.
+         * @param context the Service context.
          * @param target  the invocation target.
          * @param method  the method instance.
          */
@@ -541,7 +541,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         /**
          * Constructor.
          *
-         * @param type   the service routine method type.
+         * @param type   the Service routine method type.
          * @param args   the constructor arguments.
          * @param params the method parameters.
          */
@@ -669,7 +669,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                 mIsBound = true;
                 final List<OutputChannel<?>> outputChannels = mOutputChannels;
                 if (!outputChannels.isEmpty()) {
-                    result.pass(AndroidChannels.merge(outputChannels).buildChannels());
+                    result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannels());
                 }
             }
         }

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Implementation of a context invocation factory based on a supplier function.
+ * Implementation of a Context invocation factory based on a supplier function.
  * <p>
  * Created by davide-maestroni on 05/13/2016.
  *

@@ -26,25 +26,25 @@ import org.jetbrains.annotations.NotNull;
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.
  * <br>
- * Routine invocations created through the returned builder will be executed inside a service
- * specified by the service context. Be aware, though, that the invocation results will be
+ * Routine invocations created through the returned builder will be executed inside a Service
+ * specified by the Service context. Be aware, though, that the invocation results will be
  * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
  * thread, immediately after its invocation, will result in a deadlock.
  * <br>
  * By default output results are dispatched in the main looper.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
- * among synchronous and asynchronous invocations, but the invocations created inside the service
+ * among synchronous and asynchronous invocations, but the invocations created inside the Service
  * and the synchronous will respect the same limit separately.
  * <p>
- * It is up to the caller to properly declare the service in the manifest file. Note also that it is
- * possible to manage the service lifecycle starting it through the
- * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
+ * It is up to the caller to properly declare the Service in the manifest file. Note also that it is
+ * possible to manage the Service lifecycle starting it through the
+ * {@link android.content.Context#startService(android.content.Intent)} method. Normally the Service
  * will stay active only during a routine invocation. In fact, it is responsibility of the caller
  * to ensure that the started invocations have completed or have been aborted when the relative
- * context (for example the activity) is destroyed, so to avoid the leak of IPC connections.
+ * Context (for example the Activity) is destroyed, so to avoid the leak of IPC connections.
  * <br>
- * The service can be also made run in a different process, however, in such case, the data passed
+ * The Service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels, as well as the factory arguments, must comply with
  * the {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise
  * when employing {@link java.io.Serializable} objects on some OS versions, so, it is advisable to
@@ -59,7 +59,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Note however that, since the method might be invoked in a different process, it is not possible
  * to pass along the actual instance, but just the information needed to get or instantiate it
- * inside the target service.
+ * inside the target Service.
  * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
@@ -75,10 +75,10 @@ public class JRoutineServiceObject {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context the service context.
-     * @return the context builder.
+     * @param context the Service context.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceObjectBuilder on(@NotNull final ServiceContext context) {
@@ -86,7 +86,7 @@ public class JRoutineServiceObject {
     }
 
     /**
-     * Context based builder of service routine builders.
+     * Context based builder of Service routine builders.
      */
     public static class ServiceObjectBuilder {
 
@@ -95,19 +95,19 @@ public class JRoutineServiceObject {
         /**
          * Constructor.
          *
-         * @param context the service context.
+         * @param context the Service context.
          */
         private ServiceObjectBuilder(@NotNull final ServiceContext context) {
-            mContext = ConstantConditions.notNull("service context", context);
+            mContext = ConstantConditions.notNull("Service context", context);
         }
 
         /**
-         * Returns a builder of routines running in a service based on the builder context, wrapping
+         * Returns a builder of routines running in a Service based on the builder context, wrapping
          * the specified target object.
          * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * invocation service.
+         * invocation Service.
          * <p>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,

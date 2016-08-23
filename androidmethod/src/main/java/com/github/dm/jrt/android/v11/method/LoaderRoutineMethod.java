@@ -69,11 +69,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to avoid
  * undesired leaks, the implementing class must be static. Moreover, each constructor must have the
- * loader context as first argument.
+ * Loader context as first argument.
  * <br>
- * Moreover, for the method to be executed inside the loader, all the input channels must be closed.
- * <h2>How to access the Android context</h2>
- * It is possible to get access to the Android context (that is the application instance) from
+ * Moreover, for the method to be executed inside the Loader, all the input channels must be closed.
+ * <h2>How to access the Android Context</h2>
+ * It is possible to get access to the Android Context (that is the application instance) from
  * inside the routine by calling the {@code getContext()} method. Like, for instance:
  * <pre>
  *     <code>
@@ -86,7 +86,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  *             void run(final InputChannel&lt;String&gt; input,
  *                     final OutputChannel&lt;String&gt; output) {
- *                 final MyApplication service = (MyApplication) getContext();
+ *                 final MyApplication application = (MyApplication) getContext();
  *                 // do it
  *             }
  *         }
@@ -115,7 +115,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Loader context.
      */
     public LoaderRoutineMethod(@NotNull final LoaderContext context) {
         this(context, (Object[]) null);
@@ -124,12 +124,12 @@ public class LoaderRoutineMethod extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Loader context.
      * @param args    the constructor arguments.
      */
     public LoaderRoutineMethod(@NotNull final LoaderContext context,
             @Nullable final Object... args) {
-        mContext = ConstantConditions.notNull("service context", context);
+        mContext = ConstantConditions.notNull("Loader context", context);
         final Class<? extends LoaderRoutineMethod> type = getClass();
         if (!Reflection.hasStaticScope(type)) {
             throw new IllegalStateException(
@@ -168,9 +168,9 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a loader object routine method by wrapping the specified static method.
+     * Builds a Loader object routine method by wrapping the specified static method.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      * @param method  the method.
      * @return the routine method instance.
      * @throws java.lang.IllegalArgumentException if the specified method is not static.
@@ -187,9 +187,9 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a loader object routine method by wrapping a method of the specified target.
+     * Builds a Loader object routine method by wrapping a method of the specified target.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      * @param target  the invocation target.
      * @param method  the method.
      * @return the routine method instance.
@@ -209,9 +209,9 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Builds a loader object routine method by wrapping a method of the specified target.
+     * Builds a Loader object routine method by wrapping a method of the specified target.
      *
-     * @param context        the loader context.
+     * @param context        the Loader context.
      * @param target         the invocation target.
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
@@ -327,7 +327,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     @NotNull
     @Override
     public LoaderRoutineMethod apply(@NotNull final LoaderConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 
@@ -338,21 +338,21 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Returns the Android context (that is, the application instance).
+     * Returns the Android Context (that is, the application instance).
      * <p>
      * Note this method will return null if called outside the routine method invocation or from
      * a different thread.
      *
-     * @return the context.
+     * @return the Context.
      */
     protected Context getContext() {
         return mLocalContext.get();
     }
 
     /**
-     * Returns the loader configuration.
+     * Returns the Loader configuration.
      *
-     * @return the loader configuration.
+     * @return the Loader configuration.
      */
     @NotNull
     protected LoaderConfiguration getLoaderConfiguration() {
@@ -378,7 +378,8 @@ public class LoaderRoutineMethod extends RoutineMethod
         final OutputChannel<OUT> resultChannel = outputChannel();
         outputChannels.add(resultChannel);
         final Channel<?, ? extends Selectable<Object>> inputChannel =
-                (!inputChannels.isEmpty()) ? AndroidChannels.merge(inputChannels).buildChannels()
+                (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels)
+                                                            .buildChannels()
                         : JRoutineCore.io().<Selectable<Object>>of();
         final Channel<Selectable<Object>, Selectable<Object>> outputChannel = mode.invoke(
                 JRoutineLoader.on(mContext)
@@ -406,7 +407,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     /**
-     * Implementation of a loader routine method wrapping an object method.
+     * Implementation of a Loader routine method wrapping an object method.
      */
     public static class ObjectLoaderRoutineMethod extends LoaderRoutineMethod
             implements ObjectConfigurable<ObjectLoaderRoutineMethod> {
@@ -422,8 +423,9 @@ public class LoaderRoutineMethod extends RoutineMethod
         /**
          * Constructor.
          *
-         * @param target the invocation target.
-         * @param method the method instance.
+         * @param context the loader context.
+         * @param target  the invocation target.
+         * @param method  the method instance.
          */
         private ObjectLoaderRoutineMethod(@NotNull final LoaderContext context,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {

@@ -462,7 +462,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
         final Channel<?, ? extends ParcelableSelectable<Object>> channel =
-                SparseChannelsCompat.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                SparseChannelsCompat.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                     .buildChannels();
         final Channel<?, ParcelableSelectable<Object>> output =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -504,7 +504,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
         final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
-                SparseChannelsCompat.merge(channelMap).buildChannels();
+                SparseChannelsCompat.mergeParcelable(channelMap).buildChannels();
         channel1.pass("test3").close();
         channel2.pass(111).close();
         assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
@@ -525,7 +525,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
         final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
-                SparseChannelsCompat.merge(channelMap).buildChannels();
+                SparseChannelsCompat.mergeParcelable(channelMap).buildChannels();
         channel1.abort();
         channel2.pass(111).close();
 
@@ -544,7 +544,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
         try {
 
-            SparseChannelsCompat.merge(new SparseArrayCompat<Channel<?, ?>>(0));
+            SparseChannelsCompat.mergeParcelable(new SparseArrayCompat<Channel<?, ?>>(0));
 
             fail();
 

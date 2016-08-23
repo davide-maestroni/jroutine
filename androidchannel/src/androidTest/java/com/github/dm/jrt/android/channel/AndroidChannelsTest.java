@@ -909,7 +909,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
         final Channel<?, ? extends ParcelableSelectable<Object>> channel =
-                AndroidChannels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                AndroidChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                                .buildChannels();
         final Channel<?, ParcelableSelectable<Object>> output =
                 JRoutineService.on(serviceFrom(getActivity()))
@@ -949,7 +949,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(-7, channel1, channel2).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannels();
         channel1.pass("test1").close();
         channel2.pass(13).close();
         assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
@@ -958,7 +958,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                AndroidChannels.merge(11, Arrays.asList(channel1, channel2)).buildChannels();
+                AndroidChannels.mergeParcelable(11, Arrays.asList(channel1, channel2)).buildChannels();
         channel2.pass(13).close();
         channel1.pass("test1").close();
         assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
@@ -966,7 +966,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                 new ParcelableSelectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(channel1, channel2).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannels();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
@@ -974,7 +974,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                 new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(Arrays.asList(channel1, channel2)).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2)).buildChannels();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
@@ -998,7 +998,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                 JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                             .buildRoutine();
         final Channel<?, String> outputChannel = routine.call(
-                AndroidChannels.merge(Arrays.asList(channel1, channel2, channel3, channel4))
+                AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2, channel3, channel4))
                                .buildChannels());
 
         for (int i = 0; i < 4; i++) {
@@ -1030,7 +1030,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(-7, channel1, channel2).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannels();
         channel1.pass("test1").close();
         channel2.abort();
 
@@ -1047,7 +1047,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                AndroidChannels.merge(11, Arrays.asList(channel1, channel2)).buildChannels();
+                AndroidChannels.mergeParcelable(11, Arrays.asList(channel1, channel2)).buildChannels();
         channel2.abort();
         channel1.pass("test1").close();
 
@@ -1063,7 +1063,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(channel1, channel2).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannels();
         channel1.abort();
         channel2.pass(-17).close();
 
@@ -1079,7 +1079,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = AndroidChannels.merge(Arrays.asList(channel1, channel2)).buildChannels();
+        outputChannel = AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2)).buildChannels();
         channel1.pass("test2").close();
         channel2.abort();
 
@@ -1098,7 +1098,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.merge(0, Collections.<Channel<?, Object>>emptyList());
+            AndroidChannels.mergeParcelable(0, Collections.<Channel<?, Object>>emptyList());
 
             fail();
 
@@ -1108,7 +1108,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.merge(0);
+            AndroidChannels.mergeParcelable(0);
 
             fail();
 
@@ -1118,7 +1118,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.merge(Collections.<Channel<?, Object>>emptyList());
+            AndroidChannels.mergeParcelable(Collections.<Channel<?, Object>>emptyList());
 
             fail();
 
@@ -1128,7 +1128,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.merge();
+            AndroidChannels.mergeParcelable();
 
             fail();
 
@@ -1328,7 +1328,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
-        assertThat(AndroidChannels.selectableOutput(channel, 33)
+        assertThat(AndroidChannels.selectableParcelableOutput(channel, 33)
                                   .buildChannels()
                                   .after(seconds(10))
                                   .all()).containsExactly(
@@ -1344,7 +1344,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.selectableOutput(channel, 33).buildChannels().after(seconds(10)).all();
+            AndroidChannels.selectableParcelableOutput(channel, 33).buildChannels().after(seconds(10)).all();
 
             fail();
 

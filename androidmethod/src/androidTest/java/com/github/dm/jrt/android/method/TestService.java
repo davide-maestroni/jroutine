@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.method;
 import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
- * Test service.
+ * Test Service.
  * <p>
  * Created by davide-maestroni on 08/18/2016.
  */

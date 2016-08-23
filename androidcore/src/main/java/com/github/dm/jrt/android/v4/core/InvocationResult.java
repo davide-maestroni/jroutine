@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 /**
- * Interface defining a loader invocation result.
+ * Interface defining a Loader invocation result.
  * <p>
  * Created by davide-maestroni on 01/04/2015.
  *
@@ -34,7 +34,7 @@ import java.util.Collection;
 interface InvocationResult<OUT> {
 
     /**
-     * Aborts the loader invocation.
+     * Aborts the Loader invocation.
      */
     void abort();
 

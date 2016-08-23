@@ -40,7 +40,7 @@ import retrofit2.Retrofit;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract implementation of a call adapter factory, providing an automatic way to create context
+ * Abstract implementation of a call adapter factory, providing an automatic way to create Context
  * invocation factories to be used to handle Retrofit calls.
  * <p>
  * Created by davide-maestroni on 05/27/2016.
@@ -87,7 +87,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     }
 
     /**
-     * Gets the context invocation factory to handle the call execution.
+     * Gets the Context invocation factory to handle the call execution.
      *
      * @param configuration the invocation configuration.
      * @param responseType  the response type.

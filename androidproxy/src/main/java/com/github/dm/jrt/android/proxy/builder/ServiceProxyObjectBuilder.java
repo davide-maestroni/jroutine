@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of async proxy objects, whose methods are executed in a dedicated
- * service.
+ * Service.
  * <p>
  * Created by davide-maestroni on 05/13/2015.
  *

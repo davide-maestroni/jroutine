@@ -15,7 +15,7 @@
  */
 
 /**
- * Retrofit adapters and utility classes with support for Android compatibility library.
+ * Retrofit adapters and utility classes with support for the Android compatibility library.
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */

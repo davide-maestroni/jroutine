@@ -26,7 +26,7 @@ import android.view.WindowManager.LayoutParams;
 import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
- * Test activity.
+ * Test Activity.
  * <p>
  * Created by davide-maestroni on 01/11/2015.
  */

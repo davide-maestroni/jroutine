@@ -60,14 +60,14 @@ import java.util.concurrent.TimeUnit;
 public @interface ResultStaleTime {
 
     /**
-     * The time unit of the time after which a loader invocation result is considered to be stale.
+     * The time unit of the time after which a Loader invocation result is considered to be stale.
      *
      * @return the time unit.
      */
     TimeUnit unit() default TimeUnit.MILLISECONDS;
 
     /**
-     * The time after which a loader invocation result is considered to be stale.
+     * The time after which a Loader invocation result is considered to be stale.
      *
      * @return the time.
      */

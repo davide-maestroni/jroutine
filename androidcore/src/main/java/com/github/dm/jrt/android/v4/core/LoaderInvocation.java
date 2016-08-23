@@ -97,7 +97,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      *
      * @param context       the context instance.
      * @param factory       the invocation factory.
-     * @param configuration the loader configuration.
+     * @param configuration the Loader configuration.
      * @param order         the input data order.
      * @param logger        the logger instance.
      */
@@ -105,8 +105,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
-        mContext = ConstantConditions.notNull("loader context", context);
-        mFactory = ConstantConditions.notNull("context invocation factory", factory);
+        mContext = ConstantConditions.notNull("Loader context", context);
+        mFactory = ConstantConditions.notNull("Context invocation factory", factory);
         mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_OTHER);
@@ -118,20 +118,20 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
-     * Destroys the loader with the specified ID.
+     * Destroys the Loader with the specified ID.
      *
      * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param loaderId the Loader ID.
      */
     static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
         sMainRunner.run(new ClearExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
     }
 
     /**
-     * Destroys the loader with the specified ID and the specified inputs.
+     * Destroys the Loader with the specified ID and the specified inputs.
      *
      * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param loaderId the Loader ID.
      * @param inputs   the invocation inputs.
      */
     static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId,
@@ -144,7 +144,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * Destroys all the loaders with the specified invocation factory.
      *
      * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param loaderId the Loader ID.
      * @param factory  the invocation factory.
      */
     static void clearLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
@@ -157,7 +157,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * Destroys all the loaders with the specified invocation factory and inputs.
      *
      * @param context  the context instance.
-     * @param loaderId the loader ID.
+     * @param loaderId the Loader ID.
      * @param factory  the invocation factory.
      * @param inputs   the invocation inputs.
      */
@@ -345,7 +345,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         super.onAbort(reason);
         final Context loaderContext = mContext.getLoaderContext();
         if (loaderContext == null) {
-            mLogger.dbg("avoiding aborting invocation since context is null");
+            mLogger.dbg("avoiding aborting invocation since Context is null");
             return;
         }
 
@@ -369,14 +369,14 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final Context loaderContext = context.getLoaderContext();
         final LoaderManager loaderManager = context.getLoaderManager();
         if ((component == null) || (loaderContext == null) || (loaderManager == null)) {
-            throw new IllegalArgumentException("the routine context has been destroyed");
+            throw new IllegalArgumentException("the routine Context has been destroyed");
         }
 
         final Logger logger = mLogger;
         int loaderId = mLoaderId;
         if (loaderId == LoaderConfiguration.AUTO) {
             loaderId = 31 * mFactory.hashCode() + inputs.hashCode();
-            logger.dbg("generating loader ID: %d", loaderId);
+            logger.dbg("generating Loader ID: %d", loaderId);
         }
 
         final Loader<InvocationResult<OUT>> loader = loaderManager.getLoader(loaderId);
@@ -439,11 +439,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel());
         if (isRestart) {
-            logger.dbg("restarting loader [%d]", loaderId);
+            logger.dbg("restarting Loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
         } else {
-            logger.dbg("initializing loader [%d]", loaderId);
+            logger.dbg("initializing Loader [%d]", loaderId);
             loaderManager.initLoader(loaderId, Bundle.EMPTY, callbacks);
         }
     }
@@ -486,7 +486,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         final Logger logger = mLogger;
         if (loader.getClass() != InvocationLoader.class) {
-            logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
+            logger.err("clashing Loader ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new TypeClashException(loaderId);
         }
 
@@ -528,12 +528,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private enum ClashType {
 
         NONE,        // no clash detected
-        ABORT_OTHER, // need to abort the running loader
-        ABORT_BOTH   // need to abort both the invocation and the running loader
+        ABORT_OTHER, // need to abort the running Loader
+        ABORT_BOTH   // need to abort both the invocation and the running Loader
     }
 
     /**
-     * Execution implementation purging the loader with a specific ID.
+     * Execution implementation purging the Loader with a specific ID.
      */
     private static class ClearExecution implements Execution {
 
@@ -545,7 +545,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          * Constructor.
          *
          * @param context  the context instance.
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          */
         private ClearExecution(@NotNull final LoaderContextCompat context, final int loaderId) {
             mContext = context;
@@ -574,7 +574,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          *
          * @param context  the context instance.
          * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          */
         private ClearFactoryExecution(@NotNull final LoaderContextCompat context,
                 @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
@@ -590,7 +590,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
-     * Execution implementation purging the loader with a specific invocation factory and inputs.
+     * Execution implementation purging the Loader with a specific invocation factory and inputs.
      */
     private static class ClearFactoryInputsExecution implements Execution {
 
@@ -607,7 +607,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          *
          * @param context  the context instance.
          * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          * @param inputs   the list of inputs.
          */
         private ClearFactoryInputsExecution(@NotNull final LoaderContextCompat context,
@@ -626,7 +626,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
-     * Execution implementation purging the loader with a specific ID and inputs.
+     * Execution implementation purging the Loader with a specific ID and inputs.
      */
     private static class ClearInputsExecution implements Execution {
 
@@ -640,7 +640,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
          * Constructor.
          *
          * @param context  the context instance.
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          * @param inputs   the list of inputs.
          */
         private ClearInputsExecution(@NotNull final LoaderContextCompat context, final int loaderId,
@@ -672,8 +672,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         /**
          * Constructor.
          *
-         * @param invocation the loader invocation instance.
-         * @param loaderId   the loader ID.
+         * @param invocation the Loader invocation instance.
+         * @param loaderId   the Loader ID.
          */
         private LoaderContextInvocationFactory(@NotNull final LoaderInvocation<IN, OUT> invocation,
                 final int loaderId) {
@@ -692,7 +692,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     /**
      * Loader callbacks implementation.
      * <br>
-     * The callbacks object will make sure that the loader results are passed to the returned output
+     * The callbacks object will make sure that the Loader results are passed to the returned output
      * channels.
      *
      * @param <OUT> the output data type.
@@ -720,8 +720,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         /**
          * Constructor.
          *
-         * @param loaderManager the loader manager.
-         * @param loader        the loader instance.
+         * @param loaderManager the Loader manager.
+         * @param loader        the Loader instance.
          * @param logger        the logger instance.
          */
         private RoutineLoaderCallbacks(@NotNull final LoaderManager loaderManager,
@@ -733,7 +733,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public Loader<InvocationResult<OUT>> onCreateLoader(final int id, final Bundle args) {
-            mLogger.dbg("creating Android loader: %d", id);
+            mLogger.dbg("creating Android Loader: %d", id);
             return mLoader;
         }
 
@@ -762,7 +762,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                             == CacheStrategyType.CACHE_IF_SUCCESS)
                             : (strategyType == CacheStrategyType.CACHE_IF_ERROR))) {
                         final int id = internalLoader.getId();
-                        logger.dbg("destroying Android loader: %d", id);
+                        logger.dbg("destroying Android Loader: %d", id);
                         mLoaderManager.destroyLoader(id);
                     }
                 }
@@ -792,7 +792,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @Override
         public void onLoaderReset(final Loader<InvocationResult<OUT>> loader) {
-            mLogger.dbg("resetting Android loader: %d", mLoader.getId());
+            mLogger.dbg("resetting Android Loader: %d", mLoader.getId());
             reset(new InvocationClashException(mLoader.getId()));
         }
 

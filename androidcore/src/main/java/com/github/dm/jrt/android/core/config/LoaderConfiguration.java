@@ -29,20 +29,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
- * Class storing the invocation loader configuration.
+ * Class storing the invocation Loader configuration.
  * <p>
  * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
  * must be created from it.
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The loader ID backing the routine invocation. If set to {@link #AUTO} (the default behavior)
+ * <li>The Loader ID backing the routine invocation. If set to {@link #AUTO} (the default behavior)
  * the invocation factory and the inputs {@code hashCode()} will be used to compute the ID.</li>
- * <li>The factory ID which will override the factory {@code hashCode()} in the loader ID
+ * <li>The factory ID which will override the factory {@code hashCode()} in the Loader ID
  * computation.</li>
- * <li>The clash resolution to apply in case a loader with the same ID is running at the moment the
+ * <li>The clash resolution to apply in case a Loader with the same ID is running at the moment the
  * routine is invoked.</li>
- * <li>The clash resolution to apply in case a loader with the same ID and with the same inputs is
+ * <li>The clash resolution to apply in case a Loader with the same ID and with the same inputs is
  * running at the moment the routine is invoked.</li>
  * <li>The cache strategy to adopt on the invocation results.</li>
  * <li>The maximum time after which a cached result is considered to be stale and need to be
@@ -54,7 +54,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 public final class LoaderConfiguration extends DeepEqualObject {
 
     /**
-     * Constant identifying a loader ID computed from the factory class and the input parameters.
+     * Constant identifying a Loader ID computed from the factory class and the input parameters.
      */
     public static final int AUTO = Integer.MIN_VALUE;
 
@@ -77,7 +77,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * Constructor.
      *
-     * @param loaderId            the loader ID.
+     * @param loaderId            the Loader ID.
      * @param factoryId           the factory ID.
      * @param clashResolutionType the type of clash resolution.
      * @param matchResolutionType the type of match resolution.
@@ -100,7 +100,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a loader configuration builder.
+     * Returns a Loader configuration builder.
      *
      * @return the builder.
      */
@@ -110,9 +110,9 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a loader configuration builder initialized with the specified configuration.
+     * Returns a Loader configuration builder initialized with the specified configuration.
      *
-     * @param initialConfiguration the initial loader configuration.
+     * @param initialConfiguration the initial Loader configuration.
      * @return the builder.
      */
     @NotNull
@@ -133,7 +133,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a loader configuration builder initialized with this configuration.
+     * Returns a Loader configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
@@ -178,10 +178,10 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the loader ID (AUTO by default).
+     * Returns the Loader ID (AUTO by default).
      *
      * @param valueIfNotSet the default value if none was set.
-     * @return the loader ID.
+     * @return the Loader ID.
      */
     public int getLoaderIdOrElse(final int valueIfNotSet) {
         final int loaderId = mLoaderId;
@@ -241,7 +241,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * Invocation clash resolution enumeration.
      * <br>
-     * The clash of two invocations happens when the same loader ID is already in use at the time of
+     * The clash of two invocations happens when the same Loader ID is already in use at the time of
      * the routine execution. The possible outcomes are:
      * <ul>
      * <li>the running invocation is retained and the current one joins it</li>
@@ -292,7 +292,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Builder of loader configurations.
+     * Builder of Loader configurations.
      *
      * @param <TYPE> the configurable object type.
      */
@@ -327,7 +327,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * Constructor.
          *
          * @param configurable         the configurable instance.
-         * @param initialConfiguration the initial loader configuration.
+         * @param initialConfiguration the initial Loader configuration.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final LoaderConfiguration initialConfiguration) {
@@ -350,7 +350,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * configuration options will be reset to their default, otherwise only the non-default
          * options will be applied.
          *
-         * @param configuration the loader configuration.
+         * @param configuration the Loader configuration.
          * @return this builder.
          */
         @NotNull
@@ -408,7 +408,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         /**
          * Tells the builder how to resolve clashes of invocations with different inputs. A clash
-         * happens when a loader with the same ID is still running. A null value means that it is up
+         * happens when a Loader with the same ID is still running. A null value means that it is up
          * to the specific implementation to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.
@@ -434,9 +434,9 @@ public final class LoaderConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Tells the builder to identify the loader with the specified ID.
+         * Tells the builder to identify the Loader with the specified ID.
          *
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          * @return this builder.
          */
         @NotNull
@@ -447,7 +447,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         /**
          * Tells the builder how to resolve clashes of invocations with same invocation type and
-         * inputs. A clash happens when a loader with the same ID is still running. A null value
+         * inputs. A clash happens when a Loader with the same ID is still running. A null value
          * means that it is up to the specific implementation to choose a default resolution type.
          *
          * @param resolutionType the type of resolution.

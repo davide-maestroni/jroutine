@@ -36,7 +36,7 @@ import java.lang.reflect.Constructor;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 
 /**
- * Default implementation of a context proxy builder.
+ * Default implementation of a Context proxy builder.
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  */
@@ -61,14 +61,14 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
      */
     DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("loader context", context);
-        mTarget = ConstantConditions.notNull("context invocation target", target);
+        mContext = ConstantConditions.notNull("Loader context", context);
+        mTarget = ConstantConditions.notNull("Context invocation target", target);
     }
 
     @NotNull
     @Override
     public LoaderProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 

@@ -15,8 +15,8 @@
  */
 
 /**
- * Routine proxy core interfaces and implementations bound to an Android context, with support for
- * Android compatibility library.
+ * Routine proxy core interfaces and implementations bound to an Android Context, with support for
+ * the Android compatibility library.
  * <p>
  * Created by davide-maestroni on 05/10/2015.
  */

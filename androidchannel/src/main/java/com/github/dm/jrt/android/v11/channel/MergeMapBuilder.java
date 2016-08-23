@@ -34,8 +34,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class MergeMapBuilder<OUT>
-        extends AbstractBuilder<Channel<?, ? extends ParcelableSelectable<OUT>>> {
+class MergeMapBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
 
     private final SparseArray<? extends Channel<?, ? extends OUT>> mChannelMap;
 
@@ -62,16 +61,15 @@ class MergeMapBuilder<OUT>
 
     @NotNull
     @Override
-    protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
+    protected Channel<?, ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
         final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
-            outputChannel.pass(
-                    AndroidChannels.selectableOutput(channelMap.valueAt(i), channelMap.keyAt(i))
-                                   .buildChannels());
+            outputChannel.pass(AndroidChannels.selectableParcelableOutput(channelMap.valueAt(i),
+                    channelMap.keyAt(i)).buildChannels());
         }
 
         return outputChannel.close();

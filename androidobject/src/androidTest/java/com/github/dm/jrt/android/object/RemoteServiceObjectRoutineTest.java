@@ -66,7 +66,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Remote service object routine unit tests.
+ * Remote Service object routine unit tests.
  * <p>
  * Created by davide-maestroni on 03/12/2016.
  */

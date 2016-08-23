@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class decorating the invocations produced by a context invocation factory.
+ * Class decorating the invocations produced by a Context invocation factory.
  * <p>
  * Created by davide-maestroni on 08/19/2015.
  *
@@ -53,10 +53,10 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
     }
 
     /**
-     * Decorates the specified context invocation.
+     * Decorates the specified Context invocation.
      *
-     * @param invocation the context invocation instance to decorate.
-     * @return the decorated context invocation.
+     * @param invocation the Context invocation instance to decorate.
+     * @return the decorated Context invocation.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull

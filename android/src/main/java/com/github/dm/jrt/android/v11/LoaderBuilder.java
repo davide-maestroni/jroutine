@@ -60,7 +60,7 @@ import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
 
 /**
- * Context based builder of loader routine builders.
+ * Context based builder of Loader routine builders.
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
@@ -71,10 +71,10 @@ public class LoaderBuilder {
     /**
      * Constructor.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      */
     LoaderBuilder(@NotNull final LoaderContext context) {
-        mContext = ConstantConditions.notNull("loader context", context);
+        mContext = ConstantConditions.notNull("Loader context", context);
     }
 
     private static void checkStatic(@NotNull final Decorator decorator,
@@ -301,7 +301,7 @@ public class LoaderBuilder {
      * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
+     * application Context.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
@@ -344,24 +344,6 @@ public class LoaderBuilder {
 
     /**
      * Returns a routine builder based on a call invocation factory backed by the specified
-     * consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
-     *                                            static scope.
-     */
-    @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-        checkStatic(decorate(consumer), consumer);
-        return with(consumerCall(consumer));
-    }
-
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
      * function.
      *
      * @param function the function instance.
@@ -379,12 +361,30 @@ public class LoaderBuilder {
     }
 
     /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> withCallConsumer(
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+        checkStatic(decorate(consumer), consumer);
+        return with(consumerCall(consumer));
+    }
+
+    /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
      * class.
      * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
+     * application Context.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
@@ -484,7 +484,7 @@ public class LoaderBuilder {
     }
 
     /**
-     * Returns a builder of channels bound to the loader identified by the specified ID.
+     * Returns a builder of channels bound to the Loader identified by the specified ID.
      * <br>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
@@ -495,7 +495,7 @@ public class LoaderBuilder {
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *
-     * @param loaderId the loader ID.
+     * @param loaderId the Loader ID.
      * @return the channel builder instance.
      */
     @NotNull
@@ -509,7 +509,7 @@ public class LoaderBuilder {
      * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
+     * application Context.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
@@ -529,7 +529,7 @@ public class LoaderBuilder {
      * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
+     * application Context.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a

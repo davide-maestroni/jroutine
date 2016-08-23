@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectable<OUT>>> {
+class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable<OUT>>> {
 
     private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -53,8 +53,7 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectable<
 
     @NotNull
     @Override
-    protected Channel<?, ? extends Selectable<OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
+    protected Channel<?, Selectable<OUT>> build(@NotNull final ChannelConfiguration configuration) {
         final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();
         int i = mStartIndex;

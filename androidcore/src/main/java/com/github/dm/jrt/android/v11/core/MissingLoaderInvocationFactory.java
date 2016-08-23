@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation factory used to know whether a loader with a specific ID is present or not.
+ * Invocation factory used to know whether a Loader with a specific ID is present or not.
  * <p>
  * Created by davide-maestroni on 01/14/2015.
  *
@@ -40,7 +40,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
     /**
      * Constructor.
      *
-     * @param id the loader ID.
+     * @param id the Loader ID.
      */
     MissingLoaderInvocationFactory(final int id) {
         super(asArgs(id));
@@ -54,7 +54,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
     }
 
     /**
-     * Call context invocation implementation.
+     * Call Context invocation implementation.
      *
      * @param <OUT> the output data type.
      */
@@ -65,7 +65,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
         /**
          * Constructor.
          *
-         * @param id the loader ID.
+         * @param id the Loader ID.
          */
         private MissingLoaderInvocation(final int id) {
             mId = id;

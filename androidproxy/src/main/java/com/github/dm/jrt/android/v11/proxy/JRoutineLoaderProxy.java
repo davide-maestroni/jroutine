@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls of their methods, bound to a context lifecycle.
+ * calls of their methods in dedicated Loaders.
  * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.
@@ -53,10 +53,10 @@ public class JRoutineLoaderProxy {
     }
 
     /**
-     * Returns a context based builder of loader proxy routine builders.
+     * Returns a Context based builder of Loader proxy routine builders.
      *
-     * @param context the service context.
-     * @return the context builder.
+     * @param context the Loader context.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderProxyBuilder on(@NotNull final LoaderContext context) {
@@ -64,7 +64,7 @@ public class JRoutineLoaderProxy {
     }
 
     /**
-     * Context based builder of loader proxy routine builders.
+     * Context based builder of Loader proxy routine builders.
      */
     public static class LoaderProxyBuilder {
 
@@ -73,10 +73,10 @@ public class JRoutineLoaderProxy {
         /**
          * Constructor.
          *
-         * @param context the loader context.
+         * @param context the Loader context.
          */
         private LoaderProxyBuilder(@NotNull final LoaderContext context) {
-            mContext = ConstantConditions.notNull("loader context", context);
+            mContext = ConstantConditions.notNull("Loader context", context);
         }
 
         /**
@@ -85,7 +85,7 @@ public class JRoutineLoaderProxy {
          * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * application context.
+         * application Context.
          * <p>
          * Note that it is responsibility of the caller to retain a strong reference to the target
          * instance to prevent it from being garbage collected.

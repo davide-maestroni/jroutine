@@ -29,18 +29,18 @@ import org.jetbrains.annotations.Nullable;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class storing the service configuration.
+ * Class storing the Service configuration.
  * <p>
  * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
  * must be created from it.
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The class of the runner to be employed to execute the invocation in the configured service.
+ * <li>The class of the runner to be employed to execute the invocation in the configured Service.
  * It must declare a default constructor to be correctly instantiated.</li>
- * <li>The class of the logger to be employed by the invocations executed in the configured service.
+ * <li>The class of the logger to be employed by the invocations executed in the configured Service.
  * It must declare a default constructor to be correctly instantiated.</li>
- * <li>The looper to employ to deliver the service messages (by default the main thread one). Note
+ * <li>The looper to employ to deliver the Service messages (by default the main thread one). Note
  * that, in any case, the outputs will be collected through the configured runner.</li>
  * </ul>
  * <p>
@@ -85,7 +85,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a service configuration builder.
+     * Returns a Service configuration builder.
      *
      * @return the builder.
      */
@@ -95,7 +95,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a service configuration builder initialized with the specified configuration.
+     * Returns a Service configuration builder initialized with the specified configuration.
      *
      * @param initialConfiguration the initial configuration.
      * @return the builder.
@@ -122,7 +122,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns a service configuration builder initialized with this configuration.
+     * Returns a Service configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
@@ -155,7 +155,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the looper used for dispatching the messages from the service (null by default).
+     * Returns the looper used for dispatching the messages from the Service (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
@@ -206,7 +206,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Builder of service configurations.
+     * Builder of Service configurations.
      *
      * @param <TYPE> the configurable object type.
      */
@@ -260,7 +260,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
          * configuration options will be reset to their default, otherwise only the non-default
          * options will be applied.
          *
-         * @param configuration the service configuration.
+         * @param configuration the Service configuration.
          * @return this builder.
          */
         @NotNull
@@ -324,7 +324,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the looper on which the messages from the service are dispatched. A null value means
+         * Sets the looper on which the messages from the Service are dispatched. A null value means
          * that messages will be dispatched on the main thread (as by default).
          *
          * @param looper the looper instance.

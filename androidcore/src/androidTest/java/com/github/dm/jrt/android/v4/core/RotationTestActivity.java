@@ -25,7 +25,7 @@ import android.view.WindowManager.LayoutParams;
 import com.github.dm.jrt.android.core.R;
 
 /**
- * Test activity ensuring the creation of the loader manager during call to {@code onCreate()}.
+ * Test Activity ensuring the creation of the Loader manager during call to {@code onCreate()}.
  * <p>
  * Created by davide-maestroni on 01/28/2015.
  */

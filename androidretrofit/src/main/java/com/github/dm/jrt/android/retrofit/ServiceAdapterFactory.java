@@ -58,10 +58,10 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <br>
  * Note that the routines generated through the returned builders will ignore any input.
  * <p>
- * If properly configured, the routine invocations will run in a dedicated Android service.
+ * If properly configured, the routine invocations will run in a dedicated Android Service.
  * <br>
- * Note, however, that a different {@code OkHttpClient} instance will be created by the service. In
- * order to properly configure it, the target service class should implement
+ * Note, however, that a different {@code OkHttpClient} instance will be created by the Service. In
+ * order to properly configure it, the target Service class should implement
  * {@link com.github.dm.jrt.android.object.builder.FactoryContext}, and return the configured
  * instance when requested.
  * <p>
@@ -80,9 +80,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Constructor.
      *
-     * @param context                 the service context.
+     * @param context                 the Service context.
      * @param invocationConfiguration the invocation configuration.
-     * @param serviceConfiguration    the service configuration.
+     * @param serviceConfiguration    the Service configuration.
      */
     private ServiceAdapterFactory(@NotNull final ServiceContext context,
             @NotNull final InvocationConfiguration invocationConfiguration,
@@ -95,7 +95,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Returns an adapter factory builder.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @return the builder instance.
      */
     @NotNull
@@ -144,7 +144,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration) {
-        return JRoutineService.on(ConstantConditions.notNull("service context", mServiceContext))
+        return JRoutineService.on(ConstantConditions.notNull("Service context", mServiceContext))
                               .with(factoryOf(ServiceCallInvocation.class))
                               .apply(invocationConfiguration)
                               .apply(serviceConfiguration)
@@ -152,7 +152,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     /**
-     * Builder of service routine adapter factory instances.
+     * Builder of Service routine adapter factory instances.
      * <p>
      * The options set through the builder configuration will be applied to all the routine handling
      * the Retrofit calls, unless they are overwritten by specific annotations.
@@ -174,10 +174,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         /**
          * Constructor.
          *
-         * @param context the loader context.
+         * @param context the Service context.
          */
         private Builder(@NotNull final ServiceContext context) {
-            mServiceContext = ConstantConditions.notNull("service context", context);
+            mServiceContext = ConstantConditions.notNull("Service context", context);
         }
 
         @NotNull
@@ -192,7 +192,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @Override
         public Builder apply(@NotNull final ServiceConfiguration configuration) {
             mServiceConfiguration =
-                    ConstantConditions.notNull("service configuration", configuration);
+                    ConstantConditions.notNull("Service configuration", configuration);
             return this;
         }
 

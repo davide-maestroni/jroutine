@@ -116,7 +116,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     private static void testConsumerFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine = //
                 JRoutineAndroid.on(activity)
-                               .withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
+                               .withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                                    public void accept(final List<String> strings,
                                            final Channel<String, ?> result) {

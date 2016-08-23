@@ -32,7 +32,7 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends ParcelableSelectable<OUT>>> {
+class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
 
     private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -70,13 +70,14 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends ParcelableS
 
     @NotNull
     @Override
-    protected Channel<?, ? extends ParcelableSelectable<OUT>> build(
+    protected Channel<?, ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
         final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();
         int i = mStartIndex;
         for (final Channel<?, ? extends OUT> channel : mChannels) {
-            outputChannel.pass(AndroidChannels.selectableOutput(channel, i++).buildChannels());
+            outputChannel.pass(
+                    AndroidChannels.selectableParcelableOutput(channel, i++).buildChannels());
         }
 
         return outputChannel.close();

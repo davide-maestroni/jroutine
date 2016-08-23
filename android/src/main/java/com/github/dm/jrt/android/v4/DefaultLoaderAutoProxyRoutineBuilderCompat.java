@@ -38,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Default implementation of a loader target routine builder.
+ * Default implementation of a Loader target routine builder.
  * <p>
  * Created by davide-maestroni on 03/07/2016.
  */
@@ -60,12 +60,12 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     /**
      * Constructor.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      * @param target  the invocation target.
      */
     DefaultLoaderAutoProxyRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("loader context", context);
+        mContext = ConstantConditions.notNull("Loader context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
@@ -126,7 +126,7 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     @NotNull
     @Override
     public LoaderAutoProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 

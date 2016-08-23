@@ -24,7 +24,7 @@ import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of async proxy objects, bound to a context lifecycle.
+ * Interface defining a builder of async proxy objects, running in dedicated Loaders.
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  *

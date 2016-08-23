@@ -35,7 +35,7 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject/com/github/dm/jrt/android/object/builder/LoaderObjectRoutineBuilder.html">LoaderObjectRoutineBuilder</a>
         <p>
-            Each loader object routine instance needs a context invocation target and a specific configuration, so object routine builders provide a convenient way to set the required options.
+            Each Loader object routine instance needs a Context invocation target and a specific configuration, so object routine builders provide a convenient way to set the required options.
             Object routine builders can be also used to build objects proxying the invocation target through an interface.
             By design builders are not synchronized since the same instance is not meant to be used from different threads.
         </p>
@@ -43,7 +43,7 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject/com/github/dm/jrt/android/object/builder/ServiceObjectRoutineBuilder.html">ServiceObjectRoutineBuilder</a>
         <p>
-            Each service object routine instance needs a context invocation target and a specific configuration, so object routine builders provide a convenient way to set the required options.
+            Each Service object routine instance needs a Context invocation target and a specific configuration, so object routine builders provide a convenient way to set the required options.
             Object routine builders can be also used to build objects proxying the invocation target through an interface.
             By design builders are not synchronized since the same instance is not meant to be used from different threads.
         </p>
@@ -54,27 +54,27 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject/com/github/dm/jrt/android/v11/object/JRoutineLoaderObject.html">JRoutineLoaderObject</a>
         <p>
-            Utility class acting as a factory of loader object routine builders.
+            Utility class acting as a factory of Loader object routine builders.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject/com/github/dm/jrt/android/v4/object/JRoutineLoaderObjectCompat.html">JRoutineLoaderObjectCompat</a>
         <p>
-            Utility class acting as a factory of loader object routine builders.
+            Utility class acting as a factory of Loader object routine builders.
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject/com/github/dm/jrt/android/object/JRoutineServiceObject.html">JRoutineServiceObject</a>
         <p>
-            Utility class acting as a factory of service object routine builders.
+            Utility class acting as a factory of Service object routine builders.
         </p>
     </li>
 </ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br>
-    Note that the very same examples can be re-written using JRoutineLoaderObjectCompat and a FragmentActivity, or the JRoutineServiceObject class, in order to make the processing happen in a service instead of a loader.
+    Note that the very same examples can be re-written using JRoutineLoaderObjectCompat and a FragmentActivity, or the JRoutineServiceObject class, in order to make the processing happen in a Service instead of a Loader.
 </p>
 <b>Example 1:</b> via reflection.
 <p>
@@ -211,9 +211,9 @@
         }
     </code>
 </pre>
-<b>Example 3:</b> via proxy with custom context.
+<b>Example 3:</b> via proxy with custom Context.
 <p>
-    It is possible to customize the creation of the wrapped object by using a context wrapper as shown below.
+    It is possible to customize the creation of the wrapped object by using a Context wrapper as shown below.
 </p>
 <pre>
     <code>

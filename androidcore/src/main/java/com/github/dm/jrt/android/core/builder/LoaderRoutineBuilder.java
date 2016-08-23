@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of routines bound to a context lifecycle through loaders.
+ * Interface defining a builder of routines running in dedicated Loaders.
  * <p>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
  * prevent out of memory errors.
  * <br>
- * The local context of the invocations will always be the application one.
+ * The local Context of the invocations will always be the application one.
  * <p>
  * Created by davide-maestroni on 12/09/2014.
  *

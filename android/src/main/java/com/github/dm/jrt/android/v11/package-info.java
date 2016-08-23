@@ -16,7 +16,7 @@
 
 /**
  * Fa&ccedil;ade classes exposing the Android customization of the JRoutine library features, with
- * support for invocations run insider loader classes.
+ * support for invocations run insider Loader classes.
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */

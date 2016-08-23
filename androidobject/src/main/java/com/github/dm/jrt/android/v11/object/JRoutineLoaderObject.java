@@ -42,14 +42,14 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The {@code equals()} and {@code hashCode()} methods of the input parameter objects and the
  * invocation factory, might be employed to check for clashing of invocation instances or compute
- * the loader ID.
+ * the Loader ID.
  * <br>
  * In case the caller could not guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used in
  * order to avoid unexpected results.
  * <p>
  * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
- * an already running loader with the same ID exists at the time the new invocation is executed,
+ * an already running Loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when loaders with different implementations share the same ID, the new
  * invocation is aborted with a
@@ -64,7 +64,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Note however that, since the method might be invoked outside the calling context, it is not
  * possible to pass along the actual instance, but just the information needed to get or instantiate
- * it inside the loader instance.
+ * it inside the Loader instance.
  * <p>
  * See {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat JRoutineLoaderCompat} for
  * support of API levels lower than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
@@ -83,10 +83,10 @@ public class JRoutineLoaderObject {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param context the loader context.
-     * @return the context builder.
+     * @param context the Loader context.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderObjectBuilder on(@NotNull final LoaderContext context) {
@@ -94,7 +94,7 @@ public class JRoutineLoaderObject {
     }
 
     /**
-     * Context based builder of loader routine builders.
+     * Context based builder of Loader routine builders.
      */
     public static class LoaderObjectBuilder {
 
@@ -103,10 +103,10 @@ public class JRoutineLoaderObject {
         /**
          * Constructor.
          *
-         * @param context the loader context.
+         * @param context the Loader context.
          */
         private LoaderObjectBuilder(@NotNull final LoaderContext context) {
-            mContext = ConstantConditions.notNull("loader context", context);
+            mContext = ConstantConditions.notNull("Loader context", context);
         }
 
         /**
@@ -115,7 +115,7 @@ public class JRoutineLoaderObject {
          * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * application context.
+         * application Context.
          * <p>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a

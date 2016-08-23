@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.channel;
 import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
- * Test service.
+ * Test Service.
  * <p>
  * Created by davide-maestroni on 01/16/2015.
  */

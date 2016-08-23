@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls of their methods in a dedicated service.
+ * calls of their methods in a dedicated Service.
  * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.
@@ -48,10 +48,10 @@ public class JRoutineServiceProxy {
     }
 
     /**
-     * Returns a context based builder of service proxy routine builders.
+     * Returns a Context based builder of Service proxy routine builders.
      *
-     * @param context the service context.
-     * @return the context builder.
+     * @param context the Service context.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceProxyBuilder on(@NotNull final ServiceContext context) {
@@ -59,7 +59,7 @@ public class JRoutineServiceProxy {
     }
 
     /**
-     * Context based builder of service routine builders.
+     * Context based builder of Service routine builders.
      */
     public static class ServiceProxyBuilder {
 
@@ -68,19 +68,19 @@ public class JRoutineServiceProxy {
         /**
          * Constructor.
          *
-         * @param context the service context.
+         * @param context the Service context.
          */
         private ServiceProxyBuilder(@NotNull final ServiceContext context) {
-            mContext = ConstantConditions.notNull("service context", context);
+            mContext = ConstantConditions.notNull("Service context", context);
         }
 
         /**
          * Returns a builder of routines, wrapping the specified object instance, running in a
-         * service based on the builder context.
+         * Service based on the builder context.
          * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * invocation service.
+         * invocation Service.
          * <p>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,

@@ -115,7 +115,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
         final Routine<String, String> routine = //
                 JRoutineAndroidCompat.on(activity)
-                                     .withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
+                                     .withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                                          public void accept(final List<String> strings,
                                                  final Channel<String, ?> result) {

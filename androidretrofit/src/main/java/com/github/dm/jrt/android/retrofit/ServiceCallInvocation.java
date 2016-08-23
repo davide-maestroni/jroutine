@@ -47,7 +47,7 @@ import okio.BufferedSink;
 import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
- * Implementation of a context invocation handling OkHttp requests.
+ * Implementation of a Context invocation handling OkHttp requests.
  * <p>
  * Created by davide-maestroni on 05/17/2016.
  */

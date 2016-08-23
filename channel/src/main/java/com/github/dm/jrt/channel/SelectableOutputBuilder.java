@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends Selectable<OUT>>> {
+class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable<OUT>>> {
 
     private final Channel<?, ? extends OUT> mChannel;
 
@@ -49,8 +49,7 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ? extends 
 
     @NotNull
     @Override
-    protected Channel<?, ? extends Selectable<OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
+    protected Channel<?, Selectable<OUT>> build(@NotNull final ChannelConfiguration configuration) {
         final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
                 JRoutineCore.io().apply(configuration).buildChannel();
         mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));

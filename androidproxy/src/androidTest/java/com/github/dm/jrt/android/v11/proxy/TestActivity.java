@@ -25,7 +25,7 @@ import android.view.WindowManager.LayoutParams;
 import com.github.dm.jrt.android.proxy.R;
 
 /**
- * Test activity.
+ * Test Activity.
  * <p>
  * Created by davide-maestroni on 12/16/2014.
  */

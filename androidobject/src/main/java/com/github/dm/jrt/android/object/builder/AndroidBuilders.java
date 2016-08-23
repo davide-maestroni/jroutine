@@ -52,7 +52,7 @@ public class AndroidBuilders {
     }
 
     /**
-     * Returns a loader configuration properly modified by taking into account the annotations added
+     * Returns a Loader configuration properly modified by taking into account the annotations added
      * to the specified method.
      *
      * @param configuration the initial configuration.
@@ -102,7 +102,7 @@ public class AndroidBuilders {
     }
 
     /**
-     * Returns a loader configuration properly modified by taking into account the annotations added
+     * Returns a Loader configuration properly modified by taking into account the annotations added
      * to the specified method.
      *
      * @param configuration the initial configuration.
@@ -122,7 +122,7 @@ public class AndroidBuilders {
     }
 
     /**
-     * Returns a service configuration properly modified by taking into account the annotations
+     * Returns a Service configuration properly modified by taking into account the annotations
      * added to the specified method.
      *
      * @param configuration the initial configuration.
@@ -157,7 +157,7 @@ public class AndroidBuilders {
     }
 
     /**
-     * Returns a service configuration properly modified by taking into account the annotations
+     * Returns a Service configuration properly modified by taking into account the annotations
      * added to the specified method.
      *
      * @param configuration the initial configuration.

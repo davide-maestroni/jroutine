@@ -63,10 +63,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param activity the loader activity.
-     * @return the context based builder.
+     * @param activity the Loader Activity.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
@@ -74,11 +74,11 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param activity the loader activity.
-     * @param context  the context used to get the application one.
-     * @return the context based builder.
+     * @param activity the Loader Activity.
+     * @param context  the Context used to get the application one.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
@@ -87,10 +87,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context the service context.
-     * @return the context based builder.
+     * @param context the Service Context.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceBuilder on(@NotNull final Context context) {
@@ -98,11 +98,11 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context      the service context.
-     * @param serviceClass the service class.
-     * @return the context based builder.
+     * @param context      the Service Context.
+     * @param serviceClass the Service class.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceBuilder on(@NotNull final Context context,
@@ -111,11 +111,11 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context the service context.
-     * @param service the service intent.
-     * @return the context based builder.
+     * @param context the Service Context.
+     * @param service the Service Intent.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
@@ -123,10 +123,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param fragment the loader fragment.
-     * @return the context based builder.
+     * @param fragment the Loader Fragment.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat on(@NotNull final Fragment fragment) {
@@ -134,11 +134,11 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param fragment the loader fragment.
-     * @param context  the context used to get the application one.
-     * @return the context based builder.
+     * @param fragment the Loader Fragment.
+     * @param context  the Context used to get the application one.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
@@ -147,10 +147,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param context the loader context.
-     * @return the context based builder.
+     * @param context the Loader context.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
@@ -158,10 +158,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context the service context.
-     * @return the context based builder.
+     * @param context the Service context.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceBuilder on(@NotNull final ServiceContext context) {

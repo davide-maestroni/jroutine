@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.method;
 
 /**
- * Test service.
+ * Test Service.
  * <p>
  * Created by davide-maestroni on 08/19/2016.
  */

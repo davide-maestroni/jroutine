@@ -37,7 +37,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoader;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
 
 /**
- * Default implementation of a loader channel builder.
+ * Default implementation of a Loader channel builder.
  * <p>
  * Created by davide-maestroni on 01/14/2015.
  */
@@ -56,13 +56,13 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
      * @param context the context instance.
      */
     DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
-        mContext = ConstantConditions.notNull("loader context", context);
+        mContext = ConstantConditions.notNull("Loader context", context);
     }
 
     @NotNull
     @Override
     public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 
@@ -79,7 +79,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         if (loaderId == LoaderConfiguration.AUTO) {
-            throw new IllegalArgumentException("the loader ID must not be generated");
+            throw new IllegalArgumentException("the Loader ID must not be generated");
         }
 
         final LoaderContextCompat context = mContext;

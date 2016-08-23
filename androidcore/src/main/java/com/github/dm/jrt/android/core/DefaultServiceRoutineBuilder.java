@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class implementing a builder of routine objects executed in a dedicated service.
+ * Class implementing a builder of routine objects executed in a dedicated Service.
  * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
@@ -53,7 +53,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
      */
     DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
-        mContext = ConstantConditions.notNull("service context", context);
+        mContext = ConstantConditions.notNull("Service context", context);
         mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
     }
 
@@ -77,7 +77,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     @NotNull
     @Override
     public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
         return this;
     }
 

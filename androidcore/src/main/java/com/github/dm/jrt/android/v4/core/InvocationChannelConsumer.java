@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Class consuming the invocation loader results.
+ * Class consuming the invocation Loader results.
  * <p>
  * Created by davide-maestroni on 12/12/2014.
  *
@@ -66,12 +66,12 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     /**
      * Constructor.
      *
-     * @param loader the loader instance.
+     * @param loader the Loader instance.
      * @param logger the logger instance.
      */
     InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
-        ConstantConditions.notNull("loader instance", loader);
+        ConstantConditions.notNull("Loader instance", loader);
         mDeliverResult = new Execution() {
 
             public void run() {
@@ -142,7 +142,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
      */
     @NotNull
     InvocationResult<OUT> createResult() {
-        // Need to create a new instance each time to trick the loader manager into thinking that a
+        // Need to create a new instance each time to trick the Loader manager into thinking that a
         // brand new result is available
         return new Result();
     }

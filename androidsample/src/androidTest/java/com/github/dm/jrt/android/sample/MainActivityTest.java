@@ -46,7 +46,7 @@ import static android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegi
 import static org.hamcrest.CoreMatchers.anything;
 
 /**
- * Main activity unit test.
+ * Main Activity unit test.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */

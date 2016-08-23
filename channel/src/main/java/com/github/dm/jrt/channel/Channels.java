@@ -618,7 +618,7 @@ public class Channels {
      *                                            null object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             final int startIndex,
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return new MergeBuilder<OUT>(startIndex, channels);
@@ -652,7 +652,7 @@ public class Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             final int startIndex, @NotNull final Channel<?, ?>... channels) {
         if (channels.length == 0) {
             throw new IllegalArgumentException("the array of channels must not be empty");
@@ -687,7 +687,7 @@ public class Channels {
      *                                            null object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
         return merge(0, channels);
     }
@@ -718,7 +718,7 @@ public class Channels {
      *                                            object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
         return new MergeMapBuilder<OUT>(channels);
     }
@@ -749,7 +749,7 @@ public class Channels {
      *                                            object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             @NotNull final Channel<?, ?>... channels) {
         return merge(0, channels);
     }
@@ -1089,7 +1089,7 @@ public class Channels {
      * @return the selectable channel builder.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends Selectable<OUT>>>
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>>
     selectableOutput(
             @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new SelectableOutputBuilder<OUT>(channel, index);

@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Test fragment.
+ * Test Fragment.
  * <p>
  * Created by davide-maestroni on 12/16/2014.
  */

@@ -32,7 +32,7 @@ import java.util.HashMap;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract implementation of a builder of async proxy objects, bound to a context lifecycle.
+ * Abstract implementation of a builder of async proxy objects, running in dedicated Loaders.
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  *
@@ -55,7 +55,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @NotNull
     @Override
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 
@@ -181,7 +181,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
-     * Returns the context or component (Activity, Fragment, etc.) on which the invocation is based.
+     * Returns the Context or component (Activity, Fragment, etc.) on which the invocation is based.
      * <br>
      * Returning null means that the context has been destroyed, so an exception will be thrown.
      *
@@ -203,7 +203,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      *
      * @param invocationConfiguration the invocation configuration.
      * @param objectConfiguration     the object configuration.
-     * @param loaderConfiguration     the loader configuration.
+     * @param loaderConfiguration     the Loader configuration.
      * @return the proxy instance.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
@@ -223,7 +223,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
          * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
          * @param objectConfiguration     the object configuration.
-         * @param loaderConfiguration     the loader configuration.
+         * @param loaderConfiguration     the Loader configuration.
          */
         private ProxyInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,

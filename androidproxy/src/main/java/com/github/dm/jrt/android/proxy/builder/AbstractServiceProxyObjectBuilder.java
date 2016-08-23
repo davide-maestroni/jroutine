@@ -34,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
- * dedicated service.
+ * dedicated Service.
  * <p>
  * Created by davide-maestroni on 05/13/2015.
  *
@@ -59,7 +59,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @Override
     public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
         return this;
     }
 
@@ -178,11 +178,11 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
-     * Returns the context on which the invocation is based.
+     * Returns the Context on which the invocation is based.
      * <br>
-     * Returning null means that the context has been destroyed, so an exception will be thrown.
+     * Returning null means that the Context has been destroyed, so an exception will be thrown.
      *
-     * @return the invocation context.
+     * @return the invocation Context.
      */
     @Nullable
     protected abstract Context getInvocationContext();
@@ -200,7 +200,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
      *
      * @param invocationConfiguration the invocation configuration.
      * @param objectConfiguration     the object configuration.
-     * @param serviceConfiguration    the service configuration.
+     * @param serviceConfiguration    the Service configuration.
      * @return the proxy instance.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
@@ -220,7 +220,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
          * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
          * @param objectConfiguration     the object configuration.
-         * @param serviceConfiguration    the service configuration.
+         * @param serviceConfiguration    the Service configuration.
          */
         private ProxyInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,

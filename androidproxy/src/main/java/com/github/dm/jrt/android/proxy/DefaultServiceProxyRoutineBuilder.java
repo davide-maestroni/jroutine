@@ -38,7 +38,7 @@ import java.lang.reflect.Constructor;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor;
 
 /**
- * Default implementation of a service proxy builder.
+ * Default implementation of a Service proxy builder.
  * <p>
  * Created by davide-maestroni on 05/13/2015.
  */
@@ -59,19 +59,19 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @param target  the invocation target.
      */
     DefaultServiceProxyRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("service context", context);
+        mContext = ConstantConditions.notNull("Service context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
     @NotNull
     @Override
     public ServiceProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
         return this;
     }
 
@@ -177,7 +177,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
         /**
          * Constructor.
          *
-         * @param context        the service context.
+         * @param context        the Service context.
          * @param target         the invocation target.
          * @param interfaceClass the proxy interface class.
          */

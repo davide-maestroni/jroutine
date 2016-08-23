@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.retrofit.service;
 import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
- * Test service running in a different process.
+ * Test Service running in a different process.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */

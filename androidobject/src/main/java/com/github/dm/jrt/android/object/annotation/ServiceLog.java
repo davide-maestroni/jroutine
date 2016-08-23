@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to set a specific log class to be used by the service
+ * Through this annotation it is possible to set a specific log class to be used by the Service
  * executing the routine invocations. The specified class must have a default constructor.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.

@@ -65,7 +65,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Proxy builder fragment unit tests.
+ * Proxy builder Fragment unit tests.
  * <p>
  * Created by davide-maestroni on 05/11/2015.
  */

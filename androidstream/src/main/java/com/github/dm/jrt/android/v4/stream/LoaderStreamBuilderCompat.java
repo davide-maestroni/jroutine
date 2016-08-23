@@ -281,7 +281,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     LoaderStreamBuilderCompat<IN, OUT> applyStream(@NotNull LoaderConfiguration configuration);
 
     /**
-     * Gets the loader configuration builder related to the whole stream.
+     * Gets the Loader configuration builder related to the whole stream.
      * <br>
      * The configuration options will be applied to all the next concatenated routines unless
      * overwritten by specific ones.
@@ -296,7 +296,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     applyStreamLoaderConfiguration();
 
     /**
-     * Builds a new context invocation factory instance.
+     * Builds a new Context invocation factory instance.
      *
      * @return the factory instance.
      */
@@ -323,38 +323,38 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param factory the context invocation factory.
+     * @param factory the Context invocation factory.
      * @param <AFTER> the concatenation output type.
      * @return the new stream instance.
-     * @throws java.lang.IllegalStateException if the loader context is not set.
+     * @throws java.lang.IllegalStateException if the Loader context is not set.
      */
     @NotNull
     <AFTER> LoaderStreamBuilderCompat<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Sets the stream loader context.
+     * Sets the stream Loader context.
      * <br>
      * The context will be used by all the concatenated routines until changed.
      * <br>
      * If null it will cause the next routines to employ the configured runner instead of an Android
-     * loader.
+     * Loader.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      * @return the new stream instance.
      */
     @NotNull
     LoaderStreamBuilderCompat<IN, OUT> on(@Nullable LoaderContextCompat context);
 
     /**
-     * Interface defining a loader stream configuration.
+     * Interface defining a Loader stream configuration.
      */
     interface LoaderStreamConfigurationCompat extends StreamConfiguration {
 
         /**
-         * Gets the combination of stream and current configuration as a loader one.
+         * Gets the combination of stream and current configuration as a Loader one.
          *
-         * @return the loader configuration.
+         * @return the Loader configuration.
          */
         @NotNull
         LoaderConfiguration asLoaderConfiguration();
@@ -363,15 +363,15 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
          * Gets the configuration that will override the stream one only for the next
          * concatenated routine.
          *
-         * @return the loader configuration.
+         * @return the Loader configuration.
          */
         @NotNull
         LoaderConfiguration getCurrentLoaderConfiguration();
 
         /**
-         * Gets the stream loader context.
+         * Gets the stream Loader context.
          *
-         * @return the loader context.
+         * @return the Loader context.
          */
         @Nullable
         LoaderContextCompat getLoaderContext();
@@ -379,7 +379,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
         /**
          * Gets the configuration that will be applied to all the concatenated routines.
          *
-         * @return the loader configuration.
+         * @return the Loader configuration.
          */
         @NotNull
         LoaderConfiguration getStreamLoaderConfiguration();

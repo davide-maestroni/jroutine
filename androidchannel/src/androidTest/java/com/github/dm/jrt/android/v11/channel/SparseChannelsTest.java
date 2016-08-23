@@ -494,7 +494,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         final Channel<Integer, Integer> channel2 = builder.buildChannel();
 
         final Channel<?, ? extends ParcelableSelectable<Object>> channel =
-                SparseChannels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                SparseChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                               .buildChannels();
         final Channel<?, ParcelableSelectable<Object>> output =
                 JRoutineLoader.on(loaderFrom(getActivity()))

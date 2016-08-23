@@ -70,7 +70,7 @@ public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<
     }
 
     /**
-     * Factory creating delegating context invocation instances.
+     * Factory creating delegating Context invocation instances.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.

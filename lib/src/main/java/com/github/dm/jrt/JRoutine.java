@@ -289,21 +289,6 @@ public class JRoutine extends Channels {
 
     /**
      * Returns a routine builder based on a call invocation factory backed by the specified
-     * consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-        return JRoutineCore.with(consumerCall(consumer));
-    }
-
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
      * function.
      *
      * @param function the function instance.
@@ -315,6 +300,21 @@ public class JRoutine extends Channels {
     public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
         return JRoutineCore.with(functionCall(function));
+    }
+
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> withCallConsumer(
+            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+        return JRoutineCore.with(consumerCall(consumer));
     }
 
     /**

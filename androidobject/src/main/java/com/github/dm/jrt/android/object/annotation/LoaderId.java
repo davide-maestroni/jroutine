@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to set a specific loader ID for a single method
+ * Through this annotation it is possible to set a specific Loader ID for a single method
  * invocations.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
@@ -59,7 +59,7 @@ import java.lang.annotation.Target;
 public @interface LoaderId {
 
     /**
-     * The loader ID.
+     * The Loader ID.
      *
      * @return the ID.
      */

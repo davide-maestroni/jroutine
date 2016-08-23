@@ -29,7 +29,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
- * Test service.
+ * Test Service.
  * <p>
  * Created by davide-maestroni on 01/16/2015.
  */

@@ -64,7 +64,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param context                 the routine context.
      * @param factory                 the invocation factory.
      * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the loader configuration.
+     * @param loaderConfiguration     the Loader configuration.
      */
     DefaultLoaderRoutine(@NotNull final LoaderContext context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
@@ -72,14 +72,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             @NotNull final LoaderConfiguration loaderConfiguration) {
         super(invocationConfiguration);
         final int factoryId = loaderConfiguration.getFactoryIdOrElse(LoaderConfiguration.AUTO);
-        mContext = ConstantConditions.notNull("loader context", context);
-        ConstantConditions.notNull("context invocation factory", factory);
+        mContext = ConstantConditions.notNull("Loader context", context);
+        ConstantConditions.notNull("Context invocation factory", factory);
         mFactory = (factoryId == LoaderConfiguration.AUTO) ? factory
                 : new FactoryWrapper<IN, OUT>(factory, factoryId);
         mConfiguration = loaderConfiguration;
         mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
-        getLogger().dbg("building context routine with configuration: %s", loaderConfiguration);
+        getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
     }
 
     @Override
@@ -141,7 +141,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     }
 
     /**
-     * Wrapper of call context invocation factories overriding {@code equals()} and
+     * Wrapper of call Context invocation factories overriding {@code equals()} and
      * {@code hashCode()}.
      *
      * @param <IN>  the input data type.

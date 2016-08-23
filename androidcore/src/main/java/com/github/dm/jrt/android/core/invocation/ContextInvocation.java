@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an invocation aware of the specific Android context.
+ * Interface defining an invocation aware of the specific Android Context.
  * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
@@ -33,9 +33,9 @@ import org.jetbrains.annotations.NotNull;
 public interface ContextInvocation<IN, OUT> extends Invocation<IN, OUT> {
 
     /**
-     * Called right after the instantiation to specify the invocation context.
+     * Called right after the instantiation to specify the invocation Context.
      *
-     * @param context the context of the invocation.
+     * @param context the Context of the invocation.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     void onContext(@NotNull Context context) throws Exception;

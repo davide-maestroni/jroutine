@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 
 /**
- * Class representing an Android loader context (like activities or fragments).
+ * Class representing an Android Loader context (like Activities or Fragments).
  * <p>
  * No strong reference to the wrapped objects will be retained by this class implementations. So,
  * it is up to the caller to ensure that they are not garbage collected before being called.
@@ -46,10 +46,10 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified fragment.
+     * Returns a context wrapping the specified Fragment.
      *
-     * @param fragment the fragment instance.
-     * @return the loader context.
+     * @param fragment the Fragment instance.
+     * @return the Loader context.
      */
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final Fragment fragment) {
@@ -57,15 +57,15 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified fragment, with the specified instance as the loader
-     * context.
+     * Returns a context wrapping the specified Fragment, with the specified instance as the Loader
+     * Context.
      * <br>
-     * In order to prevent undesired leaks, the class of the specified context must be static.
+     * In order to prevent undesired leaks, the class of the specified Context must be static.
      *
-     * @param fragment the fragment instance.
-     * @param context  the context used to get the application one.
-     * @return the loader context.
-     * @throws java.lang.IllegalArgumentException if the class of the specified context has not a
+     * @param fragment the Fragment instance.
+     * @param context  the Context used to get the application one.
+     * @return the Loader context.
+     * @throws java.lang.IllegalArgumentException if the class of the specified Context has not a
      *                                            static scope.
      */
     @NotNull
@@ -75,10 +75,10 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified activity.
+     * Returns a context wrapping the specified Activity.
      *
-     * @param activity the activity instance.
-     * @return the loader context.
+     * @param activity the Activity instance.
+     * @return the Loader context.
      */
     @NotNull
     public static LoaderContextCompat loaderFrom(@NotNull final FragmentActivity activity) {
@@ -86,15 +86,15 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified activity, with the specified instance as the loader
-     * context.
+     * Returns a context wrapping the specified Activity, with the specified instance as the Loader
+     * Context.
      * <br>
-     * In order to prevent undesired leaks, the class of the specified context must be static.
+     * In order to prevent undesired leaks, the class of the specified Context must be static.
      *
-     * @param activity the activity instance.
-     * @param context  the context used to get the application one.
-     * @return the loader context.
-     * @throws java.lang.IllegalArgumentException if the class of the specified context has not a
+     * @param activity the Activity instance.
+     * @param context  the Context used to get the application one.
+     * @return the Loader context.
+     * @throws java.lang.IllegalArgumentException if the class of the specified Context has not a
      *                                            static scope.
      */
     @NotNull
@@ -112,23 +112,23 @@ public abstract class LoaderContextCompat {
     public abstract Object getComponent();
 
     /**
-     * Returns the loader context.
+     * Returns the Loader Context.
      *
-     * @return the context or null.
+     * @return the Context or null.
      */
     @Nullable
     public abstract Context getLoaderContext();
 
     /**
-     * Returns the loader manager of the specific component.
+     * Returns the Loader manager of the specific component.
      *
-     * @return the loader manager or null.
+     * @return the Loader manager or null.
      */
     @Nullable
     public abstract LoaderManager getLoaderManager();
 
     /**
-     * Loader context wrapping an activity.
+     * Loader context wrapping an Activity.
      */
     private static class ActivityContextCompat extends LoaderContextCompat {
 
@@ -139,19 +139,19 @@ public abstract class LoaderContextCompat {
         /**
          * Constructor.
          *
-         * @param activity the wrapped activity.
-         * @param context  the wrapped context.
-         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         * @param activity the wrapped Activity.
+         * @param context  the wrapped Context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified Context has not
          *                                            a static scope.
          */
         private ActivityContextCompat(@NotNull final FragmentActivity activity,
                 @NotNull final Context context) {
             mActivity = new WeakReference<FragmentActivity>(
-                    ConstantConditions.notNull("activity", activity));
+                    ConstantConditions.notNull("Activity", activity));
             final Class<? extends Context> contextClass = context.getClass();
             if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
-                        "the context class must have a static scope: " + contextClass.getName());
+                        "the Context class must have a static scope: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -207,7 +207,7 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Loader context wrapping a fragment.
+     * Loader context wrapping a Fragment.
      */
     private static class FragmentContextCompat extends LoaderContextCompat {
 
@@ -218,19 +218,19 @@ public abstract class LoaderContextCompat {
         /**
          * Constructor.
          *
-         * @param fragment the wrapped fragment.
-         * @param context  the wrapped context.
-         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         * @param fragment the wrapped Fragment.
+         * @param context  the wrapped Context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified Context has not
          *                                            a static scope.
          */
         private FragmentContextCompat(@NotNull final Fragment fragment,
                 @NotNull final Context context) {
             mFragment =
-                    new WeakReference<Fragment>(ConstantConditions.notNull("fragment", fragment));
+                    new WeakReference<Fragment>(ConstantConditions.notNull("Fragment", fragment));
             final Class<? extends Context> contextClass = context.getClass();
             if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
-                        "the context class must have a static scope: " + contextClass.getName());
+                        "the Context class must have a static scope: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);

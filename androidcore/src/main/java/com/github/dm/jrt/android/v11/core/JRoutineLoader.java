@@ -41,20 +41,20 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The {@code equals()} and {@code hashCode()} methods of the input parameter objects and the
  * invocation factory, might be employed to check for clashing of invocation instances or compute
- * the loader ID.
+ * the Loader ID.
  * <br>
  * In case the caller could not guarantee the correct behavior of the aforementioned method
  * implementations, a user defined ID or an input independent clash resolution should be used in
  * order to avoid unexpected results.
  * <p>
- * The routine invocations will be identified by the loader ID. In case a clash is detected, that
- * is, an already running loader with the same ID exists at the time the new invocation is executed,
+ * The routine invocations will be identified by the Loader ID. In case a clash is detected, that
+ * is, an already running Loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when loaders with different implementations share the same ID, the new
  * invocation is aborted with a
  * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>
- * For example, in order to get a resource from the network, needed to fill an activity UI:
+ * For example, in order to get a resource from the network, needed to fill an Activity UI:
  * <pre>
  *     <code>
  *
@@ -102,7 +102,7 @@ import org.jetbrains.annotations.NotNull;
  * The above code will ensure that the loading process survives any configuration change and the
  * resulting resource is dispatched only once.
  * <p>
- * Note that the invocation may be implemented so to run in a separate service:
+ * Note that the invocation may be implemented so to run in a dedicated Service:
  * <pre>
  *     <code>
  *
@@ -142,10 +142,10 @@ public class JRoutineLoader {
     }
 
     /**
-     * Returns a context based builder of loader routine builders.
+     * Returns a Context based builder of Loader routine builders.
      *
-     * @param context the loader context.
-     * @return the context based builder.
+     * @param context the Loader context.
+     * @return the Context based builder.
      */
     @NotNull
     public static LoaderBuilder on(@NotNull final LoaderContext context) {
@@ -153,7 +153,7 @@ public class JRoutineLoader {
     }
 
     /**
-     * Context based builder of loader routine builders.
+     * Context based builder of Loader routine builders.
      */
     public static class LoaderBuilder {
 
@@ -162,10 +162,10 @@ public class JRoutineLoader {
         /**
          * Constructor.
          *
-         * @param context the loader context.
+         * @param context the Loader context.
          */
         private LoaderBuilder(@NotNull final LoaderContext context) {
-            mContext = ConstantConditions.notNull("loader context", context);
+            mContext = ConstantConditions.notNull("Loader context", context);
         }
 
         /**
@@ -196,9 +196,9 @@ public class JRoutineLoader {
         }
 
         /**
-         * Returns a builder of channels bound to the loader identified by the specified ID.
+         * Returns a builder of channels bound to the Loader identified by the specified ID.
          * <br>
-         * If no loader with the specified ID is running at the time of the channel creation, the
+         * If no Loader with the specified ID is running at the time of the channel creation, the
          * output will be aborted with a
          * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
          * MissingLoaderException}.
@@ -207,7 +207,7 @@ public class JRoutineLoader {
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.
          *
-         * @param loaderId the loader ID.
+         * @param loaderId the Loader ID.
          * @return the channel builder instance.
          */
         @NotNull

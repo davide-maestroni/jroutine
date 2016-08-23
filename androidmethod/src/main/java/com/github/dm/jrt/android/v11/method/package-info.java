@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.invocation;
-
 /**
- * Exception indicating a clash of routine invocations with same Loader ID.
+ * Classes implementing a routine method running in a dedicated Android Loader.
  * <p>
- * Created by davide-maestroni on 06/28/2016.
+ * Created by davide-maestroni on 08/23/2016.
  */
-public class LoaderClashException extends LoaderInvocationException {
-
-    /**
-     * Constructor.
-     *
-     * @param id the Loader ID.
-     */
-    public LoaderClashException(final int id) {
-        super(id);
-    }
-}
+package com.github.dm.jrt.android.v11.method;

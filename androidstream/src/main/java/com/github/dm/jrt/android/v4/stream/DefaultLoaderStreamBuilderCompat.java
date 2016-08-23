@@ -51,7 +51,7 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
- * Default implementation of a stream loader routine builder.
+ * Default implementation of a stream Loader routine builder.
  * <p>
  * Created by davide-maestroni on 07/04/2016.
  *
@@ -419,7 +419,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
         final LoaderContextCompat loaderContext = mStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
-            throw new IllegalStateException("the loader context is null");
+            throw new IllegalStateException("the Loader context is null");
         }
 
         return map(JRoutineLoaderCompat.on(loaderContext).with(factory));
@@ -479,7 +479,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     }
 
     /**
-     * Default implementation of a loader stream configuration.
+     * Default implementation of a Loader stream configuration.
      */
     private static class DefaultLoaderStreamConfigurationCompat
             implements LoaderStreamConfigurationCompat {
@@ -505,9 +505,9 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         /**
          * Constructor.
          *
-         * @param context                    the loader context.
-         * @param streamLoaderConfiguration  the stream loader configuration.
-         * @param currentLoaderConfiguration the current loader configuration.
+         * @param context                    the Loader context.
+         * @param streamLoaderConfiguration  the stream Loader configuration.
+         * @param currentLoaderConfiguration the current Loader configuration.
          * @param streamConfiguration        the stream invocation configuration.
          * @param currentConfiguration       the current invocation configuration.
          * @param invocationMode             the invocation mode.
@@ -519,9 +519,9 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
                 @NotNull final InvocationConfiguration currentConfiguration,
                 @NotNull final InvocationMode invocationMode) {
             mLoaderContext = context;
-            mStreamLoaderConfiguration = ConstantConditions.notNull("stream loader configuration",
+            mStreamLoaderConfiguration = ConstantConditions.notNull("stream Loader configuration",
                     streamLoaderConfiguration);
-            mCurrentLoaderConfiguration = ConstantConditions.notNull("current loader configuration",
+            mCurrentLoaderConfiguration = ConstantConditions.notNull("current Loader configuration",
                     currentLoaderConfiguration);
             mStreamConfiguration = ConstantConditions.notNull("stream invocation configuration",
                     streamConfiguration);

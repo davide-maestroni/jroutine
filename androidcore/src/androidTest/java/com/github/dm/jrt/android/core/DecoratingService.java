@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Invocation service decorating the invocation factory.
+ * Invocation Service decorating the invocation factory.
  * <p>
  * Created by davide-maestroni on 10/06/2015.
  */

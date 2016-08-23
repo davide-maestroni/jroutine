@@ -42,9 +42,9 @@ public abstract class CallContextInvocation<IN, OUT> extends CallInvocation<IN, 
     }
 
     /**
-     * Returns this invocation context.
+     * Returns this invocation Context.
      *
-     * @return the context of this invocation.
+     * @return the Context of this invocation.
      */
     protected Context getContext() {
         return mContext;

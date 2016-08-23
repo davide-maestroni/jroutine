@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Test fragment.
+ * Test Fragment.
  * <p>
  * Created by davide-maestroni on 12/16/2014.
  */

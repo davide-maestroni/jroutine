@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating that the routine service has unexpectedly disconnected.
+ * Exception indicating that the routine Service has unexpectedly disconnected.
  * <p>
  * Created by davide-maestroni on 05/25/2015.
  */
@@ -43,7 +43,7 @@ public class ServiceDisconnectedException extends RoutineException {
     /**
      * Constructor.
      *
-     * @param name the service component name.
+     * @param name the Service component name.
      */
     public ServiceDisconnectedException(@Nullable final ComponentName name) {
         if (name != null) {
@@ -57,7 +57,7 @@ public class ServiceDisconnectedException extends RoutineException {
     }
 
     /**
-     * Gets the service component name.
+     * Gets the Service component name.
      *
      * @return the component name.
      */

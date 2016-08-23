@@ -33,7 +33,7 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
- * Class representing a context invocation target.
+ * Class representing a Context invocation target.
  * <br>
  * The target identifies a class or an instance whose methods are to be called asynchronously.
  * <p>
@@ -57,7 +57,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
      *
      * @param targetClass the target class.
      * @param <TYPE>      the target object type.
-     * @return the context invocation target.
+     * @return the Context invocation target.
      */
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> classOfType(
@@ -72,7 +72,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
      *
      * @param targetClass the target class.
      * @param <TYPE>      the target object type.
-     * @return the context invocation target.
+     * @return the Context invocation target.
      */
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
@@ -86,7 +86,7 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
      * @param targetClass the target class.
      * @param factoryArgs the object factory arguments.
      * @param <TYPE>      the target object type.
-     * @return the context invocation target.
+     * @return the Context invocation target.
      */
     @NotNull
     public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
@@ -95,11 +95,11 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
     }
 
     /**
-     * Returns an invocation target based on the specified context.
+     * Returns an invocation target based on the specified Context.
      * <p>
      * Note that a new instance will be returned each time the method is invoked.
      *
-     * @param context the target context.
+     * @param context the target Context.
      * @return the invocation target.
      * @throws java.lang.Exception if an unexpected error occurs.
      */

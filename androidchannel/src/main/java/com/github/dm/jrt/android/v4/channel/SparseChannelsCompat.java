@@ -87,8 +87,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @see AndroidChannels#merge(Map)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, ? extends
-            ParcelableSelectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
+    mergeParcelable(
             @NotNull final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channels) {
         return new MergeMapBuilder<OUT>(channels);
     }

@@ -48,7 +48,7 @@ import retrofit2.Retrofit;
  * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamBuilder} and
  * {@code LoaderStreamBuilderCompat} return types.
  * <br>
- * The routine invocations will run in a dedicated Android loader.
+ * The routine invocations will run in a dedicated Android Loader.
  * <br>
  * Note that the routines generated through the returned builders will ignore any input.
  * <p>
@@ -63,10 +63,10 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     /**
      * Constructor.
      *
-     * @param context                 the loader context.
+     * @param context                 the Loader context.
      * @param delegateFactory         the delegate factory.
      * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the service configuration.
+     * @param loaderConfiguration     the Loader configuration.
      */
     private LoaderAdapterFactoryCompat(@NotNull final LoaderContextCompat context,
             @Nullable final CallAdapter.Factory delegateFactory,
@@ -80,7 +80,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     /**
      * Returns an adapter factory builder.
      *
-     * @param context the loader context.
+     * @param context the Loader context.
      * @return the builder instance.
      */
     @NotNull
@@ -159,10 +159,10 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         /**
          * Constructor.
          *
-         * @param context the loader context.
+         * @param context the Loader context.
          */
         private Builder(@NotNull final LoaderContextCompat context) {
-            mLoaderContext = ConstantConditions.notNull("loader context", context);
+            mLoaderContext = ConstantConditions.notNull("Loader context", context);
         }
 
         @NotNull
@@ -177,7 +177,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         @Override
         public Builder apply(@NotNull final LoaderConfiguration configuration) {
             mLoaderConfiguration =
-                    ConstantConditions.notNull("loader configuration", configuration);
+                    ConstantConditions.notNull("Loader configuration", configuration);
             return this;
         }
 

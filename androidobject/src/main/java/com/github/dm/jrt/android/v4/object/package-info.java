@@ -15,7 +15,7 @@
  */
 
 /**
- * Object routine interfaces and implementations with support for Android compatibility library.
+ * Object routine interfaces and implementations with support for the Android compatibility library.
  * <p>
  * Created by davide-maestroni on 09/25/2014.
  */

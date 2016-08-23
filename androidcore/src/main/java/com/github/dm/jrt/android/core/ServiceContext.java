@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 
 /**
- * Class representing an Android service context.
+ * Class representing an Android Service context.
  * <p>
  * No strong reference to the wrapped contexts will be retained by this class implementations. So,
  * it is up to the caller to ensure that they are not garbage collected before being called.
@@ -46,13 +46,13 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns a context based on the specified instance.
+     * Returns a Context based on the specified instance.
      * <br>
      * The default {@link com.github.dm.jrt.android.core.service.InvocationService
      * InvocationService} class will be employed.
      *
-     * @param context the context.
-     * @return the service context.
+     * @param context the Context.
+     * @return the Service context.
      */
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context) {
@@ -60,12 +60,12 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns a context based on the specified instance, employing a service of the specified
+     * Returns a Context based on the specified instance, employing a Service of the specified
      * type.
      *
-     * @param context      the context.
-     * @param serviceClass the service type.
-     * @return the service context.
+     * @param context      the Context.
+     * @param serviceClass the Service type.
+     * @return the Service context.
      */
     @NotNull
     public static ServiceContext serviceFrom(@NotNull final Context context,
@@ -74,13 +74,13 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns a context based on the specified instance, employing the specified intent to start
-     * the service.
+     * Returns a Context based on the specified instance, employing the specified Intent to start
+     * the Service.
      *
-     * @param context the context.
-     * @param service the service intent.
-     * @return the service context.
-     * @throws java.lang.IllegalArgumentException if the component of the specified intent does not
+     * @param context the Context.
+     * @param service the Service Intent.
+     * @return the Service context.
+     * @throws java.lang.IllegalArgumentException if the component of the specified Intent does not
      *                                            inherit from {@link InvocationService}.
      */
     @NotNull
@@ -91,7 +91,7 @@ public abstract class ServiceContext {
             if ((component == null) || !InvocationService.class.isAssignableFrom(
                     Class.forName(component.getClassName()))) {
                 throw new IllegalArgumentException(
-                        "service class must inherit from " + InvocationService.class.getName());
+                        "Service class must inherit from " + InvocationService.class.getName());
             }
 
         } catch (final ClassNotFoundException e) {
@@ -158,23 +158,23 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns the service context.
+     * Returns the Service context.
      *
-     * @return the context.
+     * @return the Context.
      */
     @Nullable
     public abstract Context getServiceContext();
 
     /**
-     * Returns the service intent.
+     * Returns the Service Intent.
      *
-     * @return the intent.
+     * @return the Intent.
      */
     @NotNull
     public abstract Intent getServiceIntent();
 
     /**
-     * Service context wrapping a service intent.
+     * Service context wrapping a Service Intent.
      */
     private static class IntentServiceContext extends ServiceContext {
 
@@ -185,14 +185,14 @@ public abstract class ServiceContext {
         /**
          * Constructor.
          *
-         * @param context the context.
-         * @param service the service intent.
+         * @param context the Context.
+         * @param service the Service Intent.
          */
         private IntentServiceContext(@NotNull final Context context,
                 @NotNull final Intent service) {
             mContext = new WeakReference<Context>(
-                    ConstantConditions.notNull("service context", context));
-            mIntent = ConstantConditions.notNull("service intent", service);
+                    ConstantConditions.notNull("Service context", context));
+            mIntent = ConstantConditions.notNull("Service Intent", service);
         }
 
         @Override

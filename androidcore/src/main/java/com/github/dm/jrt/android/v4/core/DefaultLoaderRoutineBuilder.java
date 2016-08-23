@@ -34,7 +34,7 @@ import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
 
 /**
- * Default implementation of a loader routine builder.
+ * Default implementation of a Loader routine builder.
  * <p>
  * Created by davide-maestroni on 12/09/2014.
  *
@@ -60,7 +60,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      */
     DefaultLoaderRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-        mContext = ConstantConditions.notNull("loader context", context);
+        mContext = ConstantConditions.notNull("Loader context", context);
         final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
         if (!Reflection.hasStaticScope(factoryClass)) {
             throw new IllegalArgumentException(
@@ -90,7 +90,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     @NotNull
     @Override
     public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
         return this;
     }
 

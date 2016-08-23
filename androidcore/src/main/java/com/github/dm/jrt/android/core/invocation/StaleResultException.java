@@ -26,7 +26,7 @@ public class StaleResultException extends InvocationClashException {
     /**
      * Constructor.
      *
-     * @param id the loader ID.
+     * @param id the Loader ID.
      */
     public StaleResultException(final int id) {
         super(id);

@@ -25,7 +25,7 @@ import android.view.WindowManager.LayoutParams;
 import com.github.dm.jrt.android.R;
 
 /**
- * Test activity.
+ * Test Activity.
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */

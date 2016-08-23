@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Implementation of a context invocation simply passing on the input data.
+ * Implementation of a Context invocation simply passing on the input data.
  * <p>
  * Created by davide-maestroni on 10/06/2015.
  *

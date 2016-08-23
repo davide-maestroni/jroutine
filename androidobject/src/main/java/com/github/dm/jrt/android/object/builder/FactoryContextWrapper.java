@@ -22,9 +22,9 @@ import android.content.ContextWrapper;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract implementation of a context wrapper implementing a factory context.
+ * Abstract implementation of a Context wrapper implementing a factory context.
  * <br>
- * The class wraps the application context of the specified base context.
+ * The class wraps the application Context of the specified base Context.
  * <p>
  * Created by davide-maestroni on 07/09/2015.
  */
@@ -33,7 +33,7 @@ public abstract class FactoryContextWrapper extends ContextWrapper implements Fa
     /**
      * Constructor.
      *
-     * @param base the base context.
+     * @param base the base Context.
      */
     public FactoryContextWrapper(@NotNull final Context base) {
         super(base.getApplicationContext());

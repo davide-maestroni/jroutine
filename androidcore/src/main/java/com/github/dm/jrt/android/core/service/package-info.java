@@ -15,7 +15,7 @@
  */
 
 /**
- * Android service classes implementation.
+ * Android Service classes implementation.
  * <p>
  * Created by davide-maestroni on 01/10/2015.
  */

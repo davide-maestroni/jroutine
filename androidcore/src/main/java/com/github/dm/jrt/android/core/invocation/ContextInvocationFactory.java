@@ -32,11 +32,11 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 
 /**
- * Abstract class defining a factory of context invocations.
+ * Abstract class defining a factory of Context invocations.
  * <br>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
  * and {@code hashCode()} implementations. Note that such methods might be employed to uniquely
- * identify the loader backing the routine execution.
+ * identify the Loader backing the routine execution.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
@@ -55,7 +55,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Builds and returns a new context invocation factory wrapping the specified one.
+     * Builds and returns a new Context invocation factory wrapping the specified one.
      *
      * @param factory the invocation factory.
      * @param <IN>    the input data type.
@@ -71,7 +71,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Builds and returns a new context invocation factory creating instances of the specified
+     * Builds and returns a new Context invocation factory creating instances of the specified
      * class.
      * <br>
      * The method accepts also classes implementing {@link ContextInvocation}.
@@ -94,7 +94,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Builds and returns a new context invocation factory creating instances of the specified
+     * Builds and returns a new Context invocation factory creating instances of the specified
      * class by passing the specified arguments to the class constructor.
      * <br>
      * The method accepts also classes implementing {@link ContextInvocation}.
@@ -126,7 +126,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Builds and returns a new context invocation factory creating instances of the specified class
+     * Builds and returns a new Context invocation factory creating instances of the specified class
      * token.
      * <br>
      * The method accepts also classes implementing {@link ContextInvocation}.
@@ -149,7 +149,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Builds and returns a new context invocation factory creating instances of the specified class
+     * Builds and returns a new Context invocation factory creating instances of the specified class
      * token by passing the specified arguments to the class constructor.
      * <br>
      * The method accepts also classes implementing {@link ContextInvocation}.
@@ -175,10 +175,10 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Converts the specified context invocation factory into a factory of invocations.
+     * Converts the specified Context invocation factory into a factory of invocations.
      *
-     * @param context the routine context.
-     * @param factory the context invocation factory.
+     * @param context the routine Context.
+     * @param factory the Context invocation factory.
      * @param <IN>    the input data type.
      * @param <OUT>   the output data type.
      * @return the invocation factory.
@@ -190,21 +190,21 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Creates and return a new context invocation instance.
+     * Creates and return a new Context invocation instance.
      * <br>
      * A proper implementation will return a new invocation instance each time it is called, unless
      * the returned object is immutable and does not cause any side effect.
      * <br>
      * Any behavior other than that may lead to unexpected results.
      *
-     * @return the context invocation instance.
+     * @return the Context invocation instance.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     public abstract ContextInvocation<IN, OUT> newInvocation() throws Exception;
 
     /**
-     * Implementation of an invocation factory adapting context invocations to be used as common
+     * Implementation of an invocation factory adapting Context invocations to be used as common
      * ones.
      *
      * @param <IN>  the input data type.
@@ -220,13 +220,13 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         /**
          * Constructor.
          *
-         * @param context the context.
-         * @param factory the context invocation factory.
+         * @param context the Context.
+         * @param factory the Context invocation factory.
          */
         private AdaptingContextInvocationFactory(@NotNull final Context context,
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-            super(asArgs(ConstantConditions.notNull("routine context", context),
-                    ConstantConditions.notNull("context invocation factory", factory)));
+            super(asArgs(ConstantConditions.notNull("routine Context", context),
+                    ConstantConditions.notNull("Context invocation factory", factory)));
             mContext = context;
             mFactory = factory;
         }
@@ -280,7 +280,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     }
 
     /**
-     * Implementation of a context invocation factory wrapping common invocations.
+     * Implementation of a Context invocation factory wrapping common invocations.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.

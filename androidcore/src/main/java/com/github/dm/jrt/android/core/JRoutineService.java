@@ -28,23 +28,23 @@ import org.jetbrains.annotations.NotNull;
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.
  * <br>
- * Routine invocations created through the returned builder will be executed inside a service
- * specified by the service context.
+ * Routine invocations created through the returned builder will be executed inside a Service
+ * specified by the Service context.
  * <p>
- * It is up to the caller to properly declare the service in the manifest file. Note also that it is
- * possible to manage the service lifecycle starting it through the
- * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
+ * It is up to the caller to properly declare the Service in the manifest file. Note also that it is
+ * possible to manage the Service lifecycle starting it through the
+ * {@link android.content.Context#startService(android.content.Intent)} method. Normally the Service
  * will stay active only during a routine invocation. In fact, it is responsibility of the caller
  * to ensure that the started invocations have completed or have been aborted when the relative
- * context (for example the activity) is destroyed, so to avoid the leak of IPC connections.
+ * Context (for example the Activity) is destroyed, so to avoid the leak of IPC connections.
  * <br>
- * The service can be also made run in a different process, however, in such case, the data passed
+ * The Service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels, as well as the factory arguments, must comply with
  * the {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise
  * when employing {@link java.io.Serializable} objects on some OS versions, so, it is advisable to
  * use {@link android.os.Parcelable} objects instead.
  * <p>
- * For example, in order to get a resource from the network, needed to fill an activity UI:
+ * For example, in order to get a resource from the network, needed to fill an Activity UI:
  * <pre>
  *     <code>
  *
@@ -86,10 +86,10 @@ public class JRoutineService {
     }
 
     /**
-     * Returns a context based builder of service routine builders.
+     * Returns a Context based builder of Service routine builders.
      *
-     * @param context the service context.
-     * @return the context based builder.
+     * @param context the Service context.
+     * @return the Context based builder.
      */
     @NotNull
     public static ServiceBuilder on(@NotNull final ServiceContext context) {
@@ -97,7 +97,7 @@ public class JRoutineService {
     }
 
     /**
-     * Context based builder of service proxy routine builders.
+     * Context based builder of Service proxy routine builders.
      */
     public static class ServiceBuilder {
 
@@ -106,18 +106,18 @@ public class JRoutineService {
         /**
          * Constructor.
          *
-         * @param context the service context.
+         * @param context the Service context.
          */
         private ServiceBuilder(@NotNull final ServiceContext context) {
-            mContext = ConstantConditions.notNull("service context", context);
+            mContext = ConstantConditions.notNull("Service context", context);
         }
 
         /**
-         * Returns a builder of routines running in a service based on the builder context.
+         * Returns a builder of routines running in a Service based on the builder context.
          * <br>
          * In order to customize the invocation creation, the caller must override the method
          * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
-         *Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.
+         *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
          * <p>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,

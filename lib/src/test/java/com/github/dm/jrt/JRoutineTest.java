@@ -203,7 +203,7 @@ public class JRoutineTest {
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutine.withCall(new BiConsumer<List<String>, Channel<String, ?>>() {
+                JRoutine.withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
 
                     public void accept(final List<String> strings,
                             final Channel<String, ?> result) {

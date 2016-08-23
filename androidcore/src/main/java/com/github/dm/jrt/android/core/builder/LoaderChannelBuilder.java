@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a builder of channels bound to loader invocations.
+ * Interface defining a builder of channels bound to Loader invocations.
  * <br>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still be running (or cached) at the time of the channel creation.
@@ -60,7 +60,7 @@ public interface LoaderChannelBuilder extends ChannelConfigurable<LoaderChannelB
      *
      * @param <OUT> the output data type.
      * @return the newly created channel.
-     * @throws java.lang.IllegalArgumentException if the configured loader ID is equal to AUTO.
+     * @throws java.lang.IllegalArgumentException if the configured Loader ID is equal to AUTO.
      */
     @NotNull
     <OUT> Channel<?, OUT> buildChannel();

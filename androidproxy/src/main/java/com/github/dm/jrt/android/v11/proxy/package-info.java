@@ -15,7 +15,7 @@
  */
 
 /**
- * Routine proxy core interfaces and implementations bound to an Android context.
+ * Routine proxy core interfaces and implementations bound to an Android Context.
  * <p>
  * Created by davide-maestroni on 05/10/2015.
  */

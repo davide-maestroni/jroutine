@@ -64,7 +64,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
 import static java.util.UUID.randomUUID;
 
 /**
- * Routine implementation employing an Android service to run its invocations.
+ * Routine implementation employing an Android Service to run its invocations.
  * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
@@ -84,10 +84,10 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param context                 the service context.
+     * @param context                 the Service context.
      * @param target                  the invocation factory target.
      * @param invocationConfiguration the invocation configuration.
-     * @param serviceConfiguration    the service configuration.
+     * @param serviceConfiguration    the Service configuration.
      * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
      *                                            parameters was found for the configured log or the
      *                                            configured runner.
@@ -100,7 +100,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         super(invocationConfiguration);
         final Context serviceContext = context.getServiceContext();
         if (serviceContext == null) {
-            throw new IllegalStateException("the service context has been destroyed");
+            throw new IllegalStateException("the Service Context has been destroyed");
         }
 
         final Class<? extends Runner> runnerClass = serviceConfiguration.getRunnerClassOrElse(null);
@@ -120,7 +120,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         mServiceConfiguration = serviceConfiguration;
         final Class<? extends ContextInvocation<IN, OUT>> invocationClass =
                 target.getInvocationClass();
-        getLogger().dbg("building service routine on invocation %s with configurations: %s - %s",
+        getLogger().dbg("building Service routine on invocation %s with configurations: %s - %s",
                 invocationClass.getName(), invocationConfiguration, serviceConfiguration);
     }
 
@@ -132,7 +132,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     /**
-     * Channel consumer sending messages to the service.
+     * Channel consumer sending messages to the Service.
      *
      * @param <IN> the input data type.
      */
@@ -148,8 +148,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
          * Constructor.
          *
          * @param invocationId the invocation ID.
-         * @param inMessenger  the messenger receiving data from the service.
-         * @param outMessenger the messenger sending data to the service.
+         * @param inMessenger  the messenger receiving data from the Service.
+         * @param outMessenger the messenger sending data to the Service.
          */
         private ConnectionChannelConsumer(@NotNull final String invocationId,
                 @NotNull final Messenger inMessenger, @NotNull final Messenger outMessenger) {
@@ -184,7 +184,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     /**
-     * Handler implementation managing incoming messages from the service.
+     * Handler implementation managing incoming messages from the Service.
      *
      * @param <OUT> the output data type.
      */
@@ -204,7 +204,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
          * Constructor.
          *
          * @param looper        the message looper.
-         * @param context       the service context.
+         * @param context       the Service context.
          * @param outputChannel the output channel.
          * @param logger        the logger instance.
          */
@@ -220,7 +220,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         @SuppressWarnings("unchecked")
         public void handleMessage(@NotNull final Message msg) {
             final Logger logger = mLogger;
-            logger.dbg("incoming service message: %s", msg);
+            logger.dbg("incoming Service message: %s", msg);
             try {
                 switch (msg.what) {
                     case InvocationService.MSG_DATA:
@@ -242,7 +242,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                 }
 
             } catch (final Throwable t) {
-                logger.wrn(t, "error while handling service message");
+                logger.wrn(t, "error while handling Service message");
                 mOutputChannel.abort(t);
                 unbindService();
             }
@@ -280,7 +280,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     /**
-     * Service connection implementation managing the service communication state.
+     * Service connection implementation managing the Service communication state.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
@@ -309,8 +309,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
          * @param invocationId            the invocation ID.
          * @param target                  the invocation factory target.
          * @param invocationConfiguration the invocation configuration.
-         * @param serviceConfiguration    the service configuration.
-         * @param handler                 the handler managing messages from the service.
+         * @param serviceConfiguration    the Service configuration.
+         * @param handler                 the handler managing messages from the Service.
          * @param inputChannel            the input channel.
          * @param outputChannel           the output channel.
          * @param logger                  the logger instance.
@@ -335,7 +335,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
             final Logger logger = mLogger;
-            logger.dbg("service connected: %s", name);
+            logger.dbg("Service connected: %s", name);
             final Messenger outMessenger = new Messenger(service);
             final Message message = Message.obtain(null, InvocationService.MSG_INIT);
             logger.dbg("sending async invocation message");
@@ -356,7 +356,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                         new ConnectionChannelConsumer<IN>(invocationId, inMessenger, outMessenger));
 
             } catch (final RemoteException e) {
-                logger.err(e, "error while sending service invocation message");
+                logger.err(e, "error while sending Service invocation message");
                 mIncomingHandler.unbindService();
                 mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
             }
@@ -364,13 +364,13 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            mLogger.dbg("service disconnected: %s", name);
+            mLogger.dbg("Service disconnected: %s", name);
             mOutputChannel.abort(new ServiceDisconnectedException(name));
         }
     }
 
     /**
-     * Invocation implementation delegating the input processing to a dedicated service.
+     * Invocation implementation delegating the input processing to a dedicated Service.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
@@ -394,10 +394,10 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         /**
          * Constructor.
          *
-         * @param context                 the service context.
+         * @param context                 the Service context.
          * @param target                  the invocation factory target.
          * @param invocationConfiguration the invocation configuration.
-         * @param serviceConfiguration    the service configuration.
+         * @param serviceConfiguration    the Service configuration.
          * @param logger                  the logger instance.
          */
         private ServiceInvocation(@NotNull final ServiceContext context,
@@ -469,7 +469,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
             final ServiceContext context = mContext;
             final Context serviceContext = context.getServiceContext();
             if (serviceContext == null) {
-                throw new IllegalStateException("the service context has been destroyed");
+                throw new IllegalStateException("the Service Context has been destroyed");
             }
 
             final Intent intent = context.getServiceIntent();
@@ -478,8 +478,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                             mInvocationConfiguration, mServiceConfiguration, handler, mInputChannel,
                             mOutputChannel, mLogger);
             if (!serviceContext.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
-                throw new RoutineException("failed to bind to service: " + intent
-                        + ", remember to add the service declaration to the Android manifest "
+                throw new RoutineException("failed to bind to Service: " + intent
+                        + ", remember to add the Service declaration to the Android manifest "
                         + "file!");
             }
 

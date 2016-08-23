@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Empty abstract implementation of a context invocation.
+ * Empty abstract implementation of a Context invocation.
  * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p>
@@ -43,9 +43,9 @@ public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocat
     }
 
     /**
-     * Returns this invocation context.
+     * Returns this invocation Context.
      *
-     * @return the context of this invocation.
+     * @return the Context of this invocation.
      */
     protected Context getContext() {
         return mContext;

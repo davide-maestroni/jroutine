@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Default implementation of a service target routine builder.
+ * Default implementation of a Service target routine builder.
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
@@ -59,12 +59,12 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     /**
      * Constructor.
      *
-     * @param context the service context.
+     * @param context the Service context.
      * @param target  the invocation target.
      */
     DefaultServiceAutoProxyRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("service context", context);
+        mContext = ConstantConditions.notNull("Service context", context);
         mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
@@ -126,7 +126,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
     @NotNull
     @Override
     public ServiceAutoProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
         return this;
     }
 

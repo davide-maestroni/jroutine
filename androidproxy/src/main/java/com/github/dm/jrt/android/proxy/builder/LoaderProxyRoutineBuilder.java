@@ -25,8 +25,8 @@ import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of routines wrapping an object methods, bound to a context
- * lifecycle.
+ * Interface defining a builder of routines wrapping an object methods, running in dedicated
+ * Loaders.
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  */

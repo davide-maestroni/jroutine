@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes,
- * enabling asynchronous calls to the target instance methods in a dedicated service.
+ * enabling asynchronous calls to the target instance methods in a dedicated Service.
  * <br>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.

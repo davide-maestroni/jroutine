@@ -55,7 +55,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
- * Basic implementation of a service running routine invocations.
+ * Basic implementation of a Service running routine invocations.
  * <p>
  * Created by davide-maestroni on 01/09/2015.
  */
@@ -251,11 +251,11 @@ public class InvocationService extends Service {
     }
 
     /**
-     * Returns a context invocation factory instance creating invocations of the specified type.
+     * Returns a Context invocation factory instance creating invocations of the specified type.
      *
      * @param targetClass the target invocation class.
      * @param args        the factory arguments.
-     * @return the context invocation factory.
+     * @return the Context invocation factory.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
@@ -289,25 +289,25 @@ public class InvocationService extends Service {
     private RoutineInvocation getInvocation(@NotNull final Message message) {
         final Bundle data = message.peekData();
         if (data == null) {
-            mLogger.err("the service message has no data");
+            mLogger.err("the Service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the Service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
         final String invocationId = data.getString(KEY_INVOCATION_ID);
         if (invocationId == null) {
-            mLogger.err("the service message has no invocation ID");
+            mLogger.err("the Service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getName() + "] the service message has no invocation ID");
+                    "[" + getClass().getName() + "] the Service message has no invocation ID");
         }
 
         synchronized (mMutex) {
             final RoutineInvocation invocation = mInvocations.get(invocationId);
             if (invocation == null) {
-                mLogger.err("the service message has invalid invocation ID: %s", invocationId);
+                mLogger.err("the Service message has invalid invocation ID: %s", invocationId);
                 throw new IllegalArgumentException(
-                        "[" + getClass().getName() + "] the service message has invalid "
+                        "[" + getClass().getName() + "] the Service message has invalid "
                                 + "invocation ID: " + invocationId);
             }
 
@@ -318,26 +318,26 @@ public class InvocationService extends Service {
     private void initRoutine(@NotNull final Message message) throws Exception {
         final Bundle data = message.peekData();
         if (data == null) {
-            mLogger.err("the service message has no data");
+            mLogger.err("the Service message has no data");
             throw new IllegalArgumentException(
-                    "[" + getClass().getName() + "] the service message has no data");
+                    "[" + getClass().getName() + "] the Service message has no data");
         }
 
         data.setClassLoader(getClassLoader());
         final String invocationId = data.getString(KEY_INVOCATION_ID);
         if (invocationId == null) {
-            mLogger.err("the service message has no invocation ID");
+            mLogger.err("the Service message has no invocation ID");
             throw new IllegalArgumentException(
-                    "[" + getClass().getName() + "] the service message has no invocation ID");
+                    "[" + getClass().getName() + "] the Service message has no invocation ID");
         }
 
         @SuppressWarnings("unchecked") final Class<? extends ContextInvocation<?, ?>> targetClass =
                 (Class<? extends ContextInvocation<?, ?>>) data.getSerializable(
                         KEY_TARGET_INVOCATION);
         if (targetClass == null) {
-            mLogger.err("the service message has no target invocation class");
+            mLogger.err("the Service message has no target invocation class");
             throw new IllegalArgumentException(
-                    "[" + getClass().getName() + "] the service message has no target "
+                    "[" + getClass().getName() + "] the Service message has no target "
                             + "invocation class");
         }
 
@@ -424,7 +424,7 @@ public class InvocationService extends Service {
         /**
          * Constructor.
          *
-         * @param context       the routine context.
+         * @param context       the routine Context.
          * @param configuration the invocation configuration.
          * @param factory       the invocation factory.
          */
@@ -458,7 +458,7 @@ public class InvocationService extends Service {
         /**
          * Constructor.
          *
-         * @param service the service.
+         * @param service the Service.
          */
         private IncomingHandler(@NotNull final InvocationService service) {
             mService = new WeakReference<InvocationService>(service);
@@ -718,7 +718,7 @@ public class InvocationService extends Service {
         }
 
         /**
-         * Recycles this invocation, that is, removes it from the service cache.
+         * Recycles this invocation, that is, removes it from the Service cache.
          */
         void recycle() {
             synchronized (mMutex) {

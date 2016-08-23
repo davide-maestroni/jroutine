@@ -76,7 +76,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Loader object routine activity unit tests.
+ * Loader object routine Activity unit tests.
  * <p>
  * Created by davide-maestroni on 04/07/2015.
  */
@@ -1800,7 +1800,7 @@ public class LoaderObjectRoutineActivityTest
         /**
          * Constructor.
          *
-         * @param base the base context.
+         * @param base the base Context.
          */
         public StringContext(@NotNull final Context base) {
 

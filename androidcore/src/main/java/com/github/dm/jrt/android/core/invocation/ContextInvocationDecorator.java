@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Base context invocation decorator implementation.
+ * Base Context invocation decorator implementation.
  * <p>
  * Created by davide-maestroni on 08/19/2015.
  *

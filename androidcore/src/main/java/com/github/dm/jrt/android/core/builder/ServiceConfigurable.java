@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.core.config.ServiceConfiguration.Configurable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an object that can be configured through a service configuration.
+ * Interface defining an object that can be configured through a Service configuration.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
@@ -31,13 +31,13 @@ import org.jetbrains.annotations.NotNull;
 public interface ServiceConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
-     * Gets the service configuration builder related to the instance.
+     * Gets the Service configuration builder related to the instance.
      * <br>
      * The configuration options not supported by the specific implementation might be ignored.
      * <p>
      * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the service configuration builder.
+     * @return the Service configuration builder.
      */
     @NotNull
     Builder<? extends TYPE> applyServiceConfiguration();

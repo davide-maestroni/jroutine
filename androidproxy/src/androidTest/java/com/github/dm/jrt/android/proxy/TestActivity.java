@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
 /**
- * Test activity.
+ * Test Activity.
  * <p>
  * Created by davide-maestroni on 01/11/2015.
  */

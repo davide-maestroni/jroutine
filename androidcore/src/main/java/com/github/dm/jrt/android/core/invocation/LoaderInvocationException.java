@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.core.invocation;
 import com.github.dm.jrt.core.error.RoutineException;
 
 /**
- * Base exception indicating that an unrecoverable error occurred during a loader invocation
+ * Base exception indicating that an unrecoverable error occurred during a Loader invocation
  * execution.
  * <p>
  * Created by davide-maestroni on 06/03/2015.
@@ -38,16 +38,16 @@ public class LoaderInvocationException extends RoutineException {
     /**
      * Constructor.
      *
-     * @param id the loader ID.
+     * @param id the Loader ID.
      */
     public LoaderInvocationException(final int id) {
         mId = id;
     }
 
     /**
-     * Returns the loader ID.
+     * Returns the Loader ID.
      *
-     * @return the loader ID.
+     * @return the Loader ID.
      */
     public int getId() {
         return mId;

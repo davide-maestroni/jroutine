@@ -342,6 +342,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * Input channels can be passed to the {@code call()} method in place of the actual parameter
  * values, though, the order and total number of inputs must match the target method signature.
+ * Moreover, all the input channels must be closed before the wrapped method is actually invoked.
  * <br>
  * Results can be collected through the returned output channel.
  * <p>
@@ -357,7 +358,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         outputChannel.after(seconds(1)).next(); // expected value: "Hello JRoutine!"
  *     </code>
  * </pre>
- * Note that the input channels must be closed before the wrapped method is actually invoked.
  * <p>
  * Created by davide-maestroni on 08/10/2016.
  */

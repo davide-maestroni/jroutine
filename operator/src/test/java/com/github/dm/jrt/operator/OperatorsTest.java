@@ -2070,6 +2070,14 @@ public class OperatorsTest {
                                .call(1, 2)
                                .after(seconds(3))
                                .next()).containsExactly(1, 2);
+        assertThat(JRoutineCore.with(Operators.toArray())
+                               .call("test1", "test2")
+                               .after(seconds(3))
+                               .next()).containsExactly("test1", "test2");
+        assertThat(JRoutineCore.with(Operators.toArray())
+                               .call(1, 2)
+                               .after(seconds(3))
+                               .next()).containsExactly(1, 2);
     }
 
     @Test

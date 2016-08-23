@@ -1632,6 +1632,17 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations collecting inputs into an array of objects.
+     *
+     * @param <IN> the input data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<? super IN, Object[]> toArray() {
+        return toArray(Object.class);
+    }
+
+    /**
      * Returns a factory of invocations collecting inputs into an array.
      *
      * @param componentType the array component type.

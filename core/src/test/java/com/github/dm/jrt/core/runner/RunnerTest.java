@@ -300,12 +300,12 @@ public class RunnerTest {
             }
         }, 0, TimeUnit.MILLISECONDS);
 
-        millis(300).sleepAtLeast();
+        millis(200).sleepAtLeast();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
-        millis(300).sleepAtLeast();
+        millis(200).sleepAtLeast();
         assertThat(execution.isRun()).isFalse();
         runner.cancel(execution);
-        millis(500).sleepAtLeast();
+        seconds(1).sleepAtLeast();
         assertThat(execution.isRun()).isFalse();
         execution.reset();
         runner.run(new TestExecution() {

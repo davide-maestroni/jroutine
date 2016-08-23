@@ -34,24 +34,23 @@ buildscript {
 */
 
 Project.metaClass.toVersionRange = { String version ->
-
     def versions = version.split('\\.')
     "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++Integer.parseInt(versions[1]) + ")"
 }
-Project.metaClass.getWorkingBranch = {
 
+Project.metaClass.getWorkingBranch = {
     "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()
 }
-Project.metaClass.isWorkingBranch = { String branch ->
 
+Project.metaClass.isWorkingBranch = { String branch ->
     (branch != null) && branch.equals(delegate.workingBranch)
 }
-Project.metaClass.getCompileJavaCompatibility = {
 
+Project.metaClass.getCompileJavaCompatibility = {
     compileJava.sourceCompatibility
 }
-Project.metaClass.setCompileJavaCompatibility = { JavaVersion javaVersion ->
 
+Project.metaClass.setCompileJavaCompatibility = { JavaVersion javaVersion ->
     compileJava {
         def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
         if ((javaHome != null) && (javaHome.length() > 0)) {
@@ -68,12 +67,12 @@ Project.metaClass.setCompileJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.getCompileTestJavaCompatibility = {
 
+Project.metaClass.getCompileTestJavaCompatibility = {
     compileTestJava.sourceCompatibility
 }
-Project.metaClass.setCompileTestJavaCompatibility = { JavaVersion javaVersion ->
 
+Project.metaClass.setCompileTestJavaCompatibility = { JavaVersion javaVersion ->
     compileTestJava {
         def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
         if ((javaHome != null) && (javaHome.length() > 0)) {
@@ -90,21 +89,20 @@ Project.metaClass.setCompileTestJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.setJavaCompilerArgs = { args ->
 
+Project.metaClass.setJavaCompilerArgs = { args ->
     tasks.withType(JavaCompile) {
         options.compilerArgs = args
     }
 }
-Project.metaClass.conditionalDependencies = { Closure closure ->
 
+Project.metaClass.conditionalDependencies = { Closure closure ->
     closure.delegate = new ConditionalDependencySpecs(delegate)
     closure.resolveStrategy = Closure.DELEGATE_FIRST
     closure()
 }
 
 afterEvaluate { project ->
-
     def artifactPackaging = 'jar'
     if (isJavaProject(project)) {
         if (project.plugins.hasPlugin('jacoco')) {
@@ -171,7 +169,6 @@ afterEvaluate { project ->
 
         def variants = getAndroidVariants(project)
         variants.all { variant ->
-
             def buildTypeName = variant.buildType.name
             if (buildTypeName.equals("debug")) {
                 if (project.plugins.hasPlugin('findbugs')) {
@@ -295,32 +292,26 @@ afterEvaluate { project ->
 }
 
 def isJavaProject(project) {
-
     project.plugins.hasPlugin('java')
 }
 
 def isAndroidProject(project) {
-
     isAndroidLibrary(project) || isAndroidApplication(project)
 }
 
 def isAndroidLibrary(project) {
-
     project.plugins.hasPlugin('com.android.library')
 }
 
 def isAndroidApplication(project) {
-
     project.plugins.hasPlugin('com.android.application')
 }
 
 def getAndroidVariants(project) {
-
     isAndroidLibrary(project) ? project.android.libraryVariants : project.android.applicationVariants
 }
 
 def addJavadocTask(project, variant, taskName) {
-
     def variantName = variant.name.capitalize()
     project.task(taskName, type: Javadoc, dependsOn: "assemble${variantName}") {
         description "Generates Javadoc from the ${variantName} build"
@@ -344,12 +335,10 @@ class ConditionalDependencySpecs {
     Project myProject
 
     ConditionalDependencySpecs(Project context) {
-
         myProject = context
     }
 
     def compile(Object config) {
-
         def name = config.name
         def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
         def artifact = config.artifact(dependsOnProject)
@@ -382,7 +371,6 @@ class ConditionalDependencySpecs {
     }
 
     def compile(String name) {
-
         def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
         compile(name: name, artifact: { name }, version: dependsOnProject.getProperty('releaseVersion'))
     }

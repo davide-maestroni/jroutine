@@ -40,11 +40,10 @@ task clean(type: Delete) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '2.14.1'
 }
 
 gradle.projectsEvaluated {
-
     apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: 'jacoco'
 

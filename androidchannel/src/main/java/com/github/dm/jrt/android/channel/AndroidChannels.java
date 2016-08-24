@@ -157,7 +157,7 @@ public class AndroidChannels extends Channels {
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>>
-    selectParcelableInput(
+    selectInputParcelable(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             final int index) {
         return new InputSelectBuilder<DATA, IN>(channel, index);
@@ -181,7 +181,7 @@ public class AndroidChannels extends Channels {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-    selectableParcelableOutput(
+    selectableOutputParcelable(
             @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new SelectableOutputBuilder<OUT>(channel, index);
     }

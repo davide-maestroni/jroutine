@@ -523,7 +523,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 }
             }
 
-            return (OutputChannel<OUT>) outputFrom(channel.close());
+            return (OutputChannel<OUT>) toOutput(channel.close());
         }
     }
 

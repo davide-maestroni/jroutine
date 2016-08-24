@@ -77,7 +77,7 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<
         int i = mStartIndex;
         for (final Channel<?, ? extends OUT> channel : mChannels) {
             outputChannel.pass(
-                    AndroidChannels.selectableParcelableOutput(channel, i++).buildChannels());
+                    AndroidChannels.selectableOutputParcelable(channel, i++).buildChannels());
         }
 
         return outputChannel.close();

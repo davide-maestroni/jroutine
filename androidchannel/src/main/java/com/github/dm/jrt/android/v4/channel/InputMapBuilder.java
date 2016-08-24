@@ -90,7 +90,7 @@ class InputMapBuilder<DATA, IN extends DATA>
                 new SparseArrayCompat<Channel<IN, ?>>(indexes.size());
         for (final Integer index : indexes) {
             final Channel<IN, ?> inputChannel =
-                    AndroidChannels.<DATA, IN>selectParcelableInput(channel, index).apply(
+                    AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(
                             configuration).buildChannels();
             channelMap.put(index, inputChannel);
         }

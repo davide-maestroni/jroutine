@@ -69,7 +69,7 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectab
                 JRoutineCore.io().apply(configuration).buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
-            outputChannel.pass(AndroidChannels.selectableParcelableOutput(channelMap.valueAt(i),
+            outputChannel.pass(AndroidChannels.selectableOutputParcelable(channelMap.valueAt(i),
                     channelMap.keyAt(i)).buildChannels());
         }
 

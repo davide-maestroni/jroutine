@@ -182,10 +182,10 @@ public class OutputChannelTest {
     public void testAsynchronousInput2() {
         final UnitDuration timeout = seconds(1);
         final OutputChannel<String> channel1 = //
-                RoutineMethod.outputFrom(JRoutineCore.io()
-                                                     .applyChannelConfiguration()
-                                                     .withOrder(OrderType.BY_CALL)
-                                                     .configured().<String>buildChannel());
+                RoutineMethod.toOutput(JRoutineCore.io()
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .configured().<String>buildChannel());
         new Thread() {
 
             @Override
@@ -258,11 +258,11 @@ public class OutputChannelTest {
     @Test
     public void testMaxSize() {
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io()
-                                                 .applyChannelConfiguration()
-                                                 .withMaxSize(1)
-                                                 .configured()
-                                                 .buildChannel()).pass("test1", "test2");
+            RoutineMethod.toOutput(JRoutineCore.io()
+                                               .applyChannelConfiguration()
+                                               .withMaxSize(1)
+                                               .configured()
+                                               .buildChannel()).pass("test1", "test2");
             fail();
 
         } catch (final DeadlockException ignored) {
@@ -303,19 +303,19 @@ public class OutputChannelTest {
 
     @Test
     public void testNextList() {
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .pass("test1", "test2", "test3", "test4")
                                 .close()
                                 .after(seconds(1))
                                 .next(2)).containsExactly("test1", "test2");
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .pass("test1")
                                 .close()
                                 .eventuallyContinue()
                                 .after(seconds(1))
                                 .next(2)).containsExactly("test1");
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .eventuallyAbort()
                          .after(seconds(1))
@@ -326,7 +326,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .eventuallyAbort(new IllegalStateException())
                          .after(seconds(1))
@@ -338,7 +338,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .eventuallyFail()
                          .after(seconds(1))
@@ -351,16 +351,16 @@ public class OutputChannelTest {
 
     @Test
     public void testNextOr() {
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .pass("test1")
                                 .after(seconds(1))
                                 .nextOrElse(2)).isEqualTo("test1");
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .eventuallyContinue()
                                 .after(seconds(1))
                                 .nextOrElse(2)).isEqualTo(2);
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .eventuallyAbort()
                          .after(millis(100))
                          .nextOrElse("test2");
@@ -370,7 +370,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .eventuallyAbort(new IllegalStateException())
                          .after(millis(100))
                          .nextOrElse("test2");
@@ -381,7 +381,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .eventuallyFail()
                          .after(millis(100))
                          .nextOrElse("test2");
@@ -427,16 +427,16 @@ public class OutputChannelTest {
     public void testOrderType() {
         final UnitDuration timeout = seconds(1);
         final OutputChannel<Object> channel = //
-                RoutineMethod.outputFrom(JRoutineCore.io()
-                                                     .applyChannelConfiguration()
-                                                     .withOrder(OrderType.BY_CALL)
-                                                     .withRunner(Runners.sharedRunner())
-                                                     .withMaxSize(1)
-                                                     .withBackoff(noDelay())
-                                                     .withLogLevel(Level.DEBUG)
-                                                     .withLog(new NullLog())
-                                                     .configured()
-                                                     .buildChannel());
+                RoutineMethod.toOutput(JRoutineCore.io()
+                                                   .applyChannelConfiguration()
+                                                   .withOrder(OrderType.BY_CALL)
+                                                   .withRunner(Runners.sharedRunner())
+                                                   .withMaxSize(1)
+                                                   .withBackoff(noDelay())
+                                                   .withLogLevel(Level.DEBUG)
+                                                   .withLog(new NullLog())
+                                                   .configured()
+                                                   .buildChannel());
         channel.pass(-77L);
         assertThat(channel.after(timeout).next()).isEqualTo(-77L);
         final OutputChannel<Object> channel1 = RoutineMethod.outputChannel();
@@ -474,26 +474,26 @@ public class OutputChannelTest {
     @Test
     public void testPassTimeout() {
         final OutputChannel<Object> channel1 = //
-                RoutineMethod.outputFrom(JRoutineCore.io()
-                                                     .applyChannelConfiguration()
-                                                     .withOutputTimeout(millis(10))
-                                                     .withOutputTimeoutAction(
+                RoutineMethod.toOutput(JRoutineCore.io()
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(
                                                              TimeoutActionType.CONTINUE)
-                                                     .configured()
-                                                     .buildChannel());
+                                                   .configured()
+                                                   .buildChannel());
         assertThat(channel1.all()).isEmpty();
     }
 
     @Test
     public void testPassTimeout2() {
         final OutputChannel<Object> channel2 = //
-                RoutineMethod.outputFrom(JRoutineCore.io()
-                                                     .applyChannelConfiguration()
-                                                     .withOutputTimeout(millis(10))
-                                                     .withOutputTimeoutAction(
+                RoutineMethod.toOutput(JRoutineCore.io()
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(
                                                              TimeoutActionType.ABORT)
-                                                     .configured()
-                                                     .buildChannel());
+                                                   .configured()
+                                                   .buildChannel());
         try {
             channel2.all();
             fail();
@@ -505,13 +505,13 @@ public class OutputChannelTest {
     @Test
     public void testPassTimeout3() {
         final OutputChannel<Object> channel3 = //
-                RoutineMethod.outputFrom(JRoutineCore.io()
-                                                     .applyChannelConfiguration()
-                                                     .withOutputTimeout(millis(10))
-                                                     .withOutputTimeoutAction(
+                RoutineMethod.toOutput(JRoutineCore.io()
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(
                                                              TimeoutActionType.FAIL)
-                                                     .configured()
-                                                     .buildChannel());
+                                                   .configured()
+                                                   .buildChannel());
         try {
             channel3.all();
             fail();
@@ -565,7 +565,7 @@ public class OutputChannelTest {
     @Test
     public void testSize() {
         final OutputChannel<Object> channel =
-                RoutineMethod.outputFrom(JRoutineCore.with(IdentityInvocation.factoryOf()).call());
+                RoutineMethod.toOutput(JRoutineCore.with(IdentityInvocation.factoryOf()).call());
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
@@ -594,13 +594,13 @@ public class OutputChannelTest {
 
     @Test
     public void testSkip() {
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .pass("test1", "test2", "test3", "test4")
                                 .close()
                                 .after(seconds(1))
                                 .skipNext(2)
                                 .all()).containsExactly("test3", "test4");
-        assertThat(RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+        assertThat(RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                                 .pass("test1")
                                 .close()
                                 .eventuallyContinue()
@@ -608,7 +608,7 @@ public class OutputChannelTest {
                                 .skipNext(2)
                                 .all()).isEmpty();
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .close()
                          .eventuallyAbort()
@@ -620,7 +620,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .close()
                          .eventuallyAbort(new IllegalStateException())
@@ -633,7 +633,7 @@ public class OutputChannelTest {
         }
 
         try {
-            RoutineMethod.outputFrom(JRoutineCore.io().buildChannel())
+            RoutineMethod.toOutput(JRoutineCore.io().buildChannel())
                          .pass("test1")
                          .close()
                          .eventuallyFail()

@@ -109,7 +109,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(
+            SparseArrayCompat<Channel<IN, ?>>> selectInputParcelable(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             @NotNull final int... indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -136,7 +136,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(
+            SparseArrayCompat<Channel<IN, ?>>> selectInputParcelable(
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
             @NotNull final Iterable<Integer> indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -163,7 +163,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
-            SparseArrayCompat<Channel<IN, ?>>> selectParcelableInput(final int startIndex,
+            SparseArrayCompat<Channel<IN, ?>>> selectInputParcelable(final int startIndex,
             final int rangeSize,
             @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel) {
         ConstantConditions.positive("range size", rangeSize);
@@ -195,7 +195,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArrayCompat<Channel<?, OUT>>>
-    selectParcelableOutput(
+    selectOutputParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel) {
         ConstantConditions.positive("range size", rangeSize);
@@ -227,7 +227,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArrayCompat<Channel<?, OUT>>>
-    selectParcelableOutput(
+    selectOutputParcelable(
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -257,7 +257,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArrayCompat<Channel<?, OUT>>>
-    selectParcelableOutput(
+    selectOutputParcelable(
             @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();

@@ -487,7 +487,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                 }
             }
 
-            return (OutputChannel<OUT>) outputFrom(channel.close());
+            return (OutputChannel<OUT>) toOutput(channel.close());
         }
     }
 

@@ -250,12 +250,12 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         });
  *     </code>
  * </pre>
- * <h2>Output concatenation</h2>
+ * <h2>Routine concatenation</h2>
  * The output channels passed as parameters, or the one returned by the method, can be successfully
  * bound to other channels in order to concatenate several routine invocations.
  * <br>
  * The same is true for other method routines, when output channels can be passed as inputs as shown
- * in the following examples:
+ * in the following example:
  * <pre>
  *     <code>
  *
@@ -284,13 +284,39 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                     output.pass(mSum);
  *                 }
  *             }
- *         }.call(RoutineMethod.inputFrom(outputChannel), resultChannel);
+ *         }.call(RoutineMethod.toInput(outputChannel), resultChannel);
  *         inputChannel.pass(1, 2, 3, 4).close();
  *         resultChannel.after(seconds(1)).next(); // expected value: 30
  *     </code>
  * </pre>
  * Note how the input channel is closed before reading the output, since the sum routine relies
  * on the completion notification before producing any result.
+ * <br>
+ * It is also possible to feed the routine method with outputs coming from another routine. In case,
+ * for instance, a routine parsing strings into integers has already been implemented, it can be
+ * concatenated to the sum routine method as shown below:
+ * <pre>
+ *     <code>
+ *
+ *         final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
+ *         final OutputChannel&lt;Integer&gt; resultChannel = RoutineMethod.outputChannel();
+ *         new RoutineMethod() {
+ *
+ *             private int mSum;
+ *
+ *             public void sum(final InputChannel&lt;Integer&gt; input,
+ *                     final OutputChannel&lt;Integer&gt; output) {
+ *                 if (input.hasNext()) {
+ *                     mSum += input.next();
+ *                 } else {
+ *                     output.pass(mSum);
+ *                 }
+ *             }
+ *         }.call(RoutineMethod.inputFrom(channel), resultChannel);
+ *         channel.pass("1", "2", "3", "4").close();
+ *         resultChannel.after(seconds(1)).next(); // expected value: 10
+ *     </code>
+ * </pre>
  * <h2>Handling of abortion exception</h2>
  * The routine method is notified also when one of the input or output channels is aborted.
  * <br>
@@ -479,19 +505,22 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <IN> InputChannel<IN> inputChannel() {
-        return inputFrom(JRoutineCore.io().<IN>buildChannel());
+        return toInput(JRoutineCore.io().<IN>buildChannel());
     }
 
     /**
-     * Builds a new input channel wrapping the specified one.
+     * Builds a new input channel and binds the specified one to it.
      *
-     * @param channel the channel to wrap.
+     * @param channel the channel to bind.
      * @param <IN>    the input data type.
      * @return the input channel instance.
      */
     @NotNull
-    public static <IN> InputChannel<IN> inputFrom(@NotNull final Channel<IN, IN> channel) {
-        return new InputChannel<IN>(channel);
+    @SuppressWarnings("unchecked")
+    public static <IN> InputChannel<IN> inputFrom(@NotNull final Channel<?, IN> channel) {
+        final InputChannel<IN> inputChannel = inputChannel();
+        channel.bind(inputChannel).close();
+        return inputChannel;
     }
 
     /**
@@ -504,7 +533,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <IN> InputChannel<IN> inputOf() {
-        return inputFrom(JRoutineCore.io().<IN>of());
+        return toInput(JRoutineCore.io().<IN>of());
     }
 
     /**
@@ -518,7 +547,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <IN> InputChannel<IN> inputOf(@Nullable final IN input) {
-        return inputFrom(JRoutineCore.io().of(input));
+        return toInput(JRoutineCore.io().of(input));
     }
 
     /**
@@ -532,7 +561,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <IN> InputChannel<IN> inputOf(@Nullable final IN... inputs) {
-        return inputFrom(JRoutineCore.io().of(inputs));
+        return toInput(JRoutineCore.io().of(inputs));
     }
 
     /**
@@ -546,7 +575,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <IN> InputChannel<IN> inputOf(@Nullable final Iterable<IN> inputs) {
-        return inputFrom(JRoutineCore.io().of(inputs));
+        return toInput(JRoutineCore.io().of(inputs));
     }
 
     /**
@@ -557,7 +586,34 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     @NotNull
     public static <OUT> OutputChannel<OUT> outputChannel() {
-        return outputFrom(JRoutineCore.io().<OUT>buildChannel());
+        return toOutput(JRoutineCore.io().<OUT>buildChannel());
+    }
+
+    /**
+     * Builds a new output channel and binds it to the specified one.
+     *
+     * @param channel the channel to bind to.
+     * @param <OUT>   the output data type.
+     * @return the output channel instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, ?> channel) {
+        final OutputChannel<OUT> outOutputChannel = outputChannel();
+        outOutputChannel.bind(channel).close();
+        return outOutputChannel;
+    }
+
+    /**
+     * Builds a new input channel wrapping the specified one.
+     *
+     * @param channel the channel to wrap.
+     * @param <IN>    the input data type.
+     * @return the input channel instance.
+     */
+    @NotNull
+    public static <IN> InputChannel<IN> toInput(@NotNull final Channel<IN, IN> channel) {
+        return new InputChannel<IN>(channel);
     }
 
     /**
@@ -568,7 +624,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @return the output channel instance.
      */
     @NotNull
-    public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, OUT> channel) {
+    public static <OUT> OutputChannel<OUT> toOutput(@NotNull final Channel<OUT, OUT> channel) {
         return new OutputChannel<OUT>(channel);
     }
 
@@ -588,14 +644,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
         for (final Object param : params) {
             if (param instanceof InputChannel) {
-                final InputChannel<Object> inputChannel =
-                        inputFrom(JRoutineCore.io().buildChannel());
+                final InputChannel<Object> inputChannel = toInput(JRoutineCore.io().buildChannel());
                 inputChannels.add(inputChannel);
                 parameters.add(inputChannel);
 
             } else if (param instanceof OutputChannel) {
                 final OutputChannel<Object> outputChannel =
-                        outputFrom(JRoutineCore.io().buildChannel());
+                        toOutput(JRoutineCore.io().buildChannel());
                 outputChannels.add(outputChannel);
                 parameters.add(outputChannel);
 
@@ -842,7 +897,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 }
             }
 
-            return (OutputChannel<OUT>) outputFrom(channel.close());
+            return (OutputChannel<OUT>) toOutput(channel.close());
         }
     }
 

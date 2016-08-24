@@ -518,7 +518,7 @@ public class LoaderRoutineMethod extends RoutineMethod
                 }
             }
 
-            return (OutputChannel<OUT>) outputFrom(channel.close());
+            return (OutputChannel<OUT>) toOutput(channel.close());
         }
     }
 

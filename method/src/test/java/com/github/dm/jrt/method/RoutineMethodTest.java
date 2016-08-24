@@ -16,9 +16,13 @@
 
 package com.github.dm.jrt.method;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.runner.Runners;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -162,7 +166,7 @@ public class RoutineMethodTest {
             }
         }.call(inputChannel, outputChannel);
         final OutputChannel<Integer> resultChannel = RoutineMethod.outputChannel();
-        new SumRoutine().call(RoutineMethod.inputFrom(outputChannel), resultChannel);
+        new SumRoutine().call(RoutineMethod.toInput(outputChannel), resultChannel);
         inputChannel.pass(1, 2, 3, 4, 5).close();
         assertThat(resultChannel.after(seconds(1)).next()).isEqualTo(55);
     }
@@ -309,6 +313,32 @@ public class RoutineMethodTest {
     }
 
     @Test
+    public void testInputFrom() {
+        final Channel<String, String> channel = JRoutineCore.io().buildChannel();
+        final InputChannel<String> inputChannel = RoutineMethod.inputFrom(channel);
+        assertThat(channel.isBound()).isTrue();
+        assertThat(inputChannel.isOpen()).isFalse();
+        channel.pass("test");
+        assertThat(inputChannel.next()).isEqualTo("test");
+    }
+
+    @Test
+    public void testInputFrom2() {
+        final Channel<String, Integer> channel =
+                JRoutineCore.with(new MappingInvocation<String, Integer>(null) {
+
+                    public void onInput(final String input,
+                            @NotNull final Channel<Integer, ?> result) {
+                        result.pass(Integer.parseInt(input));
+                    }
+                }).call();
+        final OutputChannel<Object> outputChannel = RoutineMethod.outputChannel();
+        new SumRoutine().call(RoutineMethod.inputFrom(channel), outputChannel);
+        channel.pass("1", "2", "3", "4").close();
+        assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(10);
+    }
+
+    @Test
     public void testInputs() {
         OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new SumRoutine().call(RoutineMethod.inputOf(), outputChannel);
@@ -404,6 +434,16 @@ public class RoutineMethodTest {
             }
         }.call(outputChannel);
         assertThat(outputChannel.after(seconds(1)).next()).isEqualTo("test");
+    }
+
+    @Test
+    public void testOutputFrom() {
+        final Channel<String, String> channel = JRoutineCore.io().buildChannel();
+        final OutputChannel<String> outputChannel = RoutineMethod.outputFrom(channel);
+        assertThat(outputChannel.isBound()).isTrue();
+        assertThat(channel.isOpen()).isFalse();
+        outputChannel.pass("test");
+        assertThat(channel.next()).isEqualTo("test");
     }
 
     @Test

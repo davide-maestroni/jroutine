@@ -275,7 +275,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new SquareRoutine(context).call(inputChannel, outputChannel);
         final OutputChannel<Integer> resultChannel = RoutineMethod.outputChannel();
-        new SumRoutine(context).call(RoutineMethod.inputFrom(outputChannel), resultChannel);
+        new SumRoutine(context).call(RoutineMethod.toInput(outputChannel), resultChannel);
         inputChannel.pass(1, 2, 3, 4, 5).close();
         assertThat(resultChannel.after(seconds(10)).all()).containsExactly(55);
     }

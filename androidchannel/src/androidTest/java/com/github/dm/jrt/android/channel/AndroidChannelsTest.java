@@ -619,7 +619,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
                 JRoutineCore.io().buildChannel();
-        AndroidChannels.selectParcelableInput(channel, 33)
+        AndroidChannels.selectInputParcelable(channel, 33)
                        .buildChannels()
                        .pass("test1", "test2", "test3")
                        .close();
@@ -634,7 +634,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
                 JRoutineCore.io().buildChannel();
-        AndroidChannels.selectParcelableInput(channel, 33)
+        AndroidChannels.selectInputParcelable(channel, 33)
                        .buildChannels()
                        .pass("test1", "test2", "test3")
                        .abort();
@@ -1328,7 +1328,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
-        assertThat(AndroidChannels.selectableParcelableOutput(channel, 33)
+        assertThat(AndroidChannels.selectableOutputParcelable(channel, 33)
                                   .buildChannels()
                                   .after(seconds(10))
                                   .all()).containsExactly(
@@ -1344,7 +1344,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
         try {
 
-            AndroidChannels.selectableParcelableOutput(channel, 33).buildChannels().after(seconds(10)).all();
+            AndroidChannels.selectableOutputParcelable(channel, 33).buildChannels().after(seconds(10)).all();
 
             fail();
 
@@ -1421,12 +1421,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
             switch (selectable.index) {
 
                 case INTEGER:
-                    AndroidChannels.<Object, Integer>selectParcelableInput(result,
+                    AndroidChannels.<Object, Integer>selectInputParcelable(result,
                             INTEGER).buildChannels().pass((Integer) selectable.data).close();
                     break;
 
                 case STRING:
-                    AndroidChannels.<Object, String>selectParcelableInput(result,
+                    AndroidChannels.<Object, String>selectInputParcelable(result,
                             STRING).buildChannels().pass((String) selectable.data).close();
                     break;
             }

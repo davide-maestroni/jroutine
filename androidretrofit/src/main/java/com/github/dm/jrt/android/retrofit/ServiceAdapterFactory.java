@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
@@ -56,7 +57,8 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
  * return types.
  * <br>
- * Note that the routines generated through the returned builders will ignore any input.
+ * Note that the routines generated through stream builders must be invoked and the returned channel
+ * closed before any result is produced.
  * <p>
  * If properly configured, the routine invocations will run in a dedicated Android Service.
  * <br>
@@ -385,7 +387,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
             return JRoutineStream.<Call<?>>withStream().straight()
-                                                       .map(Operators.<Call<?>>prepend(call))
+                                                       .mapAccept(
+                                                               Functions.<Call<?>,
+                                                                       Channel<Call<?>, ?>>biSink())
+                                                       .map(Operators.<Call<?>>append(call))
                                                        .async()
                                                        .apply(mInvocationConfiguration)
                                                        .map(sInvocation)

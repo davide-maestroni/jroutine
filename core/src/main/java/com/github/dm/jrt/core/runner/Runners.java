@@ -169,6 +169,11 @@ public class Runners {
      * Returns the shared instance of a straight runner.
      * <p>
      * The returned runner will immediately run any passed execution.
+     * <p>
+     * Be careful when employing the returned runner, since it may lead to recursive calls, thus
+     * causing the invocation lifecycle to be not strictly honored. In fact, it might happen, for
+     * example, that the abortion method is called in the middle of the execution of another
+     * invocation method.
      *
      * @return the runner instance.
      */

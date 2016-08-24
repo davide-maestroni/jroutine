@@ -71,8 +71,9 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(args[0])
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .bind(onOutput(System.out::println))
+                       .call()
                        .close()
+                       .bind(onOutput(System.out::println))
                        .afterMax(seconds(3))
                        .getComplete();
                 System.exit(0);

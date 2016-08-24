@@ -27,9 +27,11 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.JRoutineLoaderStream;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfigurable;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.operator.Operators;
 
@@ -50,7 +52,8 @@ import retrofit2.Retrofit;
  * <br>
  * The routine invocations will run in a dedicated Android Loader.
  * <br>
- * Note that the routines generated through the returned builders will ignore any input.
+ * Note that the routines generated through stream builders must be invoked and the returned channel
+ * closed before any result is produced.
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
@@ -236,7 +239,11 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         @Override
         public <OUT> LoaderStreamBuilder adapt(final Call<OUT> call) {
             return JRoutineLoaderStream.<Call<?>>withStream().straight()
-                                                             .map(Operators.<Call<?>>prepend(
+                                                             .mapAccept(
+                                                                     Functions.<Call<?>,
+                                                                             Channel<Call<?>,
+                                                                                     ?>>biSink())
+                                                             .map(Operators.<Call<?>>append(
                                                                      ComparableCall.of(call)))
                                                              .async()
                                                              .map(getRoutine());

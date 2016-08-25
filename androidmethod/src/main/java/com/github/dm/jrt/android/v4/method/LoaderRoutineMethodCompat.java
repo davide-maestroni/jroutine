@@ -513,7 +513,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                                                                               .apply(getLoaderConfiguration())
                                                                               .apply(mConfiguration)
                                                                               .method(method);
-            final Channel<Object, Object> channel = mode.invoke(routine).sortedByCall();
+            final Channel<Object, Object> channel = mode.invoke(routine).sorted();
             for (final Object param : safeParams) {
                 if (param instanceof InputChannel) {
                     channel.pass((InputChannel<?>) param);

@@ -148,8 +148,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testActivityBuilderClear() throws InterruptedException {
 
         final InvocationConfiguration invocationConfiguration =
-                builder().withInputOrder(OrderType.BY_CALL)
-                         .withOutputOrder(OrderType.BY_CALL)
+                builder().withInputOrder(OrderType.SORTED)
+                         .withOutputOrder(OrderType.SORTED)
                          .configured();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -183,8 +183,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testActivityBuilderClearInputs() throws InterruptedException {
 
         final InvocationConfiguration invocationConfiguration =
-                builder().withInputOrder(OrderType.BY_CALL)
-                         .withOutputOrder(OrderType.BY_CALL)
+                builder().withInputOrder(OrderType.SORTED)
+                         .withOutputOrder(OrderType.SORTED)
                          .configured();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -713,8 +713,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testActivityRoutineClear() throws InterruptedException {
 
         final InvocationConfiguration invocationConfiguration =
-                builder().withInputOrder(OrderType.BY_CALL)
-                         .withOutputOrder(OrderType.BY_CALL)
+                builder().withInputOrder(OrderType.SORTED)
+                         .withOutputOrder(OrderType.SORTED)
                          .configured();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
@@ -741,8 +741,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                     .with(factoryOf(ClearContextInvocation.class))
                                     .applyInvocationConfiguration()
-                                    .withInputOrder(OrderType.BY_CALL)
-                                    .withOutputOrder(OrderType.BY_CALL)
+                                    .withInputOrder(OrderType.SORTED)
+                                    .withOutputOrder(OrderType.SORTED)
                                     .withOutputTimeout(seconds(10))
                                     .configured()
                                     .applyLoaderConfiguration()
@@ -976,9 +976,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   ClearContextInvocation.class))
                                                                           .applyInvocationConfiguration()
                                                                           .withInputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputTimeout(
                                                                                   seconds(10))
                                                                           .configured()
@@ -1015,9 +1015,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   ClearContextInvocation.class))
                                                                           .applyInvocationConfiguration()
                                                                           .withInputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputTimeout(
                                                                                   seconds(10))
                                                                           .configured()
@@ -1095,7 +1095,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .configured()
                                                                     .applyInvocationConfiguration()
                                                                     .withOutputOrder(
-                                                                            OrderType.BY_CALL)
+                                                                            OrderType.SORTED)
                                                                     .configured()
                                                                     .buildRoutine();
         final Channel<?, String> channel1 = routine.call("test1", "test2");
@@ -1418,9 +1418,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   ClearContextInvocation.class))
                                                                           .applyInvocationConfiguration()
                                                                           .withInputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputTimeout(
                                                                                   seconds(10))
                                                                           .configured()
@@ -1447,9 +1447,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                                   ClearContextInvocation.class))
                                                                           .applyInvocationConfiguration()
                                                                           .withInputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputOrder(
-                                                                                  OrderType.BY_CALL)
+                                                                                  OrderType.SORTED)
                                                                           .withOutputTimeout(
                                                                                   seconds(10))
                                                                           .configured()

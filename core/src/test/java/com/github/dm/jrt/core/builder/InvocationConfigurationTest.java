@@ -53,7 +53,7 @@ public class InvocationConfigurationTest {
     public void testBuildFrom() {
 
         final InvocationConfiguration configuration = builder().withPriority(11)
-                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -96,7 +96,7 @@ public class InvocationConfigurationTest {
     public void testBuilderFromEquals() {
 
         final InvocationConfiguration configuration = builder().withPriority(11)
-                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -111,7 +111,7 @@ public class InvocationConfigurationTest {
     public void testCoreInvocationsEquals() {
 
         final InvocationConfiguration configuration = builder().withCoreInstances(27)
-                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -139,7 +139,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutActionEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -157,7 +157,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -175,7 +175,7 @@ public class InvocationConfigurationTest {
     public void testFromInputChannelConfiguration() {
 
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
-                                                                       .withOrder(OrderType.BY_CALL)
+                                                                       .withOrder(OrderType.SORTED)
                                                                        .withBackoff(afterCount(
                                                                                1).constantDelay(
                                                                                millis(33)))
@@ -198,7 +198,7 @@ public class InvocationConfigurationTest {
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
-                       .withInputOrder(OrderType.BY_CALL)
+                       .withInputOrder(OrderType.SORTED)
                        .withInputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withInputMaxSize(100)
                        .configured();
@@ -209,7 +209,7 @@ public class InvocationConfigurationTest {
     public void testFromOutputChannelConfiguration() {
 
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
-                                                                       .withOrder(OrderType.BY_CALL)
+                                                                       .withOrder(OrderType.SORTED)
                                                                        .withBackoff(afterCount(
                                                                                1).constantDelay(
                                                                                millis(33)))
@@ -232,7 +232,7 @@ public class InvocationConfigurationTest {
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
-                       .withOutputOrder(OrderType.BY_CALL)
+                       .withOutputOrder(OrderType.SORTED)
                        .withOutputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withOutputMaxSize(100)
                        .configured();
@@ -243,7 +243,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputBackoffEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -271,12 +271,12 @@ public class InvocationConfigurationTest {
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
-                       .withInputOrder(OrderType.BY_CALL)
+                       .withInputOrder(OrderType.SORTED)
                        .withInputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withInputMaxSize(100)
                        .configured();
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
-                                                                       .withOrder(OrderType.BY_CALL)
+                                                                       .withOrder(OrderType.SORTED)
                                                                        .withBackoff(afterCount(
                                                                                1).constantDelay(
                                                                                millis(33)))
@@ -298,23 +298,23 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputOrderEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .configured();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputOrder(OrderType.BY_DELAY).configured());
+                builder().withInputOrder(OrderType.UNSORTED).configured());
         assertThat(configuration.builderFrom()
-                                .withInputOrder(OrderType.BY_CALL)
+                                .withInputOrder(OrderType.SORTED)
                                 .configured()).isNotEqualTo(
-                builder().withInputOrder(OrderType.BY_CALL).configured());
+                builder().withInputOrder(OrderType.SORTED).configured());
     }
 
     @Test
     public void testInputSizeEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -342,7 +342,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -355,7 +355,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogLevelEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -369,7 +369,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testMaxInvocationsEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -397,7 +397,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputBackoffEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -425,12 +425,12 @@ public class InvocationConfigurationTest {
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(Level.SILENT)
-                       .withOutputOrder(OrderType.BY_CALL)
+                       .withOutputOrder(OrderType.SORTED)
                        .withOutputBackoff(afterCount(1).constantDelay(millis(33)))
                        .withOutputMaxSize(100)
                        .configured();
         final ChannelConfiguration configuration = ChannelConfiguration.builder()
-                                                                       .withOrder(OrderType.BY_CALL)
+                                                                       .withOrder(OrderType.SORTED)
                                                                        .withBackoff(afterCount(
                                                                                1).constantDelay(
                                                                                millis(33)))
@@ -452,23 +452,23 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputOrderEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .configured();
         assertThat(configuration).isNotEqualTo(
-                builder().withOutputOrder(OrderType.BY_DELAY).configured());
+                builder().withOutputOrder(OrderType.UNSORTED).configured());
         assertThat(configuration.builderFrom()
-                                .withOutputOrder(OrderType.BY_CALL)
+                                .withOutputOrder(OrderType.SORTED)
                                 .configured()).isNotEqualTo(
-                builder().withOutputOrder(OrderType.BY_CALL).configured());
+                builder().withOutputOrder(OrderType.SORTED).configured());
     }
 
     @Test
     public void testOutputSizeEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -498,7 +498,7 @@ public class InvocationConfigurationTest {
 
         final InvocationConfiguration configuration = builder().withPriority(17)
                                                                .withCoreInstances(27)
-                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -512,7 +512,7 @@ public class InvocationConfigurationTest {
     public void testRunnerEquals() {
 
         final InvocationConfiguration configuration = builder().withPriority(11)
-                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withInputOrder(OrderType.SORTED)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)

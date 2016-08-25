@@ -187,7 +187,7 @@ public class ChannelTest {
         final UnitDuration timeout = seconds(1);
         final Channel<String, String> channel1 = JRoutineCore.io()
                                                              .applyChannelConfiguration()
-                                                             .withOrder(OrderType.BY_CALL)
+                                                             .withOrder(OrderType.SORTED)
                                                              .configured()
                                                              .buildChannel();
         new Thread() {
@@ -467,7 +467,7 @@ public class ChannelTest {
         final UnitDuration timeout = seconds(1);
         final Channel<Object, Object> channel = JRoutineCore.io()
                                                             .applyChannelConfiguration()
-                                                            .withOrder(OrderType.BY_CALL)
+                                                            .withOrder(OrderType.SORTED)
                                                             .withRunner(Runners.sharedRunner())
                                                             .withMaxSize(1)
                                                             .withBackoff(noDelay())
@@ -481,7 +481,7 @@ public class ChannelTest {
         channel1.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel1.after(timeout).all()).containsOnly(23, -77L);
         final Channel<Object, Object> channel2 = JRoutineCore.io().buildChannel();
-        channel2.sortedByDelay().sortedByCall();
+        channel2.unsorted().sorted();
         channel2.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel2.after(timeout).all()).containsExactly(23, -77L);
     }

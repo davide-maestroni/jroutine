@@ -343,7 +343,8 @@ public class ServiceRoutineMethod extends RoutineMethod
         final OutputChannel<OUT> resultChannel = outputChannel();
         outputChannels.add(resultChannel);
         final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
-                (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
+                (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels)
+                                                            .buildChannels()
                         : JRoutineCore.io().<ParcelableSelectable<Object>>of();
         final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
                 mode.invoke(JRoutineService.on(mContext)
@@ -477,7 +478,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                                                                          .apply(getServiceConfiguration())
                                                                          .apply(mConfiguration)
                                                                          .method(method);
-            final Channel<Object, Object> channel = mode.invoke(routine).sortedByCall();
+            final Channel<Object, Object> channel = mode.invoke(routine).sorted();
             for (final Object param : safeParams) {
                 if (param instanceof InputChannel) {
                     channel.pass((InputChannel<?>) param);

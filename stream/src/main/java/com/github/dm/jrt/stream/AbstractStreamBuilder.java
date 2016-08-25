@@ -278,7 +278,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> sorted() {
-        return applyStreamInvocationConfiguration().withOutputOrder(OrderType.BY_CALL).configured();
+        return applyStreamInvocationConfiguration().withOutputOrder(OrderType.SORTED).configured();
     }
 
     @NotNull
@@ -295,7 +295,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> unsorted() {
-        return applyStreamInvocationConfiguration().withOutputOrder(OrderType.BY_DELAY)
+        return applyStreamInvocationConfiguration().withOutputOrder(OrderType.UNSORTED)
                                                    .configured();
     }
 

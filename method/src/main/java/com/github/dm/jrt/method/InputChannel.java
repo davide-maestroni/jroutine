@@ -214,19 +214,19 @@ public final class InputChannel<IN> implements Channel<IN, IN> {
     }
 
     @NotNull
-    public InputChannel<IN> sortedByCall() {
-        mChannel.sortedByCall();
-        return this;
-    }
-
-    @NotNull
-    public InputChannel<IN> sortedByDelay() {
-        mChannel.sortedByDelay();
+    public InputChannel<IN> sorted() {
+        mChannel.sorted();
         return this;
     }
 
     public void throwError() {
         mChannel.throwError();
+    }
+
+    @NotNull
+    public InputChannel<IN> unsorted() {
+        mChannel.unsorted();
+        return this;
     }
 
     public Iterator<IN> iterator() {

@@ -245,19 +245,19 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<DATA, DATA> sortedByCall() {
-        mChannel.sortedByCall();
-        return this;
-    }
-
-    @NotNull
-    public Channel<DATA, DATA> sortedByDelay() {
-        mChannel.sortedByDelay();
+    public Channel<DATA, DATA> sorted() {
+        mChannel.sorted();
         return this;
     }
 
     public void throwError() {
         mChannel.throwError();
+    }
+
+    @NotNull
+    public Channel<DATA, DATA> unsorted() {
+        mChannel.unsorted();
+        return this;
     }
 
     public Iterator<DATA> iterator() {

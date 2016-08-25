@@ -318,7 +318,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
                                      .applyStreamInvocationConfiguration()
-                                     .withOutputOrder(OrderType.BY_CALL)
+                                     .withOutputOrder(OrderType.SORTED)
                                      .configured()
                                      .sequential()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
@@ -1085,7 +1085,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .applyInvocationConfiguration()
-                                                            .withOutputOrder(OrderType.BY_CALL)
+                                                            .withOutputOrder(OrderType.SORTED)
                                                             .configured()
                                                             .buildRoutine();
         assertThat(JRoutineLoaderStream //

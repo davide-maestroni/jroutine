@@ -116,18 +116,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     private static void testConsumerFunction(@NotNull final Activity activity) {
         final Routine<String, String> routine = //
                 JRoutineAndroid.on(activity)
-                               .withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
+                               .withCallConsumer(
+                                       new BiConsumer<List<String>, Channel<String, ?>>() {
 
-                                   public void accept(final List<String> strings,
-                                           final Channel<String, ?> result) {
-                                       final StringBuilder builder = new StringBuilder();
-                                       for (final String string : strings) {
-                                           builder.append(string);
-                                       }
+                                           public void accept(final List<String> strings,
+                                                   final Channel<String, ?> result) {
+                                               final StringBuilder builder = new StringBuilder();
+                                               for (final String string : strings) {
+                                                   builder.append(string);
+                                               }
 
-                                       result.pass(builder.toString());
-                                   }
-                               })
+                                               result.pass(builder.toString());
+                                           }
+                                       })
                                .buildRoutine();
         assertThat(routine.call("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }

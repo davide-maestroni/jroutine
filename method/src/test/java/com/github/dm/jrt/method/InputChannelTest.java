@@ -185,7 +185,7 @@ public class InputChannelTest {
         final InputChannel<String> channel1 = //
                 RoutineMethod.toInput(JRoutineCore.io()
                                                   .applyChannelConfiguration()
-                                                  .withOrder(OrderType.BY_CALL)
+                                                  .withOrder(OrderType.SORTED)
                                                   .configured().<String>buildChannel());
         new Thread() {
 
@@ -442,7 +442,7 @@ public class InputChannelTest {
         final InputChannel<Object> channel = //
                 RoutineMethod.toInput(JRoutineCore.io()
                                                   .applyChannelConfiguration()
-                                                  .withOrder(OrderType.BY_CALL)
+                                                  .withOrder(OrderType.SORTED)
                                                   .withRunner(Runners.sharedRunner())
                                                   .withMaxSize(1)
                                                   .withBackoff(noDelay())
@@ -456,7 +456,7 @@ public class InputChannelTest {
         channel1.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel1.after(timeout).all()).containsOnly(23, -77L);
         final InputChannel<Object> channel2 = RoutineMethod.inputChannel();
-        channel2.sortedByDelay().sortedByCall();
+        channel2.unsorted().sorted();
         channel2.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel2.after(timeout).all()).containsExactly(23, -77L);
     }
@@ -491,7 +491,7 @@ public class InputChannelTest {
                                                   .applyChannelConfiguration()
                                                   .withOutputTimeout(millis(10))
                                                   .withOutputTimeoutAction(
-                                                            TimeoutActionType.CONTINUE)
+                                                          TimeoutActionType.CONTINUE)
                                                   .configured()
                                                   .buildChannel());
         assertThat(channel1.all()).isEmpty();
@@ -503,8 +503,7 @@ public class InputChannelTest {
                 RoutineMethod.toInput(JRoutineCore.io()
                                                   .applyChannelConfiguration()
                                                   .withOutputTimeout(millis(10))
-                                                  .withOutputTimeoutAction(
-                                                            TimeoutActionType.ABORT)
+                                                  .withOutputTimeoutAction(TimeoutActionType.ABORT)
                                                   .configured()
                                                   .buildChannel());
         try {

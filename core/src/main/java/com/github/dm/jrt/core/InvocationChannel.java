@@ -120,7 +120,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
         mInputOrder = new LocalValue<OrderType>(
-                configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY));
+                configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
         mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.noDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputDelay = new LocalValue<UnitDuration>(zero());
@@ -416,18 +416,9 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<IN, OUT> sortedByCall() {
+    public Channel<IN, OUT> sorted() {
         synchronized (mMutex) {
-            mState.orderBy(OrderType.BY_CALL);
-        }
-
-        return this;
-    }
-
-    @NotNull
-    public Channel<IN, OUT> sortedByDelay() {
-        synchronized (mMutex) {
-            mState.orderBy(OrderType.BY_DELAY);
+            mState.orderBy(OrderType.SORTED);
         }
 
         return this;
@@ -435,6 +426,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     public void throwError() {
         mResultChanel.throwError();
+    }
+
+    @NotNull
+    public Channel<IN, OUT> unsorted() {
+        synchronized (mMutex) {
+            mState.orderBy(OrderType.UNSORTED);
+        }
+
+        return this;
     }
 
     public Iterator<OUT> iterator() {
@@ -789,7 +789,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mDelay = delay.value;
             mDelayUnit = delay.unit;
             final OrderType order = (mOrderType = mInputOrder.get());
-            mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
+            mQueue = (order == OrderType.SORTED) ? mInputQueue.addNested() : mInputQueue;
             mChannel = channel;
         }
 
@@ -1200,7 +1200,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (orderType != OrderType.BY_DELAY) ? queue.addNested() : queue, input);
+                    (orderType != OrderType.UNSORTED) ? queue.addNested() : queue, input);
         }
 
         /**
@@ -1283,7 +1283,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.UNSORTED) ? mInputQueue.addNested()
                             : mInputQueue, list);
         }
 
@@ -1312,7 +1312,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.UNSORTED) ? mInputQueue.addNested()
                             : mInputQueue, input);
         }
 
@@ -1349,7 +1349,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder.get() != OrderType.BY_DELAY) ? mInputQueue.addNested()
+                    (mInputOrder.get() != OrderType.UNSORTED) ? mInputQueue.addNested()
                             : mInputQueue, list);
         }
 

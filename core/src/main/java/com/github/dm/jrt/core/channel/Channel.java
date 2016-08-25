@@ -589,8 +589,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     Channel<IN, OUT> skipNext(int count);
 
     /**
-     * Tells the channel to sort the passed input data based on the order of the calls to the pass
-     * methods.
+     * Tells the channel to sort the passed input data based in the same order as they are passed
+     * to the channel.
      * <p>
      * By default no particular order is applied.
      * <p>
@@ -599,10 +599,24 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #sortedByDelay()
+     * @see #unsorted()
      */
     @NotNull
-    Channel<IN, OUT> sortedByCall();
+    Channel<IN, OUT> sorted();
+
+    /**
+     * Throws the invocation error or abort exception, if the invocation is aborted, waiting at the
+     * maximum for the set delay.
+     * <p>
+     * Note that this method invocation will block the calling thread until the routine invocation
+     * completes or is aborted, or the timeout elapses.
+     *
+     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #immediately()
+     */
+    void throwError();
 
     /**
      * Tells the channel to not sort the passed input data.
@@ -618,22 +632,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #sortedByCall()
+     * @see #sorted()
      */
     @NotNull
-    Channel<IN, OUT> sortedByDelay();
-
-    /**
-     * Throws the invocation error or abort exception, if the invocation is aborted, waiting at the
-     * maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #immediately()
-     */
-    void throwError();
+    Channel<IN, OUT> unsorted();
 }

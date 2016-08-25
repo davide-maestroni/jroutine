@@ -115,19 +115,21 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
         final Routine<String, String> routine = //
                 JRoutineAndroidCompat.on(activity)
-                                     .withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
+                                     .withCallConsumer(
+                                             new BiConsumer<List<String>, Channel<String, ?>>() {
 
-                                         public void accept(final List<String> strings,
-                                                 final Channel<String, ?> result) {
+                                                 public void accept(final List<String> strings,
+                                                         final Channel<String, ?> result) {
 
-                                             final StringBuilder builder = new StringBuilder();
-                                             for (final String string : strings) {
-                                                 builder.append(string);
-                                             }
+                                                     final StringBuilder builder =
+                                                             new StringBuilder();
+                                                     for (final String string : strings) {
+                                                         builder.append(string);
+                                                     }
 
-                                             result.pass(builder.toString());
-                                         }
-                                     })
+                                                     result.pass(builder.toString());
+                                                 }
+                                             })
                                      .buildRoutine();
         assertThat(routine.call("test", "1").after(seconds(10)).all()).containsOnly("test1");
     }

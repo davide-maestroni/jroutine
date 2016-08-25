@@ -321,8 +321,8 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String buildInputOptions(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, @Nullable final InputMode inputMode) {
-        return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION))
-                ? ".sortedByCall()" : "";
+        return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION)) ? ".sorted()"
+                : "";
     }
 
     /**

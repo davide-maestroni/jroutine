@@ -260,12 +260,12 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
-                                                               .withInputOrder(OrderType.BY_DELAY)
+                                                               .withInputOrder(OrderType.UNSORTED)
                                                                .withInputBackoff(
                                                                        afterCount(3).constantDelay(
                                                                                seconds(10)))
                                                                .withInputMaxSize(33)
-                                                               .withOutputOrder(OrderType.BY_DELAY)
+                                                               .withOutputOrder(OrderType.UNSORTED)
                                                                .withOutputBackoff(
                                                                        afterCount(3).constantDelay(
                                                                                seconds(10)))

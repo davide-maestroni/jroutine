@@ -159,14 +159,14 @@ public class ReplayChannelTest {
         final Channel<Object, String> channel =
                 (Channel<Object, String>) Channels.replay(inputChannel).buildChannels();
         try {
-            channel.sortedByCall().pass("test");
+            channel.sorted().pass("test");
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            channel.sortedByDelay().pass("test", "test");
+            channel.unsorted().pass("test", "test");
             fail();
 
         } catch (final IllegalStateException ignored) {

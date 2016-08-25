@@ -155,7 +155,7 @@ public class Builders {
             if (outputMode == OutputMode.ELEMENT) {
                 if (returnType.isArray()) {
                     if (methodResult != null) {
-                        result.sortedByCall();
+                        result.sorted();
                         final int length = Array.getLength(methodResult);
                         for (int i = 0; i < length; ++i) {
                             result.pass(Array.get(methodResult, i));
@@ -524,7 +524,7 @@ public class Builders {
         final Channel<Object, Object> outputChannel;
         final Channel<Object, Object> invocationChannel = invokeRoutine(routine, invocationMode);
         if (inputMode == InputMode.VALUE) {
-            invocationChannel.sortedByCall();
+            invocationChannel.sorted();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
             for (int i = 0; i < length; ++i) {
@@ -540,8 +540,7 @@ public class Builders {
             outputChannel = invocationChannel.close();
 
         } else if (inputMode == InputMode.COLLECTION) {
-            outputChannel =
-                    invocationChannel.sortedByCall().pass((Channel<?, Object>) args[0]).close();
+            outputChannel = invocationChannel.sorted().pass((Channel<?, Object>) args[0]).close();
 
         } else {
             outputChannel = invocationChannel.pass(args).close();

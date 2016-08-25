@@ -1089,8 +1089,7 @@ public class Channels {
      * @return the selectable channel builder.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>>
-    selectableOutput(
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> selectableOutput(
             @NotNull final Channel<?, ? extends OUT> channel, final int index) {
         return new SelectableOutputBuilder<OUT>(channel, index);
     }

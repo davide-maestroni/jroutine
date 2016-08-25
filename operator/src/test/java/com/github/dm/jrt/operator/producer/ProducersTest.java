@@ -334,7 +334,7 @@ public class ProducersTest {
                     }
                 })))
                                .applyInvocationConfiguration()
-                               .withOutputOrder(OrderType.BY_CALL)
+                               .withOutputOrder(OrderType.SORTED)
                                .configured()
                                .callParallel()
                                .close()

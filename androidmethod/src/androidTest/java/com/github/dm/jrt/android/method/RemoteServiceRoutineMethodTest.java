@@ -361,7 +361,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         new SumRoutine(
                 serviceFrom(getActivity(), RemoteTestService.class)).applyInvocationConfiguration()
                                                                     .withOutputOrder(
-                                                                            OrderType.BY_CALL)
+                                                                            OrderType.SORTED)
                                                                     .configured()
                                                                     .callParallel(inputChannel,
                                                                             outputChannel);

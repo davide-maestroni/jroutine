@@ -289,18 +289,12 @@ public class StreamBuilderTest {
         assertThat(
                 JRoutineStream.withStream().sync().call().pass(JRoutineCore.io().of("test")).next())
                 .isEqualTo("test");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .call()
-                                 .sortedByCall()
-                                 .pass("test")
-                                 .next()).isEqualTo("test");
-        assertThat(JRoutineStream.withStream()
-                                 .sync()
-                                 .call()
-                                 .sortedByDelay()
-                                 .pass("test")
-                                 .next()).isEqualTo("test");
+        assertThat(
+                JRoutineStream.withStream().sync().call().sorted().pass("test").next()).isEqualTo(
+                "test");
+        assertThat(
+                JRoutineStream.withStream().sync().call().unsorted().pass("test").next()).isEqualTo(
+                "test");
         JRoutineStream.withStream().sync().call().throwError();
         try {
             JRoutineStream.withStream().sync().call().remove();
@@ -1031,7 +1025,7 @@ public class StreamBuilderTest {
     public void testMapRoutine() {
         final Routine<String, String> routine = JRoutineCore.with(new UpperCase())
                                                             .applyInvocationConfiguration()
-                                                            .withOutputOrder(OrderType.BY_CALL)
+                                                            .withOutputOrder(OrderType.SORTED)
                                                             .configured()
                                                             .buildRoutine();
         assertThat(JRoutineStream.<String>withStream().async()

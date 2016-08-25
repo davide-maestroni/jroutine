@@ -184,7 +184,7 @@ public class OutputChannelTest {
         final OutputChannel<String> channel1 = //
                 RoutineMethod.toOutput(JRoutineCore.io()
                                                    .applyChannelConfiguration()
-                                                   .withOrder(OrderType.BY_CALL)
+                                                   .withOrder(OrderType.SORTED)
                                                    .configured().<String>buildChannel());
         new Thread() {
 
@@ -429,7 +429,7 @@ public class OutputChannelTest {
         final OutputChannel<Object> channel = //
                 RoutineMethod.toOutput(JRoutineCore.io()
                                                    .applyChannelConfiguration()
-                                                   .withOrder(OrderType.BY_CALL)
+                                                   .withOrder(OrderType.SORTED)
                                                    .withRunner(Runners.sharedRunner())
                                                    .withMaxSize(1)
                                                    .withBackoff(noDelay())
@@ -443,7 +443,7 @@ public class OutputChannelTest {
         channel1.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel1.after(timeout).all()).containsOnly(23, -77L);
         final OutputChannel<Object> channel2 = RoutineMethod.outputChannel();
-        channel2.sortedByDelay().sortedByCall();
+        channel2.unsorted().sorted();
         channel2.after(millis(200)).pass(23).immediately().pass(-77L).close();
         assertThat(channel2.after(timeout).all()).containsExactly(23, -77L);
     }
@@ -478,7 +478,7 @@ public class OutputChannelTest {
                                                    .applyChannelConfiguration()
                                                    .withOutputTimeout(millis(10))
                                                    .withOutputTimeoutAction(
-                                                             TimeoutActionType.CONTINUE)
+                                                           TimeoutActionType.CONTINUE)
                                                    .configured()
                                                    .buildChannel());
         assertThat(channel1.all()).isEmpty();
@@ -490,8 +490,7 @@ public class OutputChannelTest {
                 RoutineMethod.toOutput(JRoutineCore.io()
                                                    .applyChannelConfiguration()
                                                    .withOutputTimeout(millis(10))
-                                                   .withOutputTimeoutAction(
-                                                             TimeoutActionType.ABORT)
+                                                   .withOutputTimeoutAction(TimeoutActionType.ABORT)
                                                    .configured()
                                                    .buildChannel());
         try {
@@ -508,8 +507,7 @@ public class OutputChannelTest {
                 RoutineMethod.toOutput(JRoutineCore.io()
                                                    .applyChannelConfiguration()
                                                    .withOutputTimeout(millis(10))
-                                                   .withOutputTimeoutAction(
-                                                             TimeoutActionType.FAIL)
+                                                   .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                                    .configured()
                                                    .buildChannel());
         try {

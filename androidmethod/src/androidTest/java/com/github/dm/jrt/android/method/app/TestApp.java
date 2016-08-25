@@ -23,5 +23,4 @@ import android.app.Application;
  * <p>
  * Created by davide-maestroni on 08/18/2016.
  */
-public class TestApp extends Application {
-}
+public class TestApp extends Application {}

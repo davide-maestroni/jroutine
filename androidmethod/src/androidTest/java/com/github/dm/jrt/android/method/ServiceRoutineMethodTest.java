@@ -356,7 +356,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
         final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
         new SumRoutine(serviceFrom(getActivity())).applyInvocationConfiguration()
-                                                  .withOutputOrder(OrderType.BY_CALL)
+                                                  .withOutputOrder(OrderType.SORTED)
                                                   .configured()
                                                   .callParallel(inputChannel, outputChannel);
         inputChannel.pass(1, 2, 3, 4, 5).close();

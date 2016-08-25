@@ -23,5 +23,4 @@ import com.github.dm.jrt.android.core.service.InvocationService;
  * <p>
  * Created by davide-maestroni on 08/18/2016.
  */
-public class TestService extends InvocationService {
-}
+public class TestService extends InvocationService {}

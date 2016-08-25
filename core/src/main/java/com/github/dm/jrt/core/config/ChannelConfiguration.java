@@ -269,18 +269,18 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public enum OrderType {
 
         /**
-         * Order by call.
+         * Sorted.
          * <br>
          * Data are passed to the invocation or the channel consumer in the same order as they are
          * passed to the channel, independently from the specific delay.
          */
-        BY_CALL,
+        SORTED,
         /**
-         * Order by delay.
+         * Unsorted.
          * <br>
-         * Data are passed to the invocation or the channel consumer based on their delay.
+         * Data are passed to the invocation or the channel consumer as soon as they are available.
          */
-        BY_DELAY
+        UNSORTED
     }
 
     /**

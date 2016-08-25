@@ -606,8 +606,8 @@ public class RoutineTest {
         final Channel<String, String> channel1 = JRoutineCore.with(
                 factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
                                                              .applyInvocationConfiguration()
-                                                             .withInputOrder(OrderType.BY_CALL)
-                                                             .withOutputOrder(OrderType.BY_CALL)
+                                                             .withInputOrder(OrderType.SORTED)
+                                                             .withOutputOrder(OrderType.SORTED)
                                                              .configured()
                                                              .call();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -632,8 +632,8 @@ public class RoutineTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withOutputOrder(OrderType.BY_CALL)
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
+                                                               .withOutputOrder(OrderType.SORTED)
                                                                .configured();
         final Channel<String, String> channel3 =
                 JRoutineCore.with(factoryOf(DelayedListInvocation.class, millis(10), 2))
@@ -1159,12 +1159,12 @@ public class RoutineTest {
     public void testInputDelay() {
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .applyInvocationConfiguration()
-                               .withInputOrder(OrderType.BY_CALL)
+                               .withInputOrder(OrderType.SORTED)
                                .withInputBackoff(afterCount(1).constantDelay(zero()))
                                .configured()
                                .call()
-                               .sortedByDelay()
-                               .sortedByCall()
+                               .unsorted()
+                               .sorted()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1175,11 +1175,11 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .applyInvocationConfiguration()
-                               .withInputOrder(OrderType.BY_CALL)
+                               .withInputOrder(OrderType.SORTED)
                                .withInputBackoff(afterCount(1).constantDelay(millis(1000)))
                                .configured()
                                .call()
-                               .sortedByCall()
+                               .sorted()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1190,11 +1190,11 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .applyInvocationConfiguration()
-                               .withInputOrder(OrderType.BY_CALL)
+                               .withInputOrder(OrderType.SORTED)
                                .withInputBackoff(afterCount(1).constantDelay(millis(1000)))
                                .configured()
                                .call()
-                               .sortedByCall()
+                               .sorted()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1205,11 +1205,11 @@ public class RoutineTest {
 
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .applyInvocationConfiguration()
-                               .withInputOrder(OrderType.BY_CALL)
+                               .withInputOrder(OrderType.SORTED)
                                .withInputBackoff(afterCount(1).constantDelay(millis(1000)))
                                .configured()
                                .call()
-                               .sortedByCall()
+                               .sorted()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1222,11 +1222,11 @@ public class RoutineTest {
         channel.pass("test2").close();
         assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                                .applyInvocationConfiguration()
-                               .withInputOrder(OrderType.BY_CALL)
+                               .withInputOrder(OrderType.SORTED)
                                .withInputBackoff(afterCount(1).constantDelay(millis(1000)))
                                .configured()
                                .call()
-                               .sortedByCall()
+                               .sorted()
                                .after(millis(100))
                                .pass("test1")
                                .immediately()
@@ -1277,12 +1277,12 @@ public class RoutineTest {
             channel.pass("test2").close();
             JRoutineCore.with(IdentityInvocation.factoryOf())
                         .applyInvocationConfiguration()
-                        .withInputOrder(OrderType.BY_CALL)
+                        .withInputOrder(OrderType.SORTED)
                         .withInputMaxSize(1)
                         .withInputBackoff(afterCount(1).constantDelay(millis(1000)))
                         .configured()
                         .call()
-                        .sortedByCall()
+                        .sorted()
                         .after(millis(100))
                         .pass("test1")
                         .immediately()
@@ -1860,7 +1860,7 @@ public class RoutineTest {
                                .withInputMaxSize(2)
                                .withOutputBackoff(afterCount(1).constantDelay(1, TimeUnit.SECONDS))
                                .withOutputMaxSize(2)
-                               .withOutputOrder(OrderType.BY_CALL)
+                               .withOutputOrder(OrderType.SORTED)
                                .configured()
                                .call("test1", "test2")
                                .all()).containsExactly("test1", "test2");
@@ -1874,7 +1874,7 @@ public class RoutineTest {
                                .withInputMaxSize(2)
                                .withOutputBackoff(afterCount(2).constantDelay(zero()))
                                .withOutputMaxSize(2)
-                               .withOutputOrder(OrderType.BY_CALL)
+                               .withOutputOrder(OrderType.SORTED)
                                .configured()
                                .call("test1", "test2")
                                .all()).containsExactly("test1", "test2");
@@ -2424,20 +2424,20 @@ public class RoutineTest {
         }
 
         public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-            result.sortedByCall().sortedByDelay();
+            result.sorted().unsorted();
             assertThat(result.isOpen()).isTrue();
             assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
             assertThat(result.abort()).isFalse();
             assertThat(result.isOpen()).isFalse();
             try {
-                result.sortedByCall();
+                result.sorted();
                 fail();
 
             } catch (final InvocationException ignored) {
             }
 
             try {
-                result.sortedByDelay();
+                result.unsorted();
                 fail();
 
             } catch (final InvocationException ignored) {

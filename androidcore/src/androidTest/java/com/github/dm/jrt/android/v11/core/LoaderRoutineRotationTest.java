@@ -88,7 +88,7 @@ public class LoaderRoutineRotationTest
         JRoutineLoader.on(loaderFrom(getActivity()))
                       .with(factoryOf(ToUpperCase.class))
                       .applyInvocationConfiguration()
-                      .withOutputOrder(OrderType.BY_CALL)
+                      .withOutputOrder(OrderType.SORTED)
                       .configured()
                       .applyLoaderConfiguration()
                       .withLoaderId(0)

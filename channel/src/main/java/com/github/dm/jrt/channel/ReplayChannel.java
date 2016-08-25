@@ -300,17 +300,17 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<OUT, OUT> sortedByCall() {
-        return this;
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> sortedByDelay() {
+    public Channel<OUT, OUT> sorted() {
         return this;
     }
 
     public void throwError() {
         mOutputChannel.throwError();
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> unsorted() {
+        return this;
     }
 
     public Iterator<OUT> iterator() {
@@ -365,7 +365,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
         return JRoutineCore.io()
                            .applyChannelConfiguration()
                            .with(mConfiguration)
-                           .withOrder(OrderType.BY_CALL)
+                           .withOrder(OrderType.SORTED)
                            .configured()
                            .buildChannel();
     }

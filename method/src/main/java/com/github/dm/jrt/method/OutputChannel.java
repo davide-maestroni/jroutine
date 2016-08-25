@@ -214,19 +214,19 @@ public final class OutputChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public OutputChannel<OUT> sortedByCall() {
-        mChannel.sortedByCall();
-        return this;
-    }
-
-    @NotNull
-    public OutputChannel<OUT> sortedByDelay() {
-        mChannel.sortedByDelay();
+    public OutputChannel<OUT> sorted() {
+        mChannel.sorted();
         return this;
     }
 
     public void throwError() {
         mChannel.throwError();
+    }
+
+    @NotNull
+    public OutputChannel<OUT> unsorted() {
+        mChannel.unsorted();
+        return this;
     }
 
     public Iterator<OUT> iterator() {

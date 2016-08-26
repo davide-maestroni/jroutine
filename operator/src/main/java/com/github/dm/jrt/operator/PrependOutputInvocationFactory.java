@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -45,7 +44,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
      */
     PrependOutputInvocationFactory(@Nullable final Channel<?, ? extends OUT> channel) {
         super(asArgs(channel));
-        mChannel = (channel != null) ? Channels.replay(channel).buildChannels() : null;
+        mChannel = channel;
     }
 
     @NotNull

@@ -82,7 +82,8 @@ public final class OutputChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     @NotNull
-    public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
+    public <AFTER> Channel<? super OUT, AFTER> bind(
+            @NotNull final Channel<? super OUT, AFTER> channel) {
         return mChannel.bind(channel);
     }
 

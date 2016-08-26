@@ -210,7 +210,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     @NotNull
-    public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
+    public <AFTER> Channel<? super OUT, AFTER> bind(
+            @NotNull final Channel<? super OUT, AFTER> channel) {
         return mResultChanel.bind(channel);
     }
 

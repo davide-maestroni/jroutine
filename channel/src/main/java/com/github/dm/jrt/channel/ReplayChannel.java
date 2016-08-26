@@ -116,7 +116,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     }
 
     @NotNull
-    public Channel<? super OUT, ?> bind(@NotNull final Channel<? super OUT, ?> channel) {
+    public <AFTER> Channel<? super OUT, AFTER> bind(
+            @NotNull final Channel<? super OUT, AFTER> channel) {
         synchronized (mMutex) {
             final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
             if (channels.containsKey(channel)) {

@@ -76,4 +76,9 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     public void clear() {
     }
+
+    @NotNull
+    public Channel<IN, OUT> close() {
+        return call().close();
+    }
 }

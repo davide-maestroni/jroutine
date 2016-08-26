@@ -60,17 +60,23 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the iterable of channels.
+     * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
+    @SuppressWarnings("unchecked")
     public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> blend(
-            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new BlendBuilder<OUT>(channels);
+            @NotNull final Channel<?, ?>... channels) {
+        final int length = channels.length;
+        if (length == 0) {
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        return (BlendBuilder<OUT>) new BlendBuilder<Object>(Arrays.asList(channels));
     }
 
     /**
@@ -89,23 +95,17 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the array of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-     *                                            object.
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+     *                                            null object.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> blend(
-            @NotNull final Channel<?, ?>... channels) {
-        final int length = channels.length;
-        if (length == 0) {
-            throw new IllegalArgumentException("the array of channels must not be empty");
-        }
-
-        return (BlendBuilder<OUT>) new BlendBuilder<Object>(Arrays.asList(channels));
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        return new BlendBuilder<OUT>(channels);
     }
 
     /**
@@ -285,37 +285,6 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the iterable of channels.
-     * @param <OUT>    the output data type.
-     * @return the channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
-     */
-    @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> concat(
-            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new ConcatBuilder<OUT>(channels);
-    }
-
-    /**
-     * Returns a builder of channels concatenating the outputs coming from the specified ones, so
-     * that, all the outputs of the first channel will come before all the outputs of the second
-     * one, and so on.
-     * <p>
-     * Note that the builder will successfully create only one channel instance, and that the passed
-     * ones will be bound as a result of the creation.
-     * <br>
-     * Note also that the returned channel will be already closed.
-     * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
-     *     </code>
-     * </pre>
-     *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the channel builder.
@@ -336,6 +305,37 @@ public class Channels {
     }
 
     /**
+     * Returns a builder of channels concatenating the outputs coming from the specified ones, so
+     * that, all the outputs of the first channel will come before all the outputs of the second
+     * one, and so on.
+     * <p>
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
+     * <p>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *     </code>
+     * </pre>
+     *
+     * @param channels the iterable of channels.
+     * @param <OUT>    the output data type.
+     * @return the channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+     *                                            null object.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> concat(
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        return new ConcatBuilder<OUT>(channels);
+    }
+
+    /**
      * Returns a builder of channels distributing the input data among the specified ones. If the
      * list of data exceeds the number of channels, the invocation will be aborted.
      * <p>
@@ -361,35 +361,6 @@ public class Channels {
     @NotNull
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @NotNull final Channel<?, ?>... channels) {
-        return distribute(false, null, channels);
-    }
-
-    /**
-     * Returns a builder of channels distributing the input data among the specified ones. If the
-     * list of data exceeds the number of channels, the invocation will be aborted.
-     * <p>
-     * Note that the builder will successfully create several channel instances.
-     * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C - [list(2), list(2), list(2), ..., list(2)]
-     *     </code>
-     * </pre>
-     *
-     * @param channels the iterable of channels.
-     * @param <IN>     the input data type.
-     * @return the channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
-     */
-    @NotNull
-    public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
-            @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
         return distribute(false, null, channels);
     }
 
@@ -459,6 +430,66 @@ public class Channels {
     }
 
     /**
+     * Returns a builder of channels distributing the input data among the specified ones. If the
+     * list of data exceeds the number of channels, the invocation will be aborted.
+     * <p>
+     * Note that the builder will successfully create several channel instances.
+     * <p>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *     </code>
+     * </pre>
+     *
+     * @param channels the iterable of channels.
+     * @param <IN>     the input data type.
+     * @return the channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+     *                                            null object.
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
+            @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+        return distribute(false, null, channels);
+    }
+
+    /**
+     * Returns a builder of channels joining the data coming from the specified ones.
+     * <br>
+     * An output will be generated only when at least one result is available for each channel.
+     * <p>
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
+     * <p>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *     </code>
+     * </pre>
+     *
+     * @param channels the array of channels.
+     * @param <OUT>    the output data type.
+     * @return the channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
+            @NotNull final Channel<?, ?>... channels) {
+        return join(false, null, channels);
+    }
+
+    /**
      * Returns a builder of channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
@@ -493,6 +524,9 @@ public class Channels {
      * Returns a builder of channels joining the data coming from the specified ones.
      * <br>
      * An output will be generated only when at least one result is available for each channel.
+     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
+     * the gaps with the specified placeholder instance, so that the generated list of data will
+     * always have the same size as the channel list.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
@@ -503,12 +537,13 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
      *     </code>
      * </pre>
      *
-     * @param channels the array of channels.
-     * @param <OUT>    the output data type.
+     * @param placeholder the placeholder instance.
+     * @param channels    the array of channels.
+     * @param <OUT>       the output data type.
      * @return the channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
@@ -516,8 +551,8 @@ public class Channels {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
-            @NotNull final Channel<?, ?>... channels) {
-        return join(false, null, channels);
+            @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
+        return join(true, placeholder, channels);
     }
 
     /**
@@ -557,12 +592,9 @@ public class Channels {
     }
 
     /**
-     * Returns a builder of channels joining the data coming from the specified ones.
+     * Returns a builder of channels merging the specified instances into a selectable one.
      * <br>
-     * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the channels are closed, the remaining outputs will be returned by filling
-     * the gaps with the specified placeholder instance, so that the generated list of data will
-     * always have the same size as the channel list.
+     * The selectable indexes will be the position in the array.
      * <p>
      * Note that the builder will successfully create only one channel instance, and that the passed
      * ones will be bound as a result of the creation.
@@ -573,55 +605,21 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
+     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
-     * @param placeholder the placeholder instance.
-     * @param channels    the array of channels.
-     * @param <OUT>       the output data type.
-     * @return the channel builder.
+     * @param channels the channels to merge.
+     * @param <OUT>    the output data type.
+     * @return the selectable channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
-            @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
-        return join(true, placeholder, channels);
-    }
-
-    /**
-     * Returns a builder of channels merging the specified instances into a selectable one.
-     * <br>
-     * The selectable indexes will start from the specified one.
-     * <p>
-     * Note that the builder will successfully create only one channel instance, and that the passed
-     * ones will be bound as a result of the creation.
-     * <br>
-     * Note also that the returned channel will be already closed.
-     * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
-     *     </code>
-     * </pre>
-     *
-     * @param startIndex the selectable start index.
-     * @param channels   the iterable of channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
-     */
-    @NotNull
     public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
-            final int startIndex,
-            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        return new MergeBuilder<OUT>(startIndex, channels);
+            @NotNull final Channel<?, ?>... channels) {
+        return merge(0, channels);
     }
 
     /**
@@ -659,6 +657,39 @@ public class Channels {
         }
 
         return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, Arrays.asList(channels));
+    }
+
+    /**
+     * Returns a builder of channels merging the specified instances into a selectable one.
+     * <br>
+     * The selectable indexes will start from the specified one.
+     * <p>
+     * Note that the builder will successfully create only one channel instance, and that the passed
+     * ones will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channel will be already closed.
+     * <p>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
+     *     </code>
+     * </pre>
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the iterable of channels.
+     * @param <OUT>      the output data type.
+     * @return the selectable channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+     *                                            null object.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
+            final int startIndex,
+            @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+        return new MergeBuilder<OUT>(startIndex, channels);
     }
 
     /**
@@ -721,37 +752,6 @@ public class Channels {
     public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
             @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
         return new MergeMapBuilder<OUT>(channels);
-    }
-
-    /**
-     * Returns a builder of channels merging the specified instances into a selectable one.
-     * <br>
-     * The selectable indexes will be the position in the array.
-     * <p>
-     * Note that the builder will successfully create only one channel instance, and that the passed
-     * ones will be bound as a result of the creation.
-     * <br>
-     * Note also that the returned channel will be already closed.
-     * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
-     *     </code>
-     * </pre>
-     *
-     * @param channels the channels to merge.
-     * @param <OUT>    the output data type.
-     * @return the selectable channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-     *                                            object.
-     */
-    @NotNull
-    public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
-            @NotNull final Channel<?, ?>... channels) {
-        return merge(0, channels);
     }
 
     /**
@@ -827,20 +827,20 @@ public class Channels {
      * </pre>
      *
      * @param channel the selectable channel.
-     * @param indexes the iterable returning the channel indexes.
+     * @param indexes the array of indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and channels builder.
-     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
     selectInput(
             @NotNull final Channel<? super Selectable<DATA>, ?> channel,
-            @NotNull final Iterable<Integer> indexes) {
+            @NotNull final int... indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
-        for (final Integer index : indexes) {
+        for (final int index : indexes) {
             indexSet.add(index);
         }
 
@@ -862,20 +862,20 @@ public class Channels {
      * </pre>
      *
      * @param channel the selectable channel.
-     * @param indexes the array of indexes.
+     * @param indexes the iterable returning the channel indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and channels builder.
-     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
     selectInput(
             @NotNull final Channel<? super Selectable<DATA>, ?> channel,
-            @NotNull final int... indexes) {
+            @NotNull final Iterable<Integer> indexes) {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
-        for (final int index : indexes) {
+        for (final Integer index : indexes) {
             indexSet.add(index);
         }
 
@@ -917,47 +917,6 @@ public class Channels {
         }
 
         return new InputMapBuilder<DATA, IN>(channel, indexSet);
-    }
-
-    /**
-     * Returns a builder of maps of channels returning the output data filtered by the specified
-     * indexes.
-     * <p>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the passed channels will be bound as a result of the creation.
-     * <br>
-     * Note also that the returned channels will be already closed.
-     * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
-     * be:
-     * <pre>
-     *     <code>
-     *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
-     *     </code>
-     * </pre>
-     *
-     * @param startIndex the selectable start index.
-     * @param rangeSize  the size of the range of indexes (must be positive).
-     * @param channel    the selectable channel.
-     * @param <OUT>      the output data type.
-     * @return the map of indexes and channels builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     */
-    @NotNull
-    public static <OUT> ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> selectOutput(
-            final int startIndex, final int rangeSize,
-            @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel) {
-        ConstantConditions.positive("range size", rangeSize);
-        final HashSet<Integer> indexSet = new HashSet<Integer>();
-        final int endIndex = startIndex + rangeSize;
-        for (int i = startIndex; i < endIndex; ++i) {
-            indexSet.add(i);
-        }
-
-        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
@@ -1033,6 +992,47 @@ public class Channels {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
             indexSet.add(index);
+        }
+
+        return new OutputMapBuilder<OUT>(channel, indexSet);
+    }
+
+    /**
+     * Returns a builder of maps of channels returning the output data filtered by the specified
+     * indexes.
+     * <p>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
+     * <p>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <OUT>      the output data type.
+     * @return the map of indexes and channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> selectOutput(
+            final int startIndex, final int rangeSize,
+            @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel) {
+        ConstantConditions.positive("range size", rangeSize);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        final int endIndex = startIndex + rangeSize;
+        for (int i = startIndex; i < endIndex; ++i) {
+            indexSet.add(i);
         }
 
         return new OutputMapBuilder<OUT>(channel, indexSet);

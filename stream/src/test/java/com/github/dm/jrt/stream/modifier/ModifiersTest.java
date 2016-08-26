@@ -114,7 +114,6 @@ public class ModifiersTest {
                                               return data.sum / data.count;
                                           }
                                       })
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .next()).isCloseTo(21, Offset.offset(0.1));
@@ -154,7 +153,6 @@ public class ModifiersTest {
                                               return data.sum / data.count;
                                           }
                                       })
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .next()).isCloseTo(21, Offset.offset(0.1));
@@ -192,7 +190,6 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(1, TimeUnit.SECONDS))
-                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -200,7 +197,6 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.delay(seconds(1)))
-                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -237,7 +233,6 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(1, TimeUnit.SECONDS))
-                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -245,7 +240,6 @@ public class ModifiersTest {
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
                                  .let(Modifiers.lag(seconds(1)))
-                                 .call()
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -277,14 +271,12 @@ public class ModifiersTest {
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
                                       .let(Modifiers.<Integer, Integer, Long>parallel(2,
                                               sqr.buildFactory()))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
                                       .let(Modifiers.<Integer, Integer, Long>parallel(2, sqr))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
@@ -293,7 +285,6 @@ public class ModifiersTest {
                                       .let(Modifiers.<Integer, Integer, Integer>parallel(2,
                                               JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1, 2, 3);
@@ -301,7 +292,6 @@ public class ModifiersTest {
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
                                       .let(Modifiers.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr.buildFactory()))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
@@ -309,7 +299,6 @@ public class ModifiersTest {
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
                                       .let(Modifiers.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
@@ -318,7 +307,6 @@ public class ModifiersTest {
                                       .let(Modifiers.<Integer, Integer, Integer>parallelBy(
                                               Functions.<Integer>identity(), JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
-                                      .call()
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1, 2, 3);

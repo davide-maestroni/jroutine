@@ -180,7 +180,6 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                                                             .configured()
                                                                             .map(Functions
                                                                                     .identity())
-                                                                            .call()
                                                                             .close()
                                                                             .after(minutes(3))
                                                                             .next();
@@ -1245,7 +1244,6 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                       .configured()
                                       .map(sqrt())
                                       .map(Operators.<Double>averageDouble())
-                                      .call()
                                       .close()
                                       .next()).isCloseTo(21, Offset.offset(0.1));
     }

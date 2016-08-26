@@ -53,118 +53,95 @@ public class ProducersTest {
                     public Character apply(final Character character) {
                         return (char) (character + 1);
                     }
-                }))).call().close().after(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd',
-                'e');
+                }))).close().after(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(JRoutineCore.with(consumerCommand(range(0, 2, new BigDecimal(0.7))))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
                         new BigDecimal(0.7).add(new BigDecimal(0.7))));
         assertThat(JRoutineCore.with(consumerCommand(range(0, -10, BigInteger.valueOf(-2))))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-2), BigInteger.valueOf(-4),
                         BigInteger.valueOf(-6), BigInteger.valueOf(-8), BigInteger.valueOf(-10)));
         assertThat(JRoutineCore.with(consumerCommand(range(0, BigInteger.valueOf(2), 0.7)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
                         new BigDecimal(0.7).add(new BigDecimal(0.7))));
         assertThat(JRoutineCore.with(consumerCommand(range(0, -10, -2)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(JRoutineCore.with(consumerCommand(range(0, 2, 0.7)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(JRoutineCore.with(consumerCommand(range(0, 2, 0.7f)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(JRoutineCore.with(consumerCommand(range(0L, -9, -2)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(JRoutineCore.with(consumerCommand(range(0, (short) 9, 2)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(JRoutineCore.with(consumerCommand(range((byte) 0, (short) 9, (byte) 2)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(JRoutineCore.with(consumerCommand(range((byte) 0, (byte) 10, (byte) 2)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(JRoutineCore.with(consumerCommand(range(0, new BigDecimal(2))))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0), new BigDecimal(1), new BigDecimal(2)));
         assertThat(JRoutineCore.with(consumerCommand(range(0, BigInteger.valueOf(-2))))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-1),
                         BigInteger.valueOf(-2)));
         assertThat(JRoutineCore.with(consumerCommand(range(0.1, BigInteger.valueOf(2))))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList(new BigDecimal(0.1), new BigDecimal(0.1).add(BigDecimal.ONE)));
-        assertThat(JRoutineCore.with(consumerCommand(range(0, -5)))
-                               .call()
-                               .close()
-                               .after(seconds(3))
-                               .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
+        assertThat(JRoutineCore.with(consumerCommand(range(0, -5))).close().after(seconds(3)).all())
+                .isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(JRoutineCore.with(consumerCommand(range(0, 2.1)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(JRoutineCore.with(consumerCommand(range(0, 1.9f)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0f, 1f));
         assertThat(JRoutineCore.with(consumerCommand(range(0L, -4)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(JRoutineCore.with(consumerCommand(range(0, (short) 4)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(JRoutineCore.with(consumerCommand(range((byte) 0, (short) 4)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(JRoutineCore.with(consumerCommand(range((byte) 0, (byte) 5)))
-                               .call()
                                .close()
                                .after(seconds(3))
                                .all()).isEqualTo(
@@ -324,8 +301,7 @@ public class ProducersTest {
                     public Character apply(final Character character, final Long n) {
                         return (char) (character + 1);
                     }
-                }))).call().close().after(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd',
-                'e');
+                }))).close().after(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(JRoutineCore.with(
                 consumerCommand(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
@@ -350,7 +326,6 @@ public class ProducersTest {
                                .applyInvocationConfiguration()
                                .withRunner(Runners.syncRunner())
                                .configured()
-                               .call()
                                .close()
                                .all()).containsExactly('a', 'b', 'c', 'd', 'e');
     }

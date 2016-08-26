@@ -201,7 +201,6 @@ public class StreamBuilderTest {
         assertThat(JRoutineStream.withStream()
                                  .sync()
                                  .map(append((Object) "test"))
-                                 .call()
                                  .close()
                                  .next()).isEqualTo("test");
         try {
@@ -568,16 +567,12 @@ public class StreamBuilderTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Modifiers.<String, String>lag(1, TimeUnit.SECONDS))
-                                                      .call()
-                                                      .close()
-                                                      .after(seconds(3))
-                                                      .all()).isEmpty();
+                Modifiers.<String, String>lag(1, TimeUnit.SECONDS)).close().after(seconds(3)).all())
+                .isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(
                 JRoutineStream.<String>withStream().let(Modifiers.<String, String>lag(seconds(1)))
-                                                   .call()
                                                    .close()
                                                    .after(seconds(3))
                                                    .all()).isEmpty();
@@ -688,7 +683,7 @@ public class StreamBuilderTest {
                                   }
                               });
         try {
-            builder.sync().call().close().throwError();
+            builder.sync().close().throwError();
             fail();
 
         } catch (final InvocationException e) {
@@ -1176,7 +1171,6 @@ public class StreamBuilderTest {
                                                   return data.sum / data.count;
                                               }
                                           })
-                                          .call()
                                           .close()
                                           .after(minutes(3))
                                           .next()).isCloseTo(21, Offset.offset(0.1));
@@ -1221,7 +1215,6 @@ public class StreamBuilderTest {
                                                   return data.sum / data.count;
                                               }
                                           })
-                                          .call()
                                           .close()
                                           .after(minutes(3))
                                           .next()).isCloseTo(21, Offset.offset(0.1));
@@ -1265,7 +1258,6 @@ public class StreamBuilderTest {
                                                   return data.sum / data.count;
                                               }
                                           })
-                                          .call()
                                           .close()
                                           .after(minutes(3))
                                           .next()).isCloseTo(21, Offset.offset(0.1));
@@ -1292,7 +1284,6 @@ public class StreamBuilderTest {
                                                            }
                                                        })
                                                        .map(Operators.averageDouble())
-                                                       .call()
                                                        .close()
                                                        .next()).isCloseTo(21, Offset.offset(0.1));
     }

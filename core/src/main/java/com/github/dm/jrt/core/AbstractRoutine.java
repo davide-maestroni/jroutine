@@ -236,7 +236,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         @Override
         public void onComplete(@NotNull final Channel<OUT, ?> result) {
             if (!mHasInputs) {
-                result.pass(mRoutine.call().close());
+                result.pass(mRoutine.close());
             }
         }
 

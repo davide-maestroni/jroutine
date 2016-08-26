@@ -83,7 +83,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .configured()
                                                         .method(TestClass.GET);
-        assertThat(routine.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class JRoutineTest {
     public void testCommandInvocation() {
 
         final Routine<Void, String> routine = JRoutine.with(new GetString()).buildRoutine();
-        assertThat(routine.call().close().after(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
@@ -196,7 +196,7 @@ public class JRoutineTest {
                         result.pass("test", "1");
                     }
                 }).buildRoutine();
-        assertThat(routine.call().close().after(seconds(1)).all()).containsOnly("test", "1");
+        assertThat(routine.close().after(seconds(1)).all()).containsOnly("test", "1");
     }
 
     @Test
@@ -249,12 +249,8 @@ public class JRoutineTest {
 
     @Test
     public void testInstance() {
-        assertThat(JRoutine.withInstance("test")
-                           .method("toString")
-                           .call()
-                           .close()
-                           .after(seconds(1))
-                           .all()).containsExactly("test");
+        assertThat(JRoutine.withInstance("test").method("toString").close().after(seconds(1)).all())
+                .containsExactly("test");
     }
 
     @Test
@@ -343,7 +339,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .configured()
                                                         .method(TestClass.GET);
-        assertThat(routine.call().close().all()).containsExactly(-77L);
+        assertThat(routine.close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -388,7 +384,7 @@ public class JRoutineTest {
                                                         .configured()
                                                         .method(TestClass.class.getMethod(
                                                                 "getLong"));
-        assertThat(routine.call().close().all()).containsExactly(-77L);
+        assertThat(routine.close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -402,7 +398,7 @@ public class JRoutineTest {
                                                         .withLog(new NullLog())
                                                         .configured()
                                                         .method("getLong");
-        assertThat(routine.call().close().all()).containsExactly(-77L);
+        assertThat(routine.close().all()).containsExactly(-77L);
     }
 
     @Test
@@ -506,7 +502,6 @@ public class JRoutineTest {
                                                  })
                                                  .sync()
                                                  .map(Operators.<Double>averageDouble())
-                                                 .call()
                                                  .close()
                                                  .after(seconds(3))
                                                  .next()).isCloseTo(21, Offset.offset(0.1));
@@ -522,7 +517,7 @@ public class JRoutineTest {
                 return "test";
             }
         }).buildRoutine();
-        assertThat(routine.call().close().after(seconds(1)).all()).containsOnly("test");
+        assertThat(routine.close().after(seconds(1)).all()).containsOnly("test");
     }
 
     @Test

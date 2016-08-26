@@ -408,14 +408,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 new ClassToken<GetContextInvocation<String>>() {};
         assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
                                  .with(factoryOf(classToken))
-                                 .call()
                                  .close()
                                  .after(seconds(10))
                                  .next()).isSameAs(getActivity().getApplicationContext());
         final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
         assertThat(JRoutineLoader.on(loaderFrom(getActivity(), contextWrapper))
                                  .with(factoryOf(classToken, (Object[]) null))
-                                 .call()
                                  .close()
                                  .after(seconds(10))
                                  .next()).isSameAs(getActivity().getApplicationContext());
@@ -434,7 +432,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom((Activity) null))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
@@ -447,7 +444,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom(getActivity(), null))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
@@ -461,7 +457,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom(getActivity(), contextWrapper))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
@@ -1254,14 +1249,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 new ClassToken<GetContextInvocation<String>>() {};
         assertThat(JRoutineLoader.on(loaderFrom(fragment))
                                  .with(factoryOf(classToken))
-                                 .call()
                                  .close()
                                  .after(seconds(10))
                                  .next()).isSameAs(getActivity().getApplicationContext());
         final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
         assertThat(JRoutineLoader.on(loaderFrom(fragment, contextWrapper))
                                  .with(factoryOf(classToken))
-                                 .call()
                                  .close()
                                  .after(seconds(10))
                                  .next()).isSameAs(getActivity().getApplicationContext());
@@ -1283,7 +1276,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom((Fragment) null))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
@@ -1296,7 +1288,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom(fragment, null))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
@@ -1310,7 +1301,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
             assertThat(JRoutineLoader.on(loaderFrom(fragment, contextWrapper))
                                      .with(factoryOf(classToken))
-                                     .call()
                                      .close()
                                      .after(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());

@@ -113,7 +113,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     }
 
     @NotNull
-    public Channel<? super DATA, ?> bind(@NotNull final Channel<? super DATA, ?> channel) {
+    public <AFTER> Channel<? super DATA, AFTER> bind(
+            @NotNull final Channel<? super DATA, AFTER> channel) {
         return mChannel.bind(channel);
     }
 

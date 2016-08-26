@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -130,7 +131,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA output) {
-        return append(JRoutineCore.io().of(output));
+        return append(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
     }
 
     /**
@@ -142,7 +143,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA... outputs) {
-        return append(JRoutineCore.io().of(outputs));
+        return append(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -156,12 +157,16 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> append(
             @Nullable final Iterable<? extends DATA> outputs) {
-        return append(JRoutineCore.io().of(outputs));
+        return append(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
      * Returns a factory of invocations appending the outputs returned by the specified channel to
      * the invocation ones.
+     * <p>
+     * Note that the passed channel will be bound as a result of the call, so, in order to support
+     * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+     * {@link Channels#replay(Channel)} utility method.
      *
      * @param channel the output channel.
      * @param <DATA>  the data type.
@@ -1028,7 +1033,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA output) {
-        return prepend(JRoutineCore.io().of(output));
+        return prepend(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
     }
 
     /**
@@ -1043,7 +1048,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA... outputs) {
-        return prepend(JRoutineCore.io().of(outputs));
+        return prepend(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -1060,7 +1065,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prepend(
             @Nullable final Iterable<? extends DATA> outputs) {
-        return prepend(JRoutineCore.io().of(outputs));
+        return prepend(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -1069,6 +1074,10 @@ public class Operators {
      * <br>
      * If no input is passed to the invocation, the outputs will be produced only when the
      * invocation completes.
+     * <p>
+     * Note that the passed channel will be bound as a result of the call, so, in order to support
+     * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+     * {@link Channels#replay(Channel)} utility method.
      *
      * @param channel the output channel.
      * @param <DATA>  the data type.

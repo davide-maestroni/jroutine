@@ -82,7 +82,8 @@ public final class InputChannel<IN> implements Channel<IN, IN> {
     }
 
     @NotNull
-    public Channel<? super IN, ?> bind(@NotNull final Channel<? super IN, ?> channel) {
+    public <AFTER> Channel<? super IN, AFTER> bind(
+            @NotNull final Channel<? super IN, AFTER> channel) {
         return mChannel.bind(channel);
     }
 

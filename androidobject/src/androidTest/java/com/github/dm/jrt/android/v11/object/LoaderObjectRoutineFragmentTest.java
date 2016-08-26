@@ -118,7 +118,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                     .configured()
                                                                     .method(TestClass.GET);
 
-        assertThat(routine.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.close().after(timeout).all()).containsExactly(-77L);
     }
 
     public void testArgs() {
@@ -134,7 +134,6 @@ public class LoaderObjectRoutineFragmentTest
         assertThat(JRoutineLoaderObject.on(loaderFrom(fragment))
                                        .with(instanceOf(TestArgs.class, 17))
                                        .method("getId")
-                                       .call()
                                        .close()
                                        .after(seconds(10))
                                        .next()).isEqualTo(17);
@@ -311,7 +310,6 @@ public class LoaderObjectRoutineFragmentTest
         assertThat(JRoutineLoaderObject.on(loaderFrom(fragment, contextWrapper))
                                        .with(instanceOf(String.class))
                                        .method("toString")
-                                       .call()
                                        .close()
                                        .after(seconds(10))
                                        .next()).isEqualTo("test1");
@@ -746,7 +744,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                              .getMethod(
                                                                              "getLong"));
 
-        assertThat(routine2.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.close().after(timeout).all()).containsExactly(-77L);
 
     }
 
@@ -770,7 +768,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                      .configured()
                                                                      .method("getLong");
 
-        assertThat(routine1.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.close().after(timeout).all()).containsExactly(-77L);
     }
 
     public void testMissingAliasMethodError() {
@@ -1068,19 +1066,19 @@ public class LoaderObjectRoutineFragmentTest
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().close().all()).containsExactly(31);
-        assertThat(itf.get4().call().close().all()).containsExactly(31);
+        assertThat(itf.get4().close().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA3().call().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA3().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getA5().call().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getA5().close().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL3().call().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL3().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getL5().call().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getL5().close().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
         final Channel<Integer, Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
@@ -1167,13 +1165,11 @@ public class LoaderObjectRoutineFragmentTest
                                            .withSharedFields("1")
                                            .configured()
                                            .method("getOne")
-                                           .call()
                                            .close();
         Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields("2")
                                            .configured()
                                            .method("getTwo")
-                                           .call()
                                            .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1182,8 +1178,8 @@ public class LoaderObjectRoutineFragmentTest
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").call().close();
-        getTwo = builder.method("getTwo").call().close();
+        getOne = builder.method("getOne").close();
+        getTwo = builder.method("getTwo").close();
 
         assertThat(getOne.getComplete()).isTrue();
         assertThat(getTwo.getComplete()).isTrue();
@@ -1209,7 +1205,6 @@ public class LoaderObjectRoutineFragmentTest
                                        .withLoaderId(0)
                                        .configured()
                                        .method("test")
-                                       .call()
                                        .close()
                                        .next()).isEqualTo(31);
 
@@ -1224,7 +1219,6 @@ public class LoaderObjectRoutineFragmentTest
                                 .withLoaderId(1)
                                 .configured()
                                 .method("test")
-                                .call()
                                 .close()
                                 .next();
 
@@ -1243,7 +1237,6 @@ public class LoaderObjectRoutineFragmentTest
                                        .withLoaderId(2)
                                        .configured()
                                        .method("getInt")
-                                       .call()
                                        .close()
                                        .next()).isEqualTo(31);
 
@@ -1258,7 +1251,6 @@ public class LoaderObjectRoutineFragmentTest
                                 .withLoaderId(3)
                                 .configured()
                                 .method("getInt")
-                                .call()
                                 .close()
                                 .next();
 
@@ -1277,7 +1269,6 @@ public class LoaderObjectRoutineFragmentTest
                                        .withLoaderId(4)
                                        .configured()
                                        .method(TestTimeout.class.getMethod("getInt"))
-                                       .call()
                                        .close()
                                        .next()).isEqualTo(31);
 
@@ -1292,7 +1283,6 @@ public class LoaderObjectRoutineFragmentTest
                                 .withLoaderId(5)
                                 .configured()
                                 .method(TestTimeout.class.getMethod("getInt"))
-                                .call()
                                 .close()
                                 .next();
 

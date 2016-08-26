@@ -186,4 +186,12 @@ public interface Routine<IN, OUT> {
      * Note however that the routine will still be usable after the method returns.
      */
     void clear();
+
+    /**
+     * Short for {@code call().close()}.
+     *
+     * @return the invocation channel.
+     */
+    @NotNull
+    Channel<IN, OUT> close();
 }

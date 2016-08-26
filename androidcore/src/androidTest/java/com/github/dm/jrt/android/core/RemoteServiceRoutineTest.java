@@ -99,7 +99,6 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                            .with(factoryOf(Abort.class))
-                           .call()
                            .close()
                            .after(timeout)
                            .next();
@@ -364,8 +363,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withMaxInstances(2)
                                .configured()
                                .buildRoutine();
-        assertThat(routine4.call().close().after(timeout).all()).containsOnly("test1", "test2",
-                "test3");
+        assertThat(routine4.close().after(timeout).all()).containsOnly("test1", "test2", "test3");
         assertThat(routine4.callParallel().close().after(timeout).all()).containsOnly("test1",
                 "test2", "test3");
     }

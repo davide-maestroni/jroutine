@@ -98,7 +98,6 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
             JRoutineService.on(serviceFrom(getActivity()))
                            .with(factoryOf(Abort.class))
-                           .call()
                            .close()
                            .after(timeout)
                            .next();
@@ -368,8 +367,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                               .withMaxInstances(2)
                                                               .configured()
                                                               .buildRoutine();
-        assertThat(routine4.call().close().after(timeout).all()).containsOnly("test1", "test2",
-                "test3");
+        assertThat(routine4.close().after(timeout).all()).containsOnly("test1", "test2", "test3");
         assertThat(routine4.callParallel().close().after(timeout).all()).containsOnly("test1",
                 "test2", "test3");
     }

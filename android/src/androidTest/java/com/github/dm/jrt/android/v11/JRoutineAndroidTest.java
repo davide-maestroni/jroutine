@@ -110,7 +110,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                                          }
                                                                      })
                                                              .buildRoutine();
-        assertThat(routine.call().close().after(seconds(10)).all()).containsOnly("test", "1");
+        assertThat(routine.close().after(seconds(10)).all()).containsOnly("test", "1");
     }
 
     private static void testConsumerFunction(@NotNull final Activity activity) {
@@ -187,7 +187,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                         })
                                                         .sync()
                                                         .map(Operators.<Double>averageDouble())
-                                                        .call()
                                                         .close()
                                                         .after(seconds(10))
                                                         .next()).isCloseTo(21, Offset.offset(0.1));
@@ -203,7 +202,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                         return "test";
                     }
                 }).buildRoutine();
-        assertThat(routine.call().close().after(seconds(10)).all()).containsOnly("test");
+        assertThat(routine.close().after(seconds(10)).all()).containsOnly("test");
     }
 
     private static void testSupplierContextFactory(@NotNull final Activity activity) {
@@ -343,21 +342,18 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(JRoutineAndroid.on(getActivity())
                                   .withClassOfType(TestClass.class)
                                   .method("getStringUp")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.on(getActivity())
                                   .withClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.on(getActivity())
                                   .with(classOfType(TestClass.class))
                                   .method("TEST")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
@@ -377,7 +373,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .withCacheStrategy(CacheStrategyType.CACHE)
                                   .configured()
                                   .method("getStringLow")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
@@ -397,21 +392,18 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(JRoutineAndroid.on(getActivity())
                                   .withInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.on(getActivity())
                                   .withInstanceOf(TestClass.class)
                                   .method("getStringLow")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.on(getActivity())
                                   .with(instanceOf(TestClass.class))
                                   .method("test")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
@@ -587,21 +579,18 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .withClassOfType(TestClass.class)
                                   .method("getStringUp")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .withClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .with(classOfType(TestClass.class))
                                   .method("TEST")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("TEST");
@@ -616,21 +605,18 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .withInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .withInstanceOf(TestClass.class)
                                   .method("getStringLow")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.on((Context) getActivity())
                                   .with(instanceOf(TestClass.class))
                                   .method("test")
-                                  .call()
                                   .close()
                                   .after(seconds(10))
                                   .all()).containsExactly("test");

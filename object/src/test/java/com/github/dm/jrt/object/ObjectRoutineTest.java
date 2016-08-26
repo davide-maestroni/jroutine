@@ -133,7 +133,7 @@ public class ObjectRoutineTest {
                                                               .configured()
                                                               .method(TestClass.GET);
 
-        assertThat(routine.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -148,7 +148,7 @@ public class ObjectRoutineTest {
                                                               .configured()
                                                               .method(TestStatic.GET);
 
-        assertThat(routine.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -655,7 +655,7 @@ public class ObjectRoutineTest {
                                                                .method(TestClass.class.getMethod(
                                                                        "getLong"));
 
-        assertThat(routine2.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -669,7 +669,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method("getLong");
 
-        assertThat(routine1.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -679,19 +679,16 @@ public class ObjectRoutineTest {
         final TestClassImpl test = new TestClassImpl();
         assertThat(JRoutineObject.with(instance(test))
                                  .method(TestClassImpl.class.getMethod("getOne"))
-                                 .call()
                                  .close()
                                  .after(timeout)
                                  .all()).containsExactly(1);
         assertThat(JRoutineObject.with(instance(test))
                                  .method("getOne")
-                                 .call()
                                  .close()
                                  .after(timeout)
                                  .all()).containsExactly(1);
         assertThat(JRoutineObject.with(instance(test))
                                  .method(TestClassImpl.GET)
-                                 .call()
                                  .close()
                                  .after(timeout)
                                  .all()).containsExactly(1);
@@ -719,7 +716,6 @@ public class ObjectRoutineTest {
 
             JRoutineObject.with(classOfType(TestClassImpl.class))
                           .method("sget")
-                          .call()
                           .close()
                           .after(timeout)
                           .all();
@@ -870,7 +866,7 @@ public class ObjectRoutineTest {
                                                               .configured()
                                                               .method(TestStatic.GET);
 
-        assertThat(routine.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -1043,19 +1039,19 @@ public class ObjectRoutineTest {
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().close().all()).containsExactly(31);
-        assertThat(itf.get4().call().close().all()).containsExactly(31);
+        assertThat(itf.get4().close().all()).containsExactly(31);
         assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-        assertThat(itf.getA3().call().close().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA3().close().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getA5().call().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getA5().close().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-        assertThat(itf.getL3().call().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL3().close().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-        assertThat(itf.getL5().call().close().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getL5().close().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
         final Channel<Integer, Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
@@ -1126,7 +1122,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestClass.GET);
 
-        assertThat(routine1.call().close().all()).containsExactly(-77L);
+        assertThat(routine1.close().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutineObject.with(instance(test))
                                                                .applyInvocationConfiguration()
@@ -1137,7 +1133,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestClass.GET);
 
-        assertThat(routine2.call().close().all()).containsExactly(-77L);
+        assertThat(routine2.close().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutineObject.with(instance(test))
@@ -1149,7 +1145,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestClass.GET);
 
-        assertThat(routine3.call().close().all()).containsExactly(-77L);
+        assertThat(routine3.close().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -1162,7 +1158,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestClass.GET);
 
-        assertThat(routine4.call().close().all()).containsExactly(-77L);
+        assertThat(routine4.close().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutineObject.with(instance(test))
@@ -1174,7 +1170,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestClass.GET);
 
-        assertThat(routine5.call().close().all()).containsExactly(-77L);
+        assertThat(routine5.close().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -1191,7 +1187,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestStatic.GET);
 
-        assertThat(routine1.call().close().all()).containsExactly(-77L);
+        assertThat(routine1.close().all()).containsExactly(-77L);
 
         final Routine<Object, Object> routine2 = JRoutineObject.with(classOfType(TestStatic.class))
                                                                .applyInvocationConfiguration()
@@ -1202,7 +1198,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestStatic.GET);
 
-        assertThat(routine2.call().close().all()).containsExactly(-77L);
+        assertThat(routine2.close().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
         final Routine<Object, Object> routine3 = JRoutineObject.with(classOfType(TestStatic.class))
@@ -1214,7 +1210,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestStatic.GET);
 
-        assertThat(routine3.call().close().all()).containsExactly(-77L);
+        assertThat(routine3.close().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
@@ -1227,7 +1223,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestStatic.GET);
 
-        assertThat(routine4.call().close().all()).containsExactly(-77L);
+        assertThat(routine4.close().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
         final Routine<Object, Object> routine5 = JRoutineObject.with(classOfType(TestStatic.class))
@@ -1239,7 +1235,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method(TestStatic.GET);
 
-        assertThat(routine5.call().close().all()).containsExactly(-77L);
+        assertThat(routine5.close().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
     }
 
@@ -1257,13 +1253,11 @@ public class ObjectRoutineTest {
                                            .withSharedFields()
                                            .configured()
                                            .method("getOne")
-                                           .call()
                                            .close();
         Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
-                                           .call()
                                            .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1276,13 +1270,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1291,8 +1283,8 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").call().close();
-        getTwo = builder.method("getTwo").call().close();
+        getOne = builder.method("getOne").close();
+        getTwo = builder.method("getTwo").close();
 
         assertThat(getOne.getComplete()).isTrue();
         assertThat(getTwo.getComplete()).isTrue();
@@ -1309,12 +1301,11 @@ public class ObjectRoutineTest {
                                                            .configured();
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Object> getOne = builder.method("getOne").call().close();
+        Channel<?, Object> getOne = builder.method("getOne").close();
         Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
-                                           .call()
                                            .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1327,13 +1318,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields()
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1346,9 +1335,8 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
-        getTwo = builder.method("getTwo").call().close();
+        getTwo = builder.method("getTwo").close();
 
         assertThat(getOne.getComplete()).isTrue();
         assertThat(getTwo.getComplete()).isTrue();
@@ -1360,13 +1348,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1387,13 +1373,11 @@ public class ObjectRoutineTest {
                                            .withSharedFields()
                                            .configured()
                                            .method("getOne")
-                                           .call()
                                            .close();
         Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
-                                           .call()
                                            .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1406,13 +1390,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1421,8 +1403,8 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.method("getOne").call().close();
-        getTwo = builder.method("getTwo").call().close();
+        getOne = builder.method("getOne").close();
+        getTwo = builder.method("getTwo").close();
 
         assertThat(getOne.getComplete()).isTrue();
         assertThat(getTwo.getComplete()).isTrue();
@@ -1438,12 +1420,11 @@ public class ObjectRoutineTest {
                                                            .configured();
         long startTime = System.currentTimeMillis();
 
-        Channel<?, Object> getOne = builder.method("getOne").call().close();
+        Channel<?, Object> getOne = builder.method("getOne").close();
         Channel<?, Object> getTwo = builder.applyObjectConfiguration()
                                            .withSharedFields()
                                            .configured()
                                            .method("getTwo")
-                                           .call()
                                            .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1456,13 +1437,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields()
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1475,9 +1454,8 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
-        getTwo = builder.method("getTwo").call().close();
+        getTwo = builder.method("getTwo").close();
 
         assertThat(getOne.getComplete()).isTrue();
         assertThat(getTwo.getComplete()).isTrue();
@@ -1489,13 +1467,11 @@ public class ObjectRoutineTest {
                         .withSharedFields("1", "2")
                         .configured()
                         .method("getOne")
-                        .call()
                         .close();
         getTwo = builder.applyObjectConfiguration()
                         .withSharedFields("2")
                         .configured()
                         .method("getTwo")
-                        .call()
                         .close();
 
         assertThat(getOne.getComplete()).isTrue();
@@ -1519,7 +1495,7 @@ public class ObjectRoutineTest {
                                                                .method(TestStatic.class.getMethod(
                                                                        "getLong"));
 
-        assertThat(routine2.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine2.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -1533,7 +1509,7 @@ public class ObjectRoutineTest {
                                                                .configured()
                                                                .method("getLong");
 
-        assertThat(routine1.call().close().after(timeout).all()).containsExactly(-77L);
+        assertThat(routine1.close().after(timeout).all()).containsExactly(-77L);
     }
 
     @Test
@@ -1559,7 +1535,6 @@ public class ObjectRoutineTest {
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method("test")
-                                 .call()
                                  .close()
                                  .next()).isEqualTo(31);
 
@@ -1570,7 +1545,6 @@ public class ObjectRoutineTest {
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method("test")
-                          .call()
                           .close()
                           .next();
 
@@ -1585,7 +1559,6 @@ public class ObjectRoutineTest {
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method("getInt")
-                                 .call()
                                  .close()
                                  .next()).isEqualTo(31);
 
@@ -1596,7 +1569,6 @@ public class ObjectRoutineTest {
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method("getInt")
-                          .call()
                           .close()
                           .next();
 
@@ -1611,7 +1583,6 @@ public class ObjectRoutineTest {
                                  .withOutputTimeout(seconds(1))
                                  .configured()
                                  .method(TestTimeout.class.getMethod("getInt"))
-                                 .call()
                                  .close()
                                  .next()).isEqualTo(31);
 
@@ -1622,7 +1593,6 @@ public class ObjectRoutineTest {
                           .withOutputTimeoutAction(TimeoutActionType.FAIL)
                           .configured()
                           .method(TestTimeout.class.getMethod("getInt"))
-                          .call()
                           .close()
                           .next();
 

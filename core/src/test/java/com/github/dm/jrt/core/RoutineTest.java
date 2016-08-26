@@ -298,7 +298,7 @@ public class RoutineTest {
                             .withRunner(Runners.syncRunner())
                             .configured()
                             .buildRoutine();
-        assertThat(routine.call().close().after(timeout).all()).isEmpty();
+        assertThat(routine.close().after(timeout).all()).isEmpty();
         assertThat(
                 routine.call(Arrays.asList("test1", "test2")).after(timeout).all()).containsExactly(
                 "test1", "test2");
@@ -918,7 +918,6 @@ public class RoutineTest {
                         .withRunner(Runners.syncRunner())
                         .withLogLevel(Level.SILENT)
                         .configured()
-                        .call()
                         .close()
                         .all();
             fail();
@@ -1108,7 +1107,7 @@ public class RoutineTest {
         final ExceptionRoutine routine =
                 new ExceptionRoutine(InvocationConfiguration.defaultConfiguration());
         try {
-            routine.call().close().after(seconds(1)).all();
+            routine.close().after(seconds(1)).all();
             fail();
 
         } catch (final InvocationException e) {
@@ -1120,7 +1119,7 @@ public class RoutineTest {
     public void testInitInvocationNull() {
         final NullRoutine routine = new NullRoutine(InvocationConfiguration.defaultConfiguration());
         try {
-            routine.call().close().after(seconds(1)).all();
+            routine.close().after(seconds(1)).all();
             fail();
 
         } catch (final InvocationException e) {
@@ -1316,7 +1315,7 @@ public class RoutineTest {
                                                         .buildRoutine();
         routine.call().pass((Void) null);
         try {
-            routine.call().close().after(seconds(1)).next();
+            routine.close().after(seconds(1)).next();
             fail();
 
         } catch (final InvocationDeadlockException ignored) {

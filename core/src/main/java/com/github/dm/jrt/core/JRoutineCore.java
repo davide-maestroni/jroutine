@@ -54,8 +54,8 @@ import org.jetbrains.annotations.NotNull;
  *     <code>
  *
  *         final Channel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
- *         channel.pass(routine1.call().close())
- *                .pass(routine2.call().close())
+ *         channel.pass(routine1.close())
+ *                .pass(routine2.close())
  *                .close();
  *                .after(seconds(20))
  *                .allInto(results);
@@ -65,8 +65,8 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Void, Result&gt; output1 = routine1.call().close();
- *         final Channel&lt;Void, Result&gt; output2 = routine2.call().close();
+ *         final Channel&lt;Void, Result&gt; output1 = routine1.close();
+ *         final Channel&lt;Void, Result&gt; output2 = routine2.close();
  *         output1.after(seconds(20)).allInto(results);
  *         output2.after(seconds(20)).allInto(results);
  *     </code>
@@ -78,14 +78,14 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine2.call(routine1.call().close()).after(seconds(20).all();
+ *         routine2.call(routine1.close()).after(seconds(20).all();
  *     </code>
  * </pre>
  * Or, in an equivalent way:
  * <pre>
  *     <code>
  *
- *         routine1.call().close().bind(routine2.call()).close().after(seconds(20).all();
+ *         routine1.close().bind(routine2.call()).close().after(seconds(20).all();
  *     </code>
  * </pre>
  * <p>

@@ -112,13 +112,11 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                 InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
         assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                                .apply(configuration)
-                               .call()
                                .close()
                                .getError()).isNull();
         assertThat(
                 JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
                             .apply(configuration)
-                            .call()
                             .close()
                             .getError()).isNull();
     }

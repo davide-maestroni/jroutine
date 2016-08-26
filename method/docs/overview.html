@@ -46,19 +46,38 @@
         </p>
     </li>
 </ul>
-<h2>Main classes</h2>
-<ul>
-</ul>
 <h2>Usage examples</h2>
 <p>
-    TODO.
+    The code below shows how it is possible to create a routine method printing different outputs based on their types..
 </p>
-<b>Example 1:</b> TODO.
-<p>
-    TODO.
-</p>
+<b>Example 1:</b> via routine method implementation.
 <pre>
     <code>
+        final InputChannel&lt;Integer&gt; inputInts = RoutineMethod.inputChannel();
+        final InputChannel&lt;String&gt; inputStrings = RoutineMethod.inputChannel();
+        final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+        new RoutineMethod() {
+
+            void print(final InputChannel&lt;Integer&gt; inputInts,
+                    final InputChannel&lt;String&gt; inputStrings,
+                    final OutputChannel&lt;String&gt; output) {
+                final InputChannel&lt;?&gt; inputChannel = switchInput();
+                if (inputChannel.hasNext()) {
+                    if (inputChannel == inputInts) {
+                        output.pass("Number: " + inputChannel.next());
+                    } else if (inputChannel == inputStrings) {
+                        output.pass("String: " + inputChannel.next());
+                    }
+                }
+            }
+        }.call(inputInts, inputStrings, outputChannel);
+        outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
+
+            &#64;Override
+            public void onOutput(final String out) {
+                System.out.println(out);
+            }
+        });
     </code>
 </pre>
 </body>

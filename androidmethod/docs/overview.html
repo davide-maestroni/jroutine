@@ -22,24 +22,95 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Java functional programming based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
+    Routine method implementation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidcore" target="_blank">JRoutine-AndroidCore</a> and <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidobject" target="_blank">JRoutine-AndroidObject</a> libraries.
 </p>
 <h2>Main concepts</h2>
 <ul>
-</ul>
-<h2>Main classes</h2>
-<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidmethod/com/github/dm/jrt/android/method/ServiceRoutineMethod.html">ServiceRoutineMethod</a>
+        <p>
+            Base class providing a simple way to implement a Service routine as an object method.
+            The method will receive input through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a> instances and produce outputs through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a> instances passed as parameters.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidmethod/com/github/dm/jrt/android/v11/method/LoaderRoutineMethod.html">LoaderRoutineMethod</a>
+        <p>
+            Base class providing a simple way to implement a Loader routine as an object method.
+            The method will receive input through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a> instances and produce outputs through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a> instances passed as parameters.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/androidmethod/com/github/dm/jrt/android/v4/method/LoaderRoutineMethod.html">LoaderRoutineMethod</a>
+        <p>
+            Base class providing a simple way to implement a Loader routine as an object method.
+            The method will receive input through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a> instances and produce outputs through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a> instances passed as parameters.
+            This class is specifically meant to employ the Android Support library for retro-compatibility.
+        </p>
+    </li>
 </ul>
 <h2>Usage examples</h2>
 <p>
-    TODO.
+    The code below shows how it is possible to create a routine method printing different outputs based on their types..
 </p>
-<b>Example 1:</b> TODO.
-<p>
-    TODO.
-</p>
+<b>Example 1:</b> via Service routine method.
 <pre>
     <code>
+        final InputChannel&lt;Integer&gt; inputInts = RoutineMethod.inputChannel();
+        final InputChannel&lt;String&gt; inputStrings = RoutineMethod.inputChannel();
+        final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+        new ServiceRoutineMethod(serviceFrom(activity)) {
+
+            void print(final InputChannel&lt;Integer&gt; inputInts,
+                    final InputChannel&lt;String&gt; inputStrings,
+                    final OutputChannel&lt;String&gt; output) {
+                final InputChannel&lt;?&gt; inputChannel = switchInput();
+                if (inputChannel.hasNext()) {
+                    if (inputChannel == inputInts) {
+                        output.pass("Number: " + inputChannel.next());
+                    } else if (inputChannel == inputStrings) {
+                        output.pass("String: " + inputChannel.next());
+                    }
+                }
+            }
+        }.call(inputInts, inputStrings, outputChannel);
+        outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
+
+            &#64;Override
+            public void onOutput(final String out) {
+                System.out.println(out);
+            }
+        });
+    </code>
+</pre>
+<b>Example 2:</b> via Loader routine method.
+<pre>
+    <code>
+        final InputChannel&lt;Integer&gt; inputInts = RoutineMethod.inputChannel();
+        final InputChannel&lt;String&gt; inputStrings = RoutineMethod.inputChannel();
+        final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+        new LoaderRoutineMethod(loaderFrom(activity)) {
+
+            void print(final InputChannel&lt;Integer&gt; inputInts,
+                    final InputChannel&lt;String&gt; inputStrings,
+                    final OutputChannel&lt;String&gt; output) {
+                final InputChannel&lt;?&gt; inputChannel = switchInput();
+                if (inputChannel.hasNext()) {
+                    if (inputChannel == inputInts) {
+                        output.pass("Number: " + inputChannel.next());
+                    } else if (inputChannel == inputStrings) {
+                        output.pass("String: " + inputChannel.next());
+                    }
+                }
+            }
+        }.call(inputInts, inputStrings, outputChannel);
+        outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
+
+            &#64;Override
+            public void onOutput(final String out) {
+                System.out.println(out);
+            }
+        });
     </code>
 </pre>
 </body>

@@ -31,7 +31,7 @@ import java.util.Map.Entry;
  * @param <K> the key type.
  * @param <V> the value type.
  */
-public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
+public class LruHashMap<K, V> extends LinkedHashMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
 
@@ -47,7 +47,7 @@ public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param maxCapacity the maximum capacity.
      * @see HashMap#HashMap()
      */
-    public LRUHashMap(final int maxCapacity) {
+    public LruHashMap(final int maxCapacity) {
         this(maxCapacity, DEFAULT_INITIAL_CAPACITY);
     }
 
@@ -58,7 +58,7 @@ public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param initialCapacity the initial capacity.
      * @see HashMap#HashMap(int)
      */
-    public LRUHashMap(final int maxCapacity, final int initialCapacity) {
+    public LruHashMap(final int maxCapacity, final int initialCapacity) {
         this(maxCapacity, initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
@@ -70,7 +70,7 @@ public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param loadFactor      the load factor.
      * @see HashMap#HashMap(int, float)
      */
-    public LRUHashMap(final int maxCapacity, final int initialCapacity, final float loadFactor) {
+    public LruHashMap(final int maxCapacity, final int initialCapacity, final float loadFactor) {
         super(initialCapacity, loadFactor, true);
         mMaxCapacity = ConstantConditions.positive("maximum capacity", maxCapacity);
     }
@@ -82,7 +82,7 @@ public class LRUHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param map         the initial content.
      * @see HashMap#HashMap(Map)
      */
-    public LRUHashMap(final int maxCapacity, @NotNull final Map<? extends K, ? extends V> map) {
+    public LruHashMap(final int maxCapacity, @NotNull final Map<? extends K, ? extends V> map) {
         this(maxCapacity, map.size());
         putAll(map);
     }

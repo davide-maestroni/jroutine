@@ -48,6 +48,7 @@ import com.github.dm.jrt.stream.modifier.Modifiers;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -56,13 +57,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.Backoffs.afterCount;
+import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
+import static com.github.dm.jrt.operator.Operators.averageFloat;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
@@ -86,6 +88,42 @@ public class StreamBuilderTest {
         }
 
         return sSingleThreadRunner;
+    }
+
+    // TODO: 29/08/16 Remove
+    @Ignore
+    @Test
+    public void test() {
+        final String[] args = new String[1000];
+        for (int n = 0; n < 1000; n++) {
+            args[n] = Integer.toString(n + 1);
+        }
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("Step " + i);
+            JRoutineStream.<String>withStream().async().map(new Function<String, Integer>() {
+
+                public Integer apply(final String s) throws Exception {
+                    return Integer.parseInt(s);
+                }
+            }).map(new Function<Integer, Integer>() {
+
+                public Integer apply(final Integer integer) throws Exception {
+                    final int i = integer;
+                    return i * i;
+                }
+            }).map(averageFloat()).map(new Function<Float, Double>() {
+
+                public Double apply(final Float aFloat) throws Exception {
+                    return Math.sqrt(aFloat);
+                }
+            }).call(args).bind(onOutput(new Consumer<Double>() {
+
+                public void accept(final Double aDouble) throws Exception {
+                    System.out.println(aDouble);
+                }
+            })).after(seconds(10)).getComplete();
+        }
+        System.out.println("Ciao");
     }
 
     @Test
@@ -342,7 +380,7 @@ public class StreamBuilderTest {
                 }).call("test1", null, "test2", null).after(seconds(3)).all()).containsExactly(
                 "test1", "test2");
         assertThat(JRoutineStream //
-                .<String>withStream().parallel()
+                .<String>withStream().asyncParallel()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
@@ -356,7 +394,7 @@ public class StreamBuilderTest {
                                      .after(seconds(3))
                                      .all()).containsOnly("test1", "test2");
         assertThat(JRoutineStream //
-                .<String>withStream().sequential()
+                .<String>withStream().syncParallel()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
@@ -389,14 +427,14 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().flatMap(null);
+            JRoutineStream.withStream().asyncParallel().flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            JRoutineStream.withStream().sequential().flatMap(null);
+            JRoutineStream.withStream().syncParallel().flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -791,7 +829,7 @@ public class StreamBuilderTest {
                 "TEST2");
         assertThat(JRoutineStream //
                 .<String>withStream().sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
@@ -814,7 +852,7 @@ public class StreamBuilderTest {
                                      .call("test1", "test2")
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream//
-                .<String>withStream().sequential()
+                .<String>withStream().syncParallel()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
@@ -846,7 +884,7 @@ public class StreamBuilderTest {
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .parallel()
+                                                      .asyncParallel()
                                                       .map(factory)
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
@@ -855,7 +893,7 @@ public class StreamBuilderTest {
                                                       .map(factory)
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
+        assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                       .map(factory)
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
@@ -872,7 +910,9 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().map((InvocationFactory<Object, Object>) null);
+            JRoutineStream.withStream()
+                          .asyncParallel()
+                          .map((InvocationFactory<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -886,7 +926,9 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().sequential().map((InvocationFactory<Object, Object>) null);
+            JRoutineStream.withStream()
+                          .syncParallel()
+                          .map((InvocationFactory<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -901,7 +943,7 @@ public class StreamBuilderTest {
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .parallel()
+                                                      .asyncParallel()
                                                       .map(new UpperCase())
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
@@ -910,7 +952,7 @@ public class StreamBuilderTest {
                                                       .map(new UpperCase())
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
+        assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                       .map(new UpperCase())
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
@@ -927,7 +969,9 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().map((MappingInvocation<Object, Object>) null);
+            JRoutineStream.withStream()
+                          .asyncParallel()
+                          .map((MappingInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -941,7 +985,9 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().sequential().map((MappingInvocation<Object, Object>) null);
+            JRoutineStream.withStream()
+                          .syncParallel()
+                          .map((MappingInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -957,7 +1003,7 @@ public class StreamBuilderTest {
             }
         }).call("test1", "test2").after(seconds(3)).all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineStream.<String>withStream().sorted()
-                                                      .parallel()
+                                                      .asyncParallel()
                                                       .map(new Function<String, String>() {
 
                                                           public String apply(final String s) {
@@ -973,7 +1019,7 @@ public class StreamBuilderTest {
                 return s.toUpperCase();
             }
         }).call("test1", "test2").all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
+        assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                       .map(new Function<String, String>() {
 
                                                           public String apply(final String s) {
@@ -995,7 +1041,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().map((Function<Object, Object>) null);
+            JRoutineStream.withStream().asyncParallel().map((Function<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1009,7 +1055,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().sequential().map((Function<Object, Object>) null);
+            JRoutineStream.withStream().syncParallel().map((Function<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1028,7 +1074,7 @@ public class StreamBuilderTest {
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
+        assertThat(JRoutineStream.<String>withStream().asyncParallel()
                                                       .map(routine)
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
@@ -1038,7 +1084,7 @@ public class StreamBuilderTest {
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
+        assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                       .map(routine)
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
@@ -1053,7 +1099,7 @@ public class StreamBuilderTest {
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().parallel()
+        assertThat(JRoutineStream.<String>withStream().asyncParallel()
                                                       .map(builder)
                                                       .call("test1", "test2")
                                                       .after(seconds(3))
@@ -1062,7 +1108,7 @@ public class StreamBuilderTest {
                                                       .map(builder)
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
-        assertThat(JRoutineStream.<String>withStream().sequential()
+        assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                       .map(builder)
                                                       .call("test1", "test2")
                                                       .all()).containsExactly("TEST1", "TEST2");
@@ -1079,7 +1125,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().map((RoutineBuilder<Object, Object>) null);
+            JRoutineStream.withStream().asyncParallel().map((RoutineBuilder<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1093,7 +1139,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().sequential().map((RoutineBuilder<Object, Object>) null);
+            JRoutineStream.withStream().syncParallel().map((RoutineBuilder<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1111,7 +1157,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().parallel().map((Routine<Object, Object>) null);
+            JRoutineStream.withStream().asyncParallel().map((Routine<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1125,7 +1171,7 @@ public class StreamBuilderTest {
         }
 
         try {
-            JRoutineStream.withStream().sequential().map((Routine<Object, Object>) null);
+            JRoutineStream.withStream().syncParallel().map((Routine<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1283,6 +1329,24 @@ public class StreamBuilderTest {
                                                                        number.doubleValue());
                                                            }
                                                        })
+                                                       .map(Operators.averageDouble())
+                                                       .close()
+                                                       .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(JRoutineStream.<Integer>withStream().straightParallel()
+                                                       .map(appendAccept(range(1, 1000)))
+                                                       .applyStreamInvocationConfiguration()
+                                                       .withInputMaxSize(1)
+                                                       .withOutputMaxSize(1)
+                                                       .configured()
+                                                       .map(new Function<Number, Double>() {
+
+                                                           public Double apply(
+                                                                   final Number number) {
+                                                               return Math.sqrt(
+                                                                       number.doubleValue());
+                                                           }
+                                                       })
+                                                       .straight()
                                                        .map(Operators.averageDouble())
                                                        .close()
                                                        .next()).isCloseTo(21, Offset.offset(0.1));

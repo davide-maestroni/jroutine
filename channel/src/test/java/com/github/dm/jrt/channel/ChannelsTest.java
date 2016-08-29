@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.Backoffs.afterCount;
+import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

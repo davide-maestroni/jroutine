@@ -25,27 +25,31 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Backoff utility class.
+ * A builder of backoff instances.
  * <br>
  * This class is useful to build a backoff policy, returning a delay in milliseconds to apply when
  * a counter exceeds a specified limit.
  * <p>
  * Created by davide-maestroni on 05/10/2016.
  */
-public abstract class Backoffs {
+public class BackoffBuilder {
 
-    private static final BaseBackoff sNoBackoff = new BaseBackoff(null) {
+    private static final BaseBackoff sNoDelay = new BaseBackoff(null) {
 
         public long getDelay(final int count) {
             return NO_DELAY;
         }
     };
 
+    private final int mCount;
+
     /**
-     * Avoid explicit instantiation.
+     * Constructor.
+     *
+     * @param count the offset count.
      */
-    protected Backoffs() {
-        ConstantConditions.avoid();
+    private BackoffBuilder(final int count) {
+        mCount = ConstantConditions.notNegative("offset count", count);
     }
 
     /**
@@ -69,144 +73,127 @@ public abstract class Backoffs {
      */
     @NotNull
     public static BaseBackoff noDelay() {
-        return sNoBackoff;
+        return sNoDelay;
     }
 
     /**
-     * A builder of backoff instances.
+     * Returns a constant backoff.
+     * <br>
+     * The backoff will always return the specified delay.
+     *
+     * @param value the delay value.
+     * @param unit  the delay unit.
+     * @return the backoff instance.
+     * @throws java.lang.IllegalArgumentException if the delay is negative.
      */
-    public static class BackoffBuilder {
+    @NotNull
+    public BaseBackoff constantDelay(final long value, @NotNull final TimeUnit unit) {
+        return new ConstantBackoff(mCount, unit.toMillis(value));
+    }
 
-        private final int mCount;
+    /**
+     * Returns a constant backoff.
+     * <br>
+     * The backoff will always return the specified delay.
+     *
+     * @param delay the delay.
+     * @return the backoff instance.
+     */
+    @NotNull
+    public BaseBackoff constantDelay(@NotNull final UnitDuration delay) {
+        return new ConstantBackoff(mCount, delay.toMillis());
+    }
 
-        /**
-         * Constructor.
-         *
-         * @param count the offset count.
-         */
-        private BackoffBuilder(final int count) {
-            mCount = ConstantConditions.notNegative("offset count", count);
-        }
+    /**
+     * Returns an exponentially increasing backoff.
+     * <br>
+     * The backoff will return a delay computed as: {@code delay * 2^(count - 1)}.
+     *
+     * @param value the delay value.
+     * @param unit  the delay unit.
+     * @return the backoff instance.
+     * @throws java.lang.IllegalArgumentException if the delay is negative.
+     */
+    @NotNull
+    public BaseBackoff exponentialDelay(final long value, @NotNull final TimeUnit unit) {
+        return new ExponentialBackoff(mCount, unit.toMillis(value));
+    }
 
-        /**
-         * Returns a constant backoff.
-         * <br>
-         * The backoff will always return the specified delay.
-         *
-         * @param value the delay value.
-         * @param unit  the delay unit.
-         * @return the backoff instance.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
-         */
-        @NotNull
-        public BaseBackoff constantDelay(final long value, @NotNull final TimeUnit unit) {
-            return new ConstantBackoff(mCount, unit.toMillis(value));
-        }
+    /**
+     * Returns an exponentially increasing backoff.
+     * <br>
+     * The backoff will return a delay computed as: {@code delay * 2^(count - 1)}.
+     *
+     * @param delay the delay.
+     * @return the backoff instance.
+     */
+    @NotNull
+    public BaseBackoff exponentialDelay(@NotNull final UnitDuration delay) {
+        return new ExponentialBackoff(mCount, delay.toMillis());
+    }
 
-        /**
-         * Returns a constant backoff.
-         * <br>
-         * The backoff will always return the specified delay.
-         *
-         * @param delay the delay.
-         * @return the backoff instance.
-         */
-        @NotNull
-        public BaseBackoff constantDelay(@NotNull final UnitDuration delay) {
-            return new ConstantBackoff(mCount, delay.toMillis());
-        }
+    /**
+     * Returns a de-correlated jitter backoff.
+     * <br>
+     * The backoff will return a delay computed by taking in consideration the previous jitter
+     * delay.
+     * <p>
+     * Note that this particular implementation tries to scale the maximum jitter on the count
+     * value.
+     *
+     * @param value the delay value.
+     * @param unit  the delay unit.
+     * @return the backoff instance.
+     * @throws java.lang.IllegalArgumentException if the delay is negative.
+     */
+    @NotNull
+    public BaseBackoff jitterDelay(final long value, @NotNull final TimeUnit unit) {
+        return new DecorrelatedJitterBackoff(mCount, unit.toMillis(value));
+    }
 
-        /**
-         * Returns an exponentially increasing backoff.
-         * <br>
-         * The backoff will return a delay computed as: {@code delay * 2^(count - 1)}.
-         *
-         * @param value the delay value.
-         * @param unit  the delay unit.
-         * @return the backoff instance.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
-         */
-        @NotNull
-        public BaseBackoff exponentialDelay(final long value, @NotNull final TimeUnit unit) {
-            return new ExponentialBackoff(mCount, unit.toMillis(value));
-        }
+    /**
+     * Returns a de-correlated jitter backoff.
+     * <br>
+     * The backoff will return a delay computed by taking in consideration the previous jitter
+     * delay.
+     * <p>
+     * Note that this particular implementation tries to scale the maximum jitter on the count
+     * value.
+     *
+     * @param delay the delay.
+     * @return the backoff instance.
+     */
+    @NotNull
+    public BaseBackoff jitterDelay(@NotNull final UnitDuration delay) {
+        return new DecorrelatedJitterBackoff(mCount, delay.toMillis());
+    }
 
-        /**
-         * Returns an exponentially increasing backoff.
-         * <br>
-         * The backoff will return a delay computed as: {@code delay * 2^(count - 1)}.
-         *
-         * @param delay the delay.
-         * @return the backoff instance.
-         */
-        @NotNull
-        public BaseBackoff exponentialDelay(@NotNull final UnitDuration delay) {
-            return new ExponentialBackoff(mCount, delay.toMillis());
-        }
+    /**
+     * Returns an linearly increasing backoff.
+     * <br>
+     * The backoff will return a delay computed as: {@code delay * count}.
+     *
+     * @param value the delay value.
+     * @param unit  the delay unit.
+     * @return the backoff instance.
+     * @throws java.lang.IllegalArgumentException if the delay is negative.
+     */
+    @NotNull
+    public BaseBackoff linearDelay(final long value, @NotNull final TimeUnit unit) {
+        return new LinearBackoff(mCount, unit.toMillis(value));
+    }
 
-        /**
-         * Returns a de-correlated jitter backoff.
-         * <br>
-         * The backoff will return a delay computed by taking in consideration the previous jitter
-         * delay.
-         * <p>
-         * Note that this particular implementation tries to scale the maximum jitter on the count
-         * value.
-         *
-         * @param value the delay value.
-         * @param unit  the delay unit.
-         * @return the backoff instance.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
-         */
-        @NotNull
-        public BaseBackoff jitterDelay(final long value, @NotNull final TimeUnit unit) {
-            return new DecorrelatedJitterBackoff(mCount, unit.toMillis(value));
-        }
-
-        /**
-         * Returns a de-correlated jitter backoff.
-         * <br>
-         * The backoff will return a delay computed by taking in consideration the previous jitter
-         * delay.
-         * <p>
-         * Note that this particular implementation tries to scale the maximum jitter on the count
-         * value.
-         *
-         * @param delay the delay.
-         * @return the backoff instance.
-         */
-        @NotNull
-        public BaseBackoff jitterDelay(@NotNull final UnitDuration delay) {
-            return new DecorrelatedJitterBackoff(mCount, delay.toMillis());
-        }
-
-        /**
-         * Returns an linearly increasing backoff.
-         * <br>
-         * The backoff will return a delay computed as: {@code delay * count}.
-         *
-         * @param value the delay value.
-         * @param unit  the delay unit.
-         * @return the backoff instance.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
-         */
-        @NotNull
-        public BaseBackoff linearDelay(final long value, @NotNull final TimeUnit unit) {
-            return new LinearBackoff(mCount, unit.toMillis(value));
-        }
-
-        /**
-         * Returns an linearly increasing backoff.
-         * <br>
-         * The backoff will return a delay computed as: {@code delay * count}.
-         *
-         * @param delay the delay.
-         * @return the backoff instance.
-         */
-        @NotNull
-        public BaseBackoff linearDelay(@NotNull final UnitDuration delay) {
-            return new LinearBackoff(mCount, delay.toMillis());
-        }
+    /**
+     * Returns an linearly increasing backoff.
+     * <br>
+     * The backoff will return a delay computed as: {@code delay * count}.
+     *
+     * @param delay the delay.
+     * @return the backoff instance.
+     */
+    @NotNull
+    public BaseBackoff linearDelay(@NotNull final UnitDuration delay) {
+        return new LinearBackoff(mCount, delay.toMillis());
     }
 
     /**
@@ -224,16 +211,18 @@ public abstract class Backoffs {
         }
 
         /**
-         * Caps this backoff policy to the specified maximum delay.
+         * Sums the specified backoff to this one.
+         * <br>
+         * For each input count, if at least one of the returned delays is different than
+         * {@code NO_DELAY}, its value is returned. If both are different, the sum of the two values
+         * is returned.
          *
-         * @param value the delay value.
-         * @param unit  the delay unit.
-         * @return the capped backoff policy.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
+         * @param backoff the backoff to add.
+         * @return the summed backoff policy.
          */
         @NotNull
-        public BaseBackoff cappedTo(final long value, @NotNull final TimeUnit unit) {
-            return new CappedBackoff(this, unit.toMillis(value));
+        public BaseBackoff add(@NotNull final Backoff backoff) {
+            return new AddedBackoff(this, backoff);
         }
 
         /**
@@ -246,6 +235,19 @@ public abstract class Backoffs {
         @NotNull
         public BaseBackoff cappedTo(@NotNull final UnitDuration delay) {
             return new CappedBackoff(this, delay.toMillis());
+        }
+
+        /**
+         * Caps this backoff policy to the specified maximum delay.
+         *
+         * @param value the delay value.
+         * @param unit  the delay unit.
+         * @return the capped backoff policy.
+         * @throws java.lang.IllegalArgumentException if the delay is negative.
+         */
+        @NotNull
+        public BaseBackoff cappedTo(final long value, @NotNull final TimeUnit unit) {
+            return new CappedBackoff(this, unit.toMillis(value));
         }
 
         /**
@@ -290,6 +292,45 @@ public abstract class Backoffs {
             }
 
             return mDelay;
+        }
+    }
+
+    /**
+     * Sum backoff policy.
+     */
+    private static class AddedBackoff extends BaseBackoff {
+
+        private final Backoff mBackoff;
+
+        private final Backoff mOther;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped backoff instance.
+         * @param other   the other backoff to sum.
+         */
+        private AddedBackoff(@NotNull final Backoff wrapped, @NotNull final Backoff other) {
+            super(asArgs(wrapped, other));
+            mBackoff = wrapped;
+            mOther = ConstantConditions.notNull("backoff instance", other);
+        }
+
+        public long getDelay(final int count) {
+            final long delay1 = mBackoff.getDelay(count);
+            final long delay2 = mOther.getDelay(count);
+            if (delay1 < 0) {
+                if (delay2 < 0) {
+                    return NO_DELAY;
+                }
+
+                return delay2;
+
+            } else if (delay2 < 0) {
+                return delay1;
+            }
+
+            return delay1 + delay2;
         }
     }
 

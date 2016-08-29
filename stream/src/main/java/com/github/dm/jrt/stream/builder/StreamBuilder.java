@@ -86,14 +86,28 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     Builder<? extends StreamBuilder<IN, OUT>> applyStreamInvocationConfiguration();
 
     /**
-     * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
-     * asynchronous mode.
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * asynchronous mode employing the configured stream runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
      *
      * @return this builder.
      * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     @NotNull
     StreamBuilder<IN, OUT> async();
+
+    /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * parallel mode employing the configured stream runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     *
+     * @return this builder.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> asyncParallel();
 
     /**
      * Builds a new invocation factory instance.
@@ -316,27 +330,10 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
 
     /**
-     * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
-     * mode.
-     *
-     * @return this builder.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    @NotNull
-    StreamBuilder<IN, OUT> parallel();
-
-    /**
-     * Makes the stream sequential, that is, the concatenated routines will be invoked sequentially,
-     * that is, each input will be processed by a new invocation instance employing a synchronous
-     * runner.
-     *
-     * @return this builder.
-     */
-    @NotNull
-    StreamBuilder<IN, OUT> sequential();
-
-    /**
      * Makes the outputs of this stream sorted by the order they are passed to the result channel.
+     * <br>
+     * Note, however, that the modified options will still be overridden by the configured current
+     * ones.
      *
      * @return this builder.
      */
@@ -344,8 +341,10 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamBuilder<IN, OUT> sorted();
 
     /**
-     * Makes so the stream straight so that each input is immediately passed through the following
-     * chain of routines.
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * asynchronous mode employing the shared straight runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
      * <p>
      * Unlike the default synchronous runner, the employed one makes so that each routine in the
      * chain is passed any input as soon as it is produced by the previous one. Such behavior
@@ -361,8 +360,29 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamBuilder<IN, OUT> straight();
 
     /**
-     * Makes the stream synchronous, that is, the concatenated routines will be invoked
-     * synchronously.
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * parallel mode employing the shared straight runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     * <p>
+     * Unlike the default synchronous runner, the employed one makes so that each routine in the
+     * chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data might be accumulated before actually being
+     * processed by the next routine invocation.
+     *
+     * @return this builder.
+     * @see com.github.dm.jrt.core.runner.Runners#straightRunner() Runners.straightRunner()
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> straightParallel();
+
+    /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * asynchronous mode employing the shared synchronous runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
      *
      * @return this builder.
      * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
@@ -371,7 +391,22 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     StreamBuilder<IN, OUT> sync();
 
     /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * parallel mode employing the shared synchronous runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     *
+     * @return this builder.
+     * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> syncParallel();
+
+    /**
      * Makes the outputs of this stream unsorted.
+     * <br>
+     * Note, however, that the modified options will still be overridden by the configured current
+     * ones.
      *
      * @return this builder.
      */

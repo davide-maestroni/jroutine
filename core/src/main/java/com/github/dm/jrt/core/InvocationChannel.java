@@ -32,7 +32,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.Backoff;
-import com.github.dm.jrt.core.util.Backoffs;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -121,7 +121,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         mRunner = runner;
         mInputOrder = new LocalValue<OrderType>(
                 configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
-        mInputBackoff = configuration.getInputBackoffOrElse(Backoffs.noDelay());
+        mInputBackoff = configuration.getInputBackoffOrElse(BackoffBuilder.noDelay());
         mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputDelay = new LocalValue<UnitDuration>(zero());
         mInputQueue = new NestedQueue<IN>() {

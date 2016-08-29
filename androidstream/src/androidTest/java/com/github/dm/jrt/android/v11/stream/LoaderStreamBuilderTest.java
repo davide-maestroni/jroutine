@@ -121,7 +121,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("test1", "test2");
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .parallel()
+                                     .asyncParallel()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
@@ -138,7 +138,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsOnly("test1", "test2");
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
-                                     .sequential()
+                                     .syncParallel()
                                      .flatMap(new Function<String, Channel<?, String>>() {
 
                                          public Channel<?, String> apply(final String s) {
@@ -291,7 +291,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
@@ -319,7 +319,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .applyStreamInvocationConfiguration()
                                      .withOutputOrder(OrderType.SORTED)
                                      .configured()
-                                     .sequential()
+                                     .syncParallel()
                                      .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
 
                                          public void accept(final String s,
@@ -348,7 +348,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(new Function<String, String>() {
 
                                          public String apply(final String s) {
@@ -370,7 +370,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(activity))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(new Function<String, String>() {
 
                                          public String apply(final String s) {
@@ -535,7 +535,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .flatMap(null);
             fail();
 
@@ -545,7 +545,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .flatMap(null);
             fail();
 
@@ -747,7 +747,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(factory)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -762,7 +762,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(factory)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -791,14 +791,14 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            JRoutineLoaderStream.<String>withStream().parallel().map(factory);
+            JRoutineLoaderStream.<String>withStream().asyncParallel().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
         }
 
         try {
-            JRoutineLoaderStream.<String>withStream().sequential().map(factory);
+            JRoutineLoaderStream.<String>withStream().syncParallel().map(factory);
             fail();
 
         } catch (final IllegalStateException ignored) {
@@ -824,7 +824,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .map((ContextInvocationFactory<Object, Object>) null);
             fail();
 
@@ -844,7 +844,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .map((ContextInvocationFactory<Object, Object>) null);
             fail();
 
@@ -869,7 +869,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(factory)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -884,7 +884,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(factory)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -910,7 +910,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .map((InvocationFactory<Object, Object>) null);
             fail();
 
@@ -930,7 +930,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .map((InvocationFactory<Object, Object>) null);
             fail();
 
@@ -953,7 +953,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(new UpperCase())
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -968,7 +968,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(new UpperCase())
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -994,7 +994,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .map((MappingInvocation<Object, Object>) null);
             fail();
 
@@ -1014,7 +1014,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .map((MappingInvocation<Object, Object>) null);
             fail();
 
@@ -1049,7 +1049,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .map((Function<Object, Object>) null);
             fail();
 
@@ -1069,7 +1069,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .map((Function<Object, Object>) null);
             fail();
 
@@ -1096,7 +1096,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(routine)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1111,7 +1111,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(routine)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1133,7 +1133,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
-                                     .parallel()
+                                     .asyncParallel()
                                      .map(builder)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1148,7 +1148,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().on(loaderFrom(getActivity()))
                                      .sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(builder)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1163,7 +1163,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .after(seconds(10))
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineLoaderStream //
-                .<String>withStream().parallel()
+                .<String>withStream().asyncParallel()
                                      .map(loaderBuilder)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1176,7 +1176,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("TEST1", "TEST2");
         assertThat(JRoutineLoaderStream //
                 .<String>withStream().sorted()
-                                     .sequential()
+                                     .syncParallel()
                                      .map(loaderBuilder)
                                      .call("test1", "test2")
                                      .after(seconds(10))
@@ -1202,7 +1202,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .parallel()
+                                .asyncParallel()
                                 .map((Routine<Object, Object>) null);
             fail();
 
@@ -1222,7 +1222,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         try {
             JRoutineLoaderStream.withStream()
                                 .on(loaderFrom(getActivity()))
-                                .sequential()
+                                .syncParallel()
                                 .map((Routine<Object, Object>) null);
             fail();
 
@@ -1244,6 +1244,18 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                       .configured()
                                       .map(sqrt())
                                       .map(Operators.<Double>averageDouble())
+                                      .close()
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(JRoutineLoaderStream //
+                .<Integer>withStream().straightParallel()
+                                      .map(appendAccept(range(1, 1000)))
+                                      .applyStreamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .configured()
+                                      .map(sqrt())
+                                      .straight()
+                                      .map(Operators.averageDouble())
                                       .close()
                                       .next()).isCloseTo(21, Offset.offset(0.1));
     }

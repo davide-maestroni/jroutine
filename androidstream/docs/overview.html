@@ -111,13 +111,14 @@
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoaderStream.withStream()
-                                    .on(loaderFrom(this))
+                                    .straight(()
                                     .applyLoaderConfiguration()
                                     .withFactoryId(11)
                                     .configured()
                                     .map(loadUri())
-                                    .bind(onError(showToast(this)).andOnOutput(showImage(imageView)))
-                                    .pass(IMAGE_URI);
+                                    .on(loaderFrom(this))
+                                    .call(IMAGE_URI);
+                                    .bind(onError(showToast(this)).andOnOutput(showImage(imageView)));
             }
         }
     </code>

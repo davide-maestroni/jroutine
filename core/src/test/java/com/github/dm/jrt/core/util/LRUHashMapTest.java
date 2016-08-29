@@ -28,11 +28,11 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 08/07/2016.
  */
-public class LRUHashMapTest {
+public class LruHashMapTest {
 
     @Test
     public void testCapacity() {
-        final LRUHashMap<String, String> map = new LRUHashMap<String, String>(1);
+        final LruHashMap<String, String> map = new LruHashMap<String, String>(1);
         map.put("test1", "test1");
         map.put("test2", "test2");
         assertThat(map).containsOnlyKeys("test2");
@@ -42,11 +42,11 @@ public class LRUHashMapTest {
 
     @Test
     public void testCopy() {
-        final LRUHashMap<String, String> map1 = new LRUHashMap<String, String>(3);
+        final LruHashMap<String, String> map1 = new LruHashMap<String, String>(3);
         map1.put("test1", "test1");
         map1.put("test2", "test2");
         map1.put("test3", "test3");
-        final LRUHashMap<String, String> map2 = new LRUHashMap<String, String>(1, map1);
+        final LruHashMap<String, String> map2 = new LruHashMap<String, String>(1, map1);
         assertThat(map2).containsOnlyKeys("test3");
     }
 
@@ -54,21 +54,21 @@ public class LRUHashMapTest {
     @SuppressWarnings("ConstantConditions")
     public void testErrors() {
         try {
-            new LRUHashMap<String, String>(0);
+            new LruHashMap<String, String>(0);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
         }
 
         try {
-            new LRUHashMap<String, String>(-1);
+            new LruHashMap<String, String>(-1);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
         }
 
         try {
-            new LRUHashMap<String, String>(1, null);
+            new LruHashMap<String, String>(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -77,7 +77,7 @@ public class LRUHashMapTest {
 
     @Test
     public void testLRU() {
-        final LRUHashMap<String, String> map = new LRUHashMap<String, String>(3);
+        final LruHashMap<String, String> map = new LruHashMap<String, String>(3);
         map.put("test1", "test1");
         map.put("test2", "test2");
         map.put("test3", "test3");

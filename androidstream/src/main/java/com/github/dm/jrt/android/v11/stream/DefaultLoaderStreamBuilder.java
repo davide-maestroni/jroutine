@@ -152,6 +152,12 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> asyncParallel() {
+        return (LoaderStreamBuilder<IN, OUT>) super.asyncParallel();
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamBuilder<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>>
                     mappingFunction) {
@@ -257,18 +263,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
-    public LoaderStreamBuilder<IN, OUT> parallel() {
-        return (LoaderStreamBuilder<IN, OUT>) super.parallel();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilder<IN, OUT> sequential() {
-        return (LoaderStreamBuilder<IN, OUT>) super.sequential();
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamBuilder<IN, OUT> sorted() {
         return (LoaderStreamBuilder<IN, OUT>) super.sorted();
     }
@@ -281,14 +275,33 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> straightParallel() {
+        return (LoaderStreamBuilder<IN, OUT>) super.straightParallel();
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamBuilder<IN, OUT> sync() {
         return (LoaderStreamBuilder<IN, OUT>) super.sync();
     }
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> syncParallel() {
+        return (LoaderStreamBuilder<IN, OUT>) super.syncParallel();
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamBuilder<IN, OUT> unsorted() {
         return (LoaderStreamBuilder<IN, OUT>) super.unsorted();
+    }
+
+    @NotNull
+    protected LoaderStreamBuilder<IN, OUT> apply(@NotNull final StreamConfiguration configuration) {
+        super.apply(configuration);
+        mStreamConfiguration = (LoaderStreamConfiguration) configuration;
+        return this;
     }
 
     @NotNull
@@ -424,20 +437,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> on(@Nullable final LoaderContext context) {
         return apply(newConfiguration(context));
-    }
-
-    /**
-     * Applies the specified stream configuration.
-     *
-     * @param configuration the stream configuration.
-     * @return this builder.
-     */
-    @NotNull
-    protected LoaderStreamBuilder<IN, OUT> apply(
-            @NotNull final LoaderStreamConfiguration configuration) {
-        super.apply(configuration);
-        mStreamConfiguration = configuration;
-        return this;
     }
 
     @NotNull

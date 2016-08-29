@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.Backoffs;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -83,7 +83,7 @@ public class ModifiersTest {
                                       .applyInvocationConfiguration()
                                       .withRunner(getSingleThreadRunner())
                                       .withInputBackoff(
-                                              Backoffs.afterCount(2).linearDelay(seconds(10)))
+                                              BackoffBuilder.afterCount(2).linearDelay(seconds(10)))
                                       .configured()
                                       .map(Functions.<Number>identity())
                                       .map(new Function<Number, Double>() {
@@ -121,8 +121,8 @@ public class ModifiersTest {
                 .<Integer>withStream().map(appendAccept(range(1, 1000)))
                                       .applyInvocationConfiguration()
                                       .withRunner(getSingleThreadRunner())
-                                      .withInputBackoff(
-                                              Backoffs.afterCount(2).constantDelay(seconds(10)))
+                                      .withInputBackoff(BackoffBuilder.afterCount(2)
+                                                                      .constantDelay(seconds(10)))
                                       .configured()
                                       .map(Functions.<Number>identity())
                                       .map(new Function<Number, Double>() {

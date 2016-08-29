@@ -33,8 +33,8 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.BackoffDecorator;
-import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.JRoutineObject;
@@ -1186,7 +1186,7 @@ public class ProxyRoutineTest {
     public static class MyBackoff extends BackoffDecorator {
 
         public MyBackoff() {
-            super(Backoffs.afterCount(3).linearDelay(1, TimeUnit.SECONDS));
+            super(BackoffBuilder.afterCount(3).linearDelay(1, TimeUnit.SECONDS));
         }
     }
 

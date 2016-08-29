@@ -29,53 +29,31 @@ import java.util.Collection;
  * <p>
  * Created by davide-maestroni on 09/30/2014.
  *
- * @param <E> the element type.
+ * @param <E> the element data type.
  */
 class NestedQueue<E> {
-
-    private final static Object EMPTY_ELEMENT = new Object();
 
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
     private boolean mClosed;
 
+    private QueueManager<E> mQueueManager;
+
     /**
      * Constructor.
      */
     NestedQueue() {
+        mQueueManager = new SimpleQueueManager();
     }
 
     /**
-     * Returns the first element in the specified queue by first pruning any nested queues (a nested
-     * queue can be safely pruned when closed and empty). In case the queue is empty, the method
-     * will return the special {@link #EMPTY_ELEMENT} object (null is a valid element).
+     * Check if the specified internal queue can be pruned.
      *
-     * @param queue the queue to prune.
-     * @return the first element or {@link #EMPTY_ELEMENT}.
+     * @param queue the queue.
+     * @return whether the queue can be pruned.
      */
-    @Nullable
-    private static Object prune(@NotNull final NestedQueue<?> queue) {
-        final SimpleQueue<Object> simpleQueue = queue.mQueue;
-        if (simpleQueue.isEmpty()) {
-            return EMPTY_ELEMENT;
-        }
-
-        Object element = simpleQueue.peekFirst();
-        while (element instanceof InnerNestedQueue) {
-            final NestedQueue<?> nested = ((NestedQueue<?>) element);
-            if (!nested.mClosed || (prune(nested) != EMPTY_ELEMENT)) {
-                return nested;
-            }
-
-            simpleQueue.removeFirst();
-            if (simpleQueue.isEmpty()) {
-                return EMPTY_ELEMENT;
-            }
-
-            element = simpleQueue.peekFirst();
-        }
-
-        return element;
+    private static boolean canPrune(@NotNull final NestedQueue<?> queue) {
+        return queue.mClosed && queue.mQueue.isEmpty();
     }
 
     /**
@@ -115,6 +93,7 @@ class NestedQueue<E> {
         checkOpen();
         final InnerNestedQueue<E> queue = new InnerNestedQueue<E>();
         mQueue.add(queue);
+        mQueueManager = new NestedQueueManager();
         return queue;
     }
 
@@ -141,9 +120,7 @@ class NestedQueue<E> {
      * @return whether the queue is empty.
      */
     public boolean isEmpty() {
-        final Object element = prune(this);
-        return (element == EMPTY_ELEMENT) || ((element instanceof InnerNestedQueue)
-                && ((InnerNestedQueue<?>) element).isEmpty());
+        return mQueueManager.isEmpty();
     }
 
     /**
@@ -152,14 +129,8 @@ class NestedQueue<E> {
      * @return the element.
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
-    @SuppressWarnings("unchecked")
     public E removeFirst() {
-        final Object element = prune(this);
-        if (element instanceof InnerNestedQueue) {
-            return ((InnerNestedQueue<E>) element).removeFirst();
-        }
-
-        return (E) mQueue.removeFirst();
+        return mQueueManager.removeFirst();
     }
 
     /**
@@ -167,28 +138,8 @@ class NestedQueue<E> {
      *
      * @param collection the collection to fill.
      */
-    @SuppressWarnings("unchecked")
     public void transferTo(@NotNull final Collection<? super E> collection) {
-        if (prune(this) == EMPTY_ELEMENT) {
-            return;
-        }
-
-        final SimpleQueue<Object> queue = mQueue;
-        while (!queue.isEmpty()) {
-            final Object element = queue.peekFirst();
-            if (element instanceof InnerNestedQueue) {
-                final NestedQueue<E> nested = (NestedQueue<E>) element;
-                nested.transferTo(collection);
-                if (!nested.mClosed || !nested.mQueue.isEmpty()) {
-                    return;
-                }
-
-                queue.removeFirst();
-
-            } else {
-                collection.add((E) queue.removeFirst());
-            }
-        }
+        mQueueManager.transferTo(collection);
     }
 
     private void checkOpen() {
@@ -198,11 +149,137 @@ class NestedQueue<E> {
     }
 
     /**
+     * Interface describing a manager of the internal queue.
+     *
+     * @param <E> the element data type.
+     */
+    private interface QueueManager<E> {
+
+        /**
+         * Check if the queue does not contain any element.
+         *
+         * @return whether the queue is empty.
+         */
+        boolean isEmpty();
+
+        /**
+         * Removes the first element added into the queue.
+         *
+         * @return the element.
+         * @throws java.util.NoSuchElementException if the queue is empty.
+         */
+        E removeFirst();
+
+        /**
+         * Removes all the elements from this queue and add them to the specified collection.
+         *
+         * @param collection the collection to fill.
+         */
+        void transferTo(@NotNull Collection<? super E> collection);
+    }
+
+    /**
      * Internal class used to discriminate between an element and a nested queue.
      *
-     * @param <E>
+     * @param <E> the element data type.
      */
     private static class InnerNestedQueue<E> extends NestedQueue<E> {
 
+    }
+
+    /**
+     * Nested queue manager implementation.
+     */
+    private class NestedQueueManager implements QueueManager<E> {
+
+        @SuppressWarnings("unchecked")
+        public boolean isEmpty() {
+            final SimpleQueue<Object> queue = mQueue;
+            while (!queue.isEmpty()) {
+                final Object element = queue.peekFirst();
+                if (element instanceof InnerNestedQueue) {
+                    final NestedQueue<E> nested = (NestedQueue<E>) element;
+                    final boolean isEmpty = nested.isEmpty();
+                    if (canPrune(nested)) {
+                        queue.removeFirst();
+                        continue;
+                    }
+
+                    return isEmpty;
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        @SuppressWarnings("unchecked")
+        public E removeFirst() {
+            final SimpleQueue<Object> queue = mQueue;
+            while (true) {
+                final Object element = queue.peekFirst();
+                if (element instanceof InnerNestedQueue) {
+                    final NestedQueue<E> nested = (NestedQueue<E>) element;
+                    if (canPrune(nested)) {
+                        queue.removeFirst();
+                        continue;
+                    }
+
+                    final E e = nested.removeFirst();
+                    if (canPrune(nested)) {
+                        queue.removeFirst();
+                    }
+
+                    return e;
+                }
+
+                return (E) queue.removeFirst();
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public void transferTo(@NotNull final Collection<? super E> collection) {
+            final SimpleQueue<Object> queue = mQueue;
+            while (!queue.isEmpty()) {
+                final Object element = queue.peekFirst();
+                if (element instanceof InnerNestedQueue) {
+                    final NestedQueue<E> nested = (NestedQueue<E>) element;
+                    nested.transferTo(collection);
+                    if (canPrune(nested)) {
+                        queue.removeFirst();
+                        continue;
+                    }
+
+                    return;
+
+                } else {
+                    collection.add((E) queue.removeFirst());
+                }
+            }
+        }
+    }
+
+    /**
+     * Simple queue manager implementation.
+     */
+    private class SimpleQueueManager implements QueueManager<E> {
+
+        public boolean isEmpty() {
+            return mQueue.isEmpty();
+        }
+
+        @SuppressWarnings("unchecked")
+        public E removeFirst() {
+            return (E) mQueue.removeFirst();
+        }
+
+        @SuppressWarnings("unchecked")
+        public void transferTo(@NotNull final Collection<? super E> collection) {
+            final SimpleQueue<Object> queue = mQueue;
+            while (!queue.isEmpty()) {
+                collection.add((E) queue.removeFirst());
+            }
+        }
     }
 }

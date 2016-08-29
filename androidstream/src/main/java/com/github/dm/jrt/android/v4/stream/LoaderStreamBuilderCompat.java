@@ -89,10 +89,23 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
     LoaderStreamBuilderCompat<IN, OUT> async();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> asyncParallel();
 
     /**
      * {@inheritDoc}
@@ -227,24 +240,13 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
      */
     @NotNull
     @Override
-    LoaderStreamBuilderCompat<IN, OUT> parallel();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderStreamBuilderCompat<IN, OUT> sequential();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
     LoaderStreamBuilderCompat<IN, OUT> sorted();
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
@@ -252,10 +254,33 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> straightParallel();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
     LoaderStreamBuilderCompat<IN, OUT> sync();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> syncParallel();
 
     /**
      * {@inheritDoc}

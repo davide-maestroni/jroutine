@@ -102,6 +102,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public StreamBuilder<IN, OUT> applyStream(
             @NotNull final InvocationConfiguration configuration) {
+        mRunner = configuration.getRunnerOrElse(null);
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return apply(newConfiguration(configuration,
                 streamConfiguration.getCurrentInvocationConfiguration(),
@@ -122,8 +123,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> async() {
-        mRunner = null;
-        return invocationMode(InvocationMode.ASYNC);
+        return applyRunner(mRunner, InvocationMode.ASYNC);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> asyncParallel() {
+        return applyRunner(mRunner, InvocationMode.PARALLEL);
     }
 
     @NotNull
@@ -159,7 +164,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
         try {
             return ConstantConditions.notNull("transformed stream",
                     ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(buildConfiguration(),
+                            StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration,
                             this));
 
         } catch (final Exception e) {
@@ -198,7 +203,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             mBindingFunction = decorate(
                     ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
                             Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
-                            .apply(buildConfiguration(), getBindingFunction()));
+                            .apply(mStreamConfiguration, getBindingFunction()));
             return (StreamBuilder<BEFORE, AFTER>) this;
 
         } catch (final Exception e) {
@@ -210,6 +215,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
         return map(functionMapping(mappingFunction));
@@ -218,7 +224,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
-        final StreamConfiguration streamConfiguration = buildConfiguration();
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return map(newRoutine(streamConfiguration, factory),
                 streamConfiguration.getInvocationMode());
     }
@@ -232,24 +238,27 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-        final StreamConfiguration streamConfiguration = buildConfiguration();
+        final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return map(newRoutine(streamConfiguration, builder),
                 streamConfiguration.getInvocationMode());
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         return map(consumerMapping(mappingConsumer));
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
         return map(functionCall(mappingFunction));
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
@@ -265,32 +274,28 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
-    public StreamBuilder<IN, OUT> parallel() {
-        mRunner = null;
-        return invocationMode(InvocationMode.PARALLEL);
-    }
-
-    @NotNull
-    public StreamBuilder<IN, OUT> sequential() {
-        mRunner = Runners.syncRunner();
-        return invocationMode(InvocationMode.PARALLEL);
-    }
-
-    @NotNull
     public StreamBuilder<IN, OUT> sorted() {
         return applyStreamInvocationConfiguration().withOutputOrder(OrderType.SORTED).configured();
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> straight() {
-        mRunner = Runners.straightRunner();
-        return invocationMode(InvocationMode.ASYNC);
+        return applyRunner(Runners.straightRunner(), InvocationMode.ASYNC);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> straightParallel() {
+        return applyRunner(Runners.straightRunner(), InvocationMode.PARALLEL);
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> sync() {
-        mRunner = Runners.syncRunner();
-        return invocationMode(InvocationMode.ASYNC);
+        return applyRunner(Runners.syncRunner(), InvocationMode.ASYNC);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> syncParallel() {
+        return applyRunner(Runners.syncRunner(), InvocationMode.PARALLEL);
     }
 
     @NotNull
@@ -304,7 +309,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public Routine<IN, OUT> buildRoutine() {
         final Routine<? super IN, ? extends OUT> routine =
                 ConstantConditions.notNull("routine instance",
-                        newRoutine(buildConfiguration(), buildFactory()));
+                        newRoutine(mStreamConfiguration, buildFactory()));
         resetConfiguration();
         return (Routine<IN, OUT>) routine;
     }
@@ -377,32 +382,20 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull InvocationMode invocationMode);
 
     @NotNull
-    private StreamConfiguration buildConfiguration() {
+    private StreamBuilder<IN, OUT> applyRunner(@NotNull final Runner runner,
+            @NotNull final InvocationMode invocationMode) {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        final Runner runner = mRunner;
-        if (runner != null) {
-            return newConfiguration(streamConfiguration.getStreamInvocationConfiguration()
-                                                       .builderFrom()
-                                                       .withRunner(runner)
-                                                       .configured(),
-                    streamConfiguration.getCurrentInvocationConfiguration(),
-                    streamConfiguration.getInvocationMode());
-        }
-
-        return streamConfiguration;
+        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration()
+                                                         .builderFrom()
+                                                         .withRunner(runner)
+                                                         .configured(),
+                streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
     private FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> getBindingFunction() {
         return (FunctionDecorator<Channel<?, IN>, Channel<?, OUT>>) mBindingFunction;
-    }
-
-    @NotNull
-    private StreamBuilder<IN, OUT> invocationMode(@NotNull final InvocationMode invocationMode) {
-        final StreamConfiguration streamConfiguration = mStreamConfiguration;
-        return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-                streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
     }
 
     @SuppressWarnings("unchecked")

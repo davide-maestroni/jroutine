@@ -33,8 +33,8 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.BackoffDecorator;
-import com.github.dm.jrt.core.util.Backoffs;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -2263,7 +2263,7 @@ public class ObjectRoutineTest {
     public static class InBackoff extends BackoffDecorator {
 
         public InBackoff() {
-            super(Backoffs.afterCount(71).linearDelay(7777, TimeUnit.MICROSECONDS));
+            super(BackoffBuilder.afterCount(71).linearDelay(7777, TimeUnit.MICROSECONDS));
         }
     }
 
@@ -2307,7 +2307,7 @@ public class ObjectRoutineTest {
     public static class OutBackoff extends BackoffDecorator {
 
         public OutBackoff() {
-            super(Backoffs.afterCount(31).linearDelay(3333, TimeUnit.NANOSECONDS));
+            super(BackoffBuilder.afterCount(31).linearDelay(3333, TimeUnit.NANOSECONDS));
         }
     }
 

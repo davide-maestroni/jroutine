@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
-import static com.github.dm.jrt.core.util.Backoffs.afterCount;
-import static com.github.dm.jrt.core.util.Backoffs.noDelay;
+import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
+import static com.github.dm.jrt.core.util.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;

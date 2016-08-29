@@ -89,10 +89,23 @@ public interface LoaderStreamBuilder<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
     LoaderStreamBuilder<IN, OUT> async();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilder<IN, OUT> asyncParallel();
 
     /**
      * {@inheritDoc}
@@ -225,24 +238,13 @@ public interface LoaderStreamBuilder<IN, OUT>
      */
     @NotNull
     @Override
-    LoaderStreamBuilder<IN, OUT> parallel();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderStreamBuilder<IN, OUT> sequential();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
     LoaderStreamBuilder<IN, OUT> sorted();
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
@@ -250,10 +252,33 @@ public interface LoaderStreamBuilder<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilder<IN, OUT> straightParallel();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
      */
     @NotNull
     @Override
     LoaderStreamBuilder<IN, OUT> sync();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilder<IN, OUT> syncParallel();
 
     /**
      * {@inheritDoc}

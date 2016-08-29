@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Backoff;
-import com.github.dm.jrt.core.util.Backoffs;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
@@ -409,7 +409,7 @@ public class Modifiers {
     @NotNull
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
             final int maxCount) {
-        return retry(maxCount, Backoffs.noDelay());
+        return retry(maxCount, BackoffBuilder.noDelay());
     }
 
     /**

@@ -52,7 +52,6 @@ class DistinctIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
      * Constructor.
      */
     private DistinctIdentityInvocation() {
-        mMap = null;
     }
 
     /**

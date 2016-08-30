@@ -51,7 +51,6 @@ class DistinctInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
      * Constructor.
      */
     private DistinctInvocation() {
-        mSet = null;
     }
 
     /**

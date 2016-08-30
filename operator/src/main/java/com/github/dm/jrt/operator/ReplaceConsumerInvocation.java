@@ -19,7 +19,7 @@ package com.github.dm.jrt.operator;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerDecorator;
+import com.github.dm.jrt.function.BiConsumerDecorator;
 import com.github.dm.jrt.function.PredicateDecorator;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +36,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<Object> mPredicate;
+    private final PredicateDecorator<? super DATA> mPredicate;
 
-    private final ConsumerDecorator<? super Channel<DATA, ?>> mReplacementConsumer;
+    private final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> mReplacementConsumer;
 
     /**
      * Constructor.
@@ -46,8 +46,9 @@ class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
      * @param predicate           the predicate instance.
      * @param replacementConsumer the consumer instance.
      */
-    ReplaceConsumerInvocation(@NotNull final PredicateDecorator<Object> predicate,
-            @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> replacementConsumer) {
+    ReplaceConsumerInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+            @NotNull final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>>
+                    replacementConsumer) {
         super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
                 ConstantConditions.notNull("consumer instance", replacementConsumer)));
         mPredicate = predicate;
@@ -56,7 +57,7 @@ class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
         if (mPredicate.test(input)) {
-            mReplacementConsumer.accept(result);
+            mReplacementConsumer.accept(input, result);
 
         } else {
             result.pass(input);

@@ -66,10 +66,10 @@ import static com.github.dm.jrt.operator.Operators.prependGet;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.Operators.replace;
 import static com.github.dm.jrt.operator.Operators.replaceAccept;
-import static com.github.dm.jrt.operator.Operators.replaceGet;
+import static com.github.dm.jrt.operator.Operators.replaceApply;
 import static com.github.dm.jrt.operator.Operators.replaceSame;
 import static com.github.dm.jrt.operator.Operators.replaceSameAccept;
-import static com.github.dm.jrt.operator.Operators.replaceSameGet;
+import static com.github.dm.jrt.operator.Operators.replaceSameApply;
 import static com.github.dm.jrt.operator.Operators.then;
 import static com.github.dm.jrt.operator.Operators.thenAccept;
 import static com.github.dm.jrt.operator.Operators.thenGet;
@@ -888,6 +888,47 @@ public class OperatorsTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void testGroupByKey() {
+        assertThat(JRoutineCore.with(Operators.groupBy(new Function<Integer, Object>() {
+
+            public Object apply(final Integer i) {
+                return i % 2;
+            }
+        })).call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).after(seconds(3)).all()).containsOnly(
+                Arrays.asList(2, 4, 6, 8, 10), Arrays.asList(1, 3, 5, 7, 9));
+    }
+
+    @Test
+    public void testGroupByKeyEquals() {
+        final InvocationFactory<Object, List<Object>> factory =
+                Operators.groupBy(Functions.identity());
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Operators.groupBy(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+                return null;
+            }
+        }));
+        assertThat(factory).isEqualTo(Operators.groupBy(Functions.identity()));
+        assertThat(factory.hashCode()).isEqualTo(
+                Operators.groupBy(Functions.identity()).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testGroupByKeyError() {
+        try {
+            Operators.groupBy(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void testGroupByPlaceholder() {
         assertThat(JRoutineCore.with(Operators.<Number>groupBy(3, 0))
                                .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -1655,16 +1696,19 @@ public class OperatorsTest {
                                .call("test1", "test2", "test3")
                                .after(seconds(3))
                                .all()).containsExactly("test1", "test", "test3");
-        assertThat(JRoutineCore.with(replaceAccept("test2", new Consumer<Channel<String, ?>>() {
+        assertThat(JRoutineCore.with(
+                replaceAccept("test2", new BiConsumer<String, Channel<String, ?>>() {
 
-            public void accept(final Channel<String, ?> result) {
-                result.pass("test3", "test1");
-            }
-        })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1",
-                "test3", "test1", "test3");
-        assertThat(JRoutineCore.with(replaceGet("test2", new Supplier<String>() {
+                    public void accept(final String s, final Channel<String, ?> result) {
+                        assertThat(s).isEqualTo("test2");
+                        result.pass("test3", "test1");
+                    }
+                })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly(
+                "test1", "test3", "test1", "test3");
+        assertThat(JRoutineCore.with(replaceApply("test2", new Function<String, String>() {
 
-            public String get() {
+            public String apply(final String s) {
+                assertThat(s).isEqualTo("test2");
                 return "test";
             }
         })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1",
@@ -1699,16 +1743,19 @@ public class OperatorsTest {
                                .call(obj1, target, obj3)
                                .after(seconds(3))
                                .all()).containsExactly(obj1, obj2, obj3);
-        assertThat(JRoutineCore.with(replaceSameAccept(target, new Consumer<Channel<Object, ?>>() {
+        assertThat(JRoutineCore.with(
+                replaceSameAccept(target, new BiConsumer<Object, Channel<Object, ?>>() {
 
-            public void accept(final Channel<Object, ?> result) {
-                result.pass(obj3, obj1);
-            }
-        })).call(obj1, target, obj3).after(seconds(3)).all()).containsExactly(obj1, obj3, obj1,
-                obj3);
-        assertThat(JRoutineCore.with(replaceSameGet(target, new Supplier<Object>() {
+                    public void accept(final Object o, final Channel<Object, ?> result) {
+                        assertThat(o).isSameAs(target);
+                        result.pass(obj3, obj1);
+                    }
+                })).call(obj1, target, obj3).after(seconds(3)).all()).containsExactly(obj1, obj3,
+                obj1, obj3);
+        assertThat(JRoutineCore.with(replaceSameApply(target, new Function<Object, Object>() {
 
-            public Object get() {
+            public Object apply(final Object o) {
+                assertThat(o).isSameAs(target);
                 return obj2;
             }
         })).call(obj1, target, obj3).after(seconds(3)).all()).containsExactly(obj1, obj2, obj3);

@@ -33,7 +33,7 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Factory of grouping invocation.
+ * Factory of grouping invocations.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *

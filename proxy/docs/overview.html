@@ -24,6 +24,9 @@
 <p>
     Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">JRoutine-Object</a> library.
 </p>
+<p>
+    This module provides classes to enable asynchronous invocations of object or class methods, by wrapping them in compile time generated routines.
+</p>
 <h2>Main concepts</h2>
 <ul>
     <li>
@@ -70,7 +73,7 @@
                                                      .withSharedFields()
                                                      .configured()
                                                      .applyInvocationConfiguration()
-                                                     .withReadTimeout(seconds(3))
+                                                     .withOutputTimeout(seconds(3))
                                                      .configured()
                                                      .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
@@ -132,7 +135,7 @@
                                                             .withSharedFields()
                                                             .configured()
                                                             .applyInvocationConfiguration()
-                                                            .withReadTimeout(seconds(3))
+                                                            .withOutputTimeout(seconds(3))
                                                             .configured()
                                                             .buildProxy();
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));

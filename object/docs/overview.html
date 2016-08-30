@@ -78,7 +78,7 @@
                                                                    .withSharedFields()
                                                                    .configured()
                                                                    .applyInvocationConfiguration()
-                                                                   .withReadTimeout(seconds(3))
+                                                                   .withOutputTimeout(seconds(3))
                                                                    .configured();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
@@ -131,7 +131,7 @@
                                                       .withSharedFields()
                                                       .configured()
                                                       .applyInvocationConfiguration()
-                                                      .withReadTimeout(seconds(3))
+                                                      .withOutputTimeout(seconds(3))
                                                       .configured()
                                                       .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutineCore.io().of(args))));

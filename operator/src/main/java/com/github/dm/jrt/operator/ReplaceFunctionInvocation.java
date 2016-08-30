@@ -19,8 +19,8 @@ package com.github.dm.jrt.operator;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.PredicateDecorator;
-import com.github.dm.jrt.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,35 +28,35 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Mapping invocation replacing all the data satisfying the specified predicate, with the outputs
- * returned by a supplier instance.
+ * returned by a function instance.
  * <p>
  * Created by davide-maestroni on 07/12/2016.
  *
  * @param <DATA> the data type.
  */
-class ReplaceSupplierInvocation<DATA> extends MappingInvocation<DATA, DATA> {
+class ReplaceFunctionInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<Object> mPredicate;
+    private final PredicateDecorator<? super DATA> mPredicate;
 
-    private final Supplier<? extends DATA> mReplacementSupplier;
+    private final FunctionDecorator<DATA, ? extends DATA> mReplacementFunction;
 
     /**
      * Constructor.
      *
      * @param predicate           the predicate instance.
-     * @param replacementSupplier the supplier instance.
+     * @param replacementFunction the function instance.
      */
-    ReplaceSupplierInvocation(@NotNull final PredicateDecorator<Object> predicate,
-            @NotNull final Supplier<? extends DATA> replacementSupplier) {
+    ReplaceFunctionInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+            @NotNull final FunctionDecorator<DATA, ? extends DATA> replacementFunction) {
         super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
-                ConstantConditions.notNull("supplier instance", replacementSupplier)));
+                ConstantConditions.notNull("supplier instance", replacementFunction)));
         mPredicate = predicate;
-        mReplacementSupplier = replacementSupplier;
+        mReplacementFunction = replacementFunction;
     }
 
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
         if (mPredicate.test(input)) {
-            result.pass(mReplacementSupplier.get());
+            result.pass(mReplacementFunction.apply(input));
 
         } else {
             result.pass(input);

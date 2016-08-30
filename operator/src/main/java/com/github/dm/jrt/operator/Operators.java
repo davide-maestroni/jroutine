@@ -509,7 +509,34 @@ public class Operators {
         return Functions.predicateFilter(filterPredicate);
     }
 
-    // TODO: 8/30/16 groupBy(Function)??
+    /**
+     * Returns a factory of invocations grouping the input data in collections where all the data
+     * correspond to the same key.
+     * <br>
+     * The returned keys will be compared for equalities by employing the {@code equals()} method.
+     * <p>
+     * Given a numeric sequence of inputs starting from 0, and a key function returning the modulo
+     * 2 of such numbers, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(0, 2, 4, 6, 8, ..., N), (1, 3, 5, 7, 9, ..., N + 1)]
+     *     </code>
+     * </pre>
+     * <p>
+     * Note that the groups will be produced only after the invocation completes.
+     * <br>
+     * Note also that the group order is not guaranteed.
+     *
+     * @param keyFunction the function returning a key object for each input.
+     * @param <DATA>      the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(
+            @NotNull final Function<DATA, Object> keyFunction) {
+        return new GroupByFunctionInvocationFactory<DATA>(decorate(keyFunction));
+    }
 
     /**
      * Returns a factory of invocations grouping the input data in collections of the specified
@@ -1233,8 +1260,6 @@ public class Operators {
         return AccumulateFunctionInvocation.functionFactory(seedSupplier, accumulateFunction);
     }
 
-    // TODO: 8/30/16 replace(Predicate)
-
     /**
      * Returns a factory of invocations replacing all the data equal to the specified target with
      * the passed replacement.
@@ -1247,7 +1272,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replace(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return new ReplaceInvocation<DATA>((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceConditional((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1262,28 +1287,76 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
-            @NotNull final Consumer<? super Channel<DATA, ?>> replacementConsumer) {
-        // TODO: 8/30/16 BiConsumer??
-        return new ReplaceConsumerInvocation<DATA>(
-                (target != null) ? PredicateDecorator.isEqualTo(target)
-                        : PredicateDecorator.isNull(), decorate(replacementConsumer));
+            @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
+        return replaceConditionalAccept((target != null) ? PredicateDecorator.isEqualTo(target)
+                : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
     /**
      * Returns a factory of invocations replacing all the data equal to the specified target with
-     * the outputs returned by the passed supplier.
+     * the outputs returned by the passed function.
      *
      * @param target              the target instance.
-     * @param replacementSupplier the replacement supplier instance.
+     * @param replacementFunction the replacement function instance.
      * @param <DATA>              the data type.
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> replaceGet(@Nullable final DATA target,
-            @NotNull final Supplier<? extends DATA> replacementSupplier) {
-        return new ReplaceSupplierInvocation<DATA>(
-                (target != null) ? PredicateDecorator.isEqualTo(target)
-                        : PredicateDecorator.isNull(), decorate(replacementSupplier));
+    public static <DATA> InvocationFactory<DATA, DATA> replaceApply(@Nullable final DATA target,
+            @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
+        return replaceConditionalApply((target != null) ? PredicateDecorator.isEqualTo(target)
+                : PredicateDecorator.isNull(), decorate(replacementFunction));
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data satisfying the specified predicate
+     * with the passed replacement.
+     *
+     * @param predicate   the predicate instance.
+     * @param replacement the replacement instance.
+     * @param <DATA>      the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <DATA> InvocationFactory<DATA, DATA> replaceConditional(
+            @NotNull final Predicate<? super DATA> predicate, @Nullable final DATA replacement) {
+        return new ReplaceInvocation<DATA>(decorate(predicate), replacement);
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data satisfying the specified predicate
+     * with the outputs published by the passed consumer.
+     *
+     * @param predicate           the predicate instance.
+     * @param replacementConsumer the replacement consumer instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalAccept(
+            @NotNull final Predicate<? super DATA> predicate,
+            @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
+        return new ReplaceConsumerInvocation<DATA>(decorate((Predicate<Object>) predicate),
+                decorate(replacementConsumer));
+    }
+
+    /**
+     * Returns a factory of invocations replacing all the data satisfying the specified predicate
+     * with the outputs returned by the passed function.
+     *
+     * @param predicate           the predicate instance.
+     * @param replacementFunction the replacement function instance.
+     * @param <DATA>              the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalApply(
+            @NotNull final Predicate<? super DATA> predicate,
+            @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
+        return new ReplaceFunctionInvocation<DATA>(decorate(predicate),
+                decorate(replacementFunction));
     }
 
     /**
@@ -1298,7 +1371,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSame(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return new ReplaceInvocation<DATA>((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceConditional((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1314,27 +1387,25 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameAccept(
             @Nullable final DATA target,
-            @NotNull final Consumer<? super Channel<DATA, ?>> replacementConsumer) {
-        return new ReplaceConsumerInvocation<DATA>(
-                (target != null) ? PredicateDecorator.isSameAs(target)
-                        : PredicateDecorator.isNull(), decorate(replacementConsumer));
+            @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
+        return replaceConditionalAccept((target != null) ? PredicateDecorator.isSameAs(target)
+                : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
     /**
      * Returns a factory of invocations replacing all the data that are the same instance as the
-     * specified target with the outputs returned by the passed supplier.
+     * specified target with the outputs returned by the passed function.
      *
      * @param target              the target instance.
-     * @param replacementSupplier the replacement supplier instance.
+     * @param replacementFunction the replacement function instance.
      * @param <DATA>              the data type.
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> replaceSameGet(@Nullable final DATA target,
-            @NotNull final Supplier<? extends DATA> replacementSupplier) {
-        return new ReplaceSupplierInvocation<DATA>(
-                (target != null) ? PredicateDecorator.isSameAs(target)
-                        : PredicateDecorator.isNull(), decorate(replacementSupplier));
+    public static <DATA> InvocationFactory<DATA, DATA> replaceSameApply(@Nullable final DATA target,
+            @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
+        return replaceConditionalApply((target != null) ? PredicateDecorator.isSameAs(target)
+                : PredicateDecorator.isNull(), decorate(replacementFunction));
     }
 
     /**

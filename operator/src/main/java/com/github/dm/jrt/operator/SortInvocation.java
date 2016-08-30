@@ -45,7 +45,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
         }
     };
 
-    private ArrayList<DATA> mList = new ArrayList<DATA>();
+    private ArrayList<DATA> mList;
 
     /**
      * Constructor.
@@ -79,6 +79,11 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
 
     @Override
     public void onRecycle(final boolean isReused) {
-        mList.clear();
+        mList = null;
+    }
+
+    @Override
+    public void onRestart() {
+        mList = new ArrayList<DATA>();
     }
 }

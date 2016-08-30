@@ -24,6 +24,10 @@
 <p>
     Stream-like routine concatenation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
 </p>
+<p>
+    This module provides routine builder implementations employing a Java stream-like paradigm to simply concatenate routines.<br>
+    The built routine encapsulate the whole chain so to be easily re-used.
+</p>
 <h2>Main concepts</h2>
 <ul>
     <li>
@@ -66,12 +70,12 @@
 
             public static void main(final String[] args) {
                 final Double rms = JRoutineStream.&lt;String&gt;withStream()
-                                                 .parallel()
+                                                 .straight()
                                                  .map(Integer::parseInt)
                                                  .map(i -&gt; i * i)
-                                                 .straight()
                                                  .map(Operators.averageFloat())
                                                  .map(Math::sqrt)
+                                                 .async()
                                                  .call(args)
                                                  .after(seconds(1))
                                                  .next();

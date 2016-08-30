@@ -66,7 +66,7 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
         private final Comparator<? super DATA> mComparator;
 
-        private ArrayList<DATA> mList = new ArrayList<DATA>();
+        private ArrayList<DATA> mList;
 
         /**
          * Constructor.
@@ -91,7 +91,12 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
         @Override
         public void onRecycle(final boolean isReused) {
-            mList.clear();
+            mList = null;
+        }
+
+        @Override
+        public void onRestart() {
+            mList = new ArrayList<DATA>();
         }
     }
 }

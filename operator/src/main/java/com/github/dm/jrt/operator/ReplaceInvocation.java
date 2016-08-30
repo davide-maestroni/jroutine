@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<Object> mPredicate;
+    private final PredicateDecorator<? super DATA> mPredicate;
 
     private final DATA mReplacement;
 
@@ -45,7 +45,7 @@ class ReplaceInvocation<DATA> extends MappingInvocation<DATA, DATA> {
      * @param predicate   the predicate instance.
      * @param replacement the replacement instance.
      */
-    ReplaceInvocation(@NotNull final PredicateDecorator<Object> predicate,
+    ReplaceInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
             @Nullable final DATA replacement) {
         super(asArgs(ConstantConditions.notNull("predicate instance", predicate), replacement));
         mPredicate = predicate;

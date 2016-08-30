@@ -33,9 +33,8 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final Routine&lt;Integer, Double&gt; rms =
  *                 JRoutineStream.&lt;Integer&gt;withStream()
- *                               .parallel()
- *                               .map(i -&gt; i * i)
  *                               .straight()
+ *                               .map(i -&gt; i * i)
  *                               .map(averageFloat())
  *                               .map(Math::sqrt)
  *                               .buildRoutine();

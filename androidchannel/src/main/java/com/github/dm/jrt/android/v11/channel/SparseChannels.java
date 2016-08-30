@@ -185,38 +185,6 @@ public class SparseChannels extends AndroidChannels {
      * <br>
      * Note also that the returned channels will be already closed.
      *
-     * @param startIndex the selectable start index.
-     * @param rangeSize  the size of the range of indexes (must be positive).
-     * @param channel    the selectable channel.
-     * @param <OUT>      the output data type.
-     * @return the map of indexes and channels builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see AndroidChannels#selectOutput(int, int, Channel)
-     */
-    @NotNull
-    public static <OUT> ChannelsBuilder<? extends SparseArray<Channel<?, OUT>>>
-    selectOutputParcelable(
-            final int startIndex, final int rangeSize,
-            @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel) {
-        ConstantConditions.positive("range size", rangeSize);
-        final HashSet<Integer> indexSet = new HashSet<Integer>();
-        final int endIndex = startIndex + rangeSize;
-        for (int i = startIndex; i < endIndex; ++i) {
-            indexSet.add(i);
-        }
-
-        return new OutputMapBuilder<OUT>(channel, indexSet);
-    }
-
-    /**
-     * Returns a builder of maps of channels returning the output data filtered by the specified
-     * indexes.
-     * <p>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the passed channels will be bound as a result of the creation.
-     * <br>
-     * Note also that the returned channels will be already closed.
-     *
      * @param channel the selectable channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
@@ -263,6 +231,38 @@ public class SparseChannels extends AndroidChannels {
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
             indexSet.add(index);
+        }
+
+        return new OutputMapBuilder<OUT>(channel, indexSet);
+    }
+
+    /**
+     * Returns a builder of maps of channels returning the output data filtered by the specified
+     * indexes.
+     * <p>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
+     * <br>
+     * Note also that the returned channels will be already closed.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <OUT>      the output data type.
+     * @return the map of indexes and channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+     * @see AndroidChannels#selectOutput(int, int, Channel)
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends SparseArray<Channel<?, OUT>>>
+    selectOutputParcelable(
+            final int startIndex, final int rangeSize,
+            @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel) {
+        ConstantConditions.positive("range size", rangeSize);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        final int endIndex = startIndex + rangeSize;
+        for (int i = startIndex; i < endIndex; ++i) {
+            indexSet.add(i);
         }
 
         return new OutputMapBuilder<OUT>(channel, indexSet);

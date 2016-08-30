@@ -190,25 +190,6 @@ public class Functions {
     }
 
     /**
-     * Decorates the specified runnable instance so to provide additional features.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     * <p>
-     * Note that the passed object is expected to have a functional behavior, that is, it must not
-     * retain a mutable internal state.
-     * <br>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param action the runnable instance.
-     * @return the decorated action.
-     */
-    @NotNull
-    public static ActionDecorator decorate(@NotNull final Runnable action) {
-        return ActionDecorator.decorate(action);
-    }
-
-    /**
      * Decorates the specified bi-consumer instance so to provide additional features.
      * <br>
      * The returned object will support concatenation and comparison.
@@ -313,6 +294,25 @@ public class Functions {
     @NotNull
     public static <IN> PredicateDecorator<IN> decorate(@NotNull final Predicate<IN> predicate) {
         return PredicateDecorator.decorate(predicate);
+    }
+
+    /**
+     * Decorates the specified runnable instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to have a functional behavior, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param action the runnable instance.
+     * @return the decorated action.
+     */
+    @NotNull
+    public static ActionDecorator decorate(@NotNull final Runnable action) {
+        return ActionDecorator.decorate(action);
     }
 
     /**

@@ -173,20 +173,6 @@ public class JRoutine extends Channels {
     }
 
     /**
-     * Returns a routine builder based on the specified mapping invocation.
-     *
-     * @param invocation the mapping invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final MappingInvocation<IN, OUT> invocation) {
-        return with((InvocationFactory<IN, OUT>) invocation);
-    }
-
-    /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object.
      *
@@ -261,6 +247,20 @@ public class JRoutine extends Channels {
     @NotNull
     public static AutoProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
         return new DefaultAutoProxyRoutineBuilder(target);
+    }
+
+    /**
+     * Returns a routine builder based on the specified mapping invocation.
+     *
+     * @param invocation the mapping invocation instance.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+            @NotNull final MappingInvocation<IN, OUT> invocation) {
+        return with((InvocationFactory<IN, OUT>) invocation);
     }
 
     /**

@@ -63,30 +63,6 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param activity the Loader Activity.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
-        return on(loaderFrom(activity));
-    }
-
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param activity the Loader Activity.
-     * @param context  the Context used to get the application one.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
-            @NotNull final Context context) {
-        return on(loaderFrom(activity, context));
-    }
-
-    /**
      * Returns a Context based builder of Service routine builders.
      *
      * @param context the Service Context.
@@ -144,6 +120,30 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
             @NotNull final Context context) {
         return on(loaderFrom(fragment, context));
+    }
+
+    /**
+     * Returns a Context based builder of Loader routine builders.
+     *
+     * @param activity the Loader Activity.
+     * @return the Context based builder.
+     */
+    @NotNull
+    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
+        return on(loaderFrom(activity));
+    }
+
+    /**
+     * Returns a Context based builder of Loader routine builders.
+     *
+     * @param activity the Loader Activity.
+     * @param context  the Context used to get the application one.
+     * @return the Context based builder.
+     */
+    @NotNull
+    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
+            @NotNull final Context context) {
+        return on(loaderFrom(activity, context));
     }
 
     /**

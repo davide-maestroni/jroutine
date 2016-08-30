@@ -101,7 +101,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final UnitDuration mOutputTimeout;
 
-    private final ThreadLocal<UnitDuration> mResultDelay;
+    private final ThreadLocal<UnitDuration> mResultDelay = new ThreadLocal<UnitDuration>();
 
     private final LocalValue<OrderType> mResultOrder;
 
@@ -156,7 +156,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
         mOutputBackoff = configuration.getBackoffOrElse(BackoffBuilder.noDelay());
         mMaxOutput = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
-        mResultDelay = new ThreadLocal<UnitDuration>();
         mOutputQueue = new NestedQueue<Object>() {
 
             @Override
@@ -428,7 +427,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public List<OUT> next(final int count) {
         if (count <= 0) {
-            return Collections.emptyList();
+            return new ArrayList<OUT>();
         }
 
         final ArrayList<OUT> results = new ArrayList<OUT>(count);
@@ -441,10 +440,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public OUT nextOrElse(final OUT output) {
-        final UnitDuration outputTimeout = getTimeout();
         try {
-            return readNext(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
-                    mTimeoutException.get());
+            return next();
 
         } catch (final NoSuchElementException ignored) {
         }
@@ -1561,7 +1558,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
-     * Default implementation of a channel eventual iterator.
+     * Default implementation of a channel expiring iterator.
      */
     private class ExpiringIterator implements Iterator<OUT> {
 
@@ -1571,9 +1568,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         private final Object mMutex = new Object();
 
-        private final long mTimeout;
-
-        private final TimeUnit mTimeoutUnit;
+        private final long mTimeoutMillis;
 
         private long mEndTime = Long.MIN_VALUE;
 
@@ -1587,8 +1582,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
          */
         private ExpiringIterator(final long timeout, @NotNull final TimeUnit timeUnit,
                 @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
-            mTimeout = timeout;
-            mTimeoutUnit = timeUnit;
+            mTimeoutMillis = timeUnit.toMillis(timeout);
             mAction = action;
             mException = exception;
         }
@@ -1596,7 +1590,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         private long getTimeoutMillis() {
             synchronized (mMutex) {
                 if (mEndTime == Long.MIN_VALUE) {
-                    mEndTime = System.currentTimeMillis() + mTimeoutUnit.toMillis(mTimeout);
+                    mEndTime = System.currentTimeMillis() + mTimeoutMillis;
                 }
 
                 return Math.max(0, mEndTime - System.currentTimeMillis());

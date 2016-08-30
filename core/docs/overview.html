@@ -22,7 +22,10 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    This module implements the core part of the JRoutine library. It enables safe asynchronous invocation of code, and both active and passive retrieval of results.
+    This module implements the core part of the JRoutine library. It enables safe asynchronous invocation of code, and both active and passive retrieval of results.<br>
+    A routine can by invoked in asynchronous or parallel mode. In the former mode all the inputs are passed to the same invocation instance, while, in the latter mode, a new invocation will be created (or recycled) to handle each of the routine inputs.<br>
+    The channel returned by the routine invocation is used to both pass the input data and to collect the results. Outputs can be actively read, by calling the proper read methods, or passively, by binding the channel to an output consumer or another channel.<br>
+    The examples below show the main ways to build, invoke and concatenate routines.
 </p>
 <h2>Main concepts</h2>
 <ul>

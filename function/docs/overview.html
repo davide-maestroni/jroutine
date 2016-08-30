@@ -24,6 +24,9 @@
 <p>
     Java functional programming based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">JRoutine-Core</a> library.
 </p>
+<p>
+    This module provides classes back-porting Java 8 functional interfaces. Moreover, utility classes allow the creation of invocation factories based on implementations of such interfaces.
+</p>
 <h2>Main concepts</h2>
 <ul>
     <li>
@@ -95,7 +98,7 @@
                         })).buildRoutine();
                 final Double rms =
                         meanRoutine.call(squareRoutine.callParallel(parseRoutine.callParallel(args)))
-                                   .afterMax(seconds(3))
+                                   .after(seconds(3))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);

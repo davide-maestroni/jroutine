@@ -95,6 +95,8 @@ public class Operators {
         ConstantConditions.avoid();
     }
 
+    // TODO: 8/30/16 add dependencies to the overviews??
+
     /**
      * Returns a factory of invocations verifying that all the inputs satisfy a specific conditions.
      *
@@ -507,6 +509,8 @@ public class Operators {
         return Functions.predicateFilter(filterPredicate);
     }
 
+    // TODO: 8/30/16 groupBy(Function)??
+
     /**
      * Returns a factory of invocations grouping the input data in collections of the specified
      * size.
@@ -839,7 +843,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA output) {
-        return orElse(JRoutineCore.io().of(output));
+        return orElse(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
     }
 
     /**
@@ -852,7 +856,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA... outputs) {
-        return orElse(JRoutineCore.io().of(outputs));
+        return orElse(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -866,12 +870,16 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElse(
             @Nullable final Iterable<? extends DATA> outputs) {
-        return orElse(JRoutineCore.io().of(outputs));
+        return orElse(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
      * Returns a factory of invocations producing the outputs returned by the specified channel in
      * case the invocation produced none.
+     * <p>
+     * Note that the passed channel will be bound as a result of the call, so, in order to support
+     * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+     * {@link Channels#replay(Channel)} utility method.
      *
      * @param channel the output channel.
      * @param <DATA>  the data type.
@@ -1225,6 +1233,8 @@ public class Operators {
         return AccumulateFunctionInvocation.functionFactory(seedSupplier, accumulateFunction);
     }
 
+    // TODO: 8/30/16 replace(Predicate)
+
     /**
      * Returns a factory of invocations replacing all the data equal to the specified target with
      * the passed replacement.
@@ -1253,6 +1263,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
             @NotNull final Consumer<? super Channel<DATA, ?>> replacementConsumer) {
+        // TODO: 8/30/16 BiConsumer??
         return new ReplaceConsumerInvocation<DATA>(
                 (target != null) ? PredicateDecorator.isEqualTo(target)
                         : PredicateDecorator.isNull(), decorate(replacementConsumer));
@@ -1505,7 +1516,7 @@ public class Operators {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT output) {
-        return then(JRoutineCore.io().of(output));
+        return then(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
     }
 
     /**
@@ -1521,7 +1532,7 @@ public class Operators {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT... outputs) {
-        return then(JRoutineCore.io().of(outputs));
+        return then(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -1538,7 +1549,7 @@ public class Operators {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> then(
             @Nullable final Iterable<? extends OUT> outputs) {
-        return then(JRoutineCore.io().of(outputs));
+        return then(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
     }
 
     /**
@@ -1546,6 +1557,10 @@ public class Operators {
      * after the invocation completes.
      * <br>
      * The invocation inputs will be ignored.
+     * <p>
+     * Note that the passed channel will be bound as a result of the call, so, in order to support
+     * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+     * {@link Channels#replay(Channel)} utility method.
      *
      * @param channel the output channel.
      * @param <IN>    the input data type.

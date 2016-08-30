@@ -36,7 +36,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <IN> the input data type.
  */
-public class ToArrayInvocationFactory<IN> extends InvocationFactory<IN, IN[]> {
+class ToArrayInvocationFactory<IN> extends InvocationFactory<IN, IN[]> {
 
     private final Class<? extends IN> mComponentType;
 
@@ -45,7 +45,7 @@ public class ToArrayInvocationFactory<IN> extends InvocationFactory<IN, IN[]> {
      *
      * @param componentType the array component type.
      */
-    protected ToArrayInvocationFactory(@NotNull final Class<? extends IN> componentType) {
+    ToArrayInvocationFactory(@NotNull final Class<? extends IN> componentType) {
         super(asArgs(componentType));
         mComponentType = ConstantConditions.notNull("element type", componentType);
     }

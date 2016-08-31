@@ -56,14 +56,14 @@ public class Producers {
      * @param start             the first element of the range.
      * @param end               the last element of the range.
      * @param incrementFunction the function incrementing the current element.
-     * @param <AFTER>           the concatenation output type.
+     * @param <DATA>            the data type.
      * @return the consumer instance.
      */
     @NotNull
-    public static <AFTER extends Comparable<? super AFTER>> Consumer<Channel<AFTER, ?>> range(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> incrementFunction) {
-        return new RangeConsumer<AFTER>(ConstantConditions.notNull("start element", start),
+    public static <DATA extends Comparable<? super DATA>> Consumer<Channel<DATA, ?>> range(
+            @NotNull final DATA start, @NotNull final DATA end,
+            @NotNull final Function<DATA, DATA> incrementFunction) {
+        return new RangeConsumer<DATA>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.notNull("end element", end),
                 Functions.decorate(incrementFunction));
     }
@@ -117,14 +117,14 @@ public class Producers {
      * @param start        the first element of the sequence.
      * @param count        the number of generated elements.
      * @param nextFunction the function computing the next element.
-     * @param <AFTER>      the concatenation output type.
+     * @param <DATA>       the data type.
      * @return the consumer instance.
      * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
-    public static <AFTER> Consumer<Channel<AFTER, ?>> sequence(@NotNull final AFTER start,
-            final long count, @NotNull final BiFunction<AFTER, Long, AFTER> nextFunction) {
-        return new SequenceConsumer<AFTER>(ConstantConditions.notNull("start element", start),
+    public static <DATA> Consumer<Channel<DATA, ?>> sequence(@NotNull final DATA start,
+            final long count, @NotNull final BiFunction<DATA, Long, DATA> nextFunction) {
+        return new SequenceConsumer<DATA>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.positive("sequence size", count),
                 Functions.decorate(nextFunction));
     }

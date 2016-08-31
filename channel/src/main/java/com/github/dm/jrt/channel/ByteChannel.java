@@ -36,9 +36,8 @@ import java.util.LinkedList;
  *     <code>
  *
  *         public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
- *
  *             ...
- *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bind(result);
+ *             final BufferOutputStream outputStream = Channels.byteChannel().bind(result);
  *             ...
  *         }
  *     </code>
@@ -48,7 +47,6 @@ import java.util.LinkedList;
  *     <code>
  *
  *         public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
- *
  *             ...
  *             final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
  *             ...
@@ -88,52 +86,31 @@ public class ByteChannel {
 
     /**
      * Constructor.
+     */
+    ByteChannel() {
+        this(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param dataBufferSize the data buffer size.
+     * @throws java.lang.IllegalArgumentException if the specified buffer size is 0 or negative.
+     */
+    ByteChannel(final int dataBufferSize) {
+        this(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
+    }
+
+    /**
+     * Constructor.
      *
      * @param dataBufferSize the data buffer size.
      * @param corePoolSize   the maximum number of retained data buffers.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified buffer size is 0 or negative.
      */
-    private ByteChannel(final int dataBufferSize, final int corePoolSize) {
+    ByteChannel(final int dataBufferSize, final int corePoolSize) {
         mDataBufferSize = ConstantConditions.positive("data buffer size", dataBufferSize);
         mCorePoolSize = corePoolSize;
-    }
-
-    /**
-     * Returns a new byte channel.
-     *
-     * @return the byte channel.
-     */
-    @NotNull
-    public static ByteChannel byteChannel() {
-        return byteChannel(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
-    }
-
-    /**
-     * Returns a new byte channel.
-     *
-     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-     *                       routine channels.
-     * @return the byte channel.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
-     */
-    @NotNull
-    public static ByteChannel byteChannel(final int dataBufferSize) {
-        return byteChannel(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
-    }
-
-    /**
-     * Returns a new byte channel.
-     *
-     * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-     *                       routine channels.
-     * @param corePoolSize   the maximum number of buffers retained in the pool. Additional buffers
-     *                       created to fulfill the bytes requirement will be discarded.
-     * @return the byte channel.
-     * @throws java.lang.IllegalArgumentException if the specified size is not positive.
-     */
-    @NotNull
-    public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
-        return new ByteChannel(dataBufferSize, corePoolSize);
     }
 
     /**

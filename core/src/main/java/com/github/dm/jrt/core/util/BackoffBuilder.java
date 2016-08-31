@@ -265,37 +265,6 @@ public class BackoffBuilder {
     }
 
     /**
-     * Constant backoff policy.
-     */
-    public static class ConstantBackoff extends BaseBackoff {
-
-        private final long mDelay;
-
-        private final int mOffset;
-
-        /**
-         * Constructor.
-         *
-         * @param offset      the offset count;
-         * @param delayMillis the delay in milliseconds.
-         * @throws java.lang.IllegalArgumentException if the delay is negative.
-         */
-        private ConstantBackoff(final int offset, final long delayMillis) {
-            super(asArgs(offset, delayMillis));
-            mOffset = offset;
-            mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
-        }
-
-        public long getDelay(final int count) {
-            if (count <= mOffset) {
-                return NO_DELAY;
-            }
-
-            return mDelay;
-        }
-    }
-
-    /**
      * Sum backoff policy.
      */
     private static class AddedBackoff extends BaseBackoff {
@@ -357,6 +326,37 @@ public class BackoffBuilder {
 
         public long getDelay(final int count) {
             return Math.min(mBackoff.getDelay(count), mDelay);
+        }
+    }
+
+    /**
+     * Constant backoff policy.
+     */
+    private static class ConstantBackoff extends BaseBackoff {
+
+        private final long mDelay;
+
+        private final int mOffset;
+
+        /**
+         * Constructor.
+         *
+         * @param offset      the offset count;
+         * @param delayMillis the delay in milliseconds.
+         * @throws java.lang.IllegalArgumentException if the delay is negative.
+         */
+        private ConstantBackoff(final int offset, final long delayMillis) {
+            super(asArgs(offset, delayMillis));
+            mOffset = offset;
+            mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
+        }
+
+        public long getDelay(final int count) {
+            if (count <= mOffset) {
+                return NO_DELAY;
+            }
+
+            return mDelay;
         }
     }
 

@@ -128,10 +128,10 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                JRoutineLoaderStream.withStream()
+                JRoutineLoaderStream.&lt;URI&gt;withStream()
                                     .straight(()
                                     .applyLoaderConfiguration()
-                                    .withFactoryId(11)
+                                    .withFactoryId(11) // explicitly set the factory ID so to make the invocation survive rotations
                                     .configured()
                                     .map(loadUri())
                                     .on(loaderFrom(this))

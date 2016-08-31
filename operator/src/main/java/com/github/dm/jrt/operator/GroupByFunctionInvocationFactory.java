@@ -75,7 +75,8 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
          *
          * @param keyFunction the function returning the group key.
          */
-        GroupByFunctionInvocation(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
+        private GroupByFunctionInvocation(
+                @NotNull final FunctionDecorator<DATA, Object> keyFunction) {
             mKeyFunction = keyFunction;
         }
 

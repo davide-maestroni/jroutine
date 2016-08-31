@@ -25,7 +25,9 @@ import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -104,6 +106,36 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    public void testScopeError() {
+        try {
+            factoryFrom(new InvocationFactory<Object, Object>(null) {
+
+                @NotNull
+                @Override
+                public Invocation<Object, Object> newInvocation() throws Exception {
+                    return new TemplateInvocation<Object, Object>() {};
+                }
+            });
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            factoryOf(new TemplateInvocation<Object, Object>() {}.getClass());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+
+        try {
+            factoryOf(new TemplateContextInvocation<Object, Object>() {}.getClass());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
         }
     }
 

@@ -32,11 +32,9 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -80,8 +78,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class ParcelableByteChannel {
 
-    private static final EmptyBufferInputStream EMPTY_INPUT_STREAM = new EmptyBufferInputStream();
-
     private final ByteChannel mByteChannel;
 
     /**
@@ -105,12 +101,7 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer buffer) {
-        final ByteBuffer byteBuffer = buffer.getBuffer();
-        if (byteBuffer != null) {
-            return ByteChannel.inputStream(byteBuffer);
-        }
-
-        return EMPTY_INPUT_STREAM;
+        return ByteChannel.inputStream(buffer.getBuffer());
     }
 
     /**
@@ -128,10 +119,7 @@ public class ParcelableByteChannel {
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer... buffers) {
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.length);
         for (final ParcelableByteBuffer buffer : buffers) {
-            final ByteBuffer byteBuffer = buffer.getBuffer();
-            if (byteBuffer != null) {
-                byteBuffers.add(byteBuffer);
-            }
+            byteBuffers.add(buffer.getBuffer());
         }
 
         return ByteChannel.inputStream(byteBuffers);
@@ -153,10 +141,7 @@ public class ParcelableByteChannel {
             @NotNull final Iterable<? extends ParcelableByteBuffer> buffers) {
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>();
         for (final ParcelableByteBuffer buffer : buffers) {
-            final ByteBuffer byteBuffer = buffer.getBuffer();
-            if (byteBuffer != null) {
-                byteBuffers.add(byteBuffer);
-            }
+            byteBuffers.add(buffer.getBuffer());
         }
 
         return ByteChannel.inputStream(byteBuffers);
@@ -221,22 +206,19 @@ public class ParcelableByteChannel {
                     @Override
                     public ParcelableByteBuffer createFromParcel(final Parcel in) {
                         final byte[] data = in.createByteArray();
-                        if (data.length > 0) {
-                            final Channel<ByteBuffer, ByteBuffer> channel =
-                                    JRoutineCore.io().buildChannel();
-                            final BufferOutputStream outputStream =
-                                    Channels.byteChannel(data.length).bind(channel);
-                            try {
-                                outputStream.write(data);
-                                outputStream.close();
-                                return new ParcelableByteBuffer(channel.next());
+                        final Channel<ByteBuffer, ByteBuffer> channel =
+                                JRoutineCore.io().buildChannel();
+                        final BufferOutputStream outputStream =
+                                Channels.byteChannel(Math.max(data.length, 1)).bind(channel);
+                        try {
+                            outputStream.write(data);
+                            outputStream.close();
+                            return new ParcelableByteBuffer(channel.next());
 
-                            } catch (final IOException ignored) {
-                                // It should never happen...
-                            }
+                        } catch (final IOException e) {
+                            // It should never happen...
+                            throw new IllegalStateException(e);
                         }
-
-                        return new ParcelableByteBuffer(null);
                     }
 
                     @Override
@@ -254,8 +236,8 @@ public class ParcelableByteChannel {
          *
          * @param buffer the backing byte buffer or null.
          */
-        private ParcelableByteBuffer(@Nullable final ByteBuffer buffer) {
-            super(asArgs(buffer));
+        private ParcelableByteBuffer(@NotNull final ByteBuffer buffer) {
+            super(asArgs(ConstantConditions.notNull("byte buffer", buffer)));
             mBuffer = buffer;
         }
 
@@ -295,7 +277,7 @@ public class ParcelableByteChannel {
             return (buffer != null) ? buffer.size() : 0;
         }
 
-        @Nullable
+        @NotNull
         private ByteBuffer getBuffer() {
             return mBuffer;
         }
@@ -319,7 +301,7 @@ public class ParcelableByteChannel {
         }
 
         @Override
-        public void onComplete() throws Exception {
+        public void onComplete() {
             mChannel.close();
         }
 
@@ -331,54 +313,6 @@ public class ParcelableByteChannel {
         @Override
         public void onOutput(final ByteBuffer output) {
             mChannel.pass(new ParcelableByteBuffer(output));
-        }
-    }
-
-    /**
-     * Input stream implementation representing an empty buffer.
-     */
-    private static class EmptyBufferInputStream extends BufferInputStream {
-
-        @Override
-        public int read(@NotNull final OutputStream out) throws IOException {
-            return -1;
-        }
-
-        @Override
-        public int read() {
-            return -1;
-        }
-
-        @Override
-        public int read(@NotNull final byte[] b) {
-            return -1;
-        }
-
-        @Override
-        public int read(@NotNull final byte[] b, final int off, final int len) {
-            return -1;
-        }
-
-        @Override
-        public long skip(final long n) {
-            return 0;
-        }
-
-        @Override
-        public int available() {
-            return 0;
-        }
-
-        @Override
-        public void close() {
-        }
-
-        @Override
-        public void mark(final int readLimit) {
-        }
-
-        @Override
-        public void reset() {
         }
     }
 

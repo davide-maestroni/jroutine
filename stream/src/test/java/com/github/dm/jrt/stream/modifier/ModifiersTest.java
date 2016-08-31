@@ -413,6 +413,48 @@ public class ModifiersTest {
     }
 
     @Test
+    public void testRetryConsumerError() {
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+        new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
+                new Function<Channel<?, Object>, Channel<?, Object>>() {
+
+                    public Channel<?, Object> apply(final Channel<?, Object> channel) throws
+                            Exception {
+                        throw new NullPointerException();
+                    }
+                }, new BiFunction<Integer, RoutineException, Long>() {
+
+            public Long apply(final Integer integer, final RoutineException e) {
+                return 0L;
+            }
+        }).run();
+        assertThat(inputChannel.getError()).isNotNull();
+        assertThat(outputChannel.getError()).isNotNull();
+    }
+
+    @Test
+    public void testRetryConsumerError2() {
+        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+        new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
+                new Function<Channel<?, Object>, Channel<?, Object>>() {
+
+                    public Channel<?, Object> apply(final Channel<?, Object> channel) {
+                        return channel;
+                    }
+                }, new BiFunction<Integer, RoutineException, Long>() {
+
+            public Long apply(final Integer integer, final RoutineException e) throws Exception {
+                throw new NullPointerException();
+            }
+        }).run();
+        inputChannel.abort(new RoutineException());
+        assertThat(inputChannel.getError()).isNotNull();
+        assertThat(outputChannel.getError()).isNotNull();
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testRetryNullPointerError() {
         try {

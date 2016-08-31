@@ -165,6 +165,15 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
         parcel.recycle();
     }
 
+    public void testPrimitiveClass() {
+        try {
+            classOfType(int.class);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+        }
+    }
+
     public static class TestClass {
 
     }

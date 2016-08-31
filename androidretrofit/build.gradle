@@ -101,12 +101,15 @@ tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('https://square.github.io/okhttp/3.x/okhttp/',
             'https://square.github.io/retrofit/2.x/retrofit/',
+            "${prefix}/androidchannel/",
             "${prefix}/androidcore/",
             "${prefix}/androidobject/",
             "${prefix}/androidstream/",
+            "${prefix}/channel/",
             "${prefix}/core/",
-            "${prefix}/lib/",
+            "${prefix}/function/",
             "${prefix}/object/",
+            "${prefix}/operator/",
             "${prefix}/retrofit/",
             "${prefix}/stream/")
 }

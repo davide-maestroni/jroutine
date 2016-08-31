@@ -21,7 +21,12 @@
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.core.channel.RepeatedChannel"/>
+        <Class name="com.github.dm.jrt.channel.FutureChannel$ExpiringFutureIterator"/>
+        <Method name="next"/>
+        <Bug pattern="IT_NO_SUCH_ELEMENT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.channel.FutureChannel$FutureIterator"/>
         <Method name="next"/>
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>

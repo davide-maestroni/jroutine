@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.core.util;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> the value type.
  */
-class LocalValue<T> extends ThreadLocal<T> {
+public class LocalValue<T> extends ThreadLocal<T> {
 
     private final T mInitialValue;
 
@@ -34,7 +34,7 @@ class LocalValue<T> extends ThreadLocal<T> {
      *
      * @param initialValue the initial value.
      */
-    LocalValue(@Nullable final T initialValue) {
+    public LocalValue(@Nullable final T initialValue) {
         mInitialValue = initialValue;
     }
 

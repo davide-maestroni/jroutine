@@ -97,5 +97,6 @@ tasks.withType(Javadoc) {
             "${prefix}/androidprocessor/",
             "${prefix}/core/",
             "${prefix}/object/",
+            "${prefix}/processor/",
             "${prefix}/proxy/")
 }

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * Utility class for handling routine channels.
@@ -456,6 +457,23 @@ public class Channels {
     public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
             @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
         return distribute(false, null, channels);
+    }
+
+    /**
+     * Returns a builder of channels producing the result of the specified Future.
+     * <p>
+     * Note that the configured runner will be employed to wait for the Future to complete.
+     * <br>
+     * Note also that the returned channel will be already closed.
+     *
+     * @param future the Future instance.
+     * @param <OUT>  the output data type.
+     * @return the channel builder.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> fromFuture(
+            @NotNull final Future<OUT> future) {
+        return new FutureChannelBuilder<OUT>(future);
     }
 
     /**

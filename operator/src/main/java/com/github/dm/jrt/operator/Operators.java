@@ -95,8 +95,6 @@ public class Operators {
         ConstantConditions.avoid();
     }
 
-    // TODO: 8/30/16 add dependencies to the overviews??
-
     /**
      * Returns a factory of invocations verifying that all the inputs satisfy a specific conditions.
      *

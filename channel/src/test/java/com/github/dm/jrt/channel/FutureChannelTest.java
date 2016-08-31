@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
@@ -27,7 +28,6 @@ import com.github.dm.jrt.core.util.UnitDuration;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -58,7 +58,7 @@ public class FutureChannelTest {
                     }
                 }, 1, TimeUnit.SECONDS);
         final UnitDuration timeout = seconds(1);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         channel.abort(new IllegalStateException());
         try {
             channel.after(timeout).throwError();
@@ -79,7 +79,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         final ArrayList<String> results = new ArrayList<String>();
         channel.after(10, TimeUnit.MILLISECONDS).allInto(results);
@@ -105,7 +105,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyAbort().eventuallyFail();
         try {
@@ -127,7 +127,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
@@ -149,7 +149,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
@@ -171,7 +171,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
@@ -193,7 +193,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 500, TimeUnit.MILLISECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         final Channel<String, String> outputChannel =
                 JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
         assertThat(outputChannel.after(seconds(1)).next()).isEqualTo("test");
@@ -209,8 +209,10 @@ public class FutureChannelTest {
                         return "test";
                     }
                 });
-        final Channel<? super String, String> channel =
-                JRoutineCore.io().of(future).bind(JRoutineCore.io().<String>buildChannel());
+        final Channel<? super String, String> channel = Channels.fromFuture(future)
+                                                                .buildChannels()
+                                                                .bind(JRoutineCore.io()
+                                                                        .<String>buildChannel());
         assertThat(channel.after(seconds(1)).next()).isEqualTo("test");
         assertThat(channel.isOpen()).isTrue();
         assertThat(channel.close().isOpen()).isFalse();
@@ -225,7 +227,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.isBound()).isFalse();
         final Channel<? super String, String> outputChannel =
                 channel.bind(JRoutineCore.io().<String>buildChannel());
@@ -245,7 +247,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         channel.bind(JRoutineCore.io().<String>buildChannel());
         try {
             channel.bind(JRoutineCore.io().<String>buildChannel());
@@ -271,7 +273,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 100, TimeUnit.MILLISECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.isEmpty()).isTrue();
         channel.after(seconds(1)).next();
         assertThat(channel.isEmpty()).isTrue();
@@ -286,7 +288,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 100, TimeUnit.MILLISECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.close().after(seconds(10)).getComplete()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
@@ -301,7 +303,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 100, TimeUnit.MILLISECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.abort()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
@@ -316,7 +318,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 });
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.after(seconds(1)).hasNext()).isTrue();
     }
 
@@ -329,7 +331,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
@@ -352,7 +354,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
@@ -374,7 +376,7 @@ public class FutureChannelTest {
                 return "test";
             }
         });
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         final Iterator<String> iterator = channel.after(seconds(1)).iterator();
         assertThat(iterator.hasNext()).isTrue();
         assertThat(iterator.next()).isEqualTo("test");
@@ -396,7 +398,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
@@ -418,7 +420,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
@@ -440,28 +442,31 @@ public class FutureChannelTest {
                 return "test";
             }
         });
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.next(0)).isEmpty();
         assertThat(channel.eventuallyContinue().after(seconds(1)).next(2)).containsExactly("test");
         try {
-            JRoutineCore.io().of(executor.schedule(new Callable<String>() {
+            Channels.fromFuture(executor.schedule(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            }, 1, TimeUnit.SECONDS)).eventuallyAbort().next(2);
+            }, 1, TimeUnit.SECONDS)).buildChannels().eventuallyAbort().next(2);
             fail();
 
         } catch (final AbortException ignored) {
         }
 
         try {
-            JRoutineCore.io().of(executor.schedule(new Callable<String>() {
+            Channels.fromFuture(executor.schedule(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            }, 1, TimeUnit.SECONDS)).eventuallyAbort(new IllegalStateException()).next(2);
+            }, 1, TimeUnit.SECONDS))
+                    .buildChannels()
+                    .eventuallyAbort(new IllegalStateException())
+                    .next(2);
             fail();
 
         } catch (final AbortException e) {
@@ -469,12 +474,12 @@ public class FutureChannelTest {
         }
 
         try {
-            JRoutineCore.io().of(executor.schedule(new Callable<String>() {
+            Channels.fromFuture(executor.schedule(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            }, 1, TimeUnit.SECONDS)).eventuallyFail().next(2);
+            }, 1, TimeUnit.SECONDS)).buildChannels().eventuallyFail().next(2);
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -484,41 +489,49 @@ public class FutureChannelTest {
     @Test
     public void testNextOr() {
         final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        assertThat(JRoutineCore.io().of(executor.submit(new Callable<Object>() {
+        assertThat(Channels.fromFuture(executor.submit(new Callable<Object>() {
 
             public Object call() {
                 return "test1";
             }
-        })).after(seconds(1)).nextOrElse(2)).isEqualTo("test1");
-        assertThat(JRoutineCore.io().of(executor.schedule(new Callable<Object>() {
+        })).buildChannels().after(seconds(1)).nextOrElse(2)).isEqualTo("test1");
+        assertThat(Channels.fromFuture(executor.schedule(new Callable<Object>() {
 
             public Object call() {
                 return "test1";
             }
-        }, 3, TimeUnit.SECONDS)).eventuallyContinue().after(seconds(1)).nextOrElse(2)).isEqualTo(2);
+        }, 3, TimeUnit.SECONDS))
+                           .buildChannels()
+                           .eventuallyContinue()
+                           .after(seconds(1))
+                           .nextOrElse(2)).isEqualTo(2);
         try {
-            JRoutineCore.io().of(executor.schedule(new Callable<Object>() {
+            Channels.fromFuture(executor.schedule(new Callable<Object>() {
 
                 public Object call() {
                     return "test1";
                 }
-            }, 3, TimeUnit.SECONDS)).eventuallyAbort().after(millis(100)).nextOrElse("test2");
+            }, 3, TimeUnit.SECONDS))
+                    .buildChannels()
+                    .eventuallyAbort()
+                    .after(millis(100))
+                    .nextOrElse("test2");
             fail();
 
         } catch (final AbortException ignored) {
         }
 
         try {
-            JRoutineCore.io()
-                        .of(executor.schedule(new Callable<Object>() {
+            Channels.fromFuture(executor.schedule(new Callable<Object>() {
 
-                            public Object call() {
-                                return "test1";
-                            }
-                        }, 3, TimeUnit.SECONDS))
-                        .eventuallyAbort(new IllegalStateException())
-                        .after(millis(100))
-                        .nextOrElse("test2");
+                public Object call() {
+                    return "test1";
+                }
+            }, 3, TimeUnit.SECONDS))
+                    .buildChannels()
+                    .eventuallyAbort(new IllegalStateException())
+                    .after(millis(100))
+                    .nextOrElse("test2");
             fail();
 
         } catch (final AbortException e) {
@@ -526,12 +539,16 @@ public class FutureChannelTest {
         }
 
         try {
-            JRoutineCore.io().of(executor.schedule(new Callable<Object>() {
+            Channels.fromFuture(executor.schedule(new Callable<Object>() {
 
                 public Object call() {
                     return "test1";
                 }
-            }, 3, TimeUnit.SECONDS)).eventuallyFail().after(millis(100)).nextOrElse("test2");
+            }, 3, TimeUnit.SECONDS))
+                    .buildChannels()
+                    .eventuallyFail()
+                    .after(millis(100))
+                    .nextOrElse("test2");
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -547,7 +564,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
@@ -569,7 +586,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
@@ -591,7 +608,7 @@ public class FutureChannelTest {
                 return "test";
             }
         });
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         try {
             channel.sorted().pass("test");
             fail();
@@ -601,20 +618,6 @@ public class FutureChannelTest {
 
         try {
             channel.unsorted().pass("test", "test");
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-        }
-
-        try {
-            channel.pass(Collections.singletonList("test"));
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-        }
-
-        try {
-            channel.sorted().pass(JRoutineCore.io().of("test"));
             fail();
 
         } catch (final IllegalStateException ignored) {
@@ -630,7 +633,7 @@ public class FutureChannelTest {
                 return "test";
             }
         }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         channel.abort();
         try {
             channel.sorted().pass("test");
@@ -641,20 +644,6 @@ public class FutureChannelTest {
 
         try {
             channel.unsorted().pass("test", "test");
-            fail();
-
-        } catch (final AbortException ignored) {
-        }
-
-        try {
-            channel.pass(Collections.singletonList("test"));
-            fail();
-
-        } catch (final AbortException ignored) {
-        }
-
-        try {
-            channel.sorted().pass(JRoutineCore.io().of("test"));
             fail();
 
         } catch (final AbortException ignored) {
@@ -670,13 +659,13 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io()
-                                                            .applyChannelConfiguration()
-                                                            .withOutputTimeout(millis(10))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.CONTINUE)
-                                                            .configured()
-                                                            .of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future)
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(
+                                                           TimeoutActionType.CONTINUE)
+                                                   .configured()
+                                                   .buildChannels();
         assertThat(channel.all()).isEmpty();
     }
 
@@ -689,13 +678,12 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io()
-                                                            .applyChannelConfiguration()
-                                                            .withOutputTimeout(millis(10))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.ABORT)
-                                                            .configured()
-                                                            .of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future)
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(TimeoutActionType.ABORT)
+                                                   .configured()
+                                                   .buildChannels();
         try {
             channel.all();
             fail();
@@ -713,13 +701,12 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 3, TimeUnit.SECONDS);
-        final Channel<String, String> channel = JRoutineCore.io()
-                                                            .applyChannelConfiguration()
-                                                            .withOutputTimeout(millis(10))
-                                                            .withOutputTimeoutAction(
-                                                                    TimeoutActionType.FAIL)
-                                                            .configured()
-                                                            .of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future)
+                                                   .applyChannelConfiguration()
+                                                   .withOutputTimeout(millis(10))
+                                                   .withOutputTimeoutAction(TimeoutActionType.FAIL)
+                                                   .configured()
+                                                   .buildChannels();
         try {
             channel.all();
             fail();
@@ -737,7 +724,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 }, 100, TimeUnit.MILLISECONDS);
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(0);
         millis(500).sleepAtLeast();
@@ -754,43 +741,47 @@ public class FutureChannelTest {
     @Test
     public void testSkip() {
         final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        assertThat(JRoutineCore.io().of(executor.submit(new Callable<String>() {
+        assertThat(Channels.fromFuture(executor.submit(new Callable<String>() {
 
             public String call() {
                 return "test";
             }
-        })).after(seconds(1)).skipNext(0).all()).containsExactly("test");
-        assertThat(JRoutineCore.io().of(executor.submit(new Callable<String>() {
+        })).buildChannels().after(seconds(1)).skipNext(0).all()).containsExactly("test");
+        assertThat(Channels.fromFuture(executor.submit(new Callable<String>() {
 
             public String call() {
                 return "test";
             }
-        })).eventuallyContinue().after(seconds(1)).skipNext(2).all()).isEmpty();
-        assertThat(JRoutineCore.io().of(executor.submit(new Callable<String>() {
+        })).buildChannels().eventuallyContinue().after(seconds(1)).skipNext(2).all()).isEmpty();
+        assertThat(Channels.fromFuture(executor.submit(new Callable<String>() {
 
             public String call() {
                 return "test";
             }
-        })).after(seconds(1)).skipNext(1).all()).isEmpty();
+        })).buildChannels().after(seconds(1)).skipNext(1).all()).isEmpty();
         try {
-            JRoutineCore.io().of(executor.submit(new Callable<String>() {
+            Channels.fromFuture(executor.submit(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            })).eventuallyAbort().after(seconds(1)).skipNext(2);
+            })).buildChannels().eventuallyAbort().after(seconds(1)).skipNext(2);
             fail();
 
         } catch (final AbortException ignored) {
         }
 
         try {
-            JRoutineCore.io().of(executor.submit(new Callable<String>() {
+            Channels.fromFuture(executor.submit(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            })).eventuallyAbort(new IllegalStateException()).after(seconds(1)).skipNext(2);
+            }))
+                    .buildChannels()
+                    .eventuallyAbort(new IllegalStateException())
+                    .after(seconds(1))
+                    .skipNext(2);
             fail();
 
         } catch (final AbortException e) {
@@ -798,12 +789,12 @@ public class FutureChannelTest {
         }
 
         try {
-            JRoutineCore.io().of(executor.submit(new Callable<String>() {
+            Channels.fromFuture(executor.submit(new Callable<String>() {
 
                 public String call() {
                     return "test";
                 }
-            })).eventuallyFail().after(seconds(1)).skipNext(2);
+            })).buildChannels().eventuallyFail().after(seconds(1)).skipNext(2);
             fail();
 
         } catch (final TimeoutException ignored) {
@@ -819,7 +810,7 @@ public class FutureChannelTest {
                         return "test";
                     }
                 });
-        final Channel<String, String> channel = JRoutineCore.io().of(future);
+        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
         channel.after(seconds(1)).throwError();
     }
 }

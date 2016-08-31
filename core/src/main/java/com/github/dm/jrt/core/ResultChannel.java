@@ -36,6 +36,7 @@ import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.LocalFence;
+import com.github.dm.jrt.core.util.LocalValue;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.core.util.UnitDuration.Condition;

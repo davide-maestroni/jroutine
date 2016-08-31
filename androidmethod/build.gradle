@@ -91,5 +91,8 @@ tasks.withType(Javadoc) {
     options.links("${prefix}/androidchannel/",
             "${prefix}/androidcore/",
             "${prefix}/androidobject/",
-            "${prefix}/method/")
+            "${prefix}/channel/",
+            "${prefix}/core/",
+            "${prefix}/method/",
+            "${prefix}/object/")
 }

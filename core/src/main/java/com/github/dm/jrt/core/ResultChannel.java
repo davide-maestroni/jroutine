@@ -2052,7 +2052,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             synchronized (mMutex) {
                 final OutputChannelState state = mState;
                 mLogger.dbg("avoiding flushing output since channel is not bound");
-                if (state.isReadyToComplete()) {
+                if (state.isReadyToComplete() && (mBindingHandler == this)) {
                     mState = state.toDoneState();
                 }
 

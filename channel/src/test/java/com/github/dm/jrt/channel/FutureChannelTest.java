@@ -28,6 +28,7 @@ import com.github.dm.jrt.core.util.UnitDuration;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -608,7 +609,8 @@ public class FutureChannelTest {
                 return "test";
             }
         });
-        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
+        @SuppressWarnings("unchecked") final Channel<Object, String> channel =
+                (Channel<Object, String>) Channels.fromFuture(future).buildChannels();
         try {
             channel.sorted().pass("test");
             fail();
@@ -618,6 +620,20 @@ public class FutureChannelTest {
 
         try {
             channel.unsorted().pass("test", "test");
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.unsorted().pass(Arrays.asList("test", "test"));
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        try {
+            channel.unsorted().pass(JRoutineCore.io().buildChannel());
             fail();
 
         } catch (final IllegalStateException ignored) {
@@ -633,7 +649,8 @@ public class FutureChannelTest {
                 return "test";
             }
         }, 3, TimeUnit.SECONDS);
-        final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
+        @SuppressWarnings("unchecked") final Channel<Object, String> channel =
+                (Channel<Object, String>) Channels.fromFuture(future).buildChannels();
         channel.abort();
         try {
             channel.sorted().pass("test");
@@ -644,6 +661,20 @@ public class FutureChannelTest {
 
         try {
             channel.unsorted().pass("test", "test");
+            fail();
+
+        } catch (final AbortException ignored) {
+        }
+
+        try {
+            channel.unsorted().pass(Arrays.asList("test", "test"));
+            fail();
+
+        } catch (final AbortException ignored) {
+        }
+
+        try {
+            channel.unsorted().pass(JRoutineCore.io().buildChannel());
             fail();
 
         } catch (final AbortException ignored) {

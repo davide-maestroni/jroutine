@@ -427,7 +427,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public List<OUT> next(final int count) {
         if (count <= 0) {
-            return new ArrayList<OUT>();
+            return new ArrayList<OUT>(0);
         }
 
         final ArrayList<OUT> results = new ArrayList<OUT>(count);

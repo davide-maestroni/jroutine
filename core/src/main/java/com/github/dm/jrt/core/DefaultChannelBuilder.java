@@ -25,6 +25,8 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Future;
+
 /**
  * Class implementing a builder of channel objects.
  * <p>
@@ -69,6 +71,11 @@ class DefaultChannelBuilder implements ChannelBuilder {
     @NotNull
     public <DATA> Channel<DATA, DATA> of(@Nullable final DATA... inputs) {
         return this.<DATA>buildChannel().pass(inputs).close();
+    }
+
+    @NotNull
+    public <DATA> Channel<DATA, DATA> of(@NotNull final Future<DATA> future) {
+        return new FutureChannel<DATA>(mConfiguration, future);
     }
 
     @NotNull

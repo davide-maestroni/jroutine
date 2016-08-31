@@ -21,6 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Future;
+
 /**
  * Interface defining a builder of channel objects.
  * <p>
@@ -40,7 +42,7 @@ public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
     <DATA> Channel<DATA, DATA> buildChannel();
 
     /**
-     * Builds and returns a channel returning no data.
+     * Builds and returns a channel producing no data.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -51,7 +53,7 @@ public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
     <DATA> Channel<DATA, DATA> of();
 
     /**
-     * Builds and returns a channel returning the specified input.
+     * Builds and returns a channel producing the specified input.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -63,7 +65,7 @@ public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
     <DATA> Channel<DATA, DATA> of(@Nullable DATA input);
 
     /**
-     * Builds and returns a channel returning the specified inputs.
+     * Builds and returns a channel producing the specified inputs.
      * <p>
      * Note that the returned channel will be already closed.
      *
@@ -75,7 +77,21 @@ public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
     <DATA> Channel<DATA, DATA> of(@Nullable DATA... inputs);
 
     /**
-     * Builds and returns a channel returning the specified inputs.
+     * Builds and returns a channel producing the result of the specified Future.
+     * <br>
+     * The configured runner will be employed to wait for the Future to complete.
+     * <p>
+     * Note that the returned channel will be already closed.
+     *
+     * @param future the Future instance.
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> Channel<DATA, DATA> of(@NotNull Future<DATA> future);
+
+    /**
+     * Builds and returns a channel producing the specified inputs.
      * <p>
      * Note that the returned channel will be already closed.
      *

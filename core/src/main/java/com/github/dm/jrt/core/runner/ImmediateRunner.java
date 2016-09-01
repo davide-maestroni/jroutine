@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 05/13/2016.
  */
-class StraightRunner extends SyncRunner {
+class ImmediateRunner extends SyncRunner {
 
     @Override
     public void run(@NotNull final Execution execution, final long delay,

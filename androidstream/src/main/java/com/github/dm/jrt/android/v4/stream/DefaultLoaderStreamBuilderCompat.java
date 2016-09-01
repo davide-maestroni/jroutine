@@ -169,6 +169,18 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
     @NotNull
     @Override
+    public LoaderStreamBuilderCompat<IN, OUT> immediate() {
+        return (LoaderStreamBuilderCompat<IN, OUT>) super.immediate();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilderCompat<IN, OUT> immediateParallel() {
+        return (LoaderStreamBuilderCompat<IN, OUT>) super.immediateParallel();
+    }
+
+    @NotNull
+    @Override
     public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
@@ -267,18 +279,6 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     @Override
     public LoaderStreamBuilderCompat<IN, OUT> sorted() {
         return (LoaderStreamBuilderCompat<IN, OUT>) super.sorted();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilderCompat<IN, OUT> straight() {
-        return (LoaderStreamBuilderCompat<IN, OUT>) super.straight();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilderCompat<IN, OUT> straightParallel() {
-        return (LoaderStreamBuilderCompat<IN, OUT>) super.straightParallel();
     }
 
     @NotNull

@@ -144,6 +144,16 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     }
 
     @NotNull
+    public StreamBuilder<IN, OUT> immediate() {
+        return applyRunner(Runners.immediateRunner(), InvocationMode.ASYNC);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> immediateParallel() {
+        return applyRunner(Runners.immediateRunner(), InvocationMode.PARALLEL);
+    }
+
+    @NotNull
     public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
@@ -276,16 +286,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @NotNull
     public StreamBuilder<IN, OUT> sorted() {
         return applyStreamInvocationConfiguration().withOutputOrder(OrderType.SORTED).configured();
-    }
-
-    @NotNull
-    public StreamBuilder<IN, OUT> straight() {
-        return applyRunner(Runners.straightRunner(), InvocationMode.ASYNC);
-    }
-
-    @NotNull
-    public StreamBuilder<IN, OUT> straightParallel() {
-        return applyRunner(Runners.straightRunner(), InvocationMode.PARALLEL);
     }
 
     @NotNull

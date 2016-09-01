@@ -653,6 +653,36 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .all()).containsExactly("test1", "test2");
     }
 
+    public void testImmediate() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineLoaderStream //
+                .<Integer>withStream().immediate()
+                                      .map(appendAccept(range(1, 1000)))
+                                      .applyStreamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .configured()
+                                      .map(sqrt())
+                                      .map(Operators.<Double>averageDouble())
+                                      .close()
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(JRoutineLoaderStream //
+                .<Integer>withStream().immediateParallel()
+                                      .map(appendAccept(range(1, 1000)))
+                                      .applyStreamInvocationConfiguration()
+                                      .withInputMaxSize(1)
+                                      .withOutputMaxSize(1)
+                                      .configured()
+                                      .map(sqrt())
+                                      .immediate()
+                                      .map(Operators.averageDouble())
+                                      .close()
+                                      .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
     public void testInvocationDeadlock() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -1228,36 +1258,6 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         } catch (final NullPointerException ignored) {
         }
-    }
-
-    public void testStraight() {
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        assertThat(JRoutineLoaderStream //
-                .<Integer>withStream().straight()
-                                      .map(appendAccept(range(1, 1000)))
-                                      .applyStreamInvocationConfiguration()
-                                      .withInputMaxSize(1)
-                                      .withOutputMaxSize(1)
-                                      .configured()
-                                      .map(sqrt())
-                                      .map(Operators.<Double>averageDouble())
-                                      .close()
-                                      .next()).isCloseTo(21, Offset.offset(0.1));
-        assertThat(JRoutineLoaderStream //
-                .<Integer>withStream().straightParallel()
-                                      .map(appendAccept(range(1, 1000)))
-                                      .applyStreamInvocationConfiguration()
-                                      .withInputMaxSize(1)
-                                      .withOutputMaxSize(1)
-                                      .configured()
-                                      .map(sqrt())
-                                      .straight()
-                                      .map(Operators.averageDouble())
-                                      .close()
-                                      .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     public void testTransform() {

@@ -516,6 +516,45 @@ public class StreamBuilderTest {
     }
 
     @Test
+    public void testImmediate() {
+        assertThat(JRoutineStream.<Integer>withStream().immediate()
+                                                       .map(appendAccept(range(1, 1000)))
+                                                       .applyStreamInvocationConfiguration()
+                                                       .withInputMaxSize(1)
+                                                       .withOutputMaxSize(1)
+                                                       .configured()
+                                                       .map(new Function<Number, Double>() {
+
+                                                           public Double apply(
+                                                                   final Number number) {
+                                                               return Math.sqrt(
+                                                                       number.doubleValue());
+                                                           }
+                                                       })
+                                                       .map(Operators.averageDouble())
+                                                       .close()
+                                                       .next()).isCloseTo(21, Offset.offset(0.1));
+        assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
+                                                       .map(appendAccept(range(1, 1000)))
+                                                       .applyStreamInvocationConfiguration()
+                                                       .withInputMaxSize(1)
+                                                       .withOutputMaxSize(1)
+                                                       .configured()
+                                                       .map(new Function<Number, Double>() {
+
+                                                           public Double apply(
+                                                                   final Number number) {
+                                                               return Math.sqrt(
+                                                                       number.doubleValue());
+                                                           }
+                                                       })
+                                                       .immediate()
+                                                       .map(Operators.averageDouble())
+                                                       .close()
+                                                       .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    @Test
     public void testInvocationDeadlock() {
         try {
             final Runner runner1 = Runners.poolRunner(1);
@@ -1273,45 +1312,6 @@ public class StreamBuilderTest {
 
         } catch (final InputDeadlockException ignored) {
         }
-    }
-
-    @Test
-    public void testStraight() {
-        assertThat(JRoutineStream.<Integer>withStream().straight()
-                                                       .map(appendAccept(range(1, 1000)))
-                                                       .applyStreamInvocationConfiguration()
-                                                       .withInputMaxSize(1)
-                                                       .withOutputMaxSize(1)
-                                                       .configured()
-                                                       .map(new Function<Number, Double>() {
-
-                                                           public Double apply(
-                                                                   final Number number) {
-                                                               return Math.sqrt(
-                                                                       number.doubleValue());
-                                                           }
-                                                       })
-                                                       .map(Operators.averageDouble())
-                                                       .close()
-                                                       .next()).isCloseTo(21, Offset.offset(0.1));
-        assertThat(JRoutineStream.<Integer>withStream().straightParallel()
-                                                       .map(appendAccept(range(1, 1000)))
-                                                       .applyStreamInvocationConfiguration()
-                                                       .withInputMaxSize(1)
-                                                       .withOutputMaxSize(1)
-                                                       .configured()
-                                                       .map(new Function<Number, Double>() {
-
-                                                           public Double apply(
-                                                                   final Number number) {
-                                                               return Math.sqrt(
-                                                                       number.doubleValue());
-                                                           }
-                                                       })
-                                                       .straight()
-                                                       .map(Operators.averageDouble())
-                                                       .close()
-                                                       .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     private static class SumData {

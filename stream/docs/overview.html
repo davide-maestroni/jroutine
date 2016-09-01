@@ -80,7 +80,7 @@
 
             public static void main(final String[] args) {
                 final Double rms = JRoutineStream.&lt;String&gt;withStream()
-                                                 .straight()
+                                                 .immediate()
                                                  .map(Integer::parseInt)
                                                  .map(i -&gt; i * i)
                                                  .map(Operators.averageFloat())

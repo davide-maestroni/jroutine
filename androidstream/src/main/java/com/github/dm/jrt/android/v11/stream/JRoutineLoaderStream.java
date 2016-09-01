@@ -32,11 +32,11 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final Routine&lt;Integer, Double&gt; rms =
  *                 JRoutineLoaderStream.&lt;Integer&gt;withStream()
- *                                     .on(loaderFrom(activity))
+ *                                     .immediate()
  *                                     .map(i -&gt; i * i)
- *                                     .straight()
  *                                     .map(averageFloat())
  *                                     .map(Math::sqrt)
+ *                                     .on(loaderFrom(activity))
  *                                     .buildRoutine();
  *     </code>
  * </pre>

@@ -32,11 +32,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Runners {
 
+    private static final ImmediateRunner sImmediateRunner = new ImmediateRunner();
+
     private static final Object sMutex = new Object();
 
     private static final QueuedRunner sQueuedRunner = new QueuedRunner();
-
-    private static final StraightRunner sStraightRunner = new StraightRunner();
 
     private static Runner sSharedRunner;
 
@@ -72,6 +72,23 @@ public class Runners {
         return scheduledRunner(
                 new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
                         keepAliveUnit));
+    }
+
+    /**
+     * Returns the shared instance of an immediate runner.
+     * <p>
+     * The returned runner will immediately run any passed execution.
+     * <p>
+     * Be careful when employing the returned runner, since it may lead to recursive calls, thus
+     * causing the invocation lifecycle to be not strictly honored. In fact, it might happen, for
+     * example, that the abortion method is called in the middle of the execution of another
+     * invocation method.
+     *
+     * @return the runner instance.
+     */
+    @NotNull
+    public static Runner immediateRunner() {
+        return sImmediateRunner;
     }
 
     /**
@@ -163,23 +180,6 @@ public class Runners {
 
             return sSharedRunner;
         }
-    }
-
-    /**
-     * Returns the shared instance of a straight runner.
-     * <p>
-     * The returned runner will immediately run any passed execution.
-     * <p>
-     * Be careful when employing the returned runner, since it may lead to recursive calls, thus
-     * causing the invocation lifecycle to be not strictly honored. In fact, it might happen, for
-     * example, that the abortion method is called in the middle of the execution of another
-     * invocation method.
-     *
-     * @return the runner instance.
-     */
-    @NotNull
-    public static Runner straightRunner() {
-        return sStraightRunner;
     }
 
     /**

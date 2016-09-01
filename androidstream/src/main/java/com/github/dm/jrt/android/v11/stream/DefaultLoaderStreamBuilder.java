@@ -167,6 +167,18 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> immediate() {
+        return (LoaderStreamBuilder<IN, OUT>) super.immediate();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilder<IN, OUT> immediateParallel() {
+        return (LoaderStreamBuilder<IN, OUT>) super.immediateParallel();
+    }
+
+    @NotNull
+    @Override
     public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
@@ -265,18 +277,6 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     @Override
     public LoaderStreamBuilder<IN, OUT> sorted() {
         return (LoaderStreamBuilder<IN, OUT>) super.sorted();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilder<IN, OUT> straight() {
-        return (LoaderStreamBuilder<IN, OUT>) super.straight();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamBuilder<IN, OUT> straightParallel() {
-        return (LoaderStreamBuilder<IN, OUT>) super.straightParallel();
     }
 
     @NotNull

@@ -129,7 +129,7 @@
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoaderStream.&lt;URI&gt;withStream()
-                                    .straight(()
+                                    .immediate(()
                                     .applyLoaderConfiguration()
                                     .withFactoryId(11) // explicitly set the factory ID so to make the invocation survive rotations
                                     .configured()

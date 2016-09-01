@@ -240,7 +240,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
         @Override
         public <OUT> LoaderStreamBuilderCompat adapt(final Call<OUT> call) {
-            return JRoutineLoaderStreamCompat.<Call<?>>withStream().straight()
+            return JRoutineLoaderStreamCompat.<Call<?>>withStream().immediate()
                                                                    .mapAccept(
                                                                            Functions.<Call<?>,
                                                                                    Channel<Call<?>, ?>>biSink())

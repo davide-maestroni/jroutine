@@ -125,6 +125,26 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     /**
      * {@inheritDoc}
      * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> immediate();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> immediateParallel();
+
+    /**
+     * {@inheritDoc}
+     * <p>
      * Note that the passed builder will be this one.
      * <br>
      * A {@code LoaderStreamBuilderCompat} is expected as the function result.
@@ -241,26 +261,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     @NotNull
     @Override
     LoaderStreamBuilderCompat<IN, OUT> sorted();
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Be aware that the configured runner will actually be ignored by the concatenated routines
-     * unless no Loader context is currently set.
-     */
-    @NotNull
-    @Override
-    LoaderStreamBuilderCompat<IN, OUT> straight();
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Be aware that the configured runner will actually be ignored by the concatenated routines
-     * unless no Loader context is currently set.
-     */
-    @NotNull
-    @Override
-    LoaderStreamBuilderCompat<IN, OUT> straightParallel();
 
     /**
      * {@inheritDoc}

@@ -140,6 +140,44 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
             @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
     /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * asynchronous mode employing the shared immediate runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     * <p>
+     * Unlike the default synchronous runner, the employed one makes so that each routine in the
+     * chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data might be accumulated before actually being
+     * processed by the next routine invocation.
+     *
+     * @return this builder.
+     * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> immediate();
+
+    /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * parallel mode employing the shared immediate runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     * <p>
+     * Unlike the default synchronous runner, the employed one makes so that each routine in the
+     * chain is passed any input as soon as it is produced by the previous one. Such behavior
+     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+     * the latter approach is that all input data might be accumulated before actually being
+     * processed by the next routine invocation.
+     *
+     * @return this builder.
+     * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> immediateParallel();
+
+    /**
      * Transforms this stream by applying the specified function.
      * <p>
      * This method provides a convenient way to apply a set of configurations and concatenations
@@ -339,44 +377,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     StreamBuilder<IN, OUT> sorted();
-
-    /**
-     * Modifies the stream configuration, so that the concatenated routines will be invoked in
-     * asynchronous mode employing the shared straight runner.
-     * <br>
-     * Note, however, that the runner will still be overridden by the configured current one.
-     * <p>
-     * Unlike the default synchronous runner, the employed one makes so that each routine in the
-     * chain is passed any input as soon as it is produced by the previous one. Such behavior
-     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
-     * the latter approach is that all input data might be accumulated before actually being
-     * processed by the next routine invocation.
-     *
-     * @return this builder.
-     * @see com.github.dm.jrt.core.runner.Runners#straightRunner() Runners.straightRunner()
-     */
-    @NotNull
-    StreamBuilder<IN, OUT> straight();
-
-    /**
-     * Modifies the stream configuration, so that the concatenated routines will be invoked in
-     * parallel mode employing the shared straight runner.
-     * <br>
-     * Note, however, that the runner will still be overridden by the configured current one.
-     * <p>
-     * Unlike the default synchronous runner, the employed one makes so that each routine in the
-     * chain is passed any input as soon as it is produced by the previous one. Such behavior
-     * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-     * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
-     * the latter approach is that all input data might be accumulated before actually being
-     * processed by the next routine invocation.
-     *
-     * @return this builder.
-     * @see com.github.dm.jrt.core.runner.Runners#straightRunner() Runners.straightRunner()
-     */
-    @NotNull
-    StreamBuilder<IN, OUT> straightParallel();
 
     /**
      * Modifies the stream configuration, so that the concatenated routines will be invoked in

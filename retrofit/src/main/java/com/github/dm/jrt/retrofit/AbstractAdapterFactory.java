@@ -365,7 +365,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<?>>withStream().straight()
+            return JRoutineStream.<Call<?>>withStream().immediate()
                                                        .mapAccept(
                                                                Functions.<Call<?>,
                                                                        Channel<Call<?>, ?>>biSink())

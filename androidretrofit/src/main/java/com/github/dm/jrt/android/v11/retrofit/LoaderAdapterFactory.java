@@ -238,7 +238,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
         @Override
         public <OUT> LoaderStreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineLoaderStream.<Call<?>>withStream().straight()
+            return JRoutineLoaderStream.<Call<?>>withStream().immediate()
                                                              .mapAccept(
                                                                      Functions.<Call<?>,
                                                                              Channel<Call<?>,

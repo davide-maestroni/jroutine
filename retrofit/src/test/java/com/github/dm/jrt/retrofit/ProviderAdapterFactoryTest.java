@@ -235,7 +235,7 @@ public class ProviderAdapterFactoryTest {
 
                     final StreamBuilder<?, ?> builder = //
                             JRoutineStream.withStream()
-                                          .straight()
+                                          .immediate()
                                           .map(prepend((Object) Collections.emptyList()));
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.close();

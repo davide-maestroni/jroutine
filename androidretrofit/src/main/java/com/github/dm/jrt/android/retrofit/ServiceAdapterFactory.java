@@ -386,7 +386,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<?>>withStream().straight()
+            return JRoutineStream.<Call<?>>withStream().immediate()
                                                        .mapAccept(
                                                                Functions.<Call<?>,
                                                                        Channel<Call<?>, ?>>biSink())

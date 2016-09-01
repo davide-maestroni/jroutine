@@ -254,26 +254,29 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
         final boolean forceClose;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             verifyBound();
             forceClose = mState.isDone();
-            mBindingHandler =
-                    new ConsumerHandler(ConstantConditions.notNull("channel consumer", consumer));
+            handler = (mBindingHandler =
+                    new ConsumerHandler(ConstantConditions.notNull("channel consumer", consumer)));
         }
 
-        runFlush(forceClose);
+        runFlush(handler, forceClose);
         return this;
     }
 
     @NotNull
     public Channel<OUT, OUT> close() {
         final boolean needsFlush;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             needsFlush = mState.closeResultChannel();
+            handler = mBindingHandler;
         }
 
         if (needsFlush) {
-            runFlush(false);
+            runFlush(handler, false);
         }
 
         return this;
@@ -474,15 +477,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
         final UnitDuration delay = getDelay();
         final Execution execution;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             execution = mState.pass(delay, outputs);
+            handler = mBindingHandler;
         }
 
         if (execution != null) {
             runExecution(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(false);
+            runFlush(handler, false);
         }
 
         synchronized (mMutex) {
@@ -498,15 +503,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public Channel<OUT, OUT> pass(@Nullable final OUT output) {
         final UnitDuration delay = getDelay();
         final Execution execution;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             execution = mState.pass(delay, output);
+            handler = mBindingHandler;
         }
 
         if (execution != null) {
             runExecution(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(false);
+            runFlush(handler, false);
         }
 
         synchronized (mMutex) {
@@ -522,15 +529,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public Channel<OUT, OUT> pass(@Nullable final OUT... outputs) {
         final UnitDuration delay = getDelay();
         final Execution execution;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             execution = mState.pass(delay, outputs);
+            handler = mBindingHandler;
         }
 
         if (execution != null) {
             runExecution(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(false);
+            runFlush(handler, false);
         }
 
         synchronized (mMutex) {
@@ -642,8 +651,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         final ArrayList<Channel<?, ? extends OUT>> channels =
                 new ArrayList<Channel<?, ? extends OUT>>();
         final RoutineException abortException;
+        final BindingHandler<OUT> handler;
         synchronized (mMutex) {
             abortException = mState.closeInvocation(throwable, channels);
+            handler = mBindingHandler;
         }
 
         if (abortException != null) {
@@ -651,7 +662,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 channel.abort(abortException);
             }
 
-            runFlush(false);
+            runFlush(handler, false);
         }
     }
 
@@ -956,11 +967,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
     }
 
-    private void runFlush(final boolean forceClose) {
+    private void runFlush(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
         // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
         // deadlock issues
         if (mRunner.isExecutionThread()) {
-            getBindingHandler().flushOutput(forceClose);
+            handler.flushOutput(forceClose);
 
         } else {
             final FlushExecution execution;
@@ -1066,7 +1077,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         RoutineException abortConsumer(@NotNull final Throwable reason) {
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mLogger.wrn(reason, "aborting on consumer exception (%s)",
-                    getBindingHandler().getConsumer());
+                    mBindingHandler.getConsumer());
             internalAbort(abortException);
             return abortException;
         }
@@ -1229,13 +1240,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         public void onComplete() {
             final boolean needsFlush;
+            final BindingHandler<OUT> handler;
             synchronized (mMutex) {
                 needsFlush = mState.onConsumerComplete(mQueue);
                 mSubLogger.dbg("closing output [%s]", needsFlush);
+                handler = mBindingHandler;
             }
 
             if (needsFlush) {
-                runFlush(false);
+                runFlush(handler, false);
             }
         }
 
@@ -1254,15 +1267,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final long delay = mDelay;
             final TimeUnit timeUnit = mDelayUnit;
             final Execution execution;
+            final BindingHandler<OUT> handler;
             synchronized (mMutex) {
                 execution = mState.onConsumerOutput(mQueue, output, delay, timeUnit, mOrderType);
+                handler = mBindingHandler;
             }
 
             if (execution != null) {
                 runExecution(execution, delay, timeUnit);
 
             } else {
-                runFlush(false);
+                runFlush(handler, false);
             }
 
             synchronized (mMutex) {
@@ -1366,12 +1381,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         public void run() {
             final boolean needsFlush;
+            final BindingHandler<OUT> handler;
             synchronized (mMutex) {
                 needsFlush = mState.delayedOutputs(mQueue, mOutputs);
+                handler = mBindingHandler;
             }
 
             if (needsFlush) {
-                getBindingHandler().flushOutput(false);
+                handler.flushOutput(false);
             }
         }
     }
@@ -1399,12 +1416,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         public void run() {
             final boolean needsFlush;
+            final BindingHandler<OUT> handler;
             synchronized (mMutex) {
                 needsFlush = mState.delayedOutput(mQueue, mOutput);
+                handler = mBindingHandler;
             }
 
             if (needsFlush) {
-                getBindingHandler().flushOutput(false);
+                handler.flushOutput(false);
             }
         }
     }
@@ -1705,7 +1724,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         RoutineException abortConsumer(@NotNull final Throwable reason) {
             final RoutineException abortException = InvocationException.wrapIfNeeded(reason);
             mLogger.wrn(reason, "aborting on consumer exception (%s)",
-                    getBindingHandler().getConsumer());
+                    mBindingHandler.getConsumer());
             internalAbort(abortException);
             return abortException;
         }

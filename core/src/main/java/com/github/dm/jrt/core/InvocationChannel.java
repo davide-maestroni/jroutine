@@ -146,13 +146,14 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                             public void onAbort(@NotNull final RoutineException reason,
                                     final long delay, @NotNull final TimeUnit timeUnit) {
                                 final Execution execution;
+                                final Execution runExecution;
                                 synchronized (mMutex) {
                                     // TODO: 01/09/16 delayed abort
                                     execution = mState.onHandlerAbort(reason);
+                                    runExecution = runExecution(execution, delay);
                                 }
 
                                 if (execution != null) {
-                                    final Execution runExecution = runExecution(execution, delay);
                                     if (runExecution != null) {
                                         mRunner.run(execution, delay, timeUnit);
                                     }

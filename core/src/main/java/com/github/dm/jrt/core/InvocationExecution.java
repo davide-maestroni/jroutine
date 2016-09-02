@@ -84,6 +84,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      */
     @NotNull
     public Execution abort() {
+        // TODO: 01/09/16 create new with exception
         if (mAbortExecution == null) {
             mAbortExecution = new AbortExecution();
         }
@@ -120,6 +121,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      * @param reason the reason.
      */
     public void recycle(@NotNull final Throwable reason) {
+        // TODO: 01/09/16 create new execution
         synchronized (mMutex) {
             final Invocation<IN, OUT> invocation = mInvocation;
             if ((invocation != null) && !mIsTerminated) {

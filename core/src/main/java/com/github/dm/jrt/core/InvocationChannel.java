@@ -147,15 +147,19 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                                     final long delay, @NotNull final TimeUnit timeUnit) {
                                 final Execution execution;
                                 synchronized (mMutex) {
+                                    // TODO: 01/09/16 delayed abort
                                     execution = mState.onHandlerAbort(reason);
                                 }
 
                                 if (execution != null) {
-                                    runExecution(execution, delay, timeUnit);
+                                    final Execution runExecution = runExecution(execution, delay);
+                                    if (runExecution != null) {
+                                        mRunner.run(execution, delay, timeUnit);
+                                    }
 
                                 } else {
                                     // Make sure the invocation is properly recycled
-                                    mExecution.recycle(reason);
+                                    mExecution.recycle(reason); // TODO: 01/09/16 on runner
                                     mResultChanel.close(reason);
                                 }
                             }
@@ -174,11 +178,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         final UnitDuration delay = mInputDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            execution = mState.abortInvocation(delay, reason);
+            execution = runExecution(mState.abortInvocation(delay, reason), delay.value);
         }
 
         if (execution != null) {
-            runExecution(execution, delay.value, delay.unit);
+            mRunner.run(execution, delay.value, delay.unit);
             return true;
         }
 
@@ -224,14 +228,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @NotNull
     public Channel<IN, OUT> close() {
+        final UnitDuration delay = mInputDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            execution = mState.onClose();
+            // TODO: 01/09/16 delayed execution
+            execution = runExecution(mState.onClose(), delay.value);
         }
 
-        final UnitDuration delay = mInputDelay.get();
         if (execution != null) {
-            runExecution(execution, delay.value, delay.unit);
+            mRunner.run(execution, delay.value, delay.unit);
         }
 
         return this;
@@ -349,11 +354,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         final UnitDuration delay = mInputDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            execution = mState.pass(delay, inputs);
+            execution = runExecution(mState.pass(delay, inputs), delay.value);
         }
 
         if (execution != null) {
-            runExecution(execution, delay.value, delay.unit);
+            mRunner.run(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -370,11 +375,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         final UnitDuration delay = mInputDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            execution = mState.pass(delay, input);
+            execution = runExecution(mState.pass(delay, input), delay.value);
         }
 
         if (execution != null) {
-            runExecution(execution, delay.value, delay.unit);
+            mRunner.run(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -391,11 +396,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         final UnitDuration delay = mInputDelay.get();
         final Execution execution;
         synchronized (mMutex) {
-            execution = mState.pass(delay, inputs);
+            execution = runExecution(mState.pass(delay, inputs), delay.value);
         }
 
         if (execution != null) {
-            runExecution(execution, delay.value, delay.unit);
+            mRunner.run(execution, delay.value, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -419,10 +424,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @NotNull
     public Channel<IN, OUT> sorted() {
-        synchronized (mMutex) {
-            mState.orderBy(OrderType.SORTED);
-        }
-
+        mInputOrder.set(OrderType.SORTED);
         return this;
     }
 
@@ -432,10 +434,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @NotNull
     public Channel<IN, OUT> unsorted() {
-        synchronized (mMutex) {
-            mState.orderBy(OrderType.UNSORTED);
-        }
-
+        mInputOrder.set(OrderType.UNSORTED);
         return this;
     }
 
@@ -454,37 +453,27 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
     }
 
-    private void forceExecution(@NotNull final Execution execution) {
-        synchronized (mMutex) {
-            if (mIsConsuming) {
-                mExecutionQueue.add(execution);
-                return;
-            }
-        }
-
-        sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
-    }
-
     private void internalAbort(@NotNull final RoutineException abortException) {
         mAbortException = abortException;
         mRunner.cancel(mExecution);
+        // TODO: 01/09/16 clear inputs???
     }
 
-    private void runExecution(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        if (delay > 0) {
-            mRunner.run(execution, delay, timeUnit);
-
-        } else {
-            synchronized (mMutex) {
-                if (mIsConsuming) {
-                    mExecutionQueue.add(execution);
-                    return;
-                }
-            }
-
-            mRunner.run(execution, delay, timeUnit);
+    @Nullable
+    private Execution runExecution(@Nullable final Execution execution, final long delay) {
+        if (execution == null) {
+            return null;
         }
+
+        if (delay > 0) {
+            return execution;
+
+        } else if (mIsConsuming) {
+            mExecutionQueue.add(execution);
+            return null;
+        }
+
+        return execution;
     }
 
     private void waitInputs() {
@@ -798,33 +787,38 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void onComplete() {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerComplete(mChannel, mQueue);
+                execution = runExecution(mState.onConsumerComplete(mChannel, mQueue), 0);
             }
 
             if (execution != null) {
-                runExecution(execution, 0, TimeUnit.MILLISECONDS);
+                mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
+            final long delay = mDelay;
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerError(mChannel, error);
+                // TODO: 01/09/16 delayed abort
+                execution = runExecution(mState.onConsumerError(mChannel, error), delay);
             }
 
             if (execution != null) {
-                runExecution(execution, mDelay, mDelayUnit);
+                mRunner.run(execution, delay, mDelayUnit);
             }
         }
 
         public void onOutput(final IN output) {
+            final long delay = mDelay;
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerOutput(output, mQueue, mDelay, mDelayUnit, mOrderType);
+                execution = runExecution(
+                        mState.onConsumerOutput(output, mQueue, delay, mDelayUnit, mOrderType),
+                        delay);
             }
 
             if (execution != null) {
-                runExecution(execution, mDelay, mDelayUnit);
+                mRunner.run(execution, delay, mDelayUnit);
             }
 
             synchronized (mMutex) {
@@ -930,11 +924,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void run() {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.delayedAbortInvocation(mAbortException);
+                execution = runExecution(mState.delayedAbortInvocation(mAbortException), 0);
             }
 
             if (execution != null) {
-                forceExecution(execution);
+                sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -963,11 +957,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void run() {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.delayedInput(mQueue, mInput);
+                execution = runExecution(mState.delayedInput(mQueue, mInput), 0);
             }
 
             if (execution != null) {
-                forceExecution(execution);
+                sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -996,11 +990,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         public void run() {
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.delayedInputs(mQueue, mInputs);
+                execution = runExecution(mState.delayedInputs(mQueue, mInputs), 0);
             }
 
             if (execution != null) {
-                forceExecution(execution);
+                sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -1218,15 +1212,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mState = new AbortChannelState();
             mMutex.notifyAll();
             return mExecution.abort();
-        }
-
-        /**
-         * Called to set the input delivery order.
-         *
-         * @param orderType the input order type.
-         */
-        void orderBy(@NotNull final OrderType orderType) {
-            mInputOrder.set(ConstantConditions.notNull("order type", orderType));
         }
 
         /**

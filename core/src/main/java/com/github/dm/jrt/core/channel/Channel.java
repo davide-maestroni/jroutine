@@ -207,7 +207,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      */
     @NotNull
-    Channel<IN, OUT> close();
+    Channel<IN, OUT> close(); // TODO: 02/09/16 delay
 
     /**
      * Tells the channel to abort the invocation execution in case, after a read method is invoked,

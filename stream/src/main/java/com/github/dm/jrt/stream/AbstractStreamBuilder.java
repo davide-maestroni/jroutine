@@ -17,13 +17,16 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.ChannelInvocation;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -43,6 +46,7 @@ import com.github.dm.jrt.stream.builder.StreamBuildingException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -228,6 +232,47 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
+        if (mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null) == Runners.immediateRunner()) {
+            return liftWithConfig(
+                    new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>() {
+
+                        public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                                final StreamConfiguration streamConfiguration,
+                                final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) throws
+                                Exception {
+                            final Channel<AFTER, AFTER> outputChannel = JRoutineCore.io()
+                                                                                .apply(streamConfiguration
+                                                                                        .asChannelConfiguration())
+                                                                                .buildChannel();
+                            return decorate(function).andThen(
+                                    new Function<Channel<?, OUT>, Channel<?, AFTER>>() {
+
+                                        public Channel<?, AFTER> apply(
+                                                final Channel<?, OUT> channel) throws Exception {
+                                            channel.bind(new ChannelConsumer<OUT>() {
+
+                                                public void onComplete() throws Exception {
+                                                    outputChannel.close();
+                                                }
+
+                                                public void onError(
+                                                        @NotNull final RoutineException error) throws
+                                                        Exception {
+                                                    outputChannel.abort(error);
+                                                }
+
+                                                public void onOutput(final OUT output) throws
+                                                        Exception {
+                                                    outputChannel.pass(mappingFunction.apply(output));
+                                                }
+                                            });
+                                            return outputChannel;
+                                        }
+                                    });
+                        }
+                    });
+        }
+
         return map(functionMapping(mappingFunction));
     }
 
@@ -257,6 +302,47 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
+        if (mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null) == Runners.immediateRunner()) {
+            return liftWithConfig(
+                    new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>() {
+
+                        public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                                final StreamConfiguration streamConfiguration,
+                                final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) throws
+                                Exception {
+                            final Channel<AFTER, AFTER> outputChannel = JRoutineCore.io()
+                                                                                    .apply(streamConfiguration
+                                                                                            .asChannelConfiguration())
+                                                                                    .buildChannel();
+                            return decorate(function).andThen(
+                                    new Function<Channel<?, OUT>, Channel<?, AFTER>>() {
+
+                                        public Channel<?, AFTER> apply(
+                                                final Channel<?, OUT> channel) throws Exception {
+                                            channel.bind(new ChannelConsumer<OUT>() {
+
+                                                public void onComplete() throws Exception {
+                                                    outputChannel.close();
+                                                }
+
+                                                public void onError(
+                                                        @NotNull final RoutineException error) throws
+                                                        Exception {
+                                                    outputChannel.abort(error);
+                                                }
+
+                                                public void onOutput(final OUT output) throws
+                                                        Exception {
+                                                    mappingConsumer.accept(output, outputChannel);
+                                                }
+                                            });
+                                            return outputChannel;
+                                        }
+                                    });
+                        }
+                    });
+        }
+
         return map(consumerMapping(mappingConsumer));
     }
 
@@ -264,6 +350,49 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
+        if (mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null) == Runners.immediateRunner()) {
+            return liftWithConfig(
+                    new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>() {
+
+                        public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                                final StreamConfiguration streamConfiguration,
+                                final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) throws
+                                Exception {
+                            final Channel<AFTER, AFTER> outputChannel = JRoutineCore.io()
+                                                                                    .apply(streamConfiguration
+                                                                                            .asChannelConfiguration())
+                                                                                    .buildChannel();
+                            return decorate(function).andThen(
+                                    new Function<Channel<?, OUT>, Channel<?, AFTER>>() {
+
+                                        public Channel<?, AFTER> apply(
+                                                final Channel<?, OUT> channel) throws Exception {
+                                            channel.bind(new ChannelConsumer<OUT>() {
+
+                                                private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
+
+                                                public void onComplete() throws Exception {
+                                                    outputChannel.pass(mappingFunction.apply(mOutputs));
+                                                    outputChannel.close();
+                                                }
+
+                                                public void onError(
+                                                        @NotNull final RoutineException error) throws
+                                                        Exception {
+                                                    outputChannel.abort(error);
+                                                }
+
+                                                public void onOutput(final OUT output) throws
+                                                        Exception {
+                                                    mOutputs.add(output);
+                                                }
+                                            });
+                                            return outputChannel;
+                                        }
+                                    });
+                        }
+                    });
+        }
         return map(functionCall(mappingFunction));
     }
 
@@ -272,6 +401,49 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
+        if (mStreamConfiguration.asInvocationConfiguration().getRunnerOrElse(null) == Runners.immediateRunner()) {
+            return liftWithConfig(
+                    new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>() {
+
+                        public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                                final StreamConfiguration streamConfiguration,
+                                final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) throws
+                                Exception {
+                            final Channel<AFTER, AFTER> outputChannel = JRoutineCore.io()
+                                                                                    .apply(streamConfiguration
+                                                                                            .asChannelConfiguration())
+                                                                                    .buildChannel();
+                            return decorate(function).andThen(
+                                    new Function<Channel<?, OUT>, Channel<?, AFTER>>() {
+
+                                        public Channel<?, AFTER> apply(
+                                                final Channel<?, OUT> channel) throws Exception {
+                                            channel.bind(new ChannelConsumer<OUT>() {
+
+                                                private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
+
+                                                public void onComplete() throws Exception {
+                                                    mappingConsumer.accept(mOutputs, outputChannel);
+                                                    outputChannel.close();
+                                                }
+
+                                                public void onError(
+                                                        @NotNull final RoutineException error) throws
+                                                        Exception {
+                                                    outputChannel.abort(error);
+                                                }
+
+                                                public void onOutput(final OUT output) throws
+                                                        Exception {
+                                                    mOutputs.add(output);
+                                                }
+                                            });
+                                            return outputChannel;
+                                        }
+                                    });
+                        }
+                    });
+        }
         return map(consumerCall(mappingConsumer));
     }
 

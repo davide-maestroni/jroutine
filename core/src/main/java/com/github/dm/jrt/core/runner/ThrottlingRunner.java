@@ -89,6 +89,7 @@ class ThrottlingRunner extends RunnerDecorator {
         synchronized (mMutex) {
             final LinkedList<PendingExecution> queue = mQueue;
             if ((mRunningCount + queue.size()) >= mMaxRunning) {
+                // TODO: 02/09/16 adjust delay...
                 queue.add(new PendingExecution(execution, delay, timeUnit));
 
             } else {

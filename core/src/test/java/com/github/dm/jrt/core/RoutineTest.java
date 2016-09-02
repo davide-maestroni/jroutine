@@ -99,7 +99,7 @@ public class RoutineTest {
         assertThat(channel.isOpen()).isFalse();
 
         final Channel<String, String> channel1 =
-                routine.call().after(millis(10)).pass("test1").close();
+                routine.call().after(millis(10)).pass("test1").immediately().close();
         assertThat(channel1.isOpen()).isFalse();
         assertThat(channel1.after(timeout).getComplete()).isTrue();
         assertThat(channel1.abort()).isFalse();
@@ -747,7 +747,7 @@ public class RoutineTest {
         final Channel<String, String> channel2 = passingRoutine.call();
         channel2.after(millis(100)).abort();
         try {
-            channel2.after(millis(200)).pass("test").close().after(timeout).next();
+            channel2.after(millis(200)).pass("test").immediately().close().after(timeout).next();
             fail();
 
         } catch (final AbortException ignored) {
@@ -778,6 +778,7 @@ public class RoutineTest {
         assertThat(routine1.call()
                            .after(millis(500))
                            .pass(routine2.call("test"))
+                           .immediately()
                            .close()
                            .after(timeout)
                            .next()).isEqualTo("test");
@@ -839,10 +840,10 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutineCore.with(factoryOf(TestDiscardOnAbort.class)).buildRoutine();
         Channel<String, String> channel = routine3.call().pass("1");
-        channel.abort();
+        assertThat(channel.abort()).isTrue();
         assertThat(channel.after(timeout).getComplete()).isTrue();
         channel = routine3.call().pass("1");
-        channel.abort();
+        assertThat(channel.abort()).isTrue();
         assertThat(channel.after(timeout).getComplete()).isTrue();
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
@@ -878,8 +879,8 @@ public class RoutineTest {
                                                             .configured()
                                                             .call();
         assertThat(channel.isEmpty()).isTrue();
-        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
-        final Channel<Object, Object> result = channel.close();
+        assertThat(channel.pass("test1").after(millis(500)).pass("test2").isEmpty()).isFalse();
+        final Channel<Object, Object> result = channel.immediately().close();
         assertThat(result.outputCount()).isZero();
         assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
@@ -901,8 +902,8 @@ public class RoutineTest {
         assertThat(channel.isEmpty()).isTrue();
         channel = routine.call();
         assertThat(channel.isEmpty()).isTrue();
-        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
-        final Channel<Object, Object> result = channel.close();
+        assertThat(channel.pass("test1").after(millis(500)).pass("test2").isEmpty()).isFalse();
+        final Channel<Object, Object> result = channel.immediately().close();
         assertThat(result.isEmpty()).isFalse();
         assertThat(result.abort()).isTrue();
         assertThat(channel.isEmpty()).isTrue();
@@ -1339,6 +1340,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .immediately()
                         .close()
                         .eventuallyAbort()
                         .after(millis(100))
@@ -1354,6 +1356,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .immediately()
                         .close()
                         .eventuallyAbort(new IllegalStateException())
                         .after(millis(100))
@@ -1370,6 +1373,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .immediately()
                         .close()
                         .eventuallyFail()
                         .after(millis(100))
@@ -1598,7 +1602,7 @@ public class RoutineTest {
         final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.close();
+        channel.immediately().close();
         assertThat(channel.isOpen()).isFalse();
         outputChannel.close();
         assertThat(channel.isOpen()).isFalse();
@@ -1919,7 +1923,7 @@ public class RoutineTest {
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
-        final Channel<Object, Object> result = channel.close();
+        final Channel<Object, Object> result = channel.immediately().close();
         assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);
@@ -2662,7 +2666,7 @@ public class RoutineTest {
         @Override
         public void onComplete(@NotNull final Channel<String, ?> result) {
             final ArrayList<String> list = mList;
-            result.after(mDelay).pass(list);
+            result.after(mDelay).pass(list).immediately();
             list.clear();
         }
     }
@@ -2742,6 +2746,7 @@ public class RoutineTest {
                                     .call()
                                     .after(millis(500))
                                     .pass(channel)
+                                    .immediately()
                                     .close());
             channel.pass(s, s).close();
         }
@@ -2767,6 +2772,7 @@ public class RoutineTest {
                         .pass(s)
                         .immediately()
                         .pass(Collections.singletonList(s))
+                        .immediately()
                         .close()
                         .all();
         }
@@ -2867,7 +2873,6 @@ public class RoutineTest {
         }
 
         public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
             result.after(millis(500)).pass(s).after(millis(100)).pass(s);
         }
     }
@@ -3000,12 +3005,9 @@ public class RoutineTest {
             return new RoutineException();
         }
 
-        public boolean hasInput() {
-            return false;
-        }
-
-        public Object nextInput() {
-            return null;
+        @NotNull
+        public List<Object> getInputs() {
+            return Collections.emptyList();
         }
 
         public void onAbortComplete() {

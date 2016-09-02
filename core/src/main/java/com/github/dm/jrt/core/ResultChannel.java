@@ -271,7 +271,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         final boolean needsFlush;
         final BindingHandler<OUT> handler;
         synchronized (mMutex) {
-            needsFlush = mState.closeResultChannel();
+            needsFlush = mState.closeResultChannel(); // TODO: 02/09/16 delay...
             handler = mBindingHandler;
         }
 
@@ -1191,6 +1191,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
                 } catch (final Throwable t) {
                     synchronized (mMutex) {
+                        // TODO: 02/09/16 mState == AbortChannelState
                         logger.wrn(t, "consumer exception (%s)", consumer);
                         abortException = mState.abortConsumer(t);
                     }
@@ -1242,6 +1243,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final boolean needsFlush;
             final BindingHandler<OUT> handler;
             synchronized (mMutex) {
+                // TODO: 02/09/16 delay
                 needsFlush = mState.onConsumerComplete(mQueue);
                 mSubLogger.dbg("closing output [%s]", needsFlush);
                 handler = mBindingHandler;
@@ -1255,6 +1257,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         public void onError(@NotNull final RoutineException error) {
             final boolean needsAbort;
             synchronized (mMutex) {
+                // TODO: 02/09/16 delay
                 needsAbort = mState.onConsumerError(error);
             }
 

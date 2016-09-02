@@ -48,6 +48,7 @@ import com.github.dm.jrt.stream.modifier.Modifiers;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
+import static com.github.dm.jrt.operator.Operators.averageFloat;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
@@ -1312,6 +1314,56 @@ public class StreamBuilderTest {
 
         } catch (final InputDeadlockException ignored) {
         }
+    }
+
+    // TODO: 01/09/16 remove
+    @Ignore
+    @Test
+    public void testPerf() {
+        final String[] args = new String[100000];
+        for (int n = 0; n < 100000; n++) {
+            args[n] = Integer.toString(n + 1);
+        }
+
+        JRoutineStream.<String>withStream().immediate()
+                                           .map(new Function<String, Integer>() {
+
+                                               public Integer apply(final String s) throws
+                                                       Exception {
+                                                   return Integer.parseInt(s);
+                                               }
+                                           })
+                                           .map(new Function<Integer, Integer>() {
+
+                                               public Integer apply(final Integer integer) throws
+                                                       Exception {
+                                                   final int i = integer;
+                                                   return i * i;
+                                               }
+                                           })
+                                           .map(averageFloat())
+                                           .map(new Function<Float, Double>() {
+
+                                               public Double apply(final Float aFloat) throws
+                                                       Exception {
+                                                   return Math.sqrt(aFloat);
+                                               }
+                                           })
+                                           .async()
+                                           .applyInvocationConfiguration()
+                                           .withRunner(Runners.poolRunner(1))
+                                           .configured()
+                                           .call(args)
+                                           .bind(onOutput(new Consumer<Double>() {
+
+                                               public void accept(final Double aDouble) throws
+                                                       Exception {
+                                                   System.out.println(aDouble);
+                                               }
+                                           }))
+                                           .after(seconds(10))
+                                           .getComplete();
+        System.out.println("END");
     }
 
     private static class SumData {

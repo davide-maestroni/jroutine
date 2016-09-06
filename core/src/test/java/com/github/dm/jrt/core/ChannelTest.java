@@ -19,6 +19,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.DeadlockException;
@@ -218,6 +219,42 @@ public class ChannelTest {
     }
 
     @Test
+    public void testDelayedClose() {
+        final UnitDuration timeout = seconds(1);
+        final Channel<String, String> channel1 = JRoutineCore.io().buildChannel();
+        channel1.after(seconds(2)).close();
+        assertThat(channel1.immediately().pass("test").after(timeout).next()).isEqualTo("test");
+        assertThat(channel1.isOpen()).isTrue();
+        final Channel<String, String> channel2 = JRoutineCore.io().buildChannel();
+        channel2.after(millis(100)).close();
+        assertThat(channel2.after(millis(200)).pass("test").after(timeout).all()).containsExactly(
+                "test");
+        final Channel<String, String> channel3 = JRoutineCore.io().buildChannel();
+        channel3.after(millis(200)).close();
+        assertThat(channel3.immediately().pass("test").after(timeout).all()).containsExactly(
+                "test");
+    }
+
+    @Test
+    public void testDelayedConsumer() {
+        final Channel<String, String> channel1 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel2 = JRoutineCore.io().buildChannel();
+        channel2.after(millis(300)).pass(channel1).immediately().close();
+        channel1.pass("test").close();
+        long startTime = System.currentTimeMillis();
+        assertThat(channel2.after(seconds(1)).all()).containsExactly("test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
+        final Channel<String, String> channel3 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel4 = JRoutineCore.io().buildChannel();
+        channel4.after(millis(300)).pass(channel3).immediately().close();
+        startTime = System.currentTimeMillis();
+        channel3.abort();
+        assertThat(channel4.after(seconds(1)).getComplete()).isTrue();
+        assertThat(channel4.getError()).isNotNull();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
+    }
+
+    @Test
     public void testEmpty() {
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         assertThat(channel.isEmpty()).isTrue();
@@ -268,6 +305,20 @@ public class ChannelTest {
         }
 
         assertThat(channel.getComplete()).isFalse();
+    }
+
+    @Test
+    public void testIllegalBind() {
+        final Channel<Object, Object> invocationChannel =
+                JRoutineCore.with(IdentityInvocation.factoryOf()).call();
+        final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
+        invocationChannel.bind(new TemplateChannelConsumer<Object>() {});
+        try {
+            channel.pass(invocationChannel);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
     }
 
     @Test
@@ -557,7 +608,7 @@ public class ChannelTest {
     }
 
     @Test
-    public void testPendingInputs() throws InterruptedException {
+    public void testPendingInputs() {
         final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
@@ -574,7 +625,7 @@ public class ChannelTest {
     }
 
     @Test
-    public void testPendingInputsAbort() throws InterruptedException {
+    public void testPendingInputsAbort() {
         final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
@@ -589,7 +640,7 @@ public class ChannelTest {
     }
 
     @Test
-    public void testReadFirst() throws InterruptedException {
+    public void testReadFirst() {
         final UnitDuration timeout = seconds(1);
         final Channel<String, String> channel = JRoutineCore.io().buildChannel();
         new WeakThread(channel).start();

@@ -263,14 +263,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> close() {
         final UnitDuration delay = getDelay();
-        final boolean needsFlush;
+        final boolean isOpen;
+        final Execution execution;
         final BindingHandler<OUT> handler;
         synchronized (mMutex) {
-            needsFlush = mState.closeResultChannel(delay);
+            final OutputChannelState state = mState;
+            isOpen = state.isOpen();
+            execution = state.closeResultChannel(delay);
             handler = mBindingHandler;
         }
 
-        if (needsFlush) {
+        if (execution != null) {
+            mRunner.run(execution, delay.value, delay.unit);
+
+        } else if (isOpen) {
             runFlush(handler, false);
         }
 
@@ -668,7 +674,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         final boolean needsFlush;
         final BindingHandler<OUT> handler;
         synchronized (mMutex) {
-            needsFlush = mState.closeResultChannel(zero());
+            needsFlush = mState.delayedCloseResultChannel();
             handler = mBindingHandler;
         }
 
@@ -1356,7 +1362,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         public void run() {
             mLogger.dbg("closing result channel after delay");
-            closeImmediately();
+            final boolean needsFlush;
+            final BindingHandler<OUT> handler;
+            synchronized (mMutex) {
+                needsFlush = mState.delayedCloseResultChannel();
+                handler = mBindingHandler;
+            }
+
+            if (needsFlush) {
+                runFlush(handler, false);
+            }
         }
     }
 
@@ -1847,11 +1862,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
          * Called when the result channel is closed.
          *
          * @param delay the result delay.
-         * @return whether the internal state has changed.
+         * @return the execution to run or null.
          */
-        boolean closeResultChannel(@NotNull final UnitDuration delay) {
-            mLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
+        @Nullable
+        Execution closeResultChannel(@NotNull final UnitDuration delay) {
             if (delay.isZero()) {
+                mLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
                 if (mPendingOutputCount > 0) {
                     mState = new ResultChannelState();
 
@@ -1859,11 +1875,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     mState = new FlushChannelState();
                 }
 
-            } else {
-                mRunner.run(new DelayedCloseExecution(), delay.value, delay.unit);
+                return null;
             }
 
-            return true;
+            return new DelayedCloseExecution();
         }
 
         /**
@@ -1877,6 +1892,23 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mLogger.dbg(reason, "aborting channel after delay");
             internalAbort(reason);
             return reason;
+        }
+
+        /**
+         * Called when the result channel is closed after a delay.
+         *
+         * @return whether the internal state has changed.
+         */
+        boolean delayedCloseResultChannel() {
+            mLogger.dbg("closing result channel after delay [#%d]", mPendingOutputCount);
+            if (mPendingOutputCount > 0) {
+                mState = new ResultChannelState();
+
+            } else {
+                mState = new FlushChannelState();
+            }
+
+            return true;
         }
 
         /**
@@ -2195,9 +2227,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             return new IllegalStateException("the channel is closed");
         }
 
+        @Nullable
         @Override
-        boolean closeResultChannel(@NotNull final UnitDuration delay) {
+        Execution closeResultChannel(@NotNull final UnitDuration delay) {
             mLogger.dbg("avoiding closing result channel since already closed");
+            return null;
+        }
+
+        @Override
+        boolean delayedCloseResultChannel() {
+            mLogger.dbg("avoiding closing result channel after delay since already closed");
             return false;
         }
 

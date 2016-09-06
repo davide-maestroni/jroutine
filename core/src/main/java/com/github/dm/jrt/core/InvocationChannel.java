@@ -1264,6 +1264,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return null;
             }
 
+            ++mPendingExecutionCount;
             return new DelayedCloseExecution();
         }
 

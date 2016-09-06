@@ -796,6 +796,46 @@ public class RoutineTest {
     }
 
     @Test
+    public void testDelayedClose() {
+        final UnitDuration timeout = seconds(1);
+        final Routine<String, String> passingRoutine =
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
+        final Channel<String, String> channel1 = passingRoutine.call();
+        channel1.after(seconds(2)).close();
+        assertThat(channel1.immediately().pass("test").after(timeout).next()).isEqualTo("test");
+        assertThat(channel1.isOpen()).isTrue();
+        final Channel<String, String> channel2 = passingRoutine.call();
+        channel2.after(millis(100)).close();
+        assertThat(channel2.after(millis(200)).pass("test").after(timeout).all()).containsExactly(
+                "test");
+        final Channel<String, String> channel3 = passingRoutine.call();
+        channel3.after(millis(200)).close();
+        assertThat(channel3.immediately().pass("test").after(timeout).all()).containsExactly(
+                "test");
+    }
+
+    @Test
+    public void testDelayedConsumer() {
+        final Routine<String, String> passingRoutine =
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
+        final Channel<String, String> channel1 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel2 = passingRoutine.call();
+        channel2.after(millis(300)).pass(channel1).immediately().close();
+        channel1.pass("test").close();
+        long startTime = System.currentTimeMillis();
+        assertThat(channel2.after(seconds(1)).all()).containsExactly("test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
+        final Channel<String, String> channel3 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel4 = passingRoutine.call();
+        channel4.after(millis(300)).pass(channel3).immediately().close();
+        startTime = System.currentTimeMillis();
+        channel3.abort();
+        assertThat(channel4.after(seconds(1)).getComplete()).isTrue();
+        assertThat(channel4.getError()).isNotNull();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
+    }
+
+    @Test
     public void testDelegation() {
         final UnitDuration timeout = seconds(1);
         final Routine<Object, Object> routine1 = JRoutineCore.with(IdentityInvocation.factoryOf())
@@ -1126,6 +1166,20 @@ public class RoutineTest {
     }
 
     @Test
+    public void testIllegalBind() {
+        final Channel<Object, Object> invocationChannel =
+                JRoutineCore.with(IdentityInvocation.factoryOf()).call();
+        final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
+        channel.bind(new TemplateChannelConsumer<Object>() {});
+        try {
+            invocationChannel.pass(channel);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+    }
+
+    @Test
     public void testInitInvocationException() {
         final ExceptionRoutine routine =
                 new ExceptionRoutine(InvocationConfiguration.defaultConfiguration());
@@ -1329,7 +1383,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testInvocationNotAvailable() throws InterruptedException {
+    public void testInvocationNotAvailable() {
         final Routine<Void, Void> routine = JRoutineCore.with(new SleepCommand())
                                                         .applyInvocationConfiguration()
                                                         .withRunner(Runners.syncRunner())
@@ -1613,7 +1667,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testPendingInputs() throws InterruptedException {
+    public void testPendingInputs() {
         final Channel<Object, Object> channel =
                 JRoutineCore.with(IdentityInvocation.factoryOf()).call();
         assertThat(channel.isOpen()).isTrue();
@@ -1631,7 +1685,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testPendingInputsAbort() throws InterruptedException {
+    public void testPendingInputsAbort() {
         final Channel<Object, Object> channel =
                 JRoutineCore.with(IdentityInvocation.factoryOf()).call();
         assertThat(channel.isOpen()).isTrue();

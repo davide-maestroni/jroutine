@@ -30,7 +30,9 @@ import java.util.concurrent.TimeUnit;
  * Runner implementation throttling the number of running executions so to keep it under a specified
  * limit.
  * <p>
- * TODO: sync runner
+ * Note that, in case the runner is backed by a synchronous one, it is possible that executions are
+ * run on threads different from the calling one, so that the results will be not immediately
+ * available.
  * <p>
  * Created by davide-maestroni on 07/18/2015.
  */

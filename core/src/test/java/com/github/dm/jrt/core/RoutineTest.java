@@ -3089,8 +3089,8 @@ public class RoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
-        public boolean isExecutionThread() {
-            return false;
+        public boolean isManagedThread() {
+            return true;
         }
 
         @Override

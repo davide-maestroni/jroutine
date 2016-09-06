@@ -1132,6 +1132,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
                 final ChannelConsumer<? super OUT> consumer = mConsumer;
                 try {
+                    // TODO: 06/09/16 onOutput(outputs)??
                     for (final Object output : outputs) {
                         if (output instanceof RoutineExceptionWrapper) {
                             try {

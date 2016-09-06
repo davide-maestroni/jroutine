@@ -569,7 +569,7 @@ public class OutputChannelTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
-        channel.close();
+        channel.immediately().close();
         assertThat(channel.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(1);
@@ -582,7 +582,7 @@ public class OutputChannelTest {
         channel1.after(millis(500)).pass("test");
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);
-        channel1.close();
+        channel1.immediately().close();
         assertThat(channel1.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);

@@ -417,7 +417,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      */
     @NotNull
-    Channel<IN, OUT> immediately();
+    Channel<IN, OUT> immediately(); // TODO: 06/09/16 now()??
 
     /**
      * Returns the number of input data stored in the channel.

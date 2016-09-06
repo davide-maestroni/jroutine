@@ -1077,16 +1077,18 @@ public class RoutineTest {
                     }
                 };
         testConsumer(exceptionConsumer);
-        final CommandInvocation<String> producer = new CommandInvocation<String>(null) {
+        final MappingInvocation<String, String> producer =
+                new MappingInvocation<String, String>(null) {
 
-            public void onComplete(@NotNull final Channel<String, ?> result) {
-                for (int i = 0; i < 100; i++) {
-                    result.pass("test" + i, "test" + i);
-                }
-            }
-        };
-        final Channel<Void, String> channel =
-                JRoutineCore.with(producer).close().bind(exceptionConsumer);
+                    public void onInput(final String input,
+                            @NotNull final Channel<String, ?> result) {
+                        for (int i = 0; i < 100; i++) {
+                            result.pass(input + i, input + i);
+                        }
+                    }
+                };
+        final Channel<String, String> channel =
+                JRoutineCore.with(producer).call().pass("test").bind(exceptionConsumer);
         assertThat(channel.after(seconds(3)).getError()).isNotNull();
     }
 

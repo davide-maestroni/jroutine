@@ -25,10 +25,14 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Default implementation of an invocation execution.
+ * <p>
+ * The class does not implement any synchronization mechanism, so, it's up to the caller to ensure
+ * that the methods are never concurrently called.
  * <p>
  * Created by davide-maestroni on 09/24/2014.
  *
@@ -37,11 +41,13 @@ import java.util.List;
  */
 class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
 
-    private final InputIterator<IN> mInputIterator;
+    private final ArrayList<IN> mInputs = new ArrayList<IN>();
 
     private final InvocationManager<IN, OUT> mInvocationManager;
 
     private final Logger mLogger;
+
+    private final ExecutionObserver<IN> mObserver;
 
     private final ResultChannel<OUT> mResultChannel;
 
@@ -68,10 +74,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      * @param logger  the logger instance.
      */
     InvocationExecution(@NotNull final InvocationManager<IN, OUT> manager,
-            @NotNull final InputIterator<IN> inputs, @NotNull final ResultChannel<OUT> result,
+            @NotNull final ExecutionObserver<IN> inputs, @NotNull final ResultChannel<OUT> result,
             @NotNull final Logger logger) {
         mInvocationManager = ConstantConditions.notNull("invocation manager", manager);
-        mInputIterator = ConstantConditions.notNull("input iterator", inputs);
+        mObserver = ConstantConditions.notNull("input iterator", inputs);
         mResultChannel = ConstantConditions.notNull("result channel", result);
         mLogger = logger.subContextLogger(this);
     }
@@ -116,41 +122,34 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      *
      * @param reason the reason.
      */
-    @NotNull
-    public Execution recycle(@NotNull final Throwable reason) {
-        return new Execution() {
+    void recycle(@NotNull final Throwable reason) {
+        final Invocation<IN, OUT> invocation = mInvocation;
+        if ((invocation != null) && !mIsTerminated) {
+            mIsTerminated = true;
+            final InvocationManager<IN, OUT> manager = mInvocationManager;
+            if (mIsInitialized) {
+                try {
+                    invocation.onAbort(InvocationException.wrapIfNeeded(reason));
+                    invocation.onRecycle(true);
+                    manager.recycle(invocation);
 
-            public void run() {
-                final Invocation<IN, OUT> invocation = mInvocation;
-                if ((invocation != null) && !mIsTerminated) {
-                    mIsTerminated = true;
-                    final InvocationManager<IN, OUT> invocationManager = mInvocationManager;
-                    if (mIsInitialized) {
-                        try {
-                            invocation.onAbort(InvocationException.wrapIfNeeded(reason));
-                            invocation.onRecycle(true);
-                            invocationManager.recycle(invocation);
-
-                        } catch (final Throwable t) {
-                            invocationManager.discard(invocation);
-                        }
-
-                    } else {
-                        // Initialization failed, so just discard the invocation
-                        invocationManager.discard(invocation);
-                    }
+                } catch (final Throwable t) {
+                    manager.discard(invocation);
                 }
+
+            } else {
+                // Initialization failed, so just discard the invocation
+                manager.discard(invocation);
             }
-        };
+        }
     }
 
     private void execute(@NotNull final Invocation<IN, OUT> invocation) {
         final Logger logger = mLogger;
-        final InputIterator<IN> inputIterator = mInputIterator;
+        final ExecutionObserver<IN> observer = mObserver;
         final InvocationManager<IN, OUT> manager = mInvocationManager;
         final ResultChannel<OUT> resultChannel = mResultChannel;
         try {
-            inputIterator.onConsumeStart();
             logger.dbg("running execution");
             final boolean isComplete;
             try {
@@ -161,12 +160,15 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     mIsInitialized = true;
                 }
 
-                for (final IN input : inputIterator.getInputs()) {
+                final ArrayList<IN> inputs = mInputs;
+                inputs.clear();
+                observer.getInputs(inputs);
+                for (final IN input : inputs) {
                     invocation.onInput(input, resultChannel);
                 }
 
             } finally {
-                isComplete = inputIterator.onConsumeComplete();
+                isComplete = observer.onConsumeComplete();
             }
 
             if (isComplete) {
@@ -181,8 +183,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     manager.discard(invocation);
 
                 } finally {
-                    resultChannel.close();
-                    inputIterator.onInvocationComplete();
+                    resultChannel.closeImmediately();
+                    observer.onInvocationComplete();
                 }
             }
 
@@ -195,11 +197,11 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     /**
-     * Interface defining an iterator of input data.
+     * Interface defining an execution observer.
      *
      * @param <IN> the input data type.
      */
-    interface InputIterator<IN> {
+    interface ExecutionObserver<IN> {
 
         /**
          * Returns the exception identifying the abortion reason.
@@ -209,9 +211,12 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         @NotNull
         RoutineException getAbortException();
 
-        // TODO: 02/09/16 javadoc
-        @NotNull
-        List<IN> getInputs();
+        /**
+         * Fills the specified collection with the available inputs.
+         *
+         * @param inputs the collection to fill.
+         */
+        void getInputs(@NotNull Collection<IN> inputs);
 
         /**
          * Notifies that the execution abortion is complete.
@@ -226,11 +231,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         boolean onConsumeComplete();
 
         /**
-         * Notifies that the available inputs are about to be consumed.
-         */
-        void onConsumeStart();
-
-        /**
          * Notifies that the invocation execution is complete.
          */
         void onInvocationComplete();
@@ -241,15 +241,35 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      */
     private class AbortExecution implements Execution, InvocationObserver<IN, OUT> {
 
+        public void run() {
+            final Invocation<IN, OUT> invocation;
+            if (mIsWaitingAbortInvocation) {
+                return;
+            }
+
+            invocation = mInvocation;
+            mIsWaitingAbortInvocation = (invocation == null);
+            if (mIsWaitingInvocation) {
+                return;
+            }
+
+            if (invocation != null) {
+                onCreate(invocation);
+
+            } else if (!mInvocationManager.create(this)) {
+                mResultChannel.startWaitingInvocation();
+            }
+        }
+
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
             mIsWaitingAbortInvocation = false;
             final Logger logger = mLogger;
-            final InputIterator<IN> inputIterator = mInputIterator;
+            final ExecutionObserver<IN> observer = mObserver;
             final InvocationManager<IN, OUT> manager = mInvocationManager;
             final ResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.enterInvocation();
             try {
-                final RoutineException exception = inputIterator.getAbortException();
+                final RoutineException exception = observer.getAbortException();
                 logger.dbg(exception, "aborting invocation");
                 try {
                     if (!mIsTerminated) {
@@ -293,7 +313,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
             } finally {
                 resultChannel.exitInvocation();
-                inputIterator.onAbortComplete();
+                observer.onAbortComplete();
                 if (mIsWaitingInvocation) {
                     InvocationExecution.this.onCreate(invocation);
                 }
@@ -304,29 +324,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             final ResultChannel<OUT> resultChannel = mResultChannel;
             resultChannel.stopWaitingInvocation();
             resultChannel.close(error);
-        }
-
-        public void run() {
-            final Invocation<IN, OUT> invocation;
-            if (mIsWaitingAbortInvocation) {
-                return;
-            }
-
-            invocation = mInvocation;
-            mIsWaitingAbortInvocation = (invocation == null);
-            if (mIsWaitingInvocation) {
-                return;
-            }
-
-            if (invocation != null) {
-                onCreate(invocation);
-
-            } else {
-                mInvocationManager.create(this);
-                if (mInvocation == null) {
-                    mResultChannel.startWaitingInvocation();
-                }
-            }
         }
     }
 

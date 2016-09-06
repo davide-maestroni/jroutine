@@ -308,7 +308,7 @@ public class PriorityRunner {
         @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-            if (isExecutionThread()) {
+            if (!super.isManagedThread()) {
                 super.run(execution, delay, timeUnit);
 
             } else {

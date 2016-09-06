@@ -47,8 +47,12 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * passed as the abortion reason.
      * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
+     * <p>
+     * Note also that abortion can be delayed by calling the proper methods.
      *
      * @return whether the channel status changed as a result of the call.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
      */
     boolean abort();
 
@@ -62,9 +66,13 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * instance.
      * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
+     * <p>
+     * Note also that abortion can be delayed by calling the proper methods.
      *
      * @param reason the throwable object identifying the reason of the invocation abortion.
      * @return whether the channel status changed as a result of the call.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
      */
     boolean abort(@Nullable Throwable reason);
 
@@ -74,8 +82,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * In case of read operations the value will represent the maximum allowed time before the
      * operation completes.
      * <p>
-     * Note that an abortion command will be delayed as well. Note, however, that a delayed
-     * abortion will not prevent the invocation from completing, as pending input data do.
+     * Note that closing and abortion commands will be delayed as well. Note, however, that a
+     * delayed abortion will not prevent the invocation from completing, as pending input data do.
      * <p>
      * Note that the implementing class should ensure that calls of this method from different
      * threads will not interfere with each others.
@@ -95,8 +103,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * In case of read operations the value will represent the maximum allowed time before the
      * operation completes.
      * <p>
-     * Note that an abortion command will be delayed as well. Note, however, that a delayed
-     * abortion will not prevent the invocation from completing, as pending input data do.
+     * Note that closing and abortion commands will be delayed as well. Note, however, that a
+     * delayed abortion will not prevent the invocation from completing, as pending input data do.
      * <p>
      * Note that the implementing class should ensure that calls of this method from different
      * threads will not interfere with each others.
@@ -197,17 +205,21 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
     /**
      * Closes this channel and completes the invocation.
      * <br>
-     * After method exits, attempting to pass additional input data through the dedicated methods
-     * will cause an {@link java.lang.IllegalStateException} to be thrown.
+     * After channel is closed, attempting to pass additional input data through the dedicated
+     * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
      * <p>
      * Note that, even if calling this method is not strictly mandatory, some invocation
      * implementations may rely on the completion notification to produce their results. So, it's
      * always advisable to close the channel as soon as all the input data has been passed.
+     * <p>
+     * Not also that closing commands can be delayed by calling the proper methods.
      *
      * @return this channel.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
      */
     @NotNull
-    Channel<IN, OUT> close(); // TODO: 02/09/16 delay
+    Channel<IN, OUT> close();
 
     /**
      * Tells the channel to abort the invocation execution in case, after a read method is invoked,

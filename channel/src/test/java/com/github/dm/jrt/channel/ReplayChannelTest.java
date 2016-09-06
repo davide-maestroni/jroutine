@@ -468,7 +468,8 @@ public class ReplayChannelTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
-        final Channel<?, Object> result = Channels.replay(channel.close()).buildChannels();
+        final Channel<?, Object> result =
+                Channels.replay(channel.immediately().close()).buildChannels();
         assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.inputCount()).isEqualTo(0);
         assertThat(result.outputCount()).isEqualTo(1);

@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
  * Runner implementation throttling the number of running executions so to keep it under a specified
  * limit.
  * <p>
+ * TODO: sync runner
+ * <p>
  * Created by davide-maestroni on 07/18/2015.
  */
 class ThrottlingRunner extends RunnerDecorator {
@@ -85,21 +87,18 @@ class ThrottlingRunner extends RunnerDecorator {
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-        ThrottlingExecution throttlingExecution = null;
+        final ThrottlingExecution throttlingExecution;
         synchronized (mMutex) {
             final LinkedList<PendingExecution> queue = mQueue;
             if ((mRunningCount + queue.size()) >= mMaxRunning) {
-                // TODO: 02/09/16 adjust delay...
                 queue.add(new PendingExecution(execution, delay, timeUnit));
-
-            } else {
-                throttlingExecution = getThrottlingExecution(execution);
+                return;
             }
+
+            throttlingExecution = getThrottlingExecution(execution);
         }
 
-        if (throttlingExecution != null) {
-            super.run(throttlingExecution, delay, timeUnit);
-        }
+        super.run(throttlingExecution, delay, timeUnit);
     }
 
     @NotNull
@@ -126,6 +125,8 @@ class ThrottlingRunner extends RunnerDecorator {
 
         private final Execution mExecution;
 
+        private final long mStartTimeMillis;
+
         private final TimeUnit mTimeUnit;
 
         /**
@@ -140,6 +141,7 @@ class ThrottlingRunner extends RunnerDecorator {
             mExecution = execution;
             mDelay = delay;
             mTimeUnit = timeUnit;
+            mStartTimeMillis = System.currentTimeMillis();
         }
 
         public void run() {
@@ -148,7 +150,10 @@ class ThrottlingRunner extends RunnerDecorator {
                 throttlingExecution = getThrottlingExecution(mExecution);
             }
 
-            ThrottlingRunner.super.run(throttlingExecution, mDelay, mTimeUnit);
+            final long delay = mDelay;
+            ThrottlingRunner.super.run(throttlingExecution, (delay == 0) ? 0 : Math.max(
+                    mTimeUnit.toMillis(delay) + mStartTimeMillis - System.currentTimeMillis(), 0),
+                    TimeUnit.MILLISECONDS);
         }
     }
 

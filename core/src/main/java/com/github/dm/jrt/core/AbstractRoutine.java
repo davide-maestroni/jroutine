@@ -63,6 +63,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private final LinkedList<Invocation<IN, OUT>> mInvocations =
             new LinkedList<Invocation<IN, OUT>>();
 
+    private final boolean mIsSyncRunner;
+
     private final Logger mLogger;
 
     private final int mMaxInvocations;
@@ -72,11 +74,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
             new SimpleQueue<InvocationObserver<IN, OUT>>();
 
+    private final Runner mOriginalRunner;
+
     private final Runner mRunner;
 
     private volatile AbstractRoutine<IN, OUT> mElementRoutine;
-
-    private volatile DefaultInvocationManager mInvocationManager;
 
     private int mRunningCount;
 
@@ -89,13 +91,17 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         mConfiguration = configuration;
         final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
         final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
-        if (priority != InvocationConfiguration.DEFAULT) {
+        final boolean isSyncRunner =
+                (runner == Runners.syncRunner()) || (runner == Runners.immediateRunner());
+        if (!isSyncRunner && (priority != InvocationConfiguration.DEFAULT)) {
             mRunner = Runners.priorityRunner(runner).getRunner(priority);
 
         } else {
             mRunner = runner;
         }
 
+        mOriginalRunner = runner;
+        mIsSyncRunner = isSyncRunner; // TODO: 06/09/16 isSynchronous??
         mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
         mLogger = configuration.newLogger(this);
@@ -106,12 +112,16 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      * Constructor.
      *
      * @param configuration the invocation configuration.
-     * @param runner        the runner used for asynchronous invocation.
+     * @param runner        the runner used for executing invocation.
+     * @param isSyncRunner  if the runner is synchronous.
      * @param logger        the logger instance.
      */
     private AbstractRoutine(@NotNull final InvocationConfiguration configuration,
-            @NotNull final Runner runner, @NotNull final Logger logger) {
+            @NotNull final Runner runner, final boolean isSyncRunner,
+            @NotNull final Logger logger) {
         mConfiguration = configuration;
+        mOriginalRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        mIsSyncRunner = isSyncRunner;
         mRunner = runner;
         mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
         mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
@@ -184,32 +194,27 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @NotNull
     private Routine<IN, OUT> getElementRoutine() {
         if (mElementRoutine == null) {
-            mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mLogger) {
+            mElementRoutine =
+                    new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mIsSyncRunner, mLogger) {
 
-                @NotNull
-                @Override
-                protected Invocation<IN, OUT> newInvocation() {
-                    return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
-                }
-            };
+                        @NotNull
+                        @Override
+                        protected Invocation<IN, OUT> newInvocation() {
+                            return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
+                        }
+                    };
         }
 
         return mElementRoutine;
     }
 
     @NotNull
-    private DefaultInvocationManager getInvocationManager() {
-        if (mInvocationManager == null) {
-            mInvocationManager = new DefaultInvocationManager();
-        }
-
-        return mInvocationManager;
-    }
-
-    @NotNull
     private Channel<IN, OUT> invoke() {
-        return new InvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(), mRunner,
-                mLogger);
+        final Runner runner = mRunner;
+        final Runner throttlingRunner = mIsSyncRunner ? new SynchronizedRunner(runner)
+                : Runners.throttlingRunner(runner, 1);
+        return new InvocationChannel<IN, OUT>(mConfiguration,
+                new DefaultInvocationManager(throttlingRunner), throttlingRunner, runner, mLogger);
     }
 
     /**
@@ -280,15 +285,20 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         private final CreateExecution mCreateExecution;
 
+        private final Runner mManagerRunner;
+
         /**
          * Constructor.
+         *
+         * @param runner the runner used for asynchronous invocation.
          */
-        private DefaultInvocationManager() {
+        private DefaultInvocationManager(@NotNull final Runner runner) {
+            mManagerRunner = runner;
             mCreateExecution = new CreateExecution(this);
         }
 
-        public void create(@NotNull final InvocationObserver<IN, OUT> observer) {
-            create(observer, false);
+        public boolean create(@NotNull final InvocationObserver<IN, OUT> observer) {
+            return create(observer, false);
         }
 
         public void discard(@NotNull final Invocation<IN, OUT> invocation) {
@@ -302,7 +312,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             }
 
             if (hasDelayed) {
-                mRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
+                mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
             }
         }
 
@@ -328,28 +338,28 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             }
 
             if (hasDelayed) {
-                mRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
+                mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
             }
         }
 
         @SuppressWarnings("ConstantConditions")
-        private void create(@Nullable final InvocationObserver<IN, OUT> observer,
+        private boolean create(@Nullable final InvocationObserver<IN, OUT> observer,
                 final boolean isDelayed) {
             InvocationObserver<IN, OUT> invocationObserver = observer;
+            Throwable error = null;
             try {
-                Throwable error = null;
                 Invocation<IN, OUT> invocation = null;
                 synchronized (mMutex) {
                     final SimpleQueue<InvocationObserver<IN, OUT>> observers = mObservers;
                     if (isDelayed) {
                         if (observers.isEmpty()) {
-                            return;
+                            return false;
                         }
 
                         invocationObserver = observers.removeFirst();
                     }
 
-                    if (isDelayed || (mRunningCount < (mMaxInvocations + observers.size()))) {
+                    if (isDelayed || ((mRunningCount + observers.size()) < mMaxInvocations)) {
                         final int coreInvocations = mCoreInvocations;
                         final LinkedList<Invocation<IN, OUT>> invocations = mInvocations;
                         if (!invocations.isEmpty()) {
@@ -366,14 +376,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                             ++mRunningCount;
                         }
 
-                    } else if (!mRunner.isManagedThread()) {
+                    } else if (!mOriginalRunner.isManagedThread()) {
                         error = new InvocationDeadlockException(
                                 "cannot wait for invocation instances on a non-managed thread\nTry"
                                         + " increasing the max allowed number");
 
                     } else {
                         observers.add(invocationObserver);
-                        return;
+                        return false;
                     }
                 }
 
@@ -383,6 +393,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 } else {
                     invocationObserver.onError((error != null) ? error
                             : new NullPointerException("null invocation returned"));
+                    return false;
                 }
 
             } catch (final InvocationInterruptedException e) {
@@ -391,8 +402,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             } catch (final Throwable t) {
                 mLogger.err(t, "error while creating a new invocation instance [%d]",
                         mMaxInvocations);
-                invocationObserver.onError(t);
+                if (error == null) {
+                    invocationObserver.onError(t);
+                }
+
+                return false;
             }
+
+            return true;
         }
     }
 }

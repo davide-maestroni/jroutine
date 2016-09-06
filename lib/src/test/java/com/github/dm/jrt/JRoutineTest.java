@@ -440,7 +440,7 @@ public class JRoutineTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
         final Channel<Object, Object> outputChannel = JRoutine.io().buildChannel();
-        channel.pass(outputChannel);
+        channel.immediately().pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
@@ -496,8 +496,7 @@ public class JRoutineTest {
                                                  .map(new Function<Number, Double>() {
 
                                                      public Double apply(final Number number) {
-                                                         final double value = number.doubleValue();
-                                                         return Math.sqrt(value);
+                                                         return Math.sqrt(number.doubleValue());
                                                      }
                                                  })
                                                  .sync()

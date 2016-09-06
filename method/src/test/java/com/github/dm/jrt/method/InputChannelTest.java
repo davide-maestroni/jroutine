@@ -542,7 +542,7 @@ public class InputChannelTest {
         final InputChannel<Object> outputChannel = RoutineMethod.inputChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.close();
+        channel.immediately().close();
         assertThat(channel.isOpen()).isFalse();
         outputChannel.close();
         assertThat(channel.isOpen()).isFalse();

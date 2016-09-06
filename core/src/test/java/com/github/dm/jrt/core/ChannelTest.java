@@ -567,7 +567,7 @@ public class ChannelTest {
         final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.close();
+        channel.immediately().close();
         assertThat(channel.isOpen()).isFalse();
         outputChannel.close();
         assertThat(channel.isOpen()).isFalse();

@@ -216,7 +216,7 @@ public class FutureChannelTest {
                                                                         .<String>buildChannel());
         assertThat(channel.after(seconds(1)).next()).isEqualTo("test");
         assertThat(channel.isOpen()).isTrue();
-        assertThat(channel.close().isOpen()).isFalse();
+        assertThat(channel.immediately().close().isOpen()).isFalse();
     }
 
     @Test

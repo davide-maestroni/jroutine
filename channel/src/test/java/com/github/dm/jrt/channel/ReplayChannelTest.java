@@ -59,7 +59,7 @@ public class ReplayChannelTest {
         assertThat(channel.isBound()).isFalse();
         final ArrayList<String> results = new ArrayList<String>();
         assertThat(channel.after(1, TimeUnit.SECONDS).hasNext()).isTrue();
-        channel.immediately().allInto(results);
+        channel.now().allInto(results);
         assertThat(results).containsExactly("test");
         channel = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels();
 
@@ -379,7 +379,7 @@ public class ReplayChannelTest {
 
         }
 
-        channel.immediately();
+        channel.now();
         try {
             channel.remove();
             fail();
@@ -468,8 +468,7 @@ public class ReplayChannelTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
-        final Channel<?, Object> result =
-                Channels.replay(channel.immediately().close()).buildChannels();
+        final Channel<?, Object> result = Channels.replay(channel.now().close()).buildChannels();
         assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.inputCount()).isEqualTo(0);
         assertThat(result.outputCount()).isEqualTo(1);

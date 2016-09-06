@@ -134,7 +134,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -162,7 +162,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -235,7 +235,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
      * @see #eventuallyFail()
@@ -258,7 +258,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyContinue()
      * @see #eventuallyFail()
@@ -280,7 +280,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyFail()
@@ -301,7 +301,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -315,7 +315,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return the iterator instance.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
      * @see #eventuallyFail()
@@ -332,7 +332,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return whether the routine execution has completed.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      */
     boolean getComplete();
 
@@ -346,7 +346,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return the invocation error or null.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      */
     @Nullable
     RoutineException getError();
@@ -368,7 +368,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -398,26 +398,13 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               thrown).
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     OUT next();
-
-    /**
-     * Tells the channel to not wait for results to be available.
-     * <p>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     */
-    @NotNull
-    Channel<IN, OUT> immediately(); // TODO: 06/09/16 now()??
 
     /**
      * Returns the number of input data stored in the channel.
@@ -469,7 +456,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -504,13 +491,26 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               thrown).
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
      * @see #eventuallyFail()
      */
     OUT nextOrElse(OUT output);
+
+    /**
+     * Tells the channel to not wait for results to be available.
+     * <p>
+     * By default the timeout is set to 0 to avoid unexpected deadlocks.
+     * <p>
+     * Note that the implementing class should ensure that calls of this method from different
+     * threads will not interfere with each others.
+     *
+     * @return this channel.
+     */
+    @NotNull
+    Channel<IN, OUT> now();
 
     /**
      * Returns the number of output data stored in the channel.
@@ -592,7 +592,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      *                                                               channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      * @see #eventuallyAbort()
      * @see #eventuallyAbort(Throwable)
      * @see #eventuallyContinue()
@@ -627,7 +627,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
-     * @see #immediately()
+     * @see #now()
      */
     void throwError();
 

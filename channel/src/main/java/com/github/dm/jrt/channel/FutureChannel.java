@@ -263,11 +263,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 mTimeoutException.get());
     }
 
-    @NotNull
-    public Channel<OUT, OUT> immediately() {
-        return after(zero());
-    }
-
     public int inputCount() {
         return outputCount();
     }
@@ -301,6 +296,11 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         return output;
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> now() {
+        return after(zero());
     }
 
     public int outputCount() {

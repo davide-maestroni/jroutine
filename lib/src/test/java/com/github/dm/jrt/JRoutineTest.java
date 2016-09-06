@@ -440,7 +440,7 @@ public class JRoutineTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
         final Channel<Object, Object> outputChannel = JRoutine.io().buildChannel();
-        channel.immediately().pass(outputChannel);
+        channel.now().pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.close();
         assertThat(channel.isOpen()).isFalse();

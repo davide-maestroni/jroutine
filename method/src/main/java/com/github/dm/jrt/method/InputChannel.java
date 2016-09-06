@@ -145,12 +145,6 @@ public final class InputChannel<IN> implements Channel<IN, IN> {
         return mChannel.next();
     }
 
-    @NotNull
-    public InputChannel<IN> immediately() {
-        mChannel.immediately();
-        return this;
-    }
-
     public int inputCount() {
         return mChannel.inputCount();
     }
@@ -174,6 +168,12 @@ public final class InputChannel<IN> implements Channel<IN, IN> {
 
     public IN nextOrElse(final IN output) {
         return mChannel.nextOrElse(output);
+    }
+
+    @NotNull
+    public InputChannel<IN> now() {
+        mChannel.now();
+        return this;
     }
 
     public int outputCount() {

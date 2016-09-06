@@ -176,12 +176,6 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
         return mChannel.next();
     }
 
-    @NotNull
-    public Channel<DATA, DATA> immediately() {
-        mChannel.immediately();
-        return this;
-    }
-
     public int inputCount() {
         return mChannel.inputCount();
     }
@@ -205,6 +199,12 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
     public DATA nextOrElse(final DATA output) {
         return mChannel.nextOrElse(output);
+    }
+
+    @NotNull
+    public Channel<DATA, DATA> now() {
+        mChannel.now();
+        return this;
     }
 
     public int outputCount() {

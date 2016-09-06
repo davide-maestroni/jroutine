@@ -293,11 +293,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         return mResultChanel.next();
     }
 
-    @NotNull
-    public Channel<IN, OUT> immediately() {
-        return after(zero());
-    }
-
     public int inputCount() {
         synchronized (mMutex) {
             return mState.inputCount();
@@ -325,6 +320,11 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     public OUT nextOrElse(final OUT output) {
         return mResultChanel.nextOrElse(output);
+    }
+
+    @NotNull
+    public Channel<IN, OUT> now() {
+        return after(zero());
     }
 
     public int outputCount() {

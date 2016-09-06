@@ -154,7 +154,7 @@ public class StreamBuilderTest {
                                  .map(append((Object) "test"))
                                  .call()
                                  .after(seconds(3))
-                                 .immediately()
+                                 .now()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream()
@@ -162,7 +162,7 @@ public class StreamBuilderTest {
                                  .map(append((Object) "test"))
                                  .call()
                                  .after(3, TimeUnit.SECONDS)
-                                 .immediately()
+                                 .now()
                                  .close()
                                  .next()).isEqualTo("test");
         try {
@@ -270,7 +270,7 @@ public class StreamBuilderTest {
                                  .sync()
                                  .map(append((Object) "test"))
                                  .call()
-                                 .immediately()
+                                 .now()
                                  .close()
                                  .next()).isEqualTo("test");
         assertThat(JRoutineStream.withStream().sync().call().inputCount()).isZero();

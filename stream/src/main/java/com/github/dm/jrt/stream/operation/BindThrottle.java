@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
-import com.github.dm.jrt.stream.modifier.ThrottleChannelConsumer.CompletionHandler;
+import com.github.dm.jrt.stream.operation.ThrottleChannelConsumer.CompletionHandler;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -121,20 +121,6 @@ public abstract class Runner {
     public abstract boolean isExecutionThread();
 
     /**
-     * Checks if the calling thread belongs to the ones managed by the runner implementation.
-     * <p>
-     * The implementation of this method is not strictly mandatory, even if, the classes always
-     * returning false effectively prevent the correct detection of possible deadlocks.
-     * <br>
-     * A synchronous runner implementation will always return false.
-     *
-     * @return whether the thread is managed by the runner.
-     */
-    public boolean isManagedThread() {
-        return mManager.isManagedThread();
-    }
-
-    /**
      * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
      * runner thread).
      *

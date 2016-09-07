@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -119,12 +118,6 @@ class BindTimeThrottle<IN, OUT> implements
                 final int maxCount = mMaxCount;
                 isBind = (++mCount <= maxCount);
                 if (!isBind) {
-                    if (!runner.isManagedThread()) {
-                        throw new InvocationDeadlockException(
-                                "cannot wait for invocation instances on a non-managed thread\nTry "
-                                        + "increasing the max allowed number");
-                    }
-
                     final SimpleQueue<Runnable> queue = mQueue;
                     queue.add(new Runnable() {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.Backoff;

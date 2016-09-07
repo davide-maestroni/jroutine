@@ -44,7 +44,7 @@ import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
-import com.github.dm.jrt.stream.modifier.Modifiers;
+import com.github.dm.jrt.stream.operation.Operations;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +68,7 @@ import static com.github.dm.jrt.operator.Operators.averageFloat;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
+import static com.github.dm.jrt.stream.operation.Operations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -594,26 +594,28 @@ public class StreamBuilderTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Modifiers.<String, String>lag(1, TimeUnit.SECONDS))
+                Operations.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .call("test")
                                                       .after(seconds(3))
                                                       .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(
-                JRoutineStream.<String>withStream().let(Modifiers.<String, String>lag(seconds(1)))
+                JRoutineStream.<String>withStream().let(Operations.<String, String>lag(seconds(1)))
                                                    .call("test")
                                                    .after(seconds(3))
                                                    .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Modifiers.<String, String>lag(1, TimeUnit.SECONDS)).close().after(seconds(3)).all())
-                .isEmpty();
+                Operations.<String, String>lag(1, TimeUnit.SECONDS))
+                                                      .close()
+                                                      .after(seconds(3))
+                                                      .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(
-                JRoutineStream.<String>withStream().let(Modifiers.<String, String>lag(seconds(1)))
+                JRoutineStream.<String>withStream().let(Operations.<String, String>lag(seconds(1)))
                                                    .close()
                                                    .after(seconds(3))
                                                    .all()).isEmpty();

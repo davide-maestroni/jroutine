@@ -33,18 +33,22 @@ class FutureChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
     private final Future<OUT> mFuture;
 
+    private final boolean mInterruptIfRunning;
+
     /**
      * Constructor.
      *
-     * @param future the future instance.
+     * @param future                the future instance.
+     * @param mayInterruptIfRunning if the thread executing the task should be interrupted.
      */
-    FutureChannelBuilder(@NotNull final Future<OUT> future) {
+    FutureChannelBuilder(@NotNull final Future<OUT> future, final boolean mayInterruptIfRunning) {
         mFuture = ConstantConditions.notNull("future instance", future);
+        mInterruptIfRunning = mayInterruptIfRunning;
     }
 
     @NotNull
     @Override
     protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
-        return new FutureChannel<OUT>(configuration, mFuture);
+        return new FutureChannel<OUT>(configuration, mFuture, mInterruptIfRunning);
     }
 }

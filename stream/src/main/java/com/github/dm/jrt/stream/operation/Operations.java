@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -44,12 +44,12 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Created by davide-maestroni on 07/06/2016.
  */
-public class Modifiers {
+public class Operations {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Modifiers() {
+    protected Operations() {
         ConstantConditions.avoid();
     }
 

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.BiFunction;
@@ -76,8 +73,6 @@ class BindThrottle<IN, OUT> implements
 
         private final ChannelConfiguration mConfiguration;
 
-        private final Runner mRunner;
-
         /**
          * Constructor.
          *
@@ -89,7 +84,6 @@ class BindThrottle<IN, OUT> implements
                         bindingFunction) {
             mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
             mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-            mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
         }
 
         public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
@@ -100,13 +94,6 @@ class BindThrottle<IN, OUT> implements
             synchronized (mMutex) {
                 isBind = (++mCount <= mMaxCount);
                 if (!isBind) {
-                    final Runner runner = mRunner;
-                    if (runner.isExecutionThread() && !runner.isManagedThread()) {
-                        throw new InvocationDeadlockException(
-                                "cannot wait for invocation instances on a non-managed thread\nTry "
-                                        + "employing a different runner");
-                    }
-
                     mQueue.add(new Runnable() {
 
                         public void run() {

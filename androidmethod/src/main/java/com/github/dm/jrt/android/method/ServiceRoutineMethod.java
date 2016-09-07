@@ -133,26 +133,27 @@ public class ServiceRoutineMethod extends RoutineMethod
                     "the method class must have a static scope: " + type.getName());
         }
 
+        final Object[] additionalArgs;
         final Object[] safeArgs = Reflection.asArgs(args);
         if (type.isAnonymousClass()) {
             if (safeArgs.length > 0) {
-                final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
-                System.arraycopy(safeArgs, 0, syntheticArgs, 1, safeArgs.length);
-                syntheticArgs[0] = safeArgs;
+                additionalArgs = new Object[safeArgs.length + 1];
+                System.arraycopy(safeArgs, 0, additionalArgs, 1, safeArgs.length);
+                additionalArgs[0] = safeArgs;
 
             } else {
-                mArgs = Reflection.NO_ARGS;
+                additionalArgs = safeArgs;
             }
 
         } else {
-            mArgs = cloneArgs(safeArgs);
+            additionalArgs = cloneArgs(safeArgs);
         }
 
-        final Object[] additionalArgs = mArgs;
         final Object[] constructorArgs = new Object[additionalArgs.length + 1];
         System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
         constructorArgs[0] = context;
         Reflection.findBestMatchingConstructor(type, constructorArgs);
+        mArgs = additionalArgs;
     }
 
     /**
@@ -573,15 +574,15 @@ public class ServiceRoutineMethod extends RoutineMethod
                 inputChannel.abort(reason);
             }
 
-            final ServiceRoutineMethod routine = mInstance;
-            routine.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+            final ServiceRoutineMethod instance = mInstance;
+            instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
             try {
                 if (!mIsComplete) {
                     invokeMethod();
                 }
 
             } finally {
-                routine.setLocalInput(null);
+                instance.setLocalInput(null);
                 for (final OutputChannel<?> outputChannel : mOutputChannels) {
                     outputChannel.abort(reason);
                 }
@@ -599,8 +600,8 @@ public class ServiceRoutineMethod extends RoutineMethod
                     inputChannel.close();
                 }
 
-                final ServiceRoutineMethod routine = mInstance;
-                routine.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+                final ServiceRoutineMethod instance = mInstance;
+                instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
                 final List<OutputChannel<?>> outputChannels = mOutputChannels;
                 try {
                     final Object methodResult = invokeMethod();
@@ -610,7 +611,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                     }
 
                 } finally {
-                    routine.setLocalInput(null);
+                    instance.setLocalInput(null);
                 }
 
                 for (final OutputChannel<?> outputChannel : outputChannels) {
@@ -626,8 +627,8 @@ public class ServiceRoutineMethod extends RoutineMethod
             @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
                     (InputChannel<Object>) mInputChannels.get(input.index);
             inputChannel.pass(input.data);
-            final ServiceRoutineMethod routine = mInstance;
-            routine.setLocalInput(inputChannel);
+            final ServiceRoutineMethod instance = mInstance;
+            instance.setLocalInput(inputChannel);
             try {
                 final Object methodResult = invokeMethod();
                 if (mReturnResults) {
@@ -636,7 +637,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                 }
 
             } finally {
-                routine.setLocalInput(null);
+                instance.setLocalInput(null);
             }
         }
 
@@ -658,9 +659,10 @@ public class ServiceRoutineMethod extends RoutineMethod
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
             mContext = context;
-            final Object[] args = mArgs;
-            final Object[] constructorArgs = (mConstructorArgs = new Object[args.length + 1]);
-            System.arraycopy(args, 0, constructorArgs, 1, args.length);
+            final Object[] additionalArgs = mArgs;
+            final Object[] constructorArgs =
+                    (mConstructorArgs = new Object[additionalArgs.length + 1]);
+            System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
             constructorArgs[0] = ServiceContext.serviceFrom(context);
             mConstructor = Reflection.findBestMatchingConstructor(mType, constructorArgs);
         }
@@ -677,16 +679,16 @@ public class ServiceRoutineMethod extends RoutineMethod
 
         @Nullable
         private Object invokeMethod() throws Exception {
-            final ServiceRoutineMethod routine = mInstance;
-            routine.setLocalContext(mContext);
+            final ServiceRoutineMethod instance = mInstance;
+            instance.setLocalContext(mContext);
             try {
-                return mMethod.invoke(routine, mParams);
+                return mMethod.invoke(instance, mParams);
 
             } catch (final InvocationTargetException e) {
                 throw InvocationException.wrapIfNeeded(e.getTargetException());
 
             } finally {
-                routine.setLocalContext(null);
+                instance.setLocalContext(null);
             }
         }
     }

@@ -116,7 +116,9 @@ public class Runners {
     /**
      * Returns a runner providing ordering of executions based on priority.
      * <p>
-     * Note that wrapping a synchronous runner will not modify the execution order.
+     * Note that applying a priority to a synchronous runner might make execution invocations happen
+     * in different threads than the calling one, thus causing the results to be not immediately
+     * available.
      *
      * @param wrapped the wrapped runner instance.
      * @return the runner instance.
@@ -199,6 +201,10 @@ public class Runners {
     /**
      * Returns a runner throttling the number of running executions so to keep it under the
      * specified limit.
+     * <p>
+     * Note that applying throttling to a synchronous runner might make execution invocations happen
+     * in different threads than the calling one, thus causing the results to be not immediately
+     * available.
      *
      * @param wrapped       the wrapped instance.
      * @param maxExecutions the maximum number of running executions.

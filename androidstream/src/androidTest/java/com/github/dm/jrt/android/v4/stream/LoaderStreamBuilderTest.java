@@ -61,7 +61,7 @@ import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
+import static com.github.dm.jrt.stream.operation.Operations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

@@ -19,7 +19,6 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
@@ -74,8 +73,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
             new SimpleQueue<InvocationObserver<IN, OUT>>();
 
-    private final Runner mOriginalRunner;
-
     private final Runner mRunner;
 
     private volatile AbstractRoutine<IN, OUT> mElementRoutine;
@@ -91,17 +88,15 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         mConfiguration = configuration;
         final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
         final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
-        final boolean isSyncRunner =
-                (runner == Runners.syncRunner()) || (runner == Runners.immediateRunner());
-        if (!isSyncRunner && (priority != InvocationConfiguration.DEFAULT)) {
+        if (priority != InvocationConfiguration.DEFAULT) {
             mRunner = Runners.priorityRunner(runner).getRunner(priority);
 
         } else {
             mRunner = runner;
         }
 
-        mOriginalRunner = runner;
-        mIsSyncRunner = isSyncRunner; // TODO: 06/09/16 isSynchronous??
+        // TODO: 06/09/16 isSynchronous??
+        mIsSyncRunner = (runner == Runners.syncRunner()) || (runner == Runners.immediateRunner());
         mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
         mLogger = configuration.newLogger(this);
@@ -120,7 +115,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             @NotNull final Runner runner, final boolean isSyncRunner,
             @NotNull final Logger logger) {
         mConfiguration = configuration;
-        mOriginalRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
         mIsSyncRunner = isSyncRunner;
         mRunner = runner;
         mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
@@ -346,9 +340,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         private boolean create(@Nullable final InvocationObserver<IN, OUT> observer,
                 final boolean isDelayed) {
             InvocationObserver<IN, OUT> invocationObserver = observer;
-            Throwable error = null;
             try {
-                Invocation<IN, OUT> invocation = null;
+                Invocation<IN, OUT> invocation;
                 synchronized (mMutex) {
                     final SimpleQueue<InvocationObserver<IN, OUT>> observers = mObservers;
                     if (isDelayed) {
@@ -376,11 +369,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                             ++mRunningCount;
                         }
 
-                    } else if (!mOriginalRunner.isManagedThread()) {
-                        error = new InvocationDeadlockException(
-                                "cannot wait for invocation instances on a non-managed thread\nTry"
-                                        + " increasing the max allowed number");
-
                     } else {
                         observers.add(invocationObserver);
                         return false;
@@ -391,8 +379,9 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                     invocationObserver.onCreate(invocation);
 
                 } else {
-                    invocationObserver.onError((error != null) ? error
-                            : new NullPointerException("null invocation returned"));
+                    mLogger.err("null invocation instance returned");
+                    invocationObserver.onError(
+                            new NullPointerException("null invocation returned"));
                     return false;
                 }
 
@@ -402,10 +391,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             } catch (final Throwable t) {
                 mLogger.err(t, "error while creating a new invocation instance [%d]",
                         mMaxInvocations);
-                if (error == null) {
-                    invocationObserver.onError(t);
-                }
-
+                invocationObserver.onError(t);
                 return false;
             }
 

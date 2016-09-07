@@ -23,8 +23,11 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
+import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -45,6 +48,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.decorate;
 
@@ -597,6 +601,51 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> identity() {
         return IdentityInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations passing on data after an interval specified by a backoff
+     * policy.
+     *
+     * @param backoff the backoff policy instance.
+     * @param <DATA>  the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final Backoff backoff) {
+        return new IntervalInvocationFactory<DATA>(backoff);
+    }
+
+    /**
+     * Returns a factory of invocations passing on data after the specified time interval.
+     * <p>
+     * Note that this is the same as calling
+     * {@code interval(BackoffBuilder.afterCount(0).linearDelay(delay, timeUnit))}.
+     *
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
+     * @param <DATA>   the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(final long delay,
+            @NotNull final TimeUnit timeUnit) {
+        return interval(BackoffBuilder.afterCount(0).linearDelay(delay, timeUnit));
+    }
+
+    /**
+     * Returns a factory of invocations passing on data after the specified time interval.
+     * <p>
+     * Note that this is the same as calling
+     * {@code interval(BackoffBuilder.afterCount(0).linearDelay(delay))}.
+     *
+     * @param delay  the delay.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final UnitDuration delay) {
+        return interval(delay.value, delay.unit);
     }
 
     /**

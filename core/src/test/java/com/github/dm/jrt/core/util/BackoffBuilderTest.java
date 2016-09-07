@@ -20,8 +20,8 @@ public class BackoffBuilderTest {
     public void testAdd() {
         final Backoff backoff = BackoffBuilder.afterCount(2)
                                               .constantDelay(seconds(1))
-                                              .add(BackoffBuilder.afterCount(1)
-                                                                 .linearDelay(seconds(1.5)));
+                                              .plus(BackoffBuilder.afterCount(1)
+                                                                  .linearDelay(seconds(1.5)));
         assertThat(backoff.getDelay(1)).isEqualTo(NO_DELAY);
         assertThat(backoff.getDelay(2)).isEqualTo(1500);
         assertThat(backoff.getDelay(3)).isEqualTo(4000);
@@ -32,8 +32,8 @@ public class BackoffBuilderTest {
     public void testAdd2() {
         final Backoff backoff = BackoffBuilder.afterCount(1)
                                               .linearDelay(seconds(1.5))
-                                              .add(BackoffBuilder.afterCount(2)
-                                                                 .constantDelay(seconds(1)));
+                                              .plus(BackoffBuilder.afterCount(2)
+                                                                  .constantDelay(seconds(1)));
         assertThat(backoff.getDelay(1)).isEqualTo(NO_DELAY);
         assertThat(backoff.getDelay(2)).isEqualTo(1500);
         assertThat(backoff.getDelay(3)).isEqualTo(4000);

@@ -62,6 +62,8 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
     private final Future<OUT> mFuture;
 
+    private final boolean mInterruptIfRunning;
+
     private final AtomicBoolean mIsBound = new AtomicBoolean();
 
     private final Logger mLogger;
@@ -81,14 +83,16 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param future        the Future instance.
+     * @param configuration         the channel configuration.
+     * @param future                the Future instance.
+     * @param mayInterruptIfRunning if the thread executing the task should be interrupted.
      */
     FutureChannel(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Future<OUT> future) {
+            @NotNull final Future<OUT> future, final boolean mayInterruptIfRunning) {
         mLogger = configuration.newLogger(this);
         mFuture = ConstantConditions.notNull("future instance", future);
         mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        mInterruptIfRunning = mayInterruptIfRunning;
         mOutputTimeout = new LocalValue<UnitDuration>(configuration.getOutputTimeoutOrElse(zero()));
         mTimeoutActionType = new LocalValue<TimeoutActionType>(
                 configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
@@ -99,7 +103,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-        final boolean isCancelled = mFuture.cancel(reason != null);
+        final boolean isCancelled = mFuture.cancel(mInterruptIfRunning);
         if (isCancelled) {
             mAbortException.set(reason);
         }

@@ -3143,11 +3143,6 @@ public class RoutineTest {
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
 
         @Override
-        public boolean isManagedThread() {
-            return true;
-        }
-
-        @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
             mExecutions.add(execution);

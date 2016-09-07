@@ -775,6 +775,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     private void internalAbort(@NotNull final RoutineException abortException) {
+        // TODO: 07/09/16 avoid clear? => mState == AbortChannelState
         mOutputQueue.clear();
         mPendingOutputCount = 0;
         mAbortException = abortException;

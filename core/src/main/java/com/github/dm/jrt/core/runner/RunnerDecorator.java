@@ -50,11 +50,6 @@ public class RunnerDecorator extends Runner {
     }
 
     @Override
-    public boolean isManagedThread() {
-        return mRunner.isManagedThread();
-    }
-
-    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
         mRunner.run(execution, delay, timeUnit);

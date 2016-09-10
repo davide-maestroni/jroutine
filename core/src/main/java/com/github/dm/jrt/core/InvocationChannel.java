@@ -131,10 +131,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             }
         };
         final Backoff backoff = mInputBackoff;
-        mHasInputs = new Condition() {
+        mHasInputs = (configuration.getInputBackoffOrElse(null) != null) ? new Condition() {
 
             public boolean isTrue() {
                 return (backoff.getDelay(mInputCount) == NO_DELAY) || (mAbortException != null);
+            }
+        } : new Condition() {
+
+            public boolean isTrue() {
+                return true;
             }
         };
         mResultChanel =
@@ -891,21 +896,15 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         public boolean onConsumeComplete() {
-            final boolean isComplete;
             synchronized (mMutex) {
-                isComplete = mState.onConsumeComplete();
+                return mState.onConsumeComplete();
             }
-
-            return isComplete;
         }
 
         public boolean onFirstInput(@NotNull final InputData<IN> inputData) {
-            final boolean hasInput;
             synchronized (mMutex) {
-                hasInput = mState.onFirstInput(inputData);
+                return mState.onFirstInput(inputData);
             }
-
-            return hasInput;
         }
 
         public void onInvocationComplete() {
@@ -915,12 +914,9 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         public boolean onNextInput(@NotNull final InputData<IN> inputData) {
-            final boolean hasInput;
             synchronized (mMutex) {
-                hasInput = mState.onNextInput(inputData);
+                return mState.onNextInput(inputData);
             }
-
-            return hasInput;
         }
     }
 

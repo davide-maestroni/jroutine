@@ -121,6 +121,21 @@ public abstract class Runner {
     public abstract boolean isExecutionThread();
 
     /**
+     * Checks if this runner instance is synchronous, that is, all the executions are run in the
+     * calling thread.
+     * <p>
+     * Note that, even if the correct implementation of this method is not strictly mandatory, it
+     * will be used to optimize the invocation executions.
+     * <p>
+     * Consider inheriting from {@link com.github.dm.jrt.core.runner.AsyncRunner AsyncRunner} or
+     * {@link com.github.dm.jrt.core.runner.SyncRunner SyncRunner} class for a default
+     * implementation of most of the abstract methods.
+     *
+     * @return whether this runner is synchronous.
+     */
+    public abstract boolean isSynchronous();
+
+    /**
      * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
      * runner thread).
      *

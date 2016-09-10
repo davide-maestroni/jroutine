@@ -163,11 +163,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
         };
         final Backoff backoff = mOutputBackoff;
-        mHasOutputs = new Condition() {
+        mHasOutputs = (configuration.getBackoffOrElse(null) != null) ? new Condition() {
 
             public boolean isTrue() {
                 return (backoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
                         mAbortException != null);
+            }
+        } : new Condition() {
+
+            public boolean isTrue() {
+                return true;
             }
         };
         mBindingHandler = new OutputHandler();
@@ -352,11 +357,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 throw new InvocationInterruptedException(e);
             }
 
-            if (!mState.isDone() && mIsWaitingInvocation) {
-                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-            }
+            if (isDone) {
+                if (mIsWaitingInvocation && !mState.isDone()) {
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                }
 
-            if (!isDone) {
+            } else {
                 mLogger.wrn("waiting done timeout: [%d %s]", timeout, timeoutUnit);
             }
 
@@ -395,11 +401,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 throw new InvocationInterruptedException(e);
             }
 
-            if (!mState.isDone() && (mAbortException == null) && mIsWaitingInvocation) {
-                throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-            }
+            if (isDone) {
+                if (mIsWaitingInvocation && !mState.isDone() && (mAbortException == null)) {
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                }
 
-            if (!isDone) {
+            } else {
                 mLogger.wrn("waiting error timeout: [%d %s]", timeout, timeoutUnit);
             }
 
@@ -572,11 +579,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @NotNull
     public Channel<OUT, OUT> skipNext(final int count) {
         if (count > 0) {
-            final UnitDuration outputTimeout = getTimeout();
-            final long timeout = outputTimeout.value;
-            final TimeUnit timeoutUnit = outputTimeout.unit;
-            final TimeoutActionType timeoutAction = mTimeoutActionType.get();
-            final Throwable timeoutException = mTimeoutException.get();
             final Iterator<OUT> iterator = expiringIterator();
             try {
                 for (int i = 0; i < count; ++i) {
@@ -584,6 +586,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 }
 
             } catch (final NoSuchElementException ignored) {
+                final UnitDuration outputTimeout = getTimeout();
+                final long timeout = outputTimeout.value;
+                final TimeUnit timeoutUnit = outputTimeout.unit;
+                final TimeoutActionType timeoutAction = mTimeoutActionType.get();
                 mLogger.wrn("skipping output timeout: [%d %s] => [%s]", timeout, timeoutUnit,
                         timeoutAction);
                 if (timeoutAction == TimeoutActionType.FAIL) {
@@ -592,6 +598,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                                     + "]");
 
                 } else if (timeoutAction == TimeoutActionType.ABORT) {
+                    final Throwable timeoutException = mTimeoutException.get();
                     final RoutineException abortException =
                             AbortException.wrapIfNeeded(timeoutException);
                     abortImmediately(abortException);
@@ -842,11 +849,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     throw new InvocationInterruptedException(e);
                 }
 
-                if (outputQueue.isEmpty() && !mState.isDone() && mIsWaitingInvocation) {
-                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-                }
+                if (!isTimeout) {
+                    if (mIsWaitingInvocation && outputQueue.isEmpty() && !mState.isDone()) {
+                        throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                    }
 
-                if (isTimeout) {
+                } else {
                     logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.FAIL) {
@@ -935,11 +943,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     throw new InvocationInterruptedException(e);
                 }
 
-                if (outputQueue.isEmpty() && !mState.isDone() && mIsWaitingInvocation) {
-                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-                }
+                if (!isTimeout) {
+                    if (mIsWaitingInvocation && outputQueue.isEmpty() && !mState.isDone()) {
+                        throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                    }
 
-                if (isTimeout) {
+                } else {
                     logger.wrn("reading output timeout: [%d %s] => [%s]", timeout, timeUnit,
                             timeoutAction);
                     if (timeoutAction == TimeoutActionType.FAIL) {
@@ -1144,11 +1153,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             RoutineException abortException = null;
             synchronized (mConsumerMutex) {
                 final NestedQueue<Object> outputQueue = mOutputQueue;
-                final OutputChannelState state;
+                final OutputChannelState currentState;
                 final boolean isFinal;
                 synchronized (mMutex) {
-                    state = mState;
-                    isFinal = state.isReadyToComplete();
+                    currentState = mState;
+                    isFinal = currentState.isReadyToComplete();
                 }
 
                 final ChannelConsumer<? super OUT> consumer = mConsumer;
@@ -1178,10 +1187,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     }
 
                     if (forceClose || isFinal) {
-                        closeConsumer(state, consumer);
+                        closeConsumer(currentState, consumer);
 
                     } else {
                         synchronized (mMutex) {
+                            // Wake up the threads waiting for room in the output queue
                             mMutex.notifyAll();
                         }
                     }

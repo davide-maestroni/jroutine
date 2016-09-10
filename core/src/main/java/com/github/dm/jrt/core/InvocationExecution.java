@@ -262,12 +262,11 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     private class AbortExecution implements Execution, InvocationObserver<IN, OUT> {
 
         public void run() {
-            final Invocation<IN, OUT> invocation;
             if (mIsWaitingAbortInvocation) {
                 return;
             }
 
-            invocation = mInvocation;
+            final Invocation<IN, OUT> invocation = mInvocation;
             mIsWaitingAbortInvocation = (invocation == null);
             if (mIsWaitingInvocation) {
                 return;
@@ -348,13 +347,12 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     }
 
     public void run() {
-        final Invocation<IN, OUT> invocation;
         if (mIsWaitingInvocation) {
             ++mExecutionCount;
             return;
         }
 
-        invocation = mInvocation;
+        final Invocation<IN, OUT> invocation = mInvocation;
         mIsWaitingInvocation = (invocation == null);
         if (mIsWaitingAbortInvocation) {
             return;
@@ -363,11 +361,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         if (invocation != null) {
             onCreate(invocation);
 
-        } else {
-            mInvocationManager.create(this);
-            if (mInvocation == null) {
-                mResultChannel.startWaitingInvocation();
-            }
+        } else if (!mInvocationManager.create(this)) {
+            mResultChannel.startWaitingInvocation();
         }
     }
 

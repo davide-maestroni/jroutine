@@ -94,8 +94,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             mRunner = runner;
         }
 
-        // TODO: 06/09/16 isSynchronous??
-        mIsSyncRunner = (runner == Runners.syncRunner()) || (runner == Runners.immediateRunner());
+        mIsSyncRunner = runner.isSynchronous();
         mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
         mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
         mLogger = configuration.newLogger(this);

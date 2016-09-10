@@ -620,7 +620,7 @@ public class Operators {
      * Returns a factory of invocations passing on data after the specified time interval.
      * <p>
      * Note that this is the same as calling
-     * {@code interval(BackoffBuilder.afterCount(0).linearDelay(delay, timeUnit))}.
+     * {@code interval(BackoffBuilder.afterCount(1).linearDelay(delay, timeUnit))}.
      *
      * @param delay    the delay value.
      * @param timeUnit the delay time unit.
@@ -630,14 +630,14 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> interval(final long delay,
             @NotNull final TimeUnit timeUnit) {
-        return interval(BackoffBuilder.afterCount(0).linearDelay(delay, timeUnit));
+        return interval(BackoffBuilder.afterCount(1).linearDelay(delay, timeUnit));
     }
 
     /**
      * Returns a factory of invocations passing on data after the specified time interval.
      * <p>
      * Note that this is the same as calling
-     * {@code interval(BackoffBuilder.afterCount(0).linearDelay(delay))}.
+     * {@code interval(BackoffBuilder.afterCount(1).linearDelay(delay))}.
      *
      * @param delay  the delay.
      * @param <DATA> the data type.

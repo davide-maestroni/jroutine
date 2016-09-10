@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.util;
 
+import com.github.dm.jrt.core.util.SimpleQueue.SimpleQueueIterator;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -33,42 +35,70 @@ public class SimpleQueueTest {
 
     @Test
     public void testAdd() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 77; i++) {
-
             queue.add(i);
         }
 
         for (int i = 0; i < 77; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         assertThat(queue.isEmpty()).isTrue();
-
         for (int i = 0; i < 7; i++) {
-
             queue.add(i);
         }
 
         for (int i = 0; i < 3; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         for (int i = 7; i < 13; i++) {
-
             queue.add(i);
         }
 
         for (int i = 3; i < 13; i++) {
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
 
+        assertThat(queue.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void testAddFirst() {
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 77; i++) {
+            queue.addFirst(i);
+        }
+
+        for (int i = 76; i >= 0; i--) {
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        assertThat(queue.isEmpty()).isTrue();
+        for (int i = 0; i < 7; i++) {
+            queue.addFirst(i);
+        }
+
+        for (int i = 6; i >= 4; i--) {
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        for (int i = 4; i < 13; i++) {
+            queue.addFirst(i);
+        }
+
+        for (int i = 12; i >= 0; i--) {
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
@@ -79,184 +109,170 @@ public class SimpleQueueTest {
 
     @Test
     public void testClear() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 77; i++) {
-
             queue.add(i);
         }
 
         for (int i = 0; i < 3; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         queue.clear();
-
         assertThat(queue.isEmpty()).isTrue();
     }
 
     @Test
     public void testDrain() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 7; i++) {
-
             queue.add(i);
         }
 
         for (int i = 0; i < 3; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         final ArrayList<Integer> list = new ArrayList<Integer>();
-        queue.drainTo(list);
+        queue.transferTo(list);
         assertThat(queue.isEmpty()).isTrue();
-
         for (int i = 3; i < 7; i++) {
-
             assertThat(list.get(i - 3)).isEqualTo(i);
         }
     }
 
     @Test
-    public void testPeekAllError() {
-
+    public void testIterator() {
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 7; i++) {
+            queue.add(i);
+        }
+
+        for (int i = -1; i > -7; i--) {
+            queue.addFirst(i);
+        }
+
+        int count = -6;
+        for (final Integer integer : queue) {
+            assertThat(integer).isEqualTo(count++);
+        }
+
+        queue.clear();
+        for (int i = 0; i < 7; i++) {
+            queue.add(i);
+        }
+
+        count = 0;
+        final SimpleQueueIterator<Integer> iterator = queue.iterator();
+        while (iterator.hasNext()) {
+            final Integer integer = iterator.next();
+            assertThat(integer).isEqualTo(count++);
+            iterator.replace(-13);
+        }
 
         for (int i = 0; i < 7; i++) {
+            assertThat(queue.removeFirst()).isEqualTo(-13);
+        }
 
+        assertThat(queue.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void testPeekAllError() {
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 7; i++) {
             queue.add(i);
         }
 
         for (int i = 0; i < 7; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         try {
-
             queue.peekFirst();
-
             fail();
-
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 
     @Test
     public void testPeekClearError() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 7; i++) {
-
             queue.add(i);
         }
 
         queue.clear();
-
         try {
-
             queue.peekFirst();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 
     @Test
     public void testPeekEmptyError() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         try {
-
             queue.peekFirst();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 
     @Test
     public void testRemoveAllError() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 7; i++) {
-
             queue.add(i);
         }
 
         for (int i = 0; i < 7; i++) {
-
             assertThat(queue.isEmpty()).isFalse();
             assertThat(queue.peekFirst()).isEqualTo(i);
             assertThat(queue.removeFirst()).isEqualTo(i);
         }
 
         try {
-
             queue.removeFirst();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 
     @Test
     public void testRemoveClearError() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         for (int i = 0; i < 7; i++) {
-
             queue.add(i);
         }
 
         queue.clear();
-
         try {
-
             queue.removeFirst();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 
     @Test
     public void testRemoveEmptyError() {
-
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
-
         try {
-
             queue.removeFirst();
-
             fail();
 
         } catch (final NoSuchElementException ignored) {
-
         }
     }
 }

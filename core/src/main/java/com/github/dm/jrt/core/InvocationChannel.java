@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.InvocationExecution.ExecutionObserver;
+import com.github.dm.jrt.core.InvocationExecution.InputData;
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -173,28 +174,24 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     public boolean abort(@Nullable final Throwable reason) {
         final UnitDuration delay = mInputDelay.get();
-        final boolean isOpen;
+        final boolean isAbort;
         final Execution execution;
         synchronized (mMutex) {
             final InputChannelState state = mState;
-            isOpen = state.isChannelOpen();
-            execution = (isOpen) ? state.abortInvocation(delay, reason) : null;
+            isAbort = state.abortOutput();
+            execution = state.abortInvocation(delay, reason);
         }
 
-        if (isOpen) {
-            if (execution != null) {
-                mRunner.run(execution, delay.value, delay.unit);
-            }
-
-            return true;
+        final boolean needsAbort = (execution != null);
+        if (needsAbort) {
+            mRunner.run(execution, delay.value, delay.unit);
         }
 
-        final boolean isAbort;
-        synchronized (mMutex) {
-            isAbort = mState.abortOutput();
+        if (isAbort) {
+            return mResultChanel.abort(reason);
         }
 
-        return isAbort && mResultChanel.abort(reason);
+        return needsAbort && delay.isZero();
     }
 
     @NotNull
@@ -493,6 +490,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      */
     private class AbortChannelState extends CompleteChannelState {
 
+        @Override
+        boolean abortOutput() {
+            mLogger.dbg("avoiding aborting result channel since invocation is aborting");
+            return false;
+        }
+
         @Nullable
         @Override
         Execution delayedConsumerComplete(@NotNull final Channel<?, ? extends IN> channel,
@@ -542,12 +545,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         @Override
         public int inputCount() {
             return 0;
-        }
-
-        @Override
-        boolean abortOutput() {
-            mLogger.dbg("avoiding aborting result channel since invocation is aborting");
-            return false;
         }
 
         @Nullable
@@ -610,23 +607,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             return null;
         }
 
-        @NotNull
-        private IllegalStateException exception() {
-            mLogger.err("invalid call on closed channel");
-            return new IllegalStateException("the input channel is closed");
-        }
-
-        @Nullable
         @Override
-        Execution onClose(@NotNull final UnitDuration delay) {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        Execution delayedClose() {
-            mLogger.dbg("avoiding closing result channel after delay since already closed");
-            return null;
+        boolean abortOutput() {
+            mLogger.dbg("aborting result channel");
+            return true;
         }
 
         @Nullable
@@ -638,6 +622,25 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             }
 
             return super.delayedAbortInvocation(reason);
+        }
+
+        @Nullable
+        @Override
+        Execution delayedClose() {
+            mLogger.dbg("avoiding closing result channel after delay since already closed");
+            return null;
+        }
+
+        @NotNull
+        private IllegalStateException exception() {
+            mLogger.err("invalid call on closed channel");
+            return new IllegalStateException("the input channel is closed");
+        }
+
+        @Nullable
+        @Override
+        Execution onClose(@NotNull final UnitDuration delay) {
+            return null;
         }
 
         @Nullable
@@ -681,17 +684,17 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      */
     private class CompleteChannelState extends ClosedChannelState {
 
+        @NotNull
+        private IllegalStateException exception() {
+            mLogger.err("consumer invalid call on closed channel");
+            return new IllegalStateException("the input channel is closed");
+        }
+
         @Nullable
         @Override
         Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
             mLogger.dbg(reason, "avoiding aborting after delay since channel is closed");
             return null;
-        }
-
-        @NotNull
-        private IllegalStateException exception() {
-            mLogger.err("consumer invalid call on closed channel");
-            return new IllegalStateException("the input channel is closed");
         }
 
         @Nullable
@@ -710,12 +713,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             mLogger.dbg(
                     "avoiding closing result channel after delay since invocation has completed");
             return null;
-        }
-
-        @Override
-        public void getInputs(@NotNull final Collection<IN> inputs) {
-            mLogger.wrn("avoiding consuming input since invocation has completed [#%d]",
-                    mPendingExecutionCount);
         }
 
         @Nullable
@@ -749,7 +746,19 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         @Override
+        public boolean onFirstInput(@NotNull final InputData<IN> inputData) {
+            return onNextInput(inputData);
+        }
+
+        @Override
         public void onInvocationComplete() {
+        }
+
+        @Override
+        public boolean onNextInput(@NotNull final InputData<IN> inputData) {
+            mLogger.wrn("avoiding consuming input since invocation has completed [#%d]",
+                    mPendingExecutionCount);
+            return false;
         }
 
         @Nullable
@@ -864,12 +873,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             }
         }
 
-        public void getInputs(@NotNull final Collection<IN> inputs) {
-            synchronized (mMutex) {
-                mState.getInputs(inputs);
-            }
-        }
-
         public void onAbortComplete() {
             final Throwable abortException;
             final List<Channel<?, ? extends IN>> channels;
@@ -896,10 +899,28 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             return isComplete;
         }
 
+        public boolean onFirstInput(@NotNull final InputData<IN> inputData) {
+            final boolean hasInput;
+            synchronized (mMutex) {
+                hasInput = mState.onFirstInput(inputData);
+            }
+
+            return hasInput;
+        }
+
         public void onInvocationComplete() {
             synchronized (mMutex) {
                 mState.onInvocationComplete();
             }
+        }
+
+        public boolean onNextInput(@NotNull final InputData<IN> inputData) {
+            final boolean hasInput;
+            synchronized (mMutex) {
+                hasInput = mState.onNextInput(inputData);
+            }
+
+            return hasInput;
         }
     }
 
@@ -920,14 +941,17 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         public void run() {
+            final RoutineException abortException = mAbortException;
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.delayedAbortInvocation(mAbortException);
+                execution = mState.delayedAbortInvocation(abortException);
             }
 
             if (execution != null) {
                 sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
+
+            mResultChanel.abort(abortException);
         }
     }
 
@@ -1114,13 +1138,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         }
 
         /**
-         * Called when the invocation is aborted but the channel has been already closed.
+         * Called when the invocation is aborted.
          *
-         * @return whether the output channel was aborted.
+         * @return whether the output channel has to be aborted.
          */
         boolean abortOutput() {
-            mLogger.dbg("aborting result channel");
-            return true;
+            return false;
         }
 
         /**
@@ -1508,17 +1531,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             return InvocationException.wrapIfNeeded(mAbortException);
         }
 
-        public void getInputs(@NotNull final Collection<IN> inputs) {
-            --mPendingExecutionCount;
-            mIsPendingExecution = false;
-            mInputQueue.transferTo(inputs);
-            mLogger.dbg("consuming inputs [#%d]: %s", mInputCount, inputs);
-            final int inputCount = (mInputCount -= inputs.size());
-            if (mIsWaitingInput && (mInputBackoff.getDelay(inputCount) == NO_DELAY)) {
-                mMutex.notifyAll();
-            }
-        }
-
         public void onAbortComplete() {
         }
 
@@ -1526,8 +1538,31 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             return false;
         }
 
+        public boolean onFirstInput(@NotNull final InputData<IN> inputData) {
+            --mPendingExecutionCount;
+            mIsPendingExecution = false;
+            return onNextInput(inputData);
+        }
+
         public void onInvocationComplete() {
             mState = new CompleteChannelState();
+        }
+
+        public boolean onNextInput(@NotNull final InputData<IN> inputData) {
+            final NestedQueue<IN> inputQueue = mInputQueue;
+            if (!inputQueue.isEmpty()) {
+                final IN input = inputQueue.removeFirst();
+                mLogger.dbg("consuming input [#%d]: %s", mInputCount, input);
+                final int inputCount = --mInputCount;
+                if (mIsWaitingInput && (mInputBackoff.getDelay(inputCount) == NO_DELAY)) {
+                    mMutex.notifyAll();
+                }
+
+                inputData.data = input;
+                return true;
+            }
+
+            return false;
         }
     }
 }

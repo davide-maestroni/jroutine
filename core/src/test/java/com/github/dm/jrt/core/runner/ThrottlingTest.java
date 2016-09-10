@@ -42,7 +42,7 @@ public class ThrottlingTest {
             runner.run(execution, 0, TimeUnit.MILLISECONDS);
         }
 
-        semaphore.acquire(100);
+        assertThat(semaphore.tryAcquire(100, 20, TimeUnit.SECONDS)).isTrue();
         assertThat(TestExecution.sFailed.get()).isFalse();
     }
 
@@ -66,7 +66,8 @@ public class ThrottlingTest {
 
             try {
                 millis(100).sleepAtLeast();
-            } catch (InterruptedException ignored) {
+
+            } catch (Throwable ignored) {
             }
 
             final int after = sCount.decrementAndGet();

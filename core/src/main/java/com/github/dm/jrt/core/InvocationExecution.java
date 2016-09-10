@@ -25,9 +25,6 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
  * Default implementation of an invocation execution.
  * <p>
@@ -41,7 +38,7 @@ import java.util.Collection;
  */
 class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
 
-    private final ArrayList<IN> mInputs = new ArrayList<IN>();
+    private final InputData<IN> mInputData = new InputData<IN>();
 
     private final InvocationManager<IN, OUT> mInvocationManager;
 
@@ -160,11 +157,12 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     mIsInitialized = true;
                 }
 
-                final ArrayList<IN> inputs = mInputs;
-                inputs.clear();
-                observer.getInputs(inputs);
-                for (final IN input : inputs) {
-                    invocation.onInput(input, resultChannel);
+                final InputData<IN> inputData = mInputData;
+                if (observer.onFirstInput(inputData)) {
+                    invocation.onInput(inputData.data, resultChannel);
+                    while (observer.onNextInput(inputData)) {
+                        invocation.onInput(inputData.data, resultChannel);
+                    }
                 }
 
             } finally {
@@ -212,13 +210,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         RoutineException getAbortException();
 
         /**
-         * Fills the specified collection with the available inputs.
-         *
-         * @param inputs the collection to fill.
-         */
-        void getInputs(@NotNull Collection<IN> inputs);
-
-        /**
          * Notifies that the execution abortion is complete.
          */
         void onAbortComplete();
@@ -231,9 +222,38 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         boolean onConsumeComplete();
 
         /**
+         * Asks the observer for the first input to be processed.
+         *
+         * @param inputData the input data to be filled.
+         * @return whether any data is available.
+         */
+        boolean onFirstInput(@NotNull InputData<IN> inputData);
+
+        /**
          * Notifies that the invocation execution is complete.
          */
         void onInvocationComplete();
+
+        /**
+         * Asks the observer for the next input to be processed.
+         *
+         * @param inputData the input data to be filled.
+         * @return whether any data is available.
+         */
+        boolean onNextInput(@NotNull InputData<IN> inputData);
+    }
+
+    /**
+     * Input data class.
+     *
+     * @param <IN> the input data type.
+     */
+    static class InputData<IN> {
+
+        /**
+         * The data object.
+         */
+        IN data;
     }
 
     /**

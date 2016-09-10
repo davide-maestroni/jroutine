@@ -118,6 +118,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private boolean mIWaitingOutput;
 
+    private Condition mIsComplete;
+
+    private Condition mIsError;
+
     private boolean mIsWaitingInvocation;
 
     private int mOutputCount;
@@ -254,6 +258,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             forceClose = mState.isDone();
             handler = (mBindingHandler =
                     new ConsumerHandler(ConstantConditions.notNull("channel consumer", consumer)));
+            mMutex.notifyAll();
         }
 
         runFlush(handler, forceClose);
@@ -329,15 +334,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 checkCanWait();
             }
 
-            final TimeUnit timeoutUnit = outputTimeout.unit;
-            final boolean isDone;
-            try {
-                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
+            if (mIsComplete == null) {
+                mIsComplete = new Condition() {
 
                     public boolean isTrue() {
                         return mState.isDone() || mIsWaitingInvocation;
                     }
-                });
+                };
+            }
+
+            final TimeUnit timeoutUnit = outputTimeout.unit;
+            final boolean isDone;
+            try {
+                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, mIsComplete);
 
             } catch (final InterruptedException e) {
                 throw new InvocationInterruptedException(e);
@@ -368,15 +377,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 checkCanWait();
             }
 
-            final TimeUnit timeoutUnit = outputTimeout.unit;
-            final boolean isDone;
-            try {
-                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, new Condition() {
+            if (mIsError == null) {
+                mIsError = new Condition() {
 
                     public boolean isTrue() {
                         return mState.isDone() || (mAbortException != null) || mIsWaitingInvocation;
                     }
-                });
+                };
+            }
+
+            final TimeUnit timeoutUnit = outputTimeout.unit;
+            final boolean isDone;
+            try {
+                isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, mIsError);
 
             } catch (final InterruptedException e) {
                 throw new InvocationInterruptedException(e);
@@ -660,7 +673,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         if (abortException != null) {
             for (final Channel<?, ? extends OUT> channel : channels) {
-                channel.abort(abortException);
+                channel.now().abort(abortException);
             }
 
             runFlush(handler, false);
@@ -724,7 +737,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                             + "consumer");
         }
 
-        if (Runner.isCurrentThreadManaged()) {
+        if (Runner.isManagedThread()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on a runner thread: " + Thread.currentThread()
                             + "\nTry binding the output channel to another channel or an output "
@@ -775,10 +788,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     private void internalAbort(@NotNull final RoutineException abortException) {
-        // TODO: 07/09/16 avoid clear? => mState == AbortChannelState
-        mOutputQueue.clear();
-        mPendingOutputCount = 0;
-        mAbortException = abortException;
+        if (mAbortException == null) {
+            mAbortException = abortException;
+        }
+
         mState = new ExceptionChannelState();
         mMutex.notifyAll();
     }
@@ -814,6 +827,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     mOutputHasNext = new Condition() {
 
                         public boolean isTrue() {
+                            verifyBound();
                             return !outputQueue.isEmpty() || mState.isDone()
                                     || mIsWaitingInvocation;
                         }
@@ -823,7 +837,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 final boolean isTimeout;
                 try {
                     isTimeout = !UnitDuration.waitTrue(timeout, timeUnit, mMutex, mOutputHasNext);
-                    verifyBound();
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);
@@ -862,10 +875,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @Nullable
     @SuppressWarnings("unchecked")
     private OUT nextOutput(final long timeout, @NotNull final TimeUnit timeUnit) {
-        final Object result = mOutputQueue.removeFirst();
+        final NestedQueue<Object> outputQueue = mOutputQueue;
+        final Object result = outputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%d %s]", mOutputCount, result, timeout, timeUnit);
         if (result instanceof RoutineExceptionWrapper) {
-            mOutputQueue.add(result);
+            outputQueue.clear();
+            outputQueue.add(result);
             throw ((RoutineExceptionWrapper) result).raise();
         }
 
@@ -906,6 +921,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     mOutputNotEmpty = new Condition() {
 
                         public boolean isTrue() {
+                            verifyBound();
                             return !outputQueue.isEmpty() || mState.isDone() ||
                                     mIsWaitingInvocation;
                         }
@@ -914,7 +930,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
                 try {
                     isTimeout = !UnitDuration.waitTrue(timeout, timeUnit, mMutex, mOutputNotEmpty);
-                    verifyBound();
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);
@@ -1111,6 +1126,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         private final Object mConsumerMutex;
 
+        private Object mOutput;
+
         /**
          * Constructor.
          *
@@ -1126,21 +1143,18 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final Logger logger = mLogger;
             RoutineException abortException = null;
             synchronized (mConsumerMutex) {
+                final NestedQueue<Object> outputQueue = mOutputQueue;
                 final OutputChannelState state;
-                final ArrayList<Object> outputs = new ArrayList<Object>();
                 final boolean isFinal;
                 synchronized (mMutex) {
                     state = mState;
                     isFinal = state.isReadyToComplete();
-                    mOutputQueue.transferTo(outputs);
-                    mOutputCount = 0;
-                    mMutex.notifyAll();
                 }
 
                 final ChannelConsumer<? super OUT> consumer = mConsumer;
                 try {
-                    // TODO: 06/09/16 onOutput(outputs)??
-                    for (final Object output : outputs) {
+                    while (fillNextOutput(outputQueue)) {
+                        final Object output = mOutput;
                         if (output instanceof RoutineExceptionWrapper) {
                             try {
                                 logger.dbg("aborting consumer (%s): %s", consumer, output);
@@ -1165,6 +1179,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
                     if (forceClose || isFinal) {
                         closeConsumer(state, consumer);
+
+                    } else {
+                        synchronized (mMutex) {
+                            mMutex.notifyAll();
+                        }
                     }
 
                 } catch (final InvocationInterruptedException e) {
@@ -1173,7 +1192,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 } catch (final Throwable t) {
                     synchronized (mMutex) {
                         logger.wrn(t, "consumer exception (%s)", consumer);
+                        outputQueue.clear();
                         abortException = mState.abortConsumer(t);
+                        mMutex.notifyAll();
                     }
                 }
             }
@@ -1181,6 +1202,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             if (abortException != null) {
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
             }
+        }
+
+        private boolean fillNextOutput(@NotNull final NestedQueue<Object> outputQueue) {
+            synchronized (mMutex) {
+                if (outputQueue.isEmpty()) {
+                    return false;
+                }
+
+                final Object result = (mOutput = outputQueue.removeFirst());
+                mLogger.dbg("consuming output [#%d]: %s", mOutputCount, result);
+                --mOutputCount;
+            }
+
+            return true;
         }
 
         @Nullable
@@ -1242,7 +1277,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final TimeUnit timeUnit = mDelayUnit;
             final boolean needsAbort;
             synchronized (mMutex) {
-                needsAbort = mState.onConsumerError(error, delay, timeUnit);
+                needsAbort = mState.onConsumerError(mQueue, error, delay, timeUnit);
             }
 
             if (needsAbort) {
@@ -1250,7 +1285,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     mHandler.onAbort(error, 0, TimeUnit.MILLISECONDS);
 
                 } else {
-                    mRunner.run(new DelayedConsumerErrorExecution(error), delay, timeUnit);
+                    mRunner.run(new DelayedConsumerErrorExecution(mQueue, error), delay, timeUnit);
                 }
             }
         }
@@ -1413,12 +1448,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         private final RoutineException mAbortException;
 
+        private final NestedQueue<Object> mQueue;
+
         /**
          * Constructor.
          *
+         * @param queue the output queue.
          * @param error the abortion error.
          */
-        private DelayedConsumerErrorExecution(@NotNull final RoutineException error) {
+        private DelayedConsumerErrorExecution(@NotNull final NestedQueue<Object> queue,
+                @NotNull final RoutineException error) {
+            mQueue = queue;
             mAbortException = error;
         }
 
@@ -1426,7 +1466,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             final RoutineException abortException = mAbortException;
             final boolean needsAbort;
             synchronized (mMutex) {
-                needsAbort = mState.delayedConsumerError(abortException);
+                needsAbort = mState.delayedConsumerError(mQueue, abortException);
             }
 
             if (needsAbort) {
@@ -1718,7 +1758,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         @Override
-        boolean delayedConsumerError(@NotNull final RoutineException error) {
+        boolean delayedConsumerError(@NotNull final NestedQueue<Object> queue,
+                @NotNull final RoutineException error) {
             mLogger.dbg(error,
                     "avoiding aborting on consumer exception after delay since result channel is "
                             + "closed");
@@ -1740,7 +1781,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         @Override
-        boolean onConsumerError(@NotNull final RoutineException error, final long delay,
+        boolean onConsumerError(@NotNull final NestedQueue<Object> queue,
+                @NotNull final RoutineException error, final long delay,
                 @NotNull final TimeUnit timeUnit) {
             mLogger.dbg(error,
                     "avoiding aborting on consumer exception since result channel is closed");
@@ -1845,9 +1887,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         RoutineException closeInvocation(@Nullable final Throwable throwable,
                 @NotNull final ArrayList<Channel<?, ? extends OUT>> channels) {
             mLogger.dbg(throwable, "aborting result channel");
-            channels.addAll(mBoundChannels);
-            mBoundChannels.clear();
-            mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
+            final ArrayList<Channel<?, ? extends OUT>> boundChannels = mBoundChannels;
+            channels.addAll(boundChannels);
+            boundChannels.clear();
+            final RoutineExceptionWrapper wrapper = RoutineExceptionWrapper.wrap(throwable);
+            final NestedQueue<Object> outputQueue = mOutputQueue;
+            if (mPendingOutputCount > 0) {
+                final ArrayList<Object> outputs = new ArrayList<Object>();
+                outputQueue.transferTo(outputs);
+                outputQueue.clear();
+                outputQueue.addAll(outputs);
+            }
+
+            outputQueue.add(wrapper);
             mPendingOutputCount = 0;
             final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
             if (mAbortException == null) {
@@ -1929,11 +1981,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         /**
          * Called when the feeding consumer receives an error after a delay.
          *
+         * @param queue the output queue.
          * @param error the error.
          * @return whether the queue content has changed.
          */
-        boolean delayedConsumerError(@NotNull final RoutineException error) {
+        boolean delayedConsumerError(@NotNull final NestedQueue<Object> queue,
+                @NotNull final RoutineException error) {
             mLogger.dbg(error, "aborting output on consumer exception after delay");
+            queue.close();
             internalAbort(error);
             return true;
         }
@@ -2020,15 +2075,18 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         /**
          * Called when the feeding consumer receives an error.
          *
+         * @param queue    the output queue.
          * @param error    the error.
          * @param delay    the output delay.
          * @param timeUnit the output delay unit.
          * @return whether the queue content has changed.
          */
-        boolean onConsumerError(@NotNull final RoutineException error, final long delay,
+        boolean onConsumerError(@NotNull final NestedQueue<Object> queue,
+                @NotNull final RoutineException error, final long delay,
                 @NotNull final TimeUnit timeUnit) {
             if (delay == 0) {
                 mLogger.dbg(error, "aborting output on consumer exception");
+                queue.close();
                 internalAbort(error);
             }
 

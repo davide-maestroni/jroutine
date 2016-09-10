@@ -1022,13 +1022,13 @@ public class OperatorsTest {
                                .call(3, "test")
                                .after(seconds(3))
                                .all()).containsOnly(3, "test");
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(200);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineCore.with(Operators.interval(millis(50)))
                                .call(3, "test")
                                .after(seconds(3))
                                .all()).containsOnly(3, "test");
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(50);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineCore.with(
                 Operators.interval(BackoffBuilder.afterCount(1).constantDelay(millis(200))))

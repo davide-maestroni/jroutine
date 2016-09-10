@@ -21,10 +21,9 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.LinkedList;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -65,7 +64,7 @@ class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
         private final int mCount;
 
-        private LinkedList<DATA> mData = new LinkedList<DATA>();
+        private SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
 
         /**
          * Constructor.
@@ -83,7 +82,7 @@ class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
         @Override
         public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            final LinkedList<DATA> data = mData;
+            final SimpleQueue<DATA> data = mData;
             data.add(input);
             if (data.size() > mCount) {
                 data.removeFirst();

@@ -33,7 +33,6 @@ import com.github.dm.jrt.core.util.SimpleQueue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,8 +58,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private final int mCoreInvocations;
 
-    private final LinkedList<Invocation<IN, OUT>> mInvocations =
-            new LinkedList<Invocation<IN, OUT>>();
+    private final SimpleQueue<Invocation<IN, OUT>> mInvocations =
+            new SimpleQueue<Invocation<IN, OUT>>();
 
     private final boolean mIsSyncRunner;
 
@@ -137,7 +136,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @Override
     public void clear() {
         synchronized (mMutex) {
-            final LinkedList<Invocation<IN, OUT>> asyncInvocations = mInvocations;
+            final SimpleQueue<Invocation<IN, OUT>> asyncInvocations = mInvocations;
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {
                 discard(invocation);
             }
@@ -315,7 +314,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             synchronized (mMutex) {
                 final Logger logger = mLogger;
                 final int coreInvocations = mCoreInvocations;
-                final LinkedList<Invocation<IN, OUT>> invocations = mInvocations;
+                final SimpleQueue<Invocation<IN, OUT>> invocations = mInvocations;
                 if (invocations.size() < coreInvocations) {
                     logger.dbg("recycling invocation instance [%d/%d]: %s", invocations.size() + 1,
                             coreInvocations, invocation);
@@ -354,7 +353,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
                     if (isDelayed || ((mRunningCount + observers.size()) < mMaxInvocations)) {
                         final int coreInvocations = mCoreInvocations;
-                        final LinkedList<Invocation<IN, OUT>> invocations = mInvocations;
+                        final SimpleQueue<Invocation<IN, OUT>> invocations = mInvocations;
                         if (!invocations.isEmpty()) {
                             invocation = invocations.removeFirst();
                             mLogger.dbg("reusing invocation instance [%d/%d]: %s",

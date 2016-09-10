@@ -18,6 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -78,7 +78,7 @@ public class ByteChannel {
 
     private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_BUFFER_SIZE;
 
-    private final LinkedList<ByteBuffer> mBufferPool = new LinkedList<ByteBuffer>();
+    private final SimpleQueue<ByteBuffer> mBufferPool = new SimpleQueue<ByteBuffer>();
 
     private final int mCorePoolSize;
 
@@ -193,7 +193,7 @@ public class ByteChannel {
     private ByteBuffer acquire() {
         ByteBuffer buffer = null;
         synchronized (mBufferPool) {
-            final LinkedList<ByteBuffer> bufferPool = mBufferPool;
+            final SimpleQueue<ByteBuffer> bufferPool = mBufferPool;
             if (!bufferPool.isEmpty()) {
                 buffer = bufferPool.removeFirst();
             }
@@ -208,7 +208,7 @@ public class ByteChannel {
 
     private void release(@NotNull final ByteBuffer buffer) {
         synchronized (mBufferPool) {
-            final LinkedList<ByteBuffer> bufferPool = mBufferPool;
+            final SimpleQueue<ByteBuffer> bufferPool = mBufferPool;
             if (bufferPool.size() < mCorePoolSize) {
                 bufferPool.add(buffer);
             }

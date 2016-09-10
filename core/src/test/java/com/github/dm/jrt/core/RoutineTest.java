@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.InvocationExecution.ExecutionObserver;
+import com.github.dm.jrt.core.InvocationExecution.InputData;
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -59,7 +60,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +111,7 @@ public class RoutineTest {
 
         final Channel<String, String> channel2 = routine.call().after(millis(10)).pass("test2");
         assertThat(channel2.isOpen()).isTrue();
-        assertThat(channel2.abort(new IllegalArgumentException("test2"))).isTrue();
+        assertThat(channel2.now().abort(new IllegalArgumentException("test2"))).isTrue();
         assertThat(channel2.after(timeout).getComplete()).isTrue();
         assertThat(channel2.abort()).isFalse();
         assertThat(channel2.isOpen()).isFalse();
@@ -769,7 +769,7 @@ public class RoutineTest {
         try {
             final Channel<String, String> channel = abortRoutine.call("test");
             millis(500).sleepAtLeast();
-            channel.after(timeout).next();
+            channel.after(timeout).all();
             fail();
 
         } catch (final AbortException ignored) {
@@ -3081,9 +3081,6 @@ public class RoutineTest {
             return new RoutineException();
         }
 
-        public void getInputs(@NotNull final Collection<Object> inputs) {
-        }
-
         public void onAbortComplete() {
         }
 
@@ -3091,7 +3088,15 @@ public class RoutineTest {
             return false;
         }
 
+        public boolean onFirstInput(@NotNull final InputData<Object> inputData) {
+            return false;
+        }
+
         public void onInvocationComplete() {
+        }
+
+        public boolean onNextInput(@NotNull final InputData<Object> inputData) {
+            return false;
         }
     }
 

@@ -103,12 +103,28 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-        final boolean isCancelled = mFuture.cancel(mInterruptIfRunning);
-        if (isCancelled) {
-            mAbortException.set(reason);
+        final Future<OUT> future = mFuture;
+        final UnitDuration delay = mOutputTimeout.get();
+        if (delay.isZero()) {
+            final boolean isCancelled = future.cancel(mInterruptIfRunning);
+            if (isCancelled) {
+                mAbortException.set(reason);
+            }
+
+            return isCancelled;
         }
 
-        return isCancelled;
+        if (!future.isCancelled()) {
+            mRunner.run(new Execution() {
+
+                public void run() {
+                    future.cancel(mInterruptIfRunning);
+                }
+            }, delay.value, delay.unit);
+            return true;
+        }
+
+        return false;
     }
 
     @NotNull
@@ -414,6 +430,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 }
 
                 mFuture.get(timeout, timeUnit);
+                verifyBound();
                 logger.dbg("has output: %s [%d %s]", true, timeout, timeUnit);
                 return true;
             }
@@ -453,6 +470,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 }
 
                 final OUT output = mFuture.get(timeout, timeUnit);
+                verifyBound();
                 mIsOutput = true;
                 return output;
             }

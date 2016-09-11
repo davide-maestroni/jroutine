@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.ChannelInvocation;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
@@ -228,6 +229,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
+        if (canOptimizeBinding()) {
+            mBindingFunction = getBindingFunction().andThen(new BindMappingFunction<OUT, AFTER>(
+                    mStreamConfiguration.asChannelConfiguration(), mappingFunction));
+            return (StreamBuilder<IN, AFTER>) this;
+        }
+
         return map(functionMapping(mappingFunction));
     }
 
@@ -257,6 +264,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAccept(
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
+        if (canOptimizeBinding()) {
+            mBindingFunction = getBindingFunction().andThen(new BindMappingConsumer<OUT, AFTER>(
+                    mStreamConfiguration.asChannelConfiguration(), mappingConsumer));
+            return (StreamBuilder<IN, AFTER>) this;
+        }
+
         return map(consumerMapping(mappingConsumer));
     }
 
@@ -264,6 +277,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     @SuppressWarnings("unchecked")
     public <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
+        if (canOptimizeBinding()) {
+            mBindingFunction = getBindingFunction().andThen(new BindMappingAllFunction<OUT, AFTER>(
+                    mStreamConfiguration.asChannelConfiguration(), mappingFunction));
+            return (StreamBuilder<IN, AFTER>) this;
+        }
+
         return map(functionCall(mappingFunction));
     }
 
@@ -272,6 +291,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
+        if (canOptimizeBinding()) {
+            mBindingFunction = getBindingFunction().andThen(new BindMappingAllConsumer<OUT, AFTER>(
+                    mStreamConfiguration.asChannelConfiguration(), mappingConsumer));
+            return (StreamBuilder<IN, AFTER>) this;
+        }
+
         return map(consumerCall(mappingConsumer));
     }
 
@@ -324,6 +349,28 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     protected StreamBuilder<IN, OUT> apply(@NotNull final StreamConfiguration configuration) {
         mStreamConfiguration = ConstantConditions.notNull("stream configuration", configuration);
         return this;
+    }
+
+    /**
+     * Checks if the current configuration allows to optimize the binding of the next mapping
+     * function or consumer.
+     * <br>
+     * The optimization will consist in avoiding the creation of a routine, by employing a simple
+     * channel consumer instead.
+     *
+     * @return whether the next binding can be optimized.
+     */
+    protected boolean canOptimizeBinding() {
+        final ChannelConfiguration configuration = mStreamConfiguration.asInvocationConfiguration()
+                                                                       .inputConfigurationBuilder()
+                                                                       .configured();
+        return configuration.getRunnerOrElse(Runners.sharedRunner()).isSynchronous()
+                && configuration.builderFrom()
+                                .withRunner(null)
+                                .withLogLevel(null)
+                                .withLog(null)
+                                .configured()
+                                .equals(ChannelConfiguration.defaultConfiguration());
     }
 
     /**

@@ -307,6 +307,11 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         return this;
     }
 
+    @Override
+    protected boolean canOptimizeBinding() {
+        return (mStreamConfiguration.getLoaderContext() == null) && super.canOptimizeBinding();
+    }
+
     @NotNull
     @Override
     protected LoaderStreamConfigurationCompat newConfiguration(

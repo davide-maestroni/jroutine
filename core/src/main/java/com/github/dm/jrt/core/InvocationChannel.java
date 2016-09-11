@@ -889,7 +889,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
             }
 
             for (final Channel<?, ? extends IN> channel : channels) {
-                channel.abort(abortException);
+                channel.now().abort(abortException);
             }
         }
 

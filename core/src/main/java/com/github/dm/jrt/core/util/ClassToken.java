@@ -195,7 +195,5 @@ public abstract class ClassToken<TYPE> {
      *
      * @param <TYPE> the class type.
      */
-    private static class DefaultClassToken<TYPE> extends ClassToken<TYPE> {
-
-    }
+    private static class DefaultClassToken<TYPE> extends ClassToken<TYPE> {}
 }

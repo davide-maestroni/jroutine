@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -37,6 +38,7 @@ import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.LocalValue;
+import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.core.util.UnitDuration.Condition;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
@@ -164,6 +166,51 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         };
         final Backoff backoff = mOutputBackoff;
         mHasOutputs = (configuration.getBackoffOrElse(null) != null) ? new Condition() {
+
+            public boolean isTrue() {
+                return (backoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
+                        mAbortException != null);
+            }
+        } : new Condition() {
+
+            public boolean isTrue() {
+                return true;
+            }
+        };
+        mBindingHandler = new OutputHandler();
+        mState = new OutputChannelState();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param configuration the invocation configuration.
+     * @param handler       the abort handler.
+     * @param runner        the runner instance.
+     * @param logger        the logger instance.
+     */
+    ResultChannel(@NotNull final InvocationConfiguration configuration,
+            @NotNull final AbortHandler handler, @NotNull final Runner runner,
+            @NotNull final Logger logger) {
+        mLogger = logger.subContextLogger(this);
+        mHandler = ConstantConditions.notNull("abort handler", handler);
+        mRunner = ConstantConditions.notNull("runner instance", runner);
+        mResultOrder = new LocalValue<OrderType>(
+                configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED));
+        mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
+        mTimeoutActionType = new LocalValue<TimeoutActionType>(
+                configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
+        mOutputBackoff = configuration.getOutputBackoffOrElse(BackoffBuilder.noDelay());
+        mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
+        mOutputQueue = new NestedQueue<Object>() {
+
+            @Override
+            public void close() {
+                // Preventing closing
+            }
+        };
+        final Backoff backoff = mOutputBackoff;
+        mHasOutputs = (configuration.getOutputBackoffOrElse(null) != null) ? new Condition() {
 
             public boolean isTrue() {
                 return (backoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
@@ -1135,7 +1182,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         private final Object mConsumerMutex;
 
-        private Object mOutput;
+        private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
         /**
          * Constructor.
@@ -1153,17 +1200,21 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             RoutineException abortException = null;
             synchronized (mConsumerMutex) {
                 final NestedQueue<Object> outputQueue = mOutputQueue;
+                final SimpleQueue<Object> queue = mQueue;
                 final OutputChannelState currentState;
                 final boolean isFinal;
                 synchronized (mMutex) {
                     currentState = mState;
                     isFinal = currentState.isReadyToComplete();
+                    outputQueue.transferTo(queue);
+                    mOutputCount = 0;
+                    mMutex.notifyAll();
                 }
 
                 final ChannelConsumer<? super OUT> consumer = mConsumer;
                 try {
-                    while (fillNextOutput(outputQueue)) {
-                        final Object output = mOutput;
+                    while (!queue.isEmpty()) {
+                        final Object output = queue.removeFirst();
                         if (output instanceof RoutineExceptionWrapper) {
                             try {
                                 logger.dbg("aborting consumer (%s): %s", consumer, output);
@@ -1178,6 +1229,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                                 logger.err(t, "ignoring consumer exception (%s)", consumer);
                             }
 
+                            queue.clear();
                             break;
 
                         } else {
@@ -1188,12 +1240,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
                     if (forceClose || isFinal) {
                         closeConsumer(currentState, consumer);
-
-                    } else {
-                        synchronized (mMutex) {
-                            // Wake up the threads waiting for room in the output queue
-                            mMutex.notifyAll();
-                        }
                     }
 
                 } catch (final InvocationInterruptedException e) {
@@ -1203,8 +1249,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                     synchronized (mMutex) {
                         logger.wrn(t, "consumer exception (%s)", consumer);
                         outputQueue.clear();
+                        queue.clear();
                         abortException = mState.abortConsumer(t);
-                        mMutex.notifyAll();
                     }
                 }
             }
@@ -1212,20 +1258,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             if (abortException != null) {
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
             }
-        }
-
-        private boolean fillNextOutput(@NotNull final NestedQueue<Object> outputQueue) {
-            synchronized (mMutex) {
-                if (outputQueue.isEmpty()) {
-                    return false;
-                }
-
-                final Object result = (mOutput = outputQueue.removeFirst());
-                mLogger.dbg("consuming output [#%d]: %s", mOutputCount, result);
-                --mOutputCount;
-            }
-
-            return true;
         }
 
         @Nullable

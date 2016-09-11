@@ -45,6 +45,8 @@ public class SimpleQueue<E> implements Iterable<E> {
 
     private Object[] mQueue = new Object[INITIAL_SIZE];
 
+    private volatile long mReplaceCount = Long.MIN_VALUE;
+
     private int mSize;
 
     private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
@@ -197,6 +199,28 @@ public class SimpleQueue<E> implements Iterable<E> {
         mSize = 0;
     }
 
+    /**
+     * Removes all the elements from this queue and add them to the specified one.
+     *
+     * @param other the queue to fill.
+     */
+    @SuppressWarnings("unchecked")
+    public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+        final Object[] queue = mQueue;
+        final int mask = mMask;
+        final int last = mLast;
+        int i = mFirst;
+        while (i != last) {
+            other.add((E) queue[i]);
+            queue[i] = null;
+            i = (i + 1) & mask;
+        }
+
+        mFirst = 0;
+        mLast = 0;
+        mSize = 0;
+    }
+
     private void doubleCapacity() {
         final Object[] queue = mQueue;
         final int size = queue.length;
@@ -231,6 +255,8 @@ public class SimpleQueue<E> implements Iterable<E> {
 
         private int mPointer;
 
+        private long mReplaceCount;
+
         /**
          * Constructor.
          */
@@ -238,6 +264,7 @@ public class SimpleQueue<E> implements Iterable<E> {
             mQueue = queue;
             mPointer = (mOriginalFirst = queue.mFirst);
             mOriginalLast = queue.mLast;
+            mReplaceCount = queue.mReplaceCount;
         }
 
         public boolean hasNext() {
@@ -247,12 +274,13 @@ public class SimpleQueue<E> implements Iterable<E> {
         @SuppressWarnings("unchecked")
         public E next() {
             final SimpleQueue<E> queue = mQueue;
-            if (queue.mFirst != mOriginalFirst) {
+            final int originalLast = mOriginalLast;
+            if (queue.mLast != originalLast) {
                 throw new ConcurrentModificationException();
             }
 
             final int pointer = mPointer;
-            if (pointer == mOriginalLast) {
+            if (pointer == originalLast) {
                 throw new NoSuchElementException();
             }
 
@@ -265,7 +293,9 @@ public class SimpleQueue<E> implements Iterable<E> {
         }
 
         /**
-         * Replace the last element returned by {@code next()} with the specified one.
+         * Replaces the last element returned by {@code next()} with the specified one.
+         * <br>
+         * This method can be called several times to replace the same element.
          *
          * @param element the replacement element.
          * @throws java.lang.IllegalStateException if the {@code next()} method has not yet been
@@ -278,6 +308,10 @@ public class SimpleQueue<E> implements Iterable<E> {
             }
 
             final SimpleQueue<E> queue = mQueue;
+            if ((queue.mLast != mOriginalLast) || (++mReplaceCount != ++queue.mReplaceCount)) {
+                throw new ConcurrentModificationException();
+            }
+
             final int mask = queue.mMask;
             queue.mQueue[(pointer + mask) & mask] = element;
         }

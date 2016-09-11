@@ -47,8 +47,7 @@ class ThrottlingRunner extends RunnerDecorator {
 
     private final SimpleQueue<PendingExecution> mQueue = new SimpleQueue<PendingExecution>();
 
-    private final PendingExecution mVoidExecution =
-            new PendingExecution(new VoidExecution(), 0, TimeUnit.MILLISECONDS);
+    private final VoidPendingExecution mVoidExecution = new VoidPendingExecution();
 
     private int mRunningCount;
 
@@ -216,6 +215,34 @@ class ThrottlingRunner extends RunnerDecorator {
                 if (pendingExecution != null) {
                     pendingExecution.run();
                 }
+            }
+        }
+    }
+
+    /**
+     * Void pending execution implementation.
+     */
+    private class VoidPendingExecution extends PendingExecution {
+
+        /**
+         * Constructor.
+         */
+        private VoidPendingExecution() {
+            super(new VoidExecution(), 0, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public void run() {
+            final SimpleQueue<PendingExecution> queue = mQueue;
+            PendingExecution pendingExecution = null;
+            synchronized (mMutex) {
+                if (!queue.isEmpty()) {
+                    pendingExecution = queue.removeFirst();
+                }
+            }
+
+            if (pendingExecution != null) {
+                pendingExecution.run();
             }
         }
     }

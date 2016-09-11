@@ -44,9 +44,4 @@ public abstract class AsyncRunner extends Runner {
     public boolean isExecutionThread() {
         return getThreadManager().isManagedThread();
     }
-
-    @Override
-    public boolean isSynchronous() {
-        return false;
-    }
 }

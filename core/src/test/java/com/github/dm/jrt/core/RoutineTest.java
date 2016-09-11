@@ -26,7 +26,6 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -1013,7 +1012,7 @@ public class RoutineTest {
         final Logger logger = Logger.newLogger(null, null, this);
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(null, new TestExecutionObserver(), channel,
                     logger);
@@ -1024,7 +1023,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
                     logger);
@@ -1043,7 +1042,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
                     new TestExecutionObserver(), channel, null);
@@ -1705,7 +1704,7 @@ public class RoutineTest {
     public void testResultChannelError() {
         final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(), null,
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
                     Runners.sharedRunner(), logger);
             fail();
 
@@ -1713,7 +1712,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), null, logger);
             fail();
 
@@ -1721,7 +1720,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), null);
             fail();
 
@@ -1729,7 +1728,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
             fail();
 
@@ -1737,7 +1736,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
             fail();
 
@@ -1746,7 +1745,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.sharedRunner(), logger);
             channel.after(-1, TimeUnit.MILLISECONDS);
             fail();

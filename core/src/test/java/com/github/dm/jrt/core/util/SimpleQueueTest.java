@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.util.SimpleQueue.SimpleQueueIterator;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,6 +147,28 @@ public class SimpleQueueTest {
     }
 
     @Test
+    public void testDrain2() {
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 7; i++) {
+            queue.add(i);
+        }
+
+        for (int i = 0; i < 3; i++) {
+            assertThat(queue.isEmpty()).isFalse();
+            assertThat(queue.peekFirst()).isEqualTo(i);
+            assertThat(queue.removeFirst()).isEqualTo(i);
+        }
+
+        final SimpleQueue<Integer> other = new SimpleQueue<Integer>();
+        queue.transferTo(other);
+        assertThat(queue.isEmpty()).isTrue();
+        int i = 3;
+        for (final Integer integer : other) {
+            assertThat(integer).isEqualTo(i++);
+        }
+    }
+
+    @Test
     public void testIterator() {
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
         for (int i = 0; i < 7; i++) {
@@ -179,6 +202,86 @@ public class SimpleQueueTest {
         }
 
         assertThat(queue.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void testIteratorError() {
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 7; i++) {
+            queue.add(i);
+        }
+
+        final SimpleQueueIterator<Integer> iterator = queue.iterator();
+        try {
+            iterator.remove();
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+        }
+
+        try {
+            iterator.replace(-11);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+
+        assertThat(iterator.next()).isEqualTo(0);
+        iterator.replace(-11);
+        iterator.replace(31);
+        queue.add(8);
+        try {
+            iterator.next();
+            fail();
+
+        } catch (final ConcurrentModificationException ignored) {
+        }
+
+        try {
+            iterator.replace(-11);
+            fail();
+
+        } catch (final ConcurrentModificationException ignored) {
+        }
+    }
+
+    @Test
+    public void testIteratorError2() {
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        for (int i = 0; i < 7; i++) {
+            queue.add(i);
+        }
+
+        final SimpleQueueIterator<Integer> iterator1 = queue.iterator();
+        final SimpleQueueIterator<Integer> iterator2 = queue.iterator();
+        assertThat(iterator1.next()).isEqualTo(0);
+        assertThat(iterator2.next()).isEqualTo(0);
+        iterator1.replace(-11);
+        assertThat(iterator1.next()).isEqualTo(1);
+        assertThat(iterator2.next()).isEqualTo(1);
+        iterator1.replace(31);
+        try {
+            iterator2.replace(77);
+            fail();
+
+        } catch (final ConcurrentModificationException ignored) {
+        }
+
+        try {
+            for (final Integer ignored : queue) {
+                queue.add(8);
+            }
+
+            fail();
+
+        } catch (final ConcurrentModificationException ignored) {
+        }
+
+        final SimpleQueueIterator<Integer> iterator3 = queue.iterator();
+        assertThat(iterator3.next()).isEqualTo(-11);
+        assertThat(iterator3.next()).isEqualTo(31);
+        assertThat(queue.removeFirst()).isEqualTo(-11);
+        assertThat(queue.removeFirst()).isEqualTo(31);
     }
 
     @Test

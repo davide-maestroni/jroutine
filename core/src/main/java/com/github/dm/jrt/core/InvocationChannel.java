@@ -142,32 +142,30 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
                 return true;
             }
         };
-        mResultChanel =
-                new ResultChannel<OUT>(configuration.outputConfigurationBuilder().configured(),
-                        new AbortHandler() {
+        mResultChanel = new ResultChannel<OUT>(configuration, new AbortHandler() {
 
-                            public void onAbort(@NotNull final RoutineException reason,
-                                    final long delay, @NotNull final TimeUnit timeUnit) {
-                                final Execution execution;
-                                synchronized (mMutex) {
-                                    execution = mState.onHandlerAbort(reason, delay, timeUnit);
-                                }
+            public void onAbort(@NotNull final RoutineException reason, final long delay,
+                    @NotNull final TimeUnit timeUnit) {
+                final Execution execution;
+                synchronized (mMutex) {
+                    execution = mState.onHandlerAbort(reason, delay, timeUnit);
+                }
 
-                                if (execution != null) {
-                                    mRunner.run(execution, delay, timeUnit);
+                if (execution != null) {
+                    mRunner.run(execution, delay, timeUnit);
 
-                                } else {
-                                    // Make sure the invocation is properly recycled
-                                    mRunner.run(new Execution() {
+                } else {
+                    // Make sure the invocation is properly recycled
+                    mRunner.run(new Execution() {
 
-                                        public void run() {
-                                            mExecution.recycle(reason);
-                                            mResultChanel.close(reason);
-                                        }
-                                    }, 0, TimeUnit.MILLISECONDS);
-                                }
-                            }
-                        }, resultRunner, logger);
+                        public void run() {
+                            mExecution.recycle(reason);
+                            mResultChanel.close(reason);
+                        }
+                    }, 0, TimeUnit.MILLISECONDS);
+                }
+            }
+        }, resultRunner, logger);
         mExecution = new InvocationExecution<IN, OUT>(manager, new DefaultExecutionObserver(),
                 mResultChanel, logger);
         mState = new InputChannelState();

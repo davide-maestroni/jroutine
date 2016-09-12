@@ -33,8 +33,10 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -55,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
@@ -554,6 +557,246 @@ public class StreamBuilderTest {
                                                        .map(Operators.averageDouble())
                                                        .close()
                                                        .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    @Test
+    public void testImmediateOptimization() {
+        assertThat(JRoutineStream.<Integer>withStream().immediate()
+                                                       .map(new Function<Integer, Integer>() {
+
+                                                           public Integer apply(
+                                                                   final Integer integer) {
+                                                               return integer << 1;
+                                                           }
+                                                       })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(2, 4, 6);
+        assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
+                                                       .map(new Function<Integer, Integer>() {
+
+                                                           public Integer apply(
+                                                                   final Integer integer) {
+                                                               return integer << 1;
+                                                           }
+                                                       })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(2, 4, 6);
+        assertThat(JRoutineStream.<Integer>withStream().immediate()
+                                                       .mapAccept(
+                                                               new BiConsumer<Integer,
+                                                                       Channel<Integer, ?>>() {
+
+                                                                   public void accept(
+                                                                           final Integer integer,
+                                                                           final Channel<Integer,
+                                                                                   ?> result) {
+                                                                       result.pass(integer << 1);
+                                                                   }
+                                                               })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(2, 4, 6);
+        assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
+                                                       .mapAccept(
+                                                               new BiConsumer<Integer,
+                                                                       Channel<Integer, ?>>() {
+
+                                                                   public void accept(
+                                                                           final Integer integer,
+                                                                           final Channel<Integer,
+                                                                                   ?> result) {
+                                                                       result.pass(integer << 1);
+                                                                   }
+                                                               })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(2, 4, 6);
+        assertThat(JRoutineStream.<Integer>withStream().immediate()
+                                                       .mapAll(new Function<List<Integer>,
+                                                               Integer>() {
+
+                                                           public Integer apply(
+                                                                   final List<Integer> integers) {
+                                                               int sum = 0;
+                                                               for (final Integer integer :
+                                                                       integers) {
+                                                                   sum += integer;
+                                                               }
+
+                                                               return sum;
+                                                           }
+                                                       })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(6);
+        assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
+                                                       .mapAll(new Function<List<Integer>,
+                                                               Integer>() {
+
+                                                           public Integer apply(
+                                                                   final List<Integer> integers) {
+                                                               int sum = 0;
+                                                               for (final Integer integer :
+                                                                       integers) {
+                                                                   sum += integer;
+                                                               }
+
+                                                               return sum;
+                                                           }
+                                                       })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(1, 2, 3);
+        assertThat(JRoutineStream.<Integer>withStream().immediate()
+                                                       .mapAllAccept(
+                                                               new BiConsumer<List<Integer>,
+                                                                       Channel<Integer, ?>>() {
+
+                                                                   public void accept(
+                                                                           final List<Integer>
+                                                                                   integers,
+                                                                           final Channel<Integer,
+                                                                                   ?> result) {
+                                                                       int sum = 0;
+                                                                       for (final Integer integer
+                                                                               : integers) {
+                                                                           sum += integer;
+                                                                       }
+
+                                                                       result.pass(sum);
+                                                                   }
+                                                               })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(6);
+        assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
+                                                       .mapAllAccept(
+                                                               new BiConsumer<List<Integer>,
+                                                                       Channel<Integer, ?>>() {
+
+                                                                   public void accept(
+                                                                           final List<Integer>
+                                                                                   integers,
+                                                                           final Channel<Integer,
+                                                                                   ?> result) {
+                                                                       int sum = 0;
+                                                                       for (final Integer integer
+                                                                               : integers) {
+                                                                           sum += integer;
+                                                                       }
+
+                                                                       result.pass(sum);
+                                                                   }
+                                                               })
+                                                       .call(1, 2, 3)
+                                                       .all()).containsExactly(1, 2, 3);
+    }
+
+    @Test
+    public void testImmediateOptimizationAbort() {
+        Channel<Integer, Integer> channel = JRoutineStream //
+                .<Integer>withStream().immediate().map(new Function<Integer, Integer>() {
+
+                    public Integer apply(final Integer integer) {
+                        return integer << 1;
+                    }
+                }).call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediateParallel().map(new Function<Integer, Integer>() {
+
+                    public Integer apply(final Integer integer) {
+                        return integer << 1;
+                    }
+                }).call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediate()
+                                      .mapAccept(new BiConsumer<Integer, Channel<Integer, ?>>() {
+
+                                          public void accept(final Integer integer,
+                                                  final Channel<Integer, ?> result) {
+                                              result.pass(integer << 1);
+                                          }
+                                      })
+                                      .call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediateParallel()
+                                      .mapAccept(new BiConsumer<Integer, Channel<Integer, ?>>() {
+
+                                          public void accept(final Integer integer,
+                                                  final Channel<Integer, ?> result) {
+                                              result.pass(integer << 1);
+                                          }
+                                      })
+                                      .call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediate().mapAll(new Function<List<Integer>, Integer>() {
+
+                    public Integer apply(final List<Integer> integers) {
+                        int sum = 0;
+                        for (final Integer integer : integers) {
+                            sum += integer;
+                        }
+
+                        return sum;
+                    }
+                }).call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediateParallel()
+                                      .mapAll(new Function<List<Integer>, Integer>() {
+
+                                          public Integer apply(final List<Integer> integers) {
+                                              int sum = 0;
+                                              for (final Integer integer : integers) {
+                                                  sum += integer;
+                                              }
+
+                                              return sum;
+                                          }
+                                      })
+                                      .call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediate()
+                                      .mapAllAccept(
+                                              new BiConsumer<List<Integer>, Channel<Integer, ?>>() {
+
+                                                  public void accept(final List<Integer> integers,
+                                                          final Channel<Integer, ?> result) {
+                                                      int sum = 0;
+                                                      for (final Integer integer : integers) {
+                                                          sum += integer;
+                                                      }
+
+                                                      result.pass(sum);
+                                                  }
+                                              })
+                                      .call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
+        channel = JRoutineStream //
+                .<Integer>withStream().immediateParallel()
+                                      .mapAllAccept(
+                                              new BiConsumer<List<Integer>, Channel<Integer, ?>>() {
+
+                                                  public void accept(final List<Integer> integers,
+                                                          final Channel<Integer, ?> result) {
+                                                      int sum = 0;
+                                                      for (final Integer integer : integers) {
+                                                          sum += integer;
+                                                      }
+
+                                                      result.pass(sum);
+                                                  }
+                                              })
+                                      .call();
+        assertThat(channel.pass(1).abort()).isTrue();
+        assertThat(channel.getError()).isNotNull();
     }
 
     @Test
@@ -1065,6 +1308,26 @@ public class StreamBuilderTest {
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    @Test
+    public void testMapOn() {
+        final AtomicBoolean isCalled = new AtomicBoolean();
+        final Runner testRunner = new SyncRunner() {
+
+            @Override
+            public void run(@NotNull final Execution execution, final long delay,
+                    @NotNull final TimeUnit timeUnit) {
+                isCalled.set(true);
+                execution.run();
+            }
+        };
+        assertThat(JRoutineStream.<String>withStream().unsorted()
+                                                      .mapOn(testRunner)
+                                                      .call("test")
+                                                      .after(seconds(1))
+                                                      .all()).containsExactly("test");
+        assertThat(isCalled.get()).isTrue();
     }
 
     @Test

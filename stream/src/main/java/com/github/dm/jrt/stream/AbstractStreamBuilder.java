@@ -277,8 +277,10 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     public <AFTER> StreamBuilder<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
         if (canOptimizeBinding()) {
+            final StreamConfiguration streamConfiguration = mStreamConfiguration;
             mBindingFunction = getBindingFunction().andThen(new BindMappingAllFunction<OUT, AFTER>(
-                    mStreamConfiguration.toChannelConfiguration(), mappingFunction));
+                    streamConfiguration.toChannelConfiguration(),
+                    streamConfiguration.getInvocationMode(), mappingFunction));
             return (StreamBuilder<IN, AFTER>) this;
         }
 
@@ -291,8 +293,10 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>>
                     mappingConsumer) {
         if (canOptimizeBinding()) {
+            final StreamConfiguration streamConfiguration = mStreamConfiguration;
             mBindingFunction = getBindingFunction().andThen(new BindMappingAllConsumer<OUT, AFTER>(
-                    mStreamConfiguration.toChannelConfiguration(), mappingConsumer));
+                    streamConfiguration.toChannelConfiguration(),
+                    streamConfiguration.getInvocationMode(), mappingConsumer));
             return (StreamBuilder<IN, AFTER>) this;
         }
 

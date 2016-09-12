@@ -110,7 +110,7 @@ public class SimpleQueueTest {
 
     @Test
     public void testClear() {
-        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+        final SimpleQueue<Integer> queue = new SimpleQueue<Integer>(10);
         for (int i = 0; i < 77; i++) {
             queue.add(i);
         }

@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Minimal implementation of a light-weight queue storing elements into dynamically increasing
+ * Minimal implementation of a light-weight queue, storing elements into a dynamically increasing
  * circular buffer.
  * <p>
  * Created by davide-maestroni on 09/27/2014.
@@ -35,19 +35,41 @@ import java.util.NoSuchElementException;
  */
 public class SimpleQueue<E> implements Iterable<E> {
 
-    private static final int INITIAL_SIZE = 1 << 3; // 8
+    private static final int DEFAULT_SIZE = 1 << 3; // 8
 
     private int mFirst;
 
     private int mLast;
 
-    private int mMask = INITIAL_SIZE - 1;
+    private int mMask;
 
-    private Object[] mQueue = new Object[INITIAL_SIZE];
+    private Object[] mQueue;
 
     private volatile long mReplaceCount = Long.MIN_VALUE;
 
     private int mSize;
+
+    /**
+     * Constructor.
+     */
+    public SimpleQueue() {
+        mQueue = new Object[DEFAULT_SIZE];
+        mMask = DEFAULT_SIZE - 1;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param minCapacity the minimum capacity.
+     * @throws java.lang.IllegalArgumentException if the specified capacity is less than 1.
+     */
+    public SimpleQueue(final int minCapacity) {
+        final int msb =
+                Integer.highestOneBit(ConstantConditions.positive("minimum capacity", minCapacity));
+        final int initialCapacity = (minCapacity == msb) ? msb : msb << 1;
+        mQueue = new Object[initialCapacity];
+        mMask = initialCapacity - 1;
+    }
 
     private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
             final int first) {

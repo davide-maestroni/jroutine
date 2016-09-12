@@ -631,9 +631,9 @@ public class StreamBuilderTest {
                     public Function<Channel<?, String>, Channel<?, String>> apply(
                             final StreamConfiguration configuration,
                             final Function<Channel<?, String>, Channel<?, String>> function) {
-                        assertThat(configuration.asChannelConfiguration()).isEqualTo(
+                        assertThat(configuration.toChannelConfiguration()).isEqualTo(
                                 ChannelConfiguration.defaultConfiguration());
-                        assertThat(configuration.asInvocationConfiguration()).isEqualTo(
+                        assertThat(configuration.toInvocationConfiguration()).isEqualTo(
                                 InvocationConfiguration.defaultConfiguration());
                         assertThat(configuration.getInvocationMode()).isEqualTo(
                                 InvocationMode.ASYNC);

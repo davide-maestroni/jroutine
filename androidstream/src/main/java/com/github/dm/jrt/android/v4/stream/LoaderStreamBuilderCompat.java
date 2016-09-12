@@ -377,14 +377,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
     interface LoaderStreamConfigurationCompat extends StreamConfiguration {
 
         /**
-         * Gets the combination of stream and current configuration as a Loader one.
-         *
-         * @return the Loader configuration.
-         */
-        @NotNull
-        LoaderConfiguration asLoaderConfiguration();
-
-        /**
          * Gets the configuration that will override the stream one only for the next
          * concatenated routine.
          *
@@ -408,5 +400,13 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
          */
         @NotNull
         LoaderConfiguration getStreamLoaderConfiguration();
+
+        /**
+         * Gets the combination of stream and current configuration as a Loader one.
+         *
+         * @return the Loader configuration.
+         */
+        @NotNull
+        LoaderConfiguration toLoaderConfiguration();
     }
 }

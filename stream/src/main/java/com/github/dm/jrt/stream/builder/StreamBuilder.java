@@ -419,22 +419,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
     interface StreamConfiguration {
 
         /**
-         * Gets the combination of stream and current configuration as a channel one.
-         *
-         * @return the channel configuration.
-         */
-        @NotNull
-        ChannelConfiguration asChannelConfiguration();
-
-        /**
-         * Gets the combination of stream and current configuration as an invocation one.
-         *
-         * @return the invocation configuration.
-         */
-        @NotNull
-        InvocationConfiguration asInvocationConfiguration();
-
-        /**
          * Gets the configuration that will override the stream one only for the next
          * concatenated routine.
          *
@@ -458,5 +442,21 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
          */
         @NotNull
         InvocationConfiguration getStreamInvocationConfiguration();
+
+        /**
+         * Gets the combination of stream and current configuration as a channel one.
+         *
+         * @return the channel configuration.
+         */
+        @NotNull
+        ChannelConfiguration toChannelConfiguration();
+
+        /**
+         * Gets the combination of stream and current configuration as an invocation one.
+         *
+         * @return the invocation configuration.
+         */
+        @NotNull
+        InvocationConfiguration toInvocationConfiguration();
     }
 }

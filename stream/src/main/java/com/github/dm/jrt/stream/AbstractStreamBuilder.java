@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.ChannelInvocation;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
@@ -231,7 +230,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull final Function<? super OUT, ? extends AFTER> mappingFunction) {
         if (canOptimizeBinding()) {
             mBindingFunction = getBindingFunction().andThen(new BindMappingFunction<OUT, AFTER>(
-                    mStreamConfiguration.asChannelConfiguration(), mappingFunction));
+                    mStreamConfiguration.toChannelConfiguration(), mappingFunction));
             return (StreamBuilder<IN, AFTER>) this;
         }
 
@@ -266,7 +265,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull final BiConsumer<? super OUT, ? super Channel<AFTER, ?>> mappingConsumer) {
         if (canOptimizeBinding()) {
             mBindingFunction = getBindingFunction().andThen(new BindMappingConsumer<OUT, AFTER>(
-                    mStreamConfiguration.asChannelConfiguration(), mappingConsumer));
+                    mStreamConfiguration.toChannelConfiguration(), mappingConsumer));
             return (StreamBuilder<IN, AFTER>) this;
         }
 
@@ -279,7 +278,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
         if (canOptimizeBinding()) {
             mBindingFunction = getBindingFunction().andThen(new BindMappingAllFunction<OUT, AFTER>(
-                    mStreamConfiguration.asChannelConfiguration(), mappingFunction));
+                    mStreamConfiguration.toChannelConfiguration(), mappingFunction));
             return (StreamBuilder<IN, AFTER>) this;
         }
 
@@ -293,7 +292,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
                     mappingConsumer) {
         if (canOptimizeBinding()) {
             mBindingFunction = getBindingFunction().andThen(new BindMappingAllConsumer<OUT, AFTER>(
-                    mStreamConfiguration.asChannelConfiguration(), mappingConsumer));
+                    mStreamConfiguration.toChannelConfiguration(), mappingConsumer));
             return (StreamBuilder<IN, AFTER>) this;
         }
 
@@ -361,16 +360,17 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
      * @return whether the next binding can be optimized.
      */
     protected boolean canOptimizeBinding() {
-        final ChannelConfiguration configuration = mStreamConfiguration.asInvocationConfiguration()
-                                                                       .inputConfigurationBuilder()
-                                                                       .configured();
-        return configuration.getRunnerOrElse(Runners.sharedRunner()).isSynchronous()
-                && configuration.builderFrom()
-                                .withRunner(null)
-                                .withLogLevel(null)
-                                .withLog(null)
-                                .configured()
-                                .equals(ChannelConfiguration.defaultConfiguration());
+        final InvocationConfiguration configuration =
+                mStreamConfiguration.toInvocationConfiguration();
+        return (configuration.getRunnerOrElse(null) == Runners.immediateRunner()) && (
+                configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT)
+                        == InvocationConfiguration.DEFAULT) && (
+                configuration.getMaxInstancesOrElse(InvocationConfiguration.DEFAULT)
+                        == InvocationConfiguration.DEFAULT) && (
+                configuration.getInputBackoffOrElse(null) == null) && (
+                configuration.getInputMaxSizeOrElse(InvocationConfiguration.DEFAULT)
+                        == InvocationConfiguration.DEFAULT) && (
+                configuration.getInputOrderTypeOrElse(null) == null);
     }
 
     /**
@@ -412,7 +412,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
     protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
             @NotNull StreamConfiguration streamConfiguration,
             @NotNull RoutineBuilder<? super BEFORE, ? extends AFTER> builder) {
-        return builder.apply(streamConfiguration.asInvocationConfiguration()).buildRoutine();
+        return builder.apply(streamConfiguration.toInvocationConfiguration()).buildRoutine();
     }
 
     /**

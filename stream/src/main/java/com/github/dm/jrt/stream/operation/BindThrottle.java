@@ -60,7 +60,7 @@ class BindThrottle<IN, OUT> implements
     public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
             final StreamConfiguration streamConfiguration,
             final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return new BindingFunction(streamConfiguration.asChannelConfiguration(), function);
+        return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
     }
 
     /**

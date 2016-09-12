@@ -114,26 +114,6 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         }
 
         @NotNull
-        public ChannelConfiguration asChannelConfiguration() {
-            if (mChannelConfiguration == null) {
-                mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().configured();
-            }
-
-            return mChannelConfiguration;
-        }
-
-        @NotNull
-        public InvocationConfiguration asInvocationConfiguration() {
-            if (mInvocationConfiguration == null) {
-                mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mConfiguration).configured();
-            }
-
-            return mInvocationConfiguration;
-        }
-
-        @NotNull
         public InvocationConfiguration getCurrentInvocationConfiguration() {
             return mConfiguration;
         }
@@ -146,6 +126,26 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
         @NotNull
         public InvocationConfiguration getStreamInvocationConfiguration() {
             return mStreamConfiguration;
+        }
+
+        @NotNull
+        public ChannelConfiguration toChannelConfiguration() {
+            if (mChannelConfiguration == null) {
+                mChannelConfiguration =
+                        toInvocationConfiguration().outputConfigurationBuilder().configured();
+            }
+
+            return mChannelConfiguration;
+        }
+
+        @NotNull
+        public InvocationConfiguration toInvocationConfiguration() {
+            if (mInvocationConfiguration == null) {
+                mInvocationConfiguration =
+                        mStreamConfiguration.builderFrom().with(mConfiguration).configured();
+            }
+
+            return mInvocationConfiguration;
         }
     }
 }

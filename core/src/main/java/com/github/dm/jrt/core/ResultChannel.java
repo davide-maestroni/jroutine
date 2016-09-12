@@ -84,6 +84,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     private final ArrayList<Channel<?, ? extends OUT>> mBoundChannels =
             new ArrayList<Channel<?, ? extends OUT>>();
 
+    private final Flusher<OUT> mFlusher;
+
     private final AbortHandler mHandler;
 
     private final Condition mHasOutputs;
@@ -149,7 +151,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             @NotNull final Logger logger) {
         mLogger = logger.subContextLogger(this);
         mHandler = ConstantConditions.notNull("abort handler", handler);
-        mRunner = ConstantConditions.notNull("runner instance", runner);
+        mRunner = runner;
+        mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
         mResultOrder =
                 new LocalValue<OrderType>(configuration.getOrderTypeOrElse(OrderType.UNSORTED));
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
@@ -194,7 +197,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             @NotNull final Logger logger) {
         mLogger = logger.subContextLogger(this);
         mHandler = ConstantConditions.notNull("abort handler", handler);
-        mRunner = ConstantConditions.notNull("runner instance", runner);
+        mRunner = runner;
+        mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
         mResultOrder = new LocalValue<OrderType>(
                 configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED));
         mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
@@ -313,7 +317,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mMutex.notifyAll();
         }
 
-        runFlush(handler, forceClose);
+        mFlusher.run(handler, forceClose);
         return this;
     }
 
@@ -334,7 +338,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mRunner.run(execution, delay.value, delay.unit);
 
         } else if (isOpen) {
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
 
         return this;
@@ -555,7 +559,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mRunner.run(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
 
         synchronized (mMutex) {
@@ -581,7 +585,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mRunner.run(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
 
         synchronized (mMutex) {
@@ -607,7 +611,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             mRunner.run(execution, delay.value, delay.unit);
 
         } else {
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
 
         synchronized (mMutex) {
@@ -730,7 +734,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 channel.now().abort(abortException);
             }
 
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
     }
 
@@ -746,7 +750,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         if (needsFlush) {
-            runFlush(handler, false);
+            mFlusher.run(handler, false);
         }
     }
 
@@ -1018,33 +1022,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         throw abortException;
     }
 
-    private void runFlush(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
-        // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
-        // deadlock issues
-        if (mRunner.isExecutionThread()) {
-            handler.flushOutput(forceClose);
-
-        } else {
-            final FlushExecution execution;
-            if (forceClose) {
-                if (mForcedFlushExecution == null) {
-                    mForcedFlushExecution = new FlushExecution(true);
-                }
-
-                execution = mForcedFlushExecution;
-
-            } else {
-                if (mFlushExecution == null) {
-                    mFlushExecution = new FlushExecution(false);
-                }
-
-                execution = mFlushExecution;
-            }
-
-            mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
-        }
-    }
-
     private void verifyBound() {
         if (isBound()) {
             mLogger.err("invalid call on bound channel");
@@ -1119,6 +1096,22 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     /**
+     * Interface describing an object responsible for the flushing of output data.
+     *
+     * @param <OUT> the output data type.
+     */
+    private interface Flusher<OUT> {
+
+        /**
+         * Runs the flushing process by employing the specified handler.
+         *
+         * @param handler    the binding handler.
+         * @param forceClose whether to forcedly close the consumer.
+         */
+        void run(@NotNull BindingHandler<OUT> handler, boolean forceClose);
+    }
+
+    /**
      * The invocation has been aborted and the exception put into the output queue.
      */
     private class AbortChannelState extends ExceptionChannelState {
@@ -1170,6 +1163,40 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         OutputChannelState toDoneState() {
             return this;
+        }
+    }
+
+    /**
+     * Flusher implementation handling an asynchronous runner.
+     */
+    private class AsyncFlusher implements Flusher<OUT> {
+
+        public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
+            // Need to make sure to pass the outputs to the consumer in the runner thread, so to
+            // avoid
+            // deadlock issues
+            if (mRunner.isExecutionThread()) {
+                handler.flushOutput(forceClose);
+
+            } else {
+                final FlushExecution execution;
+                if (forceClose) {
+                    if (mForcedFlushExecution == null) {
+                        mForcedFlushExecution = new FlushExecution(true);
+                    }
+
+                    execution = mForcedFlushExecution;
+
+                } else {
+                    if (mFlushExecution == null) {
+                        mFlushExecution = new FlushExecution(false);
+                    }
+
+                    execution = mFlushExecution;
+                }
+
+                mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
+            }
         }
     }
 
@@ -1306,7 +1333,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             if (delay == 0) {
                 if (needsFlush) {
-                    runFlush(handler, false);
+                    mFlusher.run(handler, false);
                 }
 
             } else {
@@ -1346,7 +1373,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 mRunner.run(execution, delay, timeUnit);
 
             } else {
-                runFlush(handler, false);
+                mFlusher.run(handler, false);
             }
 
             synchronized (mMutex) {
@@ -1448,7 +1475,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
 
             if (needsFlush) {
-                runFlush(handler, false);
+                mFlusher.run(handler, false);
             }
         }
     }
@@ -1478,7 +1505,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
 
             if (needsFlush) {
-                runFlush(handler, false);
+                mFlusher.run(handler, false);
             }
         }
     }
@@ -2428,6 +2455,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         @Override
         Execution pass(@Nullable final OUT[] outputs, @NotNull final UnitDuration delay) {
             throw exception();
+        }
+    }
+
+    /**
+     * Flusher implementation handling a synchronous runner.
+     */
+    private class SyncFlusher implements Flusher<OUT> {
+
+        public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
+            handler.flushOutput(forceClose);
         }
     }
 

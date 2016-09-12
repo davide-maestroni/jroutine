@@ -85,7 +85,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindDelay<OUT>(
-                                        streamConfiguration.asChannelConfiguration(), delay,
+                                        streamConfiguration.toChannelConfiguration(), delay,
                                         timeUnit));
                             }
                         });
@@ -142,7 +142,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).<Channel<?, IN>>compose(new BindDelay<IN>(
-                                        streamConfiguration.asChannelConfiguration(), delay,
+                                        streamConfiguration.toChannelConfiguration(), delay,
                                         timeUnit));
                             }
                         });
@@ -203,10 +203,10 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
-                                        streamConfiguration.asChannelConfiguration(), groupCount,
+                                        streamConfiguration.toChannelConfiguration(), groupCount,
                                         JRoutineCore.with(factory)
                                                     .apply(streamConfiguration
-                                                            .asInvocationConfiguration()),
+                                                            .toInvocationConfiguration()),
                                         streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -249,7 +249,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
-                                        streamConfiguration.asChannelConfiguration(), groupCount,
+                                        streamConfiguration.toChannelConfiguration(), groupCount,
                                         routine, streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -317,10 +317,10 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
-                                        streamConfiguration.asChannelConfiguration(), keyFunction,
+                                        streamConfiguration.toChannelConfiguration(), keyFunction,
                                         JRoutineCore.with(factory)
                                                     .apply(streamConfiguration
-                                                            .asInvocationConfiguration()),
+                                                            .toInvocationConfiguration()),
                                         streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -364,7 +364,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
-                                        streamConfiguration.asChannelConfiguration(), keyFunction,
+                                        streamConfiguration.toChannelConfiguration(), keyFunction,
                                         routine, streamConfiguration.getInvocationMode()));
                             }
                         });
@@ -470,7 +470,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return new BindRetry<IN, OUT>(
-                                        streamConfiguration.asChannelConfiguration(),
+                                        streamConfiguration.toChannelConfiguration(),
                                         (Function<Channel<?, IN>, Channel<?, OUT>>) function,
                                         backoffFunction);
                             }
@@ -604,7 +604,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindTimeout<OUT>(
-                                        streamConfiguration.asChannelConfiguration(), timeout,
+                                        streamConfiguration.toChannelConfiguration(), timeout,
                                         timeUnit));
                             }
                         });
@@ -663,7 +663,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindTryCatch<OUT>(
-                                        streamConfiguration.asChannelConfiguration(),
+                                        streamConfiguration.toChannelConfiguration(),
                                         catchConsumer));
                             }
                         });
@@ -702,7 +702,7 @@ public class Operations {
                                     final Function<? super Channel<?, IN>, ? extends Channel<?,
                                             OUT>> function) {
                                 return decorate(function).andThen(new BindTryFinally<OUT>(
-                                        streamConfiguration.asChannelConfiguration(),
+                                        streamConfiguration.toChannelConfiguration(),
                                         finallyAction));
                             }
                         });

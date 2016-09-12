@@ -392,7 +392,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             public Function<Channel<?, String>, Channel<?, String>> apply(
                     final LoaderStreamConfiguration configuration,
                     final Function<Channel<?, String>, Channel<?, String>> function) {
-                assertThat(configuration.asLoaderConfiguration()).isEqualTo(
+                assertThat(configuration.toLoaderConfiguration()).isEqualTo(
                         LoaderConfiguration.defaultConfiguration());
                 assertThat(configuration.getLoaderContext()).isInstanceOf(LoaderContext.class);
                 return Functions.decorate(function)

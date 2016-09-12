@@ -737,7 +737,7 @@ public class Operators {
             return isNotNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
+        return Functions.predicateFilter(Functions.isSameAs(targetRef).negate());
     }
 
     /**
@@ -766,7 +766,7 @@ public class Operators {
             return isNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef));
+        return Functions.predicateFilter(Functions.isSameAs(targetRef));
     }
 
     /**
@@ -1319,7 +1319,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replace(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return replaceConditional((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIf((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1335,7 +1335,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-        return replaceConditionalAccept((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIfAccept((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
@@ -1351,7 +1351,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-        return replaceConditionalApply((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIfApply((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), decorate(replacementFunction));
     }
 
@@ -1366,7 +1366,7 @@ public class Operators {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditional(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIf(
             @NotNull final Predicate<? super DATA> predicate, @Nullable final DATA replacement) {
         return new ReplaceInvocation<DATA>(decorate(predicate), replacement);
     }
@@ -1382,7 +1382,7 @@ public class Operators {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalAccept(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIfAccept(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
         return new ReplaceConsumerInvocation<DATA>(decorate((Predicate<Object>) predicate),
@@ -1399,7 +1399,7 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalApply(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIfApply(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
         return new ReplaceFunctionInvocation<DATA>(decorate(predicate),
@@ -1418,7 +1418,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSame(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return replaceConditional((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIf((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1435,7 +1435,7 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameAccept(
             @Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-        return replaceConditionalAccept((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIfAccept((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
@@ -1451,7 +1451,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-        return replaceConditionalApply((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIfApply((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), decorate(replacementFunction));
     }
 

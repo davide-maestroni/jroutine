@@ -42,17 +42,19 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
 
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
-     * <p>
+     * <br>
      * An instance of {@link com.github.dm.jrt.core.channel.AbortException AbortException} will be
      * passed as the abortion reason.
+     * <br>
+     * If a delay has been set through the dedicated methods, the abortion will be accordingly
+     * postponed.
      * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
-     * <p>
-     * Note also that abortion can be delayed by calling the proper methods.
      *
      * @return whether the channel status changed as a result of the call.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
+     * @see #now()
      */
     boolean abort();
 
@@ -64,15 +66,17 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as
      * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
      * instance.
+     * <br>
+     * If a delay has been set through the dedicated methods, the abortion will be accordingly
+     * postponed.
      * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
-     * <p>
-     * Note also that abortion can be delayed by calling the proper methods.
      *
      * @param reason the throwable object identifying the reason of the invocation abortion.
      * @return whether the channel status changed as a result of the call.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
+     * @see #now()
      */
     boolean abort(@Nullable Throwable reason);
 
@@ -177,11 +181,17 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * After method exits, all the output will be passed only to the specified input channel.
      * Attempting to read through the dedicated methods will cause an
      * {@link java.lang.IllegalStateException} to be thrown.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      *
      * @param channel the input channel
      * @param <AFTER> the channel output type.
      * @return the passed channel.
      * @throws java.lang.IllegalStateException if this channel is already bound.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     <AFTER> Channel<? super OUT, AFTER> bind(@NotNull Channel<? super OUT, AFTER> channel);
@@ -192,12 +202,18 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * After method exits, all the output will be passed only to the consumer. Attempting to read
      * through the dedicated methods will cause an {@link java.lang.IllegalStateException} to be
      * thrown.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      * <p>
      * Note that the consumer methods may be called on the runner thread.
      *
      * @param consumer the consumer instance.
      * @return this channel.
      * @throws java.lang.IllegalStateException if this channel is already bound.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
@@ -207,16 +223,18 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * <br>
      * After channel is closed, attempting to pass additional input data through the dedicated
      * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
+     * <br>
+     * If a delay has been set through the dedicated methods, the closing command will be
+     * accordingly postponed.
      * <p>
      * Note that, even if calling this method is not strictly mandatory, some invocation
      * implementations may rely on the completion notification to produce their results. So, it's
      * always advisable to close the channel as soon as all the input data has been passed.
-     * <p>
-     * Not also that closing commands can be delayed by calling the proper methods.
      *
      * @return this channel.
      * @see #after(UnitDuration)
      * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> close();
@@ -521,6 +539,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
 
     /**
      * Passes the data returned by the specified channel to this one.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      * <p>
      * Note that the passed channel will be bound as a result of the call, thus effectively
      * preventing any other consumer from getting data from it.
@@ -529,39 +550,60 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException               if this channel is already closed.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
 
     /**
      * Passes the data returned by the specified iterable to this channel.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      *
      * @param inputs the iterable returning the input data.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException               if this channel is already closed.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
     /**
      * Passes the specified input to this channel.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      *
      * @param input the input.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException               if this channel is already closed.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> pass(@Nullable IN input);
 
     /**
      * Passes the specified input data to this channel.
+     * <br>
+     * If a delay has been set through the dedicated methods, the transfer of data will be
+     * accordingly postponed.
      *
      * @param inputs the input data.
      * @return this channel.
      * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
      * @throws java.lang.IllegalStateException               if this channel is already closed.
+     * @see #after(UnitDuration)
+     * @see #after(long, TimeUnit)
+     * @see #now()
      */
     @NotNull
     Channel<IN, OUT> pass(@Nullable IN... inputs);

@@ -499,6 +499,9 @@ public class Channels {
 
     /**
      * Returns a builder of channels producing the result of the specified Future.
+     * <br>
+     * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
+     * to false.
      * <p>
      * Note that the configured runner will be employed to wait for the Future to complete.
      * <br>
@@ -511,7 +514,27 @@ public class Channels {
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> fromFuture(
             @NotNull final Future<OUT> future) {
-        return new FutureChannelBuilder<OUT>(future);
+        return new FutureChannelBuilder<OUT>(future, false);
+    }
+
+    /**
+     * Returns a builder of channels producing the result of the specified Future.
+     * <br>
+     * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
+     * to true.
+     * <p>
+     * Note that the configured runner will be employed to wait for the Future to complete.
+     * <br>
+     * Note also that the returned channel will be already closed.
+     *
+     * @param future the Future instance.
+     * @param <OUT>  the output data type.
+     * @return the channel builder.
+     */
+    @NotNull
+    public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> fromFutureInterruptIfRunning(
+            @NotNull final Future<OUT> future) {
+        return new FutureChannelBuilder<OUT>(future, true);
     }
 
     /**

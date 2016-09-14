@@ -17,18 +17,22 @@
 package com.github.dm.jrt.core.runner;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.SimpleQueue;
+import com.github.dm.jrt.core.util.SimpleQueue.SimpleQueueIterator;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Runner implementation throttling the number of running executions so to keep it under a specified
  * limit.
+ * <p>
+ * Note that, in case the runner is backed by a synchronous one, it is possible that executions are
+ * run on threads different from the calling one, so that the results will be not immediately
+ * available.
  * <p>
  * Created by davide-maestroni on 07/18/2015.
  */
@@ -41,7 +45,9 @@ class ThrottlingRunner extends RunnerDecorator {
 
     private final Object mMutex = new Object();
 
-    private final LinkedList<PendingExecution> mQueue = new LinkedList<PendingExecution>();
+    private final SimpleQueue<PendingExecution> mQueue = new SimpleQueue<PendingExecution>();
+
+    private final VoidPendingExecution mVoidExecution = new VoidPendingExecution();
 
     private int mRunningCount;
 
@@ -62,11 +68,11 @@ class ThrottlingRunner extends RunnerDecorator {
     public void cancel(@NotNull final Execution execution) {
         ThrottlingExecution throttlingExecution = null;
         synchronized (mMutex) {
-            final Iterator<PendingExecution> iterator = mQueue.iterator();
+            final SimpleQueueIterator<PendingExecution> iterator = mQueue.iterator();
             while (iterator.hasNext()) {
                 final PendingExecution pendingExecution = iterator.next();
                 if (pendingExecution.mExecution == execution) {
-                    iterator.remove();
+                    iterator.replace(mVoidExecution);
                 }
             }
 
@@ -85,20 +91,18 @@ class ThrottlingRunner extends RunnerDecorator {
     @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
-        ThrottlingExecution throttlingExecution = null;
+        final ThrottlingExecution throttlingExecution;
         synchronized (mMutex) {
-            final LinkedList<PendingExecution> queue = mQueue;
+            final SimpleQueue<PendingExecution> queue = mQueue;
             if ((mRunningCount + queue.size()) >= mMaxRunning) {
                 queue.add(new PendingExecution(execution, delay, timeUnit));
-
-            } else {
-                throttlingExecution = getThrottlingExecution(execution);
+                return;
             }
+
+            throttlingExecution = getThrottlingExecution(execution);
         }
 
-        if (throttlingExecution != null) {
-            super.run(throttlingExecution, delay, timeUnit);
-        }
+        super.run(throttlingExecution, delay, timeUnit);
     }
 
     @NotNull
@@ -117,6 +121,15 @@ class ThrottlingRunner extends RunnerDecorator {
     }
 
     /**
+     * Void execution implementation.
+     */
+    private static class VoidExecution implements Execution {
+
+        public void run() {
+        }
+    }
+
+    /**
      * Pending execution implementation.
      */
     private class PendingExecution implements Execution {
@@ -124,6 +137,8 @@ class ThrottlingRunner extends RunnerDecorator {
         private final long mDelay;
 
         private final Execution mExecution;
+
+        private final long mStartTimeMillis;
 
         private final TimeUnit mTimeUnit;
 
@@ -139,6 +154,7 @@ class ThrottlingRunner extends RunnerDecorator {
             mExecution = execution;
             mDelay = delay;
             mTimeUnit = timeUnit;
+            mStartTimeMillis = System.currentTimeMillis();
         }
 
         public void run() {
@@ -147,7 +163,10 @@ class ThrottlingRunner extends RunnerDecorator {
                 throttlingExecution = getThrottlingExecution(mExecution);
             }
 
-            ThrottlingRunner.super.run(throttlingExecution, mDelay, mTimeUnit);
+            final long delay = mDelay;
+            ThrottlingRunner.super.run(throttlingExecution, (delay == 0) ? 0 : Math.max(
+                    mTimeUnit.toMillis(delay) + mStartTimeMillis - System.currentTimeMillis(), 0),
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -171,7 +190,7 @@ class ThrottlingRunner extends RunnerDecorator {
         public void run() {
             final int maxRunning = mMaxRunning;
             final Execution execution = mExecution;
-            final LinkedList<PendingExecution> queue = mQueue;
+            final SimpleQueue<PendingExecution> queue = mQueue;
             synchronized (mMutex) {
                 if (mRunningCount >= maxRunning) {
                     queue.addFirst(new PendingExecution(execution, 0, TimeUnit.MILLISECONDS));
@@ -196,6 +215,34 @@ class ThrottlingRunner extends RunnerDecorator {
                 if (pendingExecution != null) {
                     pendingExecution.run();
                 }
+            }
+        }
+    }
+
+    /**
+     * Void pending execution implementation.
+     */
+    private class VoidPendingExecution extends PendingExecution {
+
+        /**
+         * Constructor.
+         */
+        private VoidPendingExecution() {
+            super(new VoidExecution(), 0, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public void run() {
+            final SimpleQueue<PendingExecution> queue = mQueue;
+            PendingExecution pendingExecution = null;
+            synchronized (mMutex) {
+                if (!queue.isEmpty()) {
+                    pendingExecution = queue.removeFirst();
+                }
+            }
+
+            if (pendingExecution != null) {
+                pendingExecution.run();
             }
         }
     }

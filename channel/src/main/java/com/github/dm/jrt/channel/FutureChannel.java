@@ -62,6 +62,8 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
     private final Future<OUT> mFuture;
 
+    private final boolean mInterruptIfRunning;
+
     private final AtomicBoolean mIsBound = new AtomicBoolean();
 
     private final Logger mLogger;
@@ -81,14 +83,16 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     /**
      * Constructor.
      *
-     * @param configuration the channel configuration.
-     * @param future        the Future instance.
+     * @param configuration         the channel configuration.
+     * @param future                the Future instance.
+     * @param mayInterruptIfRunning if the thread executing the task should be interrupted.
      */
     FutureChannel(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Future<OUT> future) {
+            @NotNull final Future<OUT> future, final boolean mayInterruptIfRunning) {
         mLogger = configuration.newLogger(this);
         mFuture = ConstantConditions.notNull("future instance", future);
         mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+        mInterruptIfRunning = mayInterruptIfRunning;
         mOutputTimeout = new LocalValue<UnitDuration>(configuration.getOutputTimeoutOrElse(zero()));
         mTimeoutActionType = new LocalValue<TimeoutActionType>(
                 configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
@@ -99,12 +103,28 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     public boolean abort(@Nullable final Throwable reason) {
-        final boolean isCancelled = mFuture.cancel(reason != null);
-        if (isCancelled) {
-            mAbortException.set(reason);
+        final Future<OUT> future = mFuture;
+        final UnitDuration delay = mOutputTimeout.get();
+        if (delay.isZero()) {
+            final boolean isCancelled = future.cancel(mInterruptIfRunning);
+            if (isCancelled) {
+                mAbortException.set(reason);
+            }
+
+            return isCancelled;
         }
 
-        return isCancelled;
+        if (!future.isCancelled()) {
+            mRunner.run(new Execution() {
+
+                public void run() {
+                    future.cancel(mInterruptIfRunning);
+                }
+            }, delay.value, delay.unit);
+            return true;
+        }
+
+        return false;
     }
 
     @NotNull
@@ -263,11 +283,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 mTimeoutException.get());
     }
 
-    @NotNull
-    public Channel<OUT, OUT> immediately() {
-        return after(zero());
-    }
-
     public int inputCount() {
         return outputCount();
     }
@@ -301,6 +316,11 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         return output;
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> now() {
+        return after(zero());
     }
 
     public int outputCount() {
@@ -410,6 +430,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 }
 
                 mFuture.get(timeout, timeUnit);
+                verifyBound();
                 logger.dbg("has output: %s [%d %s]", true, timeout, timeUnit);
                 return true;
             }
@@ -449,6 +470,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                 }
 
                 final OUT output = mFuture.get(timeout, timeUnit);
+                verifyBound();
                 mIsOutput = true;
                 return output;
             }

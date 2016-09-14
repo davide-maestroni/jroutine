@@ -23,8 +23,11 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
+import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -45,6 +48,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.decorate;
 
@@ -600,6 +604,51 @@ public class Operators {
     }
 
     /**
+     * Returns a factory of invocations passing on data after an interval specified by a backoff
+     * policy.
+     *
+     * @param backoff the backoff policy instance.
+     * @param <DATA>  the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final Backoff backoff) {
+        return new IntervalInvocationFactory<DATA>(backoff);
+    }
+
+    /**
+     * Returns a factory of invocations passing on data after the specified time interval.
+     * <p>
+     * Note that this is the same as calling
+     * {@code interval(BackoffBuilder.afterCount(1).linearDelay(delay, timeUnit))}.
+     *
+     * @param delay    the delay value.
+     * @param timeUnit the delay time unit.
+     * @param <DATA>   the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(final long delay,
+            @NotNull final TimeUnit timeUnit) {
+        return interval(BackoffBuilder.afterCount(1).linearDelay(delay, timeUnit));
+    }
+
+    /**
+     * Returns a factory of invocations passing on data after the specified time interval.
+     * <p>
+     * Note that this is the same as calling
+     * {@code interval(BackoffBuilder.afterCount(1).linearDelay(delay))}.
+     *
+     * @param delay  the delay.
+     * @param <DATA> the data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final UnitDuration delay) {
+        return interval(delay.value, delay.unit);
+    }
+
+    /**
      * Returns a factory of invocations filtering out all the inputs that are not equal to the
      * specified object.
      *
@@ -688,7 +737,7 @@ public class Operators {
             return isNotNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
+        return Functions.predicateFilter(Functions.isSameAs(targetRef).negate());
     }
 
     /**
@@ -717,7 +766,7 @@ public class Operators {
             return isNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef));
+        return Functions.predicateFilter(Functions.isSameAs(targetRef));
     }
 
     /**
@@ -1270,7 +1319,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replace(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return replaceConditional((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIf((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1286,7 +1335,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-        return replaceConditionalAccept((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIfAccept((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
@@ -1302,7 +1351,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-        return replaceConditionalApply((target != null) ? PredicateDecorator.isEqualTo(target)
+        return replaceIfApply((target != null) ? PredicateDecorator.isEqualTo(target)
                 : PredicateDecorator.isNull(), decorate(replacementFunction));
     }
 
@@ -1317,7 +1366,7 @@ public class Operators {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditional(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIf(
             @NotNull final Predicate<? super DATA> predicate, @Nullable final DATA replacement) {
         return new ReplaceInvocation<DATA>(decorate(predicate), replacement);
     }
@@ -1333,7 +1382,7 @@ public class Operators {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalAccept(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIfAccept(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
         return new ReplaceConsumerInvocation<DATA>(decorate((Predicate<Object>) predicate),
@@ -1350,7 +1399,7 @@ public class Operators {
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> replaceConditionalApply(
+    public static <DATA> InvocationFactory<DATA, DATA> replaceIfApply(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
         return new ReplaceFunctionInvocation<DATA>(decorate(predicate),
@@ -1369,7 +1418,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSame(@Nullable final DATA target,
             @Nullable final DATA replacement) {
-        return replaceConditional((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIf((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), replacement);
     }
 
@@ -1386,7 +1435,7 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameAccept(
             @Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-        return replaceConditionalAccept((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIfAccept((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), decorate(replacementConsumer));
     }
 
@@ -1402,7 +1451,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-        return replaceConditionalApply((target != null) ? PredicateDecorator.isSameAs(target)
+        return replaceIfApply((target != null) ? PredicateDecorator.isSameAs(target)
                 : PredicateDecorator.isNull(), decorate(replacementFunction));
     }
 

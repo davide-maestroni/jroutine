@@ -142,6 +142,15 @@ class NestedQueue<E> {
         mQueueManager.transferTo(collection);
     }
 
+    /**
+     * Removes all the elements from this queue and add them to the specified one.
+     *
+     * @param other the queue to fill.
+     */
+    public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+        mQueueManager.transferTo(other);
+    }
+
     private void checkOpen() {
         if (mClosed) {
             throw new IllegalStateException("the queue is closed");
@@ -176,6 +185,13 @@ class NestedQueue<E> {
          * @param collection the collection to fill.
          */
         void transferTo(@NotNull Collection<? super E> collection);
+
+        /**
+         * Removes all the elements from this queue and add them to the specified one.
+         *
+         * @param other the queue to fill.
+         */
+        void transferTo(@NotNull SimpleQueue<? super E> other);
     }
 
     /**
@@ -183,9 +199,7 @@ class NestedQueue<E> {
      *
      * @param <E> the element data type.
      */
-    private static class InnerNestedQueue<E> extends NestedQueue<E> {
-
-    }
+    private static class InnerNestedQueue<E> extends NestedQueue<E> {}
 
     /**
      * Nested queue manager implementation.
@@ -258,6 +272,27 @@ class NestedQueue<E> {
                 }
             }
         }
+
+        @SuppressWarnings("unchecked")
+        public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+            final SimpleQueue<Object> queue = mQueue;
+            while (!queue.isEmpty()) {
+                final Object element = queue.peekFirst();
+                if (element instanceof InnerNestedQueue) {
+                    final NestedQueue<E> nested = (NestedQueue<E>) element;
+                    nested.transferTo(other);
+                    if (canPrune(nested)) {
+                        queue.removeFirst();
+                        continue;
+                    }
+
+                    return;
+
+                } else {
+                    other.add((E) queue.removeFirst());
+                }
+            }
+        }
     }
 
     /**
@@ -276,10 +311,14 @@ class NestedQueue<E> {
 
         @SuppressWarnings("unchecked")
         public void transferTo(@NotNull final Collection<? super E> collection) {
-            final SimpleQueue<Object> queue = mQueue;
-            while (!queue.isEmpty()) {
-                collection.add((E) queue.removeFirst());
-            }
+            final SimpleQueue<E> queue = (SimpleQueue<E>) mQueue;
+            queue.transferTo(collection);
+        }
+
+        @SuppressWarnings("unchecked")
+        public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+            final SimpleQueue<E> queue = (SimpleQueue<E>) mQueue;
+            queue.transferTo(other);
         }
     }
 }

@@ -268,6 +268,7 @@ public class RunnerTest {
         testRunner(new ThrottlingRunner(Runners.sharedRunner(), 5));
         testRunner(Runners.throttlingRunner(Runners.poolRunner(), 5));
         testRunner(new RunnerDecorator(new ThrottlingRunner(Runners.sharedRunner(), 5)));
+        testRunner(Runners.throttlingRunner(Runners.syncRunner(), 1));
     }
 
     @Test

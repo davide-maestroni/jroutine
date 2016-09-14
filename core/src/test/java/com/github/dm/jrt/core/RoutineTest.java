@@ -16,7 +16,8 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.core.InvocationExecution.ExecutionObserver;
+import com.github.dm.jrt.core.InvocationExecution.InputData;
 import com.github.dm.jrt.core.ResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -25,7 +26,6 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -99,7 +99,7 @@ public class RoutineTest {
         assertThat(channel.isOpen()).isFalse();
 
         final Channel<String, String> channel1 =
-                routine.call().after(millis(10)).pass("test1").close();
+                routine.call().after(millis(10)).pass("test1").now().close();
         assertThat(channel1.isOpen()).isFalse();
         assertThat(channel1.after(timeout).getComplete()).isTrue();
         assertThat(channel1.abort()).isFalse();
@@ -110,7 +110,7 @@ public class RoutineTest {
 
         final Channel<String, String> channel2 = routine.call().after(millis(10)).pass("test2");
         assertThat(channel2.isOpen()).isTrue();
-        assertThat(channel2.abort(new IllegalArgumentException("test2"))).isTrue();
+        assertThat(channel2.now().abort(new IllegalArgumentException("test2"))).isTrue();
         assertThat(channel2.after(timeout).getComplete()).isTrue();
         assertThat(channel2.abort()).isFalse();
         assertThat(channel2.isOpen()).isFalse();
@@ -139,7 +139,7 @@ public class RoutineTest {
         final Channel<String, String> channel3 =
                 routine.call().after(millis(1000000)).pass("test2");
         assertThat(channel3.isOpen()).isTrue();
-        assertThat(channel3.immediately().abort()).isTrue();
+        assertThat(channel3.now().abort()).isTrue();
         assertThat(channel3.abort(new IllegalArgumentException("test2"))).isFalse();
         assertThat(channel3.isOpen()).isFalse();
         try {
@@ -226,7 +226,7 @@ public class RoutineTest {
         assertThat(abortReason.get().getCause()).isEqualTo(exception);
         final Channel<String, String> channel1 = routine.call();
         final IllegalAccessError exception1 = new IllegalAccessError();
-        channel1.immediately().abort(exception1);
+        channel1.now().abort(exception1);
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
         assertThat(abortReason.get().getCause()).isEqualTo(exception1);
     }
@@ -389,7 +389,7 @@ public class RoutineTest {
         final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
         try {
             new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-                    null, Runners.sharedRunner(), logger);
+                    null, Runners.sharedRunner(), Runners.sharedRunner(), logger);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -397,7 +397,7 @@ public class RoutineTest {
 
         try {
             new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-                    new TestInvocationManager(), null, logger);
+                    new TestInvocationManager(), null, Runners.sharedRunner(), logger);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -405,7 +405,16 @@ public class RoutineTest {
 
         try {
             new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-                    new TestInvocationManager(), Runners.sharedRunner(), null);
+                    new TestInvocationManager(), Runners.sharedRunner(), null, logger);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+        }
+
+        try {
+            new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
+                    new TestInvocationManager(), Runners.sharedRunner(), Runners.sharedRunner(),
+                    null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -413,7 +422,7 @@ public class RoutineTest {
 
         try {
             new InvocationChannel<Object, Object>(null, new TestInvocationManager(),
-                    Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), Runners.sharedRunner(), logger);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -422,7 +431,7 @@ public class RoutineTest {
         try {
             final InvocationChannel<Object, Object> channel = new InvocationChannel<Object, Object>(
                     InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
-                    Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), Runners.sharedRunner(), logger);
             channel.close();
             channel.pass("test");
             fail();
@@ -434,7 +443,7 @@ public class RoutineTest {
 
             final InvocationChannel<Object, Object> channel = new InvocationChannel<Object, Object>(
                     InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
-                    Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), Runners.sharedRunner(), logger);
             channel.after(null);
             fail();
 
@@ -444,7 +453,7 @@ public class RoutineTest {
         try {
             final InvocationChannel<Object, Object> channel = new InvocationChannel<Object, Object>(
                     InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
-                    Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), Runners.sharedRunner(), logger);
             channel.after(1, null);
             fail();
 
@@ -454,7 +463,7 @@ public class RoutineTest {
         try {
             final InvocationChannel<Object, Object> channel = new InvocationChannel<Object, Object>(
                     InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
-                    Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), Runners.sharedRunner(), logger);
             channel.after(-1, TimeUnit.MILLISECONDS);
             fail();
 
@@ -596,7 +605,7 @@ public class RoutineTest {
         channel.after(millis(10).nanosTime()).pass("test2");
         channel.after(millis(10).microsTime()).pass("test3", "test4");
         channel.after(millis(10)).pass((String[]) null);
-        channel.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel.close().after(3, TimeUnit.SECONDS).all()).containsOnly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -614,7 +623,7 @@ public class RoutineTest {
         channel1.after(millis(10).nanosTime()).pass("test2");
         channel1.after(millis(10).microsTime()).pass(Arrays.asList("test3", "test4"));
         channel1.after(millis(10)).pass((String[]) null);
-        channel1.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel1.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel1.close().after(seconds(7000)).all()).containsExactly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -626,7 +635,7 @@ public class RoutineTest {
         channel2.after(millis(10).nanosTime()).pass("test2");
         channel2.after(millis(10).microsTime()).pass("test3", "test4");
         channel2.after(millis(10)).pass((String[]) null);
-        channel2.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel2.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel2.close().after(3, TimeUnit.SECONDS).all()).containsOnly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -645,7 +654,7 @@ public class RoutineTest {
         channel3.after(millis(10).nanosTime()).pass("test2");
         channel3.after(millis(10).microsTime()).pass("test3", "test4");
         channel3.after(millis(10)).pass((String[]) null);
-        channel3.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel3.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel3.close().after(3, TimeUnit.SECONDS).all()).containsExactly("test1",
                 "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -657,7 +666,7 @@ public class RoutineTest {
         channel4.after(millis(10).nanosTime()).pass("test2");
         channel4.after(millis(10).microsTime()).pass("test3", "test4");
         channel4.after(millis(10)).pass((String[]) null);
-        channel4.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel4.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel4.close().after(3, TimeUnit.SECONDS).all()).containsOnly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
@@ -673,7 +682,7 @@ public class RoutineTest {
         channel5.after(millis(10).nanosTime()).pass("test2");
         channel5.after(millis(10).microsTime()).pass("test3", "test4");
         channel5.after(millis(10)).pass((String[]) null);
-        channel5.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel5.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel5.close().after(3, TimeUnit.SECONDS).all()).containsExactly("test1",
                 "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
@@ -685,7 +694,7 @@ public class RoutineTest {
         channel6.after(millis(10).nanosTime()).pass("test2");
         channel6.after(millis(10).microsTime()).pass("test3", "test4");
         channel6.after(millis(10)).pass((String[]) null);
-        channel6.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel6.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel6.close().after(3, TimeUnit.SECONDS).all()).containsOnly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -701,7 +710,7 @@ public class RoutineTest {
         channel7.after(millis(10).nanosTime()).pass("test2");
         channel7.after(millis(10).microsTime()).pass("test3", "test4");
         channel7.after(millis(10)).pass((String[]) null);
-        channel7.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel7.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel7.close().after(3, TimeUnit.SECONDS).all()).containsExactly("test1",
                 "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
@@ -713,7 +722,7 @@ public class RoutineTest {
         channel8.after(millis(10).nanosTime()).pass("test2");
         channel8.after(millis(10).microsTime()).pass("test3", "test4");
         channel8.after(millis(10)).pass((String[]) null);
-        channel8.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel8.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel8.close().after(3, TimeUnit.SECONDS).all()).containsOnly("test1", "test2",
                 "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
@@ -729,7 +738,7 @@ public class RoutineTest {
         channel9.after(millis(10).nanosTime()).pass("test2");
         channel9.after(millis(10).microsTime()).pass("test3", "test4");
         channel9.after(millis(10)).pass((String[]) null);
-        channel9.immediately().pass((List<String>) null).pass((Channel<String, String>) null);
+        channel9.now().pass((List<String>) null).pass((Channel<String, String>) null);
         assertThat(channel9.close().after(3, TimeUnit.SECONDS).all()).containsExactly("test1",
                 "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
@@ -742,12 +751,11 @@ public class RoutineTest {
                 JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
         final Channel<String, String> channel1 = passingRoutine.call();
         channel1.after(seconds(2)).abort();
-        assertThat(channel1.immediately().pass("test").close().after(timeout).next()).isEqualTo(
-                "test");
+        assertThat(channel1.now().pass("test").close().after(timeout).next()).isEqualTo("test");
         final Channel<String, String> channel2 = passingRoutine.call();
         channel2.after(millis(100)).abort();
         try {
-            channel2.after(millis(200)).pass("test").close().after(timeout).next();
+            channel2.after(millis(200)).pass("test").now().close().after(timeout).next();
             fail();
 
         } catch (final AbortException ignored) {
@@ -760,7 +768,7 @@ public class RoutineTest {
         try {
             final Channel<String, String> channel = abortRoutine.call("test");
             millis(500).sleepAtLeast();
-            channel.after(timeout).next();
+            channel.after(timeout).all();
             fail();
 
         } catch (final AbortException ignored) {
@@ -778,10 +786,50 @@ public class RoutineTest {
         assertThat(routine1.call()
                            .after(millis(500))
                            .pass(routine2.call("test"))
+                           .now()
                            .close()
                            .after(timeout)
                            .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(500);
+    }
+
+    @Test
+    public void testDelayedClose() {
+        final UnitDuration timeout = seconds(1);
+        final Routine<String, String> passingRoutine =
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
+        final Channel<String, String> channel1 = passingRoutine.call();
+        channel1.after(seconds(2)).close();
+        assertThat(channel1.now().pass("test").after(timeout).next()).isEqualTo("test");
+        assertThat(channel1.isOpen()).isTrue();
+        final Channel<String, String> channel2 = passingRoutine.call();
+        channel2.after(millis(100)).close();
+        assertThat(channel2.after(millis(200)).pass("test").after(timeout).all()).containsExactly(
+                "test");
+        final Channel<String, String> channel3 = passingRoutine.call();
+        channel3.after(millis(200)).close();
+        assertThat(channel3.now().pass("test").after(timeout).all()).containsExactly("test");
+    }
+
+    @Test
+    public void testDelayedConsumer() {
+        final Routine<String, String> passingRoutine =
+                JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
+        final Channel<String, String> channel1 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel2 = passingRoutine.call();
+        channel2.after(millis(300)).pass(channel1).now().close();
+        channel1.pass("test").close();
+        long startTime = System.currentTimeMillis();
+        assertThat(channel2.after(seconds(1)).all()).containsExactly("test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
+        final Channel<String, String> channel3 = JRoutineCore.io().buildChannel();
+        final Channel<String, String> channel4 = passingRoutine.call();
+        channel4.after(millis(300)).pass(channel3).now().close();
+        startTime = System.currentTimeMillis();
+        channel3.abort();
+        assertThat(channel4.after(seconds(1)).getComplete()).isTrue();
+        assertThat(channel4.getError()).isNotNull();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
     }
 
     @Test
@@ -797,7 +845,7 @@ public class RoutineTest {
                             .buildRoutine();
         assertThat(routine2.call("test1").after(timeout).all()).containsExactly("test1");
         final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
-        channel.immediately().abort(new IllegalArgumentException());
+        channel.now().abort(new IllegalArgumentException());
         try {
             channel.after(timeout).next();
 
@@ -839,10 +887,10 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutineCore.with(factoryOf(TestDiscardOnAbort.class)).buildRoutine();
         Channel<String, String> channel = routine3.call().pass("1");
-        channel.abort();
+        assertThat(channel.abort()).isTrue();
         assertThat(channel.after(timeout).getComplete()).isTrue();
         channel = routine3.call().pass("1");
-        channel.abort();
+        assertThat(channel.abort()).isTrue();
         assertThat(channel.after(timeout).getComplete()).isTrue();
         assertThat(TestDiscard.getInstanceCount()).isZero();
 
@@ -878,8 +926,8 @@ public class RoutineTest {
                                                             .configured()
                                                             .call();
         assertThat(channel.isEmpty()).isTrue();
-        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
-        final Channel<Object, Object> result = channel.close();
+        assertThat(channel.pass("test1").after(millis(500)).pass("test2").isEmpty()).isFalse();
+        final Channel<Object, Object> result = channel.now().close();
         assertThat(result.outputCount()).isZero();
         assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(channel.isEmpty()).isFalse();
@@ -901,8 +949,8 @@ public class RoutineTest {
         assertThat(channel.isEmpty()).isTrue();
         channel = routine.call();
         assertThat(channel.isEmpty()).isTrue();
-        assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
-        final Channel<Object, Object> result = channel.close();
+        assertThat(channel.pass("test1").after(millis(500)).pass("test2").isEmpty()).isFalse();
+        final Channel<Object, Object> result = channel.now().close();
         assertThat(result.isEmpty()).isFalse();
         assertThat(result.abort()).isTrue();
         assertThat(channel.isEmpty()).isTrue();
@@ -964,9 +1012,10 @@ public class RoutineTest {
         final Logger logger = Logger.newLogger(null, null, this);
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
-            new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
+            new InvocationExecution<Object, Object>(null, new TestExecutionObserver(), channel,
+                    logger);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -974,7 +1023,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
                     logger);
@@ -985,7 +1034,7 @@ public class RoutineTest {
 
         try {
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
-                    new TestInputIterator(), null, logger);
+                    new TestExecutionObserver(), null, logger);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -993,10 +1042,10 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
-                    new TestInputIterator(), channel, null);
+                    new TestExecutionObserver(), channel, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1027,6 +1076,19 @@ public class RoutineTest {
                     }
                 };
         testConsumer(exceptionConsumer);
+        final MappingInvocation<String, String> producer =
+                new MappingInvocation<String, String>(null) {
+
+                    public void onInput(final String input,
+                            @NotNull final Channel<String, ?> result) {
+                        for (int i = 0; i < 100; i++) {
+                            result.pass(input + i, input + i);
+                        }
+                    }
+                };
+        final Channel<String, String> channel =
+                JRoutineCore.with(producer).call().pass("test").bind(exceptionConsumer);
+        assertThat(channel.after(seconds(3)).getError()).isNotNull();
     }
 
     @Test
@@ -1103,6 +1165,20 @@ public class RoutineTest {
     }
 
     @Test
+    public void testIllegalBind() {
+        final Channel<Object, Object> invocationChannel =
+                JRoutineCore.with(IdentityInvocation.factoryOf()).call();
+        final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
+        channel.bind(new TemplateChannelConsumer<Object>() {});
+        try {
+            invocationChannel.pass(channel);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+        }
+    }
+
+    @Test
     public void testInitInvocationException() {
         final ExceptionRoutine routine =
                 new ExceptionRoutine(InvocationConfiguration.defaultConfiguration());
@@ -1166,7 +1242,7 @@ public class RoutineTest {
                                .sorted()
                                .after(millis(100))
                                .pass("test1")
-                               .immediately()
+                               .now()
                                .pass("test2")
                                .close()
                                .after(seconds(1))
@@ -1181,7 +1257,7 @@ public class RoutineTest {
                                .sorted()
                                .after(millis(100))
                                .pass("test1")
-                               .immediately()
+                               .now()
                                .pass("test2")
                                .close()
                                .after(seconds(1))
@@ -1196,7 +1272,7 @@ public class RoutineTest {
                                .sorted()
                                .after(millis(100))
                                .pass("test1")
-                               .immediately()
+                               .now()
                                .pass(asArgs("test2"))
                                .close()
                                .after(seconds(1))
@@ -1211,7 +1287,7 @@ public class RoutineTest {
                                .sorted()
                                .after(millis(100))
                                .pass("test1")
-                               .immediately()
+                               .now()
                                .pass(Collections.singletonList("test2"))
                                .close()
                                .after(seconds(1))
@@ -1228,7 +1304,7 @@ public class RoutineTest {
                                .sorted()
                                .after(millis(100))
                                .pass("test1")
-                               .immediately()
+                               .now()
                                .pass(channel)
                                .close()
                                .after(seconds(1))
@@ -1284,7 +1360,7 @@ public class RoutineTest {
                         .sorted()
                         .after(millis(100))
                         .pass("test1")
-                        .immediately()
+                        .now()
                         .pass(channel)
                         .close()
                         .after(seconds(10))
@@ -1306,7 +1382,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testInvocationNotAvailable() throws InterruptedException {
+    public void testInvocationNotAvailable() {
         final Routine<Void, Void> routine = JRoutineCore.with(new SleepCommand())
                                                         .applyInvocationConfiguration()
                                                         .withRunner(Runners.syncRunner())
@@ -1339,6 +1415,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .now()
                         .close()
                         .eventuallyAbort()
                         .after(millis(100))
@@ -1354,6 +1431,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .now()
                         .close()
                         .eventuallyAbort(new IllegalStateException())
                         .after(millis(100))
@@ -1370,6 +1448,7 @@ public class RoutineTest {
                         .pass("test1")
                         .after(millis(300))
                         .pass("test2")
+                        .now()
                         .close()
                         .eventuallyFail()
                         .after(millis(100))
@@ -1577,7 +1656,7 @@ public class RoutineTest {
 
                     @Override
                     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-                        result.immediately().pass(s).after(seconds(2)).abort();
+                        result.now().pass(s).after(seconds(2)).abort();
                     }
                 };
         assertThat(JRoutineCore.with(factoryOf(invocation, this))
@@ -1587,7 +1666,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testPendingInputs() throws InterruptedException {
+    public void testPendingInputs() {
         final Channel<Object, Object> channel =
                 JRoutineCore.with(IdentityInvocation.factoryOf()).call();
         assertThat(channel.isOpen()).isTrue();
@@ -1598,14 +1677,14 @@ public class RoutineTest {
         final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.close();
+        channel.now().close();
         assertThat(channel.isOpen()).isFalse();
         outputChannel.close();
         assertThat(channel.isOpen()).isFalse();
     }
 
     @Test
-    public void testPendingInputsAbort() throws InterruptedException {
+    public void testPendingInputsAbort() {
         final Channel<Object, Object> channel =
                 JRoutineCore.with(IdentityInvocation.factoryOf()).call();
         assertThat(channel.isOpen()).isTrue();
@@ -1616,7 +1695,7 @@ public class RoutineTest {
         final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.immediately().abort();
+        channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
     }
 
@@ -1625,7 +1704,7 @@ public class RoutineTest {
     public void testResultChannelError() {
         final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(), null,
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
                     Runners.sharedRunner(), logger);
             fail();
 
@@ -1633,7 +1712,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), null, logger);
             fail();
 
@@ -1641,7 +1720,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), null);
             fail();
 
@@ -1649,7 +1728,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
             fail();
 
@@ -1657,7 +1736,7 @@ public class RoutineTest {
         }
 
         try {
-            new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+            new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
             fail();
 
@@ -1666,7 +1745,7 @@ public class RoutineTest {
 
         try {
             final ResultChannel<Object> channel =
-                    new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+                    new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.sharedRunner(), logger);
             channel.after(-1, TimeUnit.MILLISECONDS);
             fail();
@@ -1763,7 +1842,7 @@ public class RoutineTest {
         }
 
         try {
-            routine1.call().immediately().eventuallyContinue().iterator().next();
+            routine1.call().now().eventuallyContinue().iterator().next();
             fail();
 
         } catch (final NoSuchElementException ignored) {
@@ -1775,7 +1854,7 @@ public class RoutineTest {
                         .withLogLevel(Level.SILENT)
                         .configured()
                         .call("test")
-                        .immediately()
+                        .now()
                         .iterator()
                         .next();
             fail();
@@ -1919,7 +1998,7 @@ public class RoutineTest {
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
-        final Channel<Object, Object> result = channel.close();
+        final Channel<Object, Object> result = channel.now().close();
         assertThat(result.after(seconds(1)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);
@@ -2568,7 +2647,7 @@ public class RoutineTest {
 
         @Override
         public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-            result.immediately().pass(s).after(mDelay).abort();
+            result.now().pass(s).after(mDelay).abort();
         }
     }
 
@@ -2653,7 +2732,7 @@ public class RoutineTest {
                           .pass(list.toArray(new String[list.size()]));
                 }
 
-                result.immediately();
+                result.now();
                 list.clear();
                 mFlag = !mFlag;
             }
@@ -2662,7 +2741,7 @@ public class RoutineTest {
         @Override
         public void onComplete(@NotNull final Channel<String, ?> result) {
             final ArrayList<String> list = mList;
-            result.after(mDelay).pass(list);
+            result.after(mDelay).pass(list).now();
             list.clear();
         }
     }
@@ -2716,7 +2795,7 @@ public class RoutineTest {
                         .call()
                         .after(millis(500))
                         .pass(s)
-                        .immediately()
+                        .now()
                         .pass(new String[]{s})
                         .close()
                         .all();
@@ -2742,6 +2821,7 @@ public class RoutineTest {
                                     .call()
                                     .after(millis(500))
                                     .pass(channel)
+                                    .now()
                                     .close());
             channel.pass(s, s).close();
         }
@@ -2765,8 +2845,9 @@ public class RoutineTest {
                         .call()
                         .after(millis(500))
                         .pass(s)
-                        .immediately()
+                        .now()
                         .pass(Collections.singletonList(s))
+                        .now()
                         .close()
                         .all();
         }
@@ -2790,7 +2871,7 @@ public class RoutineTest {
                         .call()
                         .after(millis(500))
                         .pass(s)
-                        .immediately()
+                        .now()
                         .pass(s)
                         .close()
                         .all();
@@ -2867,7 +2948,6 @@ public class RoutineTest {
         }
 
         public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
             result.after(millis(500)).pass(s).after(millis(100)).pass(s);
         }
     }
@@ -2993,19 +3073,11 @@ public class RoutineTest {
         }
     }
 
-    private static class TestInputIterator implements InputIterator<Object> {
+    private static class TestExecutionObserver implements ExecutionObserver<Object> {
 
         @NotNull
         public RoutineException getAbortException() {
             return new RoutineException();
-        }
-
-        public boolean hasInput() {
-            return false;
-        }
-
-        public Object nextInput() {
-            return null;
         }
 
         public void onAbortComplete() {
@@ -3015,17 +3087,23 @@ public class RoutineTest {
             return false;
         }
 
-        public void onConsumeStart() {
+        public boolean onFirstInput(@NotNull final InputData<Object> inputData) {
+            return false;
         }
 
         public void onInvocationComplete() {
+        }
+
+        public boolean onNextInput(@NotNull final InputData<Object> inputData) {
+            return false;
         }
     }
 
     private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
-        public void create(@NotNull final InvocationObserver<Object, Object> observer) {
+        public boolean create(@NotNull final InvocationObserver<Object, Object> observer) {
             observer.onCreate(new TemplateInvocation<Object, Object>() {});
+            return true;
         }
 
         public void discard(@NotNull final Invocation<Object, Object> invocation) {
@@ -3067,11 +3145,6 @@ public class RoutineTest {
     private static class TestRunner extends SyncRunner {
 
         private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
-
-        @Override
-        public boolean isExecutionThread() {
-            return false;
-        }
 
         @Override
         public void run(@NotNull final Execution execution, final long delay,

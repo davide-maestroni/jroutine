@@ -136,34 +136,36 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                     "the method class must have a static scope: " + type.getName());
         }
 
+        final Object[] constructorArgs;
         final Object[] safeArgs = Reflection.asArgs(args);
         if (type.isAnonymousClass()) {
             if (safeArgs.length > 0) {
-                final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 2]);
-                System.arraycopy(safeArgs, 0, syntheticArgs, 2, safeArgs.length);
-                syntheticArgs[0] = context;
-                syntheticArgs[1] = safeArgs;
+                constructorArgs = new Object[safeArgs.length + 2];
+                System.arraycopy(safeArgs, 0, constructorArgs, 2, safeArgs.length);
+                constructorArgs[0] = context;
+                constructorArgs[1] = safeArgs;
 
             } else {
-                mArgs = new Object[]{context};
+                constructorArgs = new Object[]{context};
             }
 
         } else if (safeArgs.length > 0) {
-            final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
-            System.arraycopy(safeArgs, 0, syntheticArgs, 1, safeArgs.length);
-            syntheticArgs[0] = context;
+            constructorArgs = new Object[safeArgs.length + 1];
+            System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
+            constructorArgs[0] = context;
 
         } else {
-            mArgs = new Object[]{context};
+            constructorArgs = new Object[]{context};
         }
 
         Constructor<? extends LoaderRoutineMethodCompat> constructor = null;
         try {
-            constructor = Reflection.findBestMatchingConstructor(type, mArgs);
+            constructor = Reflection.findBestMatchingConstructor(type, constructorArgs);
 
         } catch (final IllegalArgumentException ignored) {
         }
 
+        mArgs = constructorArgs;
         mConstructor = constructor;
     }
 
@@ -739,15 +741,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @Override
         protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
                 InvocationTargetException, IllegalAccessException {
-            final LoaderRoutineMethodCompat routine = mInstance;
-            routine.setLocalContext(mContext);
-            routine.setLocalInput(inputChannel);
+            final LoaderRoutineMethodCompat instance = mInstance;
+            instance.setLocalContext(mContext);
+            instance.setLocalInput(inputChannel);
             try {
-                return mMethod.invoke(routine, mParams);
+                return mMethod.invoke(instance, mParams);
 
             } finally {
-                routine.setLocalInput(null);
-                routine.setLocalContext(null);
+                instance.setLocalInput(null);
+                instance.setLocalContext(null);
             }
         }
     }
@@ -835,15 +837,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @Override
         protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
                 InvocationTargetException, IllegalAccessException {
-            final LoaderRoutineMethodCompat routine = mInstance;
-            routine.setLocalContext(mContext);
-            routine.setLocalInput(inputChannel);
+            final LoaderRoutineMethodCompat instance = mInstance;
+            instance.setLocalContext(mContext);
+            instance.setLocalInput(inputChannel);
             try {
-                return mMethod.invoke(routine, mParams);
+                return mMethod.invoke(instance, mParams);
 
             } finally {
-                routine.setLocalInput(null);
-                routine.setLocalContext(null);
+                instance.setLocalInput(null);
+                instance.setLocalContext(null);
             }
         }
 
@@ -867,7 +869,6 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         protected List<OutputChannel<?>> getOutputChannels() {
             return mOutputChannels;
         }
-
     }
 
     /**
@@ -878,25 +879,25 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
         private final ArrayList<InputChannel<?>> mInputChannels;
 
+        private final LoaderRoutineMethodCompat mInstance;
+
         private final Method mMethod;
 
         private final ArrayList<OutputChannel<?>> mOutputChannels;
 
         private final Object[] mParams;
 
-        private final LoaderRoutineMethodCompat mRoutine;
-
         /**
          * Constructor.
          *
-         * @param routine the routine method instance.
-         * @param method  the method instance.
-         * @param params  the method parameters.
+         * @param instance the routine method instance.
+         * @param method   the method instance.
+         * @param params   the method parameters.
          */
-        private SingleInvocationFactory(@NotNull final LoaderRoutineMethodCompat routine,
+        private SingleInvocationFactory(@NotNull final LoaderRoutineMethodCompat instance,
                 @NotNull final Method method, @NotNull final Object[] params) {
-            super(asArgs(routine.getClass(), method, cloneArgs(params)));
-            mRoutine = routine;
+            super(asArgs(instance.getClass(), method, cloneArgs(params)));
+            mInstance = instance;
             mMethod = method;
             final ArrayList<InputChannel<?>> inputChannels =
                     (mInputChannels = new ArrayList<InputChannel<?>>());
@@ -908,7 +909,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @NotNull
         @Override
         public ContextInvocation<Selectable<Object>, Selectable<Object>> newInvocation() {
-            return new SingleInvocation(mInputChannels, mOutputChannels, mRoutine, mMethod,
+            return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod,
                     mParams);
         }
     }

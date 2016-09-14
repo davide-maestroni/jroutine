@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -27,19 +27,20 @@ import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
-import com.github.dm.jrt.stream.modifier.ThrottleChannelConsumer.CompletionHandler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
+
 /**
- * Invocation throttle binding function.
+ * Invocation time range throttle binding function.
  * <p>
- * Created by davide-maestroni on 07/29/2016.
+ * Created by davide-maestroni on 07/30/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindThrottle<IN, OUT> implements
+class BindTimeThrottle<IN, OUT> implements
         BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
                 super Channel<?, IN>, ? extends Channel<?, OUT>>> {
 
@@ -49,28 +50,34 @@ class BindThrottle<IN, OUT> implements
 
     private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
 
+    private final long mRangeMillis;
+
     private int mCount;
+
+    private long mNextTimeSlot = Long.MIN_VALUE;
 
     /**
      * Constructor.
      *
-     * @param count the maximum invocation count.
+     * @param count    the maximum invocation count.
+     * @param range    the time range value.
+     * @param timeUnit the time range unit.
      */
-    BindThrottle(final int count) {
+    BindTimeThrottle(final int count, final long range, @NotNull final TimeUnit timeUnit) {
         mMaxCount = ConstantConditions.positive("max count", count);
+        mRangeMillis = timeUnit.toMillis(range);
     }
 
     public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
             final StreamConfiguration streamConfiguration,
             final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return new BindingFunction(streamConfiguration.asChannelConfiguration(), function);
+        return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
     }
 
     /**
      * Binding function implementation.
      */
-    private class BindingFunction
-            implements Function<Channel<?, IN>, Channel<?, OUT>>, CompletionHandler {
+    private class BindingFunction implements Function<Channel<?, IN>, Channel<?, OUT>>, Execution {
 
         private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
 
@@ -84,7 +91,7 @@ class BindThrottle<IN, OUT> implements
          * @param configuration   the channel configuration.
          * @param bindingFunction the binding function.
          */
-        private BindingFunction(@NotNull final ChannelConfiguration configuration,
+        BindingFunction(@NotNull final ChannelConfiguration configuration,
                 @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
                         bindingFunction) {
             mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -96,45 +103,53 @@ class BindThrottle<IN, OUT> implements
             final ChannelConfiguration configuration = mConfiguration;
             final Channel<OUT, OUT> outputChannel =
                     JRoutineCore.io().apply(configuration).buildChannel();
+            final long delay;
             final boolean isBind;
+            final Runner runner = mRunner;
             synchronized (mMutex) {
-                isBind = (++mCount <= mMaxCount);
-                if (!isBind) {
-                    final Runner runner = mRunner;
-                    if (runner.isExecutionThread() && !runner.isManagedThread()) {
-                        throw new InvocationDeadlockException(
-                                "cannot wait for invocation instances on a non-managed thread\nTry "
-                                        + "employing a different runner");
-                    }
+                final long rangeMillis = mRangeMillis;
+                final long nextTimeSlot = mNextTimeSlot;
+                final long now = System.currentTimeMillis();
+                if ((nextTimeSlot == Long.MIN_VALUE) || (now >= (nextTimeSlot + rangeMillis))) {
+                    mNextTimeSlot = now + rangeMillis;
+                    mCount = 0;
+                }
 
-                    mQueue.add(new Runnable() {
+                final int maxCount = mMaxCount;
+                isBind = (++mCount <= maxCount);
+                if (!isBind) {
+                    final SimpleQueue<Runnable> queue = mQueue;
+                    queue.add(new Runnable() {
 
                         public void run() {
                             try {
-                                mBindingFunction.apply(channel)
-                                                .bind(new ThrottleChannelConsumer<OUT>(
-                                                        BindingFunction.this, outputChannel));
+                                mBindingFunction.apply(channel).bind(outputChannel);
                             } catch (final Exception e) {
                                 outputChannel.abort(e);
-                                onComplete();
                             }
                         }
                     });
+
+                    delay = (((queue.size() - 1) / maxCount) + 1) * rangeMillis;
+
+                } else {
+                    delay = 0;
                 }
             }
 
             if (isBind) {
-                mBindingFunction.apply(channel)
-                                .bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
+                mBindingFunction.apply(channel).bind(outputChannel);
+
+            } else {
+                runner.run(this, delay, TimeUnit.MILLISECONDS);
             }
 
             return outputChannel;
         }
 
-        public void onComplete() {
+        public void run() {
             final Runnable runnable;
             synchronized (mMutex) {
-                --mCount;
                 final SimpleQueue<Runnable> queue = mQueue;
                 if (queue.isEmpty()) {
                     return;

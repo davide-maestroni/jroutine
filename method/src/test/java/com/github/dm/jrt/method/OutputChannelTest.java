@@ -74,12 +74,12 @@ public class OutputChannelTest {
     public void testAbortDelay() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test");
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         final ArrayList<String> results = new ArrayList<String>();
         channel.after(10, TimeUnit.MILLISECONDS).allInto(results);
         assertThat(results).isEmpty();
-        assertThat(channel.immediately().eventuallyContinue().getComplete()).isFalse();
-        assertThat(channel.immediately().abort()).isTrue();
+        assertThat(channel.now().eventuallyContinue().getComplete()).isFalse();
+        assertThat(channel.now().abort()).isTrue();
         try {
             channel.next();
             fail();
@@ -94,7 +94,7 @@ public class OutputChannelTest {
     public void testAllIntoTimeout() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyAbort().eventuallyFail();
         try {
             channel.allInto(new ArrayList<String>());
@@ -110,7 +110,7 @@ public class OutputChannelTest {
     public void testAllIntoTimeout2() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.allInto(new ArrayList<String>());
@@ -126,7 +126,7 @@ public class OutputChannelTest {
     public void testAllTimeout() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.all();
@@ -142,7 +142,7 @@ public class OutputChannelTest {
     public void testAllTimeout2() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.all();
@@ -227,7 +227,7 @@ public class OutputChannelTest {
     public void testHasNextIteratorTimeout() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.iterator().hasNext();
@@ -243,7 +243,7 @@ public class OutputChannelTest {
     public void testHasNextIteratorTimeout2() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().hasNext();
@@ -273,7 +273,7 @@ public class OutputChannelTest {
     public void testNextIteratorTimeout() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.iterator().next();
@@ -289,7 +289,7 @@ public class OutputChannelTest {
     public void testNextIteratorTimeout2() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.iterator().next();
@@ -395,7 +395,7 @@ public class OutputChannelTest {
     public void testNextTimeout() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail();
         try {
             channel.next();
@@ -411,7 +411,7 @@ public class OutputChannelTest {
     public void testNextTimeout2() {
         final OutputChannel<String> channel = RoutineMethod.outputChannel();
         channel.after(seconds(3)).pass("test").close();
-        assertThat(channel.immediately().eventuallyContinue().all()).isEmpty();
+        assertThat(channel.now().eventuallyContinue().all()).isEmpty();
         channel.eventuallyFail().after(millis(10));
         try {
             channel.next();
@@ -440,11 +440,11 @@ public class OutputChannelTest {
         channel.pass(-77L);
         assertThat(channel.after(timeout).next()).isEqualTo(-77L);
         final OutputChannel<Object> channel1 = RoutineMethod.outputChannel();
-        channel1.after(millis(200)).pass(23).immediately().pass(-77L).close();
+        channel1.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel1.after(timeout).all()).containsOnly(23, -77L);
         final OutputChannel<Object> channel2 = RoutineMethod.outputChannel();
         channel2.unsorted().sorted();
-        channel2.after(millis(200)).pass(23).immediately().pass(-77L).close();
+        channel2.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel2.after(timeout).all()).containsExactly(23, -77L);
     }
 
@@ -465,7 +465,7 @@ public class OutputChannelTest {
                             .eventuallyContinue();
         assertThat(outputChannel.after(millis(500)).all()).containsExactly("test");
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
-        assertThat(outputChannel.immediately().getComplete()).isFalse();
+        assertThat(outputChannel.now().getComplete()).isFalse();
         channel.close();
         assertThat(channel.isOpen()).isFalse();
         assertThat(outputChannel.after(millis(500)).getComplete()).isTrue();
@@ -529,7 +529,7 @@ public class OutputChannelTest {
         final OutputChannel<Object> outputChannel = RoutineMethod.outputChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.close();
+        channel.now().close();
         assertThat(channel.isOpen()).isFalse();
         outputChannel.close();
         assertThat(channel.isOpen()).isFalse();
@@ -546,7 +546,7 @@ public class OutputChannelTest {
         final OutputChannel<Object> outputChannel = RoutineMethod.outputChannel();
         channel.pass(outputChannel);
         assertThat(channel.isOpen()).isTrue();
-        channel.immediately().abort();
+        channel.now().abort();
         assertThat(channel.isOpen()).isFalse();
     }
 
@@ -569,7 +569,7 @@ public class OutputChannelTest {
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
         assertThat(channel.outputCount()).isEqualTo(0);
-        channel.close();
+        channel.now().close();
         assertThat(channel.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel.inputCount()).isEqualTo(0);
         assertThat(channel.outputCount()).isEqualTo(1);
@@ -582,7 +582,7 @@ public class OutputChannelTest {
         channel1.after(millis(500)).pass("test");
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);
-        channel1.close();
+        channel1.now().close();
         assertThat(channel1.after(seconds(1)).getComplete()).isTrue();
         assertThat(channel1.inputCount()).isEqualTo(1);
         assertThat(channel1.outputCount()).isEqualTo(1);

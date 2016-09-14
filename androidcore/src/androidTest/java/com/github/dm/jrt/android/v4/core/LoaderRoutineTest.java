@@ -446,7 +446,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(routine2.call("test1").after(timeout).all()).containsExactly("test1");
 
         final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
-        channel.immediately().abort(new IllegalArgumentException());
+        channel.now().abort(new IllegalArgumentException());
 
         try {
 
@@ -1191,7 +1191,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(routine2.call("test1").after(timeout).all()).containsExactly("test1");
 
         final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
-        channel.immediately().abort(new IllegalArgumentException());
+        channel.now().abort(new IllegalArgumentException());
 
         try {
 
@@ -1671,7 +1671,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
-        final Channel<?, Object> result = channel.close();
+        final Channel<?, Object> result = channel.now().close();
         assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);

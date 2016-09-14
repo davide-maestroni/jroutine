@@ -211,21 +211,6 @@ public class BackoffBuilder {
         }
 
         /**
-         * Sums the specified backoff to this one.
-         * <br>
-         * For each input count, if at least one of the returned delays is different than
-         * {@code NO_DELAY}, its value is returned. If both are different, the sum of the two values
-         * is returned.
-         *
-         * @param backoff the backoff to add.
-         * @return the summed backoff policy.
-         */
-        @NotNull
-        public BaseBackoff add(@NotNull final Backoff backoff) {
-            return new AddedBackoff(this, backoff);
-        }
-
-        /**
          * Caps this backoff policy to the specified maximum delay.
          *
          * @param delay the maximum delay.
@@ -251,6 +236,21 @@ public class BackoffBuilder {
         }
 
         /**
+         * Sums the specified backoff to this one.
+         * <br>
+         * For each input count, if at least one of the returned delays is different than
+         * {@code NO_DELAY}, its value is returned. If both are different, the sum of the two values
+         * is returned.
+         *
+         * @param backoff the backoff to add.
+         * @return the summed backoff policy.
+         */
+        @NotNull
+        public BaseBackoff plus(@NotNull final Backoff backoff) {
+            return new SummedBackoff(this, backoff);
+        }
+
+        /**
          * Adds jitter to this backoff policy.
          *
          * @param percentage a floating number between 0 and 1 indicating the percentage of delay to
@@ -261,45 +261,6 @@ public class BackoffBuilder {
         @NotNull
         public BaseBackoff withJitter(final float percentage) {
             return new JitterBackoff(this, percentage);
-        }
-    }
-
-    /**
-     * Sum backoff policy.
-     */
-    private static class AddedBackoff extends BaseBackoff {
-
-        private final Backoff mBackoff;
-
-        private final Backoff mOther;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped backoff instance.
-         * @param other   the other backoff to sum.
-         */
-        private AddedBackoff(@NotNull final Backoff wrapped, @NotNull final Backoff other) {
-            super(asArgs(wrapped, other));
-            mBackoff = wrapped;
-            mOther = ConstantConditions.notNull("backoff instance", other);
-        }
-
-        public long getDelay(final int count) {
-            final long delay1 = mBackoff.getDelay(count);
-            final long delay2 = mOther.getDelay(count);
-            if (delay1 < 0) {
-                if (delay2 < 0) {
-                    return NO_DELAY;
-                }
-
-                return delay2;
-
-            } else if (delay2 < 0) {
-                return delay1;
-            }
-
-            return delay1 + delay2;
         }
     }
 
@@ -498,6 +459,45 @@ public class BackoffBuilder {
             }
 
             return mDelay * excess;
+        }
+    }
+
+    /**
+     * Summed backoff policy.
+     */
+    private static class SummedBackoff extends BaseBackoff {
+
+        private final Backoff mBackoff;
+
+        private final Backoff mOther;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped backoff instance.
+         * @param other   the other backoff to sum.
+         */
+        private SummedBackoff(@NotNull final Backoff wrapped, @NotNull final Backoff other) {
+            super(asArgs(wrapped, other));
+            mBackoff = wrapped;
+            mOther = ConstantConditions.notNull("backoff instance", other);
+        }
+
+        public long getDelay(final int count) {
+            final long delay1 = mBackoff.getDelay(count);
+            final long delay2 = mOther.getDelay(count);
+            if (delay1 < 0) {
+                if (delay2 < 0) {
+                    return NO_DELAY;
+                }
+
+                return delay2;
+
+            } else if (delay2 < 0) {
+                return delay1;
+            }
+
+            return delay1 + delay2;
         }
     }
 }

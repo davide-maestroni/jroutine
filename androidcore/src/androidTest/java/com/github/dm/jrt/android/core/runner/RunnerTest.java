@@ -174,7 +174,7 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
-    public void testHandlerRunner() throws InterruptedException {
+    public void testHandlerRunner() {
 
         final CommandInvocation<Handler> invocation = new CommandInvocation<Handler>(null) {
 

@@ -307,6 +307,11 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         return this;
     }
 
+    @Override
+    protected boolean canOptimizeBinding() {
+        return (mStreamConfiguration.getLoaderContext() == null) && super.canOptimizeBinding();
+    }
+
     @NotNull
     @Override
     protected LoaderStreamConfigurationCompat newConfiguration(
@@ -331,7 +336,7 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         final LoaderContextCompat loaderContext = loaderStreamConfiguration.getLoaderContext();
         if (loaderContext == null) {
             return JRoutineCore.with(factory)
-                               .apply(loaderStreamConfiguration.asInvocationConfiguration())
+                               .apply(loaderStreamConfiguration.toInvocationConfiguration())
                                .buildRoutine();
         }
 
@@ -343,8 +348,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
                                         .buildRoutine(), factory.hashCode(), InvocationMode.ASYNC);
         return JRoutineLoaderCompat.on(loaderContext)
                                    .with(invocationFactory)
-                                   .apply(loaderStreamConfiguration.asInvocationConfiguration())
-                                   .apply(loaderStreamConfiguration.asLoaderConfiguration())
+                                   .apply(loaderStreamConfiguration.toInvocationConfiguration())
+                                   .apply(loaderStreamConfiguration.toLoaderConfiguration())
                                    .buildRoutine();
     }
 
@@ -449,8 +454,8 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
     private <AFTER> LoaderRoutine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final LoaderRoutineBuilder<? super OUT, ? extends AFTER> builder) {
         final LoaderStreamConfigurationCompat streamConfiguration = mStreamConfiguration;
-        return builder.apply(streamConfiguration.asInvocationConfiguration())
-                      .apply(streamConfiguration.asLoaderConfiguration())
+        return builder.apply(streamConfiguration.toInvocationConfiguration())
+                      .apply(streamConfiguration.toLoaderConfiguration())
                       .buildRoutine();
     }
 
@@ -531,26 +536,6 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         }
 
         @NotNull
-        public ChannelConfiguration asChannelConfiguration() {
-            if (mChannelConfiguration == null) {
-                mChannelConfiguration =
-                        asInvocationConfiguration().outputConfigurationBuilder().configured();
-            }
-
-            return mChannelConfiguration;
-        }
-
-        @NotNull
-        public InvocationConfiguration asInvocationConfiguration() {
-            if (mInvocationConfiguration == null) {
-                mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).configured();
-            }
-
-            return mInvocationConfiguration;
-        }
-
-        @NotNull
         @Override
         public InvocationConfiguration getCurrentInvocationConfiguration() {
             return mCurrentConfiguration;
@@ -569,15 +554,23 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         }
 
         @NotNull
-        @Override
-        public LoaderConfiguration asLoaderConfiguration() {
-            if (mLoaderConfiguration == null) {
-                mLoaderConfiguration = mStreamLoaderConfiguration.builderFrom()
-                                                                 .with(mCurrentLoaderConfiguration)
-                                                                 .configured();
+        public ChannelConfiguration toChannelConfiguration() {
+            if (mChannelConfiguration == null) {
+                mChannelConfiguration =
+                        toInvocationConfiguration().outputConfigurationBuilder().configured();
             }
 
-            return mLoaderConfiguration;
+            return mChannelConfiguration;
+        }
+
+        @NotNull
+        public InvocationConfiguration toInvocationConfiguration() {
+            if (mInvocationConfiguration == null) {
+                mInvocationConfiguration =
+                        mStreamConfiguration.builderFrom().with(mCurrentConfiguration).configured();
+            }
+
+            return mInvocationConfiguration;
         }
 
         @NotNull
@@ -596,6 +589,18 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
         @Override
         public LoaderConfiguration getStreamLoaderConfiguration() {
             return mStreamLoaderConfiguration;
+        }
+
+        @NotNull
+        @Override
+        public LoaderConfiguration toLoaderConfiguration() {
+            if (mLoaderConfiguration == null) {
+                mLoaderConfiguration = mStreamLoaderConfiguration.builderFrom()
+                                                                 .with(mCurrentLoaderConfiguration)
+                                                                 .configured();
+            }
+
+            return mLoaderConfiguration;
         }
     }
 }

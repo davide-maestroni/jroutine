@@ -34,8 +34,9 @@ interface InvocationManager<IN, OUT> {
      * Creates a new invocation instance.
      *
      * @param observer the invocation observer.
+     * @return whether the invocation is immediately created (false if delayed).
      */
-    void create(@NotNull InvocationObserver<IN, OUT> observer);
+    boolean create(@NotNull InvocationObserver<IN, OUT> observer);
 
     /**
      * Discards the specified invocation.

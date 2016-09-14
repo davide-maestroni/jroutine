@@ -61,7 +61,7 @@ import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.tryCatchAccept;
+import static com.github.dm.jrt.stream.operation.Operations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -395,7 +395,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             public Function<Channel<?, String>, Channel<?, String>> apply(
                     final LoaderStreamConfigurationCompat configuration,
                     final Function<Channel<?, String>, Channel<?, String>> function) {
-                assertThat(configuration.asLoaderConfiguration()).isEqualTo(
+                assertThat(configuration.toLoaderConfiguration()).isEqualTo(
                         LoaderConfiguration.defaultConfiguration());
                 assertThat(configuration.getLoaderContext()).isInstanceOf(
                         LoaderContextCompat.class);

@@ -113,7 +113,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.call(inputChannel, true);
  *         inputChannel.pass("Hello", "JRoutine", "!");
- *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JRoutine", "!"
+ *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
  * Note that no check is done before reading the next available input, in such case the invocation
@@ -164,7 +164,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.callParallel(inputChannel, true);
  *         inputChannel.pass("Hello", "JRoutine", "!");
- *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JRoutine", "!"
+ *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
  * Or, for an inner class:
@@ -299,7 +299,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
- *         final OutputChannel&lt;Integer&gt; resultChannel = RoutineMethod.outputChannel();
+ *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
  *         new RoutineMethod() {
  *
  *             private int mSum;
@@ -312,9 +312,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                     output.pass(mSum);
  *                 }
  *             }
- *         }.call(RoutineMethod.inputFrom(channel), resultChannel);
+ *         }.call(RoutineMethod.inputFrom(channel), outputChannel);
  *         channel.pass("1", "2", "3", "4").close();
- *         resultChannel.after(seconds(1)).next(); // expected value: 10
+ *         outputChannel.after(seconds(1)).next(); // expected value: 10
  *     </code>
  * </pre>
  * <h2>Handling of abortion exception</h2>
@@ -334,13 +334,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  *         final ExternalStorage storage = ExternalStorage.create();
  *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
  *         new RoutineMethod(this, storage) {
  *
  *             private final StorageConnection mConnection = storage.openConnection();
  *
- *             void store(final InputChannel&lt;String&gt; input,
- *                     final OutputChannel&lt;Integer&gt; output) {
+ *             void store(final InputChannel&lt;String&gt; input) {
  *                 try {
  *                     if (input.hasNext()) {
  *                         mConnection.put(input.next());
@@ -356,7 +354,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                     }
  *                 }
  *             }
- *         }.call(inputChannel, true);
+ *         }.call(inputChannel);
  *     </code>
  * </pre>
  * <h2>Wrapping existing method</h2>
@@ -413,34 +411,36 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     public RoutineMethod(@Nullable final Object... args) {
         final Class<? extends RoutineMethod> type = getClass();
+        final Object[] constructorArgs;
         if (type.isAnonymousClass()) {
             final Object[] safeArgs = asArgs(args);
             if (safeArgs.length > 0) {
-                final Object[] syntheticArgs = (mArgs = new Object[safeArgs.length + 1]);
-                System.arraycopy(safeArgs, 0, syntheticArgs, 1, safeArgs.length);
+                constructorArgs = new Object[safeArgs.length + 1];
+                System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
                 if (Reflection.hasStaticScope(type)) {
-                    syntheticArgs[0] = safeArgs;
+                    constructorArgs[0] = safeArgs;
 
                 } else {
-                    syntheticArgs[0] = safeArgs[0];
-                    syntheticArgs[1] = safeArgs;
+                    constructorArgs[0] = safeArgs[0];
+                    constructorArgs[1] = safeArgs;
                 }
 
             } else {
-                mArgs = safeArgs;
+                constructorArgs = safeArgs;
             }
 
         } else {
-            mArgs = cloneArgs(args);
+            constructorArgs = cloneArgs(args);
         }
 
         Constructor<? extends RoutineMethod> constructor = null;
         try {
-            constructor = Reflection.findBestMatchingConstructor(type, mArgs);
+            constructor = Reflection.findBestMatchingConstructor(type, constructorArgs);
 
         } catch (final IllegalArgumentException ignored) {
         }
 
+        mArgs = constructorArgs;
         mConstructor = constructor;
     }
 
@@ -1100,13 +1100,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @Override
         protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
                 InvocationTargetException, IllegalAccessException {
-            final RoutineMethod routine = mInstance;
-            routine.setLocalInput(inputChannel);
+            final RoutineMethod instance = mInstance;
+            instance.setLocalInput(inputChannel);
             try {
-                return mMethod.invoke(routine, mParams);
+                return mMethod.invoke(instance, mParams);
 
             } finally {
-                routine.setLocalInput(null);
+                instance.setLocalInput(null);
             }
         }
     }
@@ -1191,13 +1191,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @Override
         protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
                 InvocationTargetException, IllegalAccessException {
-            final RoutineMethod routine = mInstance;
-            routine.setLocalInput(inputChannel);
+            final RoutineMethod instance = mInstance;
+            instance.setLocalInput(inputChannel);
             try {
-                return mMethod.invoke(routine, mParams);
+                return mMethod.invoke(instance, mParams);
 
             } finally {
-                routine.setLocalInput(null);
+                instance.setLocalInput(null);
             }
         }
 
@@ -1215,7 +1215,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         protected List<OutputChannel<?>> getOutputChannels() {
             return mOutputChannels;
         }
-
     }
 
     /**
@@ -1226,25 +1225,25 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
         private final ArrayList<InputChannel<?>> mInputChannels;
 
+        private final RoutineMethod mInstance;
+
         private final Method mMethod;
 
         private final ArrayList<OutputChannel<?>> mOutputChannels;
 
         private final Object[] mParams;
 
-        private final RoutineMethod mRoutine;
-
         /**
          * Constructor.
          *
-         * @param routine the routine method instance.
-         * @param method  the method instance.
-         * @param params  the method parameters.
+         * @param instance the routine method instance.
+         * @param method   the method instance.
+         * @param params   the method parameters.
          */
-        private SingleInvocationFactory(@NotNull final RoutineMethod routine,
+        private SingleInvocationFactory(@NotNull final RoutineMethod instance,
                 @NotNull final Method method, @NotNull final Object[] params) {
-            super(asArgs(routine.getClass(), method, cloneArgs(params)));
-            mRoutine = routine;
+            super(asArgs(instance.getClass(), method, cloneArgs(params)));
+            mInstance = instance;
             mMethod = method;
             final ArrayList<InputChannel<?>> inputChannels =
                     (mInputChannels = new ArrayList<InputChannel<?>>());
@@ -1256,7 +1255,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         @NotNull
         @Override
         public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
-            return new SingleInvocation(mInputChannels, mOutputChannels, mRoutine, mMethod,
+            return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod,
                     mParams);
         }
     }

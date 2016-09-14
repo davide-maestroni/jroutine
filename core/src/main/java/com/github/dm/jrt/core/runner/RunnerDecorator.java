@@ -50,6 +50,11 @@ public class RunnerDecorator extends Runner {
     }
 
     @Override
+    public boolean isSynchronous() {
+        return mRunner.isSynchronous();
+    }
+
+    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
         mRunner.run(execution, delay, timeUnit);

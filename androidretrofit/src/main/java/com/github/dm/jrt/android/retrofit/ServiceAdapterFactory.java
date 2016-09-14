@@ -380,7 +380,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
                         function) throws
                 Exception {
             return decorate(function).andThen(
-                    new BindService(streamConfiguration.asChannelConfiguration(), mConverter,
+                    new BindService(streamConfiguration.toChannelConfiguration(), mConverter,
                             getRoutine()));
         }
 

@@ -74,7 +74,7 @@ public class InvocationFactoryTest {
         final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").now().abort()).isTrue();
     }
 
     @Test

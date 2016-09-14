@@ -33,9 +33,9 @@ import java.util.concurrent.TimeUnit;
  */
 class LocalRunner {
 
-    private static final EmptyExecution EMPTY_EXECUTION = new EmptyExecution();
-
     private static final int INITIAL_CAPACITY = 10;
+
+    private static final VoidExecution VOID_EXECUTION = new VoidExecution();
 
     private static final LocalRunnerThreadLocal sRunner = new LocalRunnerThreadLocal();
 
@@ -168,7 +168,7 @@ class LocalRunner {
         int i = mFirst;
         while (i != last) {
             if (executions[i] == execution) {
-                executions[i] = EMPTY_EXECUTION;
+                executions[i] = VOID_EXECUTION;
                 mDelays[i] = 0;
                 mDelayUnits[i] = TimeUnit.NANOSECONDS;
             }
@@ -266,15 +266,6 @@ class LocalRunner {
     }
 
     /**
-     * Empty execution implementation.
-     */
-    private static class EmptyExecution implements Execution {
-
-        public void run() {
-        }
-    }
-
-    /**
      * Thread local initializing the queue instance.
      */
     private static class LocalRunnerThreadLocal extends ThreadLocal<LocalRunner> {
@@ -282,6 +273,15 @@ class LocalRunner {
         @Override
         protected LocalRunner initialValue() {
             return new LocalRunner();
+        }
+    }
+
+    /**
+     * Void execution implementation.
+     */
+    private static class VoidExecution implements Execution {
+
+        public void run() {
         }
     }
 }

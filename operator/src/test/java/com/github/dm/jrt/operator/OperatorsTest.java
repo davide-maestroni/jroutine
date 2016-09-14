@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.BackoffBuilder;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -43,9 +44,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
@@ -1010,6 +1013,29 @@ public class OperatorsTest {
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    @Test
+    public void testInterval() {
+        long startTime = System.currentTimeMillis();
+        assertThat(JRoutineCore.with(Operators.interval(100, TimeUnit.MILLISECONDS))
+                               .call(3, "test")
+                               .after(seconds(3))
+                               .all()).containsOnly(3, "test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
+        startTime = System.currentTimeMillis();
+        assertThat(JRoutineCore.with(Operators.interval(millis(50)))
+                               .call(3, "test")
+                               .after(seconds(3))
+                               .all()).containsOnly(3, "test");
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(50);
+        startTime = System.currentTimeMillis();
+        assertThat(JRoutineCore.with(
+                Operators.interval(BackoffBuilder.afterCount(1).constantDelay(millis(200))))
+                               .call(3, "test", null)
+                               .after(seconds(3))
+                               .all()).containsOnly(3, "test", null);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(200);
     }
 
     @Test

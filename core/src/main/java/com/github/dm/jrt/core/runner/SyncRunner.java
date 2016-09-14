@@ -51,7 +51,7 @@ public abstract class SyncRunner extends Runner {
     }
 
     @Override
-    public boolean isManagedThread() {
-        return false;
+    public boolean isSynchronous() {
+        return true;
     }
 }

@@ -20,73 +20,75 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Factory of invocations skipping the last inputs.
+ * Factory of invocation passing on data after an interval specified by a backoff policy.
  * <p>
- * Created by davide-maestroni on 07/26/2016.
+ * Created by davide-maestroni on 09/07/2016.
  *
  * @param <DATA> the data type.
  */
-class SkipLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+class IntervalInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-    private final int mCount;
+    private final Backoff mBackoff;
 
     /**
      * Constructor.
      *
-     * @param count the number of data to skip.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
+     * @param backoff the interval backoff.
      */
-    SkipLastInvocationFactory(final int count) {
-        super(asArgs(ConstantConditions.notNegative("count", count)));
-        mCount = count;
+    IntervalInvocationFactory(@NotNull final Backoff backoff) {
+        super(asArgs(ConstantConditions.notNull("backoff instance", backoff)));
+        mBackoff = backoff;
     }
 
     @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new SkipLastInvocation<DATA>(mCount);
+    public Invocation<DATA, DATA> newInvocation() throws Exception {
+        return new IntervalInvocation<DATA>(mBackoff);
     }
 
     /**
-     * Routine invocation skipping the last input data.
+     * Routine invocation passing on data after an interval specified by a backoff policy.
      *
      * @param <DATA> the data type.
      */
-    private static class SkipLastInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+    private static class IntervalInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-        private final int mCount;
+        private final Backoff mBackoff;
 
-        private SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
+        private int mCount;
+
+        private long mStartTime;
 
         /**
          * Constructor.
          *
-         * @param count the number of data to skip.
+         * @param backoff the interval backoff.
          */
-        private SkipLastInvocation(final int count) {
-            mCount = count;
+        private IntervalInvocation(@NotNull final Backoff backoff) {
+            mBackoff = backoff;
         }
 
         @Override
         public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            final SimpleQueue<DATA> data = mData;
-            data.add(input);
-            if (data.size() > mCount) {
-                result.pass(data.removeFirst());
-            }
+            result.after(Math.max(0,
+                    mStartTime + mBackoff.getDelay(++mCount) - System.currentTimeMillis()),
+                    TimeUnit.MILLISECONDS).pass(input);
         }
 
         @Override
-        public void onRecycle(final boolean isReused) throws Exception {
-            mData.clear();
+        public void onRestart() {
+            mStartTime = System.currentTimeMillis();
+            mCount = 0;
         }
     }
 }

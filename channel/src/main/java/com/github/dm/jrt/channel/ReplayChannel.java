@@ -221,12 +221,6 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
         return mOutputChannel.next();
     }
 
-    @NotNull
-    public Channel<OUT, OUT> immediately() {
-        mOutputChannel.immediately();
-        return this;
-    }
-
     public int inputCount() {
         return mChannel.inputCount();
     }
@@ -256,6 +250,12 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
     public OUT nextOrElse(final OUT output) {
         return mOutputChannel.nextOrElse(output);
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> now() {
+        mOutputChannel.now();
+        return this;
     }
 
     public int outputCount() {

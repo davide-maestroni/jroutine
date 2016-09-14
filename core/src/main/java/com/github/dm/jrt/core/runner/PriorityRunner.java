@@ -45,7 +45,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * age the lower priority execution will have, before getting precedence over the higher priority
  * one.
  * <p>
- * Note that applying a priority to a synchronous runner will have no effect.
+ * Note that applying a priority to a synchronous runner might make execution invocations happen in
+ * different threads than the calling one, thus causing the results to be not immediately available.
  * <p>
  * Created by davide-maestroni on 04/28/2015.
  */
@@ -308,38 +309,31 @@ public class PriorityRunner {
         @Override
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
-            if (isExecutionThread()) {
-                super.run(execution, delay, timeUnit);
+            final PriorityExecution priorityExecution =
+                    new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
+            synchronized (mExecutions) {
+                final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
+                        executions = mExecutions;
+                WeakHashMap<PriorityExecution, Void> priorityExecutions = executions.get(execution);
+                if (priorityExecutions == null) {
+                    priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
+                    executions.put(execution, priorityExecutions);
+                }
+
+                priorityExecutions.put(priorityExecution, null);
+            }
+
+            if (delay == 0) {
+                final ImmediateExecution immediateExecution =
+                        new ImmediateExecution(priorityExecution);
+                mImmediateExecutions.put(priorityExecution, immediateExecution);
+                mQueue.put(priorityExecution);
+                super.run(immediateExecution, 0, timeUnit);
 
             } else {
-                final PriorityExecution priorityExecution =
-                        new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
-                synchronized (mExecutions) {
-                    final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
-                            executions = mExecutions;
-                    WeakHashMap<PriorityExecution, Void> priorityExecutions =
-                            executions.get(execution);
-                    if (priorityExecutions == null) {
-                        priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
-                        executions.put(execution, priorityExecutions);
-                    }
-
-                    priorityExecutions.put(priorityExecution, null);
-                }
-
-                if (delay == 0) {
-                    final ImmediateExecution immediateExecution =
-                            new ImmediateExecution(priorityExecution);
-                    mImmediateExecutions.put(priorityExecution, immediateExecution);
-                    mQueue.put(priorityExecution);
-                    super.run(immediateExecution, 0, timeUnit);
-
-                } else {
-                    final DelayedExecution delayedExecution =
-                            new DelayedExecution(priorityExecution);
-                    mDelayedExecutions.put(priorityExecution, delayedExecution);
-                    super.run(delayedExecution, delay, timeUnit);
-                }
+                final DelayedExecution delayedExecution = new DelayedExecution(priorityExecution);
+                mDelayedExecutions.put(priorityExecution, delayedExecution);
+                super.run(delayedExecution, delay, timeUnit);
             }
         }
 

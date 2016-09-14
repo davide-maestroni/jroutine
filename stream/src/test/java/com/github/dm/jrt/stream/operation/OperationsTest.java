@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.modifier;
+package com.github.dm.jrt.stream.operation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -53,8 +53,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
 import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.modifier.Modifiers.throttle;
-import static com.github.dm.jrt.stream.modifier.Modifiers.timeoutAfter;
+import static com.github.dm.jrt.stream.operation.Operations.throttle;
+import static com.github.dm.jrt.stream.operation.Operations.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -63,7 +63,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class ModifiersTest {
+public class OperationsTest {
 
     private static Runner sSingleThreadRunner;
 
@@ -162,7 +162,7 @@ public class ModifiersTest {
     public void testConstructor() {
         boolean failed = false;
         try {
-            new Modifiers();
+            new Operations();
             failed = true;
 
         } catch (final Throwable ignored) {
@@ -175,28 +175,28 @@ public class ModifiersTest {
     public void testDelay() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.delay(1, TimeUnit.SECONDS))
+                                 .let(Operations.delay(1, TimeUnit.SECONDS))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.delay(seconds(1)))
+                                 .let(Operations.delay(seconds(1)))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.delay(1, TimeUnit.SECONDS))
+                                 .let(Operations.delay(1, TimeUnit.SECONDS))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.delay(seconds(1)))
+                                 .let(Operations.delay(seconds(1)))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -207,7 +207,7 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testDelayNullPointerError() {
         try {
-            Modifiers.delay(1, null);
+            Operations.delay(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -218,28 +218,28 @@ public class ModifiersTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.lag(1, TimeUnit.SECONDS))
+                                 .let(Operations.lag(1, TimeUnit.SECONDS))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.lag(seconds(1)))
+                                 .let(Operations.lag(seconds(1)))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.lag(1, TimeUnit.SECONDS))
+                                 .let(Operations.lag(1, TimeUnit.SECONDS))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Modifiers.lag(seconds(1)))
+                                 .let(Operations.lag(seconds(1)))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -250,7 +250,7 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testLagNullPointerError() {
         try {
-            Modifiers.lag(1, null);
+            Operations.lag(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -269,20 +269,20 @@ public class ModifiersTest {
                 });
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Long>parallel(2,
+                                      .let(Operations.<Integer, Integer, Long>parallel(2,
                                               sqr.buildFactory()))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Long>parallel(2, sqr))
+                                      .let(Operations.<Integer, Integer, Long>parallel(2, sqr))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Integer>parallel(2,
+                                      .let(Operations.<Integer, Integer, Integer>parallel(2,
                                               JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
                                       .close()
@@ -290,21 +290,21 @@ public class ModifiersTest {
                                       .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Long>parallelBy(
+                                      .let(Operations.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr.buildFactory()))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Long>parallelBy(
+                                      .let(Operations.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Modifiers.<Integer, Integer, Integer>parallelBy(
+                                      .let(Operations.<Integer, Integer, Integer>parallelBy(
                                               Functions.<Integer>identity(), JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
                                       .close()
@@ -316,56 +316,56 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testParallelSplitNullPointerError() {
         try {
-            Modifiers.parallel(1, (InvocationFactory<Object, ?>) null);
+            Operations.parallel(1, (InvocationFactory<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallel(1, (Routine<Object, ?>) null);
+            Operations.parallel(1, (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallel(1, (RoutineBuilder<Object, ?>) null);
+            Operations.parallel(1, (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallelBy(null, JRoutineStream.withStream().buildRoutine());
+            Operations.parallelBy(null, JRoutineStream.withStream().buildRoutine());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallelBy(null, JRoutineStream.withStream());
+            Operations.parallelBy(null, JRoutineStream.withStream());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
+            Operations.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
+            Operations.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
+            Operations.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -378,7 +378,7 @@ public class ModifiersTest {
         try {
             JRoutineStream.<String>withStream().map(new UpperCase())
                                                .map(factoryOf(ThrowException.class, count1))
-                                               .let(Modifiers.<String, Object>retry(2))
+                                               .let(Operations.<String, Object>retry(2))
                                                .call("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -392,7 +392,7 @@ public class ModifiersTest {
         assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                       .map(factoryOf(ThrowException.class, count2,
                                                               1))
-                                                      .let(Modifiers.<String, Object>retry(1))
+                                                      .let(Operations.<String, Object>retry(1))
                                                       .call("test")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST");
@@ -401,7 +401,7 @@ public class ModifiersTest {
         try {
             JRoutineStream.<String>withStream().map(new AbortInvocation())
                                                .map(factoryOf(ThrowException.class, count3))
-                                               .let(Modifiers.<String, Object>retry(2))
+                                               .let(Operations.<String, Object>retry(2))
                                                .call("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -458,14 +458,14 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testRetryNullPointerError() {
         try {
-            Modifiers.retry(1, null);
+            Operations.retry(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.retry(null);
+            Operations.retry(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -522,7 +522,7 @@ public class ModifiersTest {
         final Channel<Object, Object> channel =
                 JRoutineStream.withStream().let(timeoutAfter(millis(1))).call().pass("test");
         assertThat(channel.after(seconds(1)).getError()).isExactlyInstanceOf(
-                ResultTimeoutException.class);
+                com.github.dm.jrt.stream.operation.ResultTimeoutException.class);
     }
 
     @Test
@@ -534,7 +534,8 @@ public class ModifiersTest {
                                                               throw new NullPointerException();
                                                           }
                                                       })
-                                                      .let(Modifiers.<String, Object>tryCatchAccept(
+                                                      .let(Operations.<String,
+                                                              Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -554,7 +555,8 @@ public class ModifiersTest {
                                                               return o;
                                                           }
                                                       })
-                                                      .let(Modifiers.<String, Object>tryCatchAccept(
+                                                      .let(Operations.<String,
+                                                              Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
 
@@ -572,7 +574,7 @@ public class ModifiersTest {
             public Object apply(final Object o) {
                 throw new NullPointerException();
             }
-        }).let(Modifiers.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+        }).let(Operations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
 
             public Object apply(final RoutineException e) {
                 return "exception";
@@ -584,14 +586,14 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryCatchNullPointerError() {
         try {
-            Modifiers.tryCatchAccept(null);
+            Operations.tryCatchAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Modifiers.tryCatch(null);
+            Operations.tryCatch(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -607,7 +609,7 @@ public class ModifiersTest {
                 public Object apply(final Object o) {
                     throw new NullPointerException();
                 }
-            }).let(Modifiers.<String, Object>tryFinally(new Action() {
+            }).let(Operations.<String, Object>tryFinally(new Action() {
 
                 public void perform() {
                     isRun.set(true);
@@ -623,7 +625,7 @@ public class ModifiersTest {
             public Object apply(final Object o) {
                 return o;
             }
-        }).let(Modifiers.<String, Object>tryFinally(new Action() {
+        }).let(Operations.<String, Object>tryFinally(new Action() {
 
             public void perform() {
                 isRun.set(true);
@@ -636,7 +638,7 @@ public class ModifiersTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryFinallyNullPointerError() {
         try {
-            Modifiers.tryFinally(null);
+            Operations.tryFinally(null);
             fail();
 
         } catch (final NullPointerException ignored) {

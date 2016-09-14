@@ -14,9 +14,25 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.stream.operation;
+
+import com.github.dm.jrt.core.error.TimeoutException;
+
+import org.jetbrains.annotations.Nullable;
+
 /**
- * Stream transformation utility classes.
+ * Exception indicating that a timeout elapsed while waiting for new results.
  * <p>
- * Created by davide-maestroni on 07/07/2016.
+ * Created by davide-maestroni on 07/28/2016.
  */
-package com.github.dm.jrt.stream.modifier;
+public class ResultTimeoutException extends TimeoutException {
+
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public ResultTimeoutException(@Nullable final String message) {
+        super(message);
+    }
+}

@@ -87,7 +87,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
                                .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").close().abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").now().close().abort()).isTrue();
         routine.clear();
     }
 
@@ -97,7 +97,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.on(serviceFrom(getActivity(), DecoratingService.class))
                                .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").close().abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").now().close().abort()).isTrue();
         routine.clear();
     }
 
@@ -332,7 +332,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .with(factoryOf(PassingStringInvocation.class))
                                .buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").close().abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").now().close().abort()).isTrue();
         routine.clear();
     }
 
@@ -342,7 +342,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                 JRoutineService.on(serviceFrom(getActivity(), RemoteDecoratingService.class))
                                .with(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").close().abort()).isTrue();
+        assertThat(routine.call().after(millis(100)).pass("test").now().close().abort()).isTrue();
         routine.clear();
     }
 

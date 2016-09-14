@@ -401,7 +401,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(channel.inputCount()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.inputCount()).isEqualTo(1);
-        final Channel<?, String> result = channel.close();
+        final Channel<?, String> result = channel.now().close();
         assertThat(result.after(seconds(10)).getComplete()).isTrue();
         assertThat(result.outputCount()).isEqualTo(1);
         assertThat(result.size()).isEqualTo(1);

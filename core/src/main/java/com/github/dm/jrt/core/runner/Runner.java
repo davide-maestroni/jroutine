@@ -72,7 +72,7 @@ public abstract class Runner {
      *
      * @return whether the calling thread is managed by a runner.
      */
-    public static boolean isCurrentThreadManaged() {
+    public static boolean isManagedThread() {
         for (final ThreadManager manager : sManagers.keySet()) {
             if ((manager != null) && manager.isManagedThread()) {
                 return true;
@@ -121,17 +121,20 @@ public abstract class Runner {
     public abstract boolean isExecutionThread();
 
     /**
-     * Checks if the calling thread belongs to the ones managed by the runner implementation.
+     * Checks if this runner instance is synchronous, that is, all the executions are run in the
+     * calling thread.
      * <p>
-     * The implementation of this method is not strictly mandatory, even if, the classes always
-     * returning false effectively prevent the correct detection of possible deadlocks.
-     * <br>
-     * A synchronous runner implementation will always return false.
+     * Note that, even if the implementation of this method is not strictly mandatory, it will be
+     * used to optimize the invocation executions.
+     * <p>
+     * Consider inheriting from {@link com.github.dm.jrt.core.runner.AsyncRunner AsyncRunner} or
+     * {@link com.github.dm.jrt.core.runner.SyncRunner SyncRunner} class for a default
+     * implementation of most of the abstract methods.
      *
-     * @return whether the thread is managed by the runner.
+     * @return whether this runner is synchronous.
      */
-    public boolean isManagedThread() {
-        return mManager.isManagedThread();
+    public boolean isSynchronous() {
+        return false;
     }
 
     /**

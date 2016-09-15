@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.builder;
+package com.github.dm.jrt.object.config;
 
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
+import com.github.dm.jrt.object.config.ObjectConfiguration.Builder;
+import com.github.dm.jrt.object.config.ObjectConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an object that can be configured through a Loader configuration.
+ * Interface defining an object that can be configured through an object configuration.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the object type.
  */
-public interface LoaderConfigurable<TYPE> extends Configurable<TYPE> {
+public interface ObjectConfigurable<TYPE> extends Configurable<TYPE> {
 
     /**
-     * Gets the Loader configuration builder related to the instance.
+     * Gets the object configuration builder related to the instance.
      * <br>
      * The configuration options not supported by the specific implementation might be ignored.
      * <p>
      * Note that the configuration builder must be initialized with the current configuration.
      *
-     * @return the Loader configuration builder.
+     * @return the object configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> applyLoaderConfiguration();
+    Builder<? extends TYPE> applyObjectConfiguration();
 }

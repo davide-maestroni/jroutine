@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android.core.builder;
 
+import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;

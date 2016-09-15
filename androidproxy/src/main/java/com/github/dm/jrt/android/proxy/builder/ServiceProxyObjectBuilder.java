@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.builder;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
+import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;

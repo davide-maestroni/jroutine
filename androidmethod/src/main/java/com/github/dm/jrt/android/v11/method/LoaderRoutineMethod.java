@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.method;
 import android.content.Context;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
@@ -42,7 +42,7 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.InputChannel;
 import com.github.dm.jrt.method.OutputChannel;
 import com.github.dm.jrt.method.RoutineMethod;
-import com.github.dm.jrt.object.builder.ObjectConfigurable;
+import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;

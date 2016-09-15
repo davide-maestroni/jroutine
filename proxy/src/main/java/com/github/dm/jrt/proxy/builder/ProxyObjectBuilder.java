@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.proxy.builder;
 
-import com.github.dm.jrt.core.builder.InvocationConfigurable;
-import com.github.dm.jrt.object.builder.ObjectConfigurable;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.object.config.ObjectConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 

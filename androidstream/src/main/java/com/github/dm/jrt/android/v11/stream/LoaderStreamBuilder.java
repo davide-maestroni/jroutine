@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.v11.stream;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.LoaderContext;

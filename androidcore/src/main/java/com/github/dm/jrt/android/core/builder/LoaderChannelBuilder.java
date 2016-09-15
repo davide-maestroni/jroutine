@@ -16,10 +16,11 @@
 
 package com.github.dm.jrt.android.core.builder;
 
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
-import com.github.dm.jrt.core.builder.ChannelConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

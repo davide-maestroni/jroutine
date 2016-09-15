@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
-import com.github.dm.jrt.android.core.builder.ServiceConfigurable;
+import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
@@ -40,7 +40,7 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.InputChannel;
 import com.github.dm.jrt.method.OutputChannel;
 import com.github.dm.jrt.method.RoutineMethod;
-import com.github.dm.jrt.object.builder.ObjectConfigurable;
+import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;

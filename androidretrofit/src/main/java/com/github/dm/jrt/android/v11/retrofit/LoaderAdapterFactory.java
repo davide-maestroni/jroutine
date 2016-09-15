@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.v11.retrofit;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.builder.AndroidBuilders;
@@ -26,8 +26,8 @@ import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.stream.JRoutineLoaderStream;
 import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
-import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;

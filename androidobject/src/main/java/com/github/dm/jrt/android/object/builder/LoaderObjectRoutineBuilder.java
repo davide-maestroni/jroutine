@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfigurable;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;

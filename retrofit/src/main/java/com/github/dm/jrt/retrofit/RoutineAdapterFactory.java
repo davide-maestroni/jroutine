@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.builder.InvocationConfigurable;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.builder.Builders;

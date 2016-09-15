@@ -19,8 +19,8 @@ package com.github.dm.jrt.method;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.InvocationConfigurable;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -33,7 +33,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
-import com.github.dm.jrt.object.builder.ObjectConfigurable;
+import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;

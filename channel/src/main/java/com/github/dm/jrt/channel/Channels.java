@@ -57,7 +57,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [B, A, A, C, B, C, B, A, B, ...]
+     *         =&gt; [B, A, A, C, B, C, B, A, B, ...]
      *     </code>
      * </pre>
      *
@@ -92,7 +92,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [B, A, A, C, B, C, B, A, B, ...]
+     *         =&gt; [B, A, A, C, B, C, B, A, B, ...]
      *     </code>
      * </pre>
      *
@@ -158,9 +158,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
-     *         B => [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
-     *         C => [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
+     *         A =&gt; [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
+     *         B =&gt; [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
+     *         C =&gt; [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -188,9 +188,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
+     *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -225,9 +225,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
+     *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -257,9 +257,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
-     *         B => [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
-     *         C => [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
+     *         A =&gt; [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
+     *         B =&gt; [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
+     *         C =&gt; [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -287,9 +287,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, key(A)).data, Select(IN, key(A)).data, Select(IN, key(A)).data, ...]
-     *         B => [Select(IN, key(B)).data, Select(IN, key(B)).data, Select(IN, key(B)).data, ...]
-     *         C => [Select(IN, key(C)).data, Select(IN, key(C)).data, Select(IN, key(C)).data, ...]
+     *         A =&gt; [Select(IN, key(A)).data, Select(IN, key(A)).data, ...]
+     *         B =&gt; [Select(IN, key(B)).data, Select(IN, key(B)).data, ...]
+     *         C =&gt; [Select(IN, key(C)).data, Select(IN, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -320,7 +320,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *         =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
      *     </code>
      * </pre>
      *
@@ -357,7 +357,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *         =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
      *     </code>
      * </pre>
      *
@@ -384,9 +384,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C => [list(2), list(2), list(2), ..., list(2)]
+     *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C =&gt; [list(2), list(2), list(2), ..., list(2)]
      *     </code>
      * </pre>
      *
@@ -415,9 +415,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-     *         C => [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+     *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+     *         C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
      *     </code>
      * </pre>
      *
@@ -447,9 +447,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-     *         C => [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+     *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+     *         C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
      *     </code>
      * </pre>
      *
@@ -478,9 +478,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C => [list(2), list(2), list(2), ..., list(2)]
+     *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C =&gt; [list(2), list(2), list(2), ..., list(2)]
      *     </code>
      * </pre>
      *
@@ -551,7 +551,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [(A, B, C), (A, B, C), (A, B, C), ...]
+     *         =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
      *     </code>
      * </pre>
      *
@@ -582,7 +582,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [(A, B, C), (A, B, C), (A, B, C), ...]
+     *         =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
      *     </code>
      * </pre>
      *
@@ -616,7 +616,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
+     *         =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
      *     </code>
      * </pre>
      *
@@ -651,7 +651,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
+     *         =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
      *     </code>
      * </pre>
      *
@@ -684,7 +684,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
+     *         =&gt; [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -715,7 +715,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
+     *         =&gt; [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -752,7 +752,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
+     *         =&gt; [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -785,7 +785,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
+     *         =&gt; [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -816,7 +816,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
+     *         =&gt; [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), ...]
      *     </code>
      * </pre>
      *
@@ -852,7 +852,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [A, A, A, ...] => [A, A, A, ...] => [A, A, A, ...] ...
+     *         =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] ...
      *     </code>
      * </pre>
      *
@@ -875,7 +875,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(IN, index), Select(IN, index), Select(IN, index), ...]
+     *         =&gt; [Select(IN, index), Select(IN, index), Select(IN, index), ...]
      *     </code>
      * </pre>
      *
@@ -901,7 +901,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(IN2, indexes[1]), Select(IN1, indexes[0]), Select(IN3, indexes[2]), ...]
+     *         =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
      *     </code>
      * </pre>
      *
@@ -936,7 +936,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(IN2, indexes[1]), Select(IN1, indexes[0]), Select(IN3, indexes[2]), ...]
+     *         =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
      *     </code>
      * </pre>
      *
@@ -971,7 +971,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
+     *         =&gt; [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -1012,9 +1012,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
-     *         B => [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
-     *         C => [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
+     *         A =&gt; [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
+     *         B =&gt; [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
+     *         C =&gt; [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
      *     </code>
      * </pre>
      *
@@ -1051,9 +1051,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
-     *         B => [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
-     *         C => [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
+     *         A =&gt; [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
+     *         B =&gt; [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
+     *         C =&gt; [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
      *     </code>
      * </pre>
      *
@@ -1090,9 +1090,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
+     *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -1129,7 +1129,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
+     *         =&gt; [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
      *     </code>
      * </pre>
      *
@@ -1158,7 +1158,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         => [Select(A, index), Select(A, index), Select(A, index), ...]
+     *         =&gt; [Select(A, index), Select(A, index), Select(A, index), ...]
      *     </code>
      * </pre>
      *

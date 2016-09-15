@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android;
+package com.github.dm.jrt;
 
-import com.github.dm.jrt.AutoProxyRoutineBuilder;
-import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Service routine builder acting both as proxy and object builder.
+ * Routine builder acting both as proxy and object builder.
  * <p>
  * The builder will automatically decide whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -35,60 +33,63 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * Note that the use of one or the other can be forced by calling the proper method.
  * <p>
- * Created by davide-maestroni on 03/06/2016.
+ * Created by davide-maestroni on 03/03/2016.
  */
-public interface ServiceAutoProxyRoutineBuilder
-        extends AutoProxyRoutineBuilder, ServiceObjectRoutineBuilder {
+public interface ObjectProxyRoutineBuilder extends ObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    @Override
-    ServiceAutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+    ObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    @Override
-    ServiceAutoProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+    ObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
+    InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
     applyInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    applyObjectConfiguration();
+    ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder> applyObjectConfiguration();
 
     /**
-     * {@inheritDoc}
+     * Force the type of builder to be employed to create the proxy instance.
+     * <br>
+     * A null value means default algorithm will be applied, that is, the builder type will be
+     * automatically chosen based on the proxy interface definition.
+     *
+     * @param builderType the builder type.
+     * @return this builder.
      */
     @NotNull
-    @Override
-    ServiceAutoProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+    ObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
     /**
-     * {@inheritDoc}
+     * Builder type enumeration.
      */
-    @NotNull
-    @Override
-    ServiceAutoProxyRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
+    enum BuilderType {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    applyServiceConfiguration();
+        /**
+         * Object routine builder.
+         * <br>
+         * The proxy instance will be created through reflection.
+         */
+        OBJECT,
+        /**
+         * Proxy routine builder.
+         * <br>
+         * The proxy instance will be created through code generation.
+         */
+        PROXY
+    }
 }

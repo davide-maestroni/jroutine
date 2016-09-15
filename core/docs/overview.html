@@ -32,7 +32,7 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/invocation/Invocation.html">Invocation</a>
         <p>
-            An invocation represents the business logic to be executed by the routine. The invocation instance is responsible for the processing of inputs and the publishing of outputs.
+            An invocation represents the business logic to be executed in the routine. The invocation instance is responsible for the processing of inputs and the publishing of outputs.
             Invocations are managed objects, whose instantiation and lifecycle are controlled by the routine instance.
             Invocation objects are meant to be recycled, so it's up to the specific implementation to properly clean-up and reset the internal state.
             Implementing classes may safely retain variable member fields without the need of explicit synchronization.
@@ -48,8 +48,8 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/routine/Routine.html">Routine</a>
         <p>
-            Routine objects enable the execution of invocations in four different modes. Routines can be called synchronously or asynchronously: in both cases an invocation instance is created and employed to process all the inputs data.
-            Moreover, they can be called in parallel or sequential mode, where, the main difference with the first two modes is that a different invocation instance is used for each input passed.
+            Routine objects enable the execution of invocations in two different modes.
+            Routines can be called asynchronously (in which case an invocation instance is created and employed to process all the inputs data), or parallelly (where the main difference with the first mode is that a different invocation instance is used for each input passed).
             Note that routines are designed to be combined in different ways, and that they can be implemented based on different paradigms other than invocations, as far as they honour the interface contract.
         </p>
     </li>
@@ -58,7 +58,7 @@
         <p>
             Each routine instance needs an invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
             In particular, the set <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/runner/Runner.html">Runner</a> represents the source of concurrency to be used when a routine is asynchronously or parallelly invoked.
-            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+            By design builders are not synchronized, since the same instance is not meant to be used in different threads.
         </p>
     </li>
     <li>
@@ -66,7 +66,7 @@
         <p>
             A channel is the object returned when a routine is invoked, and represents the mean of communication between the invocation and the external world.
             One channel is used to pass input data to the invocation and to retrieve the outputs of the processing, while another channel will be employed by the invocation instance to publish the processing results.
-            Each channel can receive inputs from several other channels, but its outputs can be consumed only by a single object, be it either a channel or a specific consumer.
+            Each channel can receive inputs from several other channels, but its outputs can be consumed only by a single object, be it another a channel or a specific consumer.
             When a channel is bound to another channel or a channel consumer, any further attempt to explicitly read its outputs will raise an exception.
             Note that the data passed through a channel instance are expected to be immutable or effectively so.
         </p>
@@ -107,8 +107,7 @@
 </p>
 <b>Example 1:</b> via invocation implementations.
 <p>
-    This is actually the most efficient way, since there is full control on how data are passed to the specific invocations.<br>
-    In fact, the parsing, the square and the mean computation all happen in parallel background threads.<br>
+    The parsing, the square and the mean computation all happen in parallel background threads.<br>
     Note, however, that the created factories will employ reflection to instantiate the defined invocations.
 </p>
 <pre>

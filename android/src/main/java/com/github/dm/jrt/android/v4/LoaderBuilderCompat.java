@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.v4;
 
-import com.github.dm.jrt.android.LoaderAutoProxyRoutineBuilder;
+import com.github.dm.jrt.android.LoaderObjectProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
@@ -311,8 +311,8 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-        return new DefaultLoaderAutoProxyRoutineBuilderCompat(mContext, target);
+    public LoaderObjectProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
+        return new DefaultLoaderObjectProxyRoutineBuilderCompat(mContext, target);
     }
 
     /**
@@ -394,7 +394,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+    public LoaderObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
         return with(classOfType(targetClass));
     }
 
@@ -519,7 +519,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+    public LoaderObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
         return with(instanceOf(targetClass));
     }
 
@@ -540,7 +540,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderAutoProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
+    public LoaderObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
         return with(instanceOf(targetClass, factoryArgs));
     }

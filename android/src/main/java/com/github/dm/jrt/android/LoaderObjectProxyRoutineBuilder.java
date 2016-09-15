@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt;
+package com.github.dm.jrt.android;
 
+import com.github.dm.jrt.ObjectProxyRoutineBuilder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Routine builder acting both as proxy and object builder.
+ * Loader routine builder acting both as proxy and object builder.
  * <p>
  * The builder will automatically decide whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -33,63 +35,60 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * Note that the use of one or the other can be forced by calling the proper method.
  * <p>
- * Created by davide-maestroni on 03/03/2016.
+ * Created by davide-maestroni on 03/06/2016.
  */
-public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
+public interface LoaderObjectProxyRoutineBuilder
+        extends ObjectProxyRoutineBuilder, LoaderObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    AutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+    @Override
+    LoaderObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    AutoProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+    @Override
+    LoaderObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    @Override
+    InvocationConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
     applyInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> applyObjectConfiguration();
+    @Override
+    ObjectConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
+    applyObjectConfiguration();
 
     /**
-     * Force the type of builder to be employed to create the proxy instance.
-     * <br>
-     * A null value means default algorithm will be applied, that is, the builder type will be
-     * automatically chosen based on the proxy interface definition.
-     *
-     * @param builderType the builder type.
-     * @return this builder.
+     * {@inheritDoc}
      */
     @NotNull
-    AutoProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+    @Override
+    LoaderObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
     /**
-     * Builder type enumeration.
+     * {@inheritDoc}
      */
-    enum BuilderType {
+    @NotNull
+    @Override
+    LoaderObjectProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
 
-        /**
-         * Object routine builder.
-         * <br>
-         * The proxy instance will be created through reflection.
-         */
-        OBJECT,
-        /**
-         * Proxy routine builder.
-         * <br>
-         * The proxy instance will be created through code generation.
-         */
-        PROXY
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    LoaderConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
+    applyLoaderConfiguration();
 }

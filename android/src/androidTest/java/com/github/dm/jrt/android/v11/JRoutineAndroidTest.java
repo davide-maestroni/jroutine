@@ -24,7 +24,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.AutoProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;

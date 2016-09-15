@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 03/03/2016.
  */
-class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
+class DefaultObjectProxyRoutineBuilder implements ObjectProxyRoutineBuilder {
 
     private final InvocationTarget<?> mTarget;
 
@@ -56,7 +56,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
      * @throws java.lang.IllegalArgumentException if the class of specified target represents an
      *                                            interface.
      */
-    DefaultAutoProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+    DefaultObjectProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
             throw new IllegalArgumentException(
@@ -67,50 +67,50 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
-    public AutoProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+    public ObjectProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    public AutoProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+    public ObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
         mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    public InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
     applyInvocationConfiguration() {
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<AutoProxyRoutineBuilder>(
-                new InvocationConfiguration.Configurable<AutoProxyRoutineBuilder>() {
+        return new InvocationConfiguration.Builder<ObjectProxyRoutineBuilder>(
+                new InvocationConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
 
                     @NotNull
-                    public AutoProxyRoutineBuilder apply(
+                    public ObjectProxyRoutineBuilder apply(
                             @NotNull final InvocationConfiguration configuration) {
-                        return DefaultAutoProxyRoutineBuilder.this.apply(configuration);
+                        return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
                     }
                 }, config);
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder>
+    public ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
     applyObjectConfiguration() {
         final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<AutoProxyRoutineBuilder>(
-                new ObjectConfiguration.Configurable<AutoProxyRoutineBuilder>() {
+        return new ObjectConfiguration.Builder<ObjectProxyRoutineBuilder>(
+                new ObjectConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
 
                     @NotNull
-                    public AutoProxyRoutineBuilder apply(
+                    public ObjectProxyRoutineBuilder apply(
                             @NotNull final ObjectConfiguration configuration) {
-                        return DefaultAutoProxyRoutineBuilder.this.apply(configuration);
+                        return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
                     }
                 }, config);
     }
 
     @NotNull
-    public AutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    public ObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
         mBuilderType = builderType;
         return this;
     }

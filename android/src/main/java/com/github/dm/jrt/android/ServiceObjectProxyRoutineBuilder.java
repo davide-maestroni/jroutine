@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.AutoProxyRoutineBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
+import com.github.dm.jrt.ObjectProxyRoutineBuilder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Loader routine builder acting both as proxy and object builder.
+ * Service routine builder acting both as proxy and object builder.
  * <p>
  * The builder will automatically decide whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -37,29 +37,29 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public interface LoaderAutoProxyRoutineBuilder
-        extends AutoProxyRoutineBuilder, LoaderObjectRoutineBuilder {
+public interface ServiceObjectProxyRoutineBuilder
+        extends ObjectProxyRoutineBuilder, ServiceObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    LoaderAutoProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+    ServiceObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    LoaderAutoProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+    ServiceObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    InvocationConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
+    InvocationConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
     applyInvocationConfiguration();
 
     /**
@@ -67,26 +67,28 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     @Override
-    ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> applyObjectConfiguration();
+    ObjectConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+    applyObjectConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    LoaderAutoProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+    ServiceObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    LoaderAutoProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
+    ServiceObjectProxyRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Override
-    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> applyLoaderConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+    applyServiceConfiguration();
 }

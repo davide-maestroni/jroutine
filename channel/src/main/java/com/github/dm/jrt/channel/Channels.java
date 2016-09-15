@@ -57,7 +57,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [B, A, A, C, B, C, B, A, B, ...]
+     *         => [B, A, A, C, B, C, B, A, B, ...]
      *     </code>
      * </pre>
      *
@@ -92,7 +92,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [B, A, A, C, B, C, B, A, B, ...]
+     *         => [B, A, A, C, B, C, B, A, B, ...]
      *     </code>
      * </pre>
      *
@@ -154,13 +154,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, 0).data, Select(?, 0).data, Select(?, 0).data, ...]
-     *         B - [Select(?, 1).data, Select(?, 1).data, Select(?, 1).data, ...]
-     *         C - [Select(?, 2).data, Select(?, 2).data, Select(?, 2).data, ...]
+     *         A => [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
+     *         B => [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
+     *         C => [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -184,13 +184,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, SI + 0).data, Select(?, SI + 0).data, Select(?, SI + 0).data, ...]
-     *         B - [Select(?, SI + 1).data, Select(?, SI + 1).data, Select(?, SI + 1).data, ...]
-     *         C - [Select(?, SI + 2).data, Select(?, SI + 2).data, Select(?, SI + 2).data, ...]
+     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -221,13 +221,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, SI + 0).data, Select(?, SI + 0).data, Select(?, SI + 0).data, ...]
-     *         B - [Select(?, SI + 1).data, Select(?, SI + 1).data, Select(?, SI + 1).data, ...]
-     *         C - [Select(?, SI + 2).data, Select(?, SI + 2).data, Select(?, SI + 2).data, ...]
+     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -253,13 +253,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, 0).data, Select(?, 0).data, Select(?, 0).data, ...]
-     *         B - [Select(?, 1).data, Select(?, 1).data, Select(?, 1).data, ...]
-     *         C - [Select(?, 2).data, Select(?, 2).data, Select(?, 2).data, ...]
+     *         A => [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
+     *         B => [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
+     *         C => [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -283,13 +283,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
+     *         A => [Select(IN, key(A)).data, Select(IN, key(A)).data, Select(IN, key(A)).data, ...]
+     *         B => [Select(IN, key(B)).data, Select(IN, key(B)).data, Select(IN, key(B)).data, ...]
+     *         C => [Select(IN, key(C)).data, Select(IN, key(C)).data, Select(IN, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -320,7 +320,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *         => [A, A, A, ..., B, B, B, ..., C, C, C, ...]
      *     </code>
      * </pre>
      *
@@ -357,7 +357,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *         => [A, A, A, ..., B, B, B, ..., C, C, C, ...]
      *     </code>
      * </pre>
      *
@@ -380,13 +380,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C => [list(2), list(2), list(2), ..., list(2)]
      *     </code>
      * </pre>
      *
@@ -411,13 +411,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, PH, ...]
-     *         C - [list(2), list(2), list(2), ..., list(2), PH, PH, ...]
+     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+     *         C => [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
      *     </code>
      * </pre>
      *
@@ -443,13 +443,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, PH, ...]
-     *         C - [list(2), list(2), list(2), ..., list(2), PH, PH, ...]
+     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+     *         C => [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
      *     </code>
      * </pre>
      *
@@ -474,13 +474,13 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
      * <pre>
      *     <code>
      *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *         A => [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B => [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C => [list(2), list(2), list(2), ..., list(2)]
      *     </code>
      * </pre>
      *
@@ -551,7 +551,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *         => [(A, B, C), (A, B, C), (A, B, C), ...]
      *     </code>
      * </pre>
      *
@@ -582,7 +582,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *         => [(A, B, C), (A, B, C), (A, B, C), ...]
      *     </code>
      * </pre>
      *
@@ -616,7 +616,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
+     *         => [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
      *     </code>
      * </pre>
      *
@@ -651,7 +651,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
+     *         => [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
      *     </code>
      * </pre>
      *
@@ -684,7 +684,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
+     *         => [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -715,7 +715,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
+     *         => [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -752,7 +752,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
+     *         => [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -785,7 +785,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
+     *         => [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -816,7 +816,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
+     *         => [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
      *     </code>
      * </pre>
      *
@@ -838,7 +838,7 @@ public class Channels {
      * consumer, thus effectively supporting multiple bindings.
      * <p>
      * The {@link com.github.dm.jrt.core.channel.Channel#isBound()} method will always return false
-     * and the bound methods will never fail.
+     * and the {@code bind()} methods will never fail.
      * <br>
      * Note, however, that the implementation will silently prevent the same consumer or channel
      * instance to be bound twice.
@@ -848,11 +848,11 @@ public class Channels {
      * <br>
      * Note also that the returned channel will be already closed.
      * <p>
-     * Given channels {@code A}, the final output will be:
+     * Given channel {@code A}, the final output will be:
      * <pre>
      *     <code>
      *
-     *         [A, A, A, ...] [A, A, A, ...] [A, A, A, ...] ...
+     *         => [A, A, A, ...] => [A, A, A, ...] => [A, A, A, ...] ...
      *     </code>
      * </pre>
      *
@@ -871,11 +871,11 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel instances.
      * <p>
-     * Given channels {@code A}, the final output will be:
+     * Given channel {@code A}, its final output will be:
      * <pre>
      *     <code>
      *
-     *         [Select(A, I), Select(A, I), Select(A, I), ...]
+     *         => [Select(IN, index), Select(IN, index), Select(IN, index), ...]
      *     </code>
      * </pre>
      *
@@ -896,12 +896,12 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel map instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
-     * be:
+     * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+     * map, the final output of {@code A} will be:
      * <pre>
      *     <code>
      *
-     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
+     *         => [Select(IN2, indexes[1]), Select(IN1, indexes[0]), Select(IN3, indexes[2]), ...]
      *     </code>
      * </pre>
      *
@@ -931,12 +931,12 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel map instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
-     * be:
+     * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+     * map, the final output of {@code A} will be:
      * <pre>
      *     <code>
      *
-     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
+     *         => [Select(IN2, indexes[1]), Select(IN1, indexes[0]), Select(IN3, indexes[2]), ...]
      *     </code>
      * </pre>
      *
@@ -966,12 +966,12 @@ public class Channels {
      * <p>
      * Note that the builder will successfully create several channel map instances.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
-     * be:
+     * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+     * map, the final output of {@code A} will be:
      * <pre>
      *     <code>
      *
-     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
+     *         => [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -1007,14 +1007,14 @@ public class Channels {
      * <br>
      * Note also that the returned channels will be already closed.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
      * be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
+     *         A => [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
+     *         B => [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
+     *         C => [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
      *     </code>
      * </pre>
      *
@@ -1046,14 +1046,14 @@ public class Channels {
      * <br>
      * Note also that the returned channels will be already closed.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
      * be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
+     *         A => [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
+     *         B => [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
+     *         C => [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
      *     </code>
      * </pre>
      *
@@ -1085,14 +1085,14 @@ public class Channels {
      * <br>
      * Note also that the returned channels will be already closed.
      * <p>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
      * be:
      * <pre>
      *     <code>
      *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
+     *         A => [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
+     *         B => [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
+     *         C => [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -1125,11 +1125,11 @@ public class Channels {
      * Note that the builder will return the same instance for the same input and equal
      * configuration.
      * <p>
-     * Given channel {@code A}, the final output will be:
+     * Given channel {@code A}, its final output will be:
      * <pre>
      *     <code>
      *
-     *         [Select(?, I).data, Select(?, I).data, Select(?, I).data, ...]
+     *         => [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
      *     </code>
      * </pre>
      *
@@ -1158,7 +1158,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [Select(A, I), Select(A, I), Select(A, I), ...]
+     *         => [Select(A, index), Select(A, index), Select(A, index), ...]
      *     </code>
      * </pre>
      *

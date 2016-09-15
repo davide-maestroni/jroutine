@@ -245,8 +245,8 @@ public class JRoutine extends Channels {
      *                                            interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-        return new DefaultAutoProxyRoutineBuilder(target);
+    public static ObjectProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
+        return new DefaultObjectProxyRoutineBuilder(target);
     }
 
     /**
@@ -282,7 +282,7 @@ public class JRoutine extends Channels {
      *                                            interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder with(@NotNull final Object object) {
+    public static ObjectProxyRoutineBuilder with(@NotNull final Object object) {
         return (object instanceof Class) ? withClassOfType((Class<?>) object)
                 : withInstance(object);
     }
@@ -332,8 +332,8 @@ public class JRoutine extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
-        return new DefaultAutoProxyRoutineBuilder(classOfType(targetClass));
+    public static ObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+        return new DefaultObjectProxyRoutineBuilder(classOfType(targetClass));
     }
 
     /**
@@ -403,8 +403,8 @@ public class JRoutine extends Channels {
      * @return the routine builder instance.
      */
     @NotNull
-    public static AutoProxyRoutineBuilder withInstance(@NotNull final Object object) {
-        return new DefaultAutoProxyRoutineBuilder(instance(object));
+    public static ObjectProxyRoutineBuilder withInstance(@NotNull final Object object) {
+        return new DefaultObjectProxyRoutineBuilder(instance(object));
     }
 
     /**

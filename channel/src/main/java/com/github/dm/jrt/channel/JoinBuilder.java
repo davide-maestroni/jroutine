@@ -176,18 +176,33 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
             final ArrayList<OUT> outputs;
             synchronized (mMutex) {
                 myQueue.add(output);
+                final boolean isFlush = mIsFlush;
+                final boolean[] closed = mClosed;
+                final int length = queues.length;
                 boolean isFull = true;
-                for (final SimpleQueue<OUT> queue : queues) {
+                for (int i = 0; i < length; ++i) {
+                    final SimpleQueue<OUT> queue = queues[i];
                     if (queue.isEmpty()) {
+                        if (isFlush && closed[i]) {
+                            continue;
+                        }
+
                         isFull = false;
                         break;
                     }
                 }
 
                 if (isFull) {
-                    outputs = new ArrayList<OUT>(queues.length);
-                    for (final SimpleQueue<OUT> queue : queues) {
-                        outputs.add(queue.removeFirst());
+                    outputs = new ArrayList<OUT>(length);
+                    final OUT placeholder = mPlaceholder;
+                    for (int i = 0; i < length; ++i) {
+                        final SimpleQueue<OUT> queue = queues[i];
+                        if (isFlush && queue.isEmpty() && closed[i]) {
+                            outputs.add(placeholder);
+
+                        } else {
+                            outputs.add(queue.removeFirst());
+                        }
                     }
 
                 } else {

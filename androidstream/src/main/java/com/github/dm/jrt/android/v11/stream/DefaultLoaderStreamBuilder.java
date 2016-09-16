@@ -152,8 +152,20 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
 
     @NotNull
     @Override
+    public LoaderStreamBuilder<IN, OUT> async(@Nullable final Runner runner) {
+        return (LoaderStreamBuilder<IN, OUT>) super.async(runner);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamBuilder<IN, OUT> asyncParallel() {
         return (LoaderStreamBuilder<IN, OUT>) super.asyncParallel();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamBuilder<IN, OUT> asyncParallel(@Nullable final Runner runner) {
+        return (LoaderStreamBuilder<IN, OUT>) super.asyncParallel(runner);
     }
 
     @NotNull

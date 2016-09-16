@@ -22,9 +22,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -365,13 +363,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         }
 
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<?>>withStream().immediate()
-                                                       .mapAccept(
-                                                               Functions.<Call<?>,
-                                                                       Channel<Call<?>, ?>>biSink())
-                                                       .map(Operators.<Call<?>>append(call))
-                                                       .async()
-                                                       .map(getRoutine());
+            return JRoutineStream.<Call<?>>withStreamOf(call).map(getRoutine());
         }
     }
 }

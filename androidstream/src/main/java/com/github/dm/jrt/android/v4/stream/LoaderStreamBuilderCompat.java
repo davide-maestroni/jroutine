@@ -105,7 +105,27 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
      */
     @NotNull
     @Override
+    LoaderStreamBuilderCompat<IN, OUT> async(@Nullable Runner runner);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
     LoaderStreamBuilderCompat<IN, OUT> asyncParallel();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that the configured runner will actually be ignored by the concatenated routines
+     * unless no Loader context is currently set.
+     */
+    @NotNull
+    @Override
+    LoaderStreamBuilderCompat<IN, OUT> asyncParallel(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}

@@ -99,6 +99,19 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
     /**
      * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * asynchronous mode employing the specified runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     *
+     * @param runner the runner instance.
+     * @return this builder.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> async(@Nullable Runner runner);
+
+    /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
      * parallel mode employing the configured stream runner.
      * <br>
      * Note, however, that the runner will still be overridden by the configured current one.
@@ -108,6 +121,19 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
      */
     @NotNull
     StreamBuilder<IN, OUT> asyncParallel();
+
+    /**
+     * Modifies the stream configuration, so that the concatenated routines will be invoked in
+     * parallel mode employing the specified runner.
+     * <br>
+     * Note, however, that the runner will still be overridden by the configured current one.
+     *
+     * @param runner the runner instance.
+     * @return this builder.
+     * @see com.github.dm.jrt.core.routine.Routine Routine
+     */
+    @NotNull
+    StreamBuilder<IN, OUT> asyncParallel(@Nullable Runner runner);
 
     /**
      * Builds a new invocation factory instance.

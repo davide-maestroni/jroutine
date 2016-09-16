@@ -33,7 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.operator.Operators.prepend;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +63,7 @@ public class ProviderAdapterFactoryTest {
                                                    .addConverterFactory(converterFactory)
                                                    .build();
             final GitHubService service = retrofit.create(GitHubService.class);
-            service.listRepos("octocat").next();
+            service.listRepos("octocat").after(seconds(1)).next();
             assertThat(factory1.isCalled()).isTrue();
             assertThat(factory2.isCalled()).isFalse();
             assertThat(defaultFactory.isCalled()).isFalse();
@@ -92,7 +92,7 @@ public class ProviderAdapterFactoryTest {
                                                    .addConverterFactory(converterFactory)
                                                    .build();
             final GitHubService service = retrofit.create(GitHubService.class);
-            service.listRepos("octocat").next();
+            service.listRepos("octocat").after(seconds(1)).next();
             assertThat(factory1.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
@@ -121,7 +121,7 @@ public class ProviderAdapterFactoryTest {
                                                    .addConverterFactory(converterFactory)
                                                    .build();
             final GitHubService service = retrofit.create(GitHubService.class);
-            service.listRepos("octocat").next();
+            service.listRepos("octocat").after(seconds(1)).next();
             assertThat(factory1.isCalled()).isTrue();
             assertThat(defaultFactory.isCalled()).isFalse();
             factory1.setCalled(false);
@@ -173,7 +173,7 @@ public class ProviderAdapterFactoryTest {
                                                .addConverterFactory(converterFactory)
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        service.listRepos("octocat").next();
+        service.listRepos("octocat").after(seconds(1)).next();
         assertThat(factory.isCalled()).isTrue();
         try {
             service.streamRepos("octocat");
@@ -233,10 +233,8 @@ public class ProviderAdapterFactoryTest {
 
                 public <R> Object adapt(final Call<R> call) {
 
-                    final StreamBuilder<?, ?> builder = //
-                            JRoutineStream.withStream()
-                                          .immediate()
-                                          .map(prepend((Object) Collections.emptyList()));
+                    final StreamBuilder<?, ?> builder =
+                            JRoutineStream.withStreamOf((Object) Collections.emptyList());
                     if (((ParameterizedType) returnType).getRawType() == Channel.class) {
                         return builder.close();
                     }

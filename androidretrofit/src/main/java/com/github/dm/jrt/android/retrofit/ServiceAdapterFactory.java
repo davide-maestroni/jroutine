@@ -31,9 +31,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.object.builder.Builders;
-import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -386,15 +384,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<?>>withStream().immediate()
-                                                       .mapAccept(
-                                                               Functions.<Call<?>,
-                                                                       Channel<Call<?>, ?>>biSink())
-                                                       .map(Operators.<Call<?>>append(call))
-                                                       .async()
-                                                       .apply(mInvocationConfiguration)
-                                                       .map(sInvocation)
-                                                       .liftWithConfig(this);
+            return JRoutineStream.<Call<?>>withStreamOf(call).apply(mInvocationConfiguration)
+                                                             .map(sInvocation)
+                                                             .liftWithConfig(this);
         }
     }
 }

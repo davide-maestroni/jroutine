@@ -123,12 +123,24 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
 
     @NotNull
     public StreamBuilder<IN, OUT> async() {
-        return applyRunner(mRunner, InvocationMode.ASYNC);
+        return async(mRunner);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> async(@Nullable final Runner runner) {
+        mRunner = runner;
+        return applyRunner(runner, InvocationMode.ASYNC);
     }
 
     @NotNull
     public StreamBuilder<IN, OUT> asyncParallel() {
-        return applyRunner(mRunner, InvocationMode.PARALLEL);
+        return asyncParallel(mRunner);
+    }
+
+    @NotNull
+    public StreamBuilder<IN, OUT> asyncParallel(@Nullable final Runner runner) {
+        mRunner = runner;
+        return applyRunner(runner, InvocationMode.PARALLEL);
     }
 
     @NotNull
@@ -433,7 +445,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuil
             @NotNull InvocationMode invocationMode);
 
     @NotNull
-    private StreamBuilder<IN, OUT> applyRunner(@NotNull final Runner runner,
+    private StreamBuilder<IN, OUT> applyRunner(@Nullable final Runner runner,
             @NotNull final InvocationMode invocationMode) {
         final StreamConfiguration streamConfiguration = mStreamConfiguration;
         return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration()

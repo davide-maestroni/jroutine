@@ -31,6 +31,7 @@ import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat
         .LoaderStreamConfigurationCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
@@ -50,6 +51,7 @@ import com.github.dm.jrt.stream.builder.StreamBuilder;
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -1168,6 +1170,84 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
 
         } catch (final NullPointerException ignored) {
         }
+    }
+
+    public void testStreamOf() {
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf("test")
+                                             .on(loaderFrom(getActivity()))
+                                             .close()
+                                             .after(seconds(10))
+                                             .all()).containsExactly("test");
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf("test1", "test2", "test3")
+                                             .on(loaderFrom(getActivity()))
+                                             .close()
+                                             .after(seconds(10))
+                                             .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                             .on(loaderFrom(getActivity()))
+                                             .close()
+                                             .after(seconds(10))
+                                             .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf(
+                JRoutineCore.io().of("test1", "test2", "test3"))
+                                             .on(loaderFrom(getActivity()))
+                                             .close()
+                                             .after(seconds(10))
+                                             .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamOfAbort() {
+        Channel<String, String> channel = JRoutineLoaderStreamCompat.withStreamOf("test")
+                                                                    .on(loaderFrom(getActivity()))
+                                                                    .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineLoaderStreamCompat.withStreamOf("test1", "test2", "test3")
+                                            .on(loaderFrom(getActivity()))
+                                            .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineLoaderStreamCompat.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                            .on(loaderFrom(getActivity()))
+                                            .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineLoaderStreamCompat.withStreamOf(
+                JRoutineCore.io().of("test1", "test2", "test3"))
+                                            .on(loaderFrom(getActivity()))
+                                            .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+    }
+
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamOfError() {
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf("test")
+                                             .on(loaderFrom(getActivity()))
+                                             .call("test")
+                                             .after(seconds(10))
+                                             .getError()
+                                             .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf("test1", "test2", "test3")
+                                             .on(loaderFrom(getActivity()))
+                                             .call("test")
+                                             .after(seconds(10))
+                                             .getError()
+                                             .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                             .on(loaderFrom(getActivity()))
+                                             .call("test")
+                                             .after(seconds(10))
+                                             .getError()
+                                             .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineLoaderStreamCompat.withStreamOf(
+                JRoutineCore.io().of("test1", "test2", "test3"))
+                                             .on(loaderFrom(getActivity()))
+                                             .call("test")
+                                             .after(seconds(10))
+                                             .getError()
+                                             .getCause()).isInstanceOf(IllegalStateException.class);
     }
 
     public void testTransform() {

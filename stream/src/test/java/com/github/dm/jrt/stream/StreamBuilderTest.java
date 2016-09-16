@@ -1631,6 +1631,68 @@ public class StreamBuilderTest {
         System.out.println("END");
     }
 
+    @Test
+    public void testStreamOf() {
+        assertThat(JRoutineStream.withStreamOf("test").immediate().close().all()).containsExactly(
+                "test");
+        assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3").immediate().close().all())
+                .containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamOfAbort() {
+        Channel<String, String> channel = JRoutineStream.withStreamOf("test").immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineStream.withStreamOf("test1", "test2", "test3").immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                .immediate()
+                                .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
+                                .immediate()
+                                .call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamOfError() {
+        assertThat(JRoutineStream.withStreamOf("test")
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3")
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+    }
+
     private static class SumData {
 
         private final int count;

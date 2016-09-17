@@ -60,6 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
+import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
@@ -110,7 +111,11 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
 
+    private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+
     private LoaderConfiguration mConfiguration = LoaderConfiguration.defaultConfiguration();
+
+    private Class<?> mReturnType;
 
     /**
      * Constructor.
@@ -273,6 +278,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                                 + "constructor arguments");
             }
 
+            setReturnType(method.getReturnType());
             factory = new SingleInvocationFactory(this, method, safeParams);
         }
 
@@ -308,6 +314,19 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         final Method method = findBestMatchingMethod(type, safeParams);
         return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
                 InvocationMode.PARALLEL, safeParams);
+    }
+
+    /**
+     * Tells the routine to ignore the method return value, that is, it will not be passed to the
+     * output channel.
+     *
+     * @param <OUT> the output data type.
+     * @return the return value.
+     */
+    @SuppressWarnings("unchecked")
+    protected <OUT> OUT ignoreReturnValue() {
+        mLocalIgnore.set(true);
+        return (OUT) boxingDefault(mReturnType);
     }
 
     /**
@@ -400,12 +419,24 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         return resultChannel;
     }
 
+    private boolean isIgnoreReturnValue() {
+        return (mLocalIgnore.get() != null);
+    }
+
+    private void resetIgnoreReturnValue() {
+        mLocalIgnore.set(null);
+    }
+
     private void setLocalContext(@Nullable final Context context) {
         mLocalContext.set(context);
     }
 
     private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
         mLocalChannel.set(inputChannel);
+    }
+
+    private void setReturnType(@NotNull final Class<?> returnType) {
+        mReturnType = returnType;
     }
 
     /**
@@ -566,6 +597,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 }
 
             } finally {
+                resetIgnoreReturnValue();
                 for (final OutputChannel<?> outputChannel : getOutputChannels()) {
                     outputChannel.abort(reason);
                 }
@@ -584,10 +616,16 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 }
 
                 final List<OutputChannel<?>> outputChannels = getOutputChannels();
-                final Object methodResult =
-                        internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
-                if (mReturnResults) {
-                    result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
+                try {
+                    resetIgnoreReturnValue();
+                    final Object methodResult = internalInvoke(
+                            (!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+                    if (mReturnResults && !isIgnoreReturnValue()) {
+                        result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
+                    }
+
+                } finally {
+                    resetIgnoreReturnValue();
                 }
 
                 for (final OutputChannel<?> outputChannel : outputChannels) {
@@ -603,9 +641,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
             @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
                     (InputChannel<Object>) getInputChannels().get(input.index);
             inputChannel.pass(input.data);
-            final Object methodResult = internalInvoke(inputChannel);
-            if (mReturnResults) {
-                result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
+            try {
+                resetIgnoreReturnValue();
+                final Object methodResult = internalInvoke(inputChannel);
+                if (mReturnResults && !isIgnoreReturnValue()) {
+                    result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
+                }
+
+            } finally {
+                resetIgnoreReturnValue();
             }
         }
 
@@ -635,6 +679,18 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @Nullable
         protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws
                 Exception;
+
+        /**
+         * Checks if the method return value must be ignored.
+         *
+         * @return whether the return value must be ignored.
+         */
+        protected abstract boolean isIgnoreReturnValue();
+
+        /**
+         * Resets the method return value ignore flag.
+         */
+        protected abstract void resetIgnoreReturnValue();
 
         private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
             if (!mIsBound) {
@@ -722,7 +778,9 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @Override
         public void onRestart() throws Exception {
             super.onRestart();
-            mInstance = mConstructor.newInstance(mArgs);
+            final LoaderRoutineMethodCompat instance =
+                    (mInstance = mConstructor.newInstance(mArgs));
+            instance.setReturnType(mMethod.getReturnType());
             mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
         }
 
@@ -751,6 +809,16 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 instance.setLocalInput(null);
                 instance.setLocalContext(null);
             }
+        }
+
+        @Override
+        protected boolean isIgnoreReturnValue() {
+            return mInstance.isIgnoreReturnValue();
+        }
+
+        @Override
+        protected void resetIgnoreReturnValue() {
+            mInstance.resetIgnoreReturnValue();
         }
     }
 
@@ -868,6 +936,16 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         @Override
         protected List<OutputChannel<?>> getOutputChannels() {
             return mOutputChannels;
+        }
+
+        @Override
+        protected boolean isIgnoreReturnValue() {
+            return mInstance.isIgnoreReturnValue();
+        }
+
+        @Override
+        protected void resetIgnoreReturnValue() {
+            mInstance.resetIgnoreReturnValue();
         }
     }
 

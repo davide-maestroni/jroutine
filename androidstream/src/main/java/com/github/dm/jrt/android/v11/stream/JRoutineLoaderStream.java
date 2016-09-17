@@ -160,15 +160,8 @@ public class JRoutineLoaderStream {
                                                 JRoutineCore.io().buildChannel();
                                         inputs.bind(new ChannelConsumer<IN>() {
 
-                                            private boolean mIsBound;
-
                                             public void onComplete() {
-                                                if (!mIsBound) {
-                                                    mIsBound = true;
-                                                    outputChannel.pass(channel);
-                                                }
-
-                                                outputChannel.close();
+                                                outputChannel.pass(channel).close();
                                             }
 
                                             public void onError(

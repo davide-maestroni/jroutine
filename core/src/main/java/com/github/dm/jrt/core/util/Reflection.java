@@ -48,6 +48,8 @@ public class Reflection {
     private static final HashMap<Class<?>, Class<?>> sBoxingClasses =
             new HashMap<Class<?>, Class<?>>(9);
 
+    private static final HashMap<Class<?>, Object> sDefaultValues = new HashMap<Class<?>, Object>();
+
     /**
      * Avoid explicit instantiation.
      */
@@ -69,7 +71,7 @@ public class Reflection {
     /**
      * Returns the class boxing the specified primitive type.
      * <p>
-     * If the passed class does not represent a primitive type the same class is returned.
+     * If the passed class does not represent a primitive type, the same class is returned.
      *
      * @param type the primitive type.
      * @return the boxing class.
@@ -81,6 +83,24 @@ public class Reflection {
         }
 
         return sBoxingClasses.get(type);
+    }
+
+    /**
+     * Returns the default value of the specified primitive type as an instance of the relative
+     * boxing class.
+     * <p>
+     * If the passed class does not represent a primitive type, null is returned.
+     *
+     * @param type the primitive type.
+     * @return the default value.
+     */
+    @Nullable
+    public static Object boxingDefault(@NotNull final Class<?> type) {
+        if (!type.isPrimitive()) {
+            return null;
+        }
+
+        return sDefaultValues.get(type);
     }
 
     /**
@@ -430,5 +450,18 @@ public class Reflection {
         boxMap.put(long.class, Long.class);
         boxMap.put(short.class, Short.class);
         boxMap.put(void.class, Void.class);
+    }
+
+    static {
+        final HashMap<Class<?>, Object> defaultMap = sDefaultValues;
+        defaultMap.put(boolean.class, false);
+        defaultMap.put(byte.class, (byte) 0);
+        defaultMap.put(char.class, (char) 0);
+        defaultMap.put(double.class, (double) 0);
+        defaultMap.put(float.class, (float) 0);
+        defaultMap.put(int.class, 0);
+        defaultMap.put(long.class, (long) 0);
+        defaultMap.put(short.class, (short) 0);
+        defaultMap.put(void.class, null);
     }
 }

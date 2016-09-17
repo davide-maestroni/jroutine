@@ -191,11 +191,11 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
                         if (input.hasNext()) {
                             return input.next().length();
                         }
-                        return 0;
+                        return ignoreReturnValue();
                     }
                 }.call(inputStrings);
         inputStrings.pass("test").close();
-        assertThat(outputChannel.after(seconds(10)).next()).isEqualTo(4);
+        assertThat(outputChannel.after(seconds(10)).all()).containsExactly(4);
     }
 
     private static void testSwitchInput(@NotNull final FragmentActivity activity) {

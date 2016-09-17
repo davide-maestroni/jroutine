@@ -167,13 +167,11 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
                         if (input.hasNext()) {
                             return input.next().length();
                         }
-                        return 0;
+                        return ignoreReturnValue();
                     }
                 }.call(inputStrings);
-        inputStrings.pass("test");
-        assertThat(outputChannel.after(seconds(10)).next()).isEqualTo(4);
-        inputStrings.close();
-        outputChannel.after(seconds(10)).getComplete();
+        inputStrings.pass("test").close();
+        assertThat(outputChannel.after(seconds(10)).all()).containsExactly(4);
     }
 
     private static void testSwitchInput(@NotNull final Activity activity) {

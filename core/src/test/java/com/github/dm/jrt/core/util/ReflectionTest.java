@@ -48,6 +48,20 @@ public class ReflectionTest {
     }
 
     @Test
+    public void testBoxingDefault() {
+        assertThat(Reflection.boxingDefault(void.class)).isNull();
+        assertThat(Reflection.boxingDefault(int.class)).isEqualTo(0);
+        assertThat(Reflection.boxingDefault(byte.class)).isEqualTo((byte) 0);
+        assertThat(Reflection.boxingDefault(boolean.class)).isEqualTo(false);
+        assertThat(Reflection.boxingDefault(char.class)).isEqualTo((char) 0);
+        assertThat(Reflection.boxingDefault(short.class)).isEqualTo((short) 0);
+        assertThat(Reflection.boxingDefault(long.class)).isEqualTo((long) 0);
+        assertThat(Reflection.boxingDefault(float.class)).isEqualTo((float) 0);
+        assertThat(Reflection.boxingDefault(double.class)).isEqualTo((double) 0);
+        assertThat(Reflection.boxingDefault(Reflection.class)).isNull();
+    }
+
+    @Test
     public void testConstructor() {
         boolean failed = false;
         try {

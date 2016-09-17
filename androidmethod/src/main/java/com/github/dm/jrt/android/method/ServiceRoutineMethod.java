@@ -58,6 +58,7 @@ import java.util.Map.Entry;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
+import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
@@ -107,7 +108,11 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
 
+    private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+
     private ServiceConfiguration mConfiguration = ServiceConfiguration.defaultConfiguration();
+
+    private Class<?> mReturnType;
 
     /**
      * Constructor.
@@ -273,6 +278,19 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     /**
+     * Tells the routine to ignore the method return value, that is, it will not be passed to the
+     * output channel.
+     *
+     * @param <OUT> the output data type.
+     * @return the return value.
+     */
+    @SuppressWarnings("unchecked")
+    protected <OUT> OUT ignoreReturnValue() {
+        mLocalIgnore.set(true);
+        return (OUT) boxingDefault(mReturnType);
+    }
+
+    /**
      * Returns the input channel which is ready to produce data. If the method takes no input
      * channel as parameter, null will be returned.
      * <p>
@@ -367,12 +385,24 @@ public class ServiceRoutineMethod extends RoutineMethod
         return resultChannel;
     }
 
+    private boolean isIgnoreReturnValue() {
+        return (mLocalIgnore.get() != null);
+    }
+
+    private void resetIgnoreReturnValue() {
+        mLocalIgnore.set(null);
+    }
+
     private void setLocalContext(@Nullable final Context context) {
         mLocalContext.set(context);
     }
 
     private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
         mLocalChannel.set(inputChannel);
+    }
+
+    private void setReturnType(@NotNull final Class<?> returnType) {
+        mReturnType = returnType;
     }
 
     /**
@@ -582,6 +612,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                 }
 
             } finally {
+                instance.resetIgnoreReturnValue();
                 instance.setLocalInput(null);
                 for (final OutputChannel<?> outputChannel : mOutputChannels) {
                     outputChannel.abort(reason);
@@ -602,15 +633,17 @@ public class ServiceRoutineMethod extends RoutineMethod
 
                 final ServiceRoutineMethod instance = mInstance;
                 instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+                instance.resetIgnoreReturnValue();
                 final List<OutputChannel<?>> outputChannels = mOutputChannels;
                 try {
                     final Object methodResult = invokeMethod();
-                    if (mReturnResults) {
+                    if (mReturnResults && !instance.isIgnoreReturnValue()) {
                         result.pass(new ParcelableSelectable<Object>(methodResult,
                                 outputChannels.size()));
                     }
 
                 } finally {
+                    instance.resetIgnoreReturnValue();
                     instance.setLocalInput(null);
                 }
 
@@ -631,12 +664,13 @@ public class ServiceRoutineMethod extends RoutineMethod
             instance.setLocalInput(inputChannel);
             try {
                 final Object methodResult = invokeMethod();
-                if (mReturnResults) {
+                if (mReturnResults && !instance.isIgnoreReturnValue()) {
                     result.pass(
                             new ParcelableSelectable<Object>(methodResult, mOutputChannels.size()));
                 }
 
             } finally {
+                instance.resetIgnoreReturnValue();
                 instance.setLocalInput(null);
             }
         }
@@ -652,7 +686,9 @@ public class ServiceRoutineMethod extends RoutineMethod
             mIsBound = false;
             mIsAborted = false;
             mIsComplete = false;
-            mInstance = mConstructor.newInstance(mConstructorArgs);
+            final ServiceRoutineMethod instance =
+                    (mInstance = mConstructor.newInstance(mConstructorArgs));
+            instance.setReturnType(mMethod.getReturnType());
             mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
         }
 

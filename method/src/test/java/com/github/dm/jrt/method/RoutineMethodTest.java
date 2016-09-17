@@ -541,11 +541,11 @@ public class RoutineMethodTest {
                 if (input.hasNext()) {
                     return input.next().length();
                 }
-                return 0;
+                return ignoreReturnValue();
             }
         }.call(inputStrings);
-        inputStrings.pass("test");
-        assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(4);
+        inputStrings.pass("test").close();
+        assertThat(outputChannel.after(seconds(1)).all()).containsExactly(4);
     }
 
     @Test

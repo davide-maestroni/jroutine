@@ -875,7 +875,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         =&gt; [Select(IN, index), Select(IN, index), Select(IN, index), ...]
+     *         A =&gt; [Select(IN, index), Select(IN, index), Select(IN, index), ...]
      *     </code>
      * </pre>
      *
@@ -901,7 +901,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
+     *         A =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
      *     </code>
      * </pre>
      *
@@ -936,7 +936,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
+     *         A =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
      *     </code>
      * </pre>
      *
@@ -971,7 +971,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         =&gt; [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
+     *         A =&gt; [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
      *     </code>
      * </pre>
      *
@@ -1129,7 +1129,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         =&gt; [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
+     *         A =&gt; [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
      *     </code>
      * </pre>
      *

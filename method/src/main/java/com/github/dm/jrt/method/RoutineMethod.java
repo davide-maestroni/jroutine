@@ -86,7 +86,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 }
  *             }
  *         }.call(inputChannel, outputChannel);
- *         inputChannel.pass(1, 2, 3);
+ *         inputChannel.pass(1, 2, 3).close();
  *         outputChannel.after(seconds(1)).all(); // expected values: 1, 4, 9
  *     </code>
  * </pre>
@@ -109,17 +109,20 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod() {
  *
  *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
- *                 final String str = input.next();
- *                 return (isUpper) ? str.toUpperCase() : str.toLowerCase();
+ *                 if (input.hasNext()) {
+ *                     final String str = input.next();
+ *                     return (isUpper) ? str.toUpperCase() : str.toLowerCase();
+ *                 }
+ *                 return ignoreReturnValue();
  *             }
  *         }.call(inputChannel, true);
- *         inputChannel.pass("Hello", "JRoutine", "!");
+ *         inputChannel.pass("Hello", "JRoutine", "!").close();
  *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
- * Note that no check is done before reading the next available input, in such case the invocation
- * is expected to never complete, that is, the input channel will have to never be closed in order
- * to avoid exceptions.
+ * Note that, when the invocation completes, that is, no input is available, the method
+ * {@code ignoreReturnValue()} is called to avoid pushing any output to the result channel. The same
+ * method can be called any time no output is produced.
  * <p>
  * In case the very same input or output channel instance has to be passed as parameter, it has to
  * be wrapped in another input channel, like shown below:
@@ -160,11 +163,14 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod(this, locale) {
  *
  *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
- *                 final String str = input.next();
- *                 return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
+ *                 if (input.hasNext()) {
+ *                     final String str = input.next();
+ *                     return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
+ *                 }
+ *                 return ignoreReturnValue();
  *             }
  *         }.callParallel(inputChannel, true);
- *         inputChannel.pass("Hello", "JRoutine", "!");
+ *         inputChannel.pass("Hello", "JRoutine", "!").close();
  *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
@@ -182,8 +188,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *
  *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
- *                 final String str = input.next();
- *                 return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *                 if (input.hasNext()) {
+ *                     final String str = input.next();
+ *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *                 }
+ *                 return ignoreReturnValue();
  *             }
  *         }
  *     </code>
@@ -203,8 +212,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *
  *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
- *                 final String str = input.next();
- *                 return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *                 if (input.hasNext()) {
+ *                     final String str = input.next();
+ *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *                 }
+ *                 return ignoreReturnValue();
  *             }
  *         }
  *     </code>

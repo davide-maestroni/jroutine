@@ -162,7 +162,12 @@ public class JRoutineLoaderStreamCompat {
                                         inputs.bind(new ChannelConsumer<IN>() {
 
                                             public void onComplete() {
-                                                outputChannel.pass(channel).close();
+                                                try {
+                                                    outputChannel.pass(channel);
+
+                                                } finally {
+                                                    outputChannel.close();
+                                                }
                                             }
 
                                             public void onError(

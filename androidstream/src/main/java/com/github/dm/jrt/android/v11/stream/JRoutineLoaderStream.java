@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 
@@ -162,10 +163,13 @@ public class JRoutineLoaderStream {
 
                                             public void onComplete() {
                                                 try {
-                                                    outputChannel.pass(channel);
+                                                    outputChannel.pass(channel).close();
 
-                                                } finally {
-                                                    outputChannel.close();
+                                                } catch (final InvocationInterruptedException e) {
+                                                    throw e;
+
+                                                } catch (final Throwable t) {
+                                                    outputChannel.abort(t);
                                                 }
                                             }
 

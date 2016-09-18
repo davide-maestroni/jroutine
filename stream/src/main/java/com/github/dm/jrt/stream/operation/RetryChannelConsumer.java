@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -80,7 +81,16 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
     }
 
     public void onComplete() {
-        mOutputChannel.pass(mOutputs).close();
+        final Channel<OUT, ?> outputChannel = mOutputChannel;
+        try {
+            outputChannel.pass(mOutputs).close();
+
+        } catch (final InvocationInterruptedException e) {
+            throw e;
+
+        } catch (final Throwable t) {
+            outputChannel.abort(t);
+        }
     }
 
     public void run() {

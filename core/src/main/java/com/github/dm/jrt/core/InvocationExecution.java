@@ -19,6 +19,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -130,6 +131,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     invocation.onRecycle(true);
                     manager.recycle(invocation);
 
+                } catch (final InvocationInterruptedException e) {
+                    throw e;
+
                 } catch (final Throwable t) {
                     manager.discard(invocation);
                 }
@@ -176,6 +180,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     invocation.onRecycle(true);
                     manager.recycle(invocation);
 
+                } catch (final InvocationInterruptedException e) {
+                    throw e;
+
                 } catch (final Throwable t) {
                     logger.wrn(t, "Discarding invocation since it failed to be recycled");
                     manager.discard(invocation);
@@ -185,6 +192,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     observer.onInvocationComplete();
                 }
             }
+
+        } catch (final InvocationInterruptedException e) {
+            throw e;
 
         } catch (final Throwable t) {
             if (!resultChannel.abortImmediately(t)) {
@@ -320,6 +330,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     }
 
                     resultChannel.close(exception);
+
+                } catch (final InvocationInterruptedException e) {
+                    throw e;
 
                 } catch (final Throwable t) {
                     if (!mIsTerminated) {

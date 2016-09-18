@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -69,11 +70,15 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<O
     public void onComplete() {
         final ResponseBody responseBody =
                 ResponseBody.create(mMediaType, mOutputStream.toByteArray());
+        final Channel<Object, ?> outputChannel = mOutputChannel;
         try {
-            mOutputChannel.pass(mConverter.convert(responseBody)).close();
+            outputChannel.pass(mConverter.convert(responseBody)).close();
 
-        } catch (final IOException e) {
-            mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
+        } catch (final InvocationInterruptedException e) {
+            throw e;
+
+        } catch (final Throwable t) {
+            outputChannel.abort(InvocationException.wrapIfNeeded(t));
         }
     }
 

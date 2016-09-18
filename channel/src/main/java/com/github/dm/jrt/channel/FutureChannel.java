@@ -192,6 +192,9 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
                     consumer.onComplete();
 
+                } catch (final InvocationInterruptedException e) {
+                    throw e;
+
                 } catch (final Throwable t) {
                     mLogger.wrn(t, "consumer exception (%s)", consumer);
                 }

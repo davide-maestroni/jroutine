@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
@@ -104,6 +105,9 @@ class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channe
             try {
                 outputChannel.pass(mMappingFunction.apply(mOutputs));
                 outputChannel.close();
+
+            } catch (final InvocationInterruptedException e) {
+                throw e;
 
             } catch (final Throwable t) {
                 outputChannel.abort(t);

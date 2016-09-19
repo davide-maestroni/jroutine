@@ -185,17 +185,15 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
                         consumer.onError(new InvocationInterruptedException(e));
                         return;
 
-                    } catch (final Exception e) {
-                        consumer.onError(InvocationException.wrapIfNeeded(e));
+                    } catch (final Throwable t) {
+                        consumer.onError(InvocationException.wrapIfNeeded(t));
                         return;
                     }
 
                     consumer.onComplete();
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
+                    InvocationInterruptedException.throwIfInterrupt(t);
                     mLogger.wrn(t, "consumer exception (%s)", consumer);
                 }
             }

@@ -167,11 +167,9 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
 
                     channel.close();
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
                     channel.abort(t);
+                    InvocationInterruptedException.throwIfInterrupt(t);
                 }
             }
         }

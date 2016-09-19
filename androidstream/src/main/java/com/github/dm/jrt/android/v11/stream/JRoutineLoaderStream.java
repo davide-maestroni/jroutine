@@ -165,11 +165,10 @@ public class JRoutineLoaderStream {
                                                 try {
                                                     outputChannel.pass(channel).close();
 
-                                                } catch (final InvocationInterruptedException e) {
-                                                    throw e;
-
                                                 } catch (final Throwable t) {
                                                     outputChannel.abort(t);
+                                                    InvocationInterruptedException.throwIfInterrupt(
+                                                            t);
                                                 }
                                             }
 

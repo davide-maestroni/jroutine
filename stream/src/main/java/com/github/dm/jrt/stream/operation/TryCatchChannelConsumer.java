@@ -63,8 +63,8 @@ class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
             channel.close();
 
         } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
             channel.abort(t);
+            InvocationInterruptedException.throwIfInterrupt(t);
         }
     }
 

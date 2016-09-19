@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -532,6 +533,8 @@ public class InvocationService extends Service {
                 } catch (final Throwable ignored) {
                     logger.err(ignored, "error while sending routine abort message");
                 }
+
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
     }

@@ -17,6 +17,7 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
@@ -100,6 +101,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
                 return newInstance;
 
             } catch (final Throwable t) {
+                InvocationInterruptedException.throwIfInterrupt(t);
                 throw new IllegalArgumentException(t);
             }
         }

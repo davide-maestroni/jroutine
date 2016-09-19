@@ -74,11 +74,9 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<O
         try {
             outputChannel.pass(mConverter.convert(responseBody)).close();
 
-        } catch (final InvocationInterruptedException e) {
-            throw e;
-
         } catch (final Throwable t) {
             outputChannel.abort(InvocationException.wrapIfNeeded(t));
+            InvocationInterruptedException.throwIfInterrupt(t);
         }
     }
 

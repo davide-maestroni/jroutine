@@ -245,6 +245,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                 logger.wrn(t, "error while handling Service message");
                 mOutputChannel.abort(t);
                 unbindService();
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
 
@@ -355,10 +356,11 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                 mInputChannel.bind(
                         new ConnectionChannelConsumer<IN>(invocationId, inMessenger, outMessenger));
 
-            } catch (final RemoteException e) {
-                logger.err(e, "error while sending Service invocation message");
+            } catch (final Throwable t) {
+                logger.err(t, "error while sending Service invocation message");
                 mIncomingHandler.unbindService();
-                mOutputChannel.abort(InvocationException.wrapIfNeeded(e));
+                mOutputChannel.abort(InvocationException.wrapIfNeeded(t));
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
 

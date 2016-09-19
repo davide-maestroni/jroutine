@@ -106,11 +106,9 @@ class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channe
                 outputChannel.pass(mMappingFunction.apply(mOutputs));
                 outputChannel.close();
 
-            } catch (final InvocationInterruptedException e) {
-                throw e;
-
             } catch (final Throwable t) {
                 outputChannel.abort(t);
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
 

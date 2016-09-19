@@ -1269,9 +1269,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                         closeConsumer(currentState, consumer);
                     }
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
                     synchronized (mMutex) {
                         logger.wrn(t, "consumer exception (%s)", consumer);
@@ -1279,6 +1276,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                         queue.clear();
                         abortException = mState.abortConsumer(t);
                     }
+
+                    InvocationInterruptedException.throwIfInterrupt(t);
                 }
             }
 

@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -209,9 +208,6 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
                         try {
                             newChannel.pass(cachedResults).pass(lastResults);
 
-                        } catch (final InvocationInterruptedException e) {
-                            throw e;
-
                         } catch (final Throwable t) {
                             logger.wrn(t, "aborted channel");
                             abortedChannels.add(newChannel);
@@ -221,9 +217,6 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
                     for (final Channel<OUT, ?> channel : oldChannels) {
                         try {
                             channel.pass(lastResults);
-
-                        } catch (final InvocationInterruptedException e) {
-                            throw e;
 
                         } catch (final Throwable t) {
                             logger.wrn(t, "aborted channel");

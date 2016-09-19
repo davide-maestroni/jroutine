@@ -108,11 +108,9 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
                 mMappingConsumer.accept(mOutputs, outputChannel);
                 outputChannel.close();
 
-            } catch (final InvocationInterruptedException e) {
-                throw e;
-
             } catch (final Throwable t) {
                 outputChannel.abort(t);
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
 

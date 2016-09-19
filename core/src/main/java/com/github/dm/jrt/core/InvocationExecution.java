@@ -131,11 +131,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     invocation.onRecycle(true);
                     manager.recycle(invocation);
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
                     manager.discard(invocation);
+                    InvocationInterruptedException.throwIfInterrupt(t);
                 }
 
             } else {
@@ -180,12 +178,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     invocation.onRecycle(true);
                     manager.recycle(invocation);
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
                     logger.wrn(t, "Discarding invocation since it failed to be recycled");
                     manager.discard(invocation);
+                    InvocationInterruptedException.throwIfInterrupt(t);
 
                 } finally {
                     resultChannel.closeImmediately();
@@ -193,14 +189,13 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 }
             }
 
-        } catch (final InvocationInterruptedException e) {
-            throw e;
-
         } catch (final Throwable t) {
             if (!resultChannel.abortImmediately(t)) {
                 // Needed if the result channel is explicitly closed by the invocation
                 recycle(t);
             }
+
+            InvocationInterruptedException.throwIfInterrupt(t);
         }
     }
 
@@ -331,9 +326,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                     resultChannel.close(exception);
 
-                } catch (final InvocationInterruptedException e) {
-                    throw e;
-
                 } catch (final Throwable t) {
                     if (!mIsTerminated) {
                         mIsTerminated = true;
@@ -341,6 +333,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                     }
 
                     resultChannel.close(t);
+                    InvocationInterruptedException.throwIfInterrupt(t);
                 }
 
             } finally {

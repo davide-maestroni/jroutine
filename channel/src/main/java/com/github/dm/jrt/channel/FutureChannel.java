@@ -267,8 +267,8 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         } catch (final InterruptedException e) {
             return new InvocationInterruptedException(e);
 
-        } catch (final Exception e) {
-            return InvocationException.wrapIfNeeded(e);
+        } catch (final Throwable t) {
+            return InvocationException.wrapIfNeeded(t);
         }
 
         return null;
@@ -453,9 +453,12 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         } catch (final CancellationException e) {
             throw AbortException.wrapIfNeeded(mAbortException.get());
 
-        } catch (final Exception e) {
-            InvocationInterruptedException.throwIfInterrupt(e);
-            throw InvocationException.wrapIfNeeded(e);
+        } catch (final IllegalStateException e) {
+            throw e;
+
+        } catch (final Throwable t) {
+            InvocationInterruptedException.throwIfInterrupt(t);
+            throw InvocationException.wrapIfNeeded(t);
         }
 
         return false;
@@ -499,9 +502,12 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         } catch (final CancellationException e) {
             throw AbortException.wrapIfNeeded(mAbortException.get());
 
-        } catch (final Exception e) {
-            InvocationInterruptedException.throwIfInterrupt(e);
-            throw InvocationException.wrapIfNeeded(e);
+        } catch (final IllegalStateException e) {
+            throw e;
+
+        } catch (final Throwable t) {
+            InvocationInterruptedException.throwIfInterrupt(t);
+            throw InvocationException.wrapIfNeeded(t);
         }
     }
 

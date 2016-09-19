@@ -85,11 +85,9 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
         try {
             outputChannel.pass(mOutputs).close();
 
-        } catch (final InvocationInterruptedException e) {
-            throw e;
-
         } catch (final Throwable t) {
             outputChannel.abort(t);
+            InvocationInterruptedException.throwIfInterrupt(t);
         }
     }
 
@@ -99,12 +97,13 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
         try {
             mBindingFunction.apply(channel).bind(this);
 
-        } catch (final Exception e) {
-            abort(e);
+        } catch (final Throwable t) {
+            abort(t);
+            InvocationInterruptedException.throwIfInterrupt(t);
         }
     }
 
-    private void abort(@NotNull final Exception error) {
+    private void abort(@NotNull final Throwable error) {
         final RoutineException ex = InvocationException.wrapIfNeeded(error);
         mOutputChannel.abort(ex);
         mInputChannel.abort(ex);
@@ -129,26 +128,21 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
         }
 
         public void onComplete() {
-            try {
-                mChannel.close();
-
-            } catch (final Exception ignored) {
-            }
+            mChannel.close();
         }
 
         public void onError(@NotNull final RoutineException error) {
-            try {
-                mChannel.abort(error);
-
-            } catch (final Exception ignored) {
-            }
+            mChannel.abort(error);
         }
 
         public void onOutput(final IN output) {
             try {
                 mChannel.pass(output);
 
-            } catch (final Exception ignored) {
+            } catch (final InvocationInterruptedException e) {
+                throw e;
+
+            } catch (final Throwable ignored) {
             }
         }
     }
@@ -159,8 +153,9 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
             try {
                 delay = mBackoffFunction.apply(++mCount, error);
 
-            } catch (final Exception e) {
-                abort(e);
+            } catch (final Throwable t) {
+                abort(t);
+                InvocationInterruptedException.throwIfInterrupt(t);
             }
         }
 

@@ -25,6 +25,7 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.retrofit.ErrorResponseException;
 
@@ -158,8 +159,9 @@ public class ServiceCallInvocation extends
                 try {
                     publishResult(response.body(), outputChannel);
 
-                } catch (final IOException e) {
-                    outputChannel.abort(e);
+                } catch (final Throwable t) {
+                    outputChannel.abort(t);
+                    InvocationInterruptedException.throwIfInterrupt(t);
 
                 } finally {
                     outputChannel.close();

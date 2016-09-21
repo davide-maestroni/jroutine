@@ -168,7 +168,7 @@ public class ChannelTest {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(200);
 
                 } catch (final InterruptedException ignored) {
 

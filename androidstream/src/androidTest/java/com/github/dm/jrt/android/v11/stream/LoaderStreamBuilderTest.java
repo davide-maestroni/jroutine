@@ -59,11 +59,12 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
+import static com.github.dm.jrt.function.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
-import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.operation.Operations.tryCatchAccept;
+import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.stream.transform.Transformations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -155,6 +156,75 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                      .call("test1", null, "test2", null)
                                      .after(seconds(10))
                                      .all()).containsOnly("test1", "test2");
+    }
+
+    private static void testFlatTransform(@NotNull final Activity activity) {
+        assertThat(JRoutineLoaderStream //
+                .<String>withStream().on(loaderFrom(activity))
+                                     .let(new Function<StreamBuilder<String, String>,
+                                             StreamBuilder<String, String>>() {
+
+                                         public StreamBuilder<String, String> apply(
+                                                 final StreamBuilder<String, String> builder) {
+                                             return builder.map(append("test2"));
+                                         }
+                                     })
+                                     .call("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineLoaderStream //
+                .<String>withStream().on(loaderFrom(activity))
+                                     .let(new Function<StreamBuilder<String, String>,
+                                             LoaderStreamBuilder<String, String>>() {
+
+                                         public LoaderStreamBuilder<String, String> apply(
+                                                 final StreamBuilder<String, String> builder) {
+                                             return ((LoaderStreamBuilder<String, String>)
+                                                     builder).map(
+                                                     append("test2"));
+                                         }
+                                     })
+                                     .call("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineLoaderStream //
+                .<String>withStream().on(loaderFrom(activity))
+                                     .letWithConfig(
+                                             new BiFunction<LoaderStreamConfiguration,
+                                                     StreamBuilder<String, String>,
+                                                     StreamBuilder<String, String>>() {
+
+                                                 public StreamBuilder<String, String> apply(
+                                                         final LoaderStreamConfiguration
+                                                                 configuration,
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return builder.map(append("test2"));
+                                                 }
+                                             })
+                                     .call("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
+        assertThat(JRoutineLoaderStream //
+                .<String>withStream().on(loaderFrom(activity))
+                                     .letWithConfig(
+                                             new BiFunction<LoaderStreamConfiguration,
+                                                     StreamBuilder<String, String>,
+                                                     LoaderStreamBuilder<String, String>>() {
+
+                                                 public LoaderStreamBuilder<String, String> apply(
+                                                         final LoaderStreamConfiguration
+                                                                 configuration,
+                                                         final StreamBuilder<String, String>
+                                                                 builder) {
+                                                     return ((LoaderStreamBuilder<String,
+                                                             String>) builder)
+                                                             .map(append("test2"));
+                                                 }
+                                             })
+                                     .call("test1")
+                                     .after(seconds(10))
+                                     .all()).containsExactly("test1", "test2");
     }
 
     private static void testInvocationDeadlock(@NotNull final Activity activity) {
@@ -587,72 +657,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        assertThat(JRoutineLoaderStream //
-                .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(new Function<StreamBuilder<String, String>,
-                                             StreamBuilder<String, String>>() {
-
-                                         public StreamBuilder<String, String> apply(
-                                                 final StreamBuilder<String, String> builder) {
-                                             return builder.map(append("test2"));
-                                         }
-                                     })
-                                     .call("test1")
-                                     .after(seconds(10))
-                                     .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineLoaderStream //
-                .<String>withStream().on(loaderFrom(getActivity()))
-                                     .let(new Function<StreamBuilder<String, String>,
-                                             LoaderStreamBuilder<String, String>>() {
-
-                                         public LoaderStreamBuilder<String, String> apply(
-                                                 final StreamBuilder<String, String> builder) {
-                                             return ((LoaderStreamBuilder<String, String>)
-                                                     builder).map(
-                                                     append("test2"));
-                                         }
-                                     })
-                                     .call("test1")
-                                     .after(seconds(10))
-                                     .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineLoaderStream //
-                .<String>withStream().on(loaderFrom(getActivity()))
-                                     .letWithConfig(
-                                             new BiFunction<LoaderStreamConfiguration,
-                                                     StreamBuilder<String, String>,
-                                                     StreamBuilder<String, String>>() {
-
-                                                 public StreamBuilder<String, String> apply(
-                                                         final LoaderStreamConfiguration
-                                                                 configuration,
-                                                         final StreamBuilder<String, String>
-                                                                 builder) {
-                                                     return builder.map(append("test2"));
-                                                 }
-                                             })
-                                     .call("test1")
-                                     .after(seconds(10))
-                                     .all()).containsExactly("test1", "test2");
-        assertThat(JRoutineLoaderStream //
-                .<String>withStream().on(loaderFrom(getActivity()))
-                                     .letWithConfig(
-                                             new BiFunction<LoaderStreamConfiguration,
-                                                     StreamBuilder<String, String>,
-                                                     LoaderStreamBuilder<String, String>>() {
-
-                                                 public LoaderStreamBuilder<String, String> apply(
-                                                         final LoaderStreamConfiguration
-                                                                 configuration,
-                                                         final StreamBuilder<String, String>
-                                                                 builder) {
-                                                     return ((LoaderStreamBuilder<String,
-                                                             String>) builder)
-                                                             .map(append("test2"));
-                                                 }
-                                             })
-                                     .call("test1")
-                                     .after(seconds(10))
-                                     .all()).containsExactly("test1", "test2");
+        testFlatTransform(getActivity());
     }
 
     public void testImmediate() {
@@ -1262,6 +1267,100 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testStreamAccept() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineLoaderStream.withStreamAccept(range(0, 3))
+                                       .immediate()
+                                       .close()
+                                       .all()).containsExactly(0, 1, 2, 3);
+        assertThat(JRoutineLoaderStream.withStreamAccept(2, range(1, 0))
+                                       .immediate()
+                                       .close()
+                                       .all()).containsExactly(1, 0, 1, 0);
+    }
+
+    public void testStreamAcceptAbort() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        Channel<Integer, Integer> channel =
+                JRoutineLoaderStream.withStreamAccept(range(0, 3)).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineLoaderStream.withStreamAccept(2, range(1, 0)).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    }
+
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamAcceptError() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineLoaderStream.withStreamAccept(range(0, 3))
+                                       .immediate()
+                                       .call(31)
+                                       .getError()
+                                       .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineLoaderStream.withStreamAccept(2, range(1, 0))
+                                       .immediate()
+                                       .call(-17)
+                                       .getError()
+                                       .getCause()).isInstanceOf(IllegalStateException.class);
+    }
+
+    public void testStreamGet() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineLoaderStream.withStreamGet(constant("test"))
+                                       .immediate()
+                                       .close()
+                                       .all()).containsExactly("test");
+        assertThat(JRoutineLoaderStream.withStreamGet(2, constant("test2"))
+                                       .immediate()
+                                       .close()
+                                       .all()).containsExactly("test2", "test2");
+    }
+
+    public void testStreamGetAbort() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        Channel<String, String> channel =
+                JRoutineLoaderStream.withStreamGet(constant("test")).immediate().immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineLoaderStream.withStreamGet(2, constant("test2")).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    }
+
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamGetError() {
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(JRoutineLoaderStream.withStreamGet(constant("test"))
+                                       .immediate()
+                                       .call("test")
+                                       .getError()
+                                       .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineLoaderStream.withStreamGet(2, constant("test2"))
+                                       .immediate()
+                                       .call("test")
+                                       .getError()
+                                       .getCause()).isInstanceOf(IllegalStateException.class);
+    }
+
     public void testStreamOf() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;
@@ -1290,7 +1389,6 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                     .all()).containsExactly("test1", "test2", "test3");
     }
 
-    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testStreamOfAbort() {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             return;

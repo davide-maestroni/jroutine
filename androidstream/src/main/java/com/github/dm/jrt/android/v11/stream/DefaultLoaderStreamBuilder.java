@@ -194,6 +194,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> let(
             @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
                     StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        checkStatic(decorate(liftFunction), liftFunction);
         return (LoaderStreamBuilder<BEFORE, AFTER>) super.let(liftFunction);
     }
 
@@ -202,6 +203,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
     public <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> letWithConfig(
             @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN,
                     OUT>, ? extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+        checkStatic(decorate(liftFunction), liftFunction);
         return (LoaderStreamBuilder<BEFORE, AFTER>) super.letWithConfig(liftFunction);
     }
 
@@ -211,6 +213,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
             @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
                     Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
                     Channel<?, AFTER>>> liftFunction) {
+        checkStatic(decorate(liftFunction), liftFunction);
         return (LoaderStreamBuilder<BEFORE, AFTER>) super.lift(liftFunction);
     }
 
@@ -220,6 +223,7 @@ class DefaultLoaderStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT>
             @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
                     Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
+        checkStatic(decorate(liftFunction), liftFunction);
         return (LoaderStreamBuilder<BEFORE, AFTER>) super.liftWithConfig(liftFunction);
     }
 

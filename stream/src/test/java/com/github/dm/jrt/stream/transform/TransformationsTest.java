@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.operation;
+package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -52,9 +52,9 @@ import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.reduce;
-import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.operation.Operations.throttle;
-import static com.github.dm.jrt.stream.operation.Operations.timeoutAfter;
+import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.stream.transform.Transformations.throttle;
+import static com.github.dm.jrt.stream.transform.Transformations.timeoutAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -63,7 +63,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class OperationsTest {
+public class TransformationsTest {
 
     private static Runner sSingleThreadRunner;
 
@@ -162,7 +162,7 @@ public class OperationsTest {
     public void testConstructor() {
         boolean failed = false;
         try {
-            new Operations();
+            new Transformations();
             failed = true;
 
         } catch (final Throwable ignored) {
@@ -175,28 +175,28 @@ public class OperationsTest {
     public void testDelay() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.delay(1, TimeUnit.SECONDS))
+                                 .let(Transformations.delay(1, TimeUnit.SECONDS))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.delay(seconds(1)))
+                                 .let(Transformations.delay(seconds(1)))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.delay(1, TimeUnit.SECONDS))
+                                 .let(Transformations.delay(1, TimeUnit.SECONDS))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.delay(seconds(1)))
+                                 .let(Transformations.delay(seconds(1)))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -207,7 +207,7 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testDelayNullPointerError() {
         try {
-            Operations.delay(1, null);
+            Transformations.delay(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -218,28 +218,28 @@ public class OperationsTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.lag(1, TimeUnit.SECONDS))
+                                 .let(Transformations.lag(1, TimeUnit.SECONDS))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.lag(seconds(1)))
+                                 .let(Transformations.lag(seconds(1)))
                                  .call("test")
                                  .after(seconds(3))
                                  .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.lag(1, TimeUnit.SECONDS))
+                                 .let(Transformations.lag(1, TimeUnit.SECONDS))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.withStream()
-                                 .let(Operations.lag(seconds(1)))
+                                 .let(Transformations.lag(seconds(1)))
                                  .close()
                                  .after(seconds(3))
                                  .all()).isEmpty();
@@ -250,7 +250,7 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testLagNullPointerError() {
         try {
-            Operations.lag(1, null);
+            Transformations.lag(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -269,20 +269,20 @@ public class OperationsTest {
                 });
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Long>parallel(2,
+                                      .let(Transformations.<Integer, Integer, Long>parallel(2,
                                               sqr.buildFactory()))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Long>parallel(2, sqr))
+                                      .let(Transformations.<Integer, Integer, Long>parallel(2, sqr))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Integer>parallel(2,
+                                      .let(Transformations.<Integer, Integer, Integer>parallel(2,
                                               JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
                                       .close()
@@ -290,21 +290,21 @@ public class OperationsTest {
                                       .all()).containsOnly(1, 2, 3);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Long>parallelBy(
+                                      .let(Transformations.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr.buildFactory()))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Long>parallelBy(
+                                      .let(Transformations.<Integer, Integer, Long>parallelBy(
                                               Functions.<Integer>identity(), sqr))
                                       .close()
                                       .after(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(JRoutineStream //
                 .<Integer>withStream().map(appendAccept(range(1, 3)))
-                                      .let(Operations.<Integer, Integer, Integer>parallelBy(
+                                      .let(Transformations.<Integer, Integer, Integer>parallelBy(
                                               Functions.<Integer>identity(), JRoutineCore.with(
                                                       IdentityInvocation.<Integer>factoryOf())))
                                       .close()
@@ -316,56 +316,56 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testParallelSplitNullPointerError() {
         try {
-            Operations.parallel(1, (InvocationFactory<Object, ?>) null);
+            Transformations.parallel(1, (InvocationFactory<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallel(1, (Routine<Object, ?>) null);
+            Transformations.parallel(1, (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallel(1, (RoutineBuilder<Object, ?>) null);
+            Transformations.parallel(1, (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallelBy(null, JRoutineStream.withStream().buildRoutine());
+            Transformations.parallelBy(null, JRoutineStream.withStream().buildRoutine());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallelBy(null, JRoutineStream.withStream());
+            Transformations.parallelBy(null, JRoutineStream.withStream());
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
+            Transformations.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
+            Transformations.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
+            Transformations.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -378,7 +378,7 @@ public class OperationsTest {
         try {
             JRoutineStream.<String>withStream().map(new UpperCase())
                                                .map(factoryOf(ThrowException.class, count1))
-                                               .let(Operations.<String, Object>retry(2))
+                                               .let(Transformations.<String, Object>retry(2))
                                                .call("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -392,7 +392,7 @@ public class OperationsTest {
         assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                       .map(factoryOf(ThrowException.class, count2,
                                                               1))
-                                                      .let(Operations.<String, Object>retry(1))
+                                                      .let(Transformations.<String, Object>retry(1))
                                                       .call("test")
                                                       .after(seconds(3))
                                                       .all()).containsExactly("TEST");
@@ -401,7 +401,7 @@ public class OperationsTest {
         try {
             JRoutineStream.<String>withStream().map(new AbortInvocation())
                                                .map(factoryOf(ThrowException.class, count3))
-                                               .let(Operations.<String, Object>retry(2))
+                                               .let(Transformations.<String, Object>retry(2))
                                                .call("test")
                                                .after(seconds(3))
                                                .throwError();
@@ -458,14 +458,14 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testRetryNullPointerError() {
         try {
-            Operations.retry(1, null);
+            Transformations.retry(1, null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.retry(null);
+            Transformations.retry(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -522,7 +522,7 @@ public class OperationsTest {
         final Channel<Object, Object> channel =
                 JRoutineStream.withStream().let(timeoutAfter(millis(1))).call().pass("test");
         assertThat(channel.after(seconds(1)).getError()).isExactlyInstanceOf(
-                com.github.dm.jrt.stream.operation.ResultTimeoutException.class);
+                ResultTimeoutException.class);
     }
 
     @Test
@@ -534,7 +534,7 @@ public class OperationsTest {
                                                               throw new NullPointerException();
                                                           }
                                                       })
-                                                      .let(Operations.<String,
+                                                      .let(Transformations.<String,
                                                               Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
@@ -555,7 +555,7 @@ public class OperationsTest {
                                                               return o;
                                                           }
                                                       })
-                                                      .let(Operations.<String,
+                                                      .let(Transformations.<String,
                                                               Object>tryCatchAccept(
                                                               new BiConsumer<RoutineException,
                                                                       Channel<Object, ?>>() {
@@ -574,7 +574,7 @@ public class OperationsTest {
             public Object apply(final Object o) {
                 throw new NullPointerException();
             }
-        }).let(Operations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+        }).let(Transformations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
 
             public Object apply(final RoutineException e) {
                 return "exception";
@@ -586,14 +586,14 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryCatchNullPointerError() {
         try {
-            Operations.tryCatchAccept(null);
+            Transformations.tryCatchAccept(null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Operations.tryCatch(null);
+            Transformations.tryCatch(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -609,7 +609,7 @@ public class OperationsTest {
                 public Object apply(final Object o) {
                     throw new NullPointerException();
                 }
-            }).let(Operations.<String, Object>tryFinally(new Action() {
+            }).let(Transformations.<String, Object>tryFinally(new Action() {
 
                 public void perform() {
                     isRun.set(true);
@@ -625,7 +625,7 @@ public class OperationsTest {
             public Object apply(final Object o) {
                 return o;
             }
-        }).let(Operations.<String, Object>tryFinally(new Action() {
+        }).let(Transformations.<String, Object>tryFinally(new Action() {
 
             public void perform() {
                 isRun.set(true);
@@ -638,7 +638,7 @@ public class OperationsTest {
     @SuppressWarnings("ConstantConditions")
     public void testTryFinallyNullPointerError() {
         try {
-            Operations.tryFinally(null);
+            Transformations.tryFinally(null);
             fail();
 
         } catch (final NullPointerException ignored) {

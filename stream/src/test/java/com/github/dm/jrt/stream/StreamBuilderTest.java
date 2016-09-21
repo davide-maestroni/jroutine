@@ -46,11 +46,10 @@ import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
-import com.github.dm.jrt.stream.operation.Operations;
+import com.github.dm.jrt.stream.transform.Transformations;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,15 +62,15 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
-import static com.github.dm.jrt.operator.Operators.averageFloat;
 import static com.github.dm.jrt.operator.Operators.filter;
 import static com.github.dm.jrt.operator.Operators.reduce;
-import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.stream.operation.Operations.tryCatchAccept;
+import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.stream.transform.Transformations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -837,31 +836,31 @@ public class StreamBuilderTest {
     public void testLag() {
         long startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Operations.<String, String>lag(1, TimeUnit.SECONDS))
+                Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .call("test")
                                                       .after(seconds(3))
                                                       .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
-        assertThat(
-                JRoutineStream.<String>withStream().let(Operations.<String, String>lag(seconds(1)))
-                                                   .call("test")
-                                                   .after(seconds(3))
-                                                   .next()).isEqualTo("test");
+        assertThat(JRoutineStream.<String>withStream().let(
+                Transformations.<String, String>lag(seconds(1)))
+                                                      .call("test")
+                                                      .after(seconds(3))
+                                                      .next()).isEqualTo("test");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
         assertThat(JRoutineStream.<String>withStream().let(
-                Operations.<String, String>lag(1, TimeUnit.SECONDS))
+                Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                       .close()
                                                       .after(seconds(3))
                                                       .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
         startTime = System.currentTimeMillis();
-        assertThat(
-                JRoutineStream.<String>withStream().let(Operations.<String, String>lag(seconds(1)))
-                                                   .close()
-                                                   .after(seconds(3))
-                                                   .all()).isEmpty();
+        assertThat(JRoutineStream.<String>withStream().let(
+                Transformations.<String, String>lag(seconds(1)))
+                                                      .close()
+                                                      .after(seconds(3))
+                                                      .all()).isEmpty();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     }
 
@@ -1581,54 +1580,80 @@ public class StreamBuilderTest {
         }
     }
 
-    // TODO: 01/09/16 remove
-    @Ignore
     @Test
-    public void testPerf() {
-        final String[] args = new String[100000];
-        for (int n = 0; n < 100000; n++) {
-            args[n] = Integer.toString(n + 1);
-        }
+    public void testStreamAccept() {
+        assertThat(JRoutineStream.withStreamAccept(range(0, 3))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly(0, 1, 2, 3);
+        assertThat(JRoutineStream.withStreamAccept(2, range(1, 0))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly(1, 0, 1, 0);
+    }
 
-        JRoutineStream.<String>withStream().immediate()
-                                           .map(new Function<String, Integer>() {
+    @Test
+    public void testStreamAcceptAbort() {
+        Channel<Integer, Integer> channel =
+                JRoutineStream.withStreamAccept(range(0, 3)).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    }
 
-                                               public Integer apply(final String s) throws
-                                                       Exception {
-                                                   return Integer.parseInt(s);
-                                               }
-                                           })
-                                           .map(new Function<Integer, Integer>() {
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamAcceptError() {
+        assertThat(JRoutineStream.withStreamAccept(range(0, 3))
+                                 .immediate()
+                                 .call(31)
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineStream.withStreamAccept(2, range(1, 0))
+                                 .immediate()
+                                 .call(-17)
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+    }
 
-                                               public Integer apply(final Integer integer) throws
-                                                       Exception {
-                                                   final int i = integer;
-                                                   return i * i;
-                                               }
-                                           })
-                                           .map(averageFloat())
-                                           .map(new Function<Float, Double>() {
+    @Test
+    public void testStreamGet() {
+        assertThat(JRoutineStream.withStreamGet(constant("test"))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly("test");
+        assertThat(JRoutineStream.withStreamGet(2, constant("test2"))
+                                 .immediate()
+                                 .close()
+                                 .all()).containsExactly("test2", "test2");
+    }
 
-                                               public Double apply(final Float aFloat) throws
-                                                       Exception {
-                                                   return Math.sqrt(aFloat);
-                                               }
-                                           })
-                                           .async()
-                                           .applyInvocationConfiguration()
-                                           .withRunner(Runners.poolRunner(1))
-                                           .configured()
-                                           .call(args)
-                                           .bind(onOutput(new Consumer<Double>() {
+    @Test
+    public void testStreamGetAbort() {
+        Channel<String, String> channel =
+                JRoutineStream.withStreamGet(constant("test")).immediate().immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+        channel = JRoutineStream.withStreamGet(2, constant("test2")).immediate().call();
+        assertThat(channel.abort()).isTrue();
+        assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    }
 
-                                               public void accept(final Double aDouble) throws
-                                                       Exception {
-                                                   System.out.println(aDouble);
-                                               }
-                                           }))
-                                           .after(seconds(10))
-                                           .getComplete();
-        System.out.println("END");
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testStreamGetError() {
+        assertThat(JRoutineStream.withStreamGet(constant("test"))
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
+        assertThat(JRoutineStream.withStreamGet(2, constant("test2"))
+                                 .immediate()
+                                 .call("test")
+                                 .getError()
+                                 .getCause()).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -1648,7 +1673,6 @@ public class StreamBuilderTest {
     }
 
     @Test
-    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testStreamOfAbort() {
         Channel<String, String> channel = JRoutineStream.withStreamOf("test").immediate().call();
         assertThat(channel.abort()).isTrue();

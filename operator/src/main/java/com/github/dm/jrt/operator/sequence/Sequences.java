@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.operator.producer;
+package com.github.dm.jrt.operator.sequence;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -23,7 +23,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionDecorator;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,16 +34,16 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalSafe;
 
 /**
- * Utility class providing functions that produce inputs.
+ * Utility class providing functions that produce sequences of data.
  * <p>
  * Created by davide-maestroni on 07/02/2016.
  */
-public class Producers {
+public class Sequences {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Producers() {
+    protected Sequences() {
         ConstantConditions.avoid();
     }
 
@@ -65,7 +65,7 @@ public class Producers {
             @NotNull final Function<DATA, DATA> incrementFunction) {
         return new RangeConsumer<DATA>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.notNull("end element", end),
-                Functions.decorate(incrementFunction));
+                FunctionDecorator.decorate(incrementFunction));
     }
 
     /**
@@ -126,7 +126,7 @@ public class Producers {
             final long count, @NotNull final BiFunction<DATA, Long, DATA> nextFunction) {
         return new SequenceConsumer<DATA>(ConstantConditions.notNull("start element", start),
                 ConstantConditions.positive("sequence size", count),
-                Functions.decorate(nextFunction));
+                BiFunctionDecorator.decorate(nextFunction));
     }
 
     @NotNull
@@ -516,13 +516,14 @@ public class Producers {
         public void accept(final Channel<OUT, ?> result) throws Exception {
             final BiFunctionDecorator<OUT, Long, OUT> next = mNextFunction;
             OUT current = mStart;
-            final long count = mCount;
-            final long last = count - 1;
-            for (long i = 0; i < count; ++i) {
+            final long last = mCount - 1;
+            if (last >= 0) {
                 result.pass(current);
-                if (i < last) {
-                    current = next.apply(current, i);
-                }
+            }
+
+            for (long i = 0; i < last; ++i) {
+                current = next.apply(current, i);
+                result.pass(current);
             }
         }
     }

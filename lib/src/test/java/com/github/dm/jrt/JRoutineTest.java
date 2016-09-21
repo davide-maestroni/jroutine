@@ -56,7 +56,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
-import static com.github.dm.jrt.operator.producer.Producers.range;
+import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

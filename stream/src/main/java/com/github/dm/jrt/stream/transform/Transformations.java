@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.operation;
+package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -44,12 +44,12 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Created by davide-maestroni on 07/06/2016.
  */
-public class Operations {
+public class Transformations {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected Operations() {
+    protected Transformations() {
         ConstantConditions.avoid();
     }
 
@@ -71,26 +71,20 @@ public class Operations {
             final long delay, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
         ConstantConditions.notNegative("delay value", delay);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindDelay<OUT>(
-                                        streamConfiguration.toChannelConfiguration(), delay,
-                                        timeUnit));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(
+                                new BindDelay<OUT>(streamConfiguration.toChannelConfiguration(),
+                                        delay, timeUnit));
+                    }
+                });
     }
 
     /**
@@ -128,26 +122,20 @@ public class Operations {
             final long delay, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
         ConstantConditions.notNegative("delay value", delay);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).<Channel<?, IN>>compose(new BindDelay<IN>(
-                                        streamConfiguration.toChannelConfiguration(), delay,
-                                        timeUnit));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).<Channel<?, IN>>compose(
+                                new BindDelay<IN>(streamConfiguration.toChannelConfiguration(),
+                                        delay, timeUnit));
+                    }
+                });
     }
 
     /**
@@ -189,29 +177,22 @@ public class Operations {
             final int groupCount,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         ConstantConditions.notNull("invocation factory", factory);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
+        return new TransformationFunction<IN, OUT, AFTER>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, AFTER>>>() {
 
-            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, AFTER>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
-                                        streamConfiguration.toChannelConfiguration(), groupCount,
-                                        JRoutineCore.with(factory)
-                                                    .apply(streamConfiguration
-                                                            .toInvocationConfiguration()),
-                                        streamConfiguration.getInvocationMode()));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
+                                streamConfiguration.toChannelConfiguration(), groupCount,
+                                JRoutineCore.with(factory)
+                                            .apply(streamConfiguration.toInvocationConfiguration()),
+                                streamConfiguration.getInvocationMode()));
+                    }
+                });
     }
 
     /**
@@ -235,26 +216,20 @@ public class Operations {
     parallel(
             final int groupCount, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         ConstantConditions.notNull("routine instance", routine);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
+        return new TransformationFunction<IN, OUT, AFTER>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, AFTER>>>() {
 
-            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, AFTER>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
-                                        streamConfiguration.toChannelConfiguration(), groupCount,
-                                        routine, streamConfiguration.getInvocationMode()));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(new BindParallelCount<OUT, AFTER>(
+                                streamConfiguration.toChannelConfiguration(), groupCount, routine,
+                                streamConfiguration.getInvocationMode()));
+                    }
+                });
     }
 
     /**
@@ -303,29 +278,22 @@ public class Operations {
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
         ConstantConditions.notNull("function instance", keyFunction);
         ConstantConditions.notNull("invocation factory", factory);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
+        return new TransformationFunction<IN, OUT, AFTER>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, AFTER>>>() {
 
-            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, AFTER>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
-                                        streamConfiguration.toChannelConfiguration(), keyFunction,
-                                        JRoutineCore.with(factory)
-                                                    .apply(streamConfiguration
-                                                            .toInvocationConfiguration()),
-                                        streamConfiguration.getInvocationMode()));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
+                                streamConfiguration.toChannelConfiguration(), keyFunction,
+                                JRoutineCore.with(factory)
+                                            .apply(streamConfiguration.toInvocationConfiguration()),
+                                streamConfiguration.getInvocationMode()));
+                    }
+                });
     }
 
     /**
@@ -350,26 +318,20 @@ public class Operations {
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
         ConstantConditions.notNull("function instance", keyFunction);
         ConstantConditions.notNull("routine instance", routine);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>() {
+        return new TransformationFunction<IN, OUT, AFTER>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, AFTER>>>() {
 
-            public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, AFTER>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
-                                        streamConfiguration.toChannelConfiguration(), keyFunction,
-                                        routine, streamConfiguration.getInvocationMode()));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(new BindParallelKey<OUT, AFTER>(
+                                streamConfiguration.toChannelConfiguration(), keyFunction, routine,
+                                streamConfiguration.getInvocationMode()));
+                    }
+                });
     }
 
     /**
@@ -455,28 +417,21 @@ public class Operations {
             @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
                     backoffFunction) {
         ConstantConditions.notNull("function instance", backoffFunction);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            @SuppressWarnings("unchecked")
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return new BindRetry<IN, OUT>(
-                                        streamConfiguration.toChannelConfiguration(),
-                                        (Function<Channel<?, IN>, Channel<?, OUT>>) function,
-                                        backoffFunction);
-                            }
-                        });
-            }
-        };
+                    @SuppressWarnings("unchecked")
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return new BindRetry<IN, OUT>(streamConfiguration.toChannelConfiguration(),
+                                (Function<Channel<?, IN>, Channel<?, OUT>>) function,
+                                backoffFunction);
+                    }
+                });
     }
 
     /**
@@ -590,26 +545,20 @@ public class Operations {
             final long timeout, @NotNull final TimeUnit timeUnit) {
         ConstantConditions.notNull("time unit", timeUnit);
         ConstantConditions.notNegative("timeout value", timeout);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindTimeout<OUT>(
-                                        streamConfiguration.toChannelConfiguration(), timeout,
-                                        timeUnit));
-                            }
-                        });
-            }
-        };
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(
+                                new BindTimeout<OUT>(streamConfiguration.toChannelConfiguration(),
+                                        timeout, timeUnit));
+                    }
+                });
     }
 
     /**
@@ -648,27 +597,21 @@ public class Operations {
             @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
                     catchConsumer) {
         ConstantConditions.notNull("consumer instance", catchConsumer);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
-
-                            @SuppressWarnings("unchecked")
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindTryCatch<OUT>(
-                                        streamConfiguration.toChannelConfiguration(),
+                    @SuppressWarnings("unchecked")
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(
+                                new BindTryCatch<OUT>(streamConfiguration.toChannelConfiguration(),
                                         catchConsumer));
-                            }
-                        });
-            }
-        };
+                    }
+                });
     }
 
     /**
@@ -687,26 +630,50 @@ public class Operations {
     public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryFinally(
             @NotNull final Action finallyAction) {
         ConstantConditions.notNull("action instance", finallyAction);
-        return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
+        return new TransformationFunction<IN, OUT, OUT>(
+                new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>>() {
 
-            public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-                return builder.liftWithConfig(
-                        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-                                extends Channel<?, OUT>>>() {
+                    @SuppressWarnings("unchecked")
+                    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+                            final StreamConfiguration streamConfiguration,
+                            final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+                                    function) {
+                        return decorate(function).andThen(new BindTryFinally<OUT>(
+                                streamConfiguration.toChannelConfiguration(), finallyAction));
+                    }
+                });
+    }
 
-                            @SuppressWarnings("unchecked")
-                            public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                            apply(
-                                    final StreamConfiguration streamConfiguration,
-                                    final Function<? super Channel<?, IN>, ? extends Channel<?,
-                                            OUT>> function) {
-                                return decorate(function).andThen(new BindTryFinally<OUT>(
-                                        streamConfiguration.toChannelConfiguration(),
-                                        finallyAction));
-                            }
-                        });
-            }
-        };
+    /**
+     * Transformation function implementation.
+     *
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @param <AFTER> the new output type.
+     */
+    private static class TransformationFunction<IN, OUT, AFTER>
+            implements Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>> {
+
+        private final BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends
+                Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>
+                mLiftFunction;
+
+        /**
+         * Constructor.
+         *
+         * @param liftFunction the lifting function instance.
+         */
+        private TransformationFunction(
+                @NotNull final BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
+                        extends Channel<?, AFTER>>> liftFunction) {
+            mLiftFunction = liftFunction;
+        }
+
+        public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
+            return builder.liftWithConfig(mLiftFunction);
+        }
     }
 }

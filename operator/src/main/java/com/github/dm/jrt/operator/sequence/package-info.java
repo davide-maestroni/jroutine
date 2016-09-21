@@ -15,8 +15,8 @@
  */
 
 /**
- * Stream transformation utility classes.
+ * Utility classes for generating sequences of data.
  * <p>
- * Created by davide-maestroni on 07/07/2016.
+ * Created by davide-maestroni on 07/06/2016.
  */
-package com.github.dm.jrt.stream.operation;
+package com.github.dm.jrt.operator.sequence;

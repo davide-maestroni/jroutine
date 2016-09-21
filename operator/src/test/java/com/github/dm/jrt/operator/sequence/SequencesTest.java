@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.operator.producer;
+package com.github.dm.jrt.operator.sequence;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -33,17 +33,17 @@ import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.operator.producer.Producers.range;
-import static com.github.dm.jrt.operator.producer.Producers.sequence;
+import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.operator.sequence.Sequences.sequence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Producers unit tests.
+ * Sequences unit tests.
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class ProducersTest {
+public class SequencesTest {
 
     @Test
     public void testRange() {
@@ -151,7 +151,7 @@ public class ProducersTest {
     @Test
     public void testRangeEquals() {
         final Consumer<? extends Channel<? extends Number, ?>> range1 =
-                Producers.range(BigDecimal.ONE, 10);
+                Sequences.range(BigDecimal.ONE, 10);
         assertThat(range1).isEqualTo(range1);
         assertThat(range1).isNotEqualTo(null);
         assertThat(range1).isNotEqualTo("test");
@@ -160,7 +160,7 @@ public class ProducersTest {
         assertThat(range1.hashCode()).isEqualTo(range(BigDecimal.ONE, 10).hashCode());
 
         final Consumer<? extends Channel<? extends Number, ?>> range2 =
-                Producers.range(BigInteger.ONE, 10);
+                Sequences.range(BigInteger.ONE, 10);
         assertThat(range2).isEqualTo(range2);
         assertThat(range2).isNotEqualTo(null);
         assertThat(range2).isNotEqualTo("test");
@@ -168,7 +168,7 @@ public class ProducersTest {
         assertThat(range2).isEqualTo(range(BigInteger.ONE, 10));
         assertThat(range2.hashCode()).isEqualTo(range(BigInteger.ONE, 10).hashCode());
 
-        final Consumer<? extends Channel<? extends Number, ?>> range3 = Producers.range(1, 10);
+        final Consumer<? extends Channel<? extends Number, ?>> range3 = Sequences.range(1, 10);
         assertThat(range3).isEqualTo(range3);
         assertThat(range3).isNotEqualTo(null);
         assertThat(range3).isNotEqualTo("test");
@@ -176,7 +176,7 @@ public class ProducersTest {
         assertThat(range3).isEqualTo(range(1, 10));
         assertThat(range3.hashCode()).isEqualTo(range(1, 10).hashCode());
 
-        final Consumer<? extends Channel<? extends Number, ?>> range4 = Producers.range(1, 10, -2);
+        final Consumer<? extends Channel<? extends Number, ?>> range4 = Sequences.range(1, 10, -2);
         assertThat(range4).isEqualTo(range4);
         assertThat(range4).isNotEqualTo(null);
         assertThat(range4).isNotEqualTo("test");
@@ -191,7 +191,7 @@ public class ProducersTest {
             }
         };
         final Consumer<? extends Channel<? extends Character, ?>> range5 =
-                Producers.range('a', 'f', function);
+                Sequences.range('a', 'f', function);
         assertThat(range5).isEqualTo(range5);
         assertThat(range5).isNotEqualTo(null);
         assertThat(range5).isNotEqualTo("test");
@@ -204,7 +204,7 @@ public class ProducersTest {
     @SuppressWarnings("ConstantConditions")
     public void testRangeError() {
         try {
-            Producers.range(null, 'f', new Function<Character, Character>() {
+            Sequences.range(null, 'f', new Function<Character, Character>() {
 
                 public Character apply(final Character character) {
                     return (char) (character + 1);
@@ -216,7 +216,7 @@ public class ProducersTest {
         }
 
         try {
-            Producers.range('a', null, new Function<Character, Character>() {
+            Sequences.range('a', null, new Function<Character, Character>() {
 
                 public Character apply(final Character character) {
                     return (char) (character + 1);
@@ -228,28 +228,28 @@ public class ProducersTest {
         }
 
         try {
-            Producers.range('a', 'f', null);
+            Sequences.range('a', 'f', null);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Producers.range(null, 1, 1);
+            Sequences.range(null, 1, 1);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Producers.range(1, null, 1);
+            Sequences.range(1, null, 1);
             fail();
 
         } catch (final NullPointerException ignored) {
         }
 
         try {
-            Producers.range(1, 1, (Number) null);
+            Sequences.range(1, 1, (Number) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -279,14 +279,14 @@ public class ProducersTest {
         };
 
         try {
-            Producers.range(number, number, number);
+            Sequences.range(number, number, number);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
         }
 
         try {
-            Producers.range(number, number);
+            Sequences.range(number, number);
             fail();
 
         } catch (final IllegalArgumentException ignored) {

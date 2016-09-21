@@ -14,54 +14,48 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.operation;
+package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Timeout binding function.
+ * Try/catch binding function.
  * <p>
- * Created by davide-maestroni on 07/26/2016.
+ * Created by davide-maestroni on 05/07/2016.
  *
  * @param <OUT> the output data type.
  */
-class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
+class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
+
+    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
     private final ChannelConfiguration mConfiguration;
-
-    private final long mTimeout;
-
-    private final TimeUnit mTimeoutUnit;
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param timeout       the timeout value.
-     * @param timeUnit      the timeout unit.
+     * @param catchConsumer the error consumer instance.
      */
-    BindTimeout(@NotNull final ChannelConfiguration configuration, final long timeout,
-            @NotNull final TimeUnit timeUnit) {
+    BindTryCatch(@NotNull final ChannelConfiguration configuration,
+            @NotNull final BiConsumer<? super RoutineException, ? super
+                    Channel<OUT, ?>> catchConsumer) {
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mTimeout = ConstantConditions.notNegative("timeout value", timeout);
-        mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
+        mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
-        final ChannelConfiguration configuration = mConfiguration;
+    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
         final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        channel.bind(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
-                configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
+                JRoutineCore.io().apply(mConfiguration).buildChannel();
+        channel.bind(new TryCatchChannelConsumer<OUT>(mCatchConsumer, outputChannel));
         return outputChannel;
     }
 }

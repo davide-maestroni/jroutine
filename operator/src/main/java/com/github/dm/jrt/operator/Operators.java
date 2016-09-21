@@ -29,15 +29,20 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.Action;
+import com.github.dm.jrt.function.ActionDecorator;
 import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiConsumerDecorator;
 import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.BiFunctionDecorator;
 import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.ConsumerDecorator;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.PredicateDecorator;
 import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Utility class providing several operators implemented as invocation factories.
@@ -68,19 +71,19 @@ public class Operators {
             };
 
     private static final InvocationFactory<?, ?> sMax =
-            BinaryOperatorInvocation.functionFactory(Functions.max());
+            BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.max());
 
     private static final InvocationFactory<?, ?> sMin =
-            BinaryOperatorInvocation.functionFactory(Functions.min());
+            BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.min());
 
     private static final InvocationFactory<?, ?> sNone =
-            Functions.predicateFilter(Functions.negative());
+            Functions.predicateFilter(PredicateDecorator.negative());
 
     private static final InvocationFactory<?, ?> sNotNull =
-            Functions.predicateFilter(Functions.isNotNull());
+            Functions.predicateFilter(PredicateDecorator.isNotNull());
 
     private static final InvocationFactory<?, ?> sNull =
-            Functions.predicateFilter(Functions.isNull());
+            Functions.predicateFilter(PredicateDecorator.isNull());
 
     private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
             new MappingInvocation<Iterable<?>, Object>(null) {
@@ -109,7 +112,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> allMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AllMatchInvocationFactory<IN>(decorate(predicate));
+        return new AllMatchInvocationFactory<IN>(PredicateDecorator.decorate(predicate));
     }
 
     /**
@@ -123,7 +126,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> anyMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AnyMatchInvocationFactory<IN>(decorate(predicate));
+        return new AnyMatchInvocationFactory<IN>(PredicateDecorator.decorate(predicate));
     }
 
     /**
@@ -197,11 +200,13 @@ public class Operators {
      * @param <DATA>          the data type.
      * @return the invocation factory instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> appendAccept(final long count,
             @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new AppendConsumerInvocation<DATA>(count, decorate(outputsConsumer));
+        return new AppendConsumerInvocation<DATA>(count,
+                ConsumerDecorator.decorate(outputsConsumer));
     }
 
     /**
@@ -216,6 +221,7 @@ public class Operators {
      * @param outputsConsumer the consumer instance.
      * @param <DATA>          the data type.
      * @return the invocation factory instance.
+     * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> appendAccept(
@@ -239,7 +245,8 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> appendGet(final long count,
             @NotNull final Supplier<? extends DATA> outputSupplier) {
-        return new AppendSupplierInvocation<DATA>(count, decorate(outputSupplier));
+        return new AppendSupplierInvocation<DATA>(count,
+                SupplierDecorator.decorate(outputSupplier));
     }
 
     /**
@@ -374,7 +381,7 @@ public class Operators {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
-        return Functions.functionMapping(Functions.castTo(type));
+        return Functions.functionMapping(FunctionDecorator.castTo(type));
     }
 
     /**
@@ -444,8 +451,7 @@ public class Operators {
 
     /**
      * Returns a factory of invocations accumulating the outputs by adding them to the
-     * collections returned by
-     * the specified supplier.
+     * collections returned by the specified supplier.
      * <br>
      * The accumulated value will be passed as result only when the invocation completes.
      *
@@ -522,7 +528,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [(0, 2, 4, 6, 8, ..., N), (1, 3, 5, 7, 9, ..., N + 1)]
+     *         =&gt; [(0, 2, 4, 6, 8, ..., N), (1, 3, 5, 7, 9, ..., N + 1)]
      *     </code>
      * </pre>
      * <p>
@@ -537,7 +543,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(
             @NotNull final Function<DATA, Object> keyFunction) {
-        return new GroupByFunctionInvocationFactory<DATA>(decorate(keyFunction));
+        return new GroupByFunctionInvocationFactory<DATA>(FunctionDecorator.decorate(keyFunction));
     }
 
     /**
@@ -549,7 +555,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
+     *         =&gt; [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
      *     </code>
      * </pre>
      *
@@ -575,7 +581,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, PH)]
+     *         =? [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, placeholder)]
      *     </code>
      * </pre>
      *
@@ -662,7 +668,7 @@ public class Operators {
             return isNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef));
+        return Functions.predicateFilter(PredicateDecorator.isEqualTo(targetRef));
     }
 
     /**
@@ -675,7 +681,7 @@ public class Operators {
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> isInstanceOf(@NotNull final Class<?> type) {
-        return Functions.predicateFilter(Functions.isInstanceOf(type));
+        return Functions.predicateFilter(PredicateDecorator.isInstanceOf(type));
     }
 
     /**
@@ -693,7 +699,7 @@ public class Operators {
             return isNotNull();
         }
 
-        return Functions.predicateFilter(Functions.isEqualTo(targetRef).negate());
+        return Functions.predicateFilter(PredicateDecorator.isEqualTo(targetRef).negate());
     }
 
     /**
@@ -707,7 +713,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> isNotInstanceOf(
             @NotNull final Class<?> type) {
-        return Functions.predicateFilter(Functions.isInstanceOf(type).negate());
+        return Functions.predicateFilter(PredicateDecorator.isInstanceOf(type).negate());
     }
 
     /**
@@ -737,7 +743,7 @@ public class Operators {
             return isNotNull();
         }
 
-        return Functions.predicateFilter(Functions.isSameAs(targetRef).negate());
+        return Functions.predicateFilter(PredicateDecorator.isSameAs(targetRef).negate());
     }
 
     /**
@@ -766,7 +772,7 @@ public class Operators {
             return isNull();
         }
 
-        return Functions.predicateFilter(Functions.isSameAs(targetRef));
+        return Functions.predicateFilter(PredicateDecorator.isSameAs(targetRef));
     }
 
     /**
@@ -778,7 +784,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [0, 1, 2, 3, 4]
+     *         =&gt; [0, 1, 2, 3, 4]
      *     </code>
      * </pre>
      *
@@ -801,7 +807,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [5, 6, 7, 8, 9]
+     *         =&gt; [5, 6, 7, 8, 9]
      *     </code>
      * </pre>
      *
@@ -828,7 +834,7 @@ public class Operators {
     }
 
     /**
-     * Returns a factory of invocations returning the greater of the inputs as per by the specified
+     * Returns a factory of invocations returning the greater of the inputs as per the specified
      * comparator.
      *
      * @param comparator the comparator instance.
@@ -838,7 +844,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> maxBy(
             @NotNull final Comparator<? super DATA> comparator) {
-        return BinaryOperatorInvocation.functionFactory(Functions.maxBy(comparator));
+        return BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.maxBy(comparator));
     }
 
     /**
@@ -854,7 +860,7 @@ public class Operators {
     }
 
     /**
-     * Returns a factory of invocations returning the smaller of the inputs as per by the specified
+     * Returns a factory of invocations returning the smaller of the inputs as per the specified
      * comparator.
      *
      * @param comparator the comparator instance.
@@ -864,7 +870,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> minBy(
             @NotNull final Comparator<? super DATA> comparator) {
-        return BinaryOperatorInvocation.functionFactory(Functions.minBy(comparator));
+        return BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.minBy(comparator));
     }
 
     /**
@@ -890,7 +896,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> noneMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AllMatchInvocationFactory<IN>(decorate(predicate).negate());
+        return new AllMatchInvocationFactory<IN>(PredicateDecorator.decorate(predicate).negate());
     }
 
     /**
@@ -904,7 +910,7 @@ public class Operators {
     @NotNull
     public static <IN> InvocationFactory<IN, Boolean> notAllMatch(
             @NotNull final Predicate<? super IN> predicate) {
-        return new AnyMatchInvocationFactory<IN>(decorate(predicate).negate());
+        return new AnyMatchInvocationFactory<IN>(PredicateDecorator.decorate(predicate).negate());
     }
 
     /**
@@ -984,7 +990,8 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElseAccept(final long count,
             @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new OrElseConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
+        return new OrElseConsumerInvocationFactory<DATA>(count,
+                ConsumerDecorator.decorate(outputsConsumer));
     }
 
     /**
@@ -1022,7 +1029,8 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> orElseGet(final long count,
             @NotNull final Supplier<? extends DATA> outputSupplier) {
-        return new OrElseSupplierInvocationFactory<DATA>(count, decorate(outputSupplier));
+        return new OrElseSupplierInvocationFactory<DATA>(count,
+                SupplierDecorator.decorate(outputSupplier));
     }
 
     /**
@@ -1068,7 +1076,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> peekComplete(
             @NotNull final Action completeAction) {
-        return new PeekCompleteInvocation<DATA>(decorate(completeAction));
+        return new PeekCompleteInvocation<DATA>(ActionDecorator.decorate(completeAction));
     }
 
     /**
@@ -1084,7 +1092,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> peekError(
             @NotNull final Consumer<? super RoutineException> errorConsumer) {
-        return new PeekErrorInvocationFactory<DATA>(decorate(errorConsumer));
+        return new PeekErrorInvocationFactory<DATA>(ConsumerDecorator.decorate(errorConsumer));
     }
 
     /**
@@ -1100,7 +1108,7 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> peekOutput(
             @NotNull final Consumer<? super DATA> outputConsumer) {
-        return new PeekOutputInvocation<DATA>(decorate(outputConsumer));
+        return new PeekOutputInvocation<DATA>(ConsumerDecorator.decorate(outputConsumer));
     }
 
     /**
@@ -1188,11 +1196,13 @@ public class Operators {
      * @param <DATA>          the data type.
      * @return the invocation factory instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prependAccept(final long count,
             @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-        return new PrependConsumerInvocationFactory<DATA>(count, decorate(outputsConsumer));
+        return new PrependConsumerInvocationFactory<DATA>(count,
+                ConsumerDecorator.decorate(outputsConsumer));
     }
 
     /**
@@ -1208,6 +1218,7 @@ public class Operators {
      * @param outputsConsumer the consumer instance.
      * @param <DATA>          the data type.
      * @return the invocation factory instance.
+     * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prependAccept(
@@ -1233,7 +1244,8 @@ public class Operators {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> prependGet(final long count,
             @NotNull final Supplier<? extends DATA> outputSupplier) {
-        return new PrependSupplierInvocationFactory<DATA>(count, decorate(outputSupplier));
+        return new PrependSupplierInvocationFactory<DATA>(count,
+                SupplierDecorator.decorate(outputSupplier));
     }
 
     /**
@@ -1336,7 +1348,7 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceAccept(@Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
         return replaceIfAccept((target != null) ? PredicateDecorator.isEqualTo(target)
-                : PredicateDecorator.isNull(), decorate(replacementConsumer));
+                : PredicateDecorator.isNull(), BiConsumerDecorator.decorate(replacementConsumer));
     }
 
     /**
@@ -1352,7 +1364,7 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
         return replaceIfApply((target != null) ? PredicateDecorator.isEqualTo(target)
-                : PredicateDecorator.isNull(), decorate(replacementFunction));
+                : PredicateDecorator.isNull(), FunctionDecorator.decorate(replacementFunction));
     }
 
     /**
@@ -1368,7 +1380,7 @@ public class Operators {
     @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> replaceIf(
             @NotNull final Predicate<? super DATA> predicate, @Nullable final DATA replacement) {
-        return new ReplaceInvocation<DATA>(decorate(predicate), replacement);
+        return new ReplaceInvocation<DATA>(PredicateDecorator.decorate(predicate), replacement);
     }
 
     /**
@@ -1385,8 +1397,9 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceIfAccept(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-        return new ReplaceConsumerInvocation<DATA>(decorate((Predicate<Object>) predicate),
-                decorate(replacementConsumer));
+        return new ReplaceConsumerInvocation<DATA>(
+                PredicateDecorator.decorate((Predicate<Object>) predicate),
+                BiConsumerDecorator.decorate(replacementConsumer));
     }
 
     /**
@@ -1402,8 +1415,8 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceIfApply(
             @NotNull final Predicate<? super DATA> predicate,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-        return new ReplaceFunctionInvocation<DATA>(decorate(predicate),
-                decorate(replacementFunction));
+        return new ReplaceFunctionInvocation<DATA>(PredicateDecorator.decorate(predicate),
+                FunctionDecorator.decorate(replacementFunction));
     }
 
     /**
@@ -1436,7 +1449,7 @@ public class Operators {
             @Nullable final DATA target,
             @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
         return replaceIfAccept((target != null) ? PredicateDecorator.isSameAs(target)
-                : PredicateDecorator.isNull(), decorate(replacementConsumer));
+                : PredicateDecorator.isNull(), BiConsumerDecorator.decorate(replacementConsumer));
     }
 
     /**
@@ -1452,7 +1465,7 @@ public class Operators {
     public static <DATA> InvocationFactory<DATA, DATA> replaceSameApply(@Nullable final DATA target,
             @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
         return replaceIfApply((target != null) ? PredicateDecorator.isSameAs(target)
-                : PredicateDecorator.isNull(), decorate(replacementFunction));
+                : PredicateDecorator.isNull(), FunctionDecorator.decorate(replacementFunction));
     }
 
     /**
@@ -1463,7 +1476,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [5, 6, 7, ...]
+     *         =&gt; [5, 6, 7, ...]
      *     </code>
      * </pre>
      *
@@ -1485,7 +1498,7 @@ public class Operators {
      * <pre>
      *     <code>
      *
-     *         [0, 1, 2, 3, 4]
+     *         =&gt; [0, 1, 2, 3, 4]
      *     </code>
      * </pre>
      *
@@ -1732,7 +1745,8 @@ public class Operators {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> thenAccept(final long count,
             @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-        return new ThenConsumerInvocation<IN, OUT>(count, decorate(outputsConsumer));
+        return new ThenConsumerInvocation<IN, OUT>(count,
+                ConsumerDecorator.decorate(outputsConsumer));
     }
 
     /**
@@ -1770,7 +1784,8 @@ public class Operators {
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> thenGet(final long count,
             @NotNull final Supplier<? extends OUT> outputSupplier) {
-        return new ThenSupplierInvocation<IN, OUT>(count, decorate(outputSupplier));
+        return new ThenSupplierInvocation<IN, OUT>(count,
+                SupplierDecorator.decorate(outputSupplier));
     }
 
     /**
@@ -1849,8 +1864,8 @@ public class Operators {
     public static <IN, KEY, VALUE> InvocationFactory<? super IN, Map<KEY, VALUE>> toMap(
             @NotNull final Function<? super IN, KEY> keyFunction,
             @NotNull final Function<? super IN, VALUE> valueFunction) {
-        return new ToMapInvocationFactory<IN, KEY, VALUE>(decorate(keyFunction),
-                decorate(valueFunction));
+        return new ToMapInvocationFactory<IN, KEY, VALUE>(FunctionDecorator.decorate(keyFunction),
+                FunctionDecorator.decorate(valueFunction));
     }
 
     /**

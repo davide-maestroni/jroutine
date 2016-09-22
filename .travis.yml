@@ -3,6 +3,8 @@ sudo: false
 
 # Android environment setup
 language: android
+jdk:
+  - oraclejdk8
 android:
   components:
     # Platform tools
